@@ -1,0 +1,95 @@
+<launch>
+  <param name="arm_description" textfile="$(find sr_hand)/model/sr_arm_motor.urdf"/>
+  <param name="hand_description" textfile="$(find sr_hand)/model/shadowhand_motor.urdf"/>
+
+
+
+  <!--
+           shadowarm 
+                        -->
+  <node pkg="sr_hand" name="shadowarm"
+	type="shadowarm_virtual" >
+    <remap from="robot_description" to="arm_description"/>
+    <param name="shadowhand_prefix" type="string" value="sr_arm/" />
+    <param name="publish_frequency_diagnostics" type="double" value="1.0" />
+    <param name="publish_frequency" type="double" value="20.0" />
+  </node> 
+  <!-- Robot state publisher: publishes tf information regarding the 
+       positions of the arm -->
+  <node pkg="robot_state_publisher" type="state_publisher"
+	name="robot_state_publisher_pos_arm">      
+    <remap from="robot_description" to="arm_description"/>
+    <remap from="joint_states" to="/sr_arm/position/joint_states" />
+    <param name="publish_frequency" type="double" value="10.0" />
+    <param name="tf_prefix" type="string" value="sr_arm/position" />
+  </node>
+
+  <!-- Robot state publisher: publishes tf information regarding the 
+       targets of the arm -->
+  <node pkg="robot_state_publisher" type="state_publisher"
+	name="robot_state_publisher_target_arm">      
+    <remap from="robot_description" to="arm_description"/>
+    <remap from="joint_states" to="sr_arm/target/joint_states" />
+    <param name="publish_frequency" type="double" value="1.0" />
+    <param name="tf_prefix" type="string" value="sr_arm/target" />
+  </node>
+
+
+
+  <!--
+           shadowhand 
+                         -->
+  <node pkg="sr_hand" name="shadowhand"
+	type="shadowhand_virtual" >
+    <remap from="robot_description" to="hand_description"/>
+    <param name="shadowhand_prefix" type="string" value="srh/" />
+    <param name="publish_frequency_diagnostics" type="double" value="1.0" />
+    <param name="publish_frequency" type="double" value="20.0" />
+  </node>
+
+  <!-- Robot state publisher: publishes tf information regarding the 
+       position of the hand -->
+  <node pkg="robot_state_publisher" type="state_publisher"
+	name="srh_robot_state_publisher_pos">      
+    <remap from="robot_description" to="hand_description"/>
+    <remap from="joint_states" to="srh/position/joint_states" />
+    <param name="publish_frequency" type="double" value="10.0" />
+    <param name="tf_prefix" type="string" value="srh/position" />
+  </node>
+
+  <!-- Robot state publisher: publishes tf information regarding the 
+       targets of the hand -->
+  <node pkg="robot_state_publisher" type="state_publisher"
+	name="srh_robot_state_publisher_target">      
+    <remap from="robot_description" to="hand_description"/>
+    <remap from="joint_states" to="srh/target/joint_states" />
+    <param name="publish_frequency" type="double" value="1.0" />
+    <param name="tf_prefix" type="string" value="srh/target" />
+  </node>
+
+
+  <!--
+     publishes fixed transform: to link the arm and the hand
+     for both targets and positions + a fixed transform to a fixed 
+     point at 0 0 0, to remap the arm base for both positions and 
+     targets.
+                                                                    -->
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/shadowarm_base 100" />
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/shadowarm_base 100" /> 
+
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 -1.571 3.141 -1.571 /sr_arm/position/shadowarm_handsupport /srh/position/shadow_forearm 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 -1.571 3.141 -1.571 /sr_arm/target/shadowarm_handsupport /srh/target/shadow_forearm 100" />
+  
+  
+  <!--
+     Diagnostic Aggregator
+                          -->
+  
+  <node pkg="diagnostic_aggregator" type="aggregator_node"
+        name="sr_diagnostic_aggregator" >
+    <rosparam command="load" 
+              file="$(find sr_hand)/shadowhand_analyzer.yaml" />
+  </node>
+</launch>
+
+

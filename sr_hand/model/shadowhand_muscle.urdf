@@ -1,0 +1,1030 @@
+<robot name="shadowhand">
+  <link name="shadow_forearm">
+    <inertial>
+      <origin xyz="0 0 0" /> 
+      <mass value="3.0" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="3.142 0 0" /> 
+      <geometry name="shadow_forearm_geom">
+        <mesh filename="package://sr_hand/model/meshes/forearm_muscle.mesh" scale="0.016 0.016 0.016" />
+      </geometry>
+      <material name="shadow_forearm_material">
+	<color rgba="0.2 0.2 0.2 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.175" rpy="0 0 0" /> 
+      <geometry name="shadow_forearm_collision">
+        <cylinder radius="0.07" length="0.350"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="shadow_forearm">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="wrist" >
+    <inertial>
+      <origin xyz="0 0 0.396" rpy="0 0 6.284" />
+      <mass value="0.08" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" /> 
+    </inertial>
+    <visual>
+    <origin xyz="0 0 0" rpy="1.571 0 0" />
+    <geometry name="wrist_visual">
+    <mesh filename="package://sr_hand/model/meshes/wrist.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_wrist_material">
+	<color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="wrist_collision_geom">
+        <box size="0.02 0.02 0.02" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wrist">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="palm" >
+    <inertial>
+      <origin xyz="0 0.010 0.247" rpy="0 0 0" />
+      <mass value="0.08" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" /> 
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="palm_visual">
+    <mesh filename="package://sr_hand/model/meshes/palm.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_palm_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>      
+      <origin xyz="0.005 0 0.035" rpy="0 0 0" />
+      <geometry name="palm_collision_geom">
+        <box size="0.05 0.02 0.07" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="palm">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <!-- FIRST FINGER-->
+  <link name="ffknuckle">
+    <inertial>
+      <origin xyz="0.033 0 0.095" rpy="0 0 0" />
+      <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.0005" rpy="3.142 4.713 1.571" />
+       <geometry name="ffknuckle_visual">
+    <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_knuckle_material">
+	<color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="ffknuckle_collision_geom">
+        <box size="0.005 0.005 0.005" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="ffknuckle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="ffproximal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 1.571" />
+       <geometry name="ffproximal_visual">
+    <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_ffproximal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0225" rpy="0 0 0 " />
+      <geometry name="ffproximal_collision_geom">
+        <box size="0.005 0.005 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="ffproximal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="ffmiddle">
+    <inertial>
+      <origin xyz="0 0 0.045" rpy="0 0 0" />
+      <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="ffmiddle_visual">
+    <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_ffmiddle_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0125" rpy="0 0 0" />
+      <geometry name="ffmiddle_collision_geom">
+        <box size="0.005 0.005 0.010" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="ffmiddle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="ffdistal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0.025" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="ffdistal_visual">
+    <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_ffdistal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0 " />
+      <geometry name="ffdistal_collision_geom">
+        <box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="ffdistal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <!-- MIDDLE FINGER-->
+  <link name="mfknuckle">
+    <inertial>
+      <origin xyz="0.011 0 0.099" rpy="0 0 0" />
+      <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.0005" rpy="3.142 4.713 -1.571" />
+       <geometry name="mfknuckle_visual">
+    <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_knuckle_material">
+	<color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="mfknuckle_collision_geom">
+        <box size="0.005 0.005 0.005" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="mfknuckle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="mfproximal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 1.571" />
+       <geometry name="mfproximal_visual">
+    <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_mfproximal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0225" rpy="0 0 0 " />
+      <geometry name="mfproximal_collision_geom">
+        <box size="0.005 0.005 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="mfproximal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="mfmiddle">
+    <inertial>
+      <origin xyz="0 0 0.045" rpy="0 0 0" />
+      <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="mfmiddle_visual">
+    <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_mfmiddle_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0125" rpy="0 0 0" />
+      <geometry name="mfmiddle_collision_geom">
+        <box size="0.005 0.005 0.010" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="mfmiddle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="mfdistal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0.025" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="mfdistal_visual">
+    <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_mfdistal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0 " />
+      <geometry name="mfdistal_collision_geom">
+        <box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="mfdistal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <!-- RING FINGER-->
+ <link name="rfknuckle">
+    <inertial>
+      <origin xyz="-0.011 0 0.095" rpy="0 0 0" />
+     <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.0005" rpy="3.142 4.713 -1.571" />
+       <geometry name="rfknuckle_visual">
+    <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_knuckle_material">
+	<color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="rfknuckle_collision_geom">
+        <box size="0.005 0.005 0.005" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="rfknuckle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="rfproximal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 1.571" />
+       <geometry name="rfproximal_visual">
+    <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_rfproximal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0225" rpy="0 0 0 " />
+      <geometry name="rfproximal_collision_geom">
+        <box size="0.005 0.005 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="rfproximal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="rfmiddle">
+    <inertial>
+      <origin xyz="0 0 0.045" rpy="0 0 0" />
+      <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="rfmiddle_visual">
+    <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_rfmiddle_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0125" rpy="0 0 0" />
+      <geometry name="rfmiddle_collision_geom">
+        <box size="0.005 0.005 0.010" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="rfmiddle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="rfdistal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0.025" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="rfdistal_visual">
+    <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_rfdistal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0 " />
+      <geometry name="rfdistal_collision_geom">
+        <box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="rfdistal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+
+  <!-- LITTLE FINGER-->
+  <link name="lfmetacarpal">
+    <inertial>
+      <origin xyz="0.00568 0 -0.12061" rpy="0 0 0" />
+      <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+       <geometry name="lfmetacarpal_visual">
+    <mesh filename="package://sr_hand/model/meshes/lfmetacarpal.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_lfmetacarpal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.015 0 0.015" rpy="0 0 0" />
+      <geometry name="lfmetacarpal_collision_geom">
+        <box size="0.005 0.005 0.03" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="lfmetacarpal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+ <link name="lfknuckle">
+    <inertial>
+      <origin xyz="0 0 0.0425" rpy="0 0 0" />
+      <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.0005" rpy="3.142 4.713 -1.571" />
+       <geometry name="lfknuckle_visual">
+    <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_knuckle_material">
+	<color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="lfknuckle_collision_geom">
+        <box size="0.005 0.005 0.005" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="lfknuckle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="lfproximal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 1.571" />
+       <geometry name="lfproximal_visual">
+    <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_lfproximal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0225" rpy="0 0 0 " />
+      <geometry name="lfproximal_collision_geom">
+        <box size="0.005 0.005 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="lfproximal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="lfmiddle">
+    <inertial>
+      <origin xyz="0 0 0.045" rpy="0 0 0" />
+      <mass value="0.008" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="lfmiddle_visual">
+    <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_lfmiddle_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0125" rpy="0 0 0" />
+      <geometry name="lfmiddle_collision_geom">
+        <box size="0.005 0.005 0.010" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="lfmiddle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="lfdistal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0.025" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 4.713 0" />
+      <geometry name="lfdistal_visual">
+    <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_lfdistal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0 " />
+      <geometry name="lfdistal_collision_geom">
+        <box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="lfdistal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+
+  <!-- THUMB -->
+
+  <link name="thbase">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0.034 0.0085 0.02924" rpy="0 0 0"/> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+       <geometry name="thbase_visual">
+	<box size="0.001 0.001 0.001" />
+       </geometry>
+    <material name="shadow_thbase_material">
+	<color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0 " />
+      <geometry name="thbase_collision_geom">
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="thbase">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="thproximal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0" rpy="0 -0.7855 0"/> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+       <geometry name="thproximal_visual">
+    <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.01 0.01 0.01" />
+    </geometry>
+    <material name="shadow_thproximal_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0" />
+      <geometry name="thproximal_collision_geom">
+        <box size="0.005 0.005 0.02" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="thproximal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="thhub">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0.02687 0 0.02687" rpy="0 0 0"/> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+       <geometry name="thhub_visual">
+       <box size="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_thhub_material">
+	<color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0 " />
+      <geometry name="thhub_collision_geom">
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="thhub">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="thmiddle">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="0 0 0" rpy="0 -0.7855 0"/> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -1.571 0" />
+       <geometry name="thmiddle_visual">
+       <mesh filename="package://sr_hand/model/meshes/TH2_z.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_thmiddle_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.025" rpy="0 0 0 " />
+      <geometry name="thmiddle_collision_geom">
+        <box size="0.005 0.005 0.015" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="thmiddle">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <link name="thdistal">
+    <inertial>
+      <mass value="0.008" />
+      <origin xyz="-0.02263 0 0.02263" rpy="0 -0.7855 0"/> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+      izz="1.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="3.142 -1.571 3.142" />
+       <geometry name="thdistal_visual">
+       <mesh filename="package://sr_hand/model/meshes/TH1_z.mesh" scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="shadow_thmiddle_material">
+	<color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.025" rpy="0 0 0 " />
+      <geometry name="thmiddle_collision_geom">
+        <box size="0.015 0.015 0.015" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="thdistal">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  
+
+ <!--------------------------------
+|             JOINTS               |
+ ---------------------------------> 
+<!--
+  <joint name="elbow" type="revolute">
+    <parent link="world"/>
+    <child link="shadow_forearm"/>   
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.5707963267948966" upper="1.5707963267948966"
+    effort="10" velocity="1.0"/>
+  </joint>
+--> 
+  <joint name="WRJ2" type="revolute">
+    <parent link="shadow_forearm"/>
+    <child link="wrist"/>   
+    <origin xyz="0 0 0.396" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.52359877559829882" upper="0.17453292519943295"
+    effort="10" velocity="1.0"/>
+  </joint>
+  <gazebo reference="WRJ2">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+
+  <joint name="WRJ1" type="revolute">
+    <parent link="wrist"/>
+    <child link="palm"/>
+    <origin xyz="0 0 0.034" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.78539816339744828" upper="0.6108652381980153"
+    effort="10" velocity="1.0"/>
+  </joint>
+  <gazebo reference="WRJ1">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <!---------------
+     FIRST FINGER 
+    --------------->
+  <joint name="FFJ4" type="revolute">
+    <parent link="palm"/>
+    <child link="ffknuckle"/>
+    <origin xyz="0.033 0 0.095" rpy="0 0 0" />
+    <axis xyz="0 -1 0" />
+    <limit lower="-0.43633231299858238" upper="0.43633231299858238"
+    effort="10" velocity="1.0"/>
+  </joint>
+  <gazebo reference="FFJ4">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="FFJ3" type="revolute">
+    <parent link="ffknuckle"/>
+    <child link="ffproximal"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0"/>
+  </joint>
+  <gazebo reference="FFJ3">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="FFJ2" type="revolute">
+    <parent link="ffproximal"/>
+    <child link="ffmiddle"/>
+    <origin xyz="0 0 0.045" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0"/>
+  </joint>
+  <gazebo reference="FFJ2">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="FFJ1" type="revolute">
+    <parent link="ffmiddle"/>
+    <child link="ffdistal"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0"/>
+  </joint>
+  <gazebo reference="FFJ1">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <!---------------
+     MIDDLE FINGER 
+    --------------->
+
+  <joint name="MFJ4" type="revolute">
+    <parent link="palm"/>
+    <child link="mfknuckle"/>
+    <origin xyz="0.011 0 0.099" rpy="0 0 0" />
+    <axis xyz="0 -1 0" />
+    <limit lower="-0.43633231299858238" upper="0.43633231299858238"
+    effort="10" velocity="1.0"/>
+  </joint>
+  <gazebo reference="MFJ4">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="MFJ3" type="revolute">
+    <parent link="mfknuckle"/>
+    <child link="mfproximal"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0"/>
+  </joint>
+  <gazebo reference="MFJ3">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="MFJ2" type="revolute">
+    <parent link="mfproximal"/>
+    <child link="mfmiddle"/>
+    <origin xyz="0 0 0.045" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="MFJ2">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="MFJ1" type="revolute">
+    <parent link="mfmiddle"/>
+    <child link="mfdistal"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="MFJ1">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <!---------------
+     RING FINGER 
+    --------------->
+  <joint name="RFJ4" type="revolute">
+    <parent link="palm"/>
+    <child link="rfknuckle"/>
+    <origin xyz="-0.011 0 0.095" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.43633231299858238" upper="0.43633231299858238"
+    effort="10" velocity="1.0"/>
+  </joint>
+  <gazebo reference="RFJ4">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="RFJ3" type="revolute">
+    <parent link="rfknuckle"/>
+    <child link="rfproximal"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="RFJ3">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="RFJ2" type="revolute">
+    <parent link="rfproximal"/>
+    <child link="rfmiddle"/>
+    <origin xyz="0 0 0.045" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="RFJ2">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="RFJ1" type="revolute">
+    <parent link="rfmiddle"/>
+    <child link="rfdistal"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="RFJ1">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <!---------------
+     LITTLE FINGER 
+    --------------->
+
+  <joint name="LFJ5" type="revolute">
+    <parent link="palm"/>
+    <child link="lfmetacarpal"/>
+    <origin xyz="-0.01671 0 0.044" rpy="0 0 0" />
+    <axis xyz="0.57 0 0.82" />
+    <limit lower="0" upper="0.69813170079773179" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="LFJ5">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="LFJ4" type="revolute">
+    <parent link="lfmetacarpal"/>
+    <child link="lfknuckle"/>
+    <origin xyz="-0.01629 0 0.0425" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.43633231299858238" upper="0.43633231299858238"
+    effort="10" velocity="1.0"/>
+  </joint>
+  <gazebo reference="LFJ4">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="LFJ3" type="revolute">
+    <parent link="lfknuckle"/>
+    <child link="lfproximal"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="LFJ3">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="LFJ2" type="revolute">
+    <parent link="lfproximal"/>
+    <child link="lfmiddle"/>
+    <origin xyz="0 0 0.045" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="LFJ2">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="LFJ1" type="revolute">
+    <parent link="lfmiddle"/>
+    <child link="lfdistal"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.5707963267948966" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="LFJ1">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <!---------------
+     THUMB 
+    --------------->
+
+  <joint name="THJ5" type="revolute">
+    <parent link="palm"/>
+    <child link="thbase"/>
+    <origin xyz="0.034 -0.0085 0.02924" rpy="0 0.7855 0" />
+    <axis xyz="0 0 -1" />
+    <limit lower="-1.047" upper="1.047" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="THJ5">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="THJ4" type="revolute">
+    <parent link="thbase"/>
+    <child link="thproximal"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.309" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="THJ4">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="THJ3" type="revolute">
+    <parent link="thproximal"/>
+    <child link="thhub"/>
+    <origin xyz="0 0 0.038" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.2618" upper="0.2618" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="THJ3">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="THJ2" type="revolute">
+    <parent link="thhub"/>
+    <child link="thmiddle"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="0 -1 0" />
+    <limit lower="-0.5237" upper="0.5237" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="THJ2">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+  <joint name="THJ1" type="revolute">
+    <parent link="thmiddle"/>
+    <child link="thdistal"/>
+    <origin xyz="0 0 0.032" rpy="0 0 0" />
+    <axis xyz="0 -1 0" />
+    <limit lower="0" upper="1.571" effort="10"
+    velocity="1.0" />
+  </joint>
+  <gazebo reference="THJ1">
+    <material>Gazebo/GrassFloor</material>
+  </gazebo>
+
+</robot>
