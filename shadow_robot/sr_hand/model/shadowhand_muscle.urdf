@@ -9,6 +9,7 @@
       <origin xyz="0 0 0" rpy="3.142 0 0" /> 
       <geometry name="shadow_forearm_geom">
         <mesh filename="package://sr_hand/model/meshes/forearm_muscle.mesh" scale="0.016 0.016 0.016" />
+        <!--<cylinder radius="0.07" length="0.350"/>-->
       </geometry>
       <material name="shadow_forearm_material">
 	<color rgba="0.2 0.2 0.2 0.6"/>
@@ -22,7 +23,7 @@
     </collision>
   </link>
   <gazebo reference="shadow_forearm">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -50,7 +51,7 @@
     </collision>
   </link>
   <gazebo reference="wrist">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/White</material>
   </gazebo>
 
 
@@ -78,7 +79,7 @@
     </collision>
   </link>
   <gazebo reference="palm">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -107,7 +108,7 @@
     </collision>
   </link>
   <gazebo reference="ffknuckle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/White</material>
   </gazebo>
 
 
@@ -135,7 +136,7 @@
     </collision>
   </link>
   <gazebo reference="ffproximal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -163,7 +164,7 @@
     </collision>
   </link>
   <gazebo reference="ffmiddle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -191,7 +192,7 @@
     </collision>
   </link>
   <gazebo reference="ffdistal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -220,7 +221,7 @@
     </collision>
   </link>
   <gazebo reference="mfknuckle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/White</material>
   </gazebo>
 
 
@@ -248,7 +249,7 @@
     </collision>
   </link>
   <gazebo reference="mfproximal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -276,7 +277,7 @@
     </collision>
   </link>
   <gazebo reference="mfmiddle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -304,7 +305,7 @@
     </collision>
   </link>
   <gazebo reference="mfdistal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -333,7 +334,7 @@
     </collision>
   </link>
   <gazebo reference="rfknuckle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/White</material>
   </gazebo>
 
 
@@ -361,7 +362,7 @@
     </collision>
   </link>
   <gazebo reference="rfproximal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -389,7 +390,7 @@
     </collision>
   </link>
   <gazebo reference="rfmiddle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -417,7 +418,7 @@
     </collision>
   </link>
   <gazebo reference="rfdistal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -447,7 +448,7 @@
     </collision>
   </link>
   <gazebo reference="lfmetacarpal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -475,7 +476,7 @@
     </collision>
   </link>
   <gazebo reference="lfknuckle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/White</material>
   </gazebo>
 
 
@@ -503,7 +504,7 @@
     </collision>
   </link>
   <gazebo reference="lfproximal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -531,7 +532,7 @@
     </collision>
   </link>
   <gazebo reference="lfmiddle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -559,7 +560,7 @@
     </collision>
   </link>
   <gazebo reference="lfdistal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -590,7 +591,7 @@
     </collision>
   </link>
   <gazebo reference="thbase">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -618,7 +619,7 @@
     </collision>
   </link>
   <gazebo reference="thproximal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -646,7 +647,7 @@
     </collision>
   </link>
   <gazebo reference="thhub">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -674,7 +675,7 @@
     </collision>
   </link>
   <gazebo reference="thmiddle">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -702,24 +703,13 @@
     </collision>
   </link>
   <gazebo reference="thdistal">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
   
 
- <!--------------------------------
-|             JOINTS               |
- ---------------------------------> 
-<!--
-  <joint name="elbow" type="revolute">
-    <parent link="world"/>
-    <child link="shadow_forearm"/>   
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <axis xyz="0 0 1" />
-    <limit lower="-1.5707963267948966" upper="1.5707963267948966"
-    effort="10" velocity="1.0"/>
-  </joint>
---> 
+ <!-- JOINTS --> 
+
   <joint name="WRJ2" type="revolute">
     <parent link="shadow_forearm"/>
     <child link="wrist"/>   
@@ -729,7 +719,7 @@
     effort="10" velocity="1.0"/>
   </joint>
   <gazebo reference="WRJ2">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
 
@@ -742,12 +732,10 @@
     effort="10" velocity="1.0"/>
   </joint>
   <gazebo reference="WRJ1">
-    <material>Gazebo/GrassFloor</material>
+    <material>Gazebo/Grey</material>
   </gazebo>
 
-  <!---------------
-     FIRST FINGER 
-    --------------->
+<!-- FIRST FINGER -->
   <joint name="FFJ4" type="revolute">
     <parent link="palm"/>
     <child link="ffknuckle"/>
@@ -756,9 +744,6 @@
     <limit lower="-0.43633231299858238" upper="0.43633231299858238"
     effort="10" velocity="1.0"/>
   </joint>
-  <gazebo reference="FFJ4">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="FFJ3" type="revolute">
     <parent link="ffknuckle"/>
@@ -768,9 +753,6 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0"/>
   </joint>
-  <gazebo reference="FFJ3">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="FFJ2" type="revolute">
     <parent link="ffproximal"/>
@@ -780,9 +762,6 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0"/>
   </joint>
-  <gazebo reference="FFJ2">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="FFJ1" type="revolute">
     <parent link="ffmiddle"/>
@@ -792,13 +771,8 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0"/>
   </joint>
-  <gazebo reference="FFJ1">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
-  <!---------------
-     MIDDLE FINGER 
-    --------------->
+  <!-- MIDDLE FINGER -->
 
   <joint name="MFJ4" type="revolute">
     <parent link="palm"/>
@@ -808,9 +782,6 @@
     <limit lower="-0.43633231299858238" upper="0.43633231299858238"
     effort="10" velocity="1.0"/>
   </joint>
-  <gazebo reference="MFJ4">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="MFJ3" type="revolute">
     <parent link="mfknuckle"/>
@@ -820,9 +791,6 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0"/>
   </joint>
-  <gazebo reference="MFJ3">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="MFJ2" type="revolute">
     <parent link="mfproximal"/>
@@ -832,9 +800,6 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="MFJ2">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="MFJ1" type="revolute">
     <parent link="mfmiddle"/>
@@ -844,13 +809,8 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="MFJ1">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
-  <!---------------
-     RING FINGER 
-    --------------->
+  <!-- RING FINGER -->
   <joint name="RFJ4" type="revolute">
     <parent link="palm"/>
     <child link="rfknuckle"/>
@@ -859,9 +819,6 @@
     <limit lower="-0.43633231299858238" upper="0.43633231299858238"
     effort="10" velocity="1.0"/>
   </joint>
-  <gazebo reference="RFJ4">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="RFJ3" type="revolute">
     <parent link="rfknuckle"/>
@@ -871,9 +828,6 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="RFJ3">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="RFJ2" type="revolute">
     <parent link="rfproximal"/>
@@ -883,9 +837,6 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="RFJ2">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="RFJ1" type="revolute">
     <parent link="rfmiddle"/>
@@ -895,13 +846,8 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="RFJ1">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
-  <!---------------
-     LITTLE FINGER 
-    --------------->
+  <!-- LITTLE FINGER -->
 
   <joint name="LFJ5" type="revolute">
     <parent link="palm"/>
@@ -911,9 +857,6 @@
     <limit lower="0" upper="0.69813170079773179" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="LFJ5">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="LFJ4" type="revolute">
     <parent link="lfmetacarpal"/>
@@ -923,9 +866,6 @@
     <limit lower="-0.43633231299858238" upper="0.43633231299858238"
     effort="10" velocity="1.0"/>
   </joint>
-  <gazebo reference="LFJ4">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="LFJ3" type="revolute">
     <parent link="lfknuckle"/>
@@ -935,9 +875,6 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="LFJ3">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="LFJ2" type="revolute">
     <parent link="lfproximal"/>
@@ -947,9 +884,6 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="LFJ2">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="LFJ1" type="revolute">
     <parent link="lfmiddle"/>
@@ -959,13 +893,8 @@
     <limit lower="0" upper="1.5707963267948966" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="LFJ1">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
-  <!---------------
-     THUMB 
-    --------------->
+  <!-- THUMB -->
 
   <joint name="THJ5" type="revolute">
     <parent link="palm"/>
@@ -975,9 +904,6 @@
     <limit lower="-1.047" upper="1.047" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="THJ5">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="THJ4" type="revolute">
     <parent link="thbase"/>
@@ -987,9 +913,6 @@
     <limit lower="0" upper="1.309" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="THJ4">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="THJ3" type="revolute">
     <parent link="thproximal"/>
@@ -999,9 +922,6 @@
     <limit lower="-0.2618" upper="0.2618" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="THJ3">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="THJ2" type="revolute">
     <parent link="thhub"/>
@@ -1011,9 +931,6 @@
     <limit lower="-0.5237" upper="0.5237" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="THJ2">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
   <joint name="THJ1" type="revolute">
     <parent link="thmiddle"/>
@@ -1023,8 +940,5 @@
     <limit lower="0" upper="1.571" effort="10"
     velocity="1.0" />
   </joint>
-  <gazebo reference="THJ1">
-    <material>Gazebo/GrassFloor</material>
-  </gazebo>
 
 </robot>
