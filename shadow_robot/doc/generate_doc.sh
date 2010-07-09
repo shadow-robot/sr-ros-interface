@@ -6,7 +6,7 @@ cd `rospack find rosdoc`
 
 cd `rosstack find shadow_robot`
 
-echo cp -r `rospack find rosdoc`/doc doc/doxygen/
-cp -r `rospack find rosdoc`/doc/* doc/doxygen/
+echo cp -r `rospack find rosdoc`/doc doc/rosdoc/
+cp -r `rospack find rosdoc`/doc/* doc/rosdoc/
 
 echo "Doc generated and copied to doc/doxygen in shadow_robot stack."
