@@ -2,3 +2,9 @@ shadow_robot/sr_hand/build
 shadow_robot/doc/doxygen/sr_hand
 shadow_robot/doc/doxygen/sr_hand.pdf
 shadow_robot/doc/rosdoc/*
+shadow_robot/sr_hand/msg_gen
+shadow_robot/sr_hand/bin
+shadow_robot/sr_hand/msg/lisp
+shadow_robot/sr_hand/src/sr_hand/msg
+shadow_robot/sr_hand/bin/*
+shadow_robot/sr_hand/bin/examples/*
