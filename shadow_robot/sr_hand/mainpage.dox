@@ -11,8 +11,11 @@ It also contains an interface to Shadow Robot's muscle arm.
 
 
 \section howto How to use this interface
-Don't forget to add the path to the shadow_robot stack to your \p ROS_PACKAGE_PATH for the relevant packages to be 
-found by ROS.
+If you didn't pulled the branch in the stacks (.path/to/ros/stacks), don't forget to add the path to the shadow_robot stack to your \p ROS_PACKAGE_PATH for the relevant packages to be found by ROS. To do this, edit your .bashrc:
+after the line "source /path/to/ros/setup.sh", add :
+\verbatim
+export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:/path/to/shadow_robot
+\endverbatim
 
 \subsection virtualhand Virtual Hand
 To run the virtual Dextrous Hand, just compile the code: 
