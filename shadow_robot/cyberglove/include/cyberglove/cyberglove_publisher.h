@@ -18,6 +18,7 @@
 
 //messages
 #include <sensor_msgs/JointState.h>
+#include <boost/smart_ptr.hpp>
 #include "cyberglove/xml_calibration_parser.h"
 
 using namespace ros;
@@ -34,10 +35,10 @@ class CyberglovePublisher
   ~CyberglovePublisher(){};
 
   Publisher cyberglove_pub;
-  bool isPublishing;
   void initialize_calibration(std::string path_to_calibration);
   void publish();
-  
+  bool isPublishing();
+  void setPublishing(bool value);
  private:
   /////////////////
   //  CALLBACKS  //
@@ -47,6 +48,7 @@ class CyberglovePublisher
   NodeHandle node, n_tilde;
   Rate publish_rate;
   std::string path_to_glove;
+  bool publishing;
 
   ///the calibration parser
   xml_calibration_parser::XmlCalibrationParser calibration_parser;

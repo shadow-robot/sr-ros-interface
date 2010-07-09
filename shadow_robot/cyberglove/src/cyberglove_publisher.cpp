@@ -31,7 +31,7 @@ namespace cyberglove_publisher{
 /////////////////////////////////
 
 CyberglovePublisher::CyberglovePublisher()
-:  isPublishing(true), n_tilde("~"), publish_rate(0.0), path_to_glove("/dev/ttyS0")
+: n_tilde("~"), publish_rate(0.0), path_to_glove("/dev/ttyS0"), publishing(true)
 {
 
   std::string path_to_calibration;
@@ -104,13 +104,28 @@ void CyberglovePublisher::initialize_calibration(std::string path_to_calibration
   calibration_parser = XmlCalibrationParser(path_to_calibration);
 }
 
+bool CyberglovePublisher::isPublishing()
+{
+    if (publishing){
+        return true;
+        }
+    else{
+        ros::spinOnce();
+        publish_rate.sleep();
+        return false;
+    }
+}
+
+void CyberglovePublisher::setPublishing(bool value){
+    publishing = value;
+}
 
 /////////////////////////////////
 //       PUBLISH METHOD        //
 /////////////////////////////////
 void CyberglovePublisher::publish()
 {
-  if (!isPublishing) return;
+  //if (!publishing) return;
   //read the state of the glove button
   int gloveButtonState = -1;
   gloveButtonState =  read_button_value();
@@ -127,13 +142,13 @@ void CyberglovePublisher::publish()
   //if the glove button is off, then we don't read / sent position values
   if(gloveButtonState == 0)
   {
-    isPublishing = false;
+    publishing = false;
     ROS_DEBUG("The glove button is off, no data will be read / sent");
     ros::spinOnce();
     publish_rate.sleep();
     return;
   }
-  isPublishing = true;
+  publishing = true;
   //read data from the glove
   float* glovePositions;
   try

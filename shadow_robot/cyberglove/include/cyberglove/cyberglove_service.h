@@ -17,6 +17,7 @@
 #include "cyberglove_publisher.h"
 #include "cyberglove/Start.h"
 #include "cyberglove/Calibration.h"
+#include <boost/smart_ptr.hpp>
 
 //messages
 
@@ -28,15 +29,16 @@ class CybergloveService
 {
  public:
   /// Constructor
-    CybergloveService(cyberglove_publisher::CyberglovePublisher *publish);
+    CybergloveService(boost::shared_ptr<cyberglove_publisher::CyberglovePublisher> publish);
     //CybergloveService();
     bool start(cyberglove::Start::Request &req, cyberglove::Start::Response &res);
     bool calibration(cyberglove::Calibration::Request &req, cyberglove::Calibration::Response &res);
  private:
     
   NodeHandle node;
-  cyberglove_publisher::CyberglovePublisher *pub;
-  ros::ServiceServer service;
+  boost::shared_ptr<cyberglove_publisher::CyberglovePublisher> pub;
+  ros::ServiceServer service_start;
+  ros::ServiceServer service_calibration;
 };
 
 }
