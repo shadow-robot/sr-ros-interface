@@ -20,7 +20,7 @@
   <depend package="dynamic_reconfigure"/>
   <depend package="robot_monitor"/>
   <depend package="diagnostic_aggregator"/>
-  <depend package="robot_state_monitor"/>
+  <depend package="robot_state_publisher"/>
   <depend package="rviz"/>
   <export>
 	<cpp cflags="-I${prefix}/include"/>

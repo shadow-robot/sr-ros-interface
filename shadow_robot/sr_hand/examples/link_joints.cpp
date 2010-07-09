@@ -92,8 +92,14 @@ void callback(const sr_hand::joints_dataConstPtr& msg)
 
 }
 
-
-
+/** 
+ * The main: initialise a ros node, a subscriber and a publisher
+ * 
+ * @param argc 
+ * @param argv 
+ * 
+ * @return 0 on success
+ */
 int main(int argc, char** argv)
 {
   //init the ros node
@@ -116,4 +122,6 @@ int main(int argc, char** argv)
   //subscribe until interrupted.
   while( ros::ok() )
     ros::spin();
+
+  return 0;
 }

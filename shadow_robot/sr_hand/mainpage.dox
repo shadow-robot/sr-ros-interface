@@ -5,8 +5,8 @@
 \htmlinclude manifest.html
 
 \section introduction Introduction
-This ROS interface for the Dextrous Hand is a generic ROS interface used to access and experiment with Shadow Robot's
-hand. It can be used either for accessing the real hardware or use a virtual hand to test your algorithm / utilities.
+This is a generic ROS interface used to access and experiment with Shadow Robot's
+hardware. It can be used either for accessing the real hardware or use a virtual hand to test your algorithm / utilities.
 It also contains an interface to Shadow Robot's muscle arm.
 
 
@@ -126,7 +126,7 @@ You can find the documentation regarding the different publishers and the subscr
 shadowhand_publisher::ShadowhandPublisher, shadowhand_subscriber::ShadowhandSubscriber, 
 shadowhand_diagnosticer::ShadowhandDiagnosticer .
 
-The package also contains a python library to access the Dextrous Hand ROS interface through easy to use high level
+The package also contains a python library to access the ROS interface through easy to use high level
 python commands. Please refer to shadowhand_ros.py. This library is used to develop the sr_control_gui interface.
 
 \section examples Examples

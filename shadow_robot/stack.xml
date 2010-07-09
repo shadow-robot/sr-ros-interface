@@ -2,7 +2,7 @@
   <description brief="shadow_robot">
 
   This stack regroups the different ros interfaces developped for Shadow Robot's 
-  Hardware.
+  Hardware. It provides an interface to both simulated and real hardware.
 
   </description>
   <author>Maintained by Ugo Cupcic: ugo@shadowrobot.com, contact@shadowrobot.com</author>
