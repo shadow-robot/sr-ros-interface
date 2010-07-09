@@ -1,8 +1,12 @@
 import sys
-sys.path.append("python_hand_library/")
+#sys.path.append("python_hand_library/")
 import roslib; roslib.load_manifest("sr_control_gui")
+#roslib.load_manifest("cyberglove")
 import rospy
-#from Start.srv import *
+
+#Should be uncommented soon
+#from cyberglove.srv.Start.srv import *
+
 #import wx GUI
 import wx
 import subprocess
@@ -104,41 +108,54 @@ class Accessories(wx.StaticBox):
         """
         Modify the list of topics which may be related to accessories
         """
+        foundGlove = False
         for topic in self.liste : 
             if '/cyberglove' in topic :
-                self.cyberglove.append(topic)
+                foundGlove = True
             if '/cybergrasp' in topic :
                 self.cybergrasp.append(topic)  
         if len(self.cybergrasp) > 0 :
             self.cybergrasp[0:0] = ['Shutdown']
-        if len(self.cyberglove) > 0 :
-            self.cyberglove[0:0] = ['Shutdown']
+        #Should be uncommented if more than one glove is possible
+        #if len(self.cyberglove) > 0 :
+            #self.cyberglove[0:0] = ['Shutdown']
+        if foundGlove:
+            self.cyberglove.append("Stop")
+            self.cyberglove.append("Start")
+            
 
     def eventComboBox(self, event):
         """
         Binds the action of changing the value of any combobox
-
+        @todo : bind the topic changing, only the start/stop works
         @param event : the event thrown by the combobox
         """
         if event.GetId() == BOX_SEND:
             print self.sendup_cb.GetValue()
-            self.myShadowHand.setSendUpdate_topic(self.sendup_cb.GetValue())
+            self.myShadowHand.set_sendupdate_topic(self.sendup_cb.GetValue())
         if event.GetId() == BOX_DATA:
             print self.data_cb.GetValue()
-            self.myShadowHand.setShadowhand_data_topic(self.data_cb.GetValue())
+            self.myShadowHand.set_shadowhand_data_topic(self.data_cb.GetValue())
         if event.GetId() == BOX_GLOVE:
             #print self.glove_cb.GetValue()
             if self.glove_cb.GetCurrentSelection() == 0:
-                rospy.wait_for_service("cyberglove/start")
-                print "Service found"
-                try:
-                    start = rospy.ServiceProxy('cyberglove/start', Start)
-                    print "Service proxy created" 
-                    resp = start(False)
-                    return resp1.state
-                except rospy.ServiceException, e:
-                    print 'Failed to call start service'
+                #Bad way to call service, should be fixed soon
+                
+                process = subprocess.Popen("rosservice call cyberglove/start false".split(), stdout=subprocess.PIPE)
+                
+                #rospy.wait_for_service("cyberglove/start")
+                #print "Service found"
+                #try:
+                    #start = rospy.ServiceProxy('cyberglove/start', Start)
+                    #print "Service proxy created" 
+                    #resp = start(False)
+                    #return resp1.state
+                #except rospy.ServiceException, e:
+                    #print 'Failed to call start service'
                 #print "shutdown" 
+            else:
+                process = subprocess.Popen("rosservice call cyberglove/start true".split(), stdout=subprocess.PIPE)
+                
                 
         if event.GetId() == BOX_GRASP:
             print self.grasps_cb.GetValue()

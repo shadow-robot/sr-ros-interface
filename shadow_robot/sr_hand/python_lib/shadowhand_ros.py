@@ -67,17 +67,12 @@ class ShadowHand_ROS():
         self.isFirstMessage = True
         self.isFirstMessageArm = True
         self.isReady = False
-        self.toRecord=0
         self.liste = 0
         self.hasarm = 0
-        self.jointToRecord = 'None'
         self.dict_pos = {}
         self.dict_tar = {}
         self.dict_arm_pos = {}
         self.dict_arm_tar = {}
-        self.dict_record_pos = {}
-        self.dict_record_tar={}
-        self.dict_record_time={}
         rospy.init_node('python_hand_library')
         threading.Thread(None, rospy.spin)
 
@@ -92,15 +87,8 @@ class ShadowHand_ROS():
             for joint in self.lastMsg.joints_list : 
                 self.dict_pos[joint.joint_name]=joint.joint_position
                 self.dict_tar[joint.joint_name]=joint.joint_target
-            self.dict_record_pos[joint.joint_name]=[]
-            self.dict_record_tar[joint.joint_name]=[]
             self.isFirstMessage = False
             self.isReady = True
-        if self.toRecord > 0 : 
-            self.dict_record_pos[self.jointToRecord].append(self.dict_pos[self.jointToRecord])
-            self.dict_record_tar[self.jointToRecord].append(self.dict_tar)
-            self.dict_record_time[self.jointToRecord].append(rospy.Time.now())
-            toRecord = toRecord - 1
 
     def callback_arm(self, data):
         """
@@ -118,10 +106,8 @@ class ShadowHand_ROS():
     def __del__(self):
         print('Library deleted')
 
-    def close_connections(self):
-        print('Connection closed')
     
-    def setShadowhand_data_topic(self, topic):
+    def set_shadowhand_data_topic(self, topic):
         """
         @param topic: The new topic to be set as the hand publishing topic
         Set the library to listen to a new topic
@@ -129,7 +115,7 @@ class ShadowHand_ROS():
         print 'Changing subscriber to ' + topic 
         self.sub = rospy.Subscriber(topic, joints_data ,self.callback)
     
-    def setSendUpdate_topic(self, topic):
+    def set_sendupdate_topic(self, topic):
         """
         @param topic: The new topic to be set as the hand subscribing topic
         Set the library to publish to a new topic
@@ -281,68 +267,6 @@ class ShadowHand_ROS():
         """
         for key, value in self.dict_tar.items():
             self.sendupdate(jointName=key, angle=value)
-
-    def replay_hand_position_from_file(self, filename):
-        """
-        Depreciated, should not be used
-        """
-        dict_temp={}
-        objFile=open(filename,'r')
-        result = objFile.readlines()
-        for line in result : 
-            split=line.split()
-            name=split[0]
-            angle=split[1]
-            dict_temp[name]=angle
-        objFile.close()
-        self.sendupdate_from_dict(dict_temp)
-
-    def readRecordedData(self, jointName, recordingTimeInSeconds):
-        """
-        Depreciated, should not be used
-        """
-        ret = []
-        self.fileIsComplete(recordingTimeInSeconds*100)
-        """ Getting through only when ready"""
-        positions = dict_record_pos[jointName]
-        targets = dict_record_tar[jointName]
-        times = dict_record_time[jointName]            
-        for index in range(0, len(targets)) :
-            ret.append([int(times[i]), float(positions[i]), float(targets[i])])
-        minTime = ret[0][0]
-        for index in range(0, len(ret)) : 
-            ret[index][0] = float((ret[index][0]-minTime))/1000000000.0
-
-        return ret
-
-
-    def tune(self):
-        print('TODO')
-
-    def initializeJointsPosition(self):
-        print('TODO')
-
-    def saveContrlrSettings(self):
-        print('TODO')
-
-    def stepFunction(self):
-        self.sendupdate(joint.name, joint.min + 0.6*(joint.max - joint.min))
-
-    def smoothSinFunction(self, joint):
-        numberOfSteps = 500
-        for index in range(numberOfSteps):
-            theta = (float(index)/float(numberOfSteps)) * math.pi
-            mysinvalue = math.sin(theta)
-            self.sendupdate(joint.name, joint.min + mysinvalue*(joint.max - joint.min))
-            time.sleep(0.01)
-        return 0
-
-
-    def staircaseFunction(self):
-        for percentage in [0, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80,     0.90, 1.00, 0.90 , 0.80, 0.70, 0.60, 0.50, 0.40, 0.30, 0.20, 0.10, 0]:
-            self.sendupdate(joint.name, joint.min + percentage*(joint.max - joint.min))
-            time.sleep(0.25)
-        return 0
 
     def callVisualisationService(self, callList=0, reset = 0):
         """

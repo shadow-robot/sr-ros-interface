@@ -8,3 +8,10 @@ shadow_robot/sr_hand/msg/lisp
 shadow_robot/sr_hand/src/sr_hand/msg
 shadow_robot/sr_hand/bin/*
 shadow_robot/sr_hand/bin/examples/*
+shadow_robot/cyberglove/build
+shadow_robot/cyberglove/srv_gen
+shadow_robot/cyberglove/bin/cyberglove
+shadow_robot/cyberglove/srv/lisp
+shadow_robot/sr_control_gui/bin
+shadow_robot/sr_control_gui/build
+shadow_robot/cyberglove/src/cyberglove

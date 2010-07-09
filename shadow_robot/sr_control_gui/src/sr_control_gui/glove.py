@@ -1,6 +1,8 @@
 import sys
 sys.path.append("cyberglove/")
 import roslib; roslib.load_manifest('sr_control_gui')
+import rospy
+import subprocess
 #import wx GUI
 import wx
 
@@ -80,7 +82,14 @@ class Glove(wx.StaticBox):
         self.instruction.Wrap(180)
 
     def browseListener(self, event):
-        print self.button_browse.GetPath()
+        print "Loading calibration file : "+self.button_browse.GetPath()
+        #rospy.wait_for_service('/cyberglove/calibration')
+        #try:
+            #calib = rospy.ServiceProxy('cyberglove/calibration', Calibration)
+            #resp = calib(self.button_browse.GetPath())
+            #return resp.state
+        process = subprocess.Popen(("rosservice call cyberglove/calibration"+self.button.browse.GetPath()).split(), stdout=subprocess.PIPE)
+
 
     def loadCalibration(self):
         print "loading calibration"

@@ -10,10 +10,11 @@
  */
 
 #include <ros/ros.h>
-
+#include <time.h>
 #include "cyberglove/cyberglove_publisher.h"
 #include "cyberglove/cyberglove_service.h"
 #include "cyberglove/Start.h"
+#include <boost/smart_ptr.hpp>
 using namespace cyberglove_publisher;
 using namespace cyberglove_service;
 
@@ -36,13 +37,17 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "cyberglove_publisher");
   //NodeHandle n;
+  boost::shared_ptr<CyberglovePublisher> cyberglove_pub(new CyberglovePublisher());
 
-  CyberglovePublisher *cyberglove_pub = new CyberglovePublisher();
+  //CyberglovePublisher *cyberglove_pub = new CyberglovePublisher();
   CybergloveService service(cyberglove_pub);  
 
-  while( ok() )
+  while( ros::ok() )
     {
-      cyberglove_pub->publish();
+      if(cyberglove_pub->isPublishing()){
+        cyberglove_pub->publish();
+        }
+      //else{ros::spinOnce();sleep(100);}
     }
 
   return 0;
