@@ -5,7 +5,7 @@ import roslib; roslib.load_manifest("sr_control_gui")
 import rospy
 
 #Should be uncommented soon
-#from cyberglove.srv.Start.srv import *
+from cyberglove.srv import Start 
 
 #import wx GUI
 import wx
@@ -141,20 +141,25 @@ class Accessories(wx.StaticBox):
             if self.glove_cb.GetCurrentSelection() == 0:
                 #Bad way to call service, should be fixed soon
                 
-                process = subprocess.Popen("rosservice call cyberglove/start false".split(), stdout=subprocess.PIPE)
+                #process = subprocess.Popen("rosservice call cyberglove/start false".split(), stdout=subprocess.PIPE)
                 
-                #rospy.wait_for_service("cyberglove/start")
-                #print "Service found"
-                #try:
-                    #start = rospy.ServiceProxy('cyberglove/start', Start)
-                    #print "Service proxy created" 
-                    #resp = start(False)
-                    #return resp1.state
-                #except rospy.ServiceException, e:
-                    #print 'Failed to call start service'
-                #print "shutdown" 
+                rospy.wait_for_service("cyberglove/start")
+                try:
+                    start = rospy.ServiceProxy('cyberglove/start', Start)
+                    resp = start(False)
+                    return resp.state
+                except rospy.ServiceException, e:
+                    print 'Failed to call start service'
             else:
-                process = subprocess.Popen("rosservice call cyberglove/start true".split(), stdout=subprocess.PIPE)
+                rospy.wait_for_service("cyberglove/start")
+                try:
+                    start = rospy.ServiceProxy('cyberglove/start', Start)
+                    resp = start(True)
+                    return resp.state
+                except rospy.ServiceException, e:
+                    print 'Failed to call start service'
+                
+                #process = subprocess.Popen("rosservice call cyberglove/start true".split(), stdout=subprocess.PIPE)
                 
                 
         if event.GetId() == BOX_GRASP:

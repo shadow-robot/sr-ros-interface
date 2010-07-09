@@ -6,6 +6,7 @@ import subprocess
 #import wx GUI
 import wx
 
+from cyberglove.srv import Calibration
 from cyberglove_calibrer import CybergloveCalibrer
 
 class Glove(wx.StaticBox):
@@ -59,6 +60,7 @@ class Glove(wx.StaticBox):
         self.steps.Bind(wx.EVT_LISTBOX, self.stepListener)
         calib.Bind(wx.EVT_BUTTON, self.buttonListener)
         self.button_browse.Bind(wx.EVT_FILEPICKER_CHANGED,self.browseListener)
+        self.button_browse.Enable(False)
 
     def stepListener(self, event):
         index = event.GetSelection()
@@ -83,13 +85,12 @@ class Glove(wx.StaticBox):
 
     def browseListener(self, event):
         print "Loading calibration file : "+self.button_browse.GetPath()
-        #rospy.wait_for_service('/cyberglove/calibration')
-        #try:
-            #calib = rospy.ServiceProxy('cyberglove/calibration', Calibration)
-            #resp = calib(self.button_browse.GetPath())
-            #return resp.state
-        process = subprocess.Popen(("rosservice call cyberglove/calibration"+self.button.browse.GetPath()).split(), stdout=subprocess.PIPE)
+        rospy.wait_for_service('/cyberglove/calibration')
+        try:
+            calib = rospy.ServiceProxy('cyberglove/calibration', Calibration)
+            resp = calib(self.button_browse.GetPath())
+            return resp.state
+        except rospy.ServiceException, e:
+            print 'Failed to call start service'
+            
 
-
-    def loadCalibration(self):
-        print "loading calibration"
