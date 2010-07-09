@@ -1,4 +1,9 @@
 <robot name="shadowhand">
+
+  <gazebo reference="base">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  
   <link name="shadow_forearm">
     <inertial>
       <origin xyz="0 0 0" /> 
@@ -6,9 +11,10 @@
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
     </inertial>
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 1.571" /> 
+      <origin xyz="0 0 0.09" rpy="0 0 1.571" /> 
       <geometry name="shadow_forearm_geom">
-        <mesh filename="package://sr_hand/model/meshes/forearm.mesh" />
+        <!-- <mesh filename="package://sr_hand/model/meshes/forearm.mesh" /> -->
+	<cylinder radius="0.06" length="0.180" />
       </geometry>
       <material name="shadow_forearm_material">
 	<color rgba="0.2 0.2 0.2 0.6"/>
@@ -20,11 +26,13 @@
         <cylinder radius="0.06" length="0.180"/>
       </geometry>
     </collision>
-    <gazebo reference="shadow_forearm">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="shadow_forearm">
+    <mu1>10</mu1>
+    <mu2>10</mu2>
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
 
 
   <link name="wrist" >
@@ -49,11 +57,11 @@
         <box size="0.02 0.02 0.02" />
       </geometry>
     </collision>
-    <gazebo reference="wrist">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="wrist">
+    <material>Gazebo/White</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
 
 
   <link name="palm" >
@@ -78,12 +86,11 @@
         <box size="0.05 0.02 0.07" />
       </geometry>
     </collision>
-    <gazebo reference="palm">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
-  
+  <gazebo reference="palm">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
 
   <!-- FIRST FINGER-->
   <link name="ffknuckle">
@@ -108,11 +115,10 @@
         <box size="0.005 0.005 0.005" />
       </geometry>
     </collision>
-    <gazebo reference="ffknuckle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="ffknuckle">
+    <material>Gazebo/White</material>
+  </gazebo>
 
 
   <link name="ffproximal">
@@ -137,12 +143,11 @@
         <box size="0.005 0.005 0.04" />
       </geometry>
     </collision>
-    <gazebo reference="ffproximal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
-  
+  <gazebo reference="ffproximal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
 
   <link name="ffmiddle">
     <inertial>
@@ -166,12 +171,11 @@
         <box size="0.005 0.005 0.010" />
       </geometry>
     </collision>
-    <gazebo reference="ffmiddle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
-  
+  <gazebo reference="ffmiddle">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
 
   <link name="ffdistal">
     <inertial>
@@ -195,11 +199,10 @@
         <box size="0.015 0.015 0.020" />
       </geometry>
     </collision>
-    <gazebo reference="ffdistal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="ffdistal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <!-- MIDDLE FINGER-->
@@ -225,11 +228,10 @@
         <box size="0.005 0.005 0.005" />
       </geometry>
     </collision>
-    <gazebo reference="mfknuckle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="mfknuckle">
+    <material>Gazebo/White</material>
+  </gazebo>
 
 
   <link name="mfproximal">
@@ -254,11 +256,10 @@
         <box size="0.005 0.005 0.04" />
       </geometry>
     </collision>
-    <gazebo reference="mfproximal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="mfproximal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="mfmiddle">
@@ -283,11 +284,10 @@
         <box size="0.005 0.005 0.010" />
       </geometry>
     </collision>
-    <gazebo reference="mfmiddle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="mfmiddle">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="mfdistal">
@@ -312,11 +312,10 @@
         <box size="0.015 0.015 0.020" />
       </geometry>
     </collision>
-    <gazebo reference="mfdistal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="mfdistal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <!-- RING FINGER-->
@@ -342,11 +341,10 @@
         <box size="0.005 0.005 0.005" />
       </geometry>
     </collision>
-    <gazebo reference="rfknuckle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="rfknuckle">
+    <material>Gazebo/White</material>
+  </gazebo>
 
 
   <link name="rfproximal">
@@ -371,11 +369,10 @@
         <box size="0.005 0.005 0.04" />
       </geometry>
     </collision>
-    <gazebo reference="rfproximal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="rfproximal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="rfmiddle">
@@ -400,11 +397,10 @@
         <box size="0.005 0.005 0.010" />
       </geometry>
     </collision>
-    <gazebo reference="rfmiddle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="rfmiddle">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="rfdistal">
@@ -429,11 +425,10 @@
         <box size="0.015 0.015 0.020" />
       </geometry>
     </collision>
-    <gazebo reference="rfdistal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="rfdistal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
 
@@ -460,11 +455,10 @@
         <box size="0.005 0.005 0.03" />
       </geometry>
     </collision>
-    <gazebo reference="lfmetacarpal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="lfmetacarpal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
  <link name="lfknuckle">
@@ -489,11 +483,10 @@
         <box size="0.005 0.005 0.005" />
       </geometry>
     </collision>
-    <gazebo reference="lfknuckle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="lfknuckle">
+    <material>Gazebo/White</material>
+  </gazebo>
 
 
   <link name="lfproximal">
@@ -518,11 +511,10 @@
         <box size="0.005 0.005 0.04" />
       </geometry>
     </collision>
-    <gazebo reference="lfproximal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="lfproximal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="lfmiddle">
@@ -547,11 +539,10 @@
         <box size="0.005 0.005 0.010" />
       </geometry>
     </collision>
-    <gazebo reference="lfmiddle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="lfmiddle">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="lfdistal">
@@ -576,11 +567,10 @@
         <box size="0.015 0.015 0.020" />
       </geometry>
     </collision>
-    <gazebo reference="lfdistal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="lfdistal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
 
@@ -608,11 +598,10 @@
         <box size="0.001 0.001 0.001" />
       </geometry>
     </collision>
-    <gazebo reference="thbase">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="thbase">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="thproximal">
@@ -637,11 +626,10 @@
         <box size="0.005 0.005 0.02" />
       </geometry>
     </collision>
-    <gazebo reference="thproximal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="thproximal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="thhub">
@@ -666,11 +654,10 @@
         <box size="0.001 0.001 0.001" />
       </geometry>
     </collision>
-    <gazebo reference="thhub">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="thhub">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="thmiddle">
@@ -695,11 +682,10 @@
         <box size="0.005 0.005 0.015" />
       </geometry>
     </collision>
-    <gazebo reference="thmiddle">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="thmiddle">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
 
   <link name="thdistal">
@@ -724,27 +710,15 @@
         <box size="0.015 0.015 0.015" />
       </geometry>
     </collision>
-    <gazebo reference="thdistal">
-      <material>Gazebo/GrassFloor</material>
-      <selfCollide>true</selfCollide>
-    </gazebo>
   </link>
+  <gazebo reference="thdistal">
+    <material>Gazebo/Grey</material>
+  </gazebo>
 
   
 
- <!--------------------------------
-|             JOINTS               |
- ---------------------------------> 
-<!--
-  <joint name="elbow" type="revolute">
-    <parent link="world"/>
-    <child link="shadow_forearm"/>   
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <axis xyz="0 0 1" />
-    <limit lower="-1.5707963267948966" upper="1.5707963267948966"
-    effort="10" velocity="1.0"/>
-  </joint>
---> 
+ <!--|             JOINTS               |--> 
+ 
   <joint name="WRJ2" type="revolute">
     <parent link="shadow_forearm"/>
     <child link="wrist"/>   
@@ -764,9 +738,7 @@
     effort="10" velocity="1.0"/>
   </joint>
 
-  <!---------------
-     FIRST FINGER 
-    --------------->
+  <!-- FIRST FINGER -->
   <joint name="FFJ4" type="revolute">
     <parent link="palm"/>
     <child link="ffknuckle"/>
@@ -803,9 +775,7 @@
     velocity="1.0"/>
   </joint>
 
-  <!---------------
-     MIDDLE FINGER 
-    --------------->
+  <!-- MIDDLE FINGER -->
 
   <joint name="MFJ4" type="revolute">
     <parent link="palm"/>
@@ -843,9 +813,7 @@
     velocity="1.0" />
   </joint>
 
-  <!---------------
-     RING FINGER 
-    --------------->
+  <!-- RING FINGER -->
   <joint name="RFJ4" type="revolute">
     <parent link="palm"/>
     <child link="rfknuckle"/>
@@ -882,9 +850,7 @@
     velocity="1.0" />
   </joint>
 
-  <!---------------
-     LITTLE FINGER 
-    --------------->
+  <!-- LITTLE FINGER -->
 
   <joint name="LFJ5" type="revolute">
     <parent link="palm"/>
@@ -931,9 +897,7 @@
     velocity="1.0" />
   </joint>
 
-  <!---------------
-     THUMB 
-    --------------->
+  <!-- THUMB -->
 
   <joint name="THJ5" type="revolute">
     <parent link="palm"/>
