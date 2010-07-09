@@ -185,6 +185,7 @@ void read_values(float *dest) {
 
 //read the button value from the glove
 int read_button_value() {
+ return 1;
  restartButtonRead:
   tcflush(serial_port_fd, TCIFLUSH);
   tcflush(serial_port_fd, TCOFLUSH);
@@ -205,7 +206,7 @@ int read_button_value() {
 
 int setup_glove(const char* path_to_glove)
  {
-  open_board(path_to_glove);
+  /*open_board(path_to_glove);*/
 
   int i;
   for (i=0;i<GLOVE_SIZE;i++) 
@@ -225,11 +226,11 @@ int setup_glove(const char* path_to_glove)
 
 //! sample the glove values - need to call setup_glove first
 float* glove_get_values() {
-  read_values(values);
+  /*read_values(values);*/
 
   int i;
   for (i=0; i<GLOVE_SIZE; i++)
-    glove_positions[i] = values[i];
+    glove_positions[i] = 0.1f;
 
   return glove_positions;
 }
