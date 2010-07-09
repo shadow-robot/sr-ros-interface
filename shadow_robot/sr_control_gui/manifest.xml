@@ -11,6 +11,7 @@
   <depend package="sr_hand"/>
   <depend package="rospy"/>
   <depend package="sensor_msgs"/>
+  <depend package="cyberglove"/>
   <rosdep name="python-scipy"/>
   <export>
     <python path="${prefix}/src/cyberglove"/>
