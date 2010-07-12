@@ -34,7 +34,7 @@ class GraspsSaver(wx.StaticBox):
         self.rootPath = process.communicate()[0]
         self.rootPath = self.rootPath.split('\n')
         self.rootPath = self.rootPath[0]
-        print "path : "+self.rootPath
+        #print "path : "+self.rootPath
         self.myParser = GraspParser()
         self.myParser.parse_tree(self.rootPath+"/src/sr_control_gui/grasps.xml")
         self.grasp_interpoler1 = 0
