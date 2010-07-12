@@ -27,7 +27,7 @@ class ShadowHand_ROS():
         initializes the hand publisher and subscriber to the default 
         values of shadowhand_data and sendupdate 
         """
-        print "Creating good library"
+        #print "Creating good library"
         self.handJoints = [Joint("THJ1", "smart_motor_th1"), 
                            Joint("THJ2", "smart_motor_th2", -30, 30), 
                            Joint("THJ3", "smart_motor_th3",-15, 15),

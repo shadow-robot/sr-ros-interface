@@ -53,7 +53,8 @@ class VisualisationManager(wx.StaticBox):
         self.index = 0
         self.initData()
         self.drawVisualisationManager()
-
+        #UNCOMMENT WHEN SERVICE DONE
+        self.disable()
 
     def drawVisualisationManager(self):
         """
@@ -80,9 +81,11 @@ class VisualisationManager(wx.StaticBox):
             sizer_finger.Add(sizer_finger_temp)
 
         buttonpanel = wx.Panel(self.panel,-1)
-        stack = wx.Button(buttonpanel,BUTTON_STACK,label="Stack")
+        stack = wx.Button(buttonpanel,BUTTON_STACK,label="Add")
         stack.Bind(wx.EVT_BUTTON, self.buttonEvent)
+        stack.Enable(False)
         replace = wx.Button(buttonpanel,BUTTON_REPLACE,label="Replace")
+        replace.Enable(False)
         replace.Bind(wx.EVT_BUTTON, self.buttonEvent)
         rviz = wx.Button(buttonpanel, BUTTON_RVIZ, label="Rviz")
         rviz.Bind(wx.EVT_BUTTON, self.buttonEvent)
@@ -113,6 +116,19 @@ class VisualisationManager(wx.StaticBox):
         border.Add(self.sizer, 0, wx.ALL, 15)
         self.panel.SetSizer(border)
 
+    def disable(self):
+        """
+        Disable the checkboxes because visualisation is not implemented yet
+        """
+        self.hand_cb.Enable(False)
+        for key, cb in self.fingers_cb.items():
+            cb.Enable(False)
+        for key, liste in self.joints_cb.items():
+            for cb in liste:
+                cb.Enable(False)
+        for cb in self.information_cb:
+            cb.Enable(False)
+
     def buttonEvent(self, event):
         """
         Binds the 3 buttons to its action and calls the service to manage
@@ -142,8 +158,8 @@ class VisualisationManager(wx.StaticBox):
         if event.GetId() == BUTTON_RXCONSOLE:
             subprocess.Popen("rxconsole".split())
         if event.GetId() == BUTTON_MONITOR:
-            subprocess.Popen("rosrun robot_monitor robot_monitor".split())
-    
+            subprocess.Popen("rosrun robot_monitor robot_monitor".split())    
+
     def checkBoxEvent(self, event):
         """
         Handles the consistency of the joints checked
