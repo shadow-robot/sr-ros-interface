@@ -14,7 +14,7 @@
   <depend package="cyberglove"/>
   <rosdep name="python-scipy"/>
   <export>
-    <python path="${prefix}/src/cyberglove"/>
+    <python path="${prefix}/src/sr_control_gui/cyberglove"/>
     <rosdoc config="rosdoc.yaml" />
   </export>
 </package>
