@@ -12,13 +12,8 @@
   <depend package="cyberglove"/>
   <rosdep name="python-scipy"/>
   <export>
-<<<<<<< TREE
+    <rosdoc config="rosdoc.yaml" />
     <python path="${prefix}/src/sr_control_gui/cyberglove"/>
-    <rosdoc config="rosdoc.yaml" />
-=======
-    <rosdoc config="rosdoc.yaml" />
-    <python path="${prefix}/src/cyberglove"/>
->>>>>>> MERGE-SOURCE
   </export>
 </package>
 
