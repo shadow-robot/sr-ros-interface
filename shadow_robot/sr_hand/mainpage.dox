@@ -141,7 +141,7 @@ rosmake gazebo_worlds
 
 You then need to start gazebo:
 \verbatim
-roslaunch gazebo_worlds empty_world.launch
+roslaunch sr_hand empty_world.launch
 \endverbatim
 
 You can then spawn the hand model in gazebo:
