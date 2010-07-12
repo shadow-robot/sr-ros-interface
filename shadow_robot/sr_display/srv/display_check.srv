@@ -1,5 +1,0 @@
-string joint_name
-string attr_name
-int8 display
----
-int8 success
