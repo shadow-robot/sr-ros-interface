@@ -21,12 +21,21 @@ class Glove(wx.StaticBox):
         self.joints_names = {}
         self.current_instruction = 0
         self.button_browse = 0
+        process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
+        self.new_Path = process.communicate()[0]
+        self.new_Path = self.new_Path.split('\n')
+        self.new_Path = self.new_Path[0]
         self.drawGlove()
 
     def drawGlove(self):
-        sizer = wx.FlexGridSizer(rows=1, cols=4, hgap = 20, vgap=10)
+        sizer = wx.FlexGridSizer(rows=2, cols=4, hgap = 20, vgap=10)
+        sizer.Add(wx.StaticText(self.panel,-1,"Path to save calibration : "))
+        self.new_Path = wx.TextCtrl(self.panel, -1, self.new_Path+"/param/new_calibration.cal")
+        sizer.Add(self.new_Path, flag=wx.EXPAND)
+        sizer.Add(wx.Panel(self.panel,-1))
+        sizer.Add(wx.Panel(self.panel,-1))
         self.instruction = wx.StaticText(self.panel,-1,"Instruction : ",size=(180,200))
-                
+              
 
         grasps = wx.FlexGridSizer(rows=2, cols=1)
         grasps.Add(wx.StaticText(self.panel,-1,"Steps : "))
@@ -60,7 +69,7 @@ class Glove(wx.StaticBox):
         self.steps.Bind(wx.EVT_LISTBOX, self.stepListener)
         calib.Bind(wx.EVT_BUTTON, self.buttonListener)
         self.button_browse.Bind(wx.EVT_FILEPICKER_CHANGED,self.browseListener)
-        self.button_browse.Enable(False)
+        #self.button_browse.Enable(False)
 
     def stepListener(self, event):
         index = event.GetSelection()
@@ -82,13 +91,29 @@ class Glove(wx.StaticBox):
                 if self.calib.is_step_done(joint):
                     self.joints_names[joint].SetForegroundColour(wx.GREEN)
         self.instruction.Wrap(180)
+        if self.calib.all_steps_done():
+            print "All steps done, saving."
+            self.calib.write_calibration_file(self.new_Path.GetValue())
+            dialog = wx.MessageDialog(self.panel,"Calibration successful, do you want to load it ?", style = wx.YES_NO | wx.ICON_QUESTION)
+            if dialog.ShowModal() == wx.YES:
+                rospy.wait_for_service('/cyberglove/calibration')
+                try:
+                    calib = rospy.ServiceProxy('cyberglove/calibration', Calibration)
+                    path = self.new_Path.GetValue().encode("iso-8859-1")
+                    resp = calib(path)
+                    return resp.state
+                except rospy.ServiceException, e:
+                    print 'Failed to call start service'
+                
+        
 
     def browseListener(self, event):
         print "Loading calibration file : "+self.button_browse.GetPath()
         rospy.wait_for_service('/cyberglove/calibration')
         try:
             calib = rospy.ServiceProxy('cyberglove/calibration', Calibration)
-            resp = calib(self.button_browse.GetPath())
+            path = self.button_browse.GetPath().encode("iso-8859-1")
+            resp = calib(path)
             return resp.state
         except rospy.ServiceException, e:
             print 'Failed to call start service'

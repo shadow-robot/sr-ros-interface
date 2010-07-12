@@ -22,7 +22,7 @@ class Cyberglove:
     """
     def __init__(self, max_values = 50):
         self.joints = { "G_ThumbRotate": Joint(),
-                        "G_ThumbMPI": Joint(),
+                        "G_ThumbMPJ": Joint(),
                         "G_ThumbIJ": Joint(),
                         "G_ThumbAb": Joint(),
                         "G_IndexMPJ": Joint(),
