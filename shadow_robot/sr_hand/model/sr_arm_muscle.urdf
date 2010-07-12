@@ -3,7 +3,7 @@
   <link name="shadowarm_base">
     <inertial>
       <origin xyz="0 0 0.005" rpy="0 0 0"/> 
-      <mass value="0.5" />
+      <mass value="1000" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
     </inertial>
     <visual>
@@ -22,6 +22,10 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="shadowarm_base">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
   
   <link name="shadowarm_trunk">
     <inertial>
@@ -45,6 +49,10 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="shadowarm_trunk">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
   
   <joint name="trunk_rotation" type="revolute">
     <parent link="shadowarm_base"/>
@@ -57,7 +65,7 @@
   
   <link name="shadowarm_upperarm">
     <inertial>
-      <origin xyz="0.1845 -0.067 0" rpy="0 1.571 0" />
+      <origin xyz="0.1845 -0.067 0" rpy="0 0 0" />
       <mass value="5" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
     </inertial>
@@ -77,6 +85,10 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="shadowarm_upperarm">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
   
   <joint name="shoulder_rotation" type="revolute">
     <parent link="shadowarm_trunk"/>
@@ -89,7 +101,7 @@
   
   <link name="shadowarm_lowerarm">
     <inertial>
-      <origin xyz="0.0655 0 -0.08" rpy="0 1.571 0" />
+      <origin xyz="0.0655 0 -0.08" rpy="0 0 0" />
       <mass value="5" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
     </inertial>
@@ -109,6 +121,10 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="shadowarm_lowerarm">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
   
   <joint name="elbow_abduction" type="revolute">
     <parent link="shadowarm_upperarm"/>
@@ -121,7 +137,7 @@
   
   <link name="shadowarm_handsupport">
     <inertial>
-      <origin xyz="0 0 0" rpy="0 1.571 0" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
       <mass value="1" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
     </inertial>
@@ -141,6 +157,10 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="shadowarm_handsupport">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
   
   <joint name="forearm_rotation" type="revolute">
     <parent link="shadowarm_lowerarm"/>

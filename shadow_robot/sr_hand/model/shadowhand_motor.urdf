@@ -28,8 +28,6 @@
     </collision>
   </link>
   <gazebo reference="shadow_forearm">
-    <mu1>10</mu1>
-    <mu2>10</mu2>
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
