@@ -1,21 +1,19 @@
 <package>
   <description brief="Control interface for Shadow hardware">
-
-  sr_control_gui is a graphic application which integrates anything needed by the end-user to control the hand. 
-
+    sr_control_gui is a graphic application which integrates anything needed by the end-user to control the hand. 
   </description>
   <author>Sacha Aury, Ugo Cupcic / ugo@shadowrobot.com, contact@shadowrobot.com</author>
   <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://www.shadowrobot.com</url>
-  <depend package="sr_hand"/>
   <depend package="rospy"/>
+  <depend package="sr_hand"/>
   <depend package="sensor_msgs"/>
   <depend package="cyberglove"/>
   <rosdep name="python-scipy"/>
   <export>
-    <python path="${prefix}/src/cyberglove"/>
     <rosdoc config="rosdoc.yaml" />
+    <python path="${prefix}/src/cyberglove"/>
   </export>
 </package>
 
