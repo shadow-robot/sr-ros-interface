@@ -32,7 +32,7 @@ class CyberglovePublisher
   CyberglovePublisher();
   
   /// Destructor
-  ~CyberglovePublisher(){};
+  ~CyberglovePublisher();
 
   Publisher cyberglove_pub;
   void initialize_calibration(std::string path_to_calibration);
@@ -61,6 +61,9 @@ class CyberglovePublisher
   void add_jointstate(float position, std::string joint_name);
 
   std::vector<float> calibration_values;
+
+  float* glovePositions;
+
 }; // end class CyberglovePublisher
 
 } // end namespace
