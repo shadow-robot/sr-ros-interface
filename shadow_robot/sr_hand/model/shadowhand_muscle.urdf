@@ -6,10 +6,10 @@
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
     </inertial>
     <visual>
-      <origin xyz="0 0 0" rpy="3.142 0 0" /> 
+      <origin xyz="0 0 0" rpy="1.572 0 0" /> 
       <geometry name="shadow_forearm_geom">
         <mesh filename="package://sr_hand/model/meshes/forearm_muscle.mesh" scale="0.016 0.016 0.016" />
-        <!--<cylinder radius="0.07" length="0.350"/>-->
+        <!--<mesh filename="package://sr_hand/model/raw/Cylinder.004.mesh" scale="0.016 0.016 0.016" /> -->
       </geometry>
       <material name="shadow_forearm_material">
 	<color rgba="0.2 0.2 0.2 0.6"/>
@@ -29,8 +29,8 @@
 
   <link name="wrist" >
     <inertial>
-      <origin xyz="0 0 0.396" rpy="0 0 6.284" />
-      <mass value="0.08" />
+      <origin xyz="0 0 0.396" rpy="0 0 0" />
+      <mass value="0.3" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" /> 
     </inertial>
@@ -58,7 +58,7 @@
   <link name="palm" >
     <inertial>
       <origin xyz="0 0.010 0.247" rpy="0 0 0" />
-      <mass value="0.08" />
+      <mass value="0.3" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" /> 
     </inertial>
@@ -114,7 +114,7 @@
 
   <link name="ffproximal">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.014" />
       <origin xyz="0 0 0" /> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -143,7 +143,7 @@
   <link name="ffmiddle">
     <inertial>
       <origin xyz="0 0 0.045" rpy="0 0 0" />
-      <mass value="0.008" />
+      <mass value="0.012" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
     </inertial>
@@ -170,7 +170,7 @@
 
   <link name="ffdistal">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.010" />
       <origin xyz="0 0 0.025" /> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -227,7 +227,7 @@
 
   <link name="mfproximal">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.014" />
       <origin xyz="0 0 0" /> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -256,7 +256,7 @@
   <link name="mfmiddle">
     <inertial>
       <origin xyz="0 0 0.045" rpy="0 0 0" />
-      <mass value="0.008" />
+      <mass value="0.012" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
     </inertial>
@@ -283,7 +283,7 @@
 
   <link name="mfdistal">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.010" />
       <origin xyz="0 0 0.025" /> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -340,7 +340,7 @@
 
   <link name="rfproximal">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.014" />
       <origin xyz="0 0 0" /> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -369,7 +369,7 @@
   <link name="rfmiddle">
     <inertial>
       <origin xyz="0 0 0.045" rpy="0 0 0" />
-      <mass value="0.008" />
+      <mass value="0.012" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
     </inertial>
@@ -396,7 +396,7 @@
 
   <link name="rfdistal">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.010" />
       <origin xyz="0 0 0.025" /> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -427,7 +427,7 @@
   <link name="lfmetacarpal">
     <inertial>
       <origin xyz="0.00568 0 -0.12061" rpy="0 0 0" />
-      <mass value="0.008" />
+      <mass value="0.075" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
     </inertial>
@@ -482,7 +482,7 @@
 
   <link name="lfproximal">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.014" />
       <origin xyz="0 0 0" /> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -511,7 +511,7 @@
   <link name="lfmiddle">
     <inertial>
       <origin xyz="0 0 0.045" rpy="0 0 0" />
-      <mass value="0.008" />
+      <mass value="0.012" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
     </inertial>
@@ -538,7 +538,7 @@
 
   <link name="lfdistal">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.010" />
       <origin xyz="0 0 0.025" /> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -569,7 +569,7 @@
 
   <link name="thbase">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.010" />
       <origin xyz="0.034 0.0085 0.02924" rpy="0 0 0"/> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -597,8 +597,8 @@
 
   <link name="thproximal">
     <inertial>
-      <mass value="0.008" />
-      <origin xyz="0 0 0" rpy="0 -0.7855 0"/> 
+      <mass value="0.016" />
+      <origin xyz="0 0 0" rpy="0 0 0"/> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
     </inertial>
@@ -625,7 +625,7 @@
 
   <link name="thhub">
     <inertial>
-      <mass value="0.008" />
+      <mass value="0.002" />
       <origin xyz="0.02687 0 0.02687" rpy="0 0 0"/> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
@@ -653,8 +653,8 @@
 
   <link name="thmiddle">
     <inertial>
-      <mass value="0.008" />
-      <origin xyz="0 0 0" rpy="0 -0.7855 0"/> 
+      <mass value="0.016" />
+      <origin xyz="0 0 0" rpy="0 0 0"/> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
     </inertial>
@@ -681,8 +681,8 @@
 
   <link name="thdistal">
     <inertial>
-      <mass value="0.008" />
-      <origin xyz="-0.02263 0 0.02263" rpy="0 -0.7855 0"/> 
+      <mass value="0.016" />
+      <origin xyz="-0.02263 0 0.02263" rpy="0 0 0"/> 
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
       izz="1.0" />
     </inertial>
