@@ -1,0 +1,17 @@
+<package>
+  <description brief="threeD_mouse">
+
+     threeD_mouse
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/threeD_mouse</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="std_msgs"/>
+
+</package>
+
+
