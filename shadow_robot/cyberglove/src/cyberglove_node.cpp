@@ -38,8 +38,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "cyberglove_publisher");
   //NodeHandle n;
   boost::shared_ptr<CyberglovePublisher> cyberglove_pub(new CyberglovePublisher());
-
-  //CyberglovePublisher *cyberglove_pub = new CyberglovePublisher();
+  
   CybergloveService service(cyberglove_pub);  
 
   while( ros::ok() )
