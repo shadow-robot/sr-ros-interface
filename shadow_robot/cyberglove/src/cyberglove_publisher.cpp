@@ -120,6 +120,13 @@ namespace cyberglove_publisher{
       }
     else
       {
+	//check if the value was read
+	if( checkGloveState() )
+	  {
+	    ROS_INFO("The glove button was switched on, starting to publish data.");
+	    publishing = true;
+	  }
+	
 	ros::spinOnce();
 	publish_rate.sleep();
 	return false;
@@ -137,28 +144,15 @@ namespace cyberglove_publisher{
   {
     //if (!publishing) return;
     //read the state of the glove button
-    int gloveButtonState = -1;
-    gloveButtonState =  read_button_value();
-
-    //check if the value was read
-    if(gloveButtonState == -1)
-      {
-	ROS_ERROR("The glove button state value couldn't be read.");
-	ros::spinOnce();
-	publish_rate.sleep();
-	return;
-      }
-
-    //if the glove button is off, then we don't read / sent position values
-    if(gloveButtonState == 0)
+    if( !checkGloveState() )
       {
 	publishing = false;
-	ROS_DEBUG("The glove button is off, no data will be read / sent");
+	ROS_INFO("The glove button is off, no data will be read / sent");
 	ros::spinOnce();
 	publish_rate.sleep();
 	return;
       }
-    publishing = true;
+
     //read data from the glove
     try
       {
@@ -207,6 +201,24 @@ namespace cyberglove_publisher{
     //set velocity to 0. 
     //@TODO : send the correct velocity ?
     jointstate_msg.velocity.push_back(0.0);
+  }
+
+  bool CyberglovePublisher::checkGloveState()
+  {
+    int gloveButtonState = -1;
+    gloveButtonState =  read_button_value();
+    
+    //check if the value was read
+    switch( gloveButtonState)
+      {
+      case 0:
+	return false;
+      case 1:
+	return true;
+      default:
+	ROS_ERROR("The glove button state value couldn't be read.");
+	return false;
+      }
   }
 
 }// end namespace

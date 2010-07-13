@@ -18,7 +18,6 @@
 
 //messages
 #include <sensor_msgs/JointState.h>
-#include <boost/smart_ptr.hpp>
 #include "cyberglove/xml_calibration_parser.h"
 
 using namespace ros;
@@ -63,6 +62,8 @@ class CyberglovePublisher
   std::vector<float> calibration_values;
 
   float* glovePositions;
+
+  bool checkGloveState();
 
 }; // end class CyberglovePublisher
 
