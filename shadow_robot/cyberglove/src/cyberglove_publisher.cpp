@@ -101,12 +101,8 @@ namespace cyberglove_publisher{
 
   CyberglovePublisher::~CyberglovePublisher()
   {
-    if( glovePositions != NULL )
-      {
-	delete glovePositions;
-	glovePositions = NULL;
-      }
   }
+  
   void CyberglovePublisher::initialize_calibration(std::string path_to_calibration)
   {
     calibration_parser = XmlCalibrationParser(path_to_calibration);

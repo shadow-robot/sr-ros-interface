@@ -25,21 +25,23 @@ using namespace ros;
 
 namespace cyberglove_service{
 
-class CybergloveService
-{
- public:
-  /// Constructor
+  class CybergloveService
+  {
+  public:
+    /// Constructor
     CybergloveService(boost::shared_ptr<cyberglove_publisher::CyberglovePublisher> publish);
+    ~CybergloveService(){};
+
     //CybergloveService();
     bool start(cyberglove::Start::Request &req, cyberglove::Start::Response &res);
     bool calibration(cyberglove::Calibration::Request &req, cyberglove::Calibration::Response &res);
- private:
+  private:
     
-  NodeHandle node;
-  boost::shared_ptr<cyberglove_publisher::CyberglovePublisher> pub;
-  ros::ServiceServer service_start;
-  ros::ServiceServer service_calibration;
-};
+    NodeHandle node;
+    boost::shared_ptr<cyberglove_publisher::CyberglovePublisher> pub;
+    ros::ServiceServer service_start;
+    ros::ServiceServer service_calibration;
+  };
 
 }
 #endif

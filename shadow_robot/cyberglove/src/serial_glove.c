@@ -189,7 +189,6 @@ int read_button_value() {
   tcflush(serial_port_fd, TCIFLUSH);
   tcflush(serial_port_fd, TCOFLUSH);
   writeg(serial_port_fd, "?W", 2);
-  int i;
   unsigned char ch[3]={0};    //assigns 0 to the first char
 
   //TODO : this should be reduced ? 
