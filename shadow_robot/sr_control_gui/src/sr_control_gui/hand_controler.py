@@ -79,10 +79,11 @@ class MainWindow(wx.Frame):
         page4.SetSizer(layout4, True)
 
         #Create the widgets
-        #if self.myShadowHand.has_arm():
-            #jointSliders = JointSliders(subPage0, -1,"Joints",self.myShadowHand)
-        #else:
-            #jointSliders = JointSliders(page1, -1,"Joints",self.myShadowHand)
+        isHere = self.myShadowHand.check_hand_presence()
+        if not isHere :
+            self.Close()
+            return
+
         jointSliders = JointSliders(page1, -1,"Joints",self.myShadowHand)
         jointChooser = JointChooser(subPage1,-1,"Joint Chooser", self.myShadowHand)
         self.grasps = GraspsSaver(subPage1, -1, "Grasps", self.myShadowHand, jointChooser)

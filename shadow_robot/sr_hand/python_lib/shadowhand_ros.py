@@ -28,7 +28,7 @@ class ShadowHand_ROS():
         values of shadowhand_data and sendupdate 
         """
         #print "Creating good library"
-        self.handJoints = [Joint("THJ1", "smart_motor_th1"), 
+        self.allJoints = [Joint("THJ1", "smart_motor_th1"), 
                            Joint("THJ2", "smart_motor_th2", -30, 30), 
                            Joint("THJ3", "smart_motor_th3",-15, 15),
                            Joint("THJ4", "smart_motor_th4",0, 75),
@@ -49,6 +49,7 @@ class ShadowHand_ROS():
                            Joint("WRJ1", "smart_motor_wr1", -30, 40), 
                            Joint("WRJ2", "smart_motor_wr2", -30, 10),
                            ]
+        self.handJoints = []
         self.armJoints = [Joint("trunk_rotation", "", -45, 90),
                           Joint("shoulder_rotation", "", 0, 90),
                           Joint("elbow_abduction", "", 0,120),
@@ -84,6 +85,7 @@ class ShadowHand_ROS():
         """
         self.lastMsg = data;        
         if self.isFirstMessage : 
+            self.init_actual_joints()
             for joint in self.lastMsg.joints_list : 
                 self.dict_pos[joint.joint_name]=joint.joint_position
                 self.dict_tar[joint.joint_name]=joint.joint_target
@@ -106,7 +108,29 @@ class ShadowHand_ROS():
     def __del__(self):
         print('Library deleted')
 
-    
+    def init_actual_joints(self):
+        """
+        Initializes the library with just the fingers actually connected
+        """
+        for joint_all in self.allJoints :
+            for joint_msg in self.lastMsg.joints_list :
+                if joint_msg.joint_name == joint_all.name:
+                    self.handJoints.append(joint_all)
+
+    def check_hand_presence(self):
+        """
+        @return : true if the hand if detected
+        """
+        t = 0.0
+        while not self.isReady:
+            time.sleep(1.0)
+            t = t+1.0
+            rospy.loginfo("Waiting for service since "+str(t)+" seconds...")
+            if t >= 5.0:
+                rospy.logerr("No hand found. Are you sure the ROS hand is running ?")
+                return False
+        return True
+ 
     def set_shadowhand_data_topic(self, topic):
         """
         @param topic: The new topic to be set as the hand publishing topic
@@ -230,6 +254,8 @@ class ShadowHand_ROS():
         @return: dictionnary mapping joint names to actual positions
         Read all the positions in the lastMsg
         """
+        if not self.isReady:
+            return
         for joint in self.lastMsg.joints_list:
             self.dict_pos[joint.joint_name] = joint.joint_position
         return self.dict_pos
