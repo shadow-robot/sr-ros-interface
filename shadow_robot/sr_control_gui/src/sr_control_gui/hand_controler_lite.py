@@ -54,6 +54,10 @@ class MainWindowLite(wx.Frame):
         sublayout1 = wx.FlexGridSizer(cols=2, rows=1, vgap=20)
         subPage1.SetSizer(sublayout1, True)
         #Create the widgets
+        isHere = self.myShadowHand.check_hand_presence()
+        if not isHere :
+            self.Close()
+            return
         jointSliders = JointSliders(page1, -1,"Joints",self.myShadowHand)
         jointChooser = JointChooser(subPage1,-1,"Joint Chooser", self.myShadowHand)
         self.grasps = GraspsSaver(subPage1, -1, "Grasps", self.myShadowHand, jointChooser)

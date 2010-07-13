@@ -25,19 +25,11 @@ class JointSliders(wx.StaticBox):
         self.dataToSend = {}
         self.actualPositions = {}
         t = 0.0
-        while not self.myShadowHand.isReady:
-            time.sleep(1.0)
-            t = t+1.0
-            print "Waiting for service since "+str(t)+" seconds..."
-            if t >= 5.0:
-                print "Are you sure the ROS hand is running ?"
-                return
 
         self.drawJointSliders()
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.update_joints, self.timer)
         self.timer.Start(100)
-#        self.Fit()
 
     def drawJointSliders(self):
         """
@@ -51,7 +43,7 @@ class JointSliders(wx.StaticBox):
             index += 1
 
         #Draw and place the widgets
-        layout = wx.FlexGridSizer(cols=20, rows=3, vgap=5, hgap=20)
+        layout = wx.FlexGridSizer(cols=len(self.myShadowHand.handJoints), rows=3, vgap=5, hgap=20)
         for joint in self.myShadowHand.handJoints:
             slider_key=joint.name
         #for slider_key, slider_value in self.sliders.items():
