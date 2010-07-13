@@ -57,7 +57,7 @@
     </collision>
   </link>
   <gazebo reference="wrist">
-    <material>Gazebo/Grey</material>
+    <material>PR2/Grey2</material>
     <selfCollide>true</selfCollide>
   </gazebo>
 
@@ -115,7 +115,7 @@
     </collision>
   </link>
   <gazebo reference="ffknuckle">
-    <material>Gazebo/Grey</material>
+    <material>PR2/Grey2</material>
   </gazebo>
 
 
@@ -228,7 +228,7 @@
     </collision>
   </link>
   <gazebo reference="mfknuckle">
-    <material>Gazebo/Grey</material>
+    <material>PR2/Grey2</material>
   </gazebo>
 
 
@@ -341,7 +341,7 @@
     </collision>
   </link>
   <gazebo reference="rfknuckle">
-    <material>Gazebo/Grey</material>
+    <material>PR2/Grey2</material>
   </gazebo>
 
 
@@ -483,7 +483,7 @@
     </collision>
   </link>
   <gazebo reference="lfknuckle">
-    <material>Gazebo/Grey</material>
+    <material>PR2/Grey2</material>
   </gazebo>
 
 
