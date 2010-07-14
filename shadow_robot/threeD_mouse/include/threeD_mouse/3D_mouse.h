@@ -19,16 +19,63 @@
 
 namespace threedmouse 
 {
-  struct Pose
+  struct Quaternion
+  {
+
+    double x;
+    double y;
+    double z;
+    double w;
+
+  Quaternion() :
+    x(0.0), y(0.0), z(0.0), w(0.0)
+    {}
+
+  Quaternion(double nx, double ny, double nz, double nw) :
+    x(nx), y(ny), z(nz), w(nw)
+    {}
+
+  Quaternion(Quaternion& q) :
+    x(q.x), y(q.y), z(q.z), w(q.w)
+    {}
+
+  Quaternion(const Quaternion& q) :
+    x(q.x), y(q.y), z(q.z), w(q.w)
+    {}
+
+  };
+
+  struct Translation
   {
     double x;
     double y;
     double z;
 
-    double rx;
-    double ry;
-    double rz;
-    double w;
+  Translation() :
+    x(0.0), y(0.0), z(0.0)
+    {}
+
+  Translation(double nx, double ny, double nz) : 
+    x(nx), y(ny), z(nz)
+    {
+    }
+
+  Translation(Translation& t) : 
+    x(t.x), y(t.y), z(t.z)
+    {
+    }
+
+  Translation(const Translation& t) : 
+    x(t.x), y(t.y), z(t.z)
+    {
+    }
+  };
+
+  struct Pose
+  {
+    Translation translation;
+
+    Quaternion quaternion;
   };
 
   /**
@@ -74,6 +121,10 @@ namespace threedmouse
 
     void info_mouse_mode();
     void check_stopped();
+
+    // Convert roll, pitch, yaw (Euler Angles) to Quaternion
+    Quaternion euler_to_quaternion(float pitch, float yaw, float roll);
+    void normalise(Quaternion quater);
   };
 }
 

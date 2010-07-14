@@ -75,19 +75,17 @@ namespace threedmouse
   {
     //while(ros::ok())
 
+    Quaternion quater;
+
     while(spnav_wait_event(&sev)) 
       {
 	spnav_poll_event(&sev);
 	if(sev.type == SPNAV_EVENT_MOTION) 
 	  {
-	    last_pose.x = sev.motion.x;
-	    last_pose.y = sev.motion.y;
-	    last_pose.z = sev.motion.z;
+	    last_pose.translation = Translation( sev.motion.x, sev.motion.y, sev.motion.z );
 
-	    last_pose.rx = sev.motion.rx;
-	    last_pose.ry = sev.motion.ry;
-	    last_pose.rz = sev.motion.rz;
-	    last_pose.w = 0.0;
+	    quater = euler_to_quaternion(sev.motion.rx, sev.motion.ry, sev.motion.rz);
+	    last_pose.quaternion = Quaternion(quater);
 
 	    ROS_DEBUG("got motion event: t(%d, %d, %d) ", sev.motion.x, sev.motion.y, sev.motion.z);
 	    ROS_DEBUG("r(%d, %d, %d)", sev.motion.rx, sev.motion.ry, sev.motion.rz);
@@ -145,9 +143,9 @@ namespace threedmouse
     switch( mouse_mode )
       {
       case TRANSLATE:
-	posestamped_msg.pose.position.x = last_pose.x;
-	posestamped_msg.pose.position.y = last_pose.y;
-	posestamped_msg.pose.position.z = last_pose.z;
+	posestamped_msg.pose.position.x = last_pose.translation.x;
+	posestamped_msg.pose.position.y = last_pose.translation.y;
+	posestamped_msg.pose.position.z = last_pose.translation.z;
     
 	posestamped_msg.pose.orientation.x = 0.0;
 	posestamped_msg.pose.orientation.y = 0.0;
@@ -160,22 +158,21 @@ namespace threedmouse
 	posestamped_msg.pose.position.y = 0.0;
 	posestamped_msg.pose.position.z = 0.0;
     
-
-	posestamped_msg.pose.orientation.x = last_pose.rx;
-	posestamped_msg.pose.orientation.y = last_pose.ry;
-	posestamped_msg.pose.orientation.z = last_pose.rz;
-	posestamped_msg.pose.orientation.w = last_pose.w;
+	posestamped_msg.pose.orientation.x = last_pose.quaternion.x;
+	posestamped_msg.pose.orientation.y = last_pose.quaternion.y;
+	posestamped_msg.pose.orientation.z = last_pose.quaternion.z;
+	posestamped_msg.pose.orientation.w = last_pose.quaternion.w;
 	break;
 
       default:
-	posestamped_msg.pose.position.x = last_pose.x;
-	posestamped_msg.pose.position.y = last_pose.y;
-	posestamped_msg.pose.position.z = last_pose.z;
+	posestamped_msg.pose.position.x = last_pose.translation.x;
+	posestamped_msg.pose.position.y = last_pose.translation.y;
+	posestamped_msg.pose.position.z = last_pose.translation.z;
     
-	posestamped_msg.pose.orientation.x = last_pose.rx;
-	posestamped_msg.pose.orientation.y = last_pose.ry;
-	posestamped_msg.pose.orientation.z = last_pose.rz;
-	posestamped_msg.pose.orientation.w = last_pose.w;
+	posestamped_msg.pose.orientation.x = last_pose.quaternion.x;
+	posestamped_msg.pose.orientation.y = last_pose.quaternion.y;
+	posestamped_msg.pose.orientation.z = last_pose.quaternion.z;
+	posestamped_msg.pose.orientation.w = last_pose.quaternion.w;
 	break;
       }
 
@@ -183,6 +180,52 @@ namespace threedmouse
     
     ros::spinOnce();
     publish_rate.sleep();
+  }
+
+#define PIOVER180OVER2 0.0087266462599716477
+  Quaternion ThreeDMouse::euler_to_quaternion(float pitch, float yaw, float roll)
+  {
+    // Basically we create 3 Quaternions, one for pitch, one for yaw, one for roll
+    // and multiply those together.
+    // the calculation below does the same, just shorter
+
+    Quaternion quater; 
+
+    double p = pitch * PIOVER180OVER2;
+    double y = yaw * PIOVER180OVER2;
+    double r = roll * PIOVER180OVER2;
+ 
+    double sinp = sin(p);
+    double siny = sin(y);
+    double sinr = sin(r);
+    double cosp = cos(p);
+    double cosy = cos(y);
+    double cosr = cos(r);
+ 
+    quater.x = sinr * cosp * cosy - cosr * sinp * siny;
+    quater.y = cosr * sinp * cosy + sinr * cosp * siny;
+    quater.z = cosr * cosp * siny - sinr * sinp * cosy;
+    quater.w = cosr * cosp * cosy + sinr * sinp * siny;
+ 
+    normalise(quater);
+
+    return quater;
+  }
+
+  void ThreeDMouse::normalise(Quaternion quater)
+  {
+    // Don't normalize if we don't have to
+    double mag2 = quater.w * quater.w + 
+      quater.x * quater.x + quater.y * quater.y + 
+      quater.z * quater.z;
+
+    if (  mag2!=0.0 && (fabs(mag2 - 1.0f) > 0.01)) {
+      double mag = sqrt(mag2);
+      quater.w /= mag;
+      quater.x /= mag;
+      quater.y /= mag;
+      quater.z /= mag;
+    }
   }
 
 }
