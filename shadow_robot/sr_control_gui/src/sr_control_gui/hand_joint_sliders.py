@@ -5,6 +5,10 @@ sys.path.append("python_hand_library/")
 #import the wxpython GUI package
 import wx
 import time
+import math
+
+MAGIC_ID = 42
+
 class JointSliders(wx.StaticBox):
     """
     A GUI widget diplaying the sliders which can control the joints of the hand.
@@ -21,6 +25,9 @@ class JointSliders(wx.StaticBox):
         wx.StaticBox.__init__(self,parent, id, title)
         self.myShadowHand = hand    
         self.sliders = {}
+        self.magicSlider = 0
+        self.magicValue = 0
+        self.checkboxes = {}
         self.panel = wx.Panel(parent, id)
         self.dataToSend = {}
         self.actualPositions = {}
@@ -43,7 +50,7 @@ class JointSliders(wx.StaticBox):
             index += 1
 
         #Draw and place the widgets
-        layout = wx.FlexGridSizer(cols=len(self.myShadowHand.handJoints), rows=3, vgap=5, hgap=20)
+        layout = wx.FlexGridSizer(cols=1+len(self.myShadowHand.handJoints), rows=4, vgap=5, hgap=20)
         for joint in self.myShadowHand.handJoints:
             slider_key=joint.name
         #for slider_key, slider_value in self.sliders.items():
@@ -52,13 +59,21 @@ class JointSliders(wx.StaticBox):
             self.actualPositions[slider_key].SetBackgroundColour((86,255,63))
             layout.Add(self.actualPositions[slider_key])
         #for slider_key, slider_value in self.sliders.items():
+        layout.Add(wx.Panel(self.panel,-1))
         for joint in self.myShadowHand.handJoints:
             slider_key=joint.name
             layout.Add(self.sliders[slider_key])    
+        self.magicSlider = wx.Slider(self.panel, id = MAGIC_ID, value = 0,minValue = -100, maxValue = 100, size=(25,200), style = wx.VERTICAL | wx.SL_LABELS | wx.SL_AUTOTICKS)
+        layout.Add(self.magicSlider,flag=wx.ALIGN_CENTER)
+        self.magicSlider.SetToolTip(wx.ToolTip("Moves all the ticked slider"))
         #for slider_key, slider_value in self.sliders.items():
         for joint in self.myShadowHand.handJoints:
             slider_key=joint.name
             layout.Add(wx.StaticText(self.panel,-1,slider_key))
+        layout.Add(wx.StaticText(self.panel,-1,"Multi-Joints"))
+        for joint in self.myShadowHand.handJoints:
+            self.checkboxes[joint.name] = wx.CheckBox(self.panel,-1)
+            layout.Add(self.checkboxes[joint.name])
         border = wx.BoxSizer()
         border.Add(layout, 0, wx.ALL | wx.ALIGN_CENTER , 15)
         self.panel.SetSizerAndFit(border)
@@ -66,6 +81,7 @@ class JointSliders(wx.StaticBox):
         #Bind the event
         for key, value in self.sliders.items():
             value.Bind(wx.EVT_SLIDER,self.update)
+        self.magicSlider.Bind(wx.EVT_SLIDER,self.update)
 
     def update(self, event):
         """
@@ -73,6 +89,13 @@ class JointSliders(wx.StaticBox):
 
         @param event : the event thrown by the slider which moved 
         """
+        if event.GetId() == MAGIC_ID:
+            for key, value in self.checkboxes.items() :
+                if value.GetValue():
+                    slide = self.sliders[key]
+                    temp_value = (math.fabs(slide.GetMax())+math.fabs(slide.GetMin()))*self.magicSlider.GetValue()/100.0
+                    slide.SetValue(temp_value)
+                       
         for slider_key, slider in self.sliders.items():
             self.dataToSend[slider_key]=slider.GetValue()
         self.myShadowHand.sendupdate_from_dict(self.dataToSend)    
