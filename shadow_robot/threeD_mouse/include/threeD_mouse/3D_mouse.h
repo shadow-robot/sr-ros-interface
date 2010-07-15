@@ -123,6 +123,7 @@ namespace threedmouse
     void check_stopped();
 
     // Convert roll, pitch, yaw (Euler Angles) to Quaternion
+    static const double pi_over_360;
     Quaternion euler_to_quaternion(float pitch, float yaw, float roll);
     void normalise(Quaternion quater);
   };

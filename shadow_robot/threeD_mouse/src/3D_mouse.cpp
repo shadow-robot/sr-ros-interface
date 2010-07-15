@@ -16,6 +16,9 @@
 
 namespace threedmouse
 {
+
+  const double ThreeDMouse::pi_over_360 = 0.0087266462599716477;
+
   ThreeDMouse::ThreeDMouse()
     : n_tilde("~"), publish_rate(0.0)
   {
@@ -73,15 +76,16 @@ namespace threedmouse
   
   void ThreeDMouse::update_mouse_data()
   {
-    //while(ros::ok())
-
     Quaternion quater;
 
-    while(spnav_wait_event(&sev)) 
+    bool waiting_for_release = false;
+
+    while(ros::ok())
       {
 	spnav_poll_event(&sev);
-	if(sev.type == SPNAV_EVENT_MOTION) 
+	switch( sev.type )
 	  {
+	  case SPNAV_EVENT_MOTION:
 	    last_pose.translation = Translation( sev.motion.x, sev.motion.y, sev.motion.z );
 
 	    quater = euler_to_quaternion(sev.motion.rx, sev.motion.ry, sev.motion.rz);
@@ -89,26 +93,38 @@ namespace threedmouse
 
 	    ROS_DEBUG("got motion event: t(%d, %d, %d) ", sev.motion.x, sev.motion.y, sev.motion.z);
 	    ROS_DEBUG("r(%d, %d, %d)", sev.motion.rx, sev.motion.ry, sev.motion.rz);
-	  } 
-	else //BUTTON PRESSED
-	  {
-	    if(sev.button.press == true)
+
+	    break;
+
+	  case SPNAV_EVENT_BUTTON:
+	    if(waiting_for_release)
 	      {
-		if(sev.button.bnum == 0)
-		  mouse_mode == ROTATE ? mouse_mode = TRANSLATE : mouse_mode = ROTATE;
-		else
-		  mouse_mode == BOTH ? mouse_mode = TRANSLATE : mouse_mode = BOTH;
-		
-		//mouse mode changed => print info
-		info_mouse_mode();
+		if(sev.button.press == false)
+		  waiting_for_release = false;
 	      }
-	  }
+	    else
+	      {
+		if(sev.button.press == true)
+		  {
+		    waiting_for_release = true;
+		    if(sev.button.bnum == 0)
+		      mouse_mode == ROTATE ? mouse_mode = TRANSLATE : mouse_mode = ROTATE;
+		    else
+		      mouse_mode == BOTH ? mouse_mode = TRANSLATE : mouse_mode = BOTH;
+		
+		    //mouse mode changed => print info
+		    info_mouse_mode();
+		  }
+	      }
+	    break;
+
+	  default:
+	    break;
+	  } // end switch spnav event type
 	
-	if( !ros::ok() )
-	  break;
 	ros::spinOnce();
-	//sleep(0.01);
-      }
+	usleep(1000);
+      } //end while
   }
     
   /** 
@@ -182,7 +198,6 @@ namespace threedmouse
     publish_rate.sleep();
   }
 
-#define PIOVER180OVER2 0.0087266462599716477
   Quaternion ThreeDMouse::euler_to_quaternion(float pitch, float yaw, float roll)
   {
     // Basically we create 3 Quaternions, one for pitch, one for yaw, one for roll
@@ -191,9 +206,9 @@ namespace threedmouse
 
     Quaternion quater; 
 
-    double p = pitch * PIOVER180OVER2;
-    double y = yaw * PIOVER180OVER2;
-    double r = roll * PIOVER180OVER2;
+    double p = pitch * pi_over_360;
+    double y = yaw * pi_over_360;
+    double r = roll * pi_over_360;
  
     double sinp = sin(p);
     double siny = sin(y);
