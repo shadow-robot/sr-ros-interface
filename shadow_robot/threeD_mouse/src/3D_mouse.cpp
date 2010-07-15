@@ -14,10 +14,9 @@
 
 #include "threeD_mouse/3D_mouse.h"
 
+
 namespace threedmouse
 {
-
-  const double ThreeDMouse::pi_over_360 = 0.0087266462599716477;
 
   ThreeDMouse::ThreeDMouse()
     : n_tilde("~"), publish_rate(0.0)
@@ -76,7 +75,7 @@ namespace threedmouse
   
   void ThreeDMouse::update_mouse_data()
   {
-    Quaternion quater;
+    geometry::Quaternion quater;
 
     bool waiting_for_release = false;
 
@@ -86,10 +85,10 @@ namespace threedmouse
 	switch( sev.type )
 	  {
 	  case SPNAV_EVENT_MOTION:
-	    last_pose.translation = Translation( sev.motion.x, sev.motion.y, sev.motion.z );
+	    last_pose.translation = geometry::Translation( sev.motion.x, sev.motion.y, sev.motion.z );
 
-	    quater = euler_to_quaternion(sev.motion.rx, sev.motion.ry, sev.motion.rz);
-	    last_pose.quaternion = Quaternion(quater);
+	    
+	    last_pose.quaternion = quater.euler_to_quaternion(sev.motion.rx, sev.motion.ry, sev.motion.rz);
 
 	    ROS_DEBUG("got motion event: t(%d, %d, %d) ", sev.motion.x, sev.motion.y, sev.motion.z);
 	    ROS_DEBUG("r(%d, %d, %d)", sev.motion.rx, sev.motion.ry, sev.motion.rz);
@@ -196,51 +195,6 @@ namespace threedmouse
     
     ros::spinOnce();
     publish_rate.sleep();
-  }
-
-  Quaternion ThreeDMouse::euler_to_quaternion(float pitch, float yaw, float roll)
-  {
-    // Basically we create 3 Quaternions, one for pitch, one for yaw, one for roll
-    // and multiply those together.
-    // the calculation below does the same, just shorter
-
-    Quaternion quater; 
-
-    double p = pitch * pi_over_360;
-    double y = yaw * pi_over_360;
-    double r = roll * pi_over_360;
- 
-    double sinp = sin(p);
-    double siny = sin(y);
-    double sinr = sin(r);
-    double cosp = cos(p);
-    double cosy = cos(y);
-    double cosr = cos(r);
- 
-    quater.x = sinr * cosp * cosy - cosr * sinp * siny;
-    quater.y = cosr * sinp * cosy + sinr * cosp * siny;
-    quater.z = cosr * cosp * siny - sinr * sinp * cosy;
-    quater.w = cosr * cosp * cosy + sinr * sinp * siny;
- 
-    normalise(quater);
-
-    return quater;
-  }
-
-  void ThreeDMouse::normalise(Quaternion quater)
-  {
-    // Don't normalize if we don't have to
-    double mag2 = quater.w * quater.w + 
-      quater.x * quater.x + quater.y * quater.y + 
-      quater.z * quater.z;
-
-    if (  mag2!=0.0 && (fabs(mag2 - 1.0f) > 0.01)) {
-      double mag = sqrt(mag2);
-      quater.w /= mag;
-      quater.x /= mag;
-      quater.y /= mag;
-      quater.z /= mag;
-    }
   }
 
 }

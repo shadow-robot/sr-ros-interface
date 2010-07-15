@@ -17,67 +17,11 @@
 #include <spnav.h>
 #include <boost/thread.hpp>
 
+#include "threeD_mouse/geometry.h"
+
+
 namespace threedmouse 
 {
-  struct Quaternion
-  {
-
-    double x;
-    double y;
-    double z;
-    double w;
-
-  Quaternion() :
-    x(0.0), y(0.0), z(0.0), w(0.0)
-    {}
-
-  Quaternion(double nx, double ny, double nz, double nw) :
-    x(nx), y(ny), z(nz), w(nw)
-    {}
-
-  Quaternion(Quaternion& q) :
-    x(q.x), y(q.y), z(q.z), w(q.w)
-    {}
-
-  Quaternion(const Quaternion& q) :
-    x(q.x), y(q.y), z(q.z), w(q.w)
-    {}
-
-  };
-
-  struct Translation
-  {
-    double x;
-    double y;
-    double z;
-
-  Translation() :
-    x(0.0), y(0.0), z(0.0)
-    {}
-
-  Translation(double nx, double ny, double nz) : 
-    x(nx), y(ny), z(nz)
-    {
-    }
-
-  Translation(Translation& t) : 
-    x(t.x), y(t.y), z(t.z)
-    {
-    }
-
-  Translation(const Translation& t) : 
-    x(t.x), y(t.y), z(t.z)
-    {
-    }
-  };
-
-  struct Pose
-  {
-    Translation translation;
-
-    Quaternion quaternion;
-  };
-
   /**
    *enum to define the mode we're in
    **/
@@ -115,17 +59,12 @@ namespace threedmouse
     unsigned long bpix;
 
     //keep the last pose read from the 3d mouse
-    Pose last_pose;
+    geometry::Pose last_pose;
 
     MouseMode mouse_mode;
 
     void info_mouse_mode();
     void check_stopped();
-
-    // Convert roll, pitch, yaw (Euler Angles) to Quaternion
-    static const double pi_over_360;
-    Quaternion euler_to_quaternion(float pitch, float yaw, float roll);
-    void normalise(Quaternion quater);
   };
 }
 
