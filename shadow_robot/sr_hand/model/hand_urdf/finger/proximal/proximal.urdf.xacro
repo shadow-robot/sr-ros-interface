@@ -1,0 +1,41 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="proximal" params="link_prefix joint_prefix parent">
+  
+    <link name="${link_prefix}proximal">
+      <inertial>
+	<mass value="0.014" />
+	<origin xyz="0 0 0" /> 
+	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+	izz="1.0" />
+      </inertial>
+      <visual>
+	<origin xyz="0 0 0" rpy="0 -${M_PI/2} ${M_PI/2}" />
+	<geometry name="proximal_visual">
+      <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="Grey" />
+      </visual>
+      <collision>
+	<origin xyz="0 0 0.0225" rpy="0 0 0 " />
+	<geometry name="proximal_collision_geom">
+	  <box size="0.005 0.005 0.04" />
+	</geometry>
+      </collision>
+    </link>
+    <gazebo reference="${link_prefix}proximal">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <joint name="${joint_prefix}J3" type="revolute">
+      <parent link="${parent}"/>
+      <child link="${link_prefix}proximal"/>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <axis xyz="1 0 0" />
+      <limit lower="0" upper="${M_PI/2}" effort="10"
+      velocity="1.0"/>
+    </joint>
+  
+  </xacro:macro>
+  
+</robot>

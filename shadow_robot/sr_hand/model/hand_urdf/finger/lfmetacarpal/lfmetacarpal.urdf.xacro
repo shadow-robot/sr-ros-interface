@@ -1,0 +1,41 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="lfmetacarpal" params="parent">
+  
+    <link name="lfmetacarpal">
+      <inertial>
+	<origin xyz="0.00568 0 -0.12061" rpy="0 0 0" />
+	<mass value="0.075" />
+	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+	izz="1.0" />
+      </inertial>
+      <visual>
+	<origin xyz="0 0 0" rpy="0 -${M_PI/2} 0" />
+	<geometry name="lfmetacarpal_visual">
+	  <mesh filename="package://sr_hand/model/meshes/lfmetacarpal.mesh" scale="0.001 0.001 0.001" />
+	</geometry>
+	<material name="Grey" />
+      </visual>
+      <collision>
+	<origin xyz="-0.015 0 0.015" rpy="0 0 0" />
+	<geometry name="lfmetacarpal_collision_geom">
+	  <box size="0.005 0.005 0.03" />
+	</geometry>
+      </collision>
+    </link>
+    <gazebo reference="lfmetacarpal">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <joint name="LFJ5" type="revolute">
+      <parent link="${parent}"/>
+      <child link="lfmetacarpal"/>
+      <origin xyz="-0.01671 0 0.044" rpy="0 0 0" />
+      <axis xyz="0.57 0 0.82" />
+      <limit lower="0" upper="0.69813170079773179" effort="10"
+      velocity="1.0" />
+    </joint>
+
+  </xacro:macro>
+  
+</robot>

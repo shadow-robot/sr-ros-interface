@@ -1,0 +1,43 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="thbase" params="parent">
+  
+    <link name="thbase">
+      <inertial>
+	<mass value="0.010" />
+	<origin xyz="0.034 0.0085 0.02924" rpy="0 0 0"/> 
+	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"
+	izz="1.0" />
+      </inertial>
+      <visual>
+	<origin xyz="0 0 0" rpy="0 0 0" />
+	<geometry name="thbase_visual">
+	  <box size="0.001 0.001 0.001" />
+	</geometry>
+      <material name="shadow_thbase_material">
+	  <color rgba="0.5 0.5 0.5 1.0"/>
+	</material>
+      </visual>
+      <collision>
+	<origin xyz="0 0 0" rpy="0 0 0 " />
+	<geometry name="thbase_collision_geom">
+	  <box size="0.001 0.001 0.001" />
+	</geometry>
+      </collision>
+    </link>
+    <gazebo reference="thbase">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+  
+    <joint name="THJ5" type="revolute">
+      <parent link="${parent}"/>
+      <child link="thbase"/>
+      <origin xyz="0.034 -0.0085 0.02924" rpy="0 ${M_PI/4} 0" />
+      <axis xyz="0 0 -1" />
+      <limit lower="-1.047" upper="1.047" effort="10"
+      velocity="1.0" />
+    </joint>
+  
+  </xacro:macro>
+  
+</robot>
