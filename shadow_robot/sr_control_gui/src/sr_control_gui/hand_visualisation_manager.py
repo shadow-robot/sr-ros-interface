@@ -152,7 +152,7 @@ class VisualisationManager(wx.StaticBox):
         if event.GetId() == BUTTON_REPLACE:
             self.myShadowHand.callVisualisationService(toCall,1)
         if event.GetId() == BUTTON_RVIZ:
-            subprocess.Popen("roslaunch sr_hand rviz.launch".split())
+            subprocess.Popen("roslaunch sr_hand rviz_motor.launch".split())
         if event.GetId() == BUTTON_RXGRAPH:
             subprocess.Popen("rxgraph".split())
         if event.GetId() == BUTTON_RXCONSOLE:
