@@ -54,13 +54,13 @@ class Line(wx.Panel):
         else:
             self.looping_iter.Enable(True)
 
-class HandTimeLine(wx.ScrolledWindow):
+class HandTimeLine(wx.Panel):
     def __init__(self, parent, id, title, hand, window):
-        wx.ScrolledWindow.__init__(self, parent, id)
-        self.bar = wx.ScrollBar(self, -1)
+        wx.Panel.__init__(self, parent, id)
+        #self.bar = wx.ScrollBar(self, -1)
         self.myShadowHand = hand
         self.window = window
-        #self.panel=wx.Panel(parent, id)
+        self.panel=wx.Panel(self, id)
         self.grasps = {}
         self.lines = []
         process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
@@ -68,42 +68,57 @@ class HandTimeLine(wx.ScrolledWindow):
         self.rootPath = self.rootPath.split('\n')
         self.rootPath = self.rootPath[0]
         self.myParser = GraspParser()
-        self.myParser.parse_tree(self.rootPath+"/src/sr_control_gui/grasps.xml")
+        #self.myParser.parse_tree(self.rootPath+"/src/sr_control_gui/grasps.xml")
         self.grasps = self.myParser.grasps
         self.current_step = Grasp()
         self.current_step.joints_and_positions = self.myShadowHand.read_all_current_positions()
+        self.button_grasps = 0
         self.add_buttons = []
         self.indexToShow = 0
         self.sizer = wx.GridSizer(rows=20, cols=2)
         self.drawTimeLine()
 
-    def drawTimeLine(self):
-        self.addLine()
-        self.add_buttons[0].Show()
-        #for index in range(1,20):
-            #self.addLine()
-            #self.lines[index].Show(False)
-        border = wx.BoxSizer()
-        border.Add(self.sizer, 0, wx.ALL, 15)
-        #self.panel.SetSizer(self.sizer)
-        self.SetSizer(self.sizer)
 
-    def addLine(self):
-        #newline =  Line(self.panel,-1,len(self.lines)+1, self.grasps, len(self.lines))      
-        newline =  Line(self,-1,len(self.lines)+1, self.grasps.keys(), len(self.lines))      
+    def drawTimeLine(self):
+        main_sizer = wx.FlexGridSizer(rows = 2, cols=1 )
+
+        panel_top = wx.Panel(self,-1)
+        #panel_top.SetBackgroundColour(wx.RED)
+        sizer_top = wx.GridSizer(rows=1, cols=3)
+        panel_top.SetSizer(sizer_top)        
+
+        button_play = wx.Button(panel_top,-1,"Play")
+        self.button_grasps = wx.FilePickerCtrl(panel_top, -1, size=(100,30))
+        sizer_top.Add(button_play)
+        sizer_top.Add(wx.StaticText(panel_top,-1,"Load more grasps : "), wx.ALIGN_BOTTOM)
+        sizer_top.Add(self.button_grasps)
+        main_sizer.Add(panel_top)
+        main_sizer.Add(self.panel)
+
+        #self.panel.SetBackgroundColour(wx.BLUE)
+
+        self.addLine()
+        self.panel.SetSizer(self.sizer)
+
+        
+        border = wx.BoxSizer()
+        border.Add(main_sizer, 0, wx.ALL, 15)
+        self.SetSizer(border)
+
+        button_play.Bind(wx.EVT_BUTTON, self.play)
+        self.button_grasps.Bind(wx.EVT_FILEPICKER_CHANGED, self.addGrasps)
+
+    def addLine(self, position=-1):
+        newline =  Line(self.panel,-1,len(self.lines)+1, self.grasps.keys(), len(self.lines))      
         self.lines.append(newline) 
         self.sizer.Add(newline, flag=wx.ALIGN_BOTTOM)
-        #button = wx.Button(self.panel, -1, "+")
-        button = wx.Button(self, -1, "+", size=(30,30))
+        button = wx.Button(self.panel, -1, "+", size=(30,30))
         self.add_buttons.append(button)
         self.sizer.Add(button, flag=wx.ALIGN_CENTER_VERTICAL) 
-        #button.Show(False)
         button.Bind(wx.EVT_BUTTON, self.addListener)
-        border = wx.BoxSizer()
-        border.Add(self.sizer, 0, wx.ALL, 15)
-        #self.panel.SetSizer(self.sizer)
-        self.SetSizer(self.sizer)
-        self.window.Layout()
+        if position != -1:
+            for index in range(len(self.lines), position):
+                    self.lines[index].SetSelection(self.lines[index-1].GetSelection())
 
     
     def addListener(self, event):
@@ -116,7 +131,16 @@ class HandTimeLine(wx.ScrolledWindow):
         self.window.Update()
         self.window.SetSize((1280,600))
 
-    def play(self):
+    def addGrasps(self, event):
+        self.myParser.parse_tree(self.button_grasps.GetPath())
+        new_dict = self.myParser.grasps
+        print new_dict
+        for key, value in new_dict.items():
+            self.grasps[key]=value
+        for line in self.lines:
+            line.grasp.SetItems(self.grasps.keys())
+
+    def play(self, event=0):
         self.play_steps(0, len(self.lines),1)
 
 
