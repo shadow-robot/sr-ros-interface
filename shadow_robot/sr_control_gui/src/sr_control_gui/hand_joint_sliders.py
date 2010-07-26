@@ -36,7 +36,7 @@ class JointSliders(wx.StaticBox):
         self.drawJointSliders()
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.update_joints, self.timer)
-        self.timer.Start(100)
+        self.timer.Start(500)
 
     def drawJointSliders(self):
         """
@@ -99,10 +99,10 @@ class JointSliders(wx.StaticBox):
         for slider_key, slider in self.sliders.items():
             self.dataToSend[slider_key]=slider.GetValue()
         self.myShadowHand.sendupdate_from_dict(self.dataToSend)    
-        #time.sleep(0.05)
-        #self.myShadowHand.sendupdate_from_dict(self.dataToSend)    
-        #time.sleep(0.05)
-        #self.myShadowHand.sendupdate_from_dict(self.dataToSend)    
+        time.sleep(0.05)
+        self.myShadowHand.sendupdate_from_dict(self.dataToSend)    
+        time.sleep(0.05)
+        self.myShadowHand.sendupdate_from_dict(self.dataToSend)    
         positions=self.myShadowHand.read_all_current_positions()
         for joint, position in positions.items():
             if self.actualPositions.has_key(joint):
@@ -119,6 +119,10 @@ class JointSliders(wx.StaticBox):
         new_values = self.myShadowHand.read_all_current_targets()
         for key, value in new_values.items():
             if key in self.sliders.keys():
-                self.sliders[key].SetValue(value)    
+                self.sliders[key].SetValue(round(value,0))    
 
+        positions=self.myShadowHand.read_all_current_positions()
+        for joint, position in positions.items():
+            if self.actualPositions.has_key(joint):
+                self.actualPositions[joint].SetValue(str(round(float(position),2)))
     

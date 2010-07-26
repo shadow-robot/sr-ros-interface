@@ -1,0 +1,10 @@
+<launch>
+
+    <node pkg="camera1394" name="camera_left" type="camera1394_node">
+        <remap from="camera/image_raw" to="camera_left/image_raw" />
+        <remap from="camera/camera_info" to="camera_left/camera_info" />
+        <param name="camera_info_url" value="file://$(find optical_acquisition)/camera_left.yaml"  />
+        <param name="video_mode" value="320x240_yuv422" />
+    </node>   
+
+</launch>

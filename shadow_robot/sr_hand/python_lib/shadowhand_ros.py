@@ -266,7 +266,7 @@ class ShadowHand_ROS():
         Read all the targets in the lastMsg
         """
         for joint in self.lastMsg.joints_list:
-            self.dict_tar[joint.joint_name] = joint.joint_position
+            self.dict_tar[joint.joint_name] = joint.joint_target
         return self.dict_tar
 
     def read_all_current_arm_positions(self):
