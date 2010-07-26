@@ -11,10 +11,10 @@
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
     </inertial>
     <visual>
-      <origin xyz="0 0 0.09" rpy="0 0 1.571" /> 
+      <origin xyz="0 0 0" rpy="0 0 1.571" /> 
       <geometry name="shadow_forearm_geom">
-        <!-- <mesh filename="package://sr_hand/model/meshes/forearm.mesh" /> -->
-	<cylinder radius="0.06" length="0.180" />
+        <mesh filename="package://sr_hand/model/meshes/forearm.mesh" />
+	    <!--<cylinder radius="0.06" length="0.180" />-->
       </geometry>
       <material name="shadow_forearm_material">
 	<color rgba="0.2 0.2 0.2 0.6"/>

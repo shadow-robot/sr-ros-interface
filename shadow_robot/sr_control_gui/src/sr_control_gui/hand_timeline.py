@@ -17,8 +17,8 @@ class Line(wx.Panel):
         self.number = number
         self.grasp = wx.ComboBox(self,-1,choices=grasps)
         self.grasp.SetSelection(0)
-        self.pause_time = wx.TextCtrl(self,-1, value ="1.0", size=(35,20))
-        self.interpolate_time = wx.TextCtrl(self,-1, value ="0", size=(35,20))
+        self.pause_time = wx.TextCtrl(self,-1, value ="0.0", size=(35,20))
+        self.interpolate_time = wx.TextCtrl(self,-1, value ="0.0", size=(35,20))
         array_lines = ['No']
         for l in range (0, lines):
             array_lines.append("Step "+str(l+1))
@@ -68,13 +68,14 @@ class HandTimeLine(wx.Panel):
         self.rootPath = self.rootPath.split('\n')
         self.rootPath = self.rootPath[0]
         self.myParser = GraspParser()
-        #self.myParser.parse_tree(self.rootPath+"/src/sr_control_gui/grasps.xml")
+        self.myParser.parse_tree(self.rootPath+"/src/sr_control_gui/grasps.xml")
         self.grasps = self.myParser.grasps
         self.current_step = Grasp()
         self.current_step.joints_and_positions = self.myShadowHand.read_all_current_positions()
         self.button_grasps = 0
         self.add_buttons = []
         self.indexToShow = 0
+        self.index_button = 0
         self.sizer = wx.GridSizer(rows=20, cols=2)
         self.drawTimeLine()
 
@@ -112,20 +113,38 @@ class HandTimeLine(wx.Panel):
         newline =  Line(self.panel,-1,len(self.lines)+1, self.grasps.keys(), len(self.lines))      
         self.lines.append(newline) 
         self.sizer.Add(newline, flag=wx.ALIGN_BOTTOM)
-        button = wx.Button(self.panel, -1, "+", size=(30,30))
+        self.index_button = self.index_button+1
+        button = wx.Button(self.panel, self.index_button, "+", size=(30,30))
         self.add_buttons.append(button)
         self.sizer.Add(button, flag=wx.ALIGN_CENTER_VERTICAL) 
         button.Bind(wx.EVT_BUTTON, self.addListener)
         if position != -1:
-            for index in range(len(self.lines), position):
-                    self.lines[index].SetSelection(self.lines[index-1].GetSelection())
+            index = len(self.lines)
+            #print "Button clicked : "+str(position)+" should change from "+str(position+1)+" to "+str(len(self.lines))
+            while index > position:
+                #print "  Changing : "+str(index)
+                self.lines[index-1].grasp.SetSelection(self.lines[index-2].grasp.GetSelection())
+                self.lines[index-1].pause_time.SetValue(self.lines[index-2].pause_time.GetValue())
+                self.lines[index-1].interpolate_time.SetValue(self.lines[index-2].interpolate_time.GetValue())
+                self.lines[index-1].looping.SetSelection(self.lines[index-2].looping.GetSelection())
+                self.lines[index-1].looping_iter.SetValue(self.lines[index-2].looping_iter.GetValue())
+                index=index-1
+            self.lines[index].grasp.SetSelection(0)
+            self.lines[index].pause_time.SetValue(str(0.0))
+            self.lines[index].interpolate_time.SetValue(str(0.0))
+            self.lines[index].looping.SetSelection(0)
+            self.lines[index].looping_iter.SetValue(str(1))
+            
 
     
     def addListener(self, event):
         #self.indexToShow = self.indexToShow+1
         #self.lines[self.indexToShow].Show()
         #self.add_buttons[self.indexToShow].Show()
-        self.addLine()
+        if event.GetId() == self.index_button:
+            self.addLine()
+        else:
+            self.addLine(event.GetId())
         self.window.Validate()
         self.window.Refresh()
         self.window.Update()
@@ -154,7 +173,7 @@ class HandTimeLine(wx.Panel):
             self.window.Update()
             next_step=self.grasps[line.grasp.GetValue()]
             interpoler = GraspInterpoler(self.current_step,next_step)
-            if int(line.interpolate_time.GetValue()) == 0:
+            if float(line.interpolate_time.GetValue()) == 0.0:
                     self.myShadowHand.sendupdate_from_dict(next_step.joints_and_positions)   
             else:
                 for interpolation in range (0,10*int(line.interpolate_time.GetValue())):
