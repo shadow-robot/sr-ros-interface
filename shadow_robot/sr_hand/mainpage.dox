@@ -11,7 +11,7 @@ It also contains an interface to Shadow Robot's muscle arm.
 
 
 \section howto How to use this interface
-If you didn't pulled the branch in the stacks (.path/to/ros/stacks), don't forget to add the path to the shadow_robot stack to your \p ROS_PACKAGE_PATH for the relevant packages to be found by ROS. To do this, edit your .bashrc:
+If you didn't pull the branch in the stacks (.path/to/ros/stacks), don't forget to add the path to the shadow_robot stack to your \p ROS_PACKAGE_PATH for the relevant packages to be found by ROS. To do this, edit your .bashrc:
 after the line "source /path/to/ros/setup.sh", add :
 \verbatim
 export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:/path/to/shadow_robot
@@ -178,9 +178,9 @@ Then, just save the file.
 
 \subsection generatetheurdffile Generate the .urdf file
 the .urdf.xacro model has to be turned into a classic .urdf file to be used by ROS.
-To generate the good file, go to the model/robots directory and use the following command: (the example is given to generate the motor version of the hand)
+To generate the good file, use the following command: (this example generates the motor version of the hand)
 \verbatim
-rosrun xacro xacro.py -o shadowhand_motor.urdf xacro/shadowhand_motor.urdf.xacro
+rosrun xacro xacro.py -o `rospack find sr_hand`/model/robots/shadowhand_motor.urdf `rospack find sr_hand`/model/robots/xacro/shadowhand_motor.urdf.xacro
 \endverbatim
 The .urdf.xacro robot model which is in the model/robots/xacro directory is turned into an urdf file in the model/robots directory
 (Warning: the urdf file in the model/robots directory has to exist before running the command, because the order is to overwrite what was in the file)

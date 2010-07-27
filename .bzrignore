@@ -26,3 +26,4 @@ shadow_robot/optical_acquisition/bin
 shadow_robot/optical_acquisition/build
 shadow_robot/optical_synchronizer/bin
 shadow_robot/optical_synchronizer/build
+shadow_robot/sr_remappers/bin/cyberglove_remapper
