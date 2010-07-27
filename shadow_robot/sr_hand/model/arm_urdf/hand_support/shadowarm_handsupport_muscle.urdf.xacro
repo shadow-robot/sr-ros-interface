@@ -1,5 +1,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+  <include filename="$(find sr_hand)/model/arm_urdf/hand_support/shadowarm_handsupport_muscle.transmission.xacro" />
+
   <xacro:macro name="shadowarm_handsupport_muscle" params="parent">
 
     <link name="shadowarm_handsupport_muscle">
@@ -35,6 +37,8 @@
       <limit lower="-${M_PI/2}" upper="${M_PI/2}"
       effort="10" velocity="1.0"/>
     </joint>
+
+    <xacro:shadowarm_handsupport_muscle_transmission />
     
   </xacro:macro>
   

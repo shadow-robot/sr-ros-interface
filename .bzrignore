@@ -15,21 +15,14 @@ shadow_robot/cyberglove/srv/lisp
 shadow_robot/sr_control_gui/bin
 shadow_robot/sr_control_gui/build
 shadow_robot/cyberglove/src/cyberglove
-<<<<<<< TREE
-=======
 shadow_robot/sr_control_gui/param/new_calibration.cal
 shadow_robot/sr_remappers/bin
 shadow_robot/sr_remappers_bk
 shadow_robot/sr_control_gui/param/new_calibration_2.cal
->>>>>>> MERGE-SOURCE
 shadow_robot/sr_remappers/build
-shadow_robot/sr_remappers/bin/cyberglove_remapper
-<<<<<<< TREE
 shadow_robot/threeD_mouse/bin
 shadow_robot/threeD_mouse/build
-=======
 shadow_robot/optical_acquisition/bin
 shadow_robot/optical_acquisition/build
 shadow_robot/optical_synchronizer/bin
 shadow_robot/optical_synchronizer/build
->>>>>>> MERGE-SOURCE

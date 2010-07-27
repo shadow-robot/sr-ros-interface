@@ -1,5 +1,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+  <include filename="$(find sr_hand)/model/arm_urdf/upper_arm/shadowarm_upperarm.transmission.xacro" />
+
   <xacro:macro name="shadowarm_upperarm" params="parent">
   
     <link name="shadowarm_upperarm">
@@ -34,6 +36,8 @@
       <axis xyz="0 1 0" />
       <limit lower="0" upper="${M_PI/2}" effort="10" velocity="1.0"/>
     </joint>
+
+    <xacro:shadowarm_upperarm_transmission />
   
   </xacro:macro>
 
