@@ -149,7 +149,41 @@ You can then spawn the hand model in gazebo:
 rosrun gazebo spawn_model -file `rospack find sr_hand`/model/shadowhand_motor.urdf -urdf -model shadowhand
 \endverbatim
 
+Or, if you want to spawn the arm as well:
+\verbatim
+rosrun gazebo spawn_model -file `rospack find sr_hand`/model/sr_arm_motor.urdf -urdf -model sr_arm
+\endverbatim
+
 For more information on how to use gazebo in ROS, you should probably have a look at: http://www.ros.org/wiki/simulator_gazebo/Tutorials/Gazebo_ROS_API
+
+\section codemodif Modifying the Models
+The URDF Models used for the visualization (with Rviz) and the simulation (with Gazebo) are available in model/arm_urdf and model/hand_urdf.
+The arm and hand models are using xacro macros, which allow different robots to be linked in Gazebo (in order to simulate the behaviour of the arm with the hand at its extremity).
+If you want to modify something in the models, you have two things to do: change the informations in the right .urdf.xacro file, and then generate the .urdf file that will be used as a model.
+
+\subsection changethexacrofile Modify the .urdf.xacro file
+The architecture of the robot is as follows (each robot has a motor version and a muscle version):
+\li An arm_and_hand is composed of a full_arm and a full_hand.
+\li An sr_arm is composed of a single full_arm
+\li A shadowhand is composed of a single full_hand
+\li A full_arm is composed of a shadowarm_base, a shadowarm_trunk, a shadowarm_upperarm, a shadowarm_lowerarm and a shadowarm_handsupport
+\li A full_hand is composed of a forearm, a wrist, a palm, a thumb, three fingers and a little_finger
+\li A finger is composed of a knuckle, a proximal, a middle and a distal, plus a metacarpal for the little_finger.
+\li A thumb is a little more complicated, with a hub and a base to add the missing motions.
+
+All those parts are represented by "link" tags in the URDF files, and linked between them by "joint" tags.
+To modify data in a part of the hand, open the right .urdf.xacro file (for example to modify the size of the last part of each finger, you want to open the model/hand_urdf/finger/distal.urdf.xacro).
+Thus, the modification will be applied to all the identical parts of the hand.
+Then, just save the file.
+
+\subsection generatetheurdffile Generate the .urdf file
+the .urdf.xacro model has to be turned into a classic .urdf file to be used by ROS.
+To generate the good file, go to the model/robots directory and use the following command: (the example is given to generate the motor version of the hand)
+\verbatim
+rosrun xacro xacro.py -o shadowhand_motor.urdf xacro/shadowhand_motor.urdf.xacro
+\endverbatim
+The .urdf.xacro robot model which is in the model/robots/xacro directory is turned into an urdf file in the model/robots directory
+(Warning: the urdf file in the model/robots directory has to exist before running the command, because the order is to overwrite what was in the file)
 
 
 \section codeapi Code API

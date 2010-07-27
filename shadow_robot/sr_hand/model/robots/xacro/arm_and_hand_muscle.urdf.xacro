@@ -3,6 +3,7 @@
   <include filename="$(find sr_hand)/model/materials.urdf.xacro" />
   <include filename="$(find sr_hand)/model/arm_urdf/full_arm_muscle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/full_hand_muscle.urdf.xacro" />
+  <include filename="$(find sr_hand)/model/gazebo/gazebo.urdf.xacro" />
   
   <xacro:sr_arm_muscle>
   </xacro:sr_arm_muscle>

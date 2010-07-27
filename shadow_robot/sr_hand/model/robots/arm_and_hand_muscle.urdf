@@ -22,6 +22,12 @@
   <material name="White">
     <color rgba="1.0 1.0 1.0 1.0"/>
   </material>
+  <gazebo>
+    <controller:gazebo_ros_controller_manager name="gazebo_ros_controller_manager" plugin="libgazebo_ros_controller_manager.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>1000.0</updateRate>
+    </controller:gazebo_ros_controller_manager>
+  </gazebo>
   <link name="shadowarm_base">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -77,6 +83,12 @@
     <axis xyz="0 0 1"/>
     <limit effort="10" lower="-1.57079632679" upper="0.785398163397" velocity="1.0"/>
   </joint>
+  <transmission name="trunk_rotation_transmission" type="trunk_rotation_transmission">
+    <actuator name="trunk_rotation"/>
+    <joint name="trunk_rotation"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+  </transmission>
   <link name="shadowarm_upperarm">
     <inertial>
       <origin rpy="0 0 0" xyz="0.1845 -0.067 0"/>
@@ -108,6 +120,12 @@
     <axis xyz="0 1 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="shoulder_rotation_transmission" type="shoulder_rotation_transmission">
+    <actuator name="shoulder_rotation"/>
+    <joint name="shoulder_rotation"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+  </transmission>
   <link name="shadowarm_lowerarm">
     <inertial>
       <origin rpy="0 0 0" xyz="0.0655 0 -0.08"/>
@@ -139,6 +157,12 @@
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="2.09439510239" velocity="1.0"/>
   </joint>
+  <transmission name="elbow_abduction_transmission" type="elbow_abduction_transmission">
+    <actuator name="elbow_abduction"/>
+    <joint name="elbow_abduction"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+  </transmission>
   <link name="shadowarm_handsupport_muscle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -170,6 +194,12 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="-1.57079632679" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="forearm_rotation_transmission" type="forearm_rotation_transmission">
+    <actuator name="forearm_rotation"/>
+    <joint name="forearm_rotation"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+  </transmission>
   <joint name="arm_link" type="revolute">
     <parent link="shadowarm_handsupport_muscle"/>
     <child link="forearm_muscle"/>
