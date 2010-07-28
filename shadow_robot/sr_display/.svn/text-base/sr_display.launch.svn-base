@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="sr_display" name="marker_display" type="motor_info_publisher" >
+    <param name="publish_frequency" type="double" value="2.0" />
+  </node>
+</launch>
