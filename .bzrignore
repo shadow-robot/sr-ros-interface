@@ -17,4 +17,3 @@ shadow_robot/sr_control_gui/build
 shadow_robot/cyberglove/src/cyberglove
 shadow_robot/sr_remappers/build
 shadow_robot/sr_remappers/bin/cyberglove_remapper
-shadow_robot/sr_display
