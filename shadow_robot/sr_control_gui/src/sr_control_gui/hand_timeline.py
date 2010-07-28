@@ -60,6 +60,7 @@ class HandTimeLine(wx.Panel):
         #self.bar = wx.ScrollBar(self, -1)
         self.myShadowHand = hand
         self.window = window
+        self.resizing = True
         self.panel=wx.Panel(self, id)
         self.grasps = {}
         self.lines = []
@@ -149,6 +150,13 @@ class HandTimeLine(wx.Panel):
         self.window.Refresh()
         self.window.Update()
         self.window.SetSize((1280,600))
+        if self.resizing :
+            self.window.SetSize((self.window.GetSize().GetWidth(),self.window.GetSize().GetHeight()+1))
+            self.resizing = False
+        else :
+            self.window.SetSize((self.window.GetSize().GetWidth(),self.window.GetSize().GetHeight()-1))
+            self.resizing = True
+            
 
     def addGrasps(self, event):
         self.myParser.parse_tree(self.button_grasps.GetPath())
@@ -176,7 +184,7 @@ class HandTimeLine(wx.Panel):
             if float(line.interpolate_time.GetValue()) == 0.0:
                     self.myShadowHand.sendupdate_from_dict(next_step.joints_and_positions)   
             else:
-                for interpolation in range (0,10*int(line.interpolate_time.GetValue())):
+                for interpolation in range (0,10*int(float(line.interpolate_time.GetValue()))):
                     targets_to_send = interpoler.interpolate(100.0*interpolation/(10*float(line.interpolate_time.GetValue())))
                     self.myShadowHand.sendupdate_from_dict(targets_to_send)   
                     time.sleep(0.1)
@@ -186,7 +194,7 @@ class HandTimeLine(wx.Panel):
             line.SetBackgroundColour(wx.NullColor)
             loop_value = line.looping_iter.GetValue()
             if line.looping.GetSelection() != 0:
-                line.looping_iter.SetValue(str(int(line.looping_iter.GetValue())-1))
+                line.looping_iter.SetValue(str(int(float(line.looping_iter.GetValue()))-1))
                 self.play_steps(int(line.looping.GetSelection())-1,line.number, int(line.looping_iter.GetValue())+1)
             line.looping_iter.SetValue(loop_value)
                 
