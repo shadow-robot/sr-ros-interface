@@ -15,6 +15,9 @@
 namespace opticaldataglove
 {
 
+/*
+ * Interfacing the acquisition and computing process with the hand over ROS
+ */
 class MessagePublisher 
 {
 public:
@@ -26,8 +29,17 @@ public:
 
     std::string publishedTopic;
     
+/*
+ * Publishes the position of the hand on the specified topic
+ */
     void publish();
+/*
+ * ROS service to start the publishing
+ */
     bool start(opticaldataglove::Start::Request &req, opticaldataglove::Start::Response &res);
+/*
+ * ROS service to stop the publishing
+ */
     bool stop(opticaldataglove::Stop::Request &req, opticaldataglove::Stop::Response &res);
 
 private:

@@ -5,6 +5,9 @@
 
 namespace opticaldataglove{
 
+/*
+ * Class describing the distances between the joints on the human hand. These should be get only once.
+ */
 class HandModel
 {
 

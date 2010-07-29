@@ -8,15 +8,24 @@
 
 namespace opticaldataglove{
 
+/*
+ * Abstract class to interface the DataAnalyser with the Message Publisher : computing the data received by the analyser and convert it to joints positions
+ */
 class PositionMapper
 {
 
 public:
     
+/*
+ * Constructor
+ */
     PositionMapper()
     {
     };
 
+/*
+ * Destructor
+ */
     ~PositionMapper()
     {
     };
