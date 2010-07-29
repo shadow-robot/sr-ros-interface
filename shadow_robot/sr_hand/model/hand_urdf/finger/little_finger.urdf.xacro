@@ -44,6 +44,14 @@
       <limit lower="-0.43633231299858238" upper="0.43633231299858238"
       effort="10" velocity="1.0"/>
     </joint>
+
+    <transmission type="SimpleTransmission" name="lfknuckle_transmission">
+      <actuator name="LFJ4" />
+      <joint name="LFJ4" />
+      <mechanicalReduction>1</mechanicalReduction>
+      <motorTorqueConstant>1</motorTorqueConstant>
+      <pulsesPerRevolution>90000</pulsesPerRevolution>
+    </transmission>
     
     <xacro:proximal link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${link_prefix}knuckle" >
     </xacro:proximal>

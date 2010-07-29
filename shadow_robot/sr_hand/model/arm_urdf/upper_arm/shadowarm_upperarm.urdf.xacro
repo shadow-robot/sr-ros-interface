@@ -35,6 +35,7 @@
       <origin xyz="0 -0.134 0.5405" rpy="0 0 0" />
       <axis xyz="0 1 0" />
       <limit lower="0" upper="${M_PI/2}" effort="10" velocity="1.0"/>
+      <dynamics damping="1"/>
     </joint>
 
     <xacro:shadowarm_upperarm_transmission />

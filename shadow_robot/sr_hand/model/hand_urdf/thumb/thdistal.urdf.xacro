@@ -1,5 +1,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <include filename="$(find sr_hand)/model/hand_urdf/thumb/thdistal.transmission.xacro" />
+
   <xacro:macro name="thdistal" params="parent">
 
     <link name="thdistal">
@@ -37,6 +39,8 @@
       <limit lower="0" upper="1.571" effort="10"
       velocity="1.0" />
     </joint>
+
+    <xacro:thdistal_transmission />
 
   </xacro:macro>
   

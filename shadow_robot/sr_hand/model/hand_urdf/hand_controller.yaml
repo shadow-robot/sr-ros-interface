@@ -1,0 +1,215 @@
+wrist_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: WRJ2
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+palm_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: WRJ1
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+ffknuckle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: FFJ4
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+ffproximal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: FFJ3
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+ffmiddle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: FFJ2
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+ffdistal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: FFJ1
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+mfknuckle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: MFJ4
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+mfproximal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: MFJ3
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+mfmiddle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: MFJ2
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+mfdistal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: MFJ1
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+rfknuckle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: RFJ4
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+rfproximal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: RFJ3
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+rfmiddle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: RFJ2
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+rfdistal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: RFJ1
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+lfmetacarpal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: LFJ5
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+lfknuckle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: LFJ4
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+lfproximal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: LFJ3
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+lfmiddle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: LFJ2
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+lfdistal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: LFJ1
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+thbase_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: THJ5
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+thproximal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: THJ4
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+thhub_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: THJ3
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+thmiddle_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: THJ2
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+
+thdistal_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: THJ1
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1

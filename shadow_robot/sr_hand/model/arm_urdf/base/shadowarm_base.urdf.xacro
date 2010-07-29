@@ -4,6 +4,8 @@
 <property name="M_PI" value="3.1415926535897931" />
 
 <xacro:macro name="shadowarm_base">
+  <link name="world" />
+
   <link name="shadowarm_base">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/> 
@@ -28,6 +30,12 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
+
+  <joint name="base_fix" type="fixed">
+    <parent link="world"/>
+    <child link="shadowarm_base"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
 
 </xacro:macro>
 

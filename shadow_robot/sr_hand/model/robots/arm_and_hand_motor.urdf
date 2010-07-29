@@ -28,6 +28,7 @@
       <updateRate>1000.0</updateRate>
     </controller:gazebo_ros_controller_manager>
   </gazebo>
+  <link name="world"/>
   <link name="shadowarm_base">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -52,6 +53,11 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
+  <joint name="base_fix" type="fixed">
+    <parent link="world"/>
+    <child link="shadowarm_base"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
   <link name="shadowarm_trunk">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.27025"/>
@@ -82,12 +88,14 @@
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
     <axis xyz="0 0 1"/>
     <limit effort="10" lower="-1.57079632679" upper="0.785398163397" velocity="1.0"/>
+    <dynamics damping="1"/>
   </joint>
-  <transmission name="trunk_rotation_transmission" type="trunk_rotation_transmission">
+  <transmission name="trunk_rotation_transmission" type="SimpleTransmission">
     <actuator name="trunk_rotation"/>
     <joint name="trunk_rotation"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
   <link name="shadowarm_upperarm">
     <inertial>
@@ -119,12 +127,14 @@
     <origin rpy="0 0 0" xyz="0 -0.134 0.5405"/>
     <axis xyz="0 1 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
+    <dynamics damping="1"/>
   </joint>
-  <transmission name="shoulder_rotation_transmission" type="shoulder_rotation_transmission">
+  <transmission name="shoulder_rotation_transmission" type="SimpleTransmission">
     <actuator name="shoulder_rotation"/>
     <joint name="shoulder_rotation"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
   <link name="shadowarm_lowerarm">
     <inertial>
@@ -156,12 +166,14 @@
     <origin rpy="0 0 0" xyz="0.369 0 0"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="2.09439510239" velocity="1.0"/>
+    <dynamics damping="1"/>
   </joint>
-  <transmission name="elbow_abduction_transmission" type="elbow_abduction_transmission">
+  <transmission name="elbow_abduction_transmission" type="SimpleTransmission">
     <actuator name="elbow_abduction"/>
     <joint name="elbow_abduction"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
   <link name="shadowarm_handsupport_motor">
     <inertial>
@@ -193,12 +205,14 @@
     <origin rpy="0 0 0" xyz="0.131 0 -0.08"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="-1.57079632679" upper="1.57079632679" velocity="1.0"/>
+    <dynamics damping="1"/>
   </joint>
-  <transmission name="forearm_rotation_transmission" type="forearm_rotation_transmission">
+  <transmission name="forearm_rotation_transmission" type="SimpleTransmission">
     <actuator name="forearm_rotation"/>
     <joint name="forearm_rotation"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
   <joint name="arm_link" type="revolute">
     <parent link="shadowarm_handsupport_motor"/>
@@ -264,6 +278,13 @@
     <axis xyz="0 1 0"/>
     <limit effort="10" lower="-0.52359877559829882" upper="0.17453292519943295" velocity="1.0"/>
   </joint>
+  <transmission name="wrist_transmission" type="SimpleTransmission">
+    <actuator name="WRJ2"/>
+    <joint name="WRJ2"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="palm">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0.010 0.247"/>
@@ -294,6 +315,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="-0.78539816339744828" upper="0.6108652381980153" velocity="1.0"/>
   </joint>
+  <transmission name="palm_transmission" type="SimpleTransmission">
+    <actuator name="WRJ1"/>
+    <joint name="WRJ1"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="ffknuckle">
     <inertial>
       <!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
@@ -326,6 +354,13 @@
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
   </joint>
+  <transmission name="ffknuckle_transmission" type="SimpleTransmission">
+    <actuator name="FFJ4"/>
+    <joint name="FFJ4"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="ffproximal">
     <inertial>
       <mass value="0.014"/>
@@ -356,6 +391,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="ffproximal_transmission" type="SimpleTransmission">
+    <actuator name="FFJ3"/>
+    <joint name="FFJ3"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="ffmiddle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.045"/>
@@ -386,6 +428,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="ffmiddle_transmission" type="SimpleTransmission">
+    <actuator name="FFJ2"/>
+    <joint name="FFJ2"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="ffdistal">
     <inertial>
       <mass value="0.010"/>
@@ -416,6 +465,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="ffdistal_transmission" type="SimpleTransmission">
+    <actuator name="FFJ1"/>
+    <joint name="FFJ1"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="mfknuckle">
     <inertial>
       <!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
@@ -448,6 +504,13 @@
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
   </joint>
+  <transmission name="mfknuckle_transmission" type="SimpleTransmission">
+    <actuator name="MFJ4"/>
+    <joint name="MFJ4"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="mfproximal">
     <inertial>
       <mass value="0.014"/>
@@ -478,6 +541,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="mfproximal_transmission" type="SimpleTransmission">
+    <actuator name="MFJ3"/>
+    <joint name="MFJ3"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="mfmiddle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.045"/>
@@ -508,6 +578,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="mfmiddle_transmission" type="SimpleTransmission">
+    <actuator name="MFJ2"/>
+    <joint name="MFJ2"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="mfdistal">
     <inertial>
       <mass value="0.010"/>
@@ -538,6 +615,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="mfdistal_transmission" type="SimpleTransmission">
+    <actuator name="MFJ1"/>
+    <joint name="MFJ1"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="rfknuckle">
     <inertial>
       <!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
@@ -570,6 +654,13 @@
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
   </joint>
+  <transmission name="rfknuckle_transmission" type="SimpleTransmission">
+    <actuator name="RFJ4"/>
+    <joint name="RFJ4"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="rfproximal">
     <inertial>
       <mass value="0.014"/>
@@ -600,6 +691,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="rfproximal_transmission" type="SimpleTransmission">
+    <actuator name="RFJ3"/>
+    <joint name="RFJ3"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="rfmiddle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.045"/>
@@ -630,6 +728,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="rfmiddle_transmission" type="SimpleTransmission">
+    <actuator name="RFJ2"/>
+    <joint name="RFJ2"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="rfdistal">
     <inertial>
       <mass value="0.010"/>
@@ -660,6 +765,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="rfdistal_transmission" type="SimpleTransmission">
+    <actuator name="RFJ1"/>
+    <joint name="RFJ1"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="lfmetacarpal">
     <inertial>
       <origin rpy="0 0 0" xyz="0.00568 0 -0.12061"/>
@@ -690,6 +802,13 @@
     <axis xyz="0.57 0 0.82"/>
     <limit effort="10" lower="0" upper="0.69813170079773179" velocity="1.0"/>
   </joint>
+  <transmission name="lfmetacarpal_transmission" type="SimpleTransmission">
+    <actuator name="LFJ5"/>
+    <joint name="LFJ5"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="lfknuckle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.0425"/>
@@ -720,6 +839,13 @@
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
   </joint>
+  <transmission name="lfknuckle_transmission" type="SimpleTransmission">
+    <actuator name="LFJ4"/>
+    <joint name="LFJ4"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="lfproximal">
     <inertial>
       <mass value="0.014"/>
@@ -750,6 +876,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="lfproximal_transmission" type="SimpleTransmission">
+    <actuator name="LFJ3"/>
+    <joint name="LFJ3"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="lfmiddle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.045"/>
@@ -780,6 +913,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="lfmiddle_transmission" type="SimpleTransmission">
+    <actuator name="LFJ2"/>
+    <joint name="LFJ2"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="lfdistal">
     <inertial>
       <mass value="0.010"/>
@@ -810,6 +950,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
   </joint>
+  <transmission name="lfdistal_transmission" type="SimpleTransmission">
+    <actuator name="LFJ1"/>
+    <joint name="LFJ1"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="thbase">
     <inertial>
       <mass value="0.010"/>
@@ -842,6 +989,13 @@
     <axis xyz="0 0 -1"/>
     <limit effort="10" lower="-1.047" upper="1.047" velocity="1.0"/>
   </joint>
+  <transmission name="thbase_transmission" type="SimpleTransmission">
+    <actuator name="THJ5"/>
+    <joint name="THJ5"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="thproximal">
     <inertial>
       <mass value="0.016"/>
@@ -874,6 +1028,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.309" velocity="1.0"/>
   </joint>
+  <transmission name="thproximal_transmission" type="SimpleTransmission">
+    <actuator name="THJ4"/>
+    <joint name="THJ4"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="thhub">
     <inertial>
       <mass value="0.002"/>
@@ -906,6 +1067,13 @@
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="-0.2618" upper="0.2618" velocity="1.0"/>
   </joint>
+  <transmission name="thhub_transmission" type="SimpleTransmission">
+    <actuator name="THJ3"/>
+    <joint name="THJ3"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="thmiddle">
     <inertial>
       <mass value="0.016"/>
@@ -938,6 +1106,13 @@
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.5237" upper="0.5237" velocity="1.0"/>
   </joint>
+  <transmission name="thmiddle_transmission" type="SimpleTransmission">
+    <actuator name="THJ2"/>
+    <joint name="THJ2"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
   <link name="thdistal">
     <inertial>
       <mass value="0.016"/>
@@ -970,4 +1145,11 @@
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="1.571" velocity="1.0"/>
   </joint>
+  <transmission name="thdistal_transmission" type="SimpleTransmission">
+    <actuator name="THJ1"/>
+    <joint name="THJ1"/>
+    <mechanicalReduction>1</mechanicalReduction>
+    <motorTorqueConstant>1</motorTorqueConstant>
+    <pulsesPerRevolution>90000</pulsesPerRevolution>
+  </transmission>
 </robot>

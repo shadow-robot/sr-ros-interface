@@ -1,5 +1,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <include filename="$(find sr_hand)/model/hand_urdf/thumb/thbase.transmission.xacro" />
+
   <xacro:macro name="thbase" params="parent">
   
     <link name="thbase">
@@ -37,6 +39,8 @@
       <limit lower="-1.047" upper="1.047" effort="10"
       velocity="1.0" />
     </joint>
+
+    <xacro:thbase_transmission />
   
   </xacro:macro>
   
