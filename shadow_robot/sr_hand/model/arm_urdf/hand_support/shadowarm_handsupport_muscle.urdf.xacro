@@ -7,7 +7,7 @@
     <link name="shadowarm_handsupport_muscle">
       <inertial>
 	<origin xyz="0 0 0" rpy="0 0 0" />
-	<mass value="1" />
+	<mass value="0.75" />
 	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
       </inertial>
       <visual>
@@ -36,6 +36,7 @@
       <axis xyz="1 0 0" />
       <limit lower="-${M_PI/2}" upper="${M_PI/2}"
       effort="10" velocity="1.0"/>
+      <dynamics damping="1"/>
     </joint>
 
     <xacro:shadowarm_handsupport_muscle_transmission />

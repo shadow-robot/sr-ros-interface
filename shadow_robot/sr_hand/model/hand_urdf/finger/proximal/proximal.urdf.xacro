@@ -1,5 +1,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <include filename="$(find sr_hand)/model/hand_urdf/finger/proximal/proximal.transmission.xacro" />
+
   <xacro:macro name="proximal" params="link_prefix joint_prefix parent">
   
     <link name="${link_prefix}proximal">
@@ -35,6 +37,8 @@
       <limit lower="0" upper="${M_PI/2}" effort="10"
       velocity="1.0"/>
     </joint>
+
+    <xacro:proximal_transmission />
   
   </xacro:macro>
   

@@ -1,5 +1,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <include filename="$(find sr_hand)/model/hand_urdf/finger/knuckle/knuckle.transmission.xacro" />
+
   <xacro:macro name="knuckle" params="link_prefix joint_prefix parent *origin">
   
     <link name="${link_prefix}knuckle">
@@ -37,6 +39,8 @@
       <limit lower="-0.43633231299858238" upper="0.43633231299858238"
       effort="10" velocity="1.0"/>
     </joint>
+
+    <xacro:knuckle_transmission />
 
   </xacro:macro>
   

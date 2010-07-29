@@ -1,5 +1,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <include filename="$(find sr_hand)/model/hand_urdf/finger/middle/middle.transmission.xacro" />
+
   <xacro:macro name="middle" params="link_prefix joint_prefix parent">
   
     <link name="${link_prefix}middle">
@@ -35,6 +37,8 @@
       <limit lower="0" upper="${M_PI/2}" effort="10"
       velocity="1.0" />
     </joint>
+
+    <xacro:middle_transmission />
   
   </xacro:macro>
   
