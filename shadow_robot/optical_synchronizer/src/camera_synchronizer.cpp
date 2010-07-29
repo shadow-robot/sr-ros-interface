@@ -97,7 +97,7 @@ void CameraSynchronizer::callback_info_right(const sensor_msgs::CameraInfoConstP
 //	ret.header=msg->header;
 	ret.header.stamp=ros::Time(timestamp);
 //	ret.header.frame_id="/stereo/left/image_raw";
-	ret.encoding="bgr8";
+	ret.encoding="rgb8";
 	ret.is_bigendian=msg->is_bigendian;
 	ret.step=msg->step;
 	ret.data=msg->data;
