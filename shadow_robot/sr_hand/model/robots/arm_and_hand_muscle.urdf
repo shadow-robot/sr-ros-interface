@@ -32,7 +32,7 @@
   <link name="shadowarm_base">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="1000"/>
+      <mass value="0.4"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
     </inertial>
     <visual>
@@ -100,7 +100,7 @@
   <link name="shadowarm_upperarm">
     <inertial>
       <origin rpy="0 0 0" xyz="0.1845 -0.067 0"/>
-      <mass value="5"/>
+      <mass value="2"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
     </inertial>
     <visual>
@@ -139,7 +139,7 @@
   <link name="shadowarm_lowerarm">
     <inertial>
       <origin rpy="0 0 0" xyz="0.0655 0 -0.08"/>
-      <mass value="5"/>
+      <mass value="1.7"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
     </inertial>
     <visual>
@@ -178,7 +178,7 @@
   <link name="shadowarm_handsupport_muscle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="1"/>
+      <mass value="0.75"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
     </inertial>
     <visual>
@@ -217,7 +217,7 @@
   <joint name="arm_link" type="revolute">
     <parent link="shadowarm_handsupport_muscle"/>
     <child link="forearm_muscle"/>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <origin rpy="1.57079632679 0 1.57079632679" xyz="0 0 0"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="0" velocity="1.0"/>
   </joint>

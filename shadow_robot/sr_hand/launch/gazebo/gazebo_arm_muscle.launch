@@ -2,10 +2,10 @@
 
   <!-- start gazebo with an empty plane -->
   <param name="/use_sim_time" value="true" />
-  <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find sr_hand)/gazebo/empty.world" respawn="false" output="screen"/>
+  <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find sr_hand)/launch/gazebo/empty.world" respawn="false" output="screen"/>
 
   <!-- spawn the arm model -->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_muscle.urdf.xacro'" />
   <node name="spawn_arm" pkg="gazebo_tools" type="gazebo_model" args="-p robot_description spawn" respawn="false" output="screen" />
 
   <!-- Controllers for the arm -->
