@@ -6,15 +6,23 @@
 
 namespace opticaldataglove{
 
+/*
+ * Abstract class to define methods to make conversions between the raw source to the fingertips positions
+ * Key methods to implement in subclass are getFingerTipPositions and getHandModel, which is used to determine the distances between the human hand articulations
+ */
 class DataAnalyser
 {
 
 public:
-
+/*
+ * Constructor
+ */
     DataAnalyser()
     {
     };
-
+/*
+ * Destructor
+ */
     ~DataAnalyser()
     {
     };

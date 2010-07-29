@@ -5,8 +5,12 @@
 
 namespace opticaldataglove{
 
+/*
+ * Describes a joint of the hand with any possible information
+ */
 class JointData
 {
+
 public:
   double position;
   double target;

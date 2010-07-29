@@ -5,12 +5,21 @@
 
 namespace opticaldataglove{
 
+/*
+ * Class performing the conversion between 2D pictures to fingertips positions
+ */
 class TwoDimensionsAnalyser : public DataAnalyser
 {
 public :
 
+/*
+ * Constructor
+ */
     TwoDimensionsAnalyser();
 
+/*
+ * Destructor
+ */
     ~TwoDimensionsAnalyser();
 
 
