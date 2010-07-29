@@ -1,0 +1,9 @@
+<stack>
+  <description brief="dataglove">dataglove</description>
+  <author>Maintained by hand</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dataglove</url>
+  <depend stack="ros" />
+
+</stack>

@@ -25,3 +25,13 @@ shadow_robot/optical_acquisition/bin
 shadow_robot/optical_acquisition/build
 shadow_robot/optical_synchronizer/bin
 shadow_robot/optical_synchronizer/build
+shadow_robot/dataglove/dataglove_processing/.bzr
+shadow_robot/dataglove/dataglove_processing/bin
+shadow_robot/dataglove/dataglove_processing/buildshadow_robot/dataglove/dataglove_processing/srv_gen
+shadow_robot/dataglove/dataglove_processing/srv/lisp
+shadow_robot/dataglove/optical_acquisition/bin
+shadow_robot/dataglove/optical_acquisition/build
+shadow_robot/dataglove/optical_synchronizer/bin
+shadow_robot/dataglove/optical_synchronizer/build
+shadow_robot/dataglove/dataglove_processing/build
+shadow_robot/dataglove/dataglove_processing/srv_gen
