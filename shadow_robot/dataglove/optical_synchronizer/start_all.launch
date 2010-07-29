@@ -6,7 +6,7 @@
 	<param name="right_async" type="string" value="/stereo/right_async/image_raw" />
 	<param name="left_sync" type="string" value="/stereo/left/image_raw" />
 	<param name="right_sync" type="string" value="/stereo/right/image_raw" />
-	<param name="frequency" type="double" value="30"/>
+	<param name="frequency" type="double" value="15"/>
 	<param name="left_info_async" type="string" value="/stereo/left_async/camera_info" />
 	<param name="right_info_async" type="string" value="/stereo/right_async/camera_info" />
 	<param name="left_info_sync" type="string" value="/stereo/left/camera_info" />

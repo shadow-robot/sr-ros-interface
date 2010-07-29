@@ -1,0 +1,13 @@
+These values are the best found with the two firewire webcams
+rosrun dynamic_reconfigure reconfigure_gui to set them at first start
+
+prefilter_size : 9
+prefilter_cap : 8
+correlation_window_size : -43
+min_disparity : -23
+disparity_range : 128
+uniqueness_ratio : 0
+texture_threshold : 10
+speckle_size : 110
+speckle_range : 31
+
