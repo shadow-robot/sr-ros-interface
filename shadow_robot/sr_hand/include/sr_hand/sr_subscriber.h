@@ -25,12 +25,6 @@
 
 #include <boost/smart_ptr.hpp>
 
-//kdl
-#include <kdl/tree.hpp>
-#include <kdl/treefksolverpos_recursive.hpp>
-#include <kdl/treeiksolvervel_wdls.hpp>
-#include <kdl/treeiksolverpos_nr_jl.hpp>
-
 //messages
 #include <sr_hand/joints_data.h>
 #include <sr_hand/joint.h>
@@ -40,10 +34,10 @@
 #include <sr_hand/reverseKinematics.h>
 
 #include "sr_hand/hand/shadowhand.h"
+#include "sr_hand/sr_kinematics.h"
 
 using namespace ros;
 using namespace shadowhand;
-using namespace KDL;
 
 namespace shadowhand_subscriber{
 
@@ -77,31 +71,9 @@ class ShadowhandSubscriber
 
   ///The shadowhand / shadowarm object (can be either an object connected to the real robot or a virtual hand).
   boost::shared_ptr<Shadowhand>  shadowhand;
-
-  /// KDL tree containing the robot kinematic chains
-  const Tree shadowhand_kinematic_tree;
   
-  ///a vector containing the end effector names
-  static const std::vector<std::string> end_effector_names;
-  ///a vector of KDL joints containing the min and max values of the joints
-  static const JntArray joints_min, joints_max;
+  boost::shared_ptr<SrKinematics> sr_kinematics;
 
-  /**
-   *    KDL kinematic solvers
-   * We need 3 solvers as the reverse position kinematics solver works
-   * recursively: 
-   * - starting position
-   * - evaluation of the cartesian position with the forward solver
-   * - if different from target => use inverse velocity solver to
-   *   generate a new starting position
-   * - loop until position = target
-   */
-  TreeFkSolverPos_recursive treeFkSolverPos;
-  /// reverse velocity kinematics solver
-  TreeIkSolverVel_wdls treeIkSolverVel;
-  /// reverse position kinematics solver
-  TreeIkSolverPos_NR_JL treeSolverPos_NR_JL;
-  
   
   ///init function
   void init();

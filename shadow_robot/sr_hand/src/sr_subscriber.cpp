@@ -18,79 +18,29 @@
 using namespace std;
 
 
-namespace {
-  vector<string> init_end_effector_names()
-  {
-    vector<string> endeffnames;
-    endeffnames.push_back("ffdistal");
-    return endeffnames;
-  }
-
-
-  //TODO do this properly
-  KDL::JntArray init_joints_min()
-  {
-    KDL::JntArray jmin(19);
-    for( unsigned int i = 0; i < 19 ; ++i )
-      jmin(i) = 0.0;
-    return jmin;
-  }
-  KDL::JntArray init_joints_max()
-  {
-    KDL::JntArray jmax(19);
-    for( unsigned int i = 0; i < 19 ; ++i )
-      jmax(i) = KDL::PI/2.0;
-
-    return jmax;
-  }
-}
-
-
 namespace shadowhand_subscriber {
-
-  const vector<string> ShadowhandSubscriber::end_effector_names = init_end_effector_names();
-  const KDL::JntArray ShadowhandSubscriber::joints_min = init_joints_min();
-  const KDL::JntArray ShadowhandSubscriber::joints_max = init_joints_max();
 
   /////////////////////////////////
   //    CONSTRUCTOR/DESTRUCTOR   //
   /////////////////////////////////
 
   ShadowhandSubscriber::ShadowhandSubscriber(boost::shared_ptr<Shadowhand> sh)
-    : n_tilde("~"),
-      treeFkSolverPos(shadowhand_kinematic_tree), 
-      treeIkSolverVel(shadowhand_kinematic_tree, vector<string>()),
-      treeSolverPos_NR_JL( shadowhand_kinematic_tree, 
-			   vector<string>(), 
-			   KDL::JntArray(), 
-			   KDL::JntArray(), 
-			   treeFkSolverPos,
-			   treeIkSolverVel,
-			   100, 1e-6 )
+    : n_tilde("~")
   {
     shadowhand = sh;
 
-    ///////
+    ///////  
     // Initialize the subscribers
     //////
     ShadowhandSubscriber::init();
   }
 
   ShadowhandSubscriber::ShadowhandSubscriber(boost::shared_ptr<Shadowhand> sh, KDL::Tree tree)
-    : n_tilde("~"),
-      shadowhand_kinematic_tree(tree),
-      treeFkSolverPos(shadowhand_kinematic_tree),
-      treeIkSolverVel(shadowhand_kinematic_tree, end_effector_names),
-      treeSolverPos_NR_JL( shadowhand_kinematic_tree, 
-			   end_effector_names, 
-			   joints_min, 
-			   joints_max, 
-			   treeFkSolverPos,
-			   treeIkSolverVel,
-			   100, 1e-6 )
-    
+    : n_tilde("~")    
   {
     shadowhand = sh;
+
+    sr_kinematics = boost::shared_ptr<SrKinematics>(new SrKinematics(tree));
 
     ///////
     // Initialize the subscribers
@@ -194,44 +144,7 @@ namespace shadowhand_subscriber {
   
   void ShadowhandSubscriber::reverseKinematicsCallback( const sr_hand::reverseKinematicsConstPtr& msg )
   {
-    //get cartesian target from the received message
-    ROS_ERROR("toto1");
-    //KDL::Frames 
-    std::map<std::string, KDL::Frame> cartesian_targets;
-    cartesian_targets["ffdistal"] = KDL::Frame(KDL::Vector(0.027, -0.050, 0.376));
-    //KDL::Frame(KDL::Vector(0.027,0.050,0.376)));
-
-    ROS_ERROR("toto2: %d", shadowhand_kinematic_tree.getNrOfSegments());
-    shadowhand_kinematic_tree.getSegment("ffdistal");
-    ROS_ERROR("glasp");
-
-    //current positions used as a guess for the inverse kinematics
-    KDL::JntArray current_positions(shadowhand_kinematic_tree.getNrOfSegments());
-    for( unsigned int i=0; i<shadowhand_kinematic_tree.getNrOfSegments(); ++i)
-      {
-	//      ROS_ERROR("segment[%d]: %s",i, shadowhand_kinematic_tree[i]);
-	current_positions(i) = 0.0;
-      }
-    //TODO read data from the hand
-    KDL::JntArray computed_positions(shadowhand_kinematic_tree.getNrOfSegments());
-
-    ROS_ERROR("toto3");
-    int kinematics_status = -1;
-    kinematics_status = treeSolverPos_NR_JL.CartToJnt( current_positions, 
-						       cartesian_targets,
-						       computed_positions );
-    ROS_ERROR("toto4");
-    if (kinematics_status < 0)
-      {
-	ROS_WARN("Could not calculate inverse kinematics");
-      }
-    else
-      {
-	for( unsigned int i=0; i < 19 ; ++i )
-	  {
-	    ROS_ERROR("joint[%d] = %f", i, computed_positions(i));
-	  }
-      }
+    ROS_ERROR("not implemented yet");
   }
 
 } // end namespace
