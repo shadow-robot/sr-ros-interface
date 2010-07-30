@@ -139,20 +139,42 @@ The ROS interface comes with a model which can be used in gazebo. Gazebo is enca
 rosmake gazebo_worlds
 \endverbatim
 
-You then need to start gazebo:
+\subsection gazebolaunch Launching Gazebo and spawning your model
+You then can start any model that you want using the different launchers in \b launch/gazebo.
+For instance, if you want to spawn the motor hand in gazebo:
 \verbatim
-roslaunch sr_hand empty_world.launch
+roslaunch sr_hand gazebo_hand_motor.launch
 \endverbatim
+\image html http://img839.imageshack.us/img839/1015/handgazebo1.jpg
 
-You can then spawn the hand model in gazebo:
+\subsection robotmove Making your robot move
+When Gazebo is running with the robot model, you can use motion commands to make the robot move.
+Assuming you have the hand running (see picture above), you can make the FFJ3 joint (the first finger proximal part) by running:
 \verbatim
-rosrun gazebo spawn_model -file `rospack find sr_hand`/model/shadowhand_motor.urdf -urdf -model shadowhand
+rostopic pub /ffproximal_controller/command std_msgs/Float64 0.6
 \endverbatim
+In this example, ffproximal_controller can be any other hand controller, and 0.6 is the position of the joint, 0 being the lower limit and 1 the higher limit of the allowed motion angle.
+Back in Gazebo, the finger should be like this:
+\image html http://img20.imageshack.us/img20/3895/handgazebo2.jpg
 
-Or, if you want to spawn the arm as well:
-\verbatim
-rosrun gazebo spawn_model -file `rospack find sr_hand`/model/sr_arm_motor.urdf -urdf -model sr_arm
-\endverbatim
+\subsection pidmodify Modifying the PID values
+The models that are spawned in Gazebo are moveable thanks to PID controllers, which values are easy to modify, in order to set the behaviour of the robot as you wish.
+If you want to modify the hand PID values, just modify the \b model/hand_urdf/hand_controller.yaml file.
+If you want to modify the arm PID values, modify the \b model/arm_urdf/arm_controller.yaml file
+In those files each controller looks like:
+\code
+wrist_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: WRJ2
+  pid:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 1
+\endcode
+Modifying the P, I and D values will affect the speed and accuracy of your robot motions.
+Whend those values are set, just save the file and run your launch file again to apply the modifications.
+
 
 For more information on how to use gazebo in ROS, you should probably have a look at: http://www.ros.org/wiki/simulator_gazebo/Tutorials/Gazebo_ROS_API
 
