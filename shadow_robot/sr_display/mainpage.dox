@@ -29,7 +29,14 @@ You should have a view of the arm and hand, as follows:
 \verbatim
 roslaunch sr_display sr_display.launch
 \endverbatim
-In Rviz, all the informations about the hand apppear:
+
+In Rviz, press on the "Add" Button (bottom left of the window), a window appears, select "Markers", then press "OK"
+
+\image html http://img841.imageshack.us/img841/9085/handmainpage3.jpg
+
+In the left column, the "Markers" section appears. In the "Marker Topic" field, type \b "/motor_info" (or press the \b "..." button at the right of the field and select the \b "/motor_info" line.
+
+Then all the informations about the hand apppear:
 \image html http://img132.imageshack.us/img132/5956/handmainpage2.jpg
 
 If too many informations are displayed, you can untick some boxes in the left column of Rviz

@@ -11,7 +11,7 @@ It also contains an interface to Shadow Robot's muscle arm.
 
 
 \section howto How to use this interface
-If you didn't pulled the branch in the stacks (.path/to/ros/stacks), don't forget to add the path to the shadow_robot stack to your \p ROS_PACKAGE_PATH for the relevant packages to be found by ROS. To do this, edit your .bashrc:
+If you didn't pull the branch in the stacks (.path/to/ros/stacks), don't forget to add the path to the shadow_robot stack to your \p ROS_PACKAGE_PATH for the relevant packages to be found by ROS. To do this, edit your .bashrc:
 after the line "source /path/to/ros/setup.sh", add :
 \verbatim
 export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:/path/to/shadow_robot
@@ -149,7 +149,7 @@ roslaunch sr_hand gazebo_hand_motor.launch
 
 \subsection robotmove Making your robot move
 When Gazebo is running with the robot model, you can use motion commands to make the robot move.
-Assuming you have the hand running (see picture above), you can make the FFJ3 joint (the first finger proximal part) by running:
+Assuming you have the hand running (see picture above), you can move FFJ3 (the first finger proximal joint) by running:
 \verbatim
 rostopic pub /ffproximal_controller/command std_msgs/Float64 0.6
 \endverbatim
@@ -173,7 +173,7 @@ wrist_controller:
     i_clamp: 1
 \endcode
 Modifying the P, I and D values will affect the speed and accuracy of your robot motions.
-Whend those values are set, just save the file and run your launch file again to apply the modifications.
+When those values are set, just save the file and run your launch file again to apply the modifications.
 
 
 For more information on how to use gazebo in ROS, you should probably have a look at: http://www.ros.org/wiki/simulator_gazebo/Tutorials/Gazebo_ROS_API
