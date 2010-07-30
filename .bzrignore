@@ -40,3 +40,7 @@ shadow_robot/dataglove/optical_synchronizer/build
 shadow_robot/dataglove/dataglove_processing/build
 shadow_robot/dataglove/dataglove_processing/srv_gen
 >>>>>>> MERGE-SOURCE
+shadow_robot/cyberglove/srv/java
+shadow_robot/cyberglove/srv/oct
+shadow_robot/sr_hand/msg/java
+shadow_robot/sr_hand/msg/oct
