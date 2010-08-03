@@ -24,6 +24,15 @@ namespace shadowhand
   {
 #ifdef GAZEBO 
     ROS_INFO("This ROS interface is built for Gazebo.");
+    //initialises the subscriber to the Gazebo joint_states messages
+    std::string prefix;
+    std::string searched_param;
+    n_tilde = ros::NodeHandle("~");
+
+    n_tilde.searchParam("gazebo_joint_states_prefix", searched_param);
+    n_tilde.param(searched_param, prefix, std::string());
+    std::string full_topic = prefix + "joint_states";
+    gazebo_subscriber = node.subscribe(full_topic, 2, &VirtualShadowhand::gazeboCallback, this);
 #else
     ROS_INFO("This ROS interface is not built for Gazebo.");
 #endif
@@ -327,8 +336,6 @@ namespace shadowhand
 
   short VirtualShadowhand::sendupdate(std::string joint_name, double target)
   {
-    ROS_ERROR("sendupdate received");
-
     JointsMap::iterator iter = joints_map.find(joint_name);
 #ifdef GAZEBO
     std_msgs::Float64 target_msg;
@@ -362,7 +369,8 @@ namespace shadowhand
 	++iter;
 	JointData tmpData1 = JointData(iter->second);
 #ifdef GAZEBO
-	target_msg.data = target/2.0;
+	//gazebo targets are between 0 and 1
+	target_msg.data = toRad( target / 2.0 );
 	gazebo_publishers[tmpData1.publisher_index].publish(target_msg);
 	ros::spinOnce();
 #else
@@ -375,7 +383,8 @@ namespace shadowhand
 	++iter;
 	JointData tmpData2= JointData(iter->second);
 #ifdef GAZEBO
-	target_msg.data = target/2.0;
+	//gazebo targets are between 0 and 1
+	target_msg.data = toRad( target / 2.0 );
 	gazebo_publishers[tmpData2.publisher_index].publish(target_msg);
 	ros::spinOnce();
 #else
@@ -396,7 +405,8 @@ namespace shadowhand
       target = tmpData.max;
 
 #ifdef GAZEBO
-    target_msg.data = target;
+    //gazebo targets are between 0 and 1
+    target_msg.data = toRad(target);
     gazebo_publishers[tmpData.publisher_index].publish(target_msg);
     ros::spinOnce();
 #else
@@ -504,4 +514,55 @@ namespace shadowhand
 
     return returnVect;
   }
+
+#ifdef GAZEBO
+  void VirtualShadowhand::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
+  {
+    //loop on all the names in the joint_states message
+    for(unsigned int index = 0; index < msg->name.size(); ++index)
+      {
+	std::string joint_name = msg->name[index];
+	JointsMap::iterator iter = joints_map.find(joint_name);
+	//not found
+	if(iter == joints_map.end())
+	  {
+	    ROS_ERROR("Joint not found");
+	    return;
+	  }
+
+	//joint found
+	JointData tmpData(iter->second);
+    
+	tmpData.position = toDegrees(msg->position[index]);
+	tmpData.force = msg->effort[index];
+
+	joints_map[joint_name] = tmpData;
+      }
+
+    //push the sum of J1+J2 to the J0s
+    for(JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
+      {
+	JointData tmpData = it->second;
+	if( tmpData.isJointZero == 1 )
+	  {
+	    std::string joint_name = it->first;
+	    double position = 0.0;
+
+	    //get the position from joint 1
+	    ++it;
+	    JointData tmpData1 = JointData(it->second);
+	    position += tmpData1.position;
+
+	    //get the position from joint 2
+	    ++it;
+	    JointData tmpData2 = JointData(it->second);
+	    position += tmpData2.position;
+
+	    tmpData.position = position;
+
+	    joints_map[joint_name] = tmpData;
+	  }
+      }
+  }
+#endif
 } //end namespace

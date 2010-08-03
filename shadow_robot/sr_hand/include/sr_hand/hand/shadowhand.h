@@ -20,6 +20,10 @@
 #include <map>
 #include <boost/smart_ptr.hpp>
 
+#ifdef GAZEBO
+#include <sensor_msgs/JointState.h>
+#endif
+
 namespace shadowhand
 {
 /**
@@ -45,7 +49,6 @@ struct JointData
    * model with our standard ROS interface.
    */
   int publisher_index;
-  // boost::shared_ptr<ros::Subscriber> gazebo_joint_subscriber;
 #endif
 
 #ifdef GAZEBO
@@ -275,6 +278,7 @@ protected:
 
 #ifdef GAZEBO
   std::vector<ros::Publisher> gazebo_publishers;
+  ros::Subscriber gazebo_subscriber;
 #endif
 }; //end class
 
