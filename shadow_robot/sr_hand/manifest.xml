@@ -22,6 +22,8 @@
   <depend package="diagnostic_aggregator"/>
   <depend package="robot_state_publisher"/>
   <depend package="rviz"/>
+  <depend package="gazebo_worlds"/>
+  <depend package="pr2_gazebo_plugins"/>
   <export>
 	<cpp cflags="-I${prefix}/include"/>
 	<python path="${prefix}/python_lib"/>
