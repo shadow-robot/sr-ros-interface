@@ -19,7 +19,7 @@ export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:/path/to/shadow_robot
 
 \subsection virtualhand Virtual Hand
 To run the virtual Dextrous Hand, just compile the code: 
-\verbatim rosmake sr_hand\endverbatim
+\verbatim rosmake --rosdep-install sr_hand\endverbatim
 Then start the ROS interface, if you want to have a motor hand:
 \verbatim roslaunch sr_hand srh_motor.launch \endverbatim 
 Otherwise, if it's a muscle hand:
@@ -39,7 +39,7 @@ target_link_libraries(shadowhand_real robot)
 \endcode
 
 Then compile the code: 
-\verbatim rosmake sr_hand\endverbatim
+\verbatim rosmake --rosdep-install sr_hand\endverbatim
 
 You then need to modify slightly the srh_motor.launch file (or srh_muscle.launch), on line 5 replace virtual by real:
 \code
@@ -136,7 +136,7 @@ The GUI is organized in tabs :
 \section gazebo Simulation Using Gazebo 
 The ROS interface comes with a model which can be used in gazebo. Gazebo is encapsulated in ROS. To compile the ROS version of gazebo, run:
 \verbatim
-rosmake gazebo_worlds
+rosmake --rosdep-install gazebo_worlds
 \endverbatim
 
 \subsection gazebolaunch Launching Gazebo and spawning your model
