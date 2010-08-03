@@ -44,11 +44,29 @@ struct JointData
    * the JointData struct to be able to get and send data to the Gazebo
    * model with our standard ROS interface.
    */
-  ros::Publisher gazebo_joint_publisher;
-  ros::Subscriber gazebo_joint_subscriber;
+  int publisher_index;
+  // boost::shared_ptr<ros::Subscriber> gazebo_joint_subscriber;
 #endif
 
-#ifndef GAZEBO
+#ifdef GAZEBO
+  JointData() :
+    position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0),
+      min(0.0), max(90.0), isJointZero(0), publisher_index(0)
+  {
+  }
+
+  JointData(JointData& jd) :
+    position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
+      flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index)
+  {
+  }
+
+  JointData(const JointData& jd) :
+    position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
+        flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index)
+  {
+  }
+#else
   JointData() :
     position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0),
     min(0.0), max(90.0), isJointZero(0)
@@ -66,28 +84,8 @@ struct JointData
         flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero)
   {
   }
+#endif
 
-
-#else // GAZEBO
-
-  JointData() :
-    position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0),
-      min(0.0), max(90.0), isJointZero(0), gazebo_joint_publisher(ros::Publisher()), gazebo_joint_subscriber(ros::Subscriber())
-  {
-  }
-
-  JointData(JointData& jd) :
-    position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
-        flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), gazebo_joint_publisher(jd.gazebo_joint_publisher), gazebo_joint_subscriber(jd.gazebo_joint_subscriber)
-  {
-  }
-
-  JointData(const JointData& jd) :
-    position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
-        flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), gazebo_joint_publisher(jd.gazebo_joint_publisher), gazebo_joint_subscriber(jd.gazebo_joint_subscriber)
-  {
-  }
-#endif 
 };
 
 /**
@@ -275,6 +273,9 @@ protected:
   /// A mapping between the parameter names and their values.
   ParametersMap parameters_map;
 
+#ifdef GAZEBO
+  std::vector<ros::Publisher> gazebo_publishers;
+#endif
 }; //end class
 
 }//end namespace
