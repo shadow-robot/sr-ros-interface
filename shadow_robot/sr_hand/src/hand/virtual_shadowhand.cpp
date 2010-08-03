@@ -295,8 +295,6 @@ namespace shadowhand
     joints_map["WRJ2"] = tmpData;
     controllers_map["WRJ2"] = tmpController;
 
-
-
     parameters_map["d"] = PARAM_d;
     parameters_map["i"] = PARAM_i;
     parameters_map["p"] = PARAM_p;
@@ -344,7 +342,7 @@ namespace shadowhand
     //not found
     if(iter == joints_map.end())
       {
-	ROS_ERROR("Joint not found");
+	ROS_ERROR("Joint %s not found", joint_name.c_str());
 	return -1;
       }
 
@@ -369,7 +367,7 @@ namespace shadowhand
 	++iter;
 	JointData tmpData1 = JointData(iter->second);
 #ifdef GAZEBO
-	//gazebo targets are between 0 and 1
+	//gazebo targets are in radians
 	target_msg.data = toRad( target / 2.0 );
 	gazebo_publishers[tmpData1.publisher_index].publish(target_msg);
 	ros::spinOnce();
@@ -383,7 +381,7 @@ namespace shadowhand
 	++iter;
 	JointData tmpData2= JointData(iter->second);
 #ifdef GAZEBO
-	//gazebo targets are between 0 and 1
+	//gazebo targets are in radians
 	target_msg.data = toRad( target / 2.0 );
 	gazebo_publishers[tmpData2.publisher_index].publish(target_msg);
 	ros::spinOnce();
@@ -405,7 +403,7 @@ namespace shadowhand
       target = tmpData.max;
 
 #ifdef GAZEBO
-    //gazebo targets are between 0 and 1
+    //gazebo targets are in radians
     target_msg.data = toRad(target);
     gazebo_publishers[tmpData.publisher_index].publish(target_msg);
     ros::spinOnce();
@@ -523,12 +521,9 @@ namespace shadowhand
       {
 	std::string joint_name = msg->name[index];
 	JointsMap::iterator iter = joints_map.find(joint_name);
-	//not found
+	//not found => can be a joint from the arm / hand
 	if(iter == joints_map.end())
-	  {
-	    ROS_ERROR("Joint not found");
-	    return;
-	  }
+	  continue;
 
 	//joint found
 	JointData tmpData(iter->second);
