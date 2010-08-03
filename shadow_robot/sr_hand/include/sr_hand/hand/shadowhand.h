@@ -14,9 +14,11 @@
 #ifndef   	SHADOWHAND_H_
 # define   	SHADOWHAND_H_
 
+#include <ros/ros.h>
 #include <string>
 #include <vector>
 #include <map>
+#include <boost/smart_ptr.hpp>
 
 namespace shadowhand
 {
@@ -36,6 +38,17 @@ struct JointData
   double max;
   short isJointZero;
 
+#ifdef GAZEBO
+  /**
+   * GAZEBO has one publisher / subscriber per joint. We store those in 
+   * the JointData struct to be able to get and send data to the Gazebo
+   * model with our standard ROS interface.
+   */
+  ros::Publisher gazebo_joint_publisher;
+  ros::Subscriber gazebo_joint_subscriber;
+#endif
+
+#ifndef GAZEBO
   JointData() :
     position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0),
     min(0.0), max(90.0), isJointZero(0)
@@ -53,6 +66,28 @@ struct JointData
         flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero)
   {
   }
+
+
+#else // GAZEBO
+
+  JointData() :
+    position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0),
+      min(0.0), max(90.0), isJointZero(0), gazebo_joint_publisher(ros::Publisher()), gazebo_joint_subscriber(ros::Subscriber())
+  {
+  }
+
+  JointData(JointData& jd) :
+    position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
+        flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), gazebo_joint_publisher(jd.gazebo_joint_publisher), gazebo_joint_subscriber(jd.gazebo_joint_subscriber)
+  {
+  }
+
+  JointData(const JointData& jd) :
+    position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
+        flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), gazebo_joint_publisher(jd.gazebo_joint_publisher), gazebo_joint_subscriber(jd.gazebo_joint_subscriber)
+  {
+  }
+#endif 
 };
 
 /**

@@ -70,6 +70,14 @@ public:
    */
   virtual std::vector<DiagnosticData> getDiagnostics();
 protected:
+#ifdef GAZEBO
+  /**
+   * If we're building the Gazebo interface, we need a ROS node to 
+   * publish / subscribe to the Gazebo model.
+   */
+  ros::NodeHandle node;
+#endif
+
   /**
    * Initialize a mapping for the joints as well as a mapping for the controllers.
    */
@@ -79,6 +87,7 @@ protected:
   typedef std::map<std::string, JointControllerData> ControllersMap;
   ///Contains the mapping between the controller names and their data.
   ControllersMap controllers_map;
+
 }; //end class
 }
 #endif 	    /* !VIRTUAL_SHADOWHAND_H_ */
