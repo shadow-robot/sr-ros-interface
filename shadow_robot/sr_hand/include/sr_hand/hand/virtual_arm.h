@@ -61,10 +61,40 @@ public:
    */
   virtual std::vector<DiagnosticData> getDiagnostics();
 protected:
+#ifdef GAZEBO
+  /**
+   * If we're building the Gazebo interface, we need a ROS node to 
+   * publish / subscribe to the Gazebo model.
+   */
+  ros::NodeHandle node, n_tilde;
+
+  void gazeboCallback(const sensor_msgs::JointStateConstPtr& msg);
+#endif
   /**
    * Initialise a mapping for the joints.
    */
   void initializeMap();
+
+
+  /**
+   * Convert an angle in degree to an angle in radians.
+   * @param deg the angle in degrees
+   * @return the value in rads.
+   */
+  inline double toRad(double deg)
+  {
+    return deg * 3.14159265 / 180.0;
+  }
+
+  /**
+   * Convert an angle in radian to an angle in degrees.
+   * @param deg the angle in rads
+   * @return the value in degrees.
+   */
+  inline double toDegrees(double rad)
+  {
+    return rad * 180.0 / 3.14159265;
+  }
 };
 
 }//end namespace

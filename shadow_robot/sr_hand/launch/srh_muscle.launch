@@ -5,6 +5,7 @@
   <node pkg="sr_hand" name="shadowhand"
 	type="shadowhand_virtual" >
     <remap from="robot_description" to="hand_description"/>
+    <param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
     <param name="shadowhand_prefix" type="string" value="srh/" />
     <param name="publish_frequency_diagnostics" type="double" value="1.0" />
     <param name="publish_frequency" type="double" value="20.0" />
@@ -30,9 +31,8 @@
     <param name="tf_prefix" type="string" value="srh/target" />
   </node>
   
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub" args="0 0 0 0 0 0 /srh/position/shadow_forearm fixed 100" />
-  
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub" args="0 0 0 0 0 0 fixed /srh/target/shadow_forearm 100" />
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub" args="0 0 0 0 0 0 /srh/position/forearm_muscle fixed 100" />
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub" args="0 0 0 0 0 0 fixed /srh/target/forearm_muscle 100" />
   
   
   <node pkg="diagnostic_aggregator" type="aggregator_node"

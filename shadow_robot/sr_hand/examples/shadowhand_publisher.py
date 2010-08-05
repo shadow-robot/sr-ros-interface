@@ -23,14 +23,13 @@ def talker():
     Test the sendupdate command
     """
     if test_what == "sendupdate":
-        pub1 = rospy.Publisher('sr_arm/sendupdate', sendupdate)
+        pub1 = rospy.Publisher('srh/sendupdate', sendupdate)
         rospy.init_node('shadowhand_command_publisher_python')
 
-        new_target = 30
+        new_target = 90
     
-        data_to_send = [ joint(joint_name="trunk_rotation", joint_target=new_target),
-                         joint(joint_name="shoulder_rotation", joint_target=new_target), 
-                         joint(joint_name="elbow_abduction", joint_target=new_target) ]
+        data_to_send = [ joint(joint_name="FFJ0", joint_target=new_target),
+                         joint(joint_name="FFJ3", joint_target=new_target) ]
     
         pub1.publish(sendupdate(len(data_to_send), data_to_send))
         
