@@ -6,7 +6,7 @@
 
   <xacro:macro name="thbase_transmission">
   
-    <transmission type="SimpleTransmission" name="thbase_transmission">
+    <transmission type="pr2_mechanism_model/SimpleTransmission" name="thbase_transmission">
       <actuator name="THJ5" />
       <joint name="THJ5" />
       <mechanicalReduction>1</mechanicalReduction>

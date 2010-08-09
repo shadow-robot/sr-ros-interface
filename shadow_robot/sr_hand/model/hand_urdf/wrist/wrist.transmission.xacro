@@ -6,7 +6,7 @@
 
   <xacro:macro name="shadowhand_wrist_transmission">
   
-    <transmission type="SimpleTransmission" name="wrist_transmission">
+    <transmission type="pr2_mechanism_model/SimpleTransmission" name="wrist_transmission">
       <actuator name="WRJ2" />
       <joint name="WRJ2" />
       <mechanicalReduction>1</mechanicalReduction>
