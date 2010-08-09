@@ -9,7 +9,7 @@
 	<inertial>
 	  <origin xyz="0 0 0.27025" rpy="0 0 0" />
 	  <mass value="5" />
-	  <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
+	  <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"  izz="0.0" />
 	</inertial>
 	<visual>
 	  <origin xyz="0 0 0.0165" rpy="${M_PI/2} ${M_PI} ${M_PI/2}" />
@@ -37,7 +37,7 @@
       <axis xyz="0 0 1" />
       <limit lower="-${M_PI/2}" upper="${M_PI/4}"
       effort="10" velocity="1.0"/>
-      <dynamics damping="3.5"/>
+      <dynamics damping="200.5"/>
     </joint>
 
     <xacro:shadowarm_trunk_transmission />
