@@ -42,7 +42,7 @@
 
   <rendering:gui>
     <type>fltk</type>
-    <size>480 320</size>
+    <size>800 600</size>
     <pos>0 0</pos>
     <frames>
       <row height="100%">
