@@ -6,7 +6,7 @@
 
   <xacro:macro name="shadowarm_lowerarm_transmission">
   
-    <transmission type="SimpleTransmission" name="elbow_abduction_transmission">
+    <transmission type="pr2_mechanism_model/SimpleTransmission" name="elbow_abduction_transmission">
       <actuator name="elbow_abduction" />
       <joint name="elbow_abduction" />
       <mechanicalReduction>1</mechanicalReduction>

@@ -37,7 +37,7 @@
       <axis xyz="0 0 1" />
       <limit lower="-${M_PI/2}" upper="${M_PI/4}"
       effort="10" velocity="1.0"/>
-      <dynamics damping="1"/>
+      <dynamics damping="3.5"/>
     </joint>
 
     <xacro:shadowarm_trunk_transmission />

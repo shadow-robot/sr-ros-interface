@@ -38,6 +38,7 @@
       <axis xyz="0 0 -1" />
       <limit lower="-1.047" upper="1.047" effort="10"
       velocity="1.0" />
+      <dynamics damping="3.5"/>
     </joint>
 
     <xacro:thbase_transmission />

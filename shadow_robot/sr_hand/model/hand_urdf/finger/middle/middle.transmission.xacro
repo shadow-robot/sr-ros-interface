@@ -6,7 +6,7 @@
 
   <xacro:macro name="middle_transmission">
   
-    <transmission type="SimpleTransmission" name="${link_prefix}middle_transmission">
+    <transmission type="pr2_mechanism_model/SimpleTransmission" name="${link_prefix}middle_transmission">
       <actuator name="${joint_prefix}J2" />
       <joint name="${joint_prefix}J2" />
       <mechanicalReduction>1</mechanicalReduction>
