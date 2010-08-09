@@ -32,7 +32,7 @@
     <inertial>
       <origin xyz="0 0 0"/>
       <mass value="3.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 0 -1.57079632679" xyz="0 0 0"/>
@@ -57,7 +57,7 @@
       <!--<origin xyz="0 0.010 0.213" rpy="0 0 0" />-->
       <origin rpy="0 0 0" xyz="0 0.010 0.213"/>
       <mass value="0.3"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="1.57079632679 0 0" xyz="0 0 0"/>
@@ -84,7 +84,7 @@
     <origin rpy="0 0 0" xyz="0 0.010 0.213"/>
     <axis xyz="0 1 0"/>
     <limit effort="10" lower="-0.52359877559829882" upper="0.17453292519943295" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="wrist_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="WRJ2"/>
@@ -97,7 +97,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0 0.010 0.247"/>
       <mass value="0.3"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -122,7 +122,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.034"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="-0.78539816339744828" upper="0.6108652381980153" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="palm_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="WRJ1"/>
@@ -136,7 +136,7 @@
       <!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
       <origin rpy="0 0 0" xyz="0.033 0 0.095"/>
       <mass value="0.008"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
@@ -162,7 +162,7 @@
     <origin rpy="0 0 0" xyz="0.033 0 0.095"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="ffknuckle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="FFJ4"/>
@@ -175,7 +175,7 @@
     <inertial>
       <mass value="0.014"/>
       <origin xyz="0 0 0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
@@ -200,7 +200,7 @@
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="ffproximal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="FFJ3"/>
@@ -213,7 +213,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.045"/>
       <mass value="0.012"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -238,7 +238,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.045"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="ffmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="FFJ2"/>
@@ -251,7 +251,7 @@
     <inertial>
       <mass value="0.010"/>
       <origin xyz="0 0 0.025"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -276,7 +276,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.025"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="ffdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="FFJ1"/>
@@ -290,7 +290,7 @@
       <!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
       <origin rpy="0 0 0" xyz="0.011 0 0.099"/>
       <mass value="0.008"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
@@ -316,7 +316,7 @@
     <origin rpy="0 0 0" xyz="0.011 0 0.099"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="mfknuckle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="MFJ4"/>
@@ -329,7 +329,7 @@
     <inertial>
       <mass value="0.014"/>
       <origin xyz="0 0 0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
@@ -354,7 +354,7 @@
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="mfproximal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="MFJ3"/>
@@ -367,7 +367,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.045"/>
       <mass value="0.012"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -392,7 +392,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.045"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="mfmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="MFJ2"/>
@@ -405,7 +405,7 @@
     <inertial>
       <mass value="0.010"/>
       <origin xyz="0 0 0.025"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -430,7 +430,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.025"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="mfdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="MFJ1"/>
@@ -444,7 +444,7 @@
       <!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
       <origin rpy="0 0 0" xyz="-0.011 0 0.095"/>
       <mass value="0.008"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
@@ -470,7 +470,7 @@
     <origin rpy="0 0 0" xyz="-0.011 0 0.095"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="rfknuckle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="RFJ4"/>
@@ -483,7 +483,7 @@
     <inertial>
       <mass value="0.014"/>
       <origin xyz="0 0 0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
@@ -508,7 +508,7 @@
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="rfproximal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="RFJ3"/>
@@ -521,7 +521,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.045"/>
       <mass value="0.012"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -546,7 +546,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.045"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="rfmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="RFJ2"/>
@@ -559,7 +559,7 @@
     <inertial>
       <mass value="0.010"/>
       <origin xyz="0 0 0.025"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -584,7 +584,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.025"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="rfdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="RFJ1"/>
@@ -597,7 +597,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0.00568 0 -0.12061"/>
       <mass value="0.075"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -622,7 +622,7 @@
     <origin rpy="0 0 0" xyz="-0.01671 0 0.044"/>
     <axis xyz="0.57 0 0.82"/>
     <limit effort="10" lower="0" upper="0.69813170079773179" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="lfmetacarpal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="LFJ5"/>
@@ -635,7 +635,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.0425"/>
       <mass value="0.008"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
@@ -660,7 +660,7 @@
     <origin rpy="0 0 0" xyz="-0.01671 0 0.044"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="lfknuckle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="LFJ4"/>
@@ -673,7 +673,7 @@
     <inertial>
       <mass value="0.014"/>
       <origin xyz="0 0 0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
@@ -698,7 +698,7 @@
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="lfproximal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="LFJ3"/>
@@ -711,7 +711,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.045"/>
       <mass value="0.012"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -736,7 +736,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.045"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="lfmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="LFJ2"/>
@@ -749,7 +749,7 @@
     <inertial>
       <mass value="0.010"/>
       <origin xyz="0 0 0.025"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -774,7 +774,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.025"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="lfdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="LFJ1"/>
@@ -787,7 +787,7 @@
     <inertial>
       <mass value="0.010"/>
       <origin rpy="0 0 0" xyz="0.034 0.0085 0.02924"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -814,7 +814,7 @@
     <origin rpy="0 0.785398163397 0" xyz="0.034 -0.0085 0.02924"/>
     <axis xyz="0 0 -1"/>
     <limit effort="10" lower="-1.047" upper="1.047" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="thbase_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="THJ5"/>
@@ -827,7 +827,7 @@
     <inertial>
       <mass value="0.016"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -854,7 +854,7 @@
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.309" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="thproximal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="THJ4"/>
@@ -867,7 +867,7 @@
     <inertial>
       <mass value="0.002"/>
       <origin rpy="0 0 0" xyz="0.02687 0 0.02687"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -894,7 +894,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.038"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="-0.2618" upper="0.2618" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="thhub_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="THJ3"/>
@@ -907,7 +907,7 @@
     <inertial>
       <mass value="0.016"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
@@ -934,7 +934,7 @@
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="-0.5237" upper="0.5237" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="thmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="THJ2"/>
@@ -947,7 +947,7 @@
     <inertial>
       <mass value="0.016"/>
       <origin rpy="0 0 0" xyz="-0.02263 0 0.02263"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="100.0" iyz="0.0" izz="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
       <origin rpy="3.14159265359 -1.57079632679 3.14159265359" xyz="0 0 0"/>
@@ -974,7 +974,7 @@
     <origin rpy="0 0 0" xyz="0 0 0.032"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="1.571" velocity="1.0"/>
-    <dynamics damping="3.5"/>
+    <dynamics damping="50.5"/>
   </joint>
   <transmission name="thdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="THJ1"/>

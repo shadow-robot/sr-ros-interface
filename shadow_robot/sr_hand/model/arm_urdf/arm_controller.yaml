@@ -2,9 +2,9 @@ trunk_rotation_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: trunk_rotation
   pid:
-    p: 20.5
-    i: 15.0
-    d: 15.0
+    p: 60.5
+    i: 31.0
+    d: 8.0
     i_clamp: 1
 
 shoulder_rotation_controller:
