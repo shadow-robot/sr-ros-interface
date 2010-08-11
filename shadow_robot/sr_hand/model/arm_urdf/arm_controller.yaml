@@ -12,18 +12,18 @@ shoulder_rotation_controller:
   joint: shoulder_rotation
   pid:
     p: 300.0
-    i: 240.0
+    i: 360.0
     d: 400.0
-    i_clamp: 1
+    i_clamp: 20.0
 
 elbow_abduction_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: elbow_abduction
   pid:
     p: 100.0
-    i: 80.0
+    i: 150.0
     d: 150.0
-    i_clamp: 1
+    i_clamp: 10.0
 
 forearm_rotation_controller:
   type: robot_mechanism_controllers/JointPositionController
