@@ -45,3 +45,8 @@ shadow_robot/cyberglove/srv/oct
 shadow_robot/sr_hand/msg/java
 shadow_robot/sr_hand/msg/oct
 shadow_robot/sr_hand/launch/test_cam.launch
+shadow_robot/sr_display/srv_gen
+shadow_robot/sr_display/bin/*
+shadow_robot/sr_display/build/*
+shadow_robot/sr_display/src/sr_display
+shadow_robot/sr_display/srv/lisp
