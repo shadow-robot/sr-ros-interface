@@ -23,6 +23,14 @@ namespace threedmouse
     n_tilde.param("publish_frequency", publish_freq, 50.0);
     publish_rate = ros::Rate(publish_freq);
 
+    std::string searched_param;
+    n_tilde.searchParam("published_tf_name", searched_param);
+    n_tilde.param(searched_param, published_tf_name, std::string("threedmouse") );
+
+    n_tilde.searchParam("reference_joint", searched_param);
+    n_tilde.param(searched_param, reference_joint, std::string("sr_arm/position/shadowarm_handsupport"));
+
+
     if(!(dpy = XOpenDisplay(0))) 
       {
 	ROS_FATAL( "failed to connect to the X server");
@@ -154,7 +162,7 @@ namespace threedmouse
 	break;
       }
 
-    tf_broadcaster.sendTransform(tf::StampedTransform(last_transform, ros::Time::now(), "sr_arm/shadowarm_handsupport", "three_d_mouse"));
+    tf_broadcaster.sendTransform(tf::StampedTransform(last_transform, ros::Time::now(), reference_joint, published_tf_name)); 
     
     ros::spinOnce();
     publish_rate.sleep();

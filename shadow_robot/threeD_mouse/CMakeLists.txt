@@ -24,5 +24,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #common commands for building c++ executables and libraries
 LINK_LIBRARIES(spnav)
 LINK_LIBRARIES(X11)
-rosbuild_add_executable(threedmouse src/3D_mouse.cpp src/3D_mouse_node.cpp src/geometry.cpp)
+rosbuild_add_executable(threedmouse src/3D_mouse.cpp src/3D_mouse_node.cpp)
 target_link_libraries(threedmouse spnav)

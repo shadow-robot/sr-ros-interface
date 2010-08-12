@@ -44,6 +44,12 @@ namespace threedmouse
     ros::NodeHandle node, n_tilde;
     ///the rate at which the data will be published. This can be set by a parameter in the launch file.
     ros::Rate publish_rate;
+
+    ///the name to assign to the published transform
+    std::string published_tf_name;
+    /// the reference joint (e.g. the tip of the arm) from which the transform is computed.
+    std::string reference_joint;
+
     ///The transform broadcaster
     tf::TransformBroadcaster tf_broadcaster;
 
