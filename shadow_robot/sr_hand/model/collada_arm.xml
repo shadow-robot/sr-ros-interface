@@ -1,0 +1,6 @@
+<robot file="sr_arm_motor.dae">
+  <manipulator name="arm">
+    <base>shadowarm_base</base>
+    <effector>shadowarm_handsupport</effector>
+  </manipulator>
+</robot>

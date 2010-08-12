@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<COLLADA xmlns="http://www.collada.org/2008/03/COLLADASchema" version="1.5.0">
+	<asset>
+		<contributor>
+			<authoring_tool>URDF Collada Writer</authoring_tool>
+		</contributor>
+		<created>2010-08-11T16:41:52.000000</created>
+		<modified>2010-08-11T16:41:52.000000</modified>
+		<unit/>
+		<up_axis>Z_UP</up_axis>
+	</asset>
+	<library_visual_scenes id="vscenes">
+		<visual_scene id="vscene" name="URDF Visual Scene">
+			<node id="v1" name="shadow_arm">
+				<node id="v1.node0" name="shadowarm_base" sid="node0">
+					<node id="v1.node1" name="shadowarm_trunk" sid="node1">
+						<translate>0 0 0.01</translate>
+						<node id="v1.node1.visual" name="visual" sid="visual">
+							<translate>0 0 0.0165</translate>
+							<rotate>-0.57735 0.57735 -0.57735 120</rotate>
+							<rotate sid="node_joint3_axis0">1 0 0 0</rotate>
+						</node>
+						<node id="v1.node2" name="shadowarm_upperarm" sid="node2">
+							<translate>0 -0.134 0.5405</translate>
+							<node id="v1.node2.visual" name="visual" sid="visual">
+								<translate>0 0.067 0</translate>
+								<rotate>-0.577311 0.577429 -0.577311 120.013</rotate>
+								<rotate sid="node_joint2_axis0">1 0 0 0</rotate>
+							</node>
+							<node id="v1.node3" name="shadowarm_lowerarm" sid="node3">
+								<translate>0.369 0 0</translate>
+								<node id="v1.node3.visual" name="visual" sid="visual">
+									<translate>0.036 0 -0.03</translate>
+									<rotate>0.968912 -5.03896e-05 -0.247404 180.023</rotate>
+									<rotate sid="node_joint0_axis0">1 0 0 0</rotate>
+								</node>
+								<node id="v1.node4" name="shadowarm_handsupport" sid="node4">
+									<translate>0.131 0 -0.08</translate>
+									<node id="v1.node4.visual" name="visual" sid="visual">
+										<translate>-0.04 0 0</translate>
+										<rotate>0 0 -1 90.0117</rotate>
+										<rotate sid="node_joint1_axis0">1 0 0 0</rotate>
+									</node>
+								</node>
+							</node>
+						</node>
+					</node>
+				</node>
+			</node>
+		</visual_scene>
+	</library_visual_scenes>
+	<library_geometries id="geometries"/>
+	<library_kinematics_scenes id="kscenes">
+		<kinematics_scene id="kscene" name="URDF Kinematics Scene">
+			<instance_kinematics_model url="#k1" sid="inst_k1">
+				<newparam sid="kscene.inst_k1">
+					<SIDREF>kscene/inst_k1</SIDREF>
+				</newparam>
+				<newparam sid="kscene.inst_k1.joint0.axis0">
+					<SIDREF>kscene/inst_k1/joint0/axis0</SIDREF>
+				</newparam>
+				<newparam sid="kscene.inst_k1.joint0.axis0_value">
+					<float>0</float>
+				</newparam>
+				<newparam sid="kscene.inst_k1.joint1.axis0">
+					<SIDREF>kscene/inst_k1/joint1/axis0</SIDREF>
+				</newparam>
+				<newparam sid="kscene.inst_k1.joint1.axis0_value">
+					<float>0</float>
+				</newparam>
+				<newparam sid="kscene.inst_k1.joint2.axis0">
+					<SIDREF>kscene/inst_k1/joint2/axis0</SIDREF>
+				</newparam>
+				<newparam sid="kscene.inst_k1.joint2.axis0_value">
+					<float>0</float>
+				</newparam>
+				<newparam sid="kscene.inst_k1.joint3.axis0">
+					<SIDREF>kscene/inst_k1/joint3/axis0</SIDREF>
+				</newparam>
+				<newparam sid="kscene.inst_k1.joint3.axis0_value">
+					<float>0</float>
+				</newparam>
+			</instance_kinematics_model>
+		</kinematics_scene>
+	</library_kinematics_scenes>
+	<library_kinematics_models id="kmodels">
+		<kinematics_model id="k1" name="shadow_arm">
+			<technique_common>
+				<joint name="elbow_abduction" sid="joint0">
+					<revolute sid="axis0">
+						<axis>0 -1 0</axis>
+						<limits>
+							<min>0</min>
+							<max>120</max>
+						</limits>
+					</revolute>
+				</joint>
+				<joint name="forearm_rotation" sid="joint1">
+					<revolute sid="axis0">
+						<axis>1 0 0</axis>
+						<limits>
+							<min>-90</min>
+							<max>90</max>
+						</limits>
+					</revolute>
+				</joint>
+				<joint name="shoulder_rotation" sid="joint2">
+					<revolute sid="axis0">
+						<axis>0 1 0</axis>
+						<limits>
+							<min>0</min>
+							<max>90</max>
+						</limits>
+					</revolute>
+				</joint>
+				<joint name="trunk_rotation" sid="joint3">
+					<revolute sid="axis0">
+						<axis>0 0 1</axis>
+						<limits>
+							<min>-90</min>
+							<max>45</max>
+						</limits>
+					</revolute>
+				</joint>
+				<link sid="link0" name="shadowarm_base">
+					<attachment_full joint="k1/joint3">
+						<translate>0 0 0.01</translate>
+						<link sid="link1" name="shadowarm_trunk">
+							<attachment_full joint="k1/joint2">
+								<translate>0 -0.134 0.5405</translate>
+								<link sid="link2" name="shadowarm_upperarm">
+									<attachment_full joint="k1/joint0">
+										<translate>0.369 0 0</translate>
+										<link sid="link3" name="shadowarm_lowerarm">
+											<attachment_full joint="k1/joint1">
+												<translate>0.131 0 -0.08</translate>
+												<link sid="link4" name="shadowarm_handsupport"/>
+											</attachment_full>
+										</link>
+									</attachment_full>
+								</link>
+							</attachment_full>
+						</link>
+					</attachment_full>
+				</link>
+			</technique_common>
+		</kinematics_model>
+	</library_kinematics_models>
+	<library_joints id="joints"/>
+	<library_physics_scenes id="physics_scenes">
+		<physics_scene id="pscene" name="URDF Physics Scene">
+			<technique_common>
+				<gravity>0 0 0</gravity>
+			</technique_common>
+		</physics_scene>
+	</library_physics_scenes>
+	<library_effects id="effects"/>
+	<library_materials id="materials"/>
+	<scene>
+		<instance_physics_scene url="#pscene"/>
+		<instance_visual_scene url="#vscene"/>
+		<instance_kinematics_scene url="#kscene">
+			<bind_kinematics_model node="v1.node0">
+				<param>kscene.inst_k1</param>
+			</bind_kinematics_model>
+			<bind_joint_axis target="v1.node3/node_joint0_axis0">
+				<axis>
+					<param>kscene.inst_k1.joint0.axis0</param>
+				</axis>
+				<value>
+					<param>kscene.inst_k1.joint0.axis0_value</param>
+				</value>
+			</bind_joint_axis>
+			<bind_joint_axis target="v1.node4/node_joint1_axis0">
+				<axis>
+					<param>kscene.inst_k1.joint1.axis0</param>
+				</axis>
+				<value>
+					<param>kscene.inst_k1.joint1.axis0_value</param>
+				</value>
+			</bind_joint_axis>
+			<bind_joint_axis target="v1.node2/node_joint2_axis0">
+				<axis>
+					<param>kscene.inst_k1.joint2.axis0</param>
+				</axis>
+				<value>
+					<param>kscene.inst_k1.joint2.axis0_value</param>
+				</value>
+			</bind_joint_axis>
+			<bind_joint_axis target="v1.node1/node_joint3_axis0">
+				<axis>
+					<param>kscene.inst_k1.joint3.axis0</param>
+				</axis>
+				<value>
+					<param>kscene.inst_k1.joint3.axis0_value</param>
+				</value>
+			</bind_joint_axis>
+		</instance_kinematics_scene>
+	</scene>
+</COLLADA>
