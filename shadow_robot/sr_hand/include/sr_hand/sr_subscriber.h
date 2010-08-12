@@ -31,7 +31,7 @@
 #include <sr_hand/contrlr.h>
 #include <sr_hand/sendupdate.h>
 #include <sr_hand/config.h>
-#include <sr_hand/reverseKinematics.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include "sr_hand/hand/shadowhand.h"
 #include "sr_hand/sr_kinematics.h"
@@ -71,10 +71,15 @@ class ShadowhandSubscriber
 
   ///The shadowhand / shadowarm object (can be either an object connected to the real robot or a virtual hand).
   boost::shared_ptr<Shadowhand>  shadowhand;
-  
+
+  //contains the map for the joints of the object.
+  Shadowhand::JointsMap joints_map;
+
   boost::shared_ptr<SrKinematics> sr_kinematics;
 
-  
+  ///stores the current angles for the reverse kinematics
+  std::vector<double> current_angles;
+
   ///init function
   void init();
 
@@ -118,7 +123,7 @@ class ShadowhandSubscriber
    *
    * @param msg the reverse kinematic message
    */
-  void reverseKinematicsCallback( const sr_hand::reverseKinematicsConstPtr& msg );
+  void reverseKinematicsCallback( const geometry_msgs::PoseStampedConstPtr& msg );
   ///The subscriber to the reverse_kinematics topic
   Subscriber reverse_kinematics_sub;
 

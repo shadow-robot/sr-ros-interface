@@ -11,6 +11,7 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
 #include <kdl/jntarray.hpp>
+#include <sstream>
 
 #include "sr_hand/sr_kinematics.h"
 
@@ -69,7 +70,7 @@ namespace shadowhand
   {
   }
 
-  int SrKinematics::computeReverseKinematics(tf::Transform t, std::vector<double> &pose)
+  int SrKinematics::computeReverseKinematics(KDL::Frame destination_frame, std::vector<double> &pose)
   {
     if( pose.size() != number_of_joints)
       {
@@ -77,21 +78,44 @@ namespace shadowhand
 	return -1;
       }
 
+    ROS_ERROR("received pose and frame");
+
     KDL::JntArray q_init(number_of_joints), q(number_of_joints);
     for (unsigned int i = 0; i < number_of_joints; i++)
       q_init.data[i] = pose[i];
 
-    // populate F_dest from tf::Transform parameter
-    KDL::Frame F_dest;
-    tf::TransformTFToKDL(t, F_dest);
-    if (g_ik_solver->CartToJnt(q_init, F_dest, q) < 0)
+    ROS_ERROR("data initialized");
+
+    std::stringstream ss;
+    ss<<"Frame: "<<std::endl;
+    for(int i=0; i<4 ; ++i)
+      {
+	ss << "       ";
+	for(int j=0; j<4 ; ++j)
+	  {
+	    ss << destination_frame(i,j) << " ";
+	  }
+	ss << std::endl;
+      }
+    ROS_ERROR("%s",(ss.str()).c_str());
+
+    //    tf::TransformTFToKDL(t, destination_frame);
+    if (g_ik_solver->CartToJnt(q_init, destination_frame, q) < 0)
       {
 	ROS_ERROR("ik solver fail");
 	return false;
       }
-    for (unsigned int i = 0; i < number_of_joints; i++)
-      pose[i] = q.data[i];
 
+    ROS_ERROR("kinematics computed");
+
+    for (unsigned int i = 0; i < number_of_joints; i++)
+      {
+	ROS_ERROR("joint_angle[%d], %f", i, q.data[i]);
+    
+	pose[i] = q.data[i];
+      }
+
+    ROS_ERROR("done");
     return 0;
   }
 }; //end namespace

@@ -10,10 +10,7 @@
 
 
 //messages
-#include <geometry_msgs/PoseStamped.h>
-
 #include "threeD_mouse/3D_mouse.h"
-
 
 namespace threedmouse
 {
@@ -31,7 +28,8 @@ namespace threedmouse
     std::string searched_param;
     n_tilde.searchParam("threedmouse_prefix", searched_param);
     n_tilde.param(searched_param, prefix, std::string());
-    std::string full_topic = prefix + "/pose";
+    //    std::string full_topic = prefix + "/pose";
+    std::string full_topic = "sr_arm/reverseKinematics";
     pub = node.advertise<geometry_msgs::PoseStamped>(full_topic, 2);
 
     if(!(dpy = XOpenDisplay(0))) 

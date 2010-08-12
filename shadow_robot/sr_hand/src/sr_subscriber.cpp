@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <kdl_parser/kdl_parser.hpp>
+#include <tf/transform_datatypes.h>
 
 #include "sr_hand/sr_subscriber.h"
 
@@ -55,13 +56,20 @@ namespace shadowhand_subscriber {
     n_tilde.param(searched_param, prefix, std::string());
     std::string full_topic = prefix + "reverseKinematics";
     reverse_kinematics_sub = node.subscribe(full_topic, 10, &ShadowhandSubscriber::reverseKinematicsCallback, this);
+
+    joints_map = shadowhand->getAllJointsData();
+    for(Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
+      {
+	ROS_ERROR("pos: %f",it->second.position);
+	current_angles.push_back(it->second.position);
+      }
   }
 
 
   ShadowhandSubscriber:: ~ShadowhandSubscriber()
   {
-//    if( shadowhand != NULL )
-//      delete shadowhand;
+    //    if( shadowhand != NULL )
+    //      delete shadowhand;
   }
 
 
@@ -115,25 +123,25 @@ namespace shadowhand_subscriber {
   void ShadowhandSubscriber::contrlrCallback(const sr_hand::contrlrConstPtr& msg)
   {
     
-	vector<string> list_of_parameters = msg->list_of_parameters;
+    vector<string> list_of_parameters = msg->list_of_parameters;
 
-	JointControllerData ctrl_data;
+    JointControllerData ctrl_data;
 
-	//parses all the parameters transmitted in the msg
-	for (unsigned int index_param = 0; index_param < msg->length_of_list; ++index_param)
-	{
-	  //split the string (around ":")
-	  vector<string> splitted_string;
-	  boost::split(splitted_string, msg->list_of_parameters[index_param], boost::is_any_of(":"));
+    //parses all the parameters transmitted in the msg
+    for (unsigned int index_param = 0; index_param < msg->length_of_list; ++index_param)
+      {
+	//split the string (around ":")
+	vector<string> splitted_string;
+	boost::split(splitted_string, msg->list_of_parameters[index_param], boost::is_any_of(":"));
       
-	  Parameters param;
-	  param.name  = splitted_string[0];
-	  param.value = splitted_string[1];	
+	Parameters param;
+	param.name  = splitted_string[0];
+	param.value = splitted_string[1];	
 
-	  ctrl_data.data.push_back(param);
-	}
+	ctrl_data.data.push_back(param);
+      }
 
-	shadowhand->setContrl(msg->contrlr_name, ctrl_data);
+    shadowhand->setContrl(msg->contrlr_name, ctrl_data);
   }
 
   void ShadowhandSubscriber::configCallback(const sr_hand::configConstPtr& msg)
@@ -142,9 +150,63 @@ namespace shadowhand_subscriber {
   }
 
   
-  void ShadowhandSubscriber::reverseKinematicsCallback( const sr_hand::reverseKinematicsConstPtr& msg )
+  void ShadowhandSubscriber::reverseKinematicsCallback( const geometry_msgs::PoseStampedConstPtr& msg )
   {
-    ROS_ERROR("not implemented yet");
+    std::vector<double> resulting_joint_angles;
+    resulting_joint_angles = current_angles;
+
+    KDL::Rotation rotation;
+
+    std::stringstream ss;
+    ss <<"Rotation: " 
+       << msg->pose.orientation.x << " "
+       << msg->pose.orientation.y << " "
+       << msg->pose.orientation.z << " "
+       << msg->pose.orientation.w << " "
+       << std::endl;
+
+    ROS_ERROR("%s",(ss.str()).c_str());
+
+    rotation.Quaternion( msg->pose.orientation.x, 
+			 msg->pose.orientation.y, 
+			 msg->pose.orientation.z, 
+			 msg->pose.orientation.w  );
+
+    KDL::Vector translation( msg->pose.position.x, 
+			     msg->pose.position.y, 
+			     msg->pose.position.z  );
+
+    KDL::Frame transformation_frame(rotation, translation);
+    /*
+      translation: 
+      x: 0.5
+      y: -0.134
+      z: 0.4705
+      rotation: 
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+    */
+    
+    KDL::Frame current_frame;
+    tf::Transform t;
+    tf::TransformTFToKDL(t, current_frame);    
+
+    KDL::Frame destination_frame = current_frame * transformation_frame;
+
+    sr_kinematics->computeReverseKinematics(destination_frame, resulting_joint_angles);
+
+    //read current joint positions from the hand
+    joints_map = shadowhand->getAllJointsData();
+    int index = 0;
+    for(Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
+      {
+	ROS_ERROR("pos: %f",it->second.position);
+	current_angles[index] = (it->second.position);
+	++index;
+      }
+    
   }
 
 } // end namespace

@@ -32,7 +32,7 @@ namespace shadowhand
     SrKinematics(KDL::Tree tree);
     ~SrKinematics();
 
-    int computeReverseKinematics(tf::Transform t, std::vector<double> &initial_pose);
+    int computeReverseKinematics(KDL::Frame destination_frame, std::vector<double> &initial_pose);
 
   private:
     KDL::Tree kinematic_tree;
