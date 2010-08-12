@@ -8,7 +8,7 @@
            shadowarm 
                         -->
   <node pkg="sr_hand" name="shadowarm"
-	type="shadowarm_virtual" >
+	type="shadowarm_virtual" launch-prefix="xterm -e gdb --args" >
     <remap from="robot_description" to="arm_description"/>
     <param name="shadowhand_prefix" type="string" value="sr_arm/" />
     <param name="publish_frequency_diagnostics" type="double" value="1.0" />

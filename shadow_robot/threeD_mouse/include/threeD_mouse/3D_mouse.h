@@ -17,7 +17,7 @@
 #include <spnav.h>
 #include <boost/thread.hpp>
 
-#include "threeD_mouse/geometry.h"
+#include <tf/transform_broadcaster.h>
 
 
 namespace threedmouse 
@@ -44,8 +44,8 @@ namespace threedmouse
     ros::NodeHandle node, n_tilde;
     ///the rate at which the data will be published. This can be set by a parameter in the launch file.
     ros::Rate publish_rate;
-    ///The publisher which publishes the data to the \/{prefix}\/joint_states topic.
-    ros::Publisher pub;
+    ///The transform broadcaster
+    tf::TransformBroadcaster tf_broadcaster;
 
     void update_mouse_data();
 
@@ -59,7 +59,7 @@ namespace threedmouse
     unsigned long bpix;
 
     //keep the last pose read from the 3d mouse
-    geometry::Pose last_pose;
+    tf::Transform last_transform;
 
     MouseMode mouse_mode;
 

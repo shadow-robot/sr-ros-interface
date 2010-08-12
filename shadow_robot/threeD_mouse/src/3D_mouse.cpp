@@ -23,15 +23,6 @@ namespace threedmouse
     n_tilde.param("publish_frequency", publish_freq, 50.0);
     publish_rate = ros::Rate(publish_freq);
 
-    //publishes JointState messages
-    std::string prefix;
-    std::string searched_param;
-    n_tilde.searchParam("threedmouse_prefix", searched_param);
-    n_tilde.param(searched_param, prefix, std::string());
-    //    std::string full_topic = prefix + "/pose";
-    std::string full_topic = "sr_arm/reverseKinematics";
-    pub = node.advertise<geometry_msgs::PoseStamped>(full_topic, 2);
-
     if(!(dpy = XOpenDisplay(0))) 
       {
 	ROS_FATAL( "failed to connect to the X server");
@@ -73,8 +64,6 @@ namespace threedmouse
   
   void ThreeDMouse::update_mouse_data()
   {
-    geometry::Quaternion quater;
-
     bool waiting_for_release = false;
 
     while(ros::ok())
@@ -83,10 +72,10 @@ namespace threedmouse
 	switch( sev.type )
 	  {
 	  case SPNAV_EVENT_MOTION:
-	    last_pose.translation = geometry::Translation( sev.motion.x, sev.motion.y, sev.motion.z );
+	    last_transform.setOrigin( tf::Vector3(sev.motion.x / 100.0, sev.motion.y / 100.0, sev.motion.z / 100.0 ));
 
 	    
-	    last_pose.quaternion = quater.euler_to_quaternion(sev.motion.rx, sev.motion.ry, sev.motion.rz);
+	    last_transform.setRotation( tf::Quaternion(sev.motion.rx / 57.3, sev.motion.ry / 57.3, sev.motion.rz / 57.3));
 
 	    ROS_DEBUG("got motion event: t(%d, %d, %d) ", sev.motion.x, sev.motion.y, sev.motion.z);
 	    ROS_DEBUG("r(%d, %d, %d)", sev.motion.rx, sev.motion.ry, sev.motion.rz);
@@ -148,48 +137,24 @@ namespace threedmouse
   }
   
 
+  //Need a mutex?
   void ThreeDMouse::publish()
   {
-    geometry_msgs::PoseStamped posestamped_msg;
-    posestamped_msg.header.stamp = ros::Time::now();
-
     switch( mouse_mode )
       {
       case TRANSLATE:
-	posestamped_msg.pose.position.x = last_pose.translation.x;
-	posestamped_msg.pose.position.y = last_pose.translation.y;
-	posestamped_msg.pose.position.z = last_pose.translation.z;
-    
-	posestamped_msg.pose.orientation.x = 0.0;
-	posestamped_msg.pose.orientation.y = 0.0;
-	posestamped_msg.pose.orientation.z = 0.0;
-	posestamped_msg.pose.orientation.w = 0.0;
+	last_transform.setRotation( tf::Quaternion(0.0, 0.0, 0.0) );
 	break;
 
       case ROTATE:
-    	posestamped_msg.pose.position.x = 0.0;
-	posestamped_msg.pose.position.y = 0.0;
-	posestamped_msg.pose.position.z = 0.0;
-    
-	posestamped_msg.pose.orientation.x = last_pose.quaternion.x;
-	posestamped_msg.pose.orientation.y = last_pose.quaternion.y;
-	posestamped_msg.pose.orientation.z = last_pose.quaternion.z;
-	posestamped_msg.pose.orientation.w = last_pose.quaternion.w;
+    	last_transform.setOrigin( tf::Vector3(0.0,0.0,0.0) );
 	break;
 
       default:
-	posestamped_msg.pose.position.x = last_pose.translation.x;
-	posestamped_msg.pose.position.y = last_pose.translation.y;
-	posestamped_msg.pose.position.z = last_pose.translation.z;
-    
-	posestamped_msg.pose.orientation.x = last_pose.quaternion.x;
-	posestamped_msg.pose.orientation.y = last_pose.quaternion.y;
-	posestamped_msg.pose.orientation.z = last_pose.quaternion.z;
-	posestamped_msg.pose.orientation.w = last_pose.quaternion.w;
 	break;
       }
 
-    pub.publish(posestamped_msg);
+    tf_broadcaster.sendTransform(tf::StampedTransform(last_transform, ros::Time::now(), "sr_arm/shadowarm_handsupport", "three_d_mouse"));
     
     ros::spinOnce();
     publish_rate.sleep();
