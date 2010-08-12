@@ -31,7 +31,9 @@
 #include <sr_hand/contrlr.h>
 #include <sr_hand/sendupdate.h>
 #include <sr_hand/config.h>
-#include <geometry_msgs/PoseStamped.h>
+
+#include <tf/transform_listener.h>
+//#include <tf/transform_listener.h>
 
 #include "sr_hand/hand/shadowhand.h"
 #include "sr_hand/sr_kinematics.h"
@@ -115,17 +117,18 @@ class ShadowhandSubscriber
   Subscriber config_sub;
 
   /**
-   * process the reverse kinematics from the given message: uses the
+   * process the reverse kinematics: uses the
    * robot_description parameter (containing the urdf description of the
    * hand) to compute the reverse kinematics.
    *
    * @todo Not yet implemented
    *
-   * @param msg the reverse kinematic message
+   * @param msg a tf transform message
    */
-  void reverseKinematicsCallback( const geometry_msgs::PoseStampedConstPtr& msg );
+  void reverseKinematicsCallback( const tf::tfMessageConstPtr& msg );
   ///The subscriber to the reverse_kinematics topic
   Subscriber reverse_kinematics_sub;
+  tf::TransformListener tf_listener;
 
 }; // end class ShadowhandSubscriber
 

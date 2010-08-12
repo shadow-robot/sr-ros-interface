@@ -80,7 +80,7 @@ namespace threedmouse
 	switch( sev.type )
 	  {
 	  case SPNAV_EVENT_MOTION:
-	    last_transform.setOrigin( tf::Vector3(sev.motion.x / 100.0, sev.motion.y / 100.0, sev.motion.z / 100.0 ));
+	    last_transform.setOrigin( tf::Vector3(sev.motion.x / 1000.0, sev.motion.y / 1000.0, sev.motion.z / 1000.0 ));
 
 	    
 	    last_transform.setRotation( tf::Quaternion(sev.motion.rx / 57.3, sev.motion.ry / 57.3, sev.motion.rz / 57.3));

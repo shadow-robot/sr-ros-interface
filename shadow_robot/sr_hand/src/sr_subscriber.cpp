@@ -54,13 +54,12 @@ namespace shadowhand_subscriber {
     std::string searched_param;
     n_tilde.searchParam("shadowhand_prefix", searched_param);
     n_tilde.param(searched_param, prefix, std::string());
-    std::string full_topic = prefix + "reverseKinematics";
+    std::string full_topic = "/tf";
     reverse_kinematics_sub = node.subscribe(full_topic, 10, &ShadowhandSubscriber::reverseKinematicsCallback, this);
 
     joints_map = shadowhand->getAllJointsData();
     for(Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
       {
-	ROS_ERROR("pos: %f",it->second.position);
 	current_angles.push_back(it->second.position);
       }
   }
@@ -150,63 +149,34 @@ namespace shadowhand_subscriber {
   }
 
   
-  void ShadowhandSubscriber::reverseKinematicsCallback( const geometry_msgs::PoseStampedConstPtr& msg )
+  void ShadowhandSubscriber::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
   {
-    std::vector<double> resulting_joint_angles;
-    resulting_joint_angles = current_angles;
-
-    KDL::Rotation rotation;
-
-    std::stringstream ss;
-    ss <<"Rotation: " 
-       << msg->pose.orientation.x << " "
-       << msg->pose.orientation.y << " "
-       << msg->pose.orientation.z << " "
-       << msg->pose.orientation.w << " "
-       << std::endl;
-
-    ROS_ERROR("%s",(ss.str()).c_str());
-
-    rotation.Quaternion( msg->pose.orientation.x, 
-			 msg->pose.orientation.y, 
-			 msg->pose.orientation.z, 
-			 msg->pose.orientation.w  );
-
-    KDL::Vector translation( msg->pose.position.x, 
-			     msg->pose.position.y, 
-			     msg->pose.position.z  );
-
-    KDL::Frame transformation_frame(rotation, translation);
-    /*
-      translation: 
-      x: 0.5
-      y: -0.134
-      z: 0.4705
-      rotation: 
-      x: 0.0
-      y: 0.0
-      z: 0.0
-      w: 1.0
-    */
-    
-    KDL::Frame current_frame;
-    tf::Transform t;
-    tf::TransformTFToKDL(t, current_frame);    
-
-    KDL::Frame destination_frame = current_frame * transformation_frame;
-
-    sr_kinematics->computeReverseKinematics(destination_frame, resulting_joint_angles);
-
-    //read current joint positions from the hand
-    joints_map = shadowhand->getAllJointsData();
-    int index = 0;
-    for(Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
+    tf::StampedTransform transform;
+    try
       {
-	ROS_ERROR("pos: %f",it->second.position);
-	current_angles[index] = (it->second.position);
-	++index;
+	tf_listener.lookupTransform("threedmouse", "sr_arm/position/shadowarm_handsupport", ros::Time(0), transform);
+
+	//read current joint positions from the hand
+	joints_map = shadowhand->getAllJointsData();
+	int index = 0;
+
+	for(Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
+	  {
+	    //ROS_ERROR("pos: %f",it->second.position);
+	    current_angles[index] = (it->second.position);
+	    ++index;
+	  }
+
+	//compute the reverse kinematics
+	sr_kinematics->computeReverseKinematics(transform, current_angles);
+
+
+
       }
-    
+    catch(tf::TransformException ex)
+      {
+	ROS_DEBUG("%s",ex.what());
+      }
   }
 
 } // end namespace

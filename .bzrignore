@@ -26,3 +26,4 @@ shadow_robot/cyberglove/srv/java
 shadow_robot/cyberglove/srv/oct
 shadow_robot/sr_hand/include/sr_hand/kinematic_example.cpp
 shadow_robot/threeD_mouse/src/euslisp
+shadow_robot/sr_hand/src/euslisp
