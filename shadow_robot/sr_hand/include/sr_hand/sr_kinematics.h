@@ -19,6 +19,7 @@
 //kdl
 #include <kdl/tree.hpp>
 #include <kdl/chainiksolverpos_nr_jl.hpp>
+#include <kdl/chainiksolverpos_nr.hpp>
 #include <tf_conversions/tf_kdl.h>
 
 
@@ -38,6 +39,7 @@ namespace shadowhand
     KDL::Tree kinematic_tree;
 
     boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL> g_ik_solver;
+    //boost::shared_ptr<KDL::ChainIkSolverPos_NR> g_ik_solver;
 
     static const unsigned int number_of_joints;
 
@@ -50,6 +52,8 @@ namespace shadowhand
     {
       return deg * 3.14159265 / 180.0;
     }
+
+    boost::mutex computing_mutex;
   }; // end class SrKinematics
 
 }; //end namespace

@@ -154,7 +154,7 @@ namespace shadowhand_subscriber {
     tf::StampedTransform transform;
     try
       {
-	tf_listener.lookupTransform("threedmouse", "sr_arm/position/shadowarm_handsupport", ros::Time(0), transform);
+	tf_listener.lookupTransform("/threedmouse", "/sr_arm/position/shadowarm_handsupport", ros::Time(0), transform);
 
 	//read current joint positions from the hand
 	joints_map = shadowhand->getAllJointsData();

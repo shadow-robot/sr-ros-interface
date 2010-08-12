@@ -178,6 +178,8 @@ namespace shadowhand
 		g_js.name[num_joints-i-1] = joint->name;
 		q_min.data[num_joints-i-1] = joint->limits->lower;
 		q_max.data[num_joints-i-1] = joint->limits->upper;
+		
+		ROS_INFO("joint %s: min = %f, max = %f", joint->name.c_str(), joint->limits->lower, joint->limits->upper);
 	      }
 	    else
 	      {
@@ -190,7 +192,8 @@ namespace shadowhand
 	link = robot_model.getLink(link->getParent()->name);
       }
 
-    g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL>(new KDL::ChainIkSolverPos_NR_JL(chain, q_min, q_max, fk_solver_chain, ik_solver_vel, 100, 0.5));
+    g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL>(new KDL::ChainIkSolverPos_NR_JL(chain, q_min, q_max,  fk_solver_chain, ik_solver_vel, 1000, 1e-2));
+    //g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR>(new KDL::ChainIkSolverPos_NR(chain, fk_solver_chain, ik_solver_vel, 1000, 1e-1));
   }
 
   SrKinematics::~SrKinematics()
@@ -199,9 +202,15 @@ namespace shadowhand
 
   int SrKinematics::computeReverseKinematics(tf::Transform transform, std::vector<double> &joints)
   {
+    if( !computing_mutex.try_lock() )
+      return -1;
+    ROS_ERROR("toto");
+
     if( joints.size() != number_of_joints)
       {
 	ROS_ERROR("Received an initial pose containing %d joints instead of %d.", joints.size(), number_of_joints);
+
+	computing_mutex.unlock();
 	return -1;
       }
 
@@ -213,20 +222,37 @@ namespace shadowhand
 
     KDL::Frame destination_frame;
     tf::TransformTFToKDL(transform, destination_frame);
+    ROS_ERROR("starting");
     if (g_ik_solver->CartToJnt(q_init, destination_frame, q) < 0)
       {
-	ROS_WARN("ik solver fail");
+	ROS_ERROR("ik solver fail");
+
+	computing_mutex.unlock();
 	return -1;
       }
-
-    for (unsigned int i = 0; i < number_of_joints; i++)
-      {
-	ROS_ERROR("joint_angle[%d], %f", i, q.data[i]);
+    ROS_ERROR("done");
     
+    std::stringstream ss;
+    ss << "Joint angles: [";
+
+    bool not_zeros = false;
+
+    for (unsigned int i = 0; i < number_of_joints - 1; ++i)
+      {
+	if(q.data[i] != 0.0)
+	  not_zeros = true;
+
+	ss << q.data[i] << ", ";
 	//	joints[i] = q.data[i];
       }
+    ss << q.data[number_of_joints - 1] << "]";
+
+    ROS_ERROR("%s", (ss.str()).c_str());
 
     ros::spinOnce();
+
+
+    computing_mutex.unlock();
     return 0;
   }
 
