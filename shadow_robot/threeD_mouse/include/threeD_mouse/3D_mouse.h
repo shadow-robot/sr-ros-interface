@@ -71,6 +71,8 @@ namespace threedmouse
 
     void info_mouse_mode();
     void check_stopped();
+
+    boost::mutex mutex_last_transform;
   };
 }
 

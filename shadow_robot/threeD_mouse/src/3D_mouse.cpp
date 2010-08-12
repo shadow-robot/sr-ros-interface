@@ -54,8 +54,8 @@ namespace threedmouse
     //mouse mode changed => print info
     info_mouse_mode();
 
-    thread_update_mouse_data = boost::thread(boost::bind( &ThreeDMouse::check_stopped, this ));
     thread_publish = boost::thread( boost::bind( &ThreeDMouse::update_mouse_data, this ));
+    thread_update_mouse_data = boost::thread(boost::bind( &ThreeDMouse::check_stopped, this ));
   }
 
   ThreeDMouse::~ThreeDMouse()
@@ -80,14 +80,13 @@ namespace threedmouse
 	switch( sev.type )
 	  {
 	  case SPNAV_EVENT_MOTION:
-	    last_transform.setOrigin( tf::Vector3(sev.motion.x / 1000.0, sev.motion.y / 1000.0, sev.motion.z / 1000.0 ));
+	    if( !mutex_last_transform.try_lock() )
+		continue;
 
-	    
-	    last_transform.setRotation( tf::Quaternion(sev.motion.rx / 57.3, sev.motion.ry / 57.3, sev.motion.rz / 57.3));
+	    last_transform.setOrigin( tf::Vector3(sev.motion.x / 1000.0, sev.motion.y / 1000.0, sev.motion.z / 1000.0 ));	    
+	    last_transform.setRotation( tf::Quaternion(sev.motion.rx / 57.3 / 2.0, sev.motion.ry / 57.3 / 2.0, sev.motion.rz / 57.3 / 2.0));
 
-	    ROS_DEBUG("got motion event: t(%d, %d, %d) ", sev.motion.x, sev.motion.y, sev.motion.z);
-	    ROS_DEBUG("r(%d, %d, %d)", sev.motion.rx, sev.motion.ry, sev.motion.rz);
-
+	    mutex_last_transform.unlock();
 	    break;
 
 	  case SPNAV_EVENT_BUTTON:
@@ -114,8 +113,8 @@ namespace threedmouse
 
 	  default:
 	    break;
-	  } // end switch spnav event type
-	
+	  }
+	   	
 	ros::spinOnce();
 	usleep(1000);
       } //end while
@@ -144,10 +143,12 @@ namespace threedmouse
       }
   }
   
-
-  //Need a mutex?
   void ThreeDMouse::publish()
   {
+
+    if( !mutex_last_transform.try_lock() )
+	return;
+
     switch( mouse_mode )
       {
       case TRANSLATE:
@@ -155,7 +156,7 @@ namespace threedmouse
 	break;
 
       case ROTATE:
-    	last_transform.setOrigin( tf::Vector3(0.0,0.0,0.0) );
+	last_transform.setOrigin( tf::Vector3(0.0,0.0,0.0) );
 	break;
 
       default:
@@ -164,6 +165,8 @@ namespace threedmouse
 
     tf_broadcaster.sendTransform(tf::StampedTransform(last_transform, ros::Time::now(), reference_joint, published_tf_name)); 
     
+    mutex_last_transform.unlock();
+
     ros::spinOnce();
     publish_rate.sleep();
   }
