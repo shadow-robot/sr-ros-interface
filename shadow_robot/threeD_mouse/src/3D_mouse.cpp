@@ -162,7 +162,7 @@ namespace threedmouse
       default:
 	break;
       }
-
+    
     tf_broadcaster.sendTransform(tf::StampedTransform(last_transform, ros::Time::now(), reference_joint, published_tf_name)); 
     
     mutex_last_transform.unlock();

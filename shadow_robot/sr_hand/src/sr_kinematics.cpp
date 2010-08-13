@@ -13,16 +13,8 @@
 #include <kdl/jntarray.hpp>
 #include <sstream>
 
-#include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include <tf_conversions/tf_kdl.h>
-#include <tf/transform_datatypes.h>
-#include "robot_state_publisher/treefksolverposfull_recursive.hpp"
-#include <kdl_parser/kdl_parser.hpp>
-#include <kdl/jntarray.hpp>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <Eigen/LU>
 #include <sensor_msgs/JointState.h>
 
 #include "sr_hand/sr_kinematics.h"
@@ -37,42 +29,6 @@ namespace shadowhand
 
   SrKinematics::SrKinematics(KDL::Tree tree)
   {
-    /*kinematic_tree = tree;
-
-      if (!tree.getNrOfSegments())
-      {
-      ROS_ERROR("The given KDL tree is empty.");
-      return;
-      }
-
-      ROS_INFO("Number of segments in the KDL tree: %d", tree.getNrOfSegments());
-
-      KDL::Chain chain;
-      if (!tree.getChain("shadowarm_base", "shadowarm_handsupport", chain))
-      {
-      ROS_ERROR("couldn't pull arm chain from robot model");
-      return;
-      }
-
-      ROS_INFO("parsed tree successfully");
-   
-      KDL::ChainFkSolverPos_recursive fk_solver_chain(chain);
-      KDL::ChainIkSolverVel_pinv ik_solver_vel(chain);
-    
-      KDL::JntArray q_min(number_of_joints), q_max(number_of_joints);
-      q_min.data[0] = toRad(-45.0);
-      q_max.data[0] = toRad(90.0);
-
-      q_min.data[1] = toRad(0.0);
-      q_max.data[1] = toRad(90.0);
-
-      q_min.data[2] = toRad(0.0);
-      q_max.data[2] = toRad(120.0);
-
-      q_min.data[3] = toRad(-90.0);
-      q_max.data[3] = toRad(90.0);
-    */
-
     /* DFS: code to get model from parameter server */
     urdf::Model robot_model;
     std::string robot_desc;
@@ -204,8 +160,7 @@ namespace shadowhand
   {
     if( !computing_mutex.try_lock() )
       return -1;
-    ROS_ERROR("toto");
-
+   
     if( joints.size() != number_of_joints)
       {
 	ROS_ERROR("Received an initial pose containing %d joints instead of %d.", joints.size(), number_of_joints);
@@ -248,9 +203,6 @@ namespace shadowhand
     ss << q.data[number_of_joints - 1] << "]";
 
     ROS_ERROR("%s", (ss.str()).c_str());
-
-    ros::spinOnce();
-
 
     computing_mutex.unlock();
     return 0;

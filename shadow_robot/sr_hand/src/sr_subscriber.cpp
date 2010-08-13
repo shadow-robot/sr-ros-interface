@@ -55,13 +55,13 @@ namespace shadowhand_subscriber {
     n_tilde.searchParam("shadowhand_prefix", searched_param);
     n_tilde.param(searched_param, prefix, std::string());
     std::string full_topic = "/tf";
-    reverse_kinematics_sub = node.subscribe(full_topic, 10, &ShadowhandSubscriber::reverseKinematicsCallback, this);
-
     joints_map = shadowhand->getAllJointsData();
     for(Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
       {
 	current_angles.push_back(it->second.position);
       }
+
+    reverse_kinematics_sub = node.subscribe(full_topic, 10, &ShadowhandSubscriber::reverseKinematicsCallback, this);
   }
 
 
@@ -169,8 +169,6 @@ namespace shadowhand_subscriber {
 
 	//compute the reverse kinematics
 	sr_kinematics->computeReverseKinematics(transform, current_angles);
-
-
 
       }
     catch(tf::TransformException ex)
