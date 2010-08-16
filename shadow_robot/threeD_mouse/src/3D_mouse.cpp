@@ -146,9 +146,8 @@ namespace threedmouse
   void ThreeDMouse::publish()
   {
 
-    if( !mutex_last_transform.try_lock() )
-	return;
-
+    mutex_last_transform.lock();
+    
     switch( mouse_mode )
       {
       case TRANSLATE:
