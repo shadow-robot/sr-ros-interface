@@ -15,15 +15,50 @@ shadow_robot/cyberglove/srv/lisp
 shadow_robot/sr_control_gui/bin
 shadow_robot/sr_control_gui/build
 shadow_robot/cyberglove/src/cyberglove
+shadow_robot/sr_control_gui/param/new_calibration.cal
+shadow_robot/sr_remappers/bin
+shadow_robot/sr_remappers_bk
+shadow_robot/sr_control_gui/param/new_calibration_2.cal
 shadow_robot/sr_remappers/build
-shadow_robot/sr_remappers/bin/cyberglove_remapper
 shadow_robot/threeD_mouse/bin
 shadow_robot/threeD_mouse/build
+<<<<<<< TREE
 shadow_robot/cyberglove/srv
+=======
+shadow_robot/optical_acquisition/bin
+shadow_robot/optical_acquisition/build
+shadow_robot/optical_synchronizer/bin
+shadow_robot/optical_synchronizer/build
+<<<<<<< TREE
+shadow_robot/sr_remappers/bin/cyberglove_remapper
+=======
+shadow_robot/dataglove/dataglove_processing/.bzr
+shadow_robot/dataglove/dataglove_processing/bin
+shadow_robot/dataglove/dataglove_processing/buildshadow_robot/dataglove/dataglove_processing/srv_gen
+shadow_robot/dataglove/dataglove_processing/srv/lisp
+shadow_robot/dataglove/optical_acquisition/bin
+shadow_robot/dataglove/optical_acquisition/build
+shadow_robot/dataglove/optical_synchronizer/bin
+shadow_robot/dataglove/optical_synchronizer/build
+shadow_robot/dataglove/dataglove_processing/build
+shadow_robot/dataglove/dataglove_processing/srv_gen
+>>>>>>> MERGE-SOURCE
+shadow_robot/cyberglove/srv/java
+shadow_robot/cyberglove/srv/oct
+>>>>>>> MERGE-SOURCE
 shadow_robot/sr_hand/msg/java
 shadow_robot/sr_hand/msg/oct
+<<<<<<< TREE
 shadow_robot/cyberglove/srv/java
 shadow_robot/cyberglove/srv/oct
 shadow_robot/sr_hand/include/sr_hand/kinematic_example.cpp
 shadow_robot/threeD_mouse/src/euslisp
 shadow_robot/sr_hand/src/euslisp
+=======
+shadow_robot/sr_hand/launch/test_cam.launch
+shadow_robot/sr_display/srv_gen
+shadow_robot/sr_display/bin/*
+shadow_robot/sr_display/build/*
+shadow_robot/sr_display/src/sr_display
+shadow_robot/sr_display/srv/lisp
+>>>>>>> MERGE-SOURCE

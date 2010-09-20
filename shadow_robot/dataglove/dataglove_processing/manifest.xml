@@ -1,0 +1,23 @@
+<package>
+  <description brief="optical_dataglove">
+
+     optical_dataglove
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/optical_dataglove</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="cv_bridge"/>
+  <depend package="opencv2"/>
+  <depend package="usb_cam"/>
+  <depend package="image_transport"/>
+
+</package>
+
+
+

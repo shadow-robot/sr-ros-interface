@@ -56,11 +56,11 @@ namespace shadowhand_to_cyberglove_remapper{
   }
 
   void ShadowhandToCybergloveRemapper::init_names(){
-	joints_names[0]="THJ1";
-	joints_names[1]="THJ2";
-	joints_names[2]="THJ3";
-	joints_names[3]="THJ4";
-	joints_names[4]="THJ5";
+	joints_names[0]="THJ4";
+	joints_names[1]="THJ5";
+	joints_names[2]="THJ1";
+	joints_names[3]="THJ2";
+	joints_names[4]="THJ3";
 	joints_names[5]="FFJ0";
 	joints_names[6]="FFJ3";
 	joints_names[7]="FFJ4";
@@ -87,13 +87,15 @@ namespace shadowhand_to_cyberglove_remapper{
 	std::vector<double> vect=calibration_parser->get_remapped_vector(msg->position);
 	//Generate sendupdate message
 	pub.sendupdate_length=number_hand_joints;
-	
+    //DO NOT SEND THUMB 4 AND 5
+
 	std::vector<sr_hand::joint> table(number_hand_joints);
-	for(int i=0;i<number_hand_joints;i++){
+	for(int i=2;i<number_hand_joints;i++){
 		joint.joint_name=joints_names[i];
 		joint.joint_target=vect[i];
 		table[i]=joint;
 	}
+	pub.sendupdate_length=number_hand_joints-2;
 	pub.sendupdate_list=table;
 	shadowhand_pub.publish(pub);
   }

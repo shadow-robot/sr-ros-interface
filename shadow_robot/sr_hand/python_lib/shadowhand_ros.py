@@ -172,8 +172,6 @@ class ShadowHand_ROS():
         @param dicti: Dictionnary containing all the targets to send, mapping the name of the joint to the value of its target
         Sends new targets to the hand from a dictionnary
         """
-        #print(dicti)
-        #print(dicti)
         message = []
         for join in dicti.keys():
             message.append(joint(joint_name=join, joint_target=dicti[join]))
@@ -209,9 +207,6 @@ class ShadowHand_ROS():
             return self.hasarm
         self.hasarm = False
         if self.liste == 0:
-            #process = subprocess.Popen("rostopic list -p".split(), stdout=subprocess.PIPE)
-            #self.liste =  process.communicate()[0]
-            #self.liste = self.liste.split('\n')
             master = rosgraph.masterapi.Master('/rostopic')
             self.liste = master.getPublishedTopics('/')
         for topic_typ in self.liste : 
@@ -266,7 +261,7 @@ class ShadowHand_ROS():
         Read all the targets in the lastMsg
         """
         for joint in self.lastMsg.joints_list:
-            self.dict_tar[joint.joint_name] = joint.joint_position
+            self.dict_tar[joint.joint_name] = joint.joint_target
         return self.dict_tar
 
     def read_all_current_arm_positions(self):

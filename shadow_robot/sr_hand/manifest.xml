@@ -22,13 +22,14 @@
   <depend package="diagnostic_aggregator"/>
   <depend package="robot_state_publisher"/>
   <depend package="rviz"/>
-
   <depend package="pr2_arm_kinematics"/>
+  <depend package="gazebo_worlds"/>
+  <depend package="pr2_gazebo_plugins"/>
+  <depend package="pr2_mechanism_controllers"/>
   <export>
 	<cpp cflags="-I${prefix}/include"/>
 	<python path="${prefix}/python_lib"/>
 	<python path="${prefix}/src"/>
-	
   </export>
 </package>
 

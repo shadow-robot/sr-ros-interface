@@ -23,6 +23,11 @@ rosbuild_genmsg()
 
 rosbuild_add_boost_directories()
 
+
+#if you don't want to have the gazebo interface for the virtual hardware 
+# just comment this flag
+SET( CMAKE_CXX_FLAGS "-D GAZEBO")
+
 ##################
 #  VIRTUAL ARM  #
 ##################
@@ -34,8 +39,8 @@ rosbuild_link_boost(shadowarm_virtual thread)
 ##################
 #  VIRTUAL HAND  #
 ##################
-
 rosbuild_add_executable(shadowhand_virtual src/hand/shadowhand.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp src/sr_kinematics.cpp)
+rosbuild_add_executable(shadowhand_virtual src/hand/shadowhand.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp)
 rosbuild_link_boost(shadowhand_virtual thread)
 
 ##################

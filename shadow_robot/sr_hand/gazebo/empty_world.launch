@@ -1,8 +1,0 @@
-<launch>
-
-  <!-- start gazebo with an empty plane -->
-  <param name="/use_sim_time" value="true" />
-
-  <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find sr_hand)/gazebo/empty.world" respawn="false" output="screen"/>
-
-</launch>

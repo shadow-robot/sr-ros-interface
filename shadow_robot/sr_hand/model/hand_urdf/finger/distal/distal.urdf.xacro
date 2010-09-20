@@ -1,0 +1,46 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <include filename="$(find sr_hand)/model/hand_urdf/finger/distal/distal.transmission.xacro" />
+
+  <xacro:macro name="distal" params="link_prefix joint_prefix parent">
+  
+    <link name="${link_prefix}distal">
+      <inertial>
+	<mass value="0.010" />
+	<origin xyz="0 0 0.025" />
+	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
+	izz="0.0" />
+      </inertial>
+      <visual>
+	<origin xyz="0 0 0" rpy="0 -${M_PI/2} 0" />
+	<geometry name="distal_visual">
+      <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="Grey" />
+      </visual>
+      <collision>
+	<origin xyz="0 0 0.02" rpy="0 0 0" />
+	<geometry name="distal_collision_geom">
+	  <box size="0.015 0.015 0.020" />
+	</geometry>
+      </collision>
+    </link>
+    <gazebo reference="${link_prefix}distal">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <joint name="${joint_prefix}J1" type="revolute">
+      <parent link="${parent}"/>
+      <child link="${link_prefix}distal"/>
+      <origin xyz="0 0 0.025" rpy="0 0 0" />
+      <axis xyz="1 0 0" />
+      <limit lower="0" upper="${M_PI/2}" effort="10"
+      velocity="1.0" />
+      <dynamics damping="50.5"/>
+    </joint>
+
+    <xacro:distal_transmission />
+  
+  </xacro:macro>
+  
+</robot>

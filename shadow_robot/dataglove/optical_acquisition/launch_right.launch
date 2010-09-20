@@ -1,0 +1,9 @@
+<launch>
+
+    <node pkg="camera1394" name="camera_right" type="camera1394_node">
+        <remap from="camera/image_raw" to="camera_right/image_raw" />
+        <remap from="camera/camera_info" to="camera_right/camera_info" />
+        <param name="camera_info_url" value="file://$(find camera1394)/camera_right.yaml"/>
+    </node>   
+
+</launch>

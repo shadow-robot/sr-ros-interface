@@ -1,26 +1,26 @@
 /**
 \mainpage
+\image html http://www.shadowrobot.com/images/logo-shadowDB.png
 \htmlinclude manifest.html
 
-\b threeD_mouse is ... 
-
-<!-- 
-Provide an overview of your package.
--->
+\section introduction Introduction
+This is a ROS package which streams data coming from the 3DConnexion 6D mouse. It uses the spacenav daemon for linux: http://spacenav.sourceforge.net/
 
 
-\section codeapi Code API
+\section howto How to use
+Once you've added the package to your ROS_PACKAGE_PATH and compiled it using rosmake threeD_mouse, follow the following steps.
 
-<!--
-Provide links to specific auto-generated API documentation within your
-package that is of particular interest to a reader. Doxygen will
-document pretty much every part of your code, so do your best here to
-point the reader to the actual API.
+First start the spacenav daemon:
+\verbatim
+sudo spacenavd -d
+\endverbatim 
 
-If your codebase is fairly large or has different sets of APIs, you
-should use the doxygen 'group' tag to keep these APIs together. For
-example, the roscpp documentation has 'libros' group.
--->
+Then start the ROS interface:
+\verbatim
+roslaunch threeD_mouse threedmouse.launch
+\endverbatim
 
+The package will publish geometry_msgs/PoseStamped on the /threedmouse/pose topic. They contain a translation vector + a rotation quaternion.
 
+You can choose to either publish translation only, rotation only or both translation and rotation by pressing the right and left button on the device. You'll see which mode you're in if you open a rxconsole. 
 */

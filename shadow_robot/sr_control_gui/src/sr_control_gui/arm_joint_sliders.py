@@ -82,15 +82,6 @@ class ArmJointSliders(wx.StaticBox):
             self.dataToSend[slider_key]=slider.GetValue()
             self.sliders_values[slider_key].SetLabel(str(slider.GetValue()))
         self.myShadowHand.sendupdate_arm_from_dict(self.dataToSend)    
-        #time.sleep(0.05)
-        #self.myShadowHand.sendupdate_from_dict(self.dataToSend)    
-        #time.sleep(0.05)
-        #self.myShadowHand.sendupdate_from_dict(self.dataToSend)    
-        positions=self.myShadowHand.read_all_current_arm_positions()
-        for joint, position in positions.items():
-            if self.actualPositions.has_key(joint):
-                self.actualPositions[joint].SetValue(str(round(float(position),2)))
-
 
 
     def update_joints(self,event):
@@ -104,4 +95,8 @@ class ArmJointSliders(wx.StaticBox):
             if key in self.sliders.keys():
                 self.sliders[key].SetValue(value)    
 
-    
+        positions=self.myShadowHand.read_all_current_arm_positions()
+
+        for joint, position in positions.items():
+            if self.actualPositions.has_key(joint):
+                self.actualPositions[joint].SetValue(str(round(float(position),2)))

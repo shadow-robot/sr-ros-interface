@@ -11,6 +11,7 @@ from hand_visualisation_manager import VisualisationManager
 from hand_step_recorder import StepRecorder
 from hand_step_player import StepPlayer
 from hand_accessories import Accessories
+from hand_timeline import HandTimeLine
 from cyberglove_library import Cyberglove
 from arm_joint_sliders import ArmJointSliders
 from glove import Glove
@@ -21,6 +22,7 @@ import time
 
 MENU_EXIT = 0
 MENU_RECORD = 1
+MENU_PLAY = 2
 
 class MainWindow(wx.Frame):
     """
@@ -48,10 +50,12 @@ class MainWindow(wx.Frame):
         fil.Append(MENU_EXIT,"Exit","Quit")
         rec=wx.Menu()
         rec.Append(MENU_RECORD,"Record","Record steps")
+        rec.Append(MENU_PLAY,"Play","Play steps set")
         menubar.Append(fil,"File")
-        menubar.Append(rec,"Record")
+        menubar.Append(rec,"Steps")
         wx.EVT_MENU(self, MENU_EXIT, self.menuListener)
         wx.EVT_MENU(self, MENU_RECORD, self.menuListener)
+        wx.EVT_MENU(self, MENU_PLAY, self.menuListener)
         self.SetMenuBar(menubar)
         
         #Add the tabs
@@ -89,7 +93,7 @@ class MainWindow(wx.Frame):
         self.grasps = GraspsSaver(subPage1, -1, "Grasps", self.myShadowHand, jointChooser)
         visualisation = VisualisationManager(page2, -1, "Visualisation", self.myShadowHand)
         self.step = StepRecorder(self,-1,'Step recorder', self.myShadowHand, self.grasps)
-        self.player = StepPlayer(page3,-1,'Step Player', self.myShadowHand)
+        self.player = HandTimeLine(page3,-1,'Step Player', self.myShadowHand, self)
 
         self.accessories = Accessories(page4,-1,'Accessories', self.myShadowHand)
         if self.myCyberglove.has_glove():
@@ -105,7 +109,8 @@ class MainWindow(wx.Frame):
         self.addControler(sublayout1, jointChooser)
         
         self.addControler(layout2, visualisation)
-        self.addControler(layout3, self.player)
+        #self.addControler(layout3, self.player)
+        layout3.Add(self.player)
         self.addControler(layout4, self.accessories)
         if self.myShadowHand.has_arm():
             self.addControler(layout4, arm_slider)
@@ -150,7 +155,8 @@ class MainWindow(wx.Frame):
         if event.GetId() == MENU_RECORD :
             #self.step = StepRecorder(self,-1,'Step recorder', self.myShadowHand, self.grasps)
             self.step.Show(True)    
-        
+        if event.GetId() == MENU_PLAY :
+            self.player.play() 
 
 class MyApp(wx.App):
 

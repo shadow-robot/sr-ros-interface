@@ -1,0 +1,18 @@
+<package>
+  <description brief="optical_acquisition">
+
+     optical_acquisition
+
+  </description>
+  <author>hand</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/optical_acquisition</url>
+  <depend package="camera1394"/>
+  <depend package="image_view"/>
+  <depend package="image_proc"/>
+  <depend package="dynamic_reconfigure"/>
+
+</package>
+
+

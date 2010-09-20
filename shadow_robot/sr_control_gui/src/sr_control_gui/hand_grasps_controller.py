@@ -60,7 +60,7 @@ class GraspsSaver(wx.StaticBox):
         """
         keys = self.myParser.grasps.keys()
         keys.sort()
-        self.grasps_from = wx.ListBox(self.panel, 26, wx.DefaultPosition, (170, 130), keys , wx.LB_SINGLE)
+        self.grasps_from = wx.ListBox(self.panel, 26, wx.DefaultPosition, (170, 130), keys , wx.LB_SINGLE | wx.EXPAND)
         self.grasps_from.SetSelection(0)
         self.select_grasp_from = self.myParser.grasps.get(self.myParser.grasps.keys()[0])
         self.grasps_to = wx.ListBox(self.panel, 27, wx.DefaultPosition, (170, 130),  keys, wx.LB_SINGLE)
@@ -69,6 +69,7 @@ class GraspsSaver(wx.StaticBox):
         
         sizer = wx.FlexGridSizer(vgap=5, hgap=20)
         subsubsizer1 = wx.FlexGridSizer(rows=2, cols=1, vgap = 10)
+        subsubsizer1.AddGrowableCol(1,1)
         subsubsizer1.Add(wx.StaticText(self.panel, -1, "From: "))
         subsubsizer1.Add(self.grasps_from)
 
