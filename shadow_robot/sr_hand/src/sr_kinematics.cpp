@@ -8,8 +8,6 @@
  * 
  */
 
-#include <kdl/chainfksolverpos_recursive.hpp>
-#include <kdl/chainiksolvervel_pinv.hpp>
 #include <kdl/jntarray.hpp>
 #include <sstream>
 
@@ -19,7 +17,7 @@
 
 #include "sr_hand/sr_kinematics.h"
 
-namespace shadowhand
+namespace shadowrobot
 {
 const unsigned int SrKinematics::number_of_joints = 4;
 
@@ -27,14 +25,10 @@ SrKinematics::SrKinematics()
 {
 }
 
-SrKinematics::SrKinematics( KDL::Tree tree )
+SrKinematics::SrKinematics( KDL::Tree tree ) :
+    n_tilde("~")
 {
     /* DFS: code to get model from parameter server */
-    urdf::Model robot_model;
-    std::string robot_desc;
-    KDL::Chain chain;
-    ros::NodeHandle n;
-    ros::NodeHandle n_tilde("~");
 
     std::string root_name = "shadowarm_base";
     std::string tip_name = "shadowarm_handsupport_motor";
@@ -78,7 +72,6 @@ SrKinematics::SrKinematics( KDL::Tree tree )
     ROS_INFO("parsed tree successfully");
 
     unsigned int num_joints = 0;
-    KDL::JntArray q_min, q_max;
 
     boost::shared_ptr<const urdf::Link> link = robot_model.getLink(tip_name);
     while( link && link->name != root_name )
@@ -100,8 +93,8 @@ SrKinematics::SrKinematics( KDL::Tree tree )
     KDL::SegmentMap::const_iterator root_seg = tree.getRootSegment();
     std::string tree_root_name = root_seg->first;
     ROS_INFO("root: %s", tree_root_name.c_str());
-    KDL::ChainFkSolverPos_recursive fk_solver_chain(chain);
-    KDL::ChainIkSolverVel_pinv ik_solver_vel(chain);
+    fk_solver_chain =  boost::shared_ptr<KDL::ChainFkSolverPos_recursive>(new KDL::ChainFkSolverPos_recursive(chain));
+    ik_solver_vel = boost::shared_ptr<KDL::ChainIkSolverVel_pinv>(new KDL::ChainIkSolverVel_pinv(chain));
     sensor_msgs::JointState g_js, g_actual_js;
 
     q_min.resize(num_joints);
@@ -144,7 +137,7 @@ SrKinematics::SrKinematics( KDL::Tree tree )
         link = robot_model.getLink(link->getParent()->name);
     }
 
-    g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL>(new KDL::ChainIkSolverPos_NR_JL(chain, q_min, q_max, fk_solver_chain, ik_solver_vel, 1000, 1e-2));
+    g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL>(new KDL::ChainIkSolverPos_NR_JL(chain, q_min, q_max, *fk_solver_chain, *ik_solver_vel, 1000, 1e-2));
     //g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR>(new KDL::ChainIkSolverPos_NR(chain, fk_solver_chain, ik_solver_vel, 1000, 1e-1));
 }
 

@@ -20,24 +20,34 @@
 #include <kdl/tree.hpp>
 #include <kdl/chainiksolverpos_nr_jl.hpp>
 #include <kdl/chainiksolverpos_nr.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/chainiksolvervel_pinv.hpp>
 #include <tf_conversions/tf_kdl.h>
 
-
-
-namespace shadowhand
+namespace shadowrobot
 {
-  class SrKinematics
-  {
-  public:
+class SrKinematics
+{
+public:
     SrKinematics();
-    SrKinematics(KDL::Tree tree);
+    SrKinematics( KDL::Tree tree );
     ~SrKinematics();
 
-    int computeReverseKinematics(tf::Transform transform, std::vector<double> &joints);
+    int computeReverseKinematics( tf::Transform transform, std::vector<double> &joints );
 
-  private:
+private:
+    ros::NodeHandle n, n_tilde;
+
+    urdf::Model robot_model;
+    std::string robot_desc;
+    KDL::Chain chain;
+
     KDL::Tree kinematic_tree;
 
+    //kinematics solver
+    KDL::JntArray q_min, q_max;
+    boost::shared_ptr<KDL::ChainFkSolverPos_recursive> fk_solver_chain;
+    boost::shared_ptr<KDL::ChainIkSolverVel_pinv> ik_solver_vel;
     boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL> g_ik_solver;
     //boost::shared_ptr<KDL::ChainIkSolverPos_NR> g_ik_solver;
 
@@ -48,15 +58,16 @@ namespace shadowhand
      * @param deg the angle in degrees
      * @return the value in rads.
      */
-    inline double toRad(double deg)
+    inline double toRad( double deg )
     {
-      return deg * 3.14159265 / 180.0;
+        return deg * 3.14159265 / 180.0;
     }
 
     boost::mutex computing_mutex;
-  }; // end class SrKinematics
+}; // end class SrKinematics
 
-}; //end namespace
+}
+; //end namespace
 
 
 #endif

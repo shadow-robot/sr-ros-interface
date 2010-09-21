@@ -20,12 +20,13 @@
 #include <boost/smart_ptr.hpp>
 
 #include <ros/ros.h>
-#include "sr_hand/hand/shadowhand.h"
+#include "sr_hand/hand/sr_articulated_robot.h"
 
 using namespace ros;
-using namespace shadowhand;
+using namespace shadowrobot;
 
-namespace shadowhand_publisher{
+namespace shadowrobot
+{
 /**
  * This class publishes data concerning the shadowhand /shadowarm, like position, targets, forces, ... on different
  * topics. To publish those data, just call the publish() function.
@@ -35,50 +36,50 @@ namespace shadowhand_publisher{
  * (a ROS package). This is useful to visualize the data in rviz (part of ROS). A third topic is
  * \/prefix\/shadowhand_data. The messages published on this last topic are better formatted for our hardware.
  */
-class ShadowhandPublisher
+class SRPublisher
 {
- public:
-  /**
-   * Constructor initializing the ROS node, and setting the topic to which it publishes.
-   * The frequency at which this node will publish data is set by a parameter, read from ROS parameter server.
-   *
-   * @param sh A Shadowhand or Shadowarm object, where the information to be published comes from.
-   */
-  ShadowhandPublisher(boost::shared_ptr<Shadowhand> sh);
-  
-  /// Destructor
-  ~ShadowhandPublisher();
+public:
+    /**
+     * Constructor initializing the ROS node, and setting the topic to which it publishes.
+     * The frequency at which this node will publish data is set by a parameter, read from ROS parameter server.
+     *
+     * @param sh A Shadowhand or Shadowarm object, where the information to be published comes from.
+     */
+    SRPublisher( boost::shared_ptr<SRArticulatedRobot> sr_art_robot );
 
-  /**
-   * The callback method which is called at a given frequency. Gets the data from the shadowhand/shadowarm object.
-   */
-  void publish();
-  
- private:
-  ///ros node handle
-  NodeHandle node, n_tilde;
-  ///the rate at which the data will be published. This can be set by a parameter in the launch file.
-  Rate publish_rate;
+    /// Destructor
+    ~SRPublisher();
 
-  ///The shadowhand object (can be either an object connected to the real robot or a virtual hand).
-  boost::shared_ptr<Shadowhand> shadowhand;
+    /**
+     * The callback method which is called at a given frequency. Gets the data from the shadowhand/shadowarm object.
+     */
+    void publish();
 
-  ///The publisher which publishes the data to the \/{prefix}\/position\/joint_states topic.
-  Publisher shadowhand_jointstate_pos_pub;
-  ///The publisher which publishes the data to the \/{prefix}\/target\/joint_states topic.
-  Publisher shadowhand_jointstate_target_pub;
-  ///The publisher which publishes the data to the \/{prefix}\/shadowhand_data topic.
-  Publisher shadowhand_pub;
+private:
+    ///ros node handle
+    NodeHandle node, n_tilde;
+    ///the rate at which the data will be published. This can be set by a parameter in the launch file.
+    Rate publish_rate;
 
-  /**
-   * Convert an angle in degree to an angle in radians.
-   * @param deg the angle in degrees
-   * @return the value in rads.
-   */
-  inline double toRad(double deg)
-  {
-    return deg * 3.14159265 / 180.0;
-  }
+    ///The shadowhand object (can be either an object connected to the real robot or a virtual hand).
+    boost::shared_ptr<SRArticulatedRobot> sr_articulated_robot;
+
+    ///The publisher which publishes the data to the \/{prefix}\/position\/joint_states topic.
+    Publisher sr_jointstate_pos_pub;
+    ///The publisher which publishes the data to the \/{prefix}\/target\/joint_states topic.
+    Publisher sr_jointstate_target_pub;
+    ///The publisher which publishes the data to the \/{prefix}\/shadowhand_data topic.
+    Publisher sr_pub;
+
+    /**
+     * Convert an angle in degree to an angle in radians.
+     * @param deg the angle in degrees
+     * @return the value in rads.
+     */
+    inline double toRad( double deg )
+    {
+        return deg * 3.14159265 / 180.0;
+    }
 }; // end class ShadowhandPublisher
 
 } // end namespace

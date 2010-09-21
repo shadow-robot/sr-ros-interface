@@ -27,23 +27,20 @@
 using namespace std;
 using namespace ros;
 using namespace KDL;
-using namespace shadowhand_subscriber;
-using namespace shadowhand_publisher;
-using namespace shadowhand_diagnosticer;
-using namespace shadowhand;
+using namespace shadowrobot;
 //using namespace shadowhand_config_server;
 
 /////////////////////////////////
 //           MAIN              //
 /////////////////////////////////
 
-void run_diagnotics(boost::shared_ptr<ShadowhandDiagnosticer> shadowhand_diag)
+void run_diagnotics(boost::shared_ptr<SRDiagnosticer> shadowhand_diag)
 {
   while( ok() )
     shadowhand_diag->publish();
 }
 
-void run_publisher(boost::shared_ptr<ShadowhandPublisher> shadowhand_pub)
+void run_publisher(boost::shared_ptr<SRPublisher> shadowhand_pub)
 {
   while( ok() )
     shadowhand_pub->publish();
@@ -66,10 +63,10 @@ int main(int argc, char** argv)
   NodeHandle n;
 
   boost::shared_ptr<VirtualArm> virt_arm( new VirtualArm() );
-  boost::shared_ptr<ShadowhandSubscriber> shadowhand_subscriber;
+  boost::shared_ptr<SRSubscriber> shadowhand_subscriber;
 
-  boost::shared_ptr<ShadowhandPublisher> shadowhand_pub( new ShadowhandPublisher(virt_arm));
-  boost::shared_ptr<ShadowhandDiagnosticer> shadowhand_diag( new ShadowhandDiagnosticer(virt_arm, sr_arm_hardware));
+  boost::shared_ptr<SRPublisher> shadowhand_pub( new SRPublisher(virt_arm));
+  boost::shared_ptr<SRDiagnosticer> shadowhand_diag( new SRDiagnosticer(virt_arm, sr_arm_hardware));
 
   // gets the location of the robot description on the parameter server
   string full_param_name;
@@ -92,17 +89,17 @@ int main(int argc, char** argv)
   if (tree.getNrOfSegments() == 0)
   {
     ROS_WARN("ShadowHand subscriber got an empty tree and cannot do inverse kinematics");
-    shadowhand_subscriber = boost::shared_ptr<ShadowhandSubscriber>(new ShadowhandSubscriber(virt_arm));
+    shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new SRSubscriber(virt_arm));
   }
   else if (tree.getNrOfSegments() == 1)
   {
     ROS_WARN("ShadowHand subscriber got an empty tree and cannot do inverse kinematics");
 
-    shadowhand_subscriber = boost::shared_ptr<ShadowhandSubscriber>(new ShadowhandSubscriber(virt_arm));
+    shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new SRSubscriber(virt_arm));
   }
   else
   {
-    shadowhand_subscriber = boost::shared_ptr<ShadowhandSubscriber>(new ShadowhandSubscriber(virt_arm, tree));
+    shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new SRSubscriber(virt_arm, tree));
   }
 
   boost::thread thrd1( boost::bind( &run_diagnotics, shadowhand_diag ));

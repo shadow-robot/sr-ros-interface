@@ -1,4 +1,8 @@
+<<<<<<< TREE
 # Install script for directory: /home/ugo/Projects/ROS_interfaces/sr-ros-interface/reverse-kinematic/shadow_robot/cyberglove
+=======
+# Install script for directory: /home/ugo/Projects/ROS_interfaces/sr-ros-interface/trunk/shadow_robot/cyberglove
+>>>>>>> MERGE-SOURCE
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +42,15 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
+<<<<<<< TREE
 FILE(WRITE "/home/ugo/Projects/ROS_interfaces/sr-ros-interface/reverse-kinematic/shadow_robot/cyberglove/${CMAKE_INSTALL_MANIFEST}" "")
+=======
+FILE(WRITE "/home/ugo/Projects/ROS_interfaces/sr-ros-interface/trunk/shadow_robot/cyberglove/${CMAKE_INSTALL_MANIFEST}" "")
+>>>>>>> MERGE-SOURCE
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
+<<<<<<< TREE
   FILE(APPEND "/home/ugo/Projects/ROS_interfaces/sr-ros-interface/reverse-kinematic/shadow_robot/cyberglove/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+=======
+  FILE(APPEND "/home/ugo/Projects/ROS_interfaces/sr-ros-interface/trunk/shadow_robot/cyberglove/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+>>>>>>> MERGE-SOURCE
 ENDFOREACH(file)
