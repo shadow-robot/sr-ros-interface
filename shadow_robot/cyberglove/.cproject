@@ -8,7 +8,10 @@
 <externalSettings/>
 <extensions>
 <extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser">
+<attribute key="addr2line" value="addr2line"/>
+<attribute key="c++filt" value="c++filt"/>
+</extension>
 </extensions>
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.language.mapping">
@@ -148,37 +151,37 @@
 <pathentry kind="mac" name="__EXCEPTIONS" path="" value="1"/>
 <pathentry kind="mac" name="__GCC_HAVE_DWARF2_CFI_ASM" path="" value="1"/>
 <pathentry kind="mac" name="_GNU_SOURCE" path="" value="1"/>
-<pathentry include="/home/ugo/Projects/ROS_interfaces/shadow_robot/cyberglove/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/sensor_msgs/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/sensor_msgs/msg/cpp" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/sensor_msgs/srv/cpp" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/sensor_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/sensor_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/geometry_msgs/msg/cpp" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/geometry_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/diagnostic_msgs/msg/cpp" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/diagnostic_msgs/srv/cpp" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/diagnostic_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common_msgs/diagnostic_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/tools/rosrecord/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/tools/rosbag/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/tools/topic_tools/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/tools/topic_tools/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/std_msgs/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/std_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/test/rostest/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/core/roscpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/core/roscpp/msg_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/core/roscpp/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/3rdparty/xmlrpcpp/src" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/core/rosconsole/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/core/roslib/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/core/roslib/msg_gen/cpp/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/tools/rospack" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/tools/rospack/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/stacks/common/tinyxml/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/ros_latest/ros/3rdparty/gtest/gtest/include" kind="inc" path="" system="true"/>
-<pathentry include="/home/ugo/Projects/ROS_interfaces/shadow_robot/cyberglove/srv_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/home/ugo/Projects/ROS_interfaces/sr-ros-interface/reverse-kinematic/shadow_robot/cyberglove/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/sensor_msgs/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/sensor_msgs/msg/cpp" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/sensor_msgs/srv/cpp" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/sensor_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/sensor_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/geometry_msgs/msg/cpp" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/geometry_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/diagnostic_msgs/msg/cpp" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/diagnostic_msgs/srv/cpp" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/diagnostic_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common_msgs/diagnostic_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/tools/rosrecord/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/tools/rosbag/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/tools/topic_tools/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/tools/topic_tools/srv_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/std_msgs/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/std_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/test/rostest/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/core/roscpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/core/roscpp/msg_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/core/roscpp/srv_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/3rdparty/xmlrpcpp/src" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/core/rosconsole/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/core/roslib/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/core/roslib/msg_gen/cpp/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/tools/rospack" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/tools/rospack/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/stacks/common/tinyxml/include" kind="inc" path="" system="true"/>
+<pathentry include="/opt/ros/cturtle/ros/3rdparty/gtest/gtest/include" kind="inc" path="" system="true"/>
+<pathentry include="/home/ugo/Projects/ROS_interfaces/sr-ros-interface/reverse-kinematic/shadow_robot/cyberglove/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 <pathentry include="/usr/local/include" kind="inc" path="" system="true"/>
 <pathentry include="/usr/lib/gcc/i486-linux-gnu/4.4.3/include" kind="inc" path="" system="true"/>
 <pathentry include="/usr/lib/gcc/i486-linux-gnu/4.4.3/include-fixed" kind="inc" path="" system="true"/>
@@ -189,10 +192,31 @@
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 <buildTargets>
+<target name=": ROSBUILD_genmanifest_eus" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>/usr/bin/make</buildCommand>
+<buildArguments/>
+<buildTarget>ROSBUILD_genmanifest_eus</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
 <target name=": ROSBUILD_genmsg_cpp" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>/usr/bin/make</buildCommand>
 <buildArguments/>
 <buildTarget>ROSBUILD_genmsg_cpp</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
+<target name=": ROSBUILD_genmsg_eus" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>/usr/bin/make</buildCommand>
+<buildArguments/>
+<buildTarget>ROSBUILD_genmsg_eus</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
+<target name=": ROSBUILD_genmsg_java" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>/usr/bin/make</buildCommand>
+<buildArguments/>
+<buildTarget>ROSBUILD_genmsg_java</buildTarget>
 <stopOnError>true</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
@@ -203,6 +227,13 @@
 <stopOnError>true</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
+<target name=": ROSBUILD_genmsg_oct" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>/usr/bin/make</buildCommand>
+<buildArguments/>
+<buildTarget>ROSBUILD_genmsg_oct</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
 <target name=": ROSBUILD_gensrv_cpp" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>/usr/bin/make</buildCommand>
 <buildArguments/>
@@ -210,10 +241,31 @@
 <stopOnError>true</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
+<target name=": ROSBUILD_gensrv_eus" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>/usr/bin/make</buildCommand>
+<buildArguments/>
+<buildTarget>ROSBUILD_gensrv_eus</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
+<target name=": ROSBUILD_gensrv_java" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>/usr/bin/make</buildCommand>
+<buildArguments/>
+<buildTarget>ROSBUILD_gensrv_java</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
 <target name=": ROSBUILD_gensrv_lisp" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>/usr/bin/make</buildCommand>
 <buildArguments/>
 <buildTarget>ROSBUILD_gensrv_lisp</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
+<target name=": ROSBUILD_gensrv_oct" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>/usr/bin/make</buildCommand>
+<buildArguments/>
+<buildTarget>ROSBUILD_gensrv_oct</buildTarget>
 <stopOnError>true</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>

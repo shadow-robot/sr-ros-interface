@@ -18,27 +18,27 @@
 
 using namespace std;
 
+namespace shadowhand_subscriber
+{
 
-namespace shadowhand_subscriber {
+/////////////////////////////////
+//    CONSTRUCTOR/DESTRUCTOR   //
+/////////////////////////////////
 
-  /////////////////////////////////
-  //    CONSTRUCTOR/DESTRUCTOR   //
-  /////////////////////////////////
-
-  ShadowhandSubscriber::ShadowhandSubscriber(boost::shared_ptr<Shadowhand> sh)
-    : n_tilde("~")
-  {
+ShadowhandSubscriber::ShadowhandSubscriber( boost::shared_ptr<Shadowhand> sh ) :
+    n_tilde("~")
+{
     shadowhand = sh;
 
     ///////  
     // Initialize the subscribers
     //////
     ShadowhandSubscriber::init();
-  }
+}
 
-  ShadowhandSubscriber::ShadowhandSubscriber(boost::shared_ptr<Shadowhand> sh, KDL::Tree tree)
-    : n_tilde("~")    
-  {
+ShadowhandSubscriber::ShadowhandSubscriber( boost::shared_ptr<Shadowhand> sh, KDL::Tree tree ) :
+    n_tilde("~")
+{
     shadowhand = sh;
 
     sr_kinematics = boost::shared_ptr<SrKinematics>(new SrKinematics(tree));
@@ -56,24 +56,20 @@ namespace shadowhand_subscriber {
     n_tilde.param(searched_param, prefix, std::string());
     std::string full_topic = "/tf";
     joints_map = shadowhand->getAllJointsData();
-    for(Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
-      {
-	current_angles.push_back(it->second.position);
-      }
+    for( Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
+    {
+        current_angles.push_back(it->second.position);
+    }
 
     reverse_kinematics_sub = node.subscribe(full_topic, 10, &ShadowhandSubscriber::reverseKinematicsCallback, this);
-  }
+}
 
+ShadowhandSubscriber::~ShadowhandSubscriber()
+{
+}
 
-  ShadowhandSubscriber:: ~ShadowhandSubscriber()
-  {
-    //    if( shadowhand != NULL )
-    //      delete shadowhand;
-  }
-
-
-  void ShadowhandSubscriber::init()
-  {
+void ShadowhandSubscriber::init()
+{
     // subscribe to sendupdate topic, set sendupdateCallback function
     std::string prefix;
     std::string searched_param;
@@ -85,96 +81,92 @@ namespace shadowhand_subscriber {
 
     // subscribe to contrlr topic, set contrlrCallback function
     full_topic = prefix + "contrlr";
-    contrlr_sub = node.subscribe(full_topic, 2,  &ShadowhandSubscriber::contrlrCallback, this);
+    contrlr_sub = node.subscribe(full_topic, 2, &ShadowhandSubscriber::contrlrCallback, this);
 
     // subscribe to config topic, set configCallback function
     full_topic = prefix + "config";
     config_sub = node.subscribe(full_topic, 2, &ShadowhandSubscriber::configCallback, this);
-  }
+}
 
-
-  
-  /////////////////////////////////
-  //         CALLBACK            //
-  /////////////////////////////////
-  void ShadowhandSubscriber::sendupdateCallback(const sr_hand::sendupdateConstPtr& msg)
-  {    
+/////////////////////////////////
+//         CALLBACK            //
+/////////////////////////////////
+void ShadowhandSubscriber::sendupdateCallback( const sr_hand::sendupdateConstPtr& msg )
+{
     //loop on all the sendupdate messages received (if > 0)
     int sendupdate_length = msg->sendupdate_length;
-    if( sendupdate_length == 0)
-      {
-	ROS_WARN("Received empty sendupdate command.");
-	return;
-      }
+    if( sendupdate_length == 0 )
+    {
+        ROS_WARN("Received empty sendupdate command.");
+        return;
+    }
     //OK, not empty => loop to process all the sendupdate messages
-    for(unsigned short index_msg=0; index_msg < msg->sendupdate_length; ++index_msg)
-      {
-	float target = msg->sendupdate_list[index_msg].joint_target;
-	string sensor_name = msg->sendupdate_list[index_msg].joint_name;
-      
-	ROS_DEBUG("Received sendupdate Command [%s : %f]", sensor_name.c_str(), target);
-	shadowhand->sendupdate(sensor_name, (double)target);
-      }
+    for( unsigned short index_msg = 0; index_msg < msg->sendupdate_length; ++index_msg )
+    {
+        float target = msg->sendupdate_list[index_msg].joint_target;
+        string sensor_name = msg->sendupdate_list[index_msg].joint_name;
 
-  }
-  
+        ROS_DEBUG("Received sendupdate Command [%s : %f]", sensor_name.c_str(), target);
+        shadowhand->sendupdate(sensor_name, (double)target);
+    }
 
-  void ShadowhandSubscriber::contrlrCallback(const sr_hand::contrlrConstPtr& msg)
-  {
-    
+}
+
+void ShadowhandSubscriber::contrlrCallback( const sr_hand::contrlrConstPtr& msg )
+{
+
     vector<string> list_of_parameters = msg->list_of_parameters;
 
     JointControllerData ctrl_data;
 
     //parses all the parameters transmitted in the msg
-    for (unsigned int index_param = 0; index_param < msg->length_of_list; ++index_param)
-      {
-	//split the string (around ":")
-	vector<string> splitted_string;
-	boost::split(splitted_string, msg->list_of_parameters[index_param], boost::is_any_of(":"));
-      
-	Parameters param;
-	param.name  = splitted_string[0];
-	param.value = splitted_string[1];	
+    for( unsigned int index_param = 0; index_param < msg->length_of_list; ++index_param )
+    {
+        //split the string (around ":")
+        vector<string> splitted_string;
+        boost::split(splitted_string, msg->list_of_parameters[index_param], boost::is_any_of(":"));
 
-	ctrl_data.data.push_back(param);
-      }
+        Parameters param;
+        param.name = splitted_string[0];
+        param.value = splitted_string[1];
+
+        ctrl_data.data.push_back(param);
+    }
 
     shadowhand->setContrl(msg->contrlr_name, ctrl_data);
-  }
+}
 
-  void ShadowhandSubscriber::configCallback(const sr_hand::configConstPtr& msg)
-  { 
+void ShadowhandSubscriber::configCallback( const sr_hand::configConstPtr& msg )
+{
     ROS_ERROR("Configuration command callback not implemented yet");
-  }
+}
 
-  
-  void ShadowhandSubscriber::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
-  {
+void ShadowhandSubscriber::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
+{
     tf::StampedTransform transform;
     try
-      {
-	tf_listener.lookupTransform("/threedmouse", "/sr_arm/position/shadowarm_handsupport", ros::Time(0), transform);
+    {
+        tf_listener.lookupTransform("/threedmouse", "/sr_arm/position/shadowarm_handsupport", ros::Time(0), transform);
 
-	//read current joint positions from the hand
-	joints_map = shadowhand->getAllJointsData();
-	int index = 0;
+        //read current joint positions from the hand
+        joints_map = shadowhand->getAllJointsData();
+        int index = 0;
 
-	for(Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
-	  {
-	    //ROS_ERROR("pos: %f",it->second.position);
-	    current_angles[index] = (it->second.position);
-	    ++index;
-	  }
+        for( Shadowhand::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
+        {
+            ROS_DEBUG("pos[%s]: %f", it->first.c_str(), it->second.position);
+            current_angles[index] = (it->second.position);
+            ++index;
+        }
 
-	//compute the reverse kinematics
-	sr_kinematics->computeReverseKinematics(transform, current_angles);
+        //compute the reverse kinematics
+        sr_kinematics->computeReverseKinematics(transform, current_angles);
 
-      }
-    catch(tf::TransformException ex)
-      {
-	ROS_DEBUG("%s",ex.what());
-      }
-  }
+    }
+    catch( tf::TransformException ex )
+    {
+        ROS_DEBUG("%s",ex.what());
+    }
+}
 
 } // end namespace

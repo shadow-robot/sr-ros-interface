@@ -62,3 +62,15 @@ shadow_robot/sr_display/build/*
 shadow_robot/sr_display/src/sr_display
 shadow_robot/sr_display/srv/lisp
 >>>>>>> MERGE-SOURCE
+￼
+shadow_robot/sr_hand/.cproject
+￼
+shadow_robot/sr_hand/.project
+￼
+shadow_robot/sr_hand/cmake_install.cmake
+￼
+shadow_robot/threeD_mouse/.cproject
+￼
+shadow_robot/threeD_mouse/.project
+￼
+shadow_robot/threeD_mouse/cmake_install.cmake
