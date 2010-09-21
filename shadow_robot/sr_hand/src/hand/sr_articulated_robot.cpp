@@ -8,8 +8,9 @@
  *
  */
 
-#include "sr_hand/hand/shadowhand.h"
+#include "sr_hand/hand/sr_articulated_robot.h"
 
-namespace shadowhand {
+namespace shadowrobot
+{
 
 } //end namespace

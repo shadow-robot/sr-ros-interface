@@ -10,37 +10,39 @@
  * 
  */
 
-
 #ifndef SHADOWHAND_TACTILE_SENSOR_PUBLISHER_H_
 #define SHADOWHAND_TACTILE_SENSOR_PUBLISHER_H_
 
 #include <ros/ros.h>
 
-
 using namespace ros;
 
-namespace shadowhand_tactile_sensor_publisher{
-
-class ShadowhandTactileSensorPublisher
+namespace shadowrobot
 {
- public:
-  /// Constructor
-  ShadowhandTactileSensorPublisher();
-  
-  /// Destructor
-  ~ShadowhandTactileSensorPublisher(){};
 
-  void publish();
-  
- private:
-  /////////////////
-  //  CALLBACKS  //
-  /////////////////
-  //ros node handle
-  NodeHandle node, n_tilde;
-  Rate publish_rate;
+class SRTactileSensorPublisher
+{
+public:
+    /// Constructor
+    SRTactileSensorPublisher();
 
-  Publisher shadowhand_jointstate_pub;
+    /// Destructor
+    ~SRTactileSensorPublisher()
+    {
+    }
+    ;
+
+    void publish();
+
+private:
+    /////////////////
+    //  CALLBACKS  //
+    /////////////////
+    //ros node handle
+    NodeHandle node, n_tilde;
+    Rate publish_rate;
+
+    Publisher sr_jointstate_pub;
 }; // end class ShadowhandTactileSensorPublisher
 
 } // end namespace

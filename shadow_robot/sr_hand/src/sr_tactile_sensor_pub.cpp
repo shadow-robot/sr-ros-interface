@@ -35,74 +35,73 @@
 using namespace ros;
 using namespace std;
 
-
-namespace shadowhand_tactile_sensor_publisher{
-  /////////////////////////////////
-  //    CONSTRUCTOR/DESTRUCTOR   //
-  /////////////////////////////////
-ShadowhandTactileSensorPublisher::ShadowhandTactileSensorPublisher()
-  : n_tilde("~"), publish_rate(0.0)
+namespace shadowrobot
 {
-  /* We need to attach the program to the robot, or fail if we cannot. */
-  if (robot_init()<0)
+/////////////////////////////////
+//    CONSTRUCTOR/DESTRUCTOR   //
+/////////////////////////////////
+SRTactileSensorPublisher::SRTactileSensorPublisher() :
+    n_tilde("~"), publish_rate(0.0)
+{
+    /* We need to attach the program to the robot, or fail if we cannot. */
+    if( robot_init() < 0 )
     {
-      ROS_FATAL("Robot interface broken\n");
-      ROS_BREAK();
-    }
-  
-  /* We need to attach the program to the hand as well, or fail if we cannot. */
-  if (hand_init()<0)
-    {
-      ROS_FATAL("Hand interface broken\n");
-      ROS_BREAK();
+        ROS_FATAL("Robot interface broken\n");
+        ROS_BREAK();
     }
 
-  // set publish frequency
-  double publish_freq;
-  n_tilde.param("publish_frequency", publish_freq, 50.0);
-  publish_rate = Rate(publish_freq);
+    /* We need to attach the program to the hand as well, or fail if we cannot. */
+    if( hand_init() < 0 )
+    {
+        ROS_FATAL("Hand interface broken\n");
+        ROS_BREAK();
+    }
 
-  //publishes JointState messages for the robot_state_publisher
-  std::string prefix;
-  std::string searched_param;
-  n_tilde.searchParam("shadowhand_prefix", searched_param);
-  n_tilde.param(searched_param, prefix, std::string());
-  std::string full_topic = prefix + "joint_states";
-  shadowhand_jointstate_pub = node.advertise<sensor_msgs::JointState>(full_topic, 100);
+    // set publish frequency
+    double publish_freq;
+    n_tilde.param("publish_frequency", publish_freq, 50.0);
+    publish_rate = Rate(publish_freq);
+
+    //publishes JointState messages for the robot_state_publisher
+    std::string prefix;
+    std::string searched_param;
+    n_tilde.searchParam("shadowhand_prefix", searched_param);
+    n_tilde.param(searched_param, prefix, std::string());
+    std::string full_topic = prefix + "joint_states";
+    sr_jointstate_pub = node.advertise<sensor_msgs::JointState> (full_topic, 100);
 }
 
-
-  /////////////////////////////////
-  //       PUBLISH METHOD        //
-  /////////////////////////////////
-void ShadowhandTactileSensorPublisher::publish()
+/////////////////////////////////
+//       PUBLISH METHOD        //
+/////////////////////////////////
+void SRTactileSensorPublisher::publish()
 {
-  sensor_msgs::JointState jointstate_msg;
+    sensor_msgs::JointState jointstate_msg;
 
-  for( unsigned int i = 148 ; i < 174 ; ++i )
+    for( unsigned int i = 148; i < 174; ++i )
     {
-      //broken sensor
-      if(i == 161 || i == 170)
-	continue;
-      std::stringstream nametmp;
-      nametmp << "finger_sensor_e." << i;
-      struct sensor s;
-      std::string name = nametmp.str();
-      int res=robot_name_to_sensor(name.c_str(), &s);
+        //broken sensor
+        if( i == 161 || i == 170 )
+            continue;
+        std::stringstream nametmp;
+        nametmp << "finger_sensor_e." << i;
+        struct sensor s;
+        std::string name = nametmp.str();
+        int res = robot_name_to_sensor(name.c_str(), &s);
 
-      /* Check the return value to see if the sensor was found */
-      if (res)
-	ROS_ERROR("Can't open sensor %s\n", name.c_str());
-      
-      jointstate_msg.name.push_back(name);
-      jointstate_msg.effort.push_back(robot_read_sensor( &s ));
+        /* Check the return value to see if the sensor was found */
+        if( res )
+            ROS_ERROR("Can't open sensor %s\n", name.c_str());
+
+        jointstate_msg.name.push_back(name);
+        jointstate_msg.effort.push_back(robot_read_sensor(&s));
     }
 
-  //publish JointState message
-  shadowhand_jointstate_pub.publish(jointstate_msg);
+    //publish JointState message
+    sr_jointstate_pub.publish(jointstate_msg);
 
-  ros::spinOnce();
-  publish_rate.sleep();
+    ros::spinOnce();
+    publish_rate.sleep();
 }
 
 }// end namespace
