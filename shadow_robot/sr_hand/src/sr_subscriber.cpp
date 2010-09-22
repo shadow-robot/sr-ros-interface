@@ -144,7 +144,9 @@ void SRSubscriber::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
     tf::StampedTransform transform;
     try
     {
-        tf_listener.lookupTransform("/threedmouse", "/sr_arm/position/shadowarm_handsupport", ros::Time(0), transform);
+        //threedmouse is publishing the transform between the hand support and the threedmouse
+        // => we need to get the transform from the arm support (fixed point for the arm) to the threedmouse
+        tf_listener.lookupTransform("/sr_arm/position/shadowarm_base", "/threedmouse", ros::Time(0), transform);
 
         //read current joint positions from the robot
         joints_map = sr_articulated_robot->getAllJointsData();
@@ -160,10 +162,20 @@ void SRSubscriber::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
         //compute the reverse kinematics
         sr_kinematics->computeReverseKinematics(transform, current_angles);
 
+        //update the robot angles
+        unsigned int target_index = 0;
+        for( SRArticulatedRobot::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
+        {
+            double target = (double)current_angles[target_index];
+            string sensor_name = it->first;
+            ROS_DEBUG("Updating angles for reverse kinematics [%s : %f]", sensor_name.c_str(), target);
+            sr_articulated_robot->sendupdate(sensor_name, (double)target);
+            target_index++;
+        }
     }
     catch( tf::TransformException ex )
     {
-        ROS_DEBUG("%s",ex.what());
+        ROS_WARN("%s",ex.what());
     }
 }
 

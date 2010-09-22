@@ -93,7 +93,7 @@ SrKinematics::SrKinematics( KDL::Tree tree ) :
     KDL::SegmentMap::const_iterator root_seg = tree.getRootSegment();
     std::string tree_root_name = root_seg->first;
     ROS_INFO("root: %s", tree_root_name.c_str());
-    fk_solver_chain =  boost::shared_ptr<KDL::ChainFkSolverPos_recursive>(new KDL::ChainFkSolverPos_recursive(chain));
+    fk_solver_chain = boost::shared_ptr<KDL::ChainFkSolverPos_recursive>(new KDL::ChainFkSolverPos_recursive(chain));
     ik_solver_vel = boost::shared_ptr<KDL::ChainIkSolverVel_pinv>(new KDL::ChainIkSolverVel_pinv(chain));
     sensor_msgs::JointState g_js, g_actual_js;
 
@@ -166,32 +166,16 @@ int SrKinematics::computeReverseKinematics( tf::Transform transform, std::vector
 
     KDL::Frame destination_frame;
     tf::TransformTFToKDL(transform, destination_frame);
-    ROS_ERROR("starting");
     if( g_ik_solver->CartToJnt(q_init, destination_frame, q) < 0 )
     {
-        ROS_ERROR("ik solver fail");
+        ROS_DEBUG("ik solver fail");
 
         computing_mutex.unlock();
         return -1;
     }
-    ROS_ERROR("done");
 
-    std::stringstream ss;
-    ss << "Joint angles: [";
-
-    bool not_zeros = false;
-
-    for( unsigned int i = 0; i < number_of_joints - 1; ++i )
-    {
-        if( q.data[i] != 0.0 )
-            not_zeros = true;
-
-        ss << q.data[i] << ", ";
-        //	joints[i] = q.data[i];
-    }
-    ss << q.data[number_of_joints - 1] << "]";
-
-    ROS_ERROR("%s", (ss.str()).c_str());
+    for( unsigned int i = 0; i < number_of_joints; ++i )
+        joints[i] = q.data[i] * 180.0 / 3.14159;
 
     computing_mutex.unlock();
     return 0;
