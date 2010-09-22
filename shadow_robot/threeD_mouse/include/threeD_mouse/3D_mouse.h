@@ -73,6 +73,9 @@ namespace threedmouse
     void check_stopped();
 
     boost::mutex mutex_last_transform;
+
+    //consts to dampen the mouse readings
+    static const double translation_dampening, rotation_dampening;
   };
 }
 
