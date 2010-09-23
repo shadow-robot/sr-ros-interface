@@ -662,7 +662,7 @@
     <child link="rfknuckle"/>
     <!--<origin xyz="0.033 0 0.095" rpy="0 0 0" />-->
     <origin rpy="0 0 0" xyz="-0.011 0 0.095"/>
-    <axis xyz="0 -1 0"/>
+    <axis xyz="0 1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
@@ -852,7 +852,7 @@
     <parent link="lfmetacarpal"/>
     <child link="lfknuckle"/>
     <origin rpy="0 0 0" xyz="-0.01671 0 0.044"/>
-    <axis xyz="0 -1 0"/>
+    <axis xyz="0 1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>

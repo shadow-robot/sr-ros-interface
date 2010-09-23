@@ -5,10 +5,11 @@
   <include filename="$(find sr_hand)/model/hand_urdf/finger/middle/middle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/distal/distal.urdf.xacro" />
   
-  <xacro:macro name="finger" params="link_prefix joint_prefix parent *origin">
+  <xacro:macro name="finger" params="link_prefix joint_prefix parent *origin *axis">
   
     <xacro:knuckle link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${parent}" >
       <insert_block name="origin" />
+      <insert_block name="axis"/>
     </xacro:knuckle>
     
     <xacro:proximal link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${link_prefix}knuckle" >
