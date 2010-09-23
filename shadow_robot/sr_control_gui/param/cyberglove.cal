@@ -21,8 +21,8 @@
 <calib raw_value="0.610236227512" calibrated_value="0"/>
 </Joint>
 <Joint name="G_PalmArch">
-<calib raw_value="0.086614176631" calibrated_value="0"/>
-<calib raw_value="0.314960628748" calibrated_value="40"/>
+<calib raw_value="0.356614176631" calibrated_value="0"/>
+<calib raw_value="0.64960628748" calibrated_value="40"/>
 </Joint>
 <Joint name="G_PinkiePIJ">
 <calib raw_value="0.153543308377" calibrated_value="0"/>

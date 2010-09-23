@@ -44,8 +44,6 @@ class Cyberglove:
                         "G_WristPitch": Joint(),
                         "G_WristYaw": Joint() }
 
-        self.raw = rospy.Subscriber('cyberglove/raw/joint_states',JointState,self.callback_raw)
-        self.calibrated = rospy.Subscriber('cyberglove/calibrated/joint_states',JointState,self.callback_calibrated)
         self.raw_messages = []
         self.calibrated_messages = []        
         self.max_values = max_values
@@ -53,12 +51,11 @@ class Cyberglove:
         self.map = {}
         self.hasglove = 0
         self.isFirstMessage = True
-        self.liste = 0
+        self.liste = 0       
+        self.raw = rospy.Subscriber('/cyberglove/raw/joint_states',JointState,self.callback_raw)
+        self.calibrated = rospy.Subscriber('/cyberglove/calibrated/joint_states',JointState,self.callback_calibrated)
         #rospy.init_node('cyberglove_library')
         threading.Thread(None, rospy.spin)
-        #print "sleep"
-        #time.sleep(1.0)
-        #print "sleep2"
         if self.has_glove():
             time.sleep(1.0)
             self.createMap()

@@ -6,6 +6,8 @@ Minimizes the mapping matrix using a simplex algorithm
 @contact: ugo@shadowrobot.com, contact@shadowrobot.com
 """
 
+import roslib; roslib.load_manifest('sr_control_gui')
+import rospy
 from scipy.optimize import fmin  
 from cyberglove_library import Cyberglove
 
@@ -21,6 +23,7 @@ class MappingConfiguration:
 
 class MappingMinimizer:
     def __init__(self, verbose = 1):
+        rospy.init_node("cyberglove_mapper_minimizer")
         #connect to the cyberglove
         self.cyberglove = Cyberglove()
         
@@ -245,7 +248,7 @@ class MappingMinimizer:
         
         return output
     
-    def write_full_mapping(self, output_path = "../../param/GloveToHandMappings"):
+    def write_full_mapping(self, output_path = "../../../param/GloveToHandMappings"):
         """
         Writes the mapping matrix to a file:
         the glove values are the lines, the hand values are the columns
