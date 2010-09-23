@@ -84,3 +84,5 @@ shadow_robot/threeD_mouse/.project
 shadow_robot/threeD_mouse/cmake_install.cmake
 ￼
 shadow_robot/threeD_mouse/src/euslisp
+shadow_robot/sr_control_gui/.pydevproject
+shadow_robot/sr_control_gui/param/GloveToHandMappings.bk
