@@ -2,6 +2,6 @@
   <node pkg="threeD_mouse" name="threedmouse" type="threedmouse">
     <param name="published_tf_name" type="string" value="threedmouse" />
     <param name="reference_joint" type="string" value="sr_arm/position/shadowarm_handsupport_motor" />
-    <param name="publish_frequency" type="double" value="10.0" />
+    <param name="publish_frequency" type="double" value="5.0" />
   </node>
 </launch>

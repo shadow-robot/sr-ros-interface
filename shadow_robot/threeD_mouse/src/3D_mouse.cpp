@@ -29,7 +29,7 @@ ThreeDMouse::ThreeDMouse() :
     n_tilde.param(searched_param, published_tf_name, std::string("threedmouse"));
 
     n_tilde.searchParam("reference_joint", searched_param);
-    n_tilde.param(searched_param, reference_joint, std::string("sr_arm/position/shadowarm_handsupport"));
+    n_tilde.param(searched_param, reference_joint, std::string("sr_arm/position/shadowarm_handsupport_motor"));
 
     if( !(dpy = XOpenDisplay(0)) )
     {

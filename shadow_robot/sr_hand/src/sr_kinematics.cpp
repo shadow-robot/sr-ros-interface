@@ -137,7 +137,7 @@ SrKinematics::SrKinematics( KDL::Tree tree ) :
         link = robot_model.getLink(link->getParent()->name);
     }
 
-    g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL>(new KDL::ChainIkSolverPos_NR_JL(chain, q_min, q_max, *fk_solver_chain, *ik_solver_vel, 1000, 1e-2));
+    g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL>(new KDL::ChainIkSolverPos_NR_JL(chain, q_min, q_max, *fk_solver_chain, *ik_solver_vel, 100, 1.0));
     //g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR>(new KDL::ChainIkSolverPos_NR(chain, fk_solver_chain, ik_solver_vel, 1000, 1e-1));
 }
 
