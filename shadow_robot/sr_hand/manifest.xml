@@ -26,6 +26,7 @@
   <depend package="gazebo_worlds"/>
   <depend package="pr2_gazebo_plugins"/>
   <depend package="pr2_mechanism_controllers"/>
+  <depend package="arm_kinematics"/>
   <export>
 	<cpp cflags="-I${prefix}/include"/>
 	<python path="${prefix}/python_lib"/>

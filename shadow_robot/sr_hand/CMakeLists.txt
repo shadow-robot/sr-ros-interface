@@ -29,17 +29,23 @@ rosbuild_add_boost_directories()
 #SET( CMAKE_CXX_FLAGS "-D GAZEBO")
 
 ##################
+#   KINEMATICS   #
+##################
+
+rosbuild_add_executable(sr_kinematics  src/sr_kinematics.cpp)
+
+##################
 #  VIRTUAL ARM  #
 ##################
 
-rosbuild_add_executable(shadowarm_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_arm_node.cpp src/sr_diagnosticer.cpp src/sr_kinematics.cpp)
+rosbuild_add_executable(shadowarm_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_arm_node.cpp src/sr_diagnosticer.cpp)
 rosbuild_link_boost(shadowarm_virtual thread)
 
 
 ##################
 #  VIRTUAL HAND  #
 ##################
-rosbuild_add_executable(shadowhand_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp src/sr_kinematics.cpp)
+rosbuild_add_executable(shadowhand_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp)
 rosbuild_link_boost(shadowhand_virtual thread)
 
 ##################

@@ -16,170 +16,161 @@
 #include <sensor_msgs/JointState.h>
 
 #include "sr_hand/sr_kinematics.h"
+#include <sr_hand/sendupdate.h>
+#include <sr_hand/joint.h>
+using namespace ros;
 
 namespace shadowrobot
 {
-const unsigned int SrKinematics::number_of_joints = 4;
+//const std::string tmp[8] = {"base_fix", "trunk_rotation", "shoulder_rotation", "elbow_abduction", "forearm_rotation", "arm_link", "WRJ2", "WRJ1"};
+//static const std::vector<const std::string> joint_names(tmp, tmp+8);
+
 
 SrKinematics::SrKinematics()
 {
-}
 
-SrKinematics::SrKinematics( KDL::Tree tree ) :
-    n_tilde("~")
-{
-    /* DFS: code to get model from parameter server */
+    rk_client = node.serviceClient<kinematics_msgs::GetPositionIK> ("/arm_kinematics/get_ik");
 
-    std::string root_name = "shadowarm_base";
-    std::string tip_name = "shadowarm_handsupport_motor";
+    /**
+     * init the publisher on the topic /srh/sendupdate
+     * publishing messages of the type sr_hand::sendupdate.
+     */
+    pub_hand = node.advertise<sr_hand::sendupdate> ("/srh/sendupdate", 2);
+    pub_arm = node.advertise<sr_hand::sendupdate> ("/sr_arm/sendupdate", 2);
 
-    std::string urdf_xml, full_urdf_xml;
-    n_tilde.param("robot_description", urdf_xml, std::string("robot_description"));
-    n_tilde.searchParam(urdf_xml, full_urdf_xml);
+    //joint_names.push_back("base_fix");
+    joint_names.push_back("trunk_rotation");
+    joint_names.push_back("shoulder_rotation");
+    joint_names.push_back("elbow_abduction");
+    joint_names.push_back("forearm_rotation");
+    joint_names.push_back("arm_link");
+    joint_names.push_back("WRJ2");
+    joint_names.push_back("WRJ1");
 
-    TiXmlDocument xml;
-    ROS_DEBUG("Reading xml file from parameter server\n");
-    std::string result;
-    if( n_tilde.getParam(full_urdf_xml, result) )
-        xml.Parse(result.c_str());
-    else
-    {
-        ROS_FATAL("Could not load the xml from parameter server: %s\n", urdf_xml.c_str());
-        return;
-    }
-    std::string xml_string = result;
-    TiXmlElement *root_element = xml.RootElement();
-    TiXmlElement *root = xml.FirstChildElement("robot");
-    if( !root || !root_element )
-    {
-        ROS_FATAL("Could not parse the xml from %s\n", urdf_xml.c_str());
-        exit(1);
-    }
+    //subscribe to both the arm and hand joint_states to get all the joints angles.
+    std::string full_topic = "/srh/position/joint_states";
+    hand_subscriber = node.subscribe(full_topic, 10, &SrKinematics::jointstatesCallback, this);
+    full_topic = "/sr_arm/position/joint_states";
+    arm_subscriber = node.subscribe(full_topic, 10, &SrKinematics::jointstatesCallback, this);
 
-    robot_model.initXml(root);
-
-    if( !tree.getNrOfSegments() )
-    {
-        ROS_ERROR("empty tree. sad.");
-        return;
-    }
-
-    if( !tree.getChain(root_name, tip_name, chain) )
-    {
-        ROS_ERROR("couldn't pull arm chain from robot model");
-        return;
-    }
-    ROS_INFO("parsed tree successfully");
-
-    unsigned int num_joints = 0;
-
-    boost::shared_ptr<const urdf::Link> link = robot_model.getLink(tip_name);
-    while( link && link->name != root_name )
-    {
-        boost::shared_ptr<const urdf::Joint> joint = robot_model.getJoint(link->parent_joint->name);
-        ROS_INFO( "adding joint: [%s]", joint->name.c_str() );
-        if( !joint )
-        {
-            ROS_ERROR("Could not find joint: %s",link->parent_joint->name.c_str());
-            return;
-        }
-        if( joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED )
-        {
-            num_joints++;
-        }
-        link = robot_model.getLink(link->getParent()->name);
-    }
-
-    KDL::SegmentMap::const_iterator root_seg = tree.getRootSegment();
-    std::string tree_root_name = root_seg->first;
-    ROS_INFO("root: %s", tree_root_name.c_str());
-    fk_solver_chain = boost::shared_ptr<KDL::ChainFkSolverPos_recursive>(new KDL::ChainFkSolverPos_recursive(chain));
-    ik_solver_vel = boost::shared_ptr<KDL::ChainIkSolverVel_pinv>(new KDL::ChainIkSolverVel_pinv(chain));
-    sensor_msgs::JointState g_js, g_actual_js;
-
-    q_min.resize(num_joints);
-    q_max.resize(num_joints);
-    g_actual_js.name.resize(num_joints);
-    g_actual_js.position.resize(num_joints);
-    g_js.name.resize(num_joints);
-    g_js.position.resize(num_joints);
-
-    link = robot_model.getLink(tip_name);
-
-    unsigned int i = 0;
-    while( link && i < num_joints )
-    {
-        boost::shared_ptr<const urdf::Joint> joint = robot_model.getJoint(link->parent_joint->name);
-        ROS_INFO( "getting bounds for joint: [%s]", joint->name.c_str() );
-        if( !joint )
-        {
-            ROS_ERROR("Could not find joint: %s",link->parent_joint->name.c_str());
-            return;
-        }
-        if( joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED )
-        {
-            if( joint->type != urdf::Joint::CONTINUOUS )
-            {
-                g_js.name[num_joints - i - 1] = joint->name;
-                q_min.data[num_joints - i - 1] = joint->limits->lower;
-                q_max.data[num_joints - i - 1] = joint->limits->upper;
-
-                ROS_INFO("joint %s: min = %f, max = %f", joint->name.c_str(), joint->limits->lower, joint->limits->upper);
-            }
-            else
-            {
-                g_js.name[num_joints - i - 1] = joint->name;
-                q_min.data[num_joints - i - 1] = -M_PI;
-                q_max.data[num_joints - i - 1] = M_PI;
-            }
-            i++;
-        }
-        link = robot_model.getLink(link->getParent()->name);
-    }
-
-    g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR_JL>(new KDL::ChainIkSolverPos_NR_JL(chain, q_min, q_max, *fk_solver_chain, *ik_solver_vel, 100, 1.0));
-    //g_ik_solver = boost::shared_ptr<KDL::ChainIkSolverPos_NR>(new KDL::ChainIkSolverPos_NR(chain, fk_solver_chain, ik_solver_vel, 1000, 1e-1));
+    ros::Rate rate = ros::Rate(0.5);
+    rate.sleep();
+    full_topic = "/tf";
+    reverse_kinematics_sub = node.subscribe(full_topic, 10, &SrKinematics::reverseKinematicsCallback, this);
 }
 
 SrKinematics::~SrKinematics()
 {
 }
 
-int SrKinematics::computeReverseKinematics( tf::Transform transform, std::vector<double> &joints )
+void SrKinematics::jointstatesCallback( const sensor_msgs::JointStateConstPtr& msg )
 {
-    if( !computing_mutex.try_lock() )
-        return -1;
-
-    if( joints.size() != number_of_joints )
+    mutex.lock();
+    //TODO optimize this crappy hack
+    for( unsigned int index = 0; index < msg->name.size(); ++index )
     {
-        ROS_ERROR("Received an initial pose containing %d joints instead of %d.", joints.size(), number_of_joints);
-
-        computing_mutex.unlock();
-        return -1;
+        for(unsigned int index_names = 0; index_names < joint_names.size(); ++index_names)
+        {
+            //if the name is part of the list
+            if(boost::find_first(joint_names[index_names], msg->name[index]))
+            {
+                joints_map[msg->name[index]] = msg->position[index];
+                continue;
+            }
+        }
     }
+    joints_map["arm_link"] = 0.0;
+    mutex.unlock();
+}
 
-    KDL::JntArray q_init(number_of_joints), q(number_of_joints);
-    for( unsigned int i = 0; i < number_of_joints; ++i )
+void SrKinematics::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
+{
+    tf::StampedTransform transform;
+    std::string link_name = msg->transforms[0].child_frame_id;
+    try
     {
-        q_init.data[i] = joints[i];
-    }
+        //Only compute the reverse kinematics when receiving something from the threedmouse.
+        //TODO change this for a more generic way of handling it.
+        if( boost::find_first(link_name, "threedmouse") )
+        {
+            //threedmouse is publishing the transform between the hand support and the threedmouse
+            // => we need to get the transform from the arm support (fixed point for the arm) to the threedmouse
+            tf_listener.lookupTransform("/sr_arm/position/shadowarm_base", "/threedmouse", ros::Time(0), transform);
 
-    KDL::Frame destination_frame;
-    tf::TransformTFToKDL(transform, destination_frame);
-    if( g_ik_solver->CartToJnt(q_init, destination_frame, q) < 0 )
+            kinematics_msgs::GetPositionIK srv;
+            srv.request.ik_request.ik_link_name = "/threedmouse";
+            geometry_msgs::PoseStamped pose;
+
+            // the transform and the pose are equal, as we're getting the transform from the origin.
+            pose.header.stamp = ros::Time::now();
+            tf::Vector3 position = transform.getOrigin();
+            pose.pose.position.x = double(position.x());
+            pose.pose.position.y = double(position.y());
+            pose.pose.position.z = double(position.z());
+            btQuaternion orientation = transform.getRotation();
+            pose.pose.orientation.w = double(orientation.w());
+            pose.pose.orientation.x = double(orientation.x());
+            pose.pose.orientation.y = double(orientation.y());
+            pose.pose.orientation.z = double(orientation.z());
+
+            srv.request.ik_request.pose_stamped = pose;
+            srv.request.timeout = ros::Duration(0.5);
+
+            mutex.lock();
+            for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
+            {
+                ROS_DEBUG("pos[%s]: %f", it->first.c_str(), it->second);
+
+                srv.request.ik_request.ik_seed_state.joint_state.name.push_back(it->first);
+                srv.request.ik_request.ik_seed_state.joint_state.position.push_back(double(it->second));
+            }
+            mutex.unlock();
+
+            if( rk_client.call(srv) )
+            {
+                sr_hand::sendupdate msg;
+                std::vector<sr_hand::joint> jointVector;
+
+                for( unsigned int i = 0; i < srv.response.solution.joint_state.name.size(); ++i )
+                {
+                    std::string sensor_name = srv.response.solution.joint_state.name[i];
+                    double target = srv.response.solution.joint_state.position[i] * 180.0 / 3.14159;
+                    ROS_DEBUG("[%s] = %f", sensor_name.c_str(), target);
+
+                    //fill the sendupdate message
+                    sr_hand::joint joint;
+                    joint.joint_name = sensor_name;
+                    joint.joint_target = target;
+                    jointVector.push_back(joint);
+                }
+
+                msg.sendupdate_length = jointVector.size();
+                msg.sendupdate_list = jointVector;
+                //publish the message
+
+                pub_hand.publish(msg);
+                pub_arm.publish(msg);
+            }
+            else
+            {
+                ROS_ERROR("cant compute reverse kinematics");
+            }
+        }
+    }
+    catch( tf::TransformException ex )
     {
-        ROS_DEBUG("ik solver fail");
-
-        computing_mutex.unlock();
-        return -1;
+        ROS_WARN("%s",ex.what());
     }
-
-    for( unsigned int i = 0; i < number_of_joints; ++i )
-        joints[i] = q.data[i] * 180.0 / 3.14159;
-
-    computing_mutex.unlock();
-    return 0;
 }
 
 }
 ; //end namespace
+
+
+int main( int argc, char** argv )
+{
+    ros::init(argc, argv, "sr_kinematics");
+    boost::shared_ptr<shadowrobot::SrKinematics> sr_kin(new shadowrobot::SrKinematics::SrKinematics());
+    ros::spin();
+}
+

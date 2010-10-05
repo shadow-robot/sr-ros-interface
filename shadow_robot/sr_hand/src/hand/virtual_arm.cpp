@@ -90,6 +90,10 @@ void VirtualArm::initializeMap()
     tmpData.publisher_index = tmp_index;
 #endif
     joints_map["forearm_rotation"] = tmpData;
+
+    tmpData.min = 0.0;
+    tmpData.max = 0.0;
+    joints_map["arm_link"] = tmpData;
 }
 
 short VirtualArm::sendupdate( std::string joint_name, double target )
@@ -103,7 +107,7 @@ short VirtualArm::sendupdate( std::string joint_name, double target )
     //not found
     if( iter == joints_map.end() )
     {
-        ROS_ERROR("Joint %s not found.", joint_name.c_str());
+        ROS_DEBUG("Joint %s not found.", joint_name.c_str());
         return -1;
     }
 

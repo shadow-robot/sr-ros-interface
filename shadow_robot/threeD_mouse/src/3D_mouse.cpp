@@ -13,8 +13,8 @@
 
 namespace threedmouse
 {
-const double ThreeDMouse::translation_dampening = 1000.0;
-const double ThreeDMouse::rotation_dampening = 4*57.0;
+const double ThreeDMouse::translation_dampening = 4000.0;
+const double ThreeDMouse::rotation_dampening = 10.0*57.0;
 
 ThreeDMouse::ThreeDMouse() :
     n_tilde("~"), publish_rate(0.0)

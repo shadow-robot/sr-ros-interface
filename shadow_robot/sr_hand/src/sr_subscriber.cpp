@@ -39,7 +39,7 @@ SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot, 
     n_tilde("~")
 {
     sr_articulated_robot = sr_art_robot;
-    sr_kinematics = boost::shared_ptr<SrKinematics>(new SrKinematics(tree));
+    //sr_kinematics = boost::shared_ptr<SrKinematics>(new SrKinematics(tree));
 
     ///////
     // Initialize the subscribers
@@ -52,15 +52,11 @@ SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot, 
     std::string searched_param;
     n_tilde.searchParam("shadowhand_prefix", searched_param);
     n_tilde.param(searched_param, prefix, std::string());
-    std::string full_topic = "/tf";
     joints_map = sr_art_robot->getAllJointsData();
     for( SRArticulatedRobot::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
         current_angles.push_back(it->second.position);
     }
-
-    reverse_kinematics_sub = node.subscribe(full_topic, 10, &SRSubscriber::reverseKinematicsCallback, this);
-
 }
 
 SRSubscriber::~SRSubscriber()
@@ -96,7 +92,7 @@ void SRSubscriber::sendupdateCallback( const sr_hand::sendupdateConstPtr& msg )
     int sendupdate_length = msg->sendupdate_length;
     if( sendupdate_length == 0 )
     {
-        ROS_WARN("Received empty sendupdate command.");
+        ROS_DEBUG("Received empty sendupdate command.");
         return;
     }
     //OK, not empty => loop to process all the sendupdate messages
@@ -138,52 +134,6 @@ void SRSubscriber::contrlrCallback( const sr_hand::contrlrConstPtr& msg )
 void SRSubscriber::configCallback( const sr_hand::configConstPtr& msg )
 {
     ROS_ERROR("Configuration command callback not implemented yet");
-}
-
-void SRSubscriber::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
-{
-    tf::StampedTransform transform;
-    std::string link_name = msg->transforms[0].child_frame_id;
-    try
-    {
-        //Only compute the reverse kinematics when receiving something from the threedmouse.
-        //TODO change this for a more generic way of handling it.
-        if( boost::find_first(link_name, "threedmouse") )
-        {
-            //threedmouse is publishing the transform between the hand support and the threedmouse
-            // => we need to get the transform from the arm support (fixed point for the arm) to the threedmouse
-            tf_listener.lookupTransform("/sr_arm/position/shadowarm_base", "/threedmouse", ros::Time(0), transform);
-
-            //read current joint positions from the robot
-            joints_map = sr_articulated_robot->getAllJointsData();
-            int index = 0;
-
-            for( SRArticulatedRobot::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
-            {
-                ROS_DEBUG("pos[%s]: %f", it->first.c_str(), it->second.position);
-                current_angles[index] = (it->second.position);
-                ++index;
-            }
-
-            //compute the reverse kinematics
-            sr_kinematics->computeReverseKinematics(transform, current_angles);
-
-            //update the robot angles
-            unsigned int target_index = 0;
-            for( SRArticulatedRobot::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
-            {
-                double target = (double)current_angles[target_index];
-                string sensor_name = it->first;
-                ROS_DEBUG("Updating angles for reverse kinematics [%s : %f]", sensor_name.c_str(), target);
-                sr_articulated_robot->sendupdate(sensor_name, (double)target);
-                target_index++;
-            }
-        }
-    }
-    catch( tf::TransformException ex )
-    {
-        ROS_WARN("%s",ex.what());
-    }
 }
 
 }

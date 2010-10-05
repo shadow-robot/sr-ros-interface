@@ -32,6 +32,10 @@
 
 #include <tf/transform_listener.h>
 
+#include "kinematics_msgs/GetPositionIK.h"
+#include "kinematics_msgs/PositionIKRequest.h"
+#include "motion_planning_msgs/RobotState.h"
+
 #include "sr_hand/sr_kinematics.h"
 #include "sr_hand/hand/sr_articulated_robot.h"
 
@@ -133,6 +137,8 @@ private:
     ///The subscriber to the reverse_kinematics topic
     Subscriber reverse_kinematics_sub;
     tf::TransformListener tf_listener;
+
+    ros::ServiceClient rk_client;
 }; // end class ShadowhandSubscriber
 
 } // end namespace
