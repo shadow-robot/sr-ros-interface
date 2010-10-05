@@ -84,9 +84,9 @@ void ThreeDMouse::update_mouse_data()
                     continue;
 
                 ROS_DEBUG("3D mouse: [%f, %f, %f]", (double)sev.motion.x / translation_dampening, (double)sev.motion.y / translation_dampening, (double)sev.motion.z / translation_dampening);
-                last_transform.setOrigin(tf::Vector3(-(double)sev.motion.z / translation_dampening, (double)sev.motion.x / translation_dampening, (double)sev.motion.y / translation_dampening));
+                last_transform.setOrigin(tf::Vector3(-(double)sev.motion.x / translation_dampening, (double)sev.motion.y / translation_dampening, (double)sev.motion.z / translation_dampening));
                 ROS_DEBUG("3D mouse: [%f, %f, %f]", (double)sev.motion.rx / rotation_dampening, (double)sev.motion.ry / rotation_dampening, (double)sev.motion.rz / rotation_dampening);
-                last_transform.setRotation(tf::Quaternion((double)sev.motion.ry / rotation_dampening, (double)sev.motion.rx / rotation_dampening, (double)sev.motion.rz / rotation_dampening));
+                last_transform.setRotation(tf::Quaternion((double)sev.motion.rx / rotation_dampening, (double)sev.motion.ry / rotation_dampening, (double)sev.motion.rz / rotation_dampening));
 
                 mutex_last_transform.unlock();
                 break;
