@@ -36,46 +36,74 @@ public:
 private:
     ros::NodeHandle node, n_tilde;
 
+    //consts used for the topics on which to publish / subscribe
+    static const std::string hand_joint_states_topic, arm_joint_states_topic, hand_sendupdate_topic, arm_sendupdate_topic, arm_kinematics_service;
+
+    /**
+     * the name of the link composing the root and the one of the tip of the kinematic chain
+     */
+    std::string full_root_name, root_name, tip_name, rk_target;
+
+    /**
+     * contains the kinematic chain from root to tip
+     */
+    KDL::Chain chain;
+
     typedef std::map<std::string, double> JointsMap;
+    /**
+     * A map containing the joints in the kinematic chain (from root to tip) and their current positions
+     */
     JointsMap joints_map;
+
+    /**
+     * Load the robot model and extract the correct joint_names from the
+     * kinematic chain, from root to tip.
+     * @param xml the xml of the robot model
+     * @return true if success
+     */
+    bool loadModel( const std::string xml );
+
     boost::mutex mutex;
 
-    //static const std::vector<const std::string> joint_names;
-    std::vector<std::string> joint_names;
-
-    ros::Publisher pub_hand;
-    ros::Publisher pub_arm;
+    //publishes all the targets to the hand and the arm (the target names are then checked internally in the hand/arm)
+    //it's easier that way than checking if the target is for the hand or for the arm.
+    ros::Publisher pub_hand, pub_arm;
     //we need two different subscribers to joint_states: one for the hand, one for the arm
-    ros::Subscriber hand_subscriber;
-    ros::Subscriber arm_subscriber;
+    ros::Subscriber hand_subscriber, arm_subscriber;
 
-    //we can have the same callback for both subscribers
+    /**
+     * The callback for the joint_states topic. Periodically update the current position
+     * for the joints in the kinematic chain.
+     *
+     * We can have the same callback for both joint_states subscribers:
+     * we're updating joints_map with data coming from both the hand and the arm.
+     * @param msg a JointState message
+     */
     void jointstatesCallback( const sensor_msgs::JointStateConstPtr& msg );
 
     /**
-     * process the reverse kinematics: uses the
-     * robot_description parameter (containing the urdf description of the
-     * hand) to compute the reverse kinematics.
-     *
-     * @todo Not yet implemented
+     * compute the reverse kinematics for the kinematic chain between the specified
+     * root and the tip.
      *
      * @param msg a tf transform message
      */
     void reverseKinematicsCallback( const tf::tfMessageConstPtr& msg );
-    ///The subscriber to the reverse_kinematics topic
-    ros::Subscriber reverse_kinematics_sub;
+    ///The subscriber to the tf topic
+    ros::Subscriber tf_sub;
+    ///A transform listener used to get the transform between the reverse kinematics target and the root.
     tf::TransformListener tf_listener;
 
+    ///The client for the reverse kinematics service implemented in arm_kinematics.
     ros::ServiceClient rk_client;
 
     /**
-     * Convert an angle in degree to an angle in radians.
-     * @param deg the angle in degrees
-     * @return the value in rads.
+     * Convert an angle in radians to an angle in degrees.
+     * @param rad the angle in radians
+     * @return the value in degrees.
      */
-    inline double toRad( double deg )
+    inline double toDegrees( double rad )
     {
-        return deg * 3.14159265 / 180.0;
+        return rad * 57.2957795;
     }
 }; // end class SrKinematics
 

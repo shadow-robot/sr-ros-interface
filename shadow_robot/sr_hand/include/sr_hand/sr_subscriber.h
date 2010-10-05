@@ -30,13 +30,6 @@
 #include <sr_hand/sendupdate.h>
 #include <sr_hand/config.h>
 
-#include <tf/transform_listener.h>
-
-#include "kinematics_msgs/GetPositionIK.h"
-#include "kinematics_msgs/PositionIKRequest.h"
-#include "motion_planning_msgs/RobotState.h"
-
-#include "sr_hand/sr_kinematics.h"
 #include "sr_hand/hand/sr_articulated_robot.h"
 
 using namespace ros;
@@ -77,19 +70,6 @@ private:
     ///The shadowhand / shadowarm object (can be either an object connected to the real robot or a virtual hand).
     boost::shared_ptr<SRArticulatedRobot> sr_articulated_robot;
 
-    //contains the map for the joints of the object.
-    SRArticulatedRobot::JointsMap joints_map;
-
-    /// KDL tree containing the robot kinematic chains
-    const Tree sr_kinematic_tree;
-    boost::shared_ptr<SrKinematics> sr_kinematics;
-
-    ///a vector containing the end effector names
-    static const std::vector<std::string> end_effector_names;
-
-    ///stores the current angles for the reverse kinematics
-    std::vector<double> current_angles;
-
     ///init function
     void init();
 
@@ -123,22 +103,6 @@ private:
     void configCallback( const sr_hand::configConstPtr& msg );
     ///The subscriber to the config topic
     Subscriber config_sub;
-
-    /**
-     * process the reverse kinematics: uses the
-     * robot_description parameter (containing the urdf description of the
-     * hand) to compute the reverse kinematics.
-     *
-     * @todo Not yet implemented
-     *
-     * @param msg a tf transform message
-     */
-    void reverseKinematicsCallback( const tf::tfMessageConstPtr& msg );
-    ///The subscriber to the reverse_kinematics topic
-    Subscriber reverse_kinematics_sub;
-    tf::TransformListener tf_listener;
-
-    ros::ServiceClient rk_client;
 }; // end class ShadowhandSubscriber
 
 } // end namespace

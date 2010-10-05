@@ -52,11 +52,6 @@ SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot, 
     std::string searched_param;
     n_tilde.searchParam("shadowhand_prefix", searched_param);
     n_tilde.param(searched_param, prefix, std::string());
-    joints_map = sr_art_robot->getAllJointsData();
-    for( SRArticulatedRobot::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
-    {
-        current_angles.push_back(it->second.position);
-    }
 }
 
 SRSubscriber::~SRSubscriber()

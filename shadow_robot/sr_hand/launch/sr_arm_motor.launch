@@ -13,7 +13,13 @@
   </node>
 
 
-  <node pkg="sr_hand" name="sr_kinematics" type="sr_kinematics"/>
+  <node pkg="sr_hand" name="sr_kinematics" type="sr_kinematics">
+    <param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf" />
+    <param name="full_root_name" type="string" value="/sr_arm/position/shadowarm_base"/>
+    <param name="root_name" type="string" value="shadowarm_base"/>
+    <param name="tip_name" type="string" value="palm"/>
+    <param name="rk_target" type="string" value="threedmouse"/>
+  </node>
 
   <!--
            shadowhand 

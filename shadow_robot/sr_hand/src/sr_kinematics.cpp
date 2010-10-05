@@ -8,13 +8,14 @@
  * 
  */
 
-#include <kdl/jntarray.hpp>
 #include <sstream>
+#include <algorithm>
 
 #include <tf/transform_listener.h>
 #include <tf_conversions/tf_kdl.h>
 #include <sensor_msgs/JointState.h>
-
+#include <kdl_parser/kdl_parser.hpp>
+#include <kdl/jntarray.hpp>
 #include "sr_hand/sr_kinematics.h"
 #include <sr_hand/sendupdate.h>
 #include <sr_hand/joint.h>
@@ -22,64 +23,127 @@ using namespace ros;
 
 namespace shadowrobot
 {
-//const std::string tmp[8] = {"base_fix", "trunk_rotation", "shoulder_rotation", "elbow_abduction", "forearm_rotation", "arm_link", "WRJ2", "WRJ1"};
-//static const std::vector<const std::string> joint_names(tmp, tmp+8);
+const std::string SrKinematics::hand_joint_states_topic = "/srh/position/joint_states";
+const std::string SrKinematics::arm_joint_states_topic = "/sr_arm/position/joint_states";
+const std::string SrKinematics::hand_sendupdate_topic = "/srh/sendupdate";
+const std::string SrKinematics::arm_sendupdate_topic = "/sr_arm/sendupdate";
+const std::string SrKinematics::arm_kinematics_service = "/arm_kinematics/get_ik";
 
-
-SrKinematics::SrKinematics()
+SrKinematics::SrKinematics() :
+    n_tilde("~")
 {
-
-    rk_client = node.serviceClient<kinematics_msgs::GetPositionIK> ("/arm_kinematics/get_ik");
+    /**
+     * init the connection to the arm kinematics inverse kinematics service
+     */
+    rk_client = node.serviceClient<kinematics_msgs::GetPositionIK> (arm_kinematics_service);
 
     /**
      * init the publisher on the topic /srh/sendupdate
      * publishing messages of the type sr_hand::sendupdate.
      */
-    pub_hand = node.advertise<sr_hand::sendupdate> ("/srh/sendupdate", 2);
-    pub_arm = node.advertise<sr_hand::sendupdate> ("/sr_arm/sendupdate", 2);
+    pub_hand = node.advertise<sr_hand::sendupdate> (hand_sendupdate_topic, 2);
+    pub_arm = node.advertise<sr_hand::sendupdate> (arm_sendupdate_topic, 2);
 
-    //joint_names.push_back("base_fix");
-    joint_names.push_back("trunk_rotation");
-    joint_names.push_back("shoulder_rotation");
-    joint_names.push_back("elbow_abduction");
-    joint_names.push_back("forearm_rotation");
-    joint_names.push_back("arm_link");
-    joint_names.push_back("WRJ2");
-    joint_names.push_back("WRJ1");
+    // getting the root and the tip name from the parameter server
+    if( !n_tilde.getParam("full_root_name", full_root_name) )
+    {
+        ROS_FATAL("No full root name found on parameter server");
+        return;
+    }
+    if( !n_tilde.getParam("root_name", root_name) )
+    {
+        ROS_FATAL("No root name found on parameter server");
+        return;
+    }
+    if( !n_tilde.getParam("tip_name", tip_name) )
+    {
+        ROS_FATAL("No tip name found on parameter server");
+        return;
+    }
+    if( !n_tilde.getParam("rk_target", rk_target) )
+    {
+        ROS_FATAL("No tip name found on parameter server");
+        return;
+    }
+    ROS_INFO("Kinematic chain from %s to %s. Reverse kinematics Target: %s", root_name.c_str(), tip_name.c_str(), rk_target.c_str());
+
+    // get the model from the parameter server
+    std::string full_param_name, result;
+    node.searchParam("urdf_description", full_param_name);
+    n_tilde.param("urdf_description", result, std::string("Failed"));
+
+    // Load and Read Models
+    if( !loadModel(result) )
+    {
+        ROS_FATAL("Could not load models!");
+        return;
+    }
 
     //subscribe to both the arm and hand joint_states to get all the joints angles.
-    std::string full_topic = "/srh/position/joint_states";
+    std::string full_topic = hand_joint_states_topic;
     hand_subscriber = node.subscribe(full_topic, 10, &SrKinematics::jointstatesCallback, this);
-    full_topic = "/sr_arm/position/joint_states";
+    full_topic = arm_joint_states_topic;
     arm_subscriber = node.subscribe(full_topic, 10, &SrKinematics::jointstatesCallback, this);
 
     ros::Rate rate = ros::Rate(0.5);
     rate.sleep();
     full_topic = "/tf";
-    reverse_kinematics_sub = node.subscribe(full_topic, 10, &SrKinematics::reverseKinematicsCallback, this);
+    tf_sub = node.subscribe(full_topic, 10, &SrKinematics::reverseKinematicsCallback, this);
 }
 
 SrKinematics::~SrKinematics()
 {
 }
 
+bool SrKinematics::loadModel( const std::string xml )
+{
+    urdf::Model robot_model;
+    KDL::Tree tree;
+
+    //init the robot_model from the urdf
+    if( !robot_model.initString(xml) )
+    {
+        ROS_FATAL("Could not initialize robot model");
+        return -1;
+    }
+
+    // build the kinematic chain from tip to root.
+    boost::shared_ptr<const urdf::Link> link = robot_model.getLink(tip_name);
+    boost::shared_ptr<const urdf::Joint> joint;
+    while( link && link->name != root_name )
+    {
+        joint = robot_model.getJoint(link->parent_joint->name);
+        if( !joint )
+        {
+            ROS_ERROR("Could not find joint: %s",link->parent_joint->name.c_str());
+            return false;
+        }
+
+        //add the joint which is in the kinematic chain to the joint map
+        joints_map[joint->name.c_str()] = 0.0;
+        ROS_INFO( "adding joint: [%s]", joint->name.c_str() );
+
+        //get the parent link
+        link = robot_model.getLink(link->getParent()->name);
+    }
+    return true;
+}
+
 void SrKinematics::jointstatesCallback( const sensor_msgs::JointStateConstPtr& msg )
 {
     mutex.lock();
-    //TODO optimize this crappy hack
+    JointsMap::iterator result;
+
+    //update only the joints in the kinematic chain
     for( unsigned int index = 0; index < msg->name.size(); ++index )
     {
-        for(unsigned int index_names = 0; index_names < joint_names.size(); ++index_names)
+        result = joints_map.find(msg->name[index]);
+        if( result != joints_map.end() )
         {
-            //if the name is part of the list
-            if(boost::find_first(joint_names[index_names], msg->name[index]))
-            {
-                joints_map[msg->name[index]] = msg->position[index];
-                continue;
-            }
+            joints_map[msg->name[index]] = msg->position[index];
+            continue;
         }
     }
-    joints_map["arm_link"] = 0.0;
     mutex.unlock();
 }
 
@@ -90,15 +154,15 @@ void SrKinematics::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
     try
     {
         //Only compute the reverse kinematics when receiving something from the threedmouse.
-        //TODO change this for a more generic way of handling it.
-        if( boost::find_first(link_name, "threedmouse") )
+        if( boost::find_first(link_name, rk_target) )
         {
-            //threedmouse is publishing the transform between the hand support and the threedmouse
+            //the target is publishing the transform between the hand support and the target
             // => we need to get the transform from the arm support (fixed point for the arm) to the threedmouse
-            tf_listener.lookupTransform("/sr_arm/position/shadowarm_base", "/threedmouse", ros::Time(0), transform);
+            //TODO: should be from the origin for the transform and the pose to be equal
+            tf_listener.lookupTransform(full_root_name, rk_target, ros::Time(0), transform);
 
             kinematics_msgs::GetPositionIK srv;
-            srv.request.ik_request.ik_link_name = "/threedmouse";
+            srv.request.ik_request.ik_link_name = rk_target;
             geometry_msgs::PoseStamped pose;
 
             // the transform and the pose are equal, as we're getting the transform from the origin.
@@ -134,7 +198,7 @@ void SrKinematics::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
                 for( unsigned int i = 0; i < srv.response.solution.joint_state.name.size(); ++i )
                 {
                     std::string sensor_name = srv.response.solution.joint_state.name[i];
-                    double target = srv.response.solution.joint_state.position[i] * 180.0 / 3.14159;
+                    double target = toDegrees(srv.response.solution.joint_state.position[i]);
                     ROS_DEBUG("[%s] = %f", sensor_name.c_str(), target);
 
                     //fill the sendupdate message
