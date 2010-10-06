@@ -51,7 +51,7 @@ rosbuild_link_boost(shadowhand_virtual thread)
 #LINK_LIBRARIES(pthread)
 #add_library(robot STATIC IMPORTED) 
 #set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
-#rosbuild_add_executable(shadowhand_real src/hand/shadowhand.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
+#rosbuild_add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
 #rosbuild_link_boost(shadowhand_real thread)
 #target_link_libraries(shadowhand_real robot)
 

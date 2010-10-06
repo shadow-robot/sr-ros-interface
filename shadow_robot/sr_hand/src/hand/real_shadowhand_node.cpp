@@ -27,9 +27,6 @@
 using namespace std;
 using namespace ros;
 using namespace KDL;
-using namespace shadowhand_subscriber;
-using namespace shadowhand_publisher;
-using namespace shadowhand_diagnosticer;
 using namespace shadowrobot;
 //using namespace shadowhand_config_server;
 
