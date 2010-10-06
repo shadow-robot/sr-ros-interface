@@ -3,7 +3,9 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Jul 15 12:15:30 2010
  * 
- * @brief  
+ * @brief  A ROS node used to subscribe to the tf topic on which the reverse kinematics targets are published.
+ * Those targets are then transformed into a pose and sent to the arm_kinematics node which tries to compute
+ * the reverse kinematics. On success, the computed targets are then sent to the arm and to the hand.
  * 
  * 
  */
@@ -18,8 +20,10 @@
 #include <boost/thread.hpp>
 
 #include <tf/transform_listener.h>
+#include <tf_conversions/tf_kdl.h>
 
 #include <sensor_msgs/JointState.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include "kinematics_msgs/GetPositionIK.h"
 #include "kinematics_msgs/PositionIKRequest.h"
@@ -42,7 +46,7 @@ private:
     /**
      * the name of the link composing the root and the one of the tip of the kinematic chain
      */
-    std::string full_root_name, root_name, tip_name, rk_target;
+    std::string root_name, tip_name, rk_target, fixed_frame;
 
     /**
      * contains the kinematic chain from root to tip
@@ -95,6 +99,16 @@ private:
 
     ///The client for the reverse kinematics service implemented in arm_kinematics.
     ros::ServiceClient rk_client;
+
+    /**
+     * Convert the given transform to a pose.
+     *
+     * In our case, the transform and the pose are equal as we're taking the transform from the origin.
+     *
+     * @param transform Transform from the origin to the reverse kinematics target.
+     * @return Pose of the kinematics target.
+     */
+    geometry_msgs::PoseStamped getPoseFromTransform(tf::StampedTransform transform);
 
     /**
      * Convert an angle in radians to an angle in degrees.

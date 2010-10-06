@@ -3,7 +3,9 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Jul 15 11:54:22 2010
  * 
- * @brief  
+ * @brief  A ROS node used to subscribe to the tf topic on which the reverse kinematics targets are published.
+ * Those targets are then transformed into a pose and sent to the arm_kinematics node which tries to compute
+ * the reverse kinematics. On success, the computed targets are then sent to the arm and to the hand.
  * 
  * 
  */
@@ -11,14 +13,14 @@
 #include <sstream>
 #include <algorithm>
 
-#include <tf/transform_listener.h>
-#include <tf_conversions/tf_kdl.h>
 #include <sensor_msgs/JointState.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/jntarray.hpp>
-#include "sr_hand/sr_kinematics.h"
+
+#include <sr_hand/sr_kinematics.h>
 #include <sr_hand/sendupdate.h>
 #include <sr_hand/joint.h>
+
 using namespace ros;
 
 namespace shadowrobot
@@ -45,11 +47,6 @@ SrKinematics::SrKinematics() :
     pub_arm = node.advertise<sr_hand::sendupdate> (arm_sendupdate_topic, 2);
 
     // getting the root and the tip name from the parameter server
-    if( !n_tilde.getParam("full_root_name", full_root_name) )
-    {
-        ROS_FATAL("No full root name found on parameter server");
-        return;
-    }
     if( !n_tilde.getParam("root_name", root_name) )
     {
         ROS_FATAL("No root name found on parameter server");
@@ -62,7 +59,12 @@ SrKinematics::SrKinematics() :
     }
     if( !n_tilde.getParam("rk_target", rk_target) )
     {
-        ROS_FATAL("No tip name found on parameter server");
+        ROS_FATAL("No reverse kinematic target found on parameter server");
+        return;
+    }
+    if( !n_tilde.getParam("fixed_frame", fixed_frame) )
+    {
+        ROS_FATAL("No fixed_frame name found on parameter server");
         return;
     }
     ROS_INFO("Kinematic chain from %s to %s. Reverse kinematics Target: %s", root_name.c_str(), tip_name.c_str(), rk_target.c_str());
@@ -153,34 +155,22 @@ void SrKinematics::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
     std::string link_name = msg->transforms[0].child_frame_id;
     try
     {
-        //Only compute the reverse kinematics when receiving something from the threedmouse.
+        //Only compute the reverse kinematics when receiving something from the kinematics target.
         if( boost::find_first(link_name, rk_target) )
         {
             //the target is publishing the transform between the hand support and the target
-            // => we need to get the transform from the arm support (fixed point for the arm) to the threedmouse
-            //TODO: should be from the origin for the transform and the pose to be equal
-            tf_listener.lookupTransform(full_root_name, rk_target, ros::Time(0), transform);
+            // => we need to get the transform from the origin to the kinematics target
+            // this way the transform and the pose are equal.
+            tf_listener.lookupTransform(fixed_frame, rk_target, ros::Time(0), transform);
 
             kinematics_msgs::GetPositionIK srv;
             srv.request.ik_request.ik_link_name = rk_target;
-            geometry_msgs::PoseStamped pose;
-
-            // the transform and the pose are equal, as we're getting the transform from the origin.
-            pose.header.stamp = ros::Time::now();
-            tf::Vector3 position = transform.getOrigin();
-            pose.pose.position.x = double(position.x());
-            pose.pose.position.y = double(position.y());
-            pose.pose.position.z = double(position.z());
-            btQuaternion orientation = transform.getRotation();
-            pose.pose.orientation.w = double(orientation.w());
-            pose.pose.orientation.x = double(orientation.x());
-            pose.pose.orientation.y = double(orientation.y());
-            pose.pose.orientation.z = double(orientation.z());
-
-            srv.request.ik_request.pose_stamped = pose;
-            srv.request.timeout = ros::Duration(0.5);
+            srv.request.ik_request.pose_stamped = getPoseFromTransform(transform);
+            srv.request.timeout = ros::Duration(0.1);
 
             mutex.lock();
+            //Fill the vector with the current joint positions (only those in the kinematics
+            // chain).
             for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
             {
                 ROS_DEBUG("pos[%s]: %f", it->first.c_str(), it->second);
@@ -190,8 +180,11 @@ void SrKinematics::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
             }
             mutex.unlock();
 
+            //Call the reverse kinematics service (implemented in arm_kinematics)
             if( rk_client.call(srv) )
             {
+                //The Reverse Kinematics was computed successfully.
+                // -> send the computed targets to the joints.
                 sr_hand::sendupdate msg;
                 std::vector<sr_hand::joint> jointVector;
 
@@ -210,8 +203,8 @@ void SrKinematics::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
 
                 msg.sendupdate_length = jointVector.size();
                 msg.sendupdate_list = jointVector;
-                //publish the message
 
+                //publish the message for both the hand and the arm.
                 pub_hand.publish(msg);
                 pub_arm.publish(msg);
             }
@@ -227,10 +220,35 @@ void SrKinematics::reverseKinematicsCallback( const tf::tfMessageConstPtr& msg )
     }
 }
 
+geometry_msgs::PoseStamped SrKinematics::getPoseFromTransform( tf::StampedTransform transform )
+{
+    geometry_msgs::PoseStamped pose;
+
+    // the transform and the pose are equal, as we're getting the transform from the origin.
+    pose.header.stamp = ros::Time::now();
+    tf::Vector3 position = transform.getOrigin();
+    pose.pose.position.x = double(position.x());
+    pose.pose.position.y = double(position.y());
+    pose.pose.position.z = double(position.z());
+    btQuaternion orientation = transform.getRotation();
+    pose.pose.orientation.w = double(orientation.w());
+    pose.pose.orientation.x = double(orientation.x());
+    pose.pose.orientation.y = double(orientation.y());
+    pose.pose.orientation.z = double(orientation.z());
+
+    return pose;
+}
+
 }
 ; //end namespace
 
-
+/**
+ * The main function initializes this reverse kinematics ros node and starts the ros spin loop.
+ *
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main( int argc, char** argv )
 {
     ros::init(argc, argv, "sr_kinematics");
