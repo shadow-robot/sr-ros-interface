@@ -41,12 +41,12 @@ private:
     ros::NodeHandle node, n_tilde;
 
     //consts used for the topics on which to publish / subscribe
-    static const std::string hand_joint_states_topic, arm_joint_states_topic, hand_sendupdate_topic, arm_sendupdate_topic, arm_kinematics_service;
+    static const std::string hand_joint_states_topic, arm_joint_states_topic, hand_sendupdate_topic, arm_sendupdate_topic;
 
     /**
      * the name of the link composing the root and the one of the tip of the kinematic chain
      */
-    std::string root_name, tip_name, rk_target, fixed_frame;
+    std::string arm_kinematics_service, root_name, tip_name, rk_target, fixed_frame;
 
     /**
      * contains the kinematic chain from root to tip

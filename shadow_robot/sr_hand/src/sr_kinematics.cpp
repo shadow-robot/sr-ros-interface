@@ -29,7 +29,6 @@ const std::string SrKinematics::hand_joint_states_topic = "/srh/position/joint_s
 const std::string SrKinematics::arm_joint_states_topic = "/sr_arm/position/joint_states";
 const std::string SrKinematics::hand_sendupdate_topic = "/srh/sendupdate";
 const std::string SrKinematics::arm_sendupdate_topic = "/sr_arm/sendupdate";
-const std::string SrKinematics::arm_kinematics_service = "/arm_kinematics/get_ik";
 
 SrKinematics::SrKinematics() :
     n_tilde("~")
@@ -37,6 +36,11 @@ SrKinematics::SrKinematics() :
     /**
      * init the connection to the arm kinematics inverse kinematics service
      */
+    if( !n_tilde.getParam("ik_service", arm_kinematics_service) )
+    {
+        ROS_FATAL("No service name for reverse kinematics found on parameter server");
+        return;
+    }
     rk_client = node.serviceClient<kinematics_msgs::GetPositionIK> (arm_kinematics_service);
 
     /**
