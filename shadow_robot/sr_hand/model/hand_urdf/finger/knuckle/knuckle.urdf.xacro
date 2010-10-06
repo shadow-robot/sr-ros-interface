@@ -35,7 +35,7 @@
       <child link="${link_prefix}knuckle"/>
       <!--<origin xyz="0.033 0 0.095" rpy="0 0 0" />-->
       <insert_block name="origin" />
-      <axis xyz="0 -1 0" />
+      <insert_block name="axis"/>
       <limit lower="-0.43633231299858238" upper="0.43633231299858238"
       effort="10" velocity="1.0"/>
       <dynamics damping="50.5"/>

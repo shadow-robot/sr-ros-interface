@@ -6,7 +6,7 @@
     value="/cyberglove/" />
     <param name="sendupdate_prefix" type="string"
     value="/srh/" />
-    <param name="cyberglove_mapping_path" type="string" value="$(find sr_control_gui)/param/GloveToHandMappings" />
+    <param name="cyberglove_mapping_path" type="string" value="$(find sr_control_gui)/param/GloveToHandMappings_generic" />
   </node>
 </launch>
 

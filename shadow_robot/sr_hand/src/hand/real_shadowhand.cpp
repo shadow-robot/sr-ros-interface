@@ -122,7 +122,7 @@ short RealShadowhand::sendupdate( std::string joint_name, double target )
     }
     else
     {
-        ROS_DEBUG("Can't open sensor [%s]", joint_name.c_str());
+        ROS_DEBUG("Joint %s not found", joint_name.c_str());
         return -1;
     }
 
