@@ -6,18 +6,18 @@
       Kinematics
   -->
 
-  <node pkg="arm_kinematics" name="arm_kinematics" type="arm_kinematics">
+  <node pkg="arm_kinematics" name="arm_kinematics_ff" type="arm_kinematics">
     <param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf" />
     <param name="root_name" type="string" value="shadowarm_base"/>
-    <param name="tip_name" type="string" value="palm"/>
+    <param name="tip_name" type="string" value="ffdistal"/>
   </node>
 
-
-  <node pkg="sr_hand" name="sr_kinematics" type="sr_kinematics">
+  <node pkg="sr_hand" name="sr_kinematics_ff" type="sr_kinematics">
     <param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf" />
+    <param name="ik_service" type="string" value="/arm_kinematics_ff/get_ik"/>
     <param name="root_name" type="string" value="shadowarm_base"/>
-    <param name="tip_name" type="string" value="palm"/>
-    <param name="rk_target" type="string" value="threedmouse"/>
+    <param name="tip_name" type="string" value="ffdistal"/>
+    <param name="rk_target" type="string" value="threedmouse_ff"/>
     <param name="fixed_frame" type="string" value="fixed"/>
   </node>
 
