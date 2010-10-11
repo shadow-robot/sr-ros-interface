@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import sys
-sys.path.append("python_hand_library/")
 from shadowhand_ros import ShadowHand_ROS
 
 

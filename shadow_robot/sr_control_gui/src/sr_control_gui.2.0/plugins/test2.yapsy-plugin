@@ -1,9 +1,0 @@
-[Core]
-Name = test2
-Module = test2
-
-[Documentation]
-Author = author
-Version = 0.1
-Website = http://yapsy.sourceforge.net
-Description = plugin

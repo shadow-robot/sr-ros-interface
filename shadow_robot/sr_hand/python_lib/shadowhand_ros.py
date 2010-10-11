@@ -75,6 +75,7 @@ class ShadowHand_ROS():
         self.dict_arm_pos = {}
         self.dict_arm_tar = {}
         rospy.init_node('python_hand_library')
+        self.sendupdate_lock = threading.Lock()
         threading.Thread(None, rospy.spin)
 
     def callback(self, data):
@@ -164,8 +165,10 @@ class ShadowHand_ROS():
         @param angle: Target of the joint, 0 if not set
         Sends a new target for the specified joint
         """
+        self.sendupdate_lock.acquire()
         message = [joint(joint_name=jointName, joint_target=angle)]
         self.pub.publish(sendupdate(len(message), message))
+        self.sendupdate_lock.release()
 
     def sendupdate_arm_from_dict(self, dicti):
         """

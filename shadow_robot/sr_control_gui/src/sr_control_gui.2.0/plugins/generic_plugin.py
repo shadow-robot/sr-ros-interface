@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from yapsy.IPlugin import IPlugin
 
 from PyQt4 import QtCore, QtGui, Qt
@@ -36,4 +38,6 @@ class GenericPlugin(IPlugin):
         self.parent.container.addSubWindow(self.window)
         self.window.show()
     
+    def set_icon(self, path):
+        self.window.setWindowIcon(QtGui.QIcon(path))
     

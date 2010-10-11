@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+import roslib; roslib.load_manifest('sr_control_gui')
+import rospy
+from shadowhand_ros import ShadowHand_ROS
+
 import logging
 #enables the logging used by yapsy
 logging.basicConfig(level=logging.DEBUG)
@@ -11,6 +15,7 @@ import os, sys
 class MainWidget(QtGui.QWidget):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self)
+        self.sr_library = ShadowHand_ROS()
         self.parent = parent
         self.layout = QtGui.QVBoxLayout()
         self.container = QtGui.QMdiArea(self)
@@ -32,7 +37,7 @@ class MainWidget(QtGui.QWidget):
         # define a signal type for activating the plugins
         #activate_plugin = QtCore.pyqtSignal(int, name="activatePlugin")
         # Add the plugins to the menubar in tool menu
-        tools = self.parent.menuBar().addMenu('&Tools')
+        tools = self.parent.menuBar().addMenu('&Plugins')
         self.parent.statusBar().showMessage('Loading plugins...', 500)
         self.plugins = self.manager.getPluginsOfCategory("Default")
         self.plugin_actions = []
@@ -40,6 +45,13 @@ class MainWidget(QtGui.QWidget):
         for plugin in self.plugins:
             plugin.plugin_object.set_parent(self)
             name = plugin.plugin_object.name
+            
+            #add the sr_library for the shadow robot plugins
+            try:
+                plugin.plugin_object.set_sr_library(self.sr_library)
+            except:
+                rospy.loginfo("The "+name+" is not a Shadow Robot plugin.")
+            
             plugin.plugin_object.id = plugin_id
             action = QtGui.QAction(name, self)
             self.plugin_actions.append(action)
@@ -52,7 +64,7 @@ class MainWidget(QtGui.QWidget):
         ####
         # Add view menu
         ##
-        view = self.parent.menuBar().addMenu('&View')
+        view = self.parent.menuBar().addMenu('&Window')
         action = QtGui.QAction("Tile the windows", self)
         self.connect(action, QtCore.SIGNAL('triggered()'), self.tile)
         view.addAction(action)

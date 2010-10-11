@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 
+import roslib; roslib.load_manifest('sr_control_gui')
+
+import rospy
+
 import logging
 #enables the logging used by yapsy
 logging.basicConfig(level=logging.ERROR)
 
+import subprocess
 from yapsy.PluginManager import PluginManager
 from PyQt4 import QtCore, QtGui, QtWebKit
 import os, sys
+
 
 from main_widget import MainWidget
 
@@ -39,6 +45,15 @@ class MainWindow(QtGui.QMainWindow):
         self.menubar = self.menuBar()
         file = self.menubar.addMenu('&File')
         file.addAction(self.exit)
+        
+        tools = self.menubar.addMenu('&Tools')
+        rxgraph = QtGui.QAction('RxPlot', self)
+        self.connect(rxgraph, QtCore.SIGNAL('triggered()'), self.launch_rxgraph)
+        robot_monitor = QtGui.QAction('Robot Monitor', self)
+        self.connect(robot_monitor, QtCore.SIGNAL('triggered()'), self.launch_robot_monitor)
+        
+        tools.addAction(rxgraph)
+        tools.addAction(robot_monitor)
             
         ####
         # MAIN WIDGET
@@ -49,4 +64,10 @@ class MainWindow(QtGui.QMainWindow):
         # STATUSBAR
         ##
         self.statusBar().showMessage('Ready', 2000)
+
+    def launch_rxgraph(self):
+        subprocess.Popen("rxgraph".split())
+
+    def launch_robot_monitor(self):
+        subprocess.Popen("rosrun robot_monitor robot_monitor".split())
 
