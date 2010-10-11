@@ -28,7 +28,8 @@ class ExtendedSlider(QtGui.QWidget):
         self.target = QtGui.QLabel(self) 
         self.target.setText("Target: "+str(0)) 
 
-        layout = QtGui.QVBoxLayout() 
+        layout = QtGui.QVBoxLayout()
+        layout.setAlignment(QtCore.Qt.AlignCenter)
         layout.setMargin(1) 
         layout.setSpacing(2) 
         layout.addWidget(self.label) 
@@ -37,6 +38,7 @@ class ExtendedSlider(QtGui.QWidget):
         layout.addWidget(self.target) 
         
         self.is_selected = False
+        self.current_value = 0
         self.selected = QtGui.QCheckBox('',self)
         self.selected.setFocusPolicy(QtCore.Qt.NoFocus)
         self.connect(self.selected, QtCore.SIGNAL('stateChanged(int)'), self.checkbox_click)
@@ -44,12 +46,26 @@ class ExtendedSlider(QtGui.QWidget):
         
         self.setLayout(layout) 
         self.connect(self.slider, QtCore.SIGNAL('valueChanged(int)'), self.changeValue)
+        self.show()
         
     def changeValue(self, value):
+        self.current_value = value
         self.target.setText("Target: " + str(value))
     
     def checkbox_click(self, value):
         self.is_selected = value
+
+class ExtendedSuperSlider(ExtendedSlider):
+    def __init__(self, parent, joint, slider_parent):
+        ExtendedSlider.__init__(self, parent, joint)
+        self.slider_parent = slider_parent
+
+    def changeValue(self, value):
+        #read the values from the selected sliders.
+        for slider in self.slider_parent.sliders:
+            if slider.is_selected:
+                print slider.current_value
+        
 
 class JointSlider(GenericPlugin):  
     name = "Joint Slider"
@@ -58,13 +74,20 @@ class JointSlider(GenericPlugin):
         GenericPlugin.__init__(self)
         
         self.layout = QtGui.QHBoxLayout()
+        self.layout.setAlignment(QtCore.Qt.AlignCenter)
         self.frame = QtGui.QFrame()
+
+        #Add the sliders
         self.sliders = []
         for joint in joints_map.values():
             slider = ExtendedSlider(self.frame, joint)
-            slider.show()
             self.layout.addWidget(slider)
             self.sliders.append(slider)
+
+        #Add a slider to control all the selected sliders
+        selected_joints = Joint("Move Selected Joints", -100, 100)
+        self.super_slider = ExtendedSuperSlider(self.frame, selected_joints, self)
+        self.layout.addWidget(self.super_slider)
             
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
