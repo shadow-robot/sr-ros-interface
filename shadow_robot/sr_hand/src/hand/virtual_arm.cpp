@@ -46,6 +46,7 @@ VirtualArm::~VirtualArm()
 
 void VirtualArm::initializeMap()
 {
+    joints_map_mutex.lock();
     JointData tmpData;
 
 #ifdef GAZEBO
@@ -90,10 +91,14 @@ void VirtualArm::initializeMap()
     tmpData.publisher_index = tmp_index;
 #endif
     joints_map["forearm_rotation"] = tmpData;
+
+    joints_map_mutex.unlock();
 }
 
 short VirtualArm::sendupdate( std::string joint_name, double target )
 {
+    joints_map_mutex.lock();
+
     JointsMap::iterator iter = joints_map.find(joint_name);
 
 #ifdef GAZEBO
@@ -104,6 +109,7 @@ short VirtualArm::sendupdate( std::string joint_name, double target )
     if( iter == joints_map.end() )
     {
         ROS_DEBUG("Joint %s not found.", joint_name.c_str());
+        joints_map_mutex.unlock();
         return -1;
     }
 
@@ -126,11 +132,13 @@ short VirtualArm::sendupdate( std::string joint_name, double target )
 
     joints_map[joint_name] = tmpData;
 
+    joints_map_mutex.unlock();
     return 0;
 }
 
 JointData VirtualArm::getJointData( std::string joint_name )
 {
+    joints_map_mutex.lock();
     JointsMap::iterator iter = joints_map.find(joint_name);
 
     //joint found
@@ -140,16 +148,23 @@ JointData VirtualArm::getJointData( std::string joint_name )
         iter->second.temperature = ((double)(rand() % 100) / 100.0);
         iter->second.current = ((double)(rand() % 100) / 100.0);
         iter->second.force = ((double)(rand() % 100) / 100.0);
-        return iter->second;
+
+        JointData tmpData = JointData(iter->second);
+        joints_map_mutex.unlock();
+        return tmpData;
     }
 
     ROS_ERROR("Joint %s not found.", joint_name.c_str());
     JointData noData;
+    joints_map_mutex.unlock();
     return noData;
 }
 
 SRArticulatedRobot::JointsMap VirtualArm::getAllJointsData()
 {
+    joints_map_mutex.lock();
+    JointsMap tmpMap;
+
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
         JointData tmpData = it->second;
@@ -162,7 +177,9 @@ SRArticulatedRobot::JointsMap VirtualArm::getAllJointsData()
         joints_map[it->first] = tmpData;
     }
 
-    return joints_map;
+    tmpMap = JointsMap(joints_map);
+    joints_map_mutex.unlock();
+    return tmpMap;
 }
 
 short VirtualArm::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
@@ -191,6 +208,7 @@ void VirtualArm::getConfig( std::string joint_name )
 
 std::vector<DiagnosticData> VirtualArm::getDiagnostics()
 {
+    joints_map_mutex.lock();
     std::vector<DiagnosticData> returnVect;
 
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
@@ -207,12 +225,14 @@ std::vector<DiagnosticData> VirtualArm::getDiagnostics()
         returnVect.push_back(tmpDiag);
     }
 
+    joints_map_mutex.unlock();
     return returnVect;
 }
 
 #ifdef GAZEBO
 void VirtualArm::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
 {
+    joints_map_mutex.lock();
     //loop on all the names in the joint_states message
     for(unsigned int index = 0; index < msg->name.size(); ++index)
     {
@@ -231,6 +251,7 @@ void VirtualArm::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
 
         joints_map[joint_name] = tmpData;
     }
+    joints_map_mutex.unlock();
 }
 #endif
 } //end namespace
