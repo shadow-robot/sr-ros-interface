@@ -15,7 +15,6 @@ import os, sys
 class MainWidget(QtGui.QWidget):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self)
-        self.sr_library = ShadowHand_ROS()
         self.parent = parent
         self.layout = QtGui.QVBoxLayout()
         self.container = QtGui.QMdiArea(self)
@@ -46,12 +45,6 @@ class MainWidget(QtGui.QWidget):
             plugin.plugin_object.set_parent(self)
             name = plugin.plugin_object.name
             
-            #add the sr_library for the shadow robot plugins
-            try:
-                plugin.plugin_object.set_sr_library(self.sr_library)
-            except:
-                rospy.loginfo("The "+name+" is not a Shadow Robot plugin.")
-            
             plugin.plugin_object.id = plugin_id
             action = QtGui.QAction(name, self)
             self.plugin_actions.append(action)
@@ -77,6 +70,7 @@ class MainWidget(QtGui.QWidget):
         
     def cascade(self):
         self.container.cascadeSubWindows()
+        
         
         
         

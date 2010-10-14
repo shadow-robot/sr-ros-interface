@@ -2,6 +2,7 @@
 
 import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
+
 from shadowhand_ros import ShadowHand_ROS
 
 import os, sys
@@ -13,6 +14,10 @@ class ShadowGenericPlugin(GenericPlugin):
     
     def __init__(self):
         GenericPlugin.__init__(self)
+        
+    def activate(self):
+        self.sr_library = ShadowHand_ROS()
+        GenericPlugin.activate(self)
     
-    def set_sr_library(self, sr_library):
-        self.sr_library = sr_library
+    #def on_close(self):
+    #    self.sr_library.__del__()

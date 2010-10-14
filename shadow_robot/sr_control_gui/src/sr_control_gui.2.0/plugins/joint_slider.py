@@ -15,7 +15,7 @@ class Joint():
         self.max = max
 
 class ExtendedSlider(QtGui.QWidget):
-    def __init__(self, parent, joint, plugin_parent):
+    def __init__(self, joint, plugin_parent):
         QtGui.QWidget.__init__(self)
         self.plugin_parent = plugin_parent
         self.name = joint.name 
@@ -52,13 +52,12 @@ class ExtendedSlider(QtGui.QWidget):
         self.selected.setFocusPolicy(QtCore.Qt.NoFocus)
         self.connect(self.selected, QtCore.SIGNAL('stateChanged(int)'), self.checkbox_click)
         self.layout.addWidget(self.selected)
-                
-        self.setLayout(self.layout) 
         self.connect(self.slider, QtCore.SIGNAL('valueChanged(int)'), self.changeValue)
         
         self.timer = Qt.QTimer(self)
         self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.update)
-        self.timer.start(500)
+        
+        self.setLayout(self.layout) 
         self.show()
         
     def changeValue(self, value):
@@ -78,8 +77,8 @@ class ExtendedSlider(QtGui.QWidget):
         self.is_selected = value
 
 class ExtendedSuperSlider(ExtendedSlider):
-    def __init__(self, parent, joint, plugin_parent):
-        ExtendedSlider.__init__(self, parent, joint, plugin_parent)
+    def __init__(self, joint, plugin_parent):
+        ExtendedSlider.__init__(self, joint, plugin_parent)
         self.plugin_parent = plugin_parent
         self.position.close()
         self.target.setText("Target: 0%")
@@ -115,13 +114,13 @@ class JointSlider(ShadowGenericPlugin):
         #Add the sliders
         self.sliders = []
         for joint in joints_list:
-            slider = ExtendedSlider(self.frame, joint, self)
+            slider = ExtendedSlider(joint, self)
             self.layout.addWidget(slider)
             self.sliders.append(slider)
 
         #Add a slider to control all the selected sliders
         selected_joints = Joint("Move Selected Joints", -100, 100)
-        self.super_slider = ExtendedSuperSlider(self.frame, selected_joints, self)
+        self.super_slider = ExtendedSuperSlider(selected_joints, self)
         self.layout.addWidget(self.super_slider)
             
         self.frame.setLayout(self.layout)
@@ -129,4 +128,10 @@ class JointSlider(ShadowGenericPlugin):
         
     def sendupdate(self, dict):
         rospy.logerr("Virtual method, please implement.")
+    
+    def activate(self):
+        ShadowGenericPlugin.activate(self)
+        for slider in self.sliders:
+            slider.timer.start(200)
+        
             
