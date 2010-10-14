@@ -26,8 +26,7 @@ class Step(QtGui.QWidget):
         self.saved_palette = self.palette()
         green_palette = self.palette()
         green_palette.setBrush(Qt.QPalette.Window, self.green)
-        #green_palette.b
-        #green_palette.setColor(Qt.QPalette.Window, self.color)
+
         self.frame.setPalette(green_palette)
         
         self.grasp = self.parent.sr_library.grasp_parser.grasps.values()[0]
@@ -175,10 +174,19 @@ class Step(QtGui.QWidget):
     def stopped_playing(self):
         self.frame.setAutoFillBackground(False)
         self.frame.repaint()
+
+
+class SignalWidget(Qt.QWidget):
+    isPlayingSig = QtCore.pyqtSignal(int)
+    stoppedPlayingSig = QtCore.pyqtSignal(int)
     
+    def __init__(self, parent = None):
+        super(SignalWidget, self).__init__(parent)
+
+
 class MovementRecorder(ShadowGenericPlugin):  
     name = "Movement Recorder"
-        
+            
     def __init__(self):
         ShadowGenericPlugin.__init__(self)
         self.set_icon('images/icons/iconArmHand.png')
@@ -197,11 +205,17 @@ class MovementRecorder(ShadowGenericPlugin):
         play_btn.setIcon(QtGui.QIcon('image/icons/play.png'))
         play_btn.setText("Play")
         play_btn.setFixedWidth(60)
-        self.command_frame.connect(play_btn, QtCore.SIGNAL('clicked()'), self.play)
+        self.command_frame.connect(play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
         self.sublayout.addWidget(play_btn)
+        
+        self.signal_widget = SignalWidget(self.frame)
+        self.signal_widget.isPlayingSig['int'].connect(self.started_playing)
+        self.signal_widget.stoppedPlayingSig['int'].connect(self.stopped_playing)
         
         self.mutex = threading.Lock()
         self.stopped = True
+        
+        self.thread = None
         
         stop_btn = QtGui.QPushButton()
         stop_btn.setIcon(QtGui.QIcon('image/icons/stop.png'))
@@ -212,7 +226,12 @@ class MovementRecorder(ShadowGenericPlugin):
         
         self.command_frame.setLayout(self.sublayout)
         self.layout.addWidget(self.command_frame)
+    
+    def started_playing(self, index):
+        self.steps[index].is_playing()
         
+    def stopped_playing(self, index):
+        self.steps[index].stopped_playing()
         
     def add_step(self):
         step_tmp = Step(len(self.steps), self)
@@ -222,9 +241,6 @@ class MovementRecorder(ShadowGenericPlugin):
         Qt.QTimer.singleShot(0, self.window.adjustSize)
         for step, index in zip(self.steps, range(0, len(self.steps))):
             step.set_step_id(index)
-        #self.window.adjustSize()
-        #self.window.resize(782, (len(self.steps) + 1) * 45)
-
 
     def activate(self):
         ShadowGenericPlugin.activate(self)
@@ -235,18 +251,21 @@ class MovementRecorder(ShadowGenericPlugin):
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
 
-
-    def play(self):
+    def button_play_clicked(self):       
         if len(self.steps) < 1:
             return
         
         for step in self.steps:
             step.remaining_loops =  step.number_of_loops
-        
+         
+        self.thread = threading.Thread(None, self.play)
+        self.thread.start()
+
+    def play(self):  
         self.stopped = False
         first_time = True
         index = 0
-        
+             
         while index < len(self.steps):
             if self.stopped:
                 return
@@ -256,7 +275,6 @@ class MovementRecorder(ShadowGenericPlugin):
             first_time = False
             
     def stop(self):
-        print "Button stop pressed"
         self.mutex.acquire()
         self.stopped = True
         self.mutex.release()
@@ -267,16 +285,9 @@ class MovementRecorder(ShadowGenericPlugin):
             return index + 1
         next_step = step
         
-        self.current_step.is_playing()
-        
-        thread = threading.Thread(None, self.move_step, args=[next_step])
-        thread.start()
-        
-        #self.wait_for_thread()
-        
-        print "ok done"
-        thread.join()
-        self.current_step.stopped_playing()   
+        self.signal_widget.isPlayingSig['int'].emit(index)
+        self.move_step(next_step)
+        self.signal_widget.stoppedPlayingSig['int'].emit(index)
         
         self.current_step = next_step   
         
@@ -286,19 +297,6 @@ class MovementRecorder(ShadowGenericPlugin):
                 step.remaining_loops = step.remaining_loops - 1
                 return step.loop_to_step
         return index + 1
-    
-    def wait_for_thread(self):
-        self.frame.connect(self.timer, QtCore.SIGNAL('timeout()'), self.check_stopped)
-        self.timer.start(100)
-    
-    def check_stopped(self):
-        self.mutex.acquire()
-        print "TIMER: tick"
-        if self.stopped:
-            print "TIMER: STOP"
-            self.timer.stop()
-        self.mutex.release()
-        
     
     def move_step(self, next_step):
         interpoler = self.sr_library.create_grasp_interpoler(self.current_step.grasp, next_step.grasp)
