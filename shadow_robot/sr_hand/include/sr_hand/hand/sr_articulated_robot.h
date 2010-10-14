@@ -18,7 +18,9 @@
 #include <string>
 #include <vector>
 #include <map>
+
 #include <boost/smart_ptr.hpp>
+#include <boost/thread.hpp>
 
 #ifdef GAZEBO
 #include <sensor_msgs/JointState.h>
@@ -137,6 +139,21 @@ struct Parameters
     std::string name;
     ///value of the parameter
     std::string value;
+
+    Parameters() :
+        name(""), value("")
+    {
+    }
+
+    Parameters( Parameters& param ) :
+        name(param.name), value(param.value)
+    {
+    }
+
+    Parameters( const Parameters& param ) :
+        name(param.name), value(param.value)
+    {
+    }
 };
 
 /**
@@ -145,6 +162,21 @@ struct Parameters
 struct JointControllerData
 {
     std::vector<Parameters> data;
+
+    JointControllerData() :
+        data()
+    {
+    }
+
+    JointControllerData( JointControllerData& jcd ) :
+        data(jcd.data)
+    {
+    }
+
+    JointControllerData( const JointControllerData& jcd ) :
+        data(jcd.data)
+    {
+    }
 };
 
 /**
@@ -274,6 +306,10 @@ protected:
 
     /// A mapping between the parameter names and their values.
     ParametersMap parameters_map;
+
+    boost::mutex joints_map_mutex;
+    boost::mutex parameters_map_mutex;
+    boost::mutex controllers_map_mutex;
 
 #ifdef GAZEBO
     std::vector<ros::Publisher> gazebo_publishers;

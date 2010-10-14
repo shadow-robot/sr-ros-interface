@@ -47,6 +47,10 @@ VirtualShadowhand::~VirtualShadowhand()
 
 void VirtualShadowhand::initializeMap()
 {
+    joints_map_mutex.lock();
+    parameters_map_mutex.lock();
+    controllers_map_mutex.lock();
+
     JointData tmpData;
     JointData tmpDataZero;
     JointControllerData tmpController;
@@ -330,10 +334,15 @@ void VirtualShadowhand::initializeMap()
     parameters_map["max_temperature"] = PARAM_max_temperature;
     parameters_map["max_current"] = PARAM_max_current;
 
+    controllers_map_mutex.unlock();
+    parameters_map_mutex.unlock();
+    joints_map_mutex.unlock();
 }
 
 short VirtualShadowhand::sendupdate( std::string joint_name, double target )
 {
+    joints_map_mutex.lock();
+
     JointsMap::iterator iter = joints_map.find(joint_name);
 #ifdef GAZEBO
     std_msgs::Float64 target_msg;
@@ -343,6 +352,8 @@ short VirtualShadowhand::sendupdate( std::string joint_name, double target )
     if( iter == joints_map.end() )
     {
         ROS_DEBUG("Joint %s not found", joint_name.c_str());
+
+        joints_map_mutex.unlock();
         return -1;
     }
 
@@ -391,6 +402,8 @@ short VirtualShadowhand::sendupdate( std::string joint_name, double target )
         tmpData2.target = target / 2.0;
 
         joints_map[iter->first] = tmpData2;
+
+        joints_map_mutex.unlock();
         return 0;
     }
 
@@ -414,11 +427,14 @@ short VirtualShadowhand::sendupdate( std::string joint_name, double target )
 
     joints_map[joint_name] = tmpData;
 
+    joints_map_mutex.unlock();
     return 0;
 }
 
 JointData VirtualShadowhand::getJointData( std::string joint_name )
 {
+    joints_map_mutex.lock();
+
     JointsMap::iterator iter = joints_map.find(joint_name);
 
     //joint found
@@ -428,16 +444,23 @@ JointData VirtualShadowhand::getJointData( std::string joint_name )
         iter->second.temperature = ((double)(rand() % 100) / 100.0);
         iter->second.current = ((double)(rand() % 100) / 100.0);
         iter->second.force = ((double)(rand() % 100) / 100.0);
-        return iter->second;
+
+        JointData tmp = JointData(iter->second);
+
+        joints_map_mutex.unlock();
+        return tmp;
     }
 
     ROS_ERROR("Joint %s not found.", joint_name.c_str());
     JointData noData;
+    joints_map_mutex.unlock();
     return noData;
 }
 
 SRArticulatedRobot::JointsMap VirtualShadowhand::getAllJointsData()
 {
+    joints_map_mutex.lock();
+
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
         JointData tmpData = it->second;
@@ -450,11 +473,15 @@ SRArticulatedRobot::JointsMap VirtualShadowhand::getAllJointsData()
         joints_map[it->first] = tmpData;
     }
 
-    return joints_map;
+    JointsMap tmp_map = JointsMap(joints_map);
+    joints_map_mutex.unlock();
+    return tmp_map;
 }
 
 short VirtualShadowhand::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
 {
+    controllers_map_mutex.lock();
+
     ControllersMap::iterator iter = controllers_map.find(contrlr_name);
 
     //joint found
@@ -462,101 +489,117 @@ short VirtualShadowhand::setContrl( std::string contrlr_name, JointControllerDat
     {
         controllers_map[iter->first] = ctrlr_data;
     }
-else        ROS_ERROR("Controller %s not found", contrlr_name.c_str());
-
-        return 0;
-    }
-
-    JointControllerData VirtualShadowhand::getContrl(std::string contrlr_name)
+    else
     {
-        ControllersMap::iterator iter = controllers_map.find(contrlr_name);
-
-        //joint found
-        if(iter != controllers_map.end())
-        return iter->second;
-
-        ROS_ERROR("Controller %s not found", contrlr_name.c_str() );
-        JointControllerData no_result;
-        return no_result;
+        ROS_ERROR("Controller %s not found", contrlr_name.c_str());
     }
 
-    short VirtualShadowhand::setConfig(std::vector<std::string> myConfig)
+    controllers_map_mutex.unlock();
+    return 0;
+}
+
+JointControllerData VirtualShadowhand::getContrl( std::string contrlr_name )
+{
+    controllers_map_mutex.lock();
+    ControllersMap::iterator iter = controllers_map.find(contrlr_name);
+
+    //joint found
+    if( iter != controllers_map.end() )
     {
-        ROS_WARN("The set config function is not implemented in the virtual shadowhand.");
-        return 0;
+        JointControllerData tmp = JointControllerData(iter->second);
+        controllers_map_mutex.unlock();
+        return tmp;
     }
 
-    void VirtualShadowhand::getConfig(std::string joint_name)
+    ROS_ERROR("Controller %s not found", contrlr_name.c_str() );
+    JointControllerData no_result;
+    controllers_map_mutex.unlock();
+    return no_result;
+}
+
+short VirtualShadowhand::setConfig( std::vector<std::string> myConfig )
+{
+    ROS_WARN("The set config function is not implemented in the virtual shadowhand.");
+    return 0;
+}
+
+void VirtualShadowhand::getConfig( std::string joint_name )
+{
+    ROS_WARN("The get config function is not implemented in the virtual shadowhand.");
+}
+
+std::vector<DiagnosticData> VirtualShadowhand::getDiagnostics()
+{
+    joints_map_mutex.lock();
+    std::vector<DiagnosticData> returnVect;
+
+    for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
-        ROS_WARN("The get config function is not implemented in the virtual shadowhand.");
+        DiagnosticData tmpDiag;
+        tmpDiag.joint_name = it->first;
+        tmpDiag.level = 0;
+        tmpDiag.flags = "";
+        tmpDiag.target_sensor_num = 0;
+        tmpDiag.target = it->second.target;
+        tmpDiag.position_sensor_num = 0;
+        tmpDiag.position = it-> second.position;
+
+        returnVect.push_back(tmpDiag);
     }
 
-    std::vector<DiagnosticData> VirtualShadowhand::getDiagnostics()
-    {
-        std::vector<DiagnosticData> returnVect;
-
-        for(JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
-        {
-            DiagnosticData tmpDiag;
-            tmpDiag.joint_name = it->first;
-            tmpDiag.level = 0;
-            tmpDiag.flags = "";
-            tmpDiag.target_sensor_num = 0;
-            tmpDiag.target = it->second.target;
-            tmpDiag.position_sensor_num = 0;
-            tmpDiag.position = it-> second.position;
-
-            returnVect.push_back(tmpDiag);
-        }
-
-        return returnVect;
-    }
+    joints_map_mutex.unlock();
+    return returnVect;
+}
 
 #ifdef GAZEBO
-    void VirtualShadowhand::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
+void VirtualShadowhand::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
+{
+    joints_map_mutex.lock();
+
+    //loop on all the names in the joint_states message
+    for(unsigned int index = 0; index < msg->name.size(); ++index)
     {
-        //loop on all the names in the joint_states message
-        for(unsigned int index = 0; index < msg->name.size(); ++index)
+        std::string joint_name = msg->name[index];
+        JointsMap::iterator iter = joints_map.find(joint_name);
+        //not found => can be a joint from the arm / hand
+        if(iter == joints_map.end())
+        continue;
+
+        //joint found
+        JointData tmpData(iter->second);
+
+        tmpData.position = toDegrees(msg->position[index]);
+        tmpData.force = msg->effort[index];
+
+        joints_map[joint_name] = tmpData;
+    }
+
+    //push the sum of J1+J2 to the J0s
+    for(JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
+    {
+        JointData tmpData = it->second;
+        if( tmpData.isJointZero == 1 )
         {
-            std::string joint_name = msg->name[index];
-            JointsMap::iterator iter = joints_map.find(joint_name);
-            //not found => can be a joint from the arm / hand
-            if(iter == joints_map.end())
-            continue;
+            std::string joint_name = it->first;
+            double position = 0.0;
 
-            //joint found
-            JointData tmpData(iter->second);
+            //get the position from joint 1
+            ++it;
+            JointData tmpData1 = JointData(it->second);
+            position += tmpData1.position;
 
-            tmpData.position = toDegrees(msg->position[index]);
-            tmpData.force = msg->effort[index];
+            //get the position from joint 2
+            ++it;
+            JointData tmpData2 = JointData(it->second);
+            position += tmpData2.position;
+
+            tmpData.position = position;
 
             joints_map[joint_name] = tmpData;
         }
-
-        //push the sum of J1+J2 to the J0s
-        for(JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
-        {
-            JointData tmpData = it->second;
-            if( tmpData.isJointZero == 1 )
-            {
-                std::string joint_name = it->first;
-                double position = 0.0;
-
-                //get the position from joint 1
-                ++it;
-                JointData tmpData1 = JointData(it->second);
-                position += tmpData1.position;
-
-                //get the position from joint 2
-                ++it;
-                JointData tmpData2 = JointData(it->second);
-                position += tmpData2.position;
-
-                tmpData.position = position;
-
-                joints_map[joint_name] = tmpData;
-            }
-        }
     }
+
+    joints_map_mutex.unlock();
+}
 #endif
 } //end namespace

@@ -45,6 +45,9 @@ RealShadowhand::~RealShadowhand()
 
 void RealShadowhand::initializeMap()
 {
+    joints_map_mutex.lock();
+    parameters_map_mutex.lock();
+
     JointData tmpData;
 
     tmpData.position = 0.0;
@@ -98,10 +101,15 @@ void RealShadowhand::initializeMap()
     parameters_map["max_temp"] = PARAM_max_temperature;
     parameters_map["max_temperature"] = PARAM_max_temperature;
     parameters_map["max_current"] = PARAM_max_current;
+
+    parameters_map_mutex.unlock();
+    joints_map_mutex.unlock();
 }
 
 short RealShadowhand::sendupdate( std::string joint_name, double target )
 {
+    joints_map_mutex.lock();
+
     //search the sensor in the hash_map
     JointsMap::iterator iter = joints_map.find(joint_name);
 
@@ -118,18 +126,20 @@ short RealShadowhand::sendupdate( std::string joint_name, double target )
 
         //here we update the actual hand angles
         robot_update_sensor(&hand_joints[index_hand_joints].joint_target, target);
+        joints_map_mutex.unlock();
         return 0;
     }
-    else
-    {
-        ROS_DEBUG("Joint %s not found", joint_name.c_str());
-        return -1;
-    }
 
+    ROS_DEBUG("Joint %s not found", joint_name.c_str());
+
+    joints_map_mutex.unlock();
+    return -1;
 }
 
 JointData RealShadowhand::getJointData( std::string joint_name )
 {
+    joints_map_mutex.lock();
+
     JointsMap::iterator iter = joints_map.find(joint_name);
 
     //joint not found
@@ -144,6 +154,8 @@ JointData RealShadowhand::getJointData( std::string joint_name )
         noData.force = 0.0;
         noData.flags = "";
         noData.jointIndex = 0;
+
+        joints_map_mutex.unlock();
         return noData;
     }
 
@@ -165,143 +177,28 @@ JointData RealShadowhand::getJointData( std::string joint_name )
 
     joints_map[joint_name] = tmpData;
 
+    joints_map_mutex.unlock();
     return tmpData;
-    /*
-
-     shadowhand::joints_data msg;
-     std::vector<shadowhand::joint> myVector;
-
-     sensor_msgs::JointState jointstate_msg;
-
-     //get the data from the hand
-     for (unsigned int i=0; i<NUM_HAND_JOINTS + 4; ++i)
-     {
-     shadowhand::joint joint;
-     //name
-     std::string jointName = hand_joints[i].joint_name;
-     joint.joint_name = jointName;
-
-     // /!\ don't publish the joint0s to joint_states otherwise
-     // it won't match the model
-     bool isJoint0 = false;
-     std::string joint0 = "J0";
-
-     int foundAt = jointName.find(joint0);
-     if( foundAt != -1 )
-     isJoint0 = true;
-     //      if( isJoint0 )
-     //	{
-     //	  jointstate_msg.effort.push_back(0.0);
-     //	  }
-
-     //publish 0 for joint1 effort
-     std::string joint1 = "FJ1";
-     foundAt = jointName.find(joint1);
-     if( foundAt != -1 )
-     jointstate_msg.effort.push_back(0.0);
-
-     if( !isJoint0 )
-     {
-     //target & position
-     joint.joint_position = robot_read_sensor(&hand_joints[i].position);
-
-     jointstate_msg.name.push_back(hand_joints[i].joint_name);
-
-     jointstate_msg.position.push_back( (robot_read_sensor(&hand_joints[i].position)*3.14159f / 180.0f));
-
-     //WARNING the velocity vector contains the targets... IT's a
-     //hack
-     //TODO: remove this hack
-     jointstate_msg.velocity.push_back((robot_read_sensor(&hand_joints[i].joint_target)*3.14159f / 180.0f));
-     }
-     joint.joint_target = robot_read_sensor(&hand_joints[i].joint_target);
-
-     //more information
-     if (hand_joints[i].a.smartmotor.has_sensors)
-     {
-     //torque
-     joint.joint_torque = robot_read_sensor( &hand_joints[i].a.smartmotor.torque );
-     //if( !isJoint0 )
-     jointstate_msg.effort.push_back(robot_read_sensor( &hand_joints[i].a.smartmotor.torque ));
-
-     //temperature & current
-     joint.joint_temperature = robot_read_sensor(&hand_joints[i].a.smartmotor.temperature);
-     joint.joint_current = robot_read_sensor(&hand_joints[i].a.smartmotor.current);
-
-     //check for error_flags
-     uint64_t uuid = robot_node_id(hand_joints[i].a.smartmotor.nodename);
-     struct hand_protocol_flags fl;
-     fl = hand_protocol_get_status_flags(uuid);
-     if (fl.valid)
-     {
-     struct hand_protocol_flags_smart_motor f;
-     f = fl.u.smart_motor;
-     //concatenate the flags in a stringstream
-     std::stringstream ss;
-
-     bool at_least_one_error_flag = false;
-     if( f.nfault_pin )
-     {
-     at_least_one_error_flag = true;
-     ss << "NFAULT ";
-     ROS_ERROR( "[%s]: NFAULT", hand_joints[i].joint_name );
-     }
-     if( f.temperature_cutout )
-     {
-     at_least_one_error_flag = true;
-     ss << "TEMP ";
-     }
-     if( f.current_throttle )
-     {
-     at_least_one_error_flag = true;
-     ss << "CURRENT ";
-     }
-     if( f.force_hard_limit )
-     {
-     at_least_one_error_flag = true;
-     ss << "FORCE ";
-     }
-     if( hand_protocol_dead(uuid) )
-     {
-     at_least_one_error_flag = true;
-     ss << "DEAD ";
-     }
-
-     //set the message flags
-     joint.error_flag = ss.str();
-     //if a flag is up, then print a warning as well
-     if( at_least_one_error_flag )
-     ROS_WARN( "[%s]: %s", hand_joints[i].joint_name, (ss.str()).c_str());
-     }
-     }
-
-     myVector.push_back(joint);
-     }
-
-     //set the standard message
-     msg.joints_list_length = NUM_HAND_JOINTS;
-     msg.joints_list = myVector;
-
-     //publish standard data (pos, target, current, temp, force, ...)
-     shadowhand_pub.publish(msg);
-
-     //publish JointState message
-     shadowhand_jointstate_pub.publish(jointstate_msg);
-     */
 }
 
 SRArticulatedRobot::JointsMap RealShadowhand::getAllJointsData()
 {
+    joints_map_mutex.lock();
     //update the map for each joints
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
         getJointData(it->first);
 
+    JointsMap tmp = JointsMap(joints_map);
+
+    joints_map_mutex.unlock();
     //return the map
-    return joints_map;
+    return tmp;
 }
 
 short RealShadowhand::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
 {
+    parameters_map_mutex.lock();
+
     struct controller_config myConfig;
     memset(&myConfig, 0, sizeof(myConfig));
 
@@ -326,6 +223,8 @@ short RealShadowhand::setContrl( std::string contrlr_name, JointControllerData c
         //parameter found
         controller_update_param(&myConfig, (controller_param)iter->second, ctrlr_data.data[i].value.c_str());
     }
+
+    parameters_map_mutex.unlock();
 
     int result_ctrlr = controller_write_to_hardware(&myConfig);
     if( result_ctrlr )
