@@ -176,6 +176,7 @@ class Step(QtGui.QWidget):
         self.frame.repaint()
 
 
+        self.grasp_slider = None
 class SignalWidget(Qt.QWidget):
     isPlayingSig = QtCore.pyqtSignal(int)
     stoppedPlayingSig = QtCore.pyqtSignal(int)
