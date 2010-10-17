@@ -8,20 +8,33 @@ from Grasp import Grasp
 from grasps_interpoler import GraspInterpoler
 from grasps_parser import GraspParser
 
-class GraspChooser(QtGui.QWidget):
+class GraspChooser(QtGui.QListWidget):
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QtGui.QListWidget.__init__(self)
 
-        sublayout = QtGui.QVBoxLayout()
-        frame = QtGui.QFrame()
-        list = QtGui.QListWidget()
+        self.parent = parent
+        
+        self.setViewMode(QtGui.QListView.ListMode)
+        self.setResizeMode(QtGui.QListView.Adjust)
+
+        #sublayout = QtGui.QVBoxLayout()
+        #self.frame = QtGui.QFrame()
+        #self.list = QtGui.QListWidget()
         #tree.setColumnCount(1)
-        item = QtGui.QListWidgetItem("Toto", list)
+    
+    def draw(self):
+        for grasp_name in self.parent.sr_library.grasp_parser.grasps.keys():
+            self.addItem( QtGui.QListWidgetItem(grasp_name))    
+        self.connect(self, QtCore.SIGNAL('itemClicked(QListWidgetItem*)'), self.grasp_choosed)
         
-        sublayout.addWidget(list)
+        #sublayout.addWidget(self.list)
         
-        frame.setLayout(sublayout)
-        self.show()
+        #self.frame.setLayout(sublayout)
+        #self.show()
+        
+    def grasp_choosed(self, item):
+        print item.text()
+        #print grasp_name
         
 class GraspSlider(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -63,15 +76,16 @@ class GraspController(ShadowGenericPlugin):
          
         self.layout.addWidget(subframe)
         
-        self.grasp_chooser = GraspChooser()
+        self.grasp_chooser = GraspChooser(self)
         self.layout.addWidget(self.grasp_chooser)
              
+    def activate(self):
+        ShadowGenericPlugin.activate(self)
         self.frame.show()  
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
-        
-    def activate(self):
-        ShadowGenericPlugin.activate(self)
+        self.grasp_chooser.draw()
+        Qt.QTimer.singleShot(0, self.window.adjustSize)
         
         
     def save_grasp(self):
