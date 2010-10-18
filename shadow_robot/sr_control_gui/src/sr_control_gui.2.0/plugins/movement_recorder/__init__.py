@@ -253,7 +253,7 @@ class MovementRecorder(ShadowGenericPlugin):
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.setSizeConstraint(Qt.QLayout.SetFixedSize)
         
-        self.sublayout = QtGui.QHBoxLayout()
+        self.sublayout = QtGui.QGridLayout()
         self.command_frame = QtGui.QFrame()
                 
         self.play_btn = QtGui.QPushButton()
@@ -261,7 +261,7 @@ class MovementRecorder(ShadowGenericPlugin):
         self.play_btn.setText("Play")
         self.play_btn.setFixedWidth(60)
         self.command_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
-        self.sublayout.addWidget(self.play_btn)
+        self.sublayout.addWidget(self.play_btn, 0, 0)
         
         self.signal_widget = SignalWidget(self.frame)
         self.signal_widget.isPlayingSig['int'].connect(self.started_playing)
@@ -277,21 +277,25 @@ class MovementRecorder(ShadowGenericPlugin):
         stop_btn.setText("Stop")
         stop_btn.setFixedWidth(60)
         self.command_frame.connect(stop_btn, QtCore.SIGNAL('clicked()'), self.stop)
-        self.sublayout.addWidget(stop_btn)
+        self.sublayout.addWidget(stop_btn, 0, 1)
+        
+        self.sublayout.addWidget(QtGui.QLabel(''),0,2)
+        #self.sublayout.addWidget(QtGui.QLabel(''),0,3)
+        #self.sublayout.addWidget(QtGui.QLabel(''),0,4)
         
         save_btn = QtGui.QPushButton()
         save_btn.setIcon(QtGui.QIcon('image/icons/save.png'))
         save_btn.setText("Save")
         save_btn.setFixedWidth(60)
         self.command_frame.connect(save_btn, QtCore.SIGNAL('clicked()'), self.save)
-        self.sublayout.addWidget(save_btn)
+        self.sublayout.addWidget(save_btn, 0, 3)
         
         load_btn = QtGui.QPushButton()
         load_btn.setIcon(QtGui.QIcon('image/icons/load.png'))
         load_btn.setText("Load")
         load_btn.setFixedWidth(60)
         self.command_frame.connect(load_btn, QtCore.SIGNAL('clicked()'), self.load)
-        self.sublayout.addWidget(load_btn)
+        self.sublayout.addWidget(load_btn, 0, 4)
         
         self.command_frame.setLayout(self.sublayout)
         self.layout.addWidget(self.command_frame)
@@ -299,8 +303,7 @@ class MovementRecorder(ShadowGenericPlugin):
     def save(self):
         filename = QtGui.QFileDialog.getSaveFileName(self.window, 'Save Script',
                     '')
-        print "saving: " + filename
-        
+                
         if filename == "":
             return
         
@@ -339,8 +342,7 @@ class MovementRecorder(ShadowGenericPlugin):
         filename = QtGui.QFileDialog.getOpenFileName(self.window, 'Open Script',
                     '')
         
-        if filename != "":            
-            length = len(self.steps) 
+        if filename != "":       
             while len(self.steps) != 0:
                 self.steps[0].remove_step(delete_first=True)
             #del self.steps[:]
