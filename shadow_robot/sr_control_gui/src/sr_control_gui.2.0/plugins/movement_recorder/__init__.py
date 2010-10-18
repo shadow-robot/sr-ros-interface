@@ -1,6 +1,7 @@
 import os, sys
 sys.path.append(os.getcwd() + "/plugins")
 
+import xml.etree.ElementTree as ET
 import time, threading
 
 from PyQt4 import QtCore, QtGui, Qt
@@ -33,49 +34,49 @@ class Step(QtGui.QWidget):
         label_grasp = QtGui.QLabel(self.frame)
         label_grasp.setText("Step " + str(self.step_index + 1) + ":")
         
-        list_grasp = QtGui.QComboBox(self.frame)
+        self.list_grasp = QtGui.QComboBox(self.frame)
         for grasp_name in self.parent.sr_library.grasp_parser.grasps.keys():
-            list_grasp.addItem(grasp_name)    
-        self.frame.connect(list_grasp, QtCore.SIGNAL('activated(QString)'), self.grasp_choosed)
-        self.widgets.append(list_grasp)
+            self.list_grasp.addItem(grasp_name)    
+        self.frame.connect(self.list_grasp, QtCore.SIGNAL('activated(QString)'), self.grasp_choosed)
+        self.widgets.append(self.list_grasp)
 
     
         label_pause = QtGui.QLabel(self.frame)
         label_pause.setText(" Pause Time:")
         self.widgets.append(label_pause)
 
-        pause_input = QtGui.QLineEdit(self.frame)
-        pause_input.setValidator(Qt.QDoubleValidator(self))
-        pause_input.setText("0.0")
-        pause_input.setFixedWidth(35)
-        pause_input.setAlignment(QtCore.Qt.AlignRight)
-        self.frame.connect(pause_input, QtCore.SIGNAL('textChanged(QString)'), self.pause_changed)
-        self.widgets.append(pause_input)
+        self.pause_input = QtGui.QLineEdit(self.frame)
+        self.pause_input.setValidator(Qt.QDoubleValidator(self))
+        self.pause_input.setText("0.0")
+        self.pause_input.setFixedWidth(35)
+        self.pause_input.setAlignment(QtCore.Qt.AlignRight)
+        self.frame.connect(self.pause_input, QtCore.SIGNAL('textChanged(QString)'), self.pause_changed)
+        self.widgets.append(self.pause_input)
 
         label_interp = QtGui.QLabel(self.frame)
         label_interp.setText("s.   Interpolation Time:")
         self.widgets.append(label_interp)
 
-        interp_input = QtGui.QLineEdit(self.frame)
-        interp_input.setValidator(Qt.QDoubleValidator(self))
-        interp_input.setText("1.0")
-        interp_input.setAlignment(QtCore.Qt.AlignRight)
-        interp_input.setFixedWidth(35)
-        self.frame.connect(interp_input, QtCore.SIGNAL('textChanged(QString)'), self.interp_changed)
-        self.widgets.append(interp_input)
+        self.interp_input = QtGui.QLineEdit(self.frame)
+        self.interp_input.setValidator(Qt.QDoubleValidator(self))
+        self.interp_input.setText("1.0")
+        self.interp_input.setAlignment(QtCore.Qt.AlignRight)
+        self.interp_input.setFixedWidth(35)
+        self.frame.connect(self.interp_input, QtCore.SIGNAL('textChanged(QString)'), self.interp_changed)
+        self.widgets.append(self.interp_input)
 
         label_looping = QtGui.QLabel(self.frame)
         label_looping.setText("s.   Looping from step:")
         self.widgets.append(label_looping)
         
-        loop_input = QtGui.QComboBox(self.frame)
+        self.loop_input = QtGui.QComboBox(self.frame)
         for i in range(0, self.step_index + 1):
             if i == 0:
-                loop_input.addItem("None")
+                self.loop_input.addItem("None")
             else:
-                loop_input.addItem(str(i))
-        self.frame.connect(loop_input, QtCore.SIGNAL('activated(QString)'), self.choose_looping)
-        self.widgets.append(loop_input)
+                self.loop_input.addItem(str(i))
+        self.frame.connect(self.loop_input, QtCore.SIGNAL('activated(QString)'), self.choose_looping)
+        self.widgets.append(self.loop_input)
     
         self.number_loops = QtGui.QLineEdit(self.frame)
         self.number_loops.setValidator(Qt.QIntValidator(self))
@@ -108,13 +109,13 @@ class Step(QtGui.QWidget):
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.setSpacing(2)
         self.layout.addWidget(label_grasp)
-        self.layout.addWidget(list_grasp)
+        self.layout.addWidget(self.list_grasp)
         self.layout.addWidget(label_pause)
-        self.layout.addWidget(pause_input)
+        self.layout.addWidget(self.pause_input)
         self.layout.addWidget(label_interp)
-        self.layout.addWidget(interp_input)
+        self.layout.addWidget(self.interp_input)
         self.layout.addWidget(label_looping)
-        self.layout.addWidget(loop_input)
+        self.layout.addWidget(self.loop_input)
         self.layout.addWidget(self.number_loops)
         self.layout.addWidget(label_times)
         self.layout.addWidget(new_step_button)
@@ -154,14 +155,21 @@ class Step(QtGui.QWidget):
             self.number_loops.setText("1")
             self.loop_to_step = int(looping) - 1
                 
-    def remove_step(self):
-        if len(self.parent.steps) > 1:
-            self.parent.layout.removeWidget(self)
-            self.parent.steps.remove(self)
-            for widget in self.widgets:
-                self.layout.removeWidget(self)
-                widget.destroy()
-            self.destroy()
+    def remove_step(self, delete_first=False):
+        """
+        Make sure we don't delete the first item from the GUI
+        """
+        if not delete_first:
+            print "dont delete"
+            if len(self.parent.steps) <= 1:
+                return
+        
+        self.parent.layout.removeWidget(self)
+        self.parent.steps.remove(self)
+        for widget in self.widgets:
+            self.layout.removeWidget(self)
+            widget.destroy()
+        self.destroy()
         Qt.QTimer.singleShot(0, self.parent.window.adjustSize)
     
     def set_step_id(self, index):
@@ -174,6 +182,51 @@ class Step(QtGui.QWidget):
     def stopped_playing(self):
         self.frame.setAutoFillBackground(False)
         self.frame.repaint()
+        
+    def save_to_xml(self):
+        xml_step = ET.Element("step")
+        grasp = ET.SubElement(xml_step, "grasp")
+        grasp.set("name", self.grasp.grasp_name)
+        pause = ET.SubElement(xml_step, "pause_time")
+        pause.text = str(self.pause_time)
+        interpolation = ET.SubElement(xml_step, "interpolation_time")
+        interpolation.text = str(self.interpolation_time)
+        looping = ET.SubElement(xml_step, "loop_to_step")
+        looping.text = str(self.loop_to_step)
+        nb_loops = ET.SubElement(xml_step, "number_loops")
+        nb_loops.text = str(self.number_of_loops)
+        return xml_step
+    
+    def load_from_xml(self, xml_element):
+        for subelement in xml_element:
+            if subelement.tag == "grasp":
+                grasp_name = subelement.attrib.get("name") 
+                self.grasp_choosed(grasp_name)
+                for index, grasp_name_ref in zip(range(0, len(self.parent.sr_library.grasp_parser.grasps.keys())), self.parent.sr_library.grasp_parser.grasps.keys()):
+                    if grasp_name == grasp_name_ref:
+                        self.list_grasp.setCurrentIndex(index)
+                        break
+            if subelement.tag == "pause_time":
+                self.pause_time = float(subelement.text)
+                self.pause_input.setText(subelement.text)
+                
+            if subelement.tag == "interpolation_time":
+                self.interpolation_time = float(subelement.text)
+                self.interp_input.setText(subelement.text)
+                
+            if subelement.tag == "loop_to_step":
+                self.loop_to_step = int(subelement.text)
+                self.loop_input.setCurrentIndex(self.loop_to_step + 1)
+                if self.loop_to_step == -1:
+                    self.number_loops.setDisabled(True)
+                else:
+                    self.number_loops.setEnabled(True)
+                
+            if subelement.tag == "number_loops":
+                self.number_of_loops = int(subelement.text)
+                self.number_loops.setText(subelement.text)
+
+        
 
 
         self.grasp_slider = None
@@ -181,7 +234,7 @@ class SignalWidget(Qt.QWidget):
     isPlayingSig = QtCore.pyqtSignal(int)
     stoppedPlayingSig = QtCore.pyqtSignal(int)
     
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(SignalWidget, self).__init__(parent)
 
 
@@ -190,6 +243,7 @@ class MovementRecorder(ShadowGenericPlugin):
             
     def __init__(self):
         ShadowGenericPlugin.__init__(self)
+        
         self.set_icon('images/icons/iconArmHand.png')
         
         self.frame = QtGui.QFrame()
@@ -202,12 +256,12 @@ class MovementRecorder(ShadowGenericPlugin):
         self.sublayout = QtGui.QHBoxLayout()
         self.command_frame = QtGui.QFrame()
                 
-        play_btn = QtGui.QPushButton()
-        play_btn.setIcon(QtGui.QIcon('image/icons/play.png'))
-        play_btn.setText("Play")
-        play_btn.setFixedWidth(60)
-        self.command_frame.connect(play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
-        self.sublayout.addWidget(play_btn)
+        self.play_btn = QtGui.QPushButton()
+        self.play_btn.setIcon(QtGui.QIcon('image/icons/play.png'))
+        self.play_btn.setText("Play")
+        self.play_btn.setFixedWidth(60)
+        self.command_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
+        self.sublayout.addWidget(self.play_btn)
         
         self.signal_widget = SignalWidget(self.frame)
         self.signal_widget.isPlayingSig['int'].connect(self.started_playing)
@@ -225,8 +279,80 @@ class MovementRecorder(ShadowGenericPlugin):
         self.command_frame.connect(stop_btn, QtCore.SIGNAL('clicked()'), self.stop)
         self.sublayout.addWidget(stop_btn)
         
+        save_btn = QtGui.QPushButton()
+        save_btn.setIcon(QtGui.QIcon('image/icons/save.png'))
+        save_btn.setText("Save")
+        save_btn.setFixedWidth(60)
+        self.command_frame.connect(save_btn, QtCore.SIGNAL('clicked()'), self.save)
+        self.sublayout.addWidget(save_btn)
+        
+        load_btn = QtGui.QPushButton()
+        load_btn.setIcon(QtGui.QIcon('image/icons/load.png'))
+        load_btn.setText("Load")
+        load_btn.setFixedWidth(60)
+        self.command_frame.connect(load_btn, QtCore.SIGNAL('clicked()'), self.load)
+        self.sublayout.addWidget(load_btn)
+        
         self.command_frame.setLayout(self.sublayout)
         self.layout.addWidget(self.command_frame)
+    
+    def save(self):
+        filename = QtGui.QFileDialog.getSaveFileName(self.window, 'Save Script',
+                    '')
+        print "saving: " + filename
+        
+        if filename == "":
+            return
+        
+        root = ET.Element("movement")
+        #xml_steps = []
+        for step in self.steps:
+            #ET.Element step_xml = step.save_to_xml()
+            root.append(step.save_to_xml())
+        
+        self.indent(root)
+        tree = ET.ElementTree(root)
+        
+        tree.write(filename)
+        
+    def indent(self, elem, level=0):
+        """
+        print a prettier / indented xml tree
+        """
+        i = "\n" + level * "  "
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + "  "
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                self.indent(elem, level + 1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i
+    
+    def load(self):
+        #remove all the present steps
+        
+        filename = QtGui.QFileDialog.getOpenFileName(self.window, 'Open Script',
+                    '')
+        
+        if filename != "":            
+            length = len(self.steps) 
+            while len(self.steps) != 0:
+                self.steps[0].remove_step(delete_first=True)
+            #del self.steps[:]
+        
+            tree = ET.parse(filename)
+            root = tree.getroot()
+            xml_steps = tree.findall("step")
+            
+            for step in xml_steps:
+                self.add_step()
+                self.steps[-1].load_from_xml(step)
+                #print len(self.steps)
     
     def started_playing(self, index):
         self.steps[index].is_playing()
@@ -256,8 +382,10 @@ class MovementRecorder(ShadowGenericPlugin):
         if len(self.steps) < 1:
             return
         
+        self.play_btn.setDisabled(True)
+        
         for step in self.steps:
-            step.remaining_loops =  step.number_of_loops
+            step.remaining_loops = step.number_of_loops
          
         self.thread = threading.Thread(None, self.play)
         self.thread.start()
@@ -268,17 +396,23 @@ class MovementRecorder(ShadowGenericPlugin):
         index = 0
              
         while index < len(self.steps):
+            self.mutex.acquire()
             if self.stopped:
+                self.mutex.release()
                 return
+            self.mutex.release()
             
             step = self.steps[index]
             index = self.play_step(step, first_time, index)
             first_time = False
             
+        self.play_btn.setEnabled(True)
+            
     def stop(self):
         self.mutex.acquire()
         self.stopped = True
         self.mutex.release()
+        self.play_btn.setEnabled(True)
             
     def play_step(self, step, first_time, index):
         if first_time:

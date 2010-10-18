@@ -24,7 +24,7 @@ class MainWindow(QtGui.QMainWindow):
         # BASIC PARAMETERS
         ##        
         self.setWindowTitle("Shadow Robot Controller")
-        self.resize(800, 600)
+        self.resize(1000, 600)
         self.setWindowIcon(QtGui.QIcon('images/icons/app_icon.png'))
                 
         ####
