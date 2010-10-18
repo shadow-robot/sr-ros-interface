@@ -31,7 +31,7 @@ class Step(QtGui.QWidget):
         
         self.grasp = self.parent.sr_library.grasp_parser.grasps.values()[0]
         label_grasp = QtGui.QLabel(self.frame)
-        label_grasp.setText("Step " + str(self.step_index + 1) + ":")
+        label_grasp.setText("Grasp:  ")# + str(self.step_index + 1) + ":")
         self.widgets.append(label_grasp)
         
         self.list_grasp = QtGui.QComboBox(self.frame)
