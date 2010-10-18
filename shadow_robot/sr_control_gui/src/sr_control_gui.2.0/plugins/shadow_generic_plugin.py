@@ -23,5 +23,6 @@ class ShadowGenericPlugin(GenericPlugin):
             return
         self.sr_library = ShadowHand_ROS()
     
-    #def on_close(self):
-    #    self.sr_library.__del__()
+    def on_close(self):
+        GenericPlugin.on_close(self)
+        #self.sr_library.__del__()

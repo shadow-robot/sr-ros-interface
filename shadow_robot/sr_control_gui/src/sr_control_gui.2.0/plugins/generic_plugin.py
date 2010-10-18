@@ -44,4 +44,5 @@ class GenericPlugin(IPlugin):
         self.window.setWindowIcon(QtGui.QIcon(path))
     
     def on_close(self):
-        return
+        self.window.close()
+    #    print "toto parent"

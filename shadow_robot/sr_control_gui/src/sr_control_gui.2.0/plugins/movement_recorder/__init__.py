@@ -8,10 +8,10 @@ from PyQt4 import QtCore, QtGui, Qt
 from shadow_generic_plugin import ShadowGenericPlugin
 
 class Step(QtGui.QWidget):
-    def __init__(self, step_index, parent):
-        QtGui.QWidget.__init__(self)
+    def __init__(self, parent, step_index, plugin_parent):
+        QtGui.QWidget.__init__(self, parent = parent)
         self.step_index = step_index
-        self.parent = parent
+        self.parent = plugin_parent
         self.grasp = 0
         self.pause_time = 0
         self.interpolation_time = 1
@@ -21,18 +21,18 @@ class Step(QtGui.QWidget):
         
         self.widgets = []
     
-    def draw(self):        
+    def draw(self):
         self.frame = QtGui.QFrame(self)
         self.green = QtGui.QColor(0, 255, 0)
         self.saved_palette = self.palette()
         green_palette = self.palette()
         green_palette.setBrush(Qt.QPalette.Window, self.green)
-
         self.frame.setPalette(green_palette)
         
         self.grasp = self.parent.sr_library.grasp_parser.grasps.values()[0]
         label_grasp = QtGui.QLabel(self.frame)
         label_grasp.setText("Step " + str(self.step_index + 1) + ":")
+        self.widgets.append(label_grasp)
         
         self.list_grasp = QtGui.QComboBox(self.frame)
         for grasp_name in self.parent.sr_library.grasp_parser.grasps.keys():
@@ -160,17 +160,12 @@ class Step(QtGui.QWidget):
         Make sure we don't delete the first item from the GUI
         """
         if not delete_first:
-            print "dont delete"
             if len(self.parent.steps) <= 1:
                 return
-        
-        self.parent.layout.removeWidget(self)
+        self.close()
         self.parent.steps.remove(self)
-        for widget in self.widgets:
-            self.layout.removeWidget(self)
-            widget.destroy()
-        self.destroy()
         Qt.QTimer.singleShot(0, self.parent.window.adjustSize)
+        del self
     
     def set_step_id(self, index):
         self.step_index = index
@@ -250,6 +245,8 @@ class MovementRecorder(ShadowGenericPlugin):
         self.timer = Qt.QTimer(self.frame)
         
         self.layout = QtGui.QVBoxLayout()
+        self.layout.setSpacing(2)
+        
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.setSizeConstraint(Qt.QLayout.SetFixedSize)
         
@@ -279,7 +276,7 @@ class MovementRecorder(ShadowGenericPlugin):
         self.command_frame.connect(stop_btn, QtCore.SIGNAL('clicked()'), self.stop)
         self.sublayout.addWidget(stop_btn, 0, 1)
         
-        self.sublayout.addWidget(QtGui.QLabel(''),0,2)
+        self.sublayout.addWidget(QtGui.QLabel(''), 0, 2)
         #self.sublayout.addWidget(QtGui.QLabel(''),0,3)
         #self.sublayout.addWidget(QtGui.QLabel(''),0,4)
         
@@ -299,7 +296,7 @@ class MovementRecorder(ShadowGenericPlugin):
         
         self.command_frame.setLayout(self.sublayout)
         self.layout.addWidget(self.command_frame)
-    
+            
     def save(self):
         filename = QtGui.QFileDialog.getSaveFileName(self.window, 'Save Script',
                     '')
@@ -339,14 +336,11 @@ class MovementRecorder(ShadowGenericPlugin):
     def load(self):
         #remove all the present steps
         
-        filename = QtGui.QFileDialog.getOpenFileName(self.window, 'Open Script',
-                    '')
+        filename = QtGui.QFileDialog.getOpenFileName(self.window, 'Open Script', '')
         
         if filename != "":       
-            while len(self.steps) != 0:
-                self.steps[0].remove_step(delete_first=True)
-            #del self.steps[:]
-        
+            self.remove_all_steps()
+            
             tree = ET.parse(filename)
             root = tree.getroot()
             xml_steps = tree.findall("step")
@@ -356,6 +350,11 @@ class MovementRecorder(ShadowGenericPlugin):
                 self.steps[-1].load_from_xml(step)
                 #print len(self.steps)
     
+    def remove_all_steps(self):
+        while len(self.steps) != 0:
+            self.steps[0].remove_step(delete_first=True)
+        #del self.steps[:]       
+    
     def started_playing(self, index):
         self.steps[index].is_playing()
         
@@ -363,7 +362,7 @@ class MovementRecorder(ShadowGenericPlugin):
         self.steps[index].stopped_playing()
         
     def add_step(self):
-        step_tmp = Step(len(self.steps), self)
+        step_tmp = Step(self.window, len(self.steps), self)
         self.steps.append(step_tmp)
         self.layout.addWidget(step_tmp)
         step_tmp.draw()
@@ -453,9 +452,13 @@ class MovementRecorder(ShadowGenericPlugin):
                   
         time.sleep(self.current_step.pause_time)      
             
+    def on_close(self):
+        self.remove_all_steps()
+        ShadowGenericPlugin.on_close(self)
+        #
+        #self.close()
             
-            
-            
+    
             
             
             
