@@ -93,17 +93,17 @@ class Step(QtGui.QWidget):
         label_times.setText("times. ")
         self.widgets.append(label_times)
         
-        new_step_button = QtGui.QPushButton(self.frame)
-        new_step_button.setText("+")
-        new_step_button.setFixedWidth(20)
-        self.frame.connect(new_step_button, QtCore.SIGNAL('clicked()'), self.add_step)
-        self.widgets.append(new_step_button)
+        self.new_step_button = QtGui.QPushButton(self.frame)
+        self.new_step_button.setText("+")
+        self.new_step_button.setFixedWidth(20)
+        self.frame.connect(self.new_step_button, QtCore.SIGNAL('clicked()'), self.add_step)
+        self.widgets.append(self.new_step_button)
         
-        remove_step_button = QtGui.QPushButton(self.frame)
-        remove_step_button.setText("-")
-        remove_step_button.setFixedWidth(20)
-        self.frame.connect(remove_step_button, QtCore.SIGNAL('clicked()'), self.remove_step)
-        self.widgets.append(remove_step_button)
+        self.remove_step_button = QtGui.QPushButton(self.frame)
+        self.remove_step_button.setText("-")
+        self.remove_step_button.setFixedWidth(20)
+        self.frame.connect(self.remove_step_button, QtCore.SIGNAL('clicked()'), self.remove_step)
+        self.widgets.append(self.remove_step_button)
         
         self.layout = QtGui.QHBoxLayout()
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
@@ -118,8 +118,8 @@ class Step(QtGui.QWidget):
         self.layout.addWidget(self.loop_input)
         self.layout.addWidget(self.number_loops)
         self.layout.addWidget(label_times)
-        self.layout.addWidget(new_step_button)
-        self.layout.addWidget(remove_step_button)
+        self.layout.addWidget(self.new_step_button)
+        self.layout.addWidget(self.remove_step_button)
         
         self.frame.setLayout(self.layout)
         
@@ -287,12 +287,12 @@ class MovementRecorder(ShadowGenericPlugin):
         self.command_frame.connect(save_btn, QtCore.SIGNAL('clicked()'), self.save)
         self.sublayout.addWidget(save_btn, 0, 3)
         
-        load_btn = QtGui.QPushButton()
-        load_btn.setIcon(QtGui.QIcon('image/icons/load.png'))
-        load_btn.setText("Load")
-        load_btn.setFixedWidth(60)
-        self.command_frame.connect(load_btn, QtCore.SIGNAL('clicked()'), self.load)
-        self.sublayout.addWidget(load_btn, 0, 4)
+        self.load_btn = QtGui.QPushButton()
+        self.load_btn.setIcon(QtGui.QIcon('image/icons/load.png'))
+        self.load_btn.setText("Load")
+        self.load_btn.setFixedWidth(60)
+        self.command_frame.connect(self.load_btn, QtCore.SIGNAL('clicked()'), self.load)
+        self.sublayout.addWidget(self.load_btn, 0, 4)
         
         self.command_frame.setLayout(self.sublayout)
         self.layout.addWidget(self.command_frame)
@@ -384,8 +384,11 @@ class MovementRecorder(ShadowGenericPlugin):
             return
         
         self.play_btn.setDisabled(True)
+        self.load_btn.setDisabled(True)
         
         for step in self.steps:
+            step.remove_step_button.setDisabled(True)
+            step.new_step_button.setDisabled(True)
             step.remaining_loops = step.number_of_loops
          
         self.thread = threading.Thread(None, self.play)
@@ -407,13 +410,17 @@ class MovementRecorder(ShadowGenericPlugin):
             index = self.play_step(step, first_time, index)
             first_time = False
             
-        self.play_btn.setEnabled(True)
+        self.stop()
             
-    def stop(self):
+    def stop(self):        
+        for step in self.steps:
+            step.new_step_button.setEnabled(True)
+            step.remove_step_button.setEnabled(True)
         self.mutex.acquire()
         self.stopped = True
         self.mutex.release()
         self.play_btn.setEnabled(True)
+        self.load_btn.setEnabled(True)
             
     def play_step(self, step, first_time, index):
         if first_time:
