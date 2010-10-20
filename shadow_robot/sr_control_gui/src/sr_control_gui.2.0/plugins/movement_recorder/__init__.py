@@ -35,7 +35,9 @@ class Step(QtGui.QWidget):
         self.widgets.append(label_grasp)
         
         self.list_grasp = QtGui.QComboBox(self.frame)
-        for grasp_name in self.parent.sr_library.grasp_parser.grasps.keys():
+        list_grasps = self.parent.sr_library.grasp_parser.grasps.keys()
+        list_grasps.sort()
+        for grasp_name in list_grasps:
             self.list_grasp.addItem(grasp_name)    
         self.frame.connect(self.list_grasp, QtCore.SIGNAL('activated(QString)'), self.grasp_choosed)
         self.widgets.append(self.list_grasp)
@@ -197,7 +199,9 @@ class Step(QtGui.QWidget):
             if subelement.tag == "grasp":
                 grasp_name = subelement.attrib.get("name") 
                 self.grasp_choosed(grasp_name)
-                for index, grasp_name_ref in zip(range(0, len(self.parent.sr_library.grasp_parser.grasps.keys())), self.parent.sr_library.grasp_parser.grasps.keys()):
+                list_grasps = self.parent.sr_library.grasp_parser.grasps.keys()
+                list_grasps.sort()
+                for index, grasp_name_ref in zip(range(0, len(list_grasps)), list_grasps):
                     if grasp_name == grasp_name_ref:
                         self.list_grasp.setCurrentIndex(index)
                         break
