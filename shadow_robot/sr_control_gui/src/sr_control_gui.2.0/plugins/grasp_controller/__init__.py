@@ -125,7 +125,7 @@ class GraspSaver(QtGui.QDialog):
         for joint_to_save in joints_to_save:
             grasp.joints_and_positions[joint_to_save] = self.all_joints[joint_to_save]
         
-        self.plugin_parent.sr_library.grasp_parser.write_grasp_to_file(grasp)
+        self.plugin_parent.parent.parent.libraries["sr_library"].grasp_parser.write_grasp_to_file(grasp)
         
         self.plugin_parent.parent.parent.reload_grasp_signal_widget.reloadGraspSig['int'].emit(1)
         #self.plugin_parent.refresh_lists()
@@ -171,12 +171,12 @@ class GraspChooser(QtGui.QWidget):
         self.show()
         
     def double_click(self, item):
-        self.grasp = self.plugin_parent.sr_library.grasp_parser.grasps[str(item.text())]
-        self.plugin_parent.sr_library.sendupdate_from_dict(self.grasp.joints_and_positions)
+        self.grasp = self.plugin_parent.parent.parent.libraries["sr_library"].grasp_parser.grasps[str(item.text())]
+        self.plugin_parent.parent.parent.libraries["sr_library"].sendupdate_from_dict(self.grasp.joints_and_positions)
         self.plugin_parent.set_reference_grasp()
     
     def grasp_choosed(self, item, first_time=False):
-        self.grasp = self.plugin_parent.sr_library.grasp_parser.grasps[str(item.text())]
+        self.grasp = self.plugin_parent.parent.parent.libraries["sr_library"].grasp_parser.grasps[str(item.text())]
         if not first_time:
             self.plugin_parent.grasp_changed()
             self.plugin_parent.set_reference_grasp()
@@ -184,7 +184,7 @@ class GraspChooser(QtGui.QWidget):
     def refresh_list(self, value = 0):
         self.list.clear()   
         first_item = None
-        grasps = self.plugin_parent.sr_library.grasp_parser.grasps.keys()
+        grasps = self.plugin_parent.parent.parent.libraries["sr_library"].grasp_parser.grasps.keys()
         grasps.sort()
         for grasp_name in grasps:
             item = QtGui.QListWidgetItem(grasp_name)
@@ -297,11 +297,11 @@ class GraspController(ShadowGenericPlugin):
         Qt.QTimer.singleShot(0, self.window.adjustSize)
         
     def save_grasp(self):
-        all_joints = self.sr_library.read_all_current_positions()
+        all_joints = self.parent.parent.libraries["sr_library"].read_all_current_positions()
         GraspSaver(self.window, all_joints, self)
     
     def set_reference_grasp(self):
-        self.current_grasp.joints_and_positions = self.sr_library.read_all_current_positions()
+        self.current_grasp.joints_and_positions = self.parent.parent.libraries["sr_library"].read_all_current_positions()
         
         self.grasp_interpoler_1 = GraspInterpoler(self.grasp_from_chooser.grasp, self.current_grasp)
         self.grasp_interpoler_2 = GraspInterpoler(self.current_grasp, self.grasp_to_chooser.grasp)
@@ -309,7 +309,7 @@ class GraspController(ShadowGenericPlugin):
         self.grasp_slider.slider.setValue(0)
     
     def grasp_changed(self):
-        self.current_grasp.joints_and_positions = self.sr_library.read_all_current_positions()
+        self.current_grasp.joints_and_positions = self.parent.parent.libraries["sr_library"].read_all_current_positions()
         self.grasp_interpoler_1 = GraspInterpoler(self.grasp_from_chooser.grasp, self.current_grasp)
         self.grasp_interpoler_2 = GraspInterpoler(self.current_grasp, self.grasp_to_chooser.grasp)    
     
@@ -317,7 +317,7 @@ class GraspController(ShadowGenericPlugin):
         #from -> current
         if value < 0:
             targets_to_send = self.grasp_interpoler_1.interpolate(100 + value)
-            self.sr_library.sendupdate_from_dict(targets_to_send)
+            self.parent.parent.libraries["sr_library"].sendupdate_from_dict(targets_to_send)
         else:   #current -> to
             targets_to_send = self.grasp_interpoler_2.interpolate(value)
-            self.sr_library.sendupdate_from_dict(targets_to_send)
+            self.parent.parent.libraries["sr_library"].sendupdate_from_dict(targets_to_send)

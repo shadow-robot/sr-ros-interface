@@ -14,15 +14,13 @@ class ShadowGenericPlugin(GenericPlugin):
     
     def __init__(self):
         GenericPlugin.__init__(self)
-        self.sr_library = None
         
     def activate(self):
         GenericPlugin.activate(self)
-        # only activate the first time you open the window
-        if self.sr_library !=  None:
-            return
-        self.sr_library = ShadowHand_ROS()
-    
+        # only activate the library if it hasn't been already loaded
+        if self.parent.parent.libraries.get("sr_library") == None:
+            self.parent.parent.libraries["sr_library"] = ShadowHand_ROS()
+        
     def on_close(self):
         GenericPlugin.on_close(self)
-        #self.sr_library.__del__()
+        

@@ -67,6 +67,11 @@ class MainWindow(QtGui.QMainWindow):
         self.reload_grasp_signal_widget = ReloadGraspSignalWidget()            
 
         ####
+        # LIBRARIES
+        ##
+        self.libraries = {}
+
+        ####
         # MAIN WIDGET
         ##
         self.setCentralWidget(MainWidget(self))

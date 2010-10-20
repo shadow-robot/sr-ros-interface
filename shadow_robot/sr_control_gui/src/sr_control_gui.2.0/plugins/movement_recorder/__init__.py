@@ -31,7 +31,7 @@ class Step(QtGui.QWidget):
         green_palette.setBrush(Qt.QPalette.Window, self.green)
         self.frame.setPalette(green_palette)
         
-        self.grasp = self.parent.sr_library.grasp_parser.grasps.values()[0]
+        self.grasp = self.parent.parent.parent.libraries["sr_library"].grasp_parser.grasps.values()[0]
         label_grasp = QtGui.QLabel(self.frame)
         label_grasp.setText("Grasp:  ")# + str(self.step_index + 1) + ":")
         self.widgets.append(label_grasp)
@@ -134,7 +134,7 @@ class Step(QtGui.QWidget):
         self.show()
             
     def grasp_choosed(self, grasp_name):
-        self.grasp = self.parent.sr_library.grasp_parser.grasps[str(grasp_name)]
+        self.grasp = self.parent.parent.parent.libraries["sr_library"].grasp_parser.grasps[str(grasp_name)]
 
     def pause_changed(self, pause_time):
         self.pause_time = float(pause_time)
@@ -200,7 +200,7 @@ class Step(QtGui.QWidget):
             if subelement.tag == "grasp":
                 grasp_name = subelement.attrib.get("name") 
                 self.grasp_choosed(grasp_name)
-                list_grasps = self.parent.sr_library.grasp_parser.grasps.keys()
+                list_grasps = self.parent.parent.parent.libraries["sr_library"].grasp_parser.grasps.keys()
                 list_grasps.sort()
                 for index, grasp_name_ref in zip(range(0, len(list_grasps)), list_grasps):
                     if grasp_name == grasp_name_ref:
@@ -229,8 +229,8 @@ class Step(QtGui.QWidget):
     
     def refresh_list(self, value = 0):
         self.list_grasp.clear()
-        self.parent.sr_library.grasp_parser.refresh()
-        list_grasps = self.parent.sr_library.grasp_parser.grasps.keys()
+        self.parent.parent.parent.libraries["sr_library"].grasp_parser.refresh()
+        list_grasps = self.parent.parent.parent.libraries["sr_library"].grasp_parser.grasps.keys()
         list_grasps.sort()
         for grasp_name in list_grasps:
             self.list_grasp.addItem(grasp_name)        
@@ -452,9 +452,9 @@ class MovementRecorder(ShadowGenericPlugin):
         return index + 1
     
     def move_step(self, next_step):
-        interpoler = self.sr_library.create_grasp_interpoler(self.current_step.grasp, next_step.grasp)
+        interpoler = self.parent.parent.libraries["sr_library"].create_grasp_interpoler(self.current_step.grasp, next_step.grasp)
         if self.current_step.interpolation_time == 0.0:
-            self.sr_library.sendupdate_from_dict(next_step.grasp.joints_and_positions)
+            self.parent.parent.libraries["sr_library"].sendupdate_from_dict(next_step.grasp.joints_and_positions)
         else:
             for interpolation in range (0, 10 * int(self.current_step.interpolation_time)):
                 self.mutex.acquire()
@@ -463,8 +463,8 @@ class MovementRecorder(ShadowGenericPlugin):
                     return
                 self.mutex.release()
                 
-                targets_to_send = self.sr_library.grasp_interpoler.interpolate(100.0 * interpolation / (10 * self.current_step.interpolation_time))
-                self.sr_library.sendupdate_from_dict(targets_to_send)        
+                targets_to_send = self.parent.parent.libraries["sr_library"].grasp_interpoler.interpolate(100.0 * interpolation / (10 * self.current_step.interpolation_time))
+                self.parent.parent.libraries["sr_library"].sendupdate_from_dict(targets_to_send)        
                 time.sleep(0.1)
                   
         time.sleep(self.current_step.pause_time)      

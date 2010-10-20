@@ -70,7 +70,7 @@ class ExtendedSlider(QtGui.QWidget):
         self.plugin_parent.sendupdate(joint_dict)        
     
     def update(self):
-        self.current_value = round(self.plugin_parent.sr_library.valueof(self.name),1)
+        self.current_value = round(self.plugin_parent.parent.parent.libraries["sr_library"].valueof(self.name),1)
         self.position.setText("Pos: " + str(self.current_value))
     
     def checkbox_click(self, value):
