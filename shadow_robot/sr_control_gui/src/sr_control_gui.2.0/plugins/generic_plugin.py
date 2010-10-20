@@ -31,18 +31,25 @@ class GenericPlugin(IPlugin):
         #self.window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.window.widget()
         self.window.setWindowTitle(self.name)
+        self.is_window_opened = False
         
     def set_parent(self, parent):
         self.parent = parent
         self.window.set_container(self.parent.container)
                 
     def activate(self):
-        self.parent.container.addSubWindow(self.window)
-        self.window.show()
+        if not self.is_window_opened:
+            self.parent.container.addSubWindow(self.window)
+            self.window.show()
+            self.is_window_opened = True
+        else:
+            self.parent.container.setActiveSubWindow(self.window)
+            
     
     def set_icon(self, path):
         self.window.setWindowIcon(QtGui.QIcon(path))
     
     def on_close(self):
+        self.is_window_opened = False
         self.window.close()
     #    print "toto parent"

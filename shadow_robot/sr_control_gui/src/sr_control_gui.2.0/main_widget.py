@@ -20,6 +20,7 @@ class MainWidget(QtGui.QWidget):
         self.container = QtGui.QMdiArea(self)
         self.container.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.container.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        
         self.layout.addWidget(self.container)
         self.setLayout(self.layout)
         ####

@@ -310,12 +310,20 @@ class GraspController(ShadowGenericPlugin):
         
         self.grasp_to_chooser = GraspChooser(self.window, self, "To: ")
         self.layout.addWidget(self.grasp_to_chooser)
+        
+        self.frame.setLayout(self.layout)
+        self.window.setWidget(self.frame)
+        
+        self.is_activated = False
              
     def activate(self):
         ShadowGenericPlugin.activate(self)
 
-        self.frame.setLayout(self.layout)
-        self.window.setWidget(self.frame)
+        if self.is_activated:
+            return
+        
+        self.is_activated = True
+
         self.grasp_slider.draw()
         self.grasp_to_chooser.draw()
         self.grasp_from_chooser.draw()

@@ -249,6 +249,8 @@ class MovementRecorder(ShadowGenericPlugin):
     def __init__(self):
         ShadowGenericPlugin.__init__(self)
         
+        self.first_time = True
+        
         self.set_icon('images/icons/iconArmHand.png')
         
         self.frame = QtGui.QFrame()
@@ -306,7 +308,23 @@ class MovementRecorder(ShadowGenericPlugin):
         
         self.command_frame.setLayout(self.sublayout)
         self.layout.addWidget(self.command_frame)
+        
+        self.frame.setLayout(self.layout)
+        self.window.setWidget(self.frame)
+    
+    def activate(self):
+        ShadowGenericPlugin.activate(self)
+        
+        if self.first_time:                        
+            self.steps = []
+            self.add_step()
+            self.first_time = False
             
+        elif not self.is_window_opened:                        
+            self.steps = []
+            self.add_step()
+            
+        
     def save(self):
         filename = QtGui.QFileDialog.getSaveFileName(self.window, 'Save Script',
                     '')
@@ -378,16 +396,7 @@ class MovementRecorder(ShadowGenericPlugin):
         step_tmp.draw()
         Qt.QTimer.singleShot(0, self.window.adjustSize)
         for step, index in zip(self.steps, range(0, len(self.steps))):
-            step.set_step_id(index)
-
-    def activate(self):
-        ShadowGenericPlugin.activate(self)
-                                
-        self.steps = []
-        self.add_step()
-        
-        self.frame.setLayout(self.layout)
-        self.window.setWidget(self.frame)
+            step.set_step_id(index)       
 
     def button_play_clicked(self):       
         if len(self.steps) < 1:
@@ -470,6 +479,7 @@ class MovementRecorder(ShadowGenericPlugin):
         time.sleep(self.current_step.pause_time)      
             
     def on_close(self):
+        self.first_time = True
         self.remove_all_steps()
         ShadowGenericPlugin.on_close(self)
         #
