@@ -163,11 +163,13 @@ class GraspChooser(QtGui.QWidget):
     def double_click(self, item):
         self.grasp = self.plugin_parent.sr_library.grasp_parser.grasps[str(item.text())]
         self.plugin_parent.sr_library.sendupdate_from_dict(self.grasp.joints_and_positions)
+        self.plugin_parent.set_reference_grasp()
     
     def grasp_choosed(self, item, first_time=False):
         self.grasp = self.plugin_parent.sr_library.grasp_parser.grasps[str(item.text())]
         if not first_time:
             self.plugin_parent.grasp_changed()
+            self.plugin_parent.set_reference_grasp()
     
     def refresh_list(self):
         self.list.clear()   
