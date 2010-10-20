@@ -60,7 +60,14 @@ class JointSelecter(QtGui.QWidget):
                 joints.append(str(cb.text()))
         
         return joints
+
+    def select_all(self):
+        for cb in self.checkboxes:
+            cb.setChecked(True)
             
+    def deselect_all(self):
+        for cb in self.checkboxes:
+            cb.setChecked(False)    
 
 class GraspSaver(QtGui.QDialog):
     def __init__(self, parent, all_joints, plugin_parent):
@@ -83,6 +90,18 @@ class GraspSaver(QtGui.QDialog):
         self.upper_layout.addWidget(name_widget)
         self.upper_frame.setLayout(self.upper_layout)
         
+        select_all_frame = QtGui.QFrame()
+        select_all_layout = QtGui.QHBoxLayout()
+        btn_select_all = QtGui.QPushButton(select_all_frame)
+        btn_select_all.setText("Select All")
+        select_all_layout.addWidget(btn_select_all)
+        self.connect(btn_select_all, QtCore.SIGNAL("clicked()"), self.select_all)
+        btn_deselect_all = QtGui.QPushButton(select_all_frame)
+        btn_deselect_all.setText("Deselect All")
+        select_all_layout.addWidget(btn_deselect_all)
+        self.connect(btn_deselect_all, QtCore.SIGNAL("clicked()"), self.deselect_all)
+        select_all_frame.setLayout(select_all_layout)
+                
         self.joint_selecter = JointSelecter(self, self.all_joints)
         
         btn_frame = QtGui.QFrame()   
@@ -101,11 +120,18 @@ class GraspSaver(QtGui.QDialog):
         
         self.layout = QtGui.QVBoxLayout()
         self.layout.addWidget(self.upper_frame)
+        self.layout.addWidget(select_all_frame)
         self.layout.addWidget(self.joint_selecter)
         self.layout.addWidget(btn_frame)
         
         self.setLayout(self.layout)
         self.show()
+        
+    def select_all(self):
+        self.joint_selecter.select_all()
+        
+    def deselect_all(self):
+        self.joint_selecter.deselect_all()
     
     def name_changed(self, name):
         self.grasp_name = name
