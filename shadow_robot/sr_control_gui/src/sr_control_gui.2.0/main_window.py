@@ -10,11 +10,17 @@ logging.basicConfig(level=logging.ERROR)
 
 import subprocess
 from yapsy.PluginManager import PluginManager
-from PyQt4 import QtCore, QtGui, QtWebKit
+from PyQt4 import QtCore, QtGui, Qt
 import os, sys
 
 
 from main_widget import MainWidget
+
+class ReloadGraspSignalWidget(Qt.QWidget):
+    reloadGraspSig = QtCore.pyqtSignal(int)
+    
+    def __init__(self, parent = None):
+        super(ReloadGraspSignalWidget, self).__init__(parent)
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
@@ -54,7 +60,12 @@ class MainWindow(QtGui.QMainWindow):
         
         tools.addAction(rxgraph)
         tools.addAction(robot_monitor)
-            
+
+        ###
+        # SIGNALS
+        ##
+        self.reload_grasp_signal_widget = ReloadGraspSignalWidget()            
+
         ####
         # MAIN WIDGET
         ##

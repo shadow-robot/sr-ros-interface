@@ -7,6 +7,8 @@ import time, threading
 from PyQt4 import QtCore, QtGui, Qt
 from shadow_generic_plugin import ShadowGenericPlugin
 
+from main_window import ReloadGraspSignalWidget
+
 class Step(QtGui.QWidget):
     def __init__(self, parent, step_index, plugin_parent):
         QtGui.QWidget.__init__(self, parent = parent)
@@ -35,10 +37,7 @@ class Step(QtGui.QWidget):
         self.widgets.append(label_grasp)
         
         self.list_grasp = QtGui.QComboBox(self.frame)
-        list_grasps = self.parent.sr_library.grasp_parser.grasps.keys()
-        list_grasps.sort()
-        for grasp_name in list_grasps:
-            self.list_grasp.addItem(grasp_name)    
+        self.refresh_list()
         self.frame.connect(self.list_grasp, QtCore.SIGNAL('activated(QString)'), self.grasp_choosed)
         self.widgets.append(self.list_grasp)
 
@@ -124,6 +123,8 @@ class Step(QtGui.QWidget):
         self.layout.addWidget(self.remove_step_button)
         
         self.frame.setLayout(self.layout)
+        
+        self.parent.parent.parent.reload_grasp_signal_widget.reloadGraspSig['int'].connect(self.refresh_list)
         
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.frame)
@@ -224,11 +225,16 @@ class Step(QtGui.QWidget):
             if subelement.tag == "number_loops":
                 self.number_of_loops = int(subelement.text)
                 self.number_loops.setText(subelement.text)
-
-        
-
-
         self.grasp_slider = None
+    
+    def refresh_list(self, value = 0):
+        self.list_grasp.clear()
+        self.parent.sr_library.grasp_parser.refresh()
+        list_grasps = self.parent.sr_library.grasp_parser.grasps.keys()
+        list_grasps.sort()
+        for grasp_name in list_grasps:
+            self.list_grasp.addItem(grasp_name)        
+    
 class SignalWidget(Qt.QWidget):
     isPlayingSig = QtCore.pyqtSignal(int)
     stoppedPlayingSig = QtCore.pyqtSignal(int)
@@ -296,7 +302,7 @@ class MovementRecorder(ShadowGenericPlugin):
         self.load_btn.setText("Load")
         self.load_btn.setFixedWidth(60)
         self.command_frame.connect(self.load_btn, QtCore.SIGNAL('clicked()'), self.load)
-        self.sublayout.addWidget(self.load_btn, 0, 4)
+        self.sublayout.addWidget(self.load_btn, 0, 4)    
         
         self.command_frame.setLayout(self.sublayout)
         self.layout.addWidget(self.command_frame)

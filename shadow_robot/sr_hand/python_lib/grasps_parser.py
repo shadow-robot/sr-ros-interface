@@ -68,6 +68,9 @@ class GraspParser():
         objFileWrite.close()
         
         self.parse_tree(xml_filename)
+    
+    def refresh(self):
+        self.parse_tree(self.xml_path)
             
 ############################
 #    MAIN - simple test    #

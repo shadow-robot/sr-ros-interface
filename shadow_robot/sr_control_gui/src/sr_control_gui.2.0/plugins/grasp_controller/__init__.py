@@ -8,6 +8,8 @@ from Grasp import Grasp
 from grasps_interpoler import GraspInterpoler
 from grasps_parser import GraspParser
 
+from main_window import ReloadGraspSignalWidget
+
 class JointSelecter(QtGui.QWidget):
     def __init__(self, parent, all_joints):
         QtGui.QWidget.__init__(self, parent=parent)
@@ -124,7 +126,9 @@ class GraspSaver(QtGui.QDialog):
             grasp.joints_and_positions[joint_to_save] = self.all_joints[joint_to_save]
         
         self.plugin_parent.sr_library.grasp_parser.write_grasp_to_file(grasp)
-        self.plugin_parent.refresh_lists()
+        
+        self.plugin_parent.parent.parent.reload_grasp_signal_widget.reloadGraspSig['int'].emit(1)
+        #self.plugin_parent.refresh_lists()
         
         QtGui.QDialog.accept(self)
 
@@ -153,6 +157,12 @@ class GraspChooser(QtGui.QWidget):
         self.layout.addWidget(self.title)
         self.layout.addWidget(self.list)
         
+        
+        ###
+        # SIGNALS
+        ##
+        self.plugin_parent.parent.parent.reload_grasp_signal_widget.reloadGraspSig['int'].connect(self.refresh_list)
+        
         self.frame.setLayout(self.layout)
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.frame)
@@ -171,7 +181,7 @@ class GraspChooser(QtGui.QWidget):
             self.plugin_parent.grasp_changed()
             self.plugin_parent.set_reference_grasp()
     
-    def refresh_list(self):
+    def refresh_list(self, value = 0):
         self.list.clear()   
         first_item = None
         grasps = self.plugin_parent.sr_library.grasp_parser.grasps.keys()
@@ -311,7 +321,3 @@ class GraspController(ShadowGenericPlugin):
         else:   #current -> to
             targets_to_send = self.grasp_interpoler_2.interpolate(value)
             self.sr_library.sendupdate_from_dict(targets_to_send)
-
-    def refresh_lists(self):
-        self.grasp_from_chooser.refresh_list()
-        self.grasp_to_chooser.refresh_list()
