@@ -87,7 +87,7 @@ class ShadowHand_ROS():
         self.rootPath = self.rootPath.split('\n')
         self.rootPath = self.rootPath[0]
         #print "path : "+self.rootPath
-        self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasps.xml")
+        self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasp/grasps.xml")
       
         self.grasp_interpoler = 0
         
