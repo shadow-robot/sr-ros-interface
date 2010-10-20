@@ -8,6 +8,126 @@ from Grasp import Grasp
 from grasps_interpoler import GraspInterpoler
 from grasps_parser import GraspParser
 
+class JointSelecter(QtGui.QWidget):
+    def __init__(self, parent, all_joints):
+        QtGui.QWidget.__init__(self, parent=parent)
+        self.frame = QtGui.QFrame()
+        self.layout = QtGui.QGridLayout()
+        self.checkboxes = []
+        
+        col = 0
+        #vectors to set the correct row in the layout for each col
+        rows = [0, 0, 0, 0, 0, 0]
+        joint_names = all_joints.keys()
+        joint_names.sort()
+        for joint in joint_names:
+            if "fj1" in joint.lower():
+                continue
+            if "fj2" in joint.lower():
+                continue    
+            if "ff" in joint.lower():
+                col = 0
+            elif "mf" in joint.lower():
+                col = 1
+            elif "rf" in joint.lower():
+                col = 2
+            elif "lf" in joint.lower():
+                col = 3
+            elif "th" in joint.lower():
+                col = 4
+            else:
+                col = 5
+                
+            row = rows[col]
+            rows[col] = row + 1
+            cb = QtGui.QCheckBox(QtCore.QString(joint), self.frame)
+            self.checkboxes.append(cb)
+            self.layout.addWidget(cb, row, col)
+                
+        self.frame.setLayout(self.layout)
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.frame)
+        self.frame.show()
+        self.setLayout(layout)
+        self.show()
+    
+    def get_selected(self):
+        joints = []
+        for cb in self.checkboxes:
+            if cb.isChecked():
+                joints.append(str(cb.text()))
+        
+        return joints
+            
+
+class GraspSaver(QtGui.QDialog):
+    def __init__(self, parent, all_joints, plugin_parent):
+        QtGui.QDialog.__init__(self, parent)
+        self.plugin_parent = plugin_parent
+        self.all_joints = all_joints
+        self.setModal(True)
+        self.setWindowTitle("Save Grasp")
+        
+        self.grasp_name = ""
+        
+        self.upper_frame = QtGui.QFrame()
+        self.upper_layout = QtGui.QHBoxLayout()
+        label_name = QtGui.QLabel()
+        label_name.setText("Grasp Name: ")
+        name_widget = QtGui.QLineEdit()
+        self.upper_frame.connect(name_widget, QtCore.SIGNAL('textChanged(QString)'), self.name_changed)
+        
+        self.upper_layout.addWidget(label_name)
+        self.upper_layout.addWidget(name_widget)
+        self.upper_frame.setLayout(self.upper_layout)
+        
+        self.joint_selecter = JointSelecter(self, self.all_joints)
+        
+        btn_frame = QtGui.QFrame()   
+        self.btn_ok = QtGui.QPushButton(btn_frame)
+        self.btn_ok.setText("OK")
+        self.btn_ok.setDisabled(True)
+        self.connect(self.btn_ok, QtCore.SIGNAL("clicked()"), self.accept)
+        btn_cancel = QtGui.QPushButton(btn_frame)
+        btn_cancel.setText("Cancel")
+        self.connect(btn_cancel, QtCore.SIGNAL("clicked()"), self.reject)
+        
+        btn_layout = QtGui.QHBoxLayout()
+        btn_layout.addWidget(self.btn_ok)
+        btn_layout.addWidget(btn_cancel)
+        btn_frame.setLayout(btn_layout)
+        
+        self.layout = QtGui.QVBoxLayout()
+        self.layout.addWidget(self.upper_frame)
+        self.layout.addWidget(self.joint_selecter)
+        self.layout.addWidget(btn_frame)
+        
+        self.setLayout(self.layout)
+        self.show()
+    
+    def name_changed(self, name):
+        self.grasp_name = name
+        if self.grasp_name != "":
+            self.btn_ok.setEnabled(True)
+        else:
+            self.btn_ok.setDisabled(True)
+        
+    
+    def accept(self):
+        grasp = Grasp()
+        grasp.grasp_name = self.grasp_name
+                
+        joints_to_save = self.joint_selecter.get_selected()
+        if len(joints_to_save) == 0:
+            joints_to_save = self.all_joints.keys()
+        for joint_to_save in joints_to_save:
+            grasp.joints_and_positions[joint_to_save] = self.all_joints[joint_to_save]
+        
+        self.plugin_parent.sr_library.grasp_parser.write_grasp_to_file(grasp)
+        self.plugin_parent.refresh_lists()
+        
+        QtGui.QDialog.accept(self)
+
 class GraspChooser(QtGui.QWidget):
     def __init__(self, parent, plugin_parent, title):
         QtGui.QWidget.__init__(self)
@@ -20,17 +140,14 @@ class GraspChooser(QtGui.QWidget):
         self.frame = QtGui.QFrame(self)
 
         self.list = QtGui.QListWidget()
-        first_item = None
-        for grasp_name in self.plugin_parent.sr_library.grasp_parser.grasps.keys():
-            item = QtGui.QListWidgetItem(grasp_name)
-            if first_item == None:
-                first_item = item
-            self.list.addItem(item)    
+        first_item = self.refresh_list()  
         self.connect(self.list, QtCore.SIGNAL('itemClicked(QListWidgetItem*)'), self.grasp_choosed)
+            
+        self.connect(self.list, QtCore.SIGNAL('itemDoubleClicked(QListWidgetItem*)'), self.double_click)
         self.list.setViewMode(QtGui.QListView.ListMode)
         self.list.setResizeMode(QtGui.QListView.Adjust)
         self.list.setItemSelected(first_item, True)
-        self.grasp_choosed(first_item, first_time = True)
+        self.grasp_choosed(first_item, first_time=True)
         
         self.layout = QtGui.QVBoxLayout()
         self.layout.addWidget(self.title)
@@ -43,11 +160,27 @@ class GraspChooser(QtGui.QWidget):
         self.setLayout(layout)
         self.show()
         
-    def grasp_choosed(self, item, first_time = False):
+    def double_click(self, item):
+        self.grasp = self.plugin_parent.sr_library.grasp_parser.grasps[str(item.text())]
+        self.plugin_parent.sr_library.sendupdate_from_dict(self.grasp.joints_and_positions)
+    
+    def grasp_choosed(self, item, first_time=False):
         self.grasp = self.plugin_parent.sr_library.grasp_parser.grasps[str(item.text())]
         if not first_time:
             self.plugin_parent.grasp_changed()
-        #print grasp_name
+    
+    def refresh_list(self):
+        self.list.clear()   
+        first_item = None
+        grasps = self.plugin_parent.sr_library.grasp_parser.grasps.keys()
+        grasps.sort()
+        for grasp_name in grasps:
+            item = QtGui.QListWidgetItem(grasp_name)
+            if first_item == None:
+                first_item = item
+            self.list.addItem(item)
+        return first_item
+    
         
 class GraspSlider(QtGui.QWidget):
     def __init__(self, parent, plugin_parent):
@@ -152,7 +285,8 @@ class GraspController(ShadowGenericPlugin):
         Qt.QTimer.singleShot(0, self.window.adjustSize)
         
     def save_grasp(self):
-        print "save grasp"
+        all_joints = self.sr_library.read_all_current_positions()
+        GraspSaver(self.window, all_joints, self)
     
     def set_reference_grasp(self):
         self.current_grasp.joints_and_positions = self.sr_library.read_all_current_positions()
@@ -175,3 +309,7 @@ class GraspController(ShadowGenericPlugin):
         else:   #current -> to
             targets_to_send = self.grasp_interpoler_2.interpolate(value)
             self.sr_library.sendupdate_from_dict(targets_to_send)
+
+    def refresh_lists(self):
+        self.grasp_from_chooser.refresh_list()
+        self.grasp_to_chooser.refresh_list()
