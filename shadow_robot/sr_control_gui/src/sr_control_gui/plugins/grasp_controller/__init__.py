@@ -1,5 +1,12 @@
 import os, sys
-sys.path.append(os.getcwd() + "/plugins")
+
+#Not very pretty....
+import subprocess
+process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
+rootPath = process.communicate()[0]
+rootPath = rootPath.split('\n')
+rootPath = rootPath[0]
+sys.path.append(rootPath+ "/src/sr_control_gui/plugins")
 
 from PyQt4 import QtCore, QtGui, Qt
 from shadow_generic_plugin import ShadowGenericPlugin
@@ -276,8 +283,6 @@ class GraspController(ShadowGenericPlugin):
         self.grasp_interpoler_1 = None
         self.grasp_interpoler_2 = None
         
-        self.set_icon('images/icons/iconHand.png')
-        
         self.frame = QtGui.QFrame()
         self.layout = QtGui.QHBoxLayout()
         
@@ -289,11 +294,11 @@ class GraspController(ShadowGenericPlugin):
         
         btn_frame = QtGui.QFrame()
         btn_layout = QtGui.QHBoxLayout()
-        btn_save = QtGui.QPushButton()
-        btn_save.setText("Save")
-        btn_save.setFixedWidth(130)
-        btn_frame.connect(btn_save, QtCore.SIGNAL('clicked()'), self.save_grasp)
-        btn_layout.addWidget(btn_save)
+        self.btn_save = QtGui.QPushButton()
+        self.btn_save.setText("Save")
+        self.btn_save.setFixedWidth(130)
+        btn_frame.connect(self.btn_save, QtCore.SIGNAL('clicked()'), self.save_grasp)
+        btn_layout.addWidget(self.btn_save)
         btn_set_ref = QtGui.QPushButton()
         btn_set_ref.setText("Set As Reference")
         btn_set_ref.setFixedWidth(130)
@@ -318,7 +323,10 @@ class GraspController(ShadowGenericPlugin):
              
     def activate(self):
         ShadowGenericPlugin.activate(self)
-
+        
+        self.btn_save.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/save.png'))
+        self.set_icon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/iconHand.png')
+        
         if self.is_activated:
             return
         

@@ -4,12 +4,11 @@ import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 from shadowhand_ros import ShadowHand_ROS
 
-import subprocess
 import logging
 #enables the logging used by yapsy
 logging.basicConfig(level=logging.ERROR)
 
-from yapsy.PluginManager import PluginManager
+from yapsy.PluginManager import PluginManager, IPlugin
 from PyQt4 import Qt, QtCore, QtGui, QtWebKit
 import os, sys
 
@@ -30,24 +29,19 @@ class MainWidget(QtGui.QWidget):
         # Create plugin manager
         self.manager = PluginManager()
         
-        process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
-        self.rootPath = process.communicate()[0]
-        self.rootPath = self.rootPath.split('\n')
-        self.rootPath = self.rootPath[0]
-        #print "path : "+self.rootPath      
-        
-        self.manager.setPluginPlaces([self.rootPath+"/src/sr_control_gui/plugins"])
+        self.manager.setPluginPlaces([self.parent.rootPath + "/src/sr_control_gui/plugins"])
 
-        # Load plugins
-        self.manager.locatePlugins()
-        self.manager.loadPlugins()
-
-        # define a signal type for activating the plugins
-        #activate_plugin = QtCore.pyqtSignal(int, name="activatePlugin")
         # Add the plugins to the menubar in tool menu
         tools = self.parent.menuBar().addMenu('&Plugins')
         self.parent.statusBar().showMessage('Loading plugins...', 500)
+        
+        # Load plugins
+        nb_plugins_found = self.manager.locatePlugins()
+        rospy.loginfo(str(nb_plugins_found) + " plugins found")
+        self.manager.loadPlugins()
+                
         self.plugins = self.manager.getPluginsOfCategory("Default")
+        
         self.plugin_actions = []
         plugin_id = 0
         for plugin in self.plugins:

@@ -1,5 +1,12 @@
 import os, sys
-sys.path.append(os.getcwd() + "/plugins")
+
+#Not very pretty....
+import subprocess
+process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
+rootPath = process.communicate()[0]
+rootPath = rootPath.split('\n')
+rootPath = rootPath[0]
+sys.path.append(rootPath+ "/src/sr_control_gui/plugins")
 
 import xml.etree.ElementTree as ET
 import time, threading
@@ -251,8 +258,6 @@ class MovementRecorder(ShadowGenericPlugin):
         
         self.first_time = True
         
-        self.set_icon('images/icons/iconArmHand.png')
-        
         self.frame = QtGui.QFrame()
         self.timer = Qt.QTimer(self.frame)
         
@@ -266,7 +271,6 @@ class MovementRecorder(ShadowGenericPlugin):
         self.command_frame = QtGui.QFrame()
                 
         self.play_btn = QtGui.QPushButton()
-        self.play_btn.setIcon(QtGui.QIcon('image/icons/play.png'))
         self.play_btn.setText("Play")
         self.play_btn.setFixedWidth(60)
         self.command_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
@@ -281,26 +285,23 @@ class MovementRecorder(ShadowGenericPlugin):
         
         self.thread = None
         
-        stop_btn = QtGui.QPushButton()
-        stop_btn.setIcon(QtGui.QIcon('image/icons/stop.png'))
-        stop_btn.setText("Stop")
-        stop_btn.setFixedWidth(60)
-        self.command_frame.connect(stop_btn, QtCore.SIGNAL('clicked()'), self.stop)
-        self.sublayout.addWidget(stop_btn, 0, 1)
+        self.stop_btn = QtGui.QPushButton()
+        self.stop_btn.setText("Stop")
+        self.stop_btn.setFixedWidth(60)
+        self.command_frame.connect(self.stop_btn, QtCore.SIGNAL('clicked()'), self.stop)
+        self.sublayout.addWidget(self.stop_btn, 0, 1)
         
         self.sublayout.addWidget(QtGui.QLabel(''), 0, 2)
         #self.sublayout.addWidget(QtGui.QLabel(''),0,3)
         #self.sublayout.addWidget(QtGui.QLabel(''),0,4)
         
-        save_btn = QtGui.QPushButton()
-        save_btn.setIcon(QtGui.QIcon('image/icons/save.png'))
-        save_btn.setText("Save")
-        save_btn.setFixedWidth(60)
-        self.command_frame.connect(save_btn, QtCore.SIGNAL('clicked()'), self.save)
-        self.sublayout.addWidget(save_btn, 0, 3)
+        self.save_btn = QtGui.QPushButton()
+        self.save_btn.setText("Save")
+        self.save_btn.setFixedWidth(60)
+        self.command_frame.connect(self.save_btn, QtCore.SIGNAL('clicked()'), self.save)
+        self.sublayout.addWidget(self.save_btn, 0, 3)
         
         self.load_btn = QtGui.QPushButton()
-        self.load_btn.setIcon(QtGui.QIcon('image/icons/load.png'))
         self.load_btn.setText("Load")
         self.load_btn.setFixedWidth(60)
         self.command_frame.connect(self.load_btn, QtCore.SIGNAL('clicked()'), self.load)
@@ -314,6 +315,12 @@ class MovementRecorder(ShadowGenericPlugin):
     
     def activate(self):
         ShadowGenericPlugin.activate(self)
+        
+        self.set_icon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/iconArmHand.png')
+        self.load_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/load.png'))
+        self.save_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/save.png'))
+        self.stop_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/stop.png'))
+        self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/play.png'))
         
         if self.first_time:                        
             self.steps = []

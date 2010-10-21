@@ -1,5 +1,13 @@
 import os, sys
-sys.path.append(os.getcwd() + "/plugins")
+
+#Not very pretty....
+import subprocess
+process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
+rootPath = process.communicate()[0]
+rootPath = rootPath.split('\n')
+rootPath = rootPath[0]
+sys.path.append(rootPath+ "/src/sr_control_gui/plugins")
+
 from joint_slider import Joint, JointSlider
   
 class HandJointSlider(JointSlider):  
@@ -32,7 +40,7 @@ class HandJointSlider(JointSlider):
         joints_list.append(Joint("THJ5", -60, 60))
         
         JointSlider.__init__(self, joints_list)
-        self.set_icon('images/icons/iconHand.png')
 
     def sendupdate(self, dict):
         self.parent.parent.libraries["sr_library"].sendupdate_from_dict(dict)
+        self.set_icon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/iconHand.png')

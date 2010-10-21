@@ -4,6 +4,7 @@ import roslib; roslib.load_manifest('sr_control_gui')
 
 import rospy
 
+import subprocess
 import logging
 #enables the logging used by yapsy
 logging.basicConfig(level=logging.ERROR)
@@ -26,17 +27,22 @@ class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
         
+        # root path
+        process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
+        self.rootPath = process.communicate()[0]
+        self.rootPath = self.rootPath.split('\n')
+        self.rootPath = self.rootPath[0]
         ####
         # BASIC PARAMETERS
         ##        
         self.setWindowTitle("Shadow Robot Controller")
         self.resize(1000, 600)
-        self.setWindowIcon(QtGui.QIcon('images/icons/app_icon.png'))
+        self.setWindowIcon(QtGui.QIcon(self.rootPath+'/src/sr_control_gui/images/icons/app_icon.png'))
                 
         ####
         # TOOLBAR
         ##
-        self.exit = QtGui.QAction(QtGui.QIcon('images/icons/application-exit.png'), 'Exit', self)
+        self.exit = QtGui.QAction(QtGui.QIcon(self.rootPath+'/src/sr_control_gui/images/icons/application-exit.png'), 'Exit', self)
         self.exit.setStatusTip('Exit application')
         self.connect(self.exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
         self.toolbar = self.addToolBar('Exit')
