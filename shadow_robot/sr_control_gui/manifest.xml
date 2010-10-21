@@ -13,7 +13,6 @@
   <rosdep name="python-scipy"/>
   <export>
     <rosdoc config="rosdoc.yaml" />
-    <python path="${prefix}/src/sr_control_gui/cyberglove"/>
   </export>
 </package>
 

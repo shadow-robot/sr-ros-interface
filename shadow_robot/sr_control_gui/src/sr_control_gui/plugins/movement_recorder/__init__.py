@@ -32,7 +32,7 @@ class Step(QtGui.QWidget):
     
     def draw(self):
         self.frame = QtGui.QFrame(self)
-        self.green = QtGui.QColor(0, 255, 0)
+        self.green = QtGui.QColor(153, 231, 96)
         self.saved_palette = self.palette()
         green_palette = self.palette()
         green_palette.setBrush(Qt.QPalette.Window, self.green)
