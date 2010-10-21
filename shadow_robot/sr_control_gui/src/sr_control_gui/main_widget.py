@@ -4,9 +4,10 @@ import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 from shadowhand_ros import ShadowHand_ROS
 
+import subprocess
 import logging
 #enables the logging used by yapsy
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 from yapsy.PluginManager import PluginManager
 from PyQt4 import Qt, QtCore, QtGui, QtWebKit
@@ -28,7 +29,14 @@ class MainWidget(QtGui.QWidget):
         ##
         # Create plugin manager
         self.manager = PluginManager()
-        self.manager.setPluginPlaces(["plugins"])
+        
+        process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
+        self.rootPath = process.communicate()[0]
+        self.rootPath = self.rootPath.split('\n')
+        self.rootPath = self.rootPath[0]
+        #print "path : "+self.rootPath      
+        
+        self.manager.setPluginPlaces([self.rootPath+"/src/sr_control_gui/plugins"])
 
         # Load plugins
         self.manager.locatePlugins()
