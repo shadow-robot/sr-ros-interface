@@ -1,0 +1,9 @@
+[Core]
+Name = grasp_controller
+Module = grasp_controller
+
+[Documentation]
+Author = Ugo Cupcic
+Version = 0.1
+Website = http://www.shadowrobot.com
+Description = Interpolate between predefined grasps for the Dextrous Hand and record new grasps.

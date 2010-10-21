@@ -21,13 +21,14 @@
   <depend package="robot_monitor"/>
   <depend package="diagnostic_aggregator"/>
   <depend package="robot_state_publisher"/>
-  <depend package="rviz"/>
-  <depend package="gazebo_worlds"/>
+<!--  <depend package="rviz"/>
+  <depend package="gazebo_worlds"/> 
   <depend package="pr2_gazebo_plugins"/>
-  <depend package="pr2_mechanism_controllers"/>
+  <depend package="pr2_mechanism_controllers"/> -->
   <export>
 	<cpp cflags="-I${prefix}/include"/>
 	<python path="${prefix}/python_lib"/>
+	<python path="${prefix}/python_lib/grasp"/>
 	<python path="${prefix}/src"/>
 	
   </export>

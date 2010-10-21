@@ -12,6 +12,7 @@ class GraspParser():
         #initialize stuff
         self.xml_tree = ""
         self.grasps = {}
+        self.xml_path = ""
     
     def parse_tree(self, xml_filename="grasps.xml"):
         """
@@ -28,6 +29,8 @@ class GraspParser():
         except Exception, inst:
             print "Unexpected error opening %s: %s" % (xml_filename, inst)
             return
+        
+        self.xml_path = xml_filename
         
         tree_root = self.xml_tree.getroot()
         tree_grasp = tree_root.findall("grasp")
@@ -48,6 +51,26 @@ class GraspParser():
                 grasp_tmp.joints_and_positions.update({joint_name:joint_position})                
             
             self.grasps.update({grasp_tmp.grasp_name: grasp_tmp})
+            
+    def write_grasp_to_file(self, grasp, xml_filename = ""):
+        if xml_filename == "":
+            xml_filename = self.xml_path
+            
+        toWrite = grasp.convert_to_xml() 
+        objFileRead = open(xml_filename,'r')
+        previous = objFileRead.readlines()
+        objFileRead.close()
+        objFileWrite = open(xml_filename,'w')
+        for index in range (0,len(previous)-1):
+            objFileWrite.write(previous[index])
+        objFileWrite.write(toWrite)
+        objFileWrite.write('</root>')
+        objFileWrite.close()
+        
+        self.parse_tree(xml_filename)
+    
+    def refresh(self):
+        self.parse_tree(self.xml_path)
             
 ############################
 #    MAIN - simple test    #

@@ -9,6 +9,8 @@ import threading
 import rosgraph.masterapi
 from sr_hand.msg import sendupdate, joint, joints_data
 from sensor_msgs.msg import *
+from grasps_parser import GraspParser
+from grasps_interpoler import GraspInterpoler
 
 class Joint():
     def __init__(self, name="", motor="", min=0, max=90):
@@ -55,8 +57,8 @@ class ShadowHand_ROS():
                           Joint("elbow_abduction", "", 0,120),
                           Joint("forearm_rotation", "", -90,90)
                          ]
-        self.lastMsg = 0;
-        self.lastArmMsg = 0;
+        self.lastMsg = 0
+        self.lastArmMsg = 0
         self.cyberglove_pub = 0
         self.cyberglove_sub = 0
         self.cybergrasp_pub = 0
@@ -75,7 +77,24 @@ class ShadowHand_ROS():
         self.dict_arm_pos = {}
         self.dict_arm_tar = {}
         rospy.init_node('python_hand_library')
+        self.sendupdate_lock = threading.Lock()
+        
+        ###
+        # Grasps
+        self.grasp_parser = GraspParser()
+        process = subprocess.Popen("rospack find sr_hand".split(), stdout=subprocess.PIPE)
+        self.rootPath = process.communicate()[0]
+        self.rootPath = self.rootPath.split('\n')
+        self.rootPath = self.rootPath[0]
+        #print "path : "+self.rootPath
+        self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasp/grasps.xml")
+      
+        self.grasp_interpoler = 0
+        
         threading.Thread(None, rospy.spin)
+
+    def create_grasp_interpoler(self, current_step, next_step):
+        self.grasp_interpoler = GraspInterpoler(current_step, next_step)
 
     def callback(self, data):
         """
@@ -103,11 +122,7 @@ class ShadowHand_ROS():
             for joint in self.lastArmMsg.joints_list : 
                 self.dict_arm_pos[joint.joint_name]=joint.joint_position
                 self.dict_arm_tar[joint.joint_name]=joint.joint_target
-        
-
-    def __del__(self):
-        print('Library deleted')
-
+       
     def init_actual_joints(self):
         """
         Initializes the library with just the fingers actually connected
@@ -164,8 +179,10 @@ class ShadowHand_ROS():
         @param angle: Target of the joint, 0 if not set
         Sends a new target for the specified joint
         """
+        self.sendupdate_lock.acquire()
         message = [joint(joint_name=jointName, joint_target=angle)]
         self.pub.publish(sendupdate(len(message), message))
+        self.sendupdate_lock.release()
 
     def sendupdate_arm_from_dict(self, dicti):
         """
