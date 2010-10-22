@@ -76,7 +76,7 @@ class CybergloveCalibrer:
         
         @param description_function: specify a function you want to use to describe the calibration steps ( text / 
         pictures / animation / ... ). Must take a joint name as parameter.
-        """
+        """        
         self.calibration_steps = []
                 
         self.cyberglove = Cyberglove()
