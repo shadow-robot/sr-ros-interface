@@ -39,6 +39,9 @@ class HandJointSlider(JointSlider):
         joints_list.append(Joint("THJ4", 0, 70))
         joints_list.append(Joint("THJ5", -60, 60))
         
+        joints_list.append(Joint("WRJ1", -35, 45))
+        joints_list.append(Joint("WRJ2", -30, 10))
+        
         JointSlider.__init__(self, joints_list)
 
     def sendupdate(self, dict):
