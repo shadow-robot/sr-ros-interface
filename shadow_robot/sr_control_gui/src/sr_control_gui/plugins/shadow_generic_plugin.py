@@ -4,6 +4,7 @@ import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
 from shadowhand_ros import ShadowHand_ROS
+from PyQt4 import QtCore, QtGui, Qt
 
 import os, sys
 
@@ -27,7 +28,11 @@ class ShadowGenericPlugin(GenericPlugin):
         GenericPlugin.activate(self)
         # only activate the library if it hasn't been already loaded
         if self.parent.parent.libraries.get("sr_library") == None:
+            self.parent.emit(QtCore.SIGNAL("messageToStatusbar(QString)"), 
+                             "Loading Shadowhand Library...")
             self.parent.parent.libraries["sr_library"] = ShadowHand_ROS()
+            self.parent.emit(QtCore.SIGNAL("messageToStatusbar(QString)"), 
+                             "Shadowhand Library Loaded.")
         
     def on_close(self):
         GenericPlugin.on_close(self)

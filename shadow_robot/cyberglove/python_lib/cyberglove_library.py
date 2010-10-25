@@ -54,12 +54,11 @@ class Cyberglove:
         self.liste = 0       
         self.raw = rospy.Subscriber('/cyberglove/raw/joint_states',JointState,self.callback_raw)
         self.calibrated = rospy.Subscriber('/cyberglove/calibrated/joint_states',JointState,self.callback_calibrated)
-        #rospy.init_node('cyberglove_library')
         threading.Thread(None, rospy.spin)
         if self.has_glove():
             time.sleep(1.0)
             self.createMap()
-
+        
     def callback_raw(self, data):
         """
         Adds the last values received to the list of raw values

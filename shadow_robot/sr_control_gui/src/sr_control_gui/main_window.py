@@ -20,12 +20,13 @@ from main_widget import MainWidget
 class ReloadGraspSignalWidget(Qt.QWidget):
     reloadGraspSig = QtCore.pyqtSignal(int)
     
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(ReloadGraspSignalWidget, self).__init__(parent)
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
+        rospy.init_node('sr_control_gui')
         
         # root path
         process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
@@ -37,12 +38,12 @@ class MainWindow(QtGui.QMainWindow):
         ##        
         self.setWindowTitle("Shadow Robot Controller")
         self.resize(1000, 600)
-        self.setWindowIcon(QtGui.QIcon(self.rootPath+'/src/sr_control_gui/images/icons/app_icon.png'))
+        self.setWindowIcon(QtGui.QIcon(self.rootPath + '/src/sr_control_gui/images/icons/app_icon.png'))
                 
         ####
         # TOOLBAR
         ##
-        self.exit = QtGui.QAction(QtGui.QIcon(self.rootPath+'/src/sr_control_gui/images/icons/application-exit.png'), 'Exit', self)
+        self.exit = QtGui.QAction(QtGui.QIcon(self.rootPath + '/src/sr_control_gui/images/icons/application-exit.png'), 'Exit', self)
         self.exit.setStatusTip('Exit application')
         self.connect(self.exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
         self.toolbar = self.addToolBar('Exit')
@@ -80,12 +81,15 @@ class MainWindow(QtGui.QMainWindow):
         ####
         # MAIN WIDGET
         ##
-        self.setCentralWidget(MainWidget(self))
+        my_mdi_area = MainWidget(self)
+        self.setCentralWidget(my_mdi_area)
 
         ####
         # STATUSBAR
         ##
         self.statusBar().showMessage('Ready', 2000)
+        self.connect(my_mdi_area, QtCore.SIGNAL("messageToStatusbar(QString)"),
+                     self.statusBar(), QtCore.SLOT("showMessage(QString)"))
 
     def launch_rxgraph(self):
         subprocess.Popen("rxgraph".split())

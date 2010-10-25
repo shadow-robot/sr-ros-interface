@@ -4,6 +4,7 @@ import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
 from cyberglove_library import Cyberglove
+from PyQt4 import QtCore, QtGui, Qt
 
 import os, sys
 
@@ -27,7 +28,11 @@ class CybergloveGenericPlugin(GenericPlugin):
         GenericPlugin.activate(self)
         # only activate the library if it hasn't been already loaded
         if self.parent.parent.libraries.get("cyberglove") == None:
+            self.parent.emit(QtCore.SIGNAL("messageToStatusbar(QString)"), 
+                             "Loading Cyberglove Library...")
             self.parent.parent.libraries["cyberglove"] = Cyberglove()
+            self.parent.emit(QtCore.SIGNAL("messageToStatusbar(QString)"), 
+                             "Cyberglove Library Loaded.")
         
     def on_close(self):
         GenericPlugin.on_close(self)

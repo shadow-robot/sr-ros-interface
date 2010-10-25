@@ -76,7 +76,7 @@ class ShadowHand_ROS():
         self.dict_tar = {}
         self.dict_arm_pos = {}
         self.dict_arm_tar = {}
-        rospy.init_node('python_hand_library')
+        #rospy.init_node('python_hand_library')
         self.sendupdate_lock = threading.Lock()
         
         ###
