@@ -5,9 +5,13 @@ Calibration utility for the cyberglove.
 @author: Ugo Cupcic
 @contact: ugo@shadowrobot.com, contact@shadowrobot.com
 """
+import roslib; roslib.load_manifest('sr_control_gui')
 
 import os
 from cyberglove_library import Cyberglove
+from cyberglove.srv import Calibration as CalibrationSrv
+
+import rospy
 
 class Joint:
     """
@@ -267,6 +271,19 @@ class CybergloveCalibrer:
 
         return 0
     
+    def load_calib(self, filename):
+        if filename == "":
+            return -1
+        
+        rospy.wait_for_service('/cyberglove/calibration')
+        try:
+            calib = rospy.ServiceProxy('cyberglove/calibration', CalibrationSrv)
+            path = filename.encode("iso-8859-1")
+            resp = calib(path)
+            return resp.state
+        except rospy.ServiceException, e:
+            print 'Failed to call start service'
+            return -2
     
     
 

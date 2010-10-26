@@ -317,7 +317,7 @@ class CybergloveCalibrerPlugin(CybergloveGenericPlugin):
             if filename == "":
                 return
         
-        self.calibrer.load_calib(filename)
+        self.calibrer.load_calib(str(filename))
         
         
         

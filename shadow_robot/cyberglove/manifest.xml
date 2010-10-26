@@ -21,6 +21,7 @@
   <export>
     <cpp cflags="-I${prefix}/include/"/>
     <python path="${prefix}/python_lib"/>
+    <python path="${prefix}/src"/>
   </export>
 
 </package>
