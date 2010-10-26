@@ -310,7 +310,17 @@ class CybergloveCalibrerPlugin(CybergloveGenericPlugin):
             return
         
         self.calibrer.write_calibration_file(filename)
-    
+        
+        # QMessageBox returns 0 for yes
+        if QtGui.QMessageBox.information(self.window, 
+                                         "Load new Calibration", 
+                                         "Do you want to load the new calibration file?", 
+                                         "yes", 
+                                         "no") == 0:
+            self.load_calib(filename)
+        
+            
+        
     def load_calib(self, filename = ""):
         if filename == "":
             filename = QtGui.QFileDialog.getOpenFileName(self.window, 'Open Calibration', '')
@@ -318,6 +328,9 @@ class CybergloveCalibrerPlugin(CybergloveGenericPlugin):
                 return
         
         self.calibrer.load_calib(str(filename))
+        
+        self.parent.emit(QtCore.SIGNAL("messageToStatusbar(QString)"), 
+                         "New Cyberglove Calibration Loaded.")
         
         
         
