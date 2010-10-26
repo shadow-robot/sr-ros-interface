@@ -89,3 +89,4 @@ shadow_robot/sr_control_gui/param/GloveToHandMappings.bk
 shadow_robot/sr_hand/.settings
 shadow_robot/sr_hand/python_lib/test.py
 shadow_robot/cyberglove/.pydevproject
+shadow_robot/sr_control_gui/src/sr_control_gui/images/glove_calibration/tmp

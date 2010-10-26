@@ -69,6 +69,12 @@ def default_description(step_name, max = 0):
     else:        
         print "calibrating max values for: "+ str(step_name)
         
+def do_nothing(step_name, max = 0):
+    """
+    A function that does nothing. Used to have an empty description function.
+    """
+    nothing = True
+    
 class CybergloveCalibrer:
     """
     A utility to calibrate the cyberglove.
@@ -92,6 +98,8 @@ class CybergloveCalibrer:
         
         self.get_calibration_steps()
         
+        if description_function == None:
+            description_function = do_nothing
         self.description_function = description_function
         
     def get_calibration_steps(self):

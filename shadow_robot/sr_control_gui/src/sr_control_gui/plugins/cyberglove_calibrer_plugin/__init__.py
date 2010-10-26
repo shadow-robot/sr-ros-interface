@@ -24,7 +24,7 @@ noimage_path = rootPath + '/src/sr_control_gui/images/image-missing.png'
 class StepDescription():
     def __init__(self):
         self.text = ""
-        self.image_path = noimage_path
+        self.image_path = [noimage_path,noimage_path] 
         self.current_substep = 0
 
 class StepDescriber(QtGui.QWidget):
@@ -49,7 +49,9 @@ class StepDescriber(QtGui.QWidget):
     
     def set_description(self, description):
         self.text_description.setText(description.text)
-        self.image_description.setPixmap(QtGui.QPixmap(description.image_path))
+        index = description.current_substep
+        self.image_description.setPixmap(QtGui.QPixmap(description.image_path[index]))
+        self.image_description.repaint()
         self.repaint()
     
     
@@ -114,6 +116,8 @@ class StepSelector(QtGui.QWidget):
         self.list.clear()   
         first_item = None
         steps = self.calibrer.calibration_steps
+        index = 1
+        base_image_path = rootPath + '/src/sr_control_gui/images/glove_calibration/step'
         for step in steps:
             item = QtGui.QListWidgetItem(step.step_name)
             if first_item == None:
@@ -121,7 +125,10 @@ class StepSelector(QtGui.QWidget):
             self.list.addItem(item)
             self.steps[step.step_name] = step
             
-            self.steps_description[step.step_name] = StepDescription()
+            description = StepDescription()
+            description.image_path = [base_image_path+str(index)+"-a.jpeg", base_image_path+str(index)+"-b.jpeg"]
+            self.steps_description[step.step_name] = description
+            index = index + 1
         return first_item
     
     
@@ -246,7 +253,7 @@ class CybergloveCalibrerPlugin(CybergloveGenericPlugin):
         
         self.is_activated = True
 
-        self.calibrer = CybergloveCalibrer()
+        self.calibrer = CybergloveCalibrer(description_function = None)
 
         self.joint_names = self.parent.parent.libraries["cyberglove"].joints.keys()
         self.joint_names.sort()
