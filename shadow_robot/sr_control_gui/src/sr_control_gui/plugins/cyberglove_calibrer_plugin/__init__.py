@@ -36,9 +36,11 @@ class StepDescriber(QtGui.QWidget):
         self.layout = QtGui.QVBoxLayout()
         
         self.text_description = QtGui.QTextEdit()
+        self.text_description.setMaximumHeight(60)
         self.layout.addWidget(self.text_description)    
         
         self.image_description = QtGui.QLabel()
+        self.image_description.setMinimumSize(170, 170)
         self.layout.addWidget(self.image_description)  
         
         self.frame.setLayout(self.layout)
