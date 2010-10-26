@@ -30,7 +30,16 @@ class CybergloveGenericPlugin(GenericPlugin):
         if self.parent.parent.libraries.get("cyberglove") == None:
             self.parent.emit(QtCore.SIGNAL("messageToStatusbar(QString)"), 
                              "Loading Cyberglove Library...")
-            self.parent.parent.libraries["cyberglove"] = Cyberglove()
+            try:
+                self.parent.parent.libraries["cyberglove"] = Cyberglove()
+            except:
+                self.parent.emit(QtCore.SIGNAL("messageToStatusbar(QString)"), 
+                                 "Couldn't load the Cyberglove Library.")
+                self.window.close()
+                
+                self.parent.parent.libraries.get("cyberglove") == None
+                return
+            
             self.parent.emit(QtCore.SIGNAL("messageToStatusbar(QString)"), 
                              "Cyberglove Library Loaded.")
         

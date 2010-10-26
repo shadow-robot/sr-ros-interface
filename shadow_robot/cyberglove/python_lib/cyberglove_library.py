@@ -20,7 +20,7 @@ class Cyberglove:
     """
     Interface to the Cyberglove publisher. 
     """
-    def __init__(self, max_values = 50):
+    def __init__(self, max_values = 2):
         self.joints = { "G_ThumbRotate": Joint(),
                         "G_ThumbMPJ": Joint(),
                         "G_ThumbIJ": Joint(),
@@ -47,7 +47,6 @@ class Cyberglove:
         self.raw_messages = []
         self.calibrated_messages = []        
         self.max_values = max_values
-        self.index_to_change = 0
         self.map = {}
         self.hasglove = 0
         self.isFirstMessage = True
@@ -58,6 +57,8 @@ class Cyberglove:
         if self.has_glove():
             time.sleep(1.0)
             self.createMap()
+        else:
+            raise Exception("No glove found")
         
     def callback_raw(self, data):
         """
@@ -83,8 +84,8 @@ class Cyberglove:
         if len(vector) < self.max_values:
             vector.append(value)
         else:
-            vector[self.index_to_change] = value
-            self.index_to_change = (self.index_to_change+1)%self.max_values
+            vector.pop(0)
+            vector.append(value)
     
     def createMap(self):
         """
@@ -105,6 +106,7 @@ class Cyberglove:
             raw_value = raw_value + self.raw_messages[index].position[joint_index]
         
         raw_value = raw_value / len(self.raw_messages)
+        
         return raw_value 
     
     def read_calibrated_average_value(self, joint_name):
@@ -122,6 +124,7 @@ class Cyberglove:
             calibrated_value = calibrated_value + self.calibrated_messages[index].position[joint_index]
         
         calibrated_value = calibrated_value / len(self.calibrated_messages)
+        
         return calibrated_value
     
     def get_joints_names(self):
