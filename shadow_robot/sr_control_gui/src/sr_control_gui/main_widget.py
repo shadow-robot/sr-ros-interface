@@ -44,17 +44,40 @@ class MainWidget(QtGui.QWidget):
         
         self.plugin_actions = []
         plugin_id = 0
+        
+        cyberglove_menu = QtGui.QMenu("Cyberglove")
+        cyberglove_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/src/sr_control_gui/images/icons/iconGlove.png'))
+        hand_menu = QtGui.QMenu("Shadow Hand")
+        hand_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/src/sr_control_gui/images/icons/iconHand.png'))
+        arm_menu = QtGui.QMenu("Shadow Arm")
+        arm_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/src/sr_control_gui/images/icons/iconArm.png'))
+        
+        categories = [[cyberglove_menu,"cyberglove"], 
+                      [hand_menu, "shadowhand"], 
+                      [arm_menu, "shadowarm"],
+                      [QtGui.QMenu("Other"), ""]]
+        
         for plugin in self.plugins:
             plugin.plugin_object.set_parent(self)
             name = plugin.plugin_object.name
+            
             
             plugin.plugin_object.id = plugin_id
             action = QtGui.QAction(name, self)
             self.plugin_actions.append(action)
             self.connect(action, QtCore.SIGNAL('triggered()'), plugin.plugin_object.activate)
-            tools.addAction(action)
+            
+            for category in categories:
+                if category[1] in plugin.description.lower():
+                    category[0].addAction(action)
+                    break
+                    
             plugin_id += 1
-                        
+        
+        for category in categories:
+            if category[1] == "":
+                tools.addSeparator()
+            tools.addMenu(category[0])
         self.parent.statusBar().showMessage(str(len(self.plugins)) + ' plugins loaded.', 500)
 
         ####
