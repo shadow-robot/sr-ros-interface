@@ -52,10 +52,10 @@ class MainWidget(QtGui.QWidget):
         arm_menu = QtGui.QMenu("Shadow Arm")
         arm_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/src/sr_control_gui/images/icons/iconArm.png'))
         
-        categories = [[cyberglove_menu,"cyberglove"], 
-                      [hand_menu, "shadowhand"], 
-                      [arm_menu, "shadowarm"],
-                      [QtGui.QMenu("Other"), ""]]
+        categories = [[cyberglove_menu, "cyberglove", 0],
+                      [hand_menu, "shadowhand", 0],
+                      [arm_menu, "shadowarm", 0],
+                      [QtGui.QMenu("Other"), "", 0]]
         
         for plugin in self.plugins:
             plugin.plugin_object.set_parent(self)
@@ -70,6 +70,7 @@ class MainWidget(QtGui.QWidget):
             for category in categories:
                 if category[1] in plugin.description.lower():
                     category[0].addAction(action)
+                    category[2] = category[2] + 1
                     break
                     
             plugin_id += 1
@@ -77,6 +78,8 @@ class MainWidget(QtGui.QWidget):
         for category in categories:
             if category[1] == "":
                 tools.addSeparator()
+            if category[2] == 0:
+                category[0].setDisabled(True)
             tools.addMenu(category[0])
         self.parent.statusBar().showMessage(str(len(self.plugins)) + ' plugins loaded.', 500)
 
