@@ -1,6 +1,6 @@
 [Core]
-Name = cyberglove_calibrer_plugin
-Module = cyberglove_calibrer_plugin
+Name = cyberglove_calibrator_plugin
+Module = cyberglove_calibrator_plugin
 
 [Documentation]
 Author = Ugo Cupcic

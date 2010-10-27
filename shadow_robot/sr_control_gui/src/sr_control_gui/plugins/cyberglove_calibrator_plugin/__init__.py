@@ -233,8 +233,8 @@ class GloveMappingWidget(QtGui.QWidget):
             self.joints_frames[joint].setPalette(self.green_palette)
             self.frame.repaint()      
 
-class CybergloveCalibrerPlugin(CybergloveGenericPlugin):  
-    name = "Cyberglove Calibrer"
+class CybergloveCalibratorPlugin(CybergloveGenericPlugin):  
+    name = "Cyberglove Calibrator"
         
     def __init__(self):
         CybergloveGenericPlugin.__init__(self)
