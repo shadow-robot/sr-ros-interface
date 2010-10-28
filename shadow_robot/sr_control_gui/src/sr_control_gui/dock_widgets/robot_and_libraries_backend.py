@@ -51,6 +51,7 @@ class Library(object):
         self.ip = ""
         self.hostname = ""
         self.status = ""
+        self.is_local = True
         self.list_of_nodes = list_of_nodes
         self.start_cmd = start_cmd
         self.stop_cmd = stop_cmd
@@ -63,11 +64,16 @@ class Library(object):
     def set_local_ip(self):
         ip = socket.gethostbyname(socket.gethostname())
         self.set_ip(ip)
+        self.is_local = True
     
     def set_ip(self, ip):
         self.ip = ip
         try:
             self.hostname = socket.gethostbyaddr(str(ip))[0]
+            if self.hostname != socket.gethostbyname(socket.gethostname()):
+                self.is_local = False
+            else:
+                self.is_local = True
         except:
             self.hostname = ""
 
