@@ -14,7 +14,13 @@ from yapsy.PluginManager import PluginManager
 from PyQt4 import QtCore, QtGui, Qt
 import os, sys
 
+process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
+rootPath = process.communicate()[0]
+rootPath = rootPath.split('\n')
+rootPath = rootPath[0]
+sys.path.append(rootPath + '/src/sr_control_gui/dock_widgets')
 
+from robot_and_libraries_dock_widget import RobotAndLibrariesDockWidget
 from main_widget import MainWidget
 
 class ReloadGraspSignalWidget(Qt.QWidget):
@@ -22,6 +28,7 @@ class ReloadGraspSignalWidget(Qt.QWidget):
     
     def __init__(self, parent=None):
         super(ReloadGraspSignalWidget, self).__init__(parent)
+
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
@@ -48,7 +55,7 @@ class MainWindow(QtGui.QMainWindow):
         self.connect(self.exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
         self.toolbar = self.addToolBar('Exit')
         self.toolbar.addAction(self.exit)
-
+        
         #Shortcuts
         self.exit.setShortcut('Ctrl+Q')
 
@@ -78,6 +85,19 @@ class MainWindow(QtGui.QMainWindow):
         ##
         self.libraries = {}
 
+        ####
+        # DOCKS
+        ##
+        self.robot_and_libraries_dock = RobotAndLibrariesDockWidget(self)
+        
+        self.show_robot_and_libraries = QtGui.QAction(QtGui.QIcon(self.rootPath + '/src/sr_control_gui/images/icons/robot_libraries_hidden.png'), 'Show or hide the available robots and libraries', self)
+        self.show_robot_and_libraries.setStatusTip('Robot and libraries')
+        self.connect(self.show_robot_and_libraries, QtCore.SIGNAL('triggered()'), self.robot_and_libraries_dock.show_hide)
+        self.toolbar_docks = self.addToolBar('Docks')
+        self.toolbar_docks.addAction(self.show_robot_and_libraries)
+
+        self.addDockWidget(QtCore.Qt.TopDockWidgetArea, self.robot_and_libraries_dock)
+        
         ####
         # MAIN WIDGET
         ##
