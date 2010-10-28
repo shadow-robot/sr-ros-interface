@@ -57,8 +57,9 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         timer.start(1000 / library_refresh_rate)
     
     def edit_ip(self):
-        self.setFlags(self.flags() or QtCore.Qt.ItemIsEditable)
+        self.setFlags(self.flags() | QtCore.Qt.ItemIsEditable)
         self.parent.editItem(self, 2)
+        #print self.data(2, QtCore.Qt.EditRole)
     
     def refresh_status(self):
         self.library.get_status()
