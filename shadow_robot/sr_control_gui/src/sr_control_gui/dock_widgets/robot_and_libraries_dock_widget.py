@@ -55,11 +55,10 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         timer = QtCore.QTimer(parent)
         parent.connect(timer, QtCore.SIGNAL('timeout()'), self.refresh_status)
         timer.start(1000 / library_refresh_rate)
-    
+            
     def edit_ip(self):
         self.setFlags(self.flags() | QtCore.Qt.ItemIsEditable)
         self.parent.editItem(self, 2)
-        #print self.data(2, QtCore.Qt.EditRole)
     
     def refresh_status(self):
         self.library.get_status()
@@ -81,6 +80,18 @@ class LibraryItem(QtGui.QTreeWidgetItem):
             
             self.setBackgroundColor(0, QtGui.QColor(self.red))
             
+    def setData(self, column, role, value):
+        """
+        overload the virtual setData method to read the new ip
+        """
+        QtGui.QTreeWidgetItem.setData(self, column, role, value)
+        # if the ip address is changed
+        if column == 2:
+            try:
+                value = str(value.toString())
+                self.change_ip(value)
+            except:
+                return - 1
     
     def showContextMenu(self, point):
         self.menu.exec_(point)
@@ -99,8 +110,10 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         print "rebooting"
     
     def change_ip(self, new_ip):
-        self.library.set_ip(new_ip)
-        
+        if self.library.set_ip(new_ip) == -1:
+            rospy.logerr("Bad IP address specified - setting local IP")
+            self.library.set_local_ip()
+        self.setData(2, QtCore.Qt.DisplayRole, self.library.hostname)
         if self.library.is_local:
             self.reboot_computer_action.setDisabled(True)
         else:
@@ -170,7 +183,7 @@ class LibrariesWidget(QtGui.QWidget):
         self.connect(self.tree,
                      QtCore.SIGNAL("customContextMenuRequested(const QPoint &)"),
                      self.showContextMenu) 
-        
+                
         #self.connect(self.tree, QtCore.SIGNAL('itemDoubleClicked (QTreeWidgetItem *, int)'), 
         #             self.tree.editItem)
         for item in items:
@@ -180,7 +193,7 @@ class LibrariesWidget(QtGui.QWidget):
 
         layout.addWidget(list_frame)
         self.setLayout(layout)
-        
+                
     def showContextMenu(self, point):
         item = self.tree.itemAt(point)
         if item == None:

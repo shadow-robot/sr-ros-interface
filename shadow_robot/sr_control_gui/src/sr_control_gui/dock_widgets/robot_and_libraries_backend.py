@@ -67,6 +67,11 @@ class Library(object):
         self.is_local = True
     
     def set_ip(self, ip):
+        try:
+            socket.inet_aton(ip)
+        except socket.error:
+            # not a valid ip
+            return -1
         self.ip = ip
         try:
             self.hostname = socket.gethostbyaddr(str(ip))[0]
