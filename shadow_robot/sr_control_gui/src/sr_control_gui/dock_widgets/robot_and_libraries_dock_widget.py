@@ -263,6 +263,9 @@ class LibrariesWidget(QtGui.QWidget):
                                                      stop_cmd="rosnode kill " + " ".join(list_of_nodes),
                                                      status_cmd="rosnode list",
                                                      root_path=self.parent().parent().rootPath)
+        
+        self.robot_and_libraries_backend.add_robot("Robot Hand",
+                                                   root_path=self.parent().parent().rootPath)
 
         self.tree = QtGui.QTreeWidget()
         self.tree.setEditTriggers(Qt.QAbstractItemView.DoubleClicked)
