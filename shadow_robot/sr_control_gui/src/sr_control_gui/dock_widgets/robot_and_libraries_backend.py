@@ -56,9 +56,21 @@ class RunCommand(Qt.QThread):
             self.library.status = self.final_status
 
     def run_ssh_command(self):
-        self.ssh_client.connect(self.library.ip,
+        self.library.ssh_client.connect(self.library.ip,
                                 username=self.library.login,
                                 password=self.library.password)
+        
+        stdin, stdout, stderr = self.library.ssh_client.exec_command("source ~/.bashrc.d/ros.sh; " + 
+                                                                     self.command)
+        if stderr.readlines() != []:
+            error = "Couldn't run the command \"" 
+            error += self.command + "\"on the following ip: "
+            error += self.library.ip
+            for line in stderr.readlines():
+                error+= "\n   "+ line
+            rospy.logerr(error)
+        
+        self.library.ssh_client.close()
         
 class Library(object):
     def __init__(self, name="", list_of_nodes=[], start_cmd="", stop_cmd="", status_cmd="", root_path=""):
