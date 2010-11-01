@@ -6,17 +6,8 @@ import rospy
 from cyberglove_library import Cyberglove
 from PyQt4 import QtCore, QtGui, Qt
 
-import os, sys
-
-#Not very pretty....
-import subprocess
-process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
-rootPath = process.communicate()[0]
-rootPath = rootPath.split('\n')
-rootPath = rootPath[0]
-sys.path.append(rootPath+ "/src/sr_control_gui/plugins")
-
 from generic_plugin import GenericPlugin
+from config import *
 
 class CybergloveGenericPlugin(GenericPlugin):  
     name = "Cyberglove Robot Generic Plugin"
@@ -47,5 +38,5 @@ class CybergloveGenericPlugin(GenericPlugin):
         GenericPlugin.on_close(self)
         
     def depends(self):
-        return ["Cyberglove"]
+        return Config.cyberglove_generic_plugin_config.dependencies
         

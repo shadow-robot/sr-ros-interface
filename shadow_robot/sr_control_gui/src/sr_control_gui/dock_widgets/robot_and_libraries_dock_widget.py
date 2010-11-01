@@ -7,7 +7,7 @@ from PyQt4 import QtCore, QtGui, Qt
 
 from generic_dock_widget import GenericDockWidget
 from robot_and_libraries_backend import RobotAndLibrariesBackend, Library
-from config import Config
+from config import *
 
 class LoginForm(QtGui.QDialog):
     def __init__(self, parent, treeitem, title, library):
@@ -262,50 +262,35 @@ class LibrariesWidget(QtGui.QWidget):
         
         self.robot_and_libraries_backend = backend
         
-        list_of_nodes = ["/shadowhand"]
-        
-        self.robot_and_libraries_backend.add_library("Shadow Hand",
-                                                     list_of_nodes=list_of_nodes,
-                                                     start_cmd="roslaunch sr_hand srh_motor.launch",
-                                                     stop_cmd="rosnode kill " + " ".join(list_of_nodes),
-                                                     status_cmd="rosnode list",
+        self.robot_and_libraries_backend.add_library(Config.library_shadowhand.name,
+                                                     list_of_nodes=Config.library_shadowhand.list_of_nodes,
+                                                     start_cmd=Config.library_shadowhand.start_cmd,
+                                                     stop_cmd=Config.library_shadowhand.stop_cmd,
+                                                     status_cmd=Config.library_shadowhand.status_cmd,
                                                      root_path=self.parent().parent().rootPath)
         
-        list_of_nodes = ["/shadowarm",
-                          "/shadowhand",
-                          "/srh_robot_state_publisher_pos",
-                          "/srh_robot_state_publisher_target",
-                          "/fixed_frame_pos_pub_arm",
-                          "/fixed_frame_target_pub_arm",
-                          "/link_hand_arm_pos",
-                          "/link_hand_arm_target",
-                          "/robot_state_publisher_pos_arm",
-                          "/robot_state_publisher_target_arm"]
-        
-        self.robot_and_libraries_backend.add_library("Shadow Hand and Arm",
-                                                     list_of_nodes=list_of_nodes,
-                                                     start_cmd="roslaunch sr_hand sr_arm_motor.launch",
-                                                     stop_cmd="rosnode kill " + " ".join(list_of_nodes),
-                                                     status_cmd="rosnode list",
+        self.robot_and_libraries_backend.add_library(Config.library_shadow_arm_hand.name,
+                                                     list_of_nodes=Config.library_shadow_arm_hand.list_of_nodes,
+                                                     start_cmd=Config.library_shadow_arm_hand.start_cmd,
+                                                     stop_cmd=Config.library_shadow_arm_hand.stop_cmd,
+                                                     status_cmd=Config.library_shadow_arm_hand.status_cmd,
                                                      root_path=self.parent().parent().rootPath)
         
-        list_of_nodes = ["/cyberglove"]
-        self.robot_and_libraries_backend.add_library("Cyberglove",
-                                                     list_of_nodes=list_of_nodes,
-                                                     start_cmd="roslaunch cyberglove cyberglove.launch",
-                                                     stop_cmd="rosnode kill " + " ".join(list_of_nodes),
-                                                     status_cmd="rosnode list",
+        self.robot_and_libraries_backend.add_library(Config.library_cyberglove.name,
+                                                     list_of_nodes=Config.library_cyberglove.list_of_nodes,
+                                                     start_cmd=Config.library_cyberglove.start_cmd,
+                                                     stop_cmd=Config.library_cyberglove.stop_cmd,
+                                                     status_cmd=Config.library_cyberglove.status_cmd,
                                                      root_path=self.parent().parent().rootPath)
         
-        list_of_nodes = ["/cyberglove_remapper"]
-        self.robot_and_libraries_backend.add_library("Glove Remapper",
-                                                     list_of_nodes=list_of_nodes,
-                                                     start_cmd="roslaunch sr_remappers remapper_glove.launch",
-                                                     stop_cmd="rosnode kill " + " ".join(list_of_nodes),
-                                                     status_cmd="rosnode list",
+        self.robot_and_libraries_backend.add_library(Config.library_cyberglove_remapper.name,
+                                                     list_of_nodes=Config.library_cyberglove_remapper.list_of_nodes,
+                                                     start_cmd=Config.library_cyberglove_remapper.start_cmd,
+                                                     stop_cmd=Config.library_cyberglove_remapper.stop_cmd,
+                                                     status_cmd=Config.library_cyberglove_remapper.status_cmd,
                                                      root_path=self.parent().parent().rootPath)
         
-        self.robot_and_libraries_backend.add_robot("Robot Hand",
+        self.robot_and_libraries_backend.add_robot(Config.robot_code.name,
                                                    root_path=self.parent().parent().rootPath)
 
         self.tree = QtGui.QTreeWidget()

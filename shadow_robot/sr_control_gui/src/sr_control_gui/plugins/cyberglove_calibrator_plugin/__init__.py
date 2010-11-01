@@ -1,13 +1,8 @@
-import os, sys
+#!/usr/bin/env python
 
-#Not very pretty....
-import subprocess
-process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
-rootPath = process.communicate()[0]
-rootPath = rootPath.split('\n')
-rootPath = rootPath[0]
-sys.path.append(rootPath + "/src/sr_control_gui/plugins")
-  
+import roslib; roslib.load_manifest('sr_control_gui')
+import rospy
+
 from PyQt4 import QtCore, QtGui, Qt
 from cyberglove_generic_plugin import CybergloveGenericPlugin
 

@@ -3,6 +3,7 @@
 from yapsy.IPlugin import IPlugin
 
 from PyQt4 import QtCore, QtGui, Qt
+from config import *
 
 class MyMdiSubWindow(QtGui.QMdiSubWindow):
     def __init__(self, parent):
@@ -54,4 +55,4 @@ class GenericPlugin(IPlugin):
         self.window.close()
 
     def depends(self):
-        return []
+        return Config.generic_plugin_config.dependencies

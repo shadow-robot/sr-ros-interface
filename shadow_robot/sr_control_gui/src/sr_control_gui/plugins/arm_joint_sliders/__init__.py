@@ -1,15 +1,10 @@
-import os, sys
+#!/usr/bin/env python
 
-#Not very pretty....
-import subprocess
-process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
-rootPath = process.communicate()[0]
-rootPath = rootPath.split('\n')
-rootPath = rootPath[0]
-sys.path.append(rootPath+ "/src/sr_control_gui/plugins")
+import roslib; roslib.load_manifest('sr_control_gui')
+import rospy
 
 from joint_slider import Joint, JointSlider
-  
+from config import Config
 
 class ArmJointSlider(JointSlider):  
     name = "Arm Joint Sliders"
@@ -29,4 +24,4 @@ class ArmJointSlider(JointSlider):
         self.set_icon(self.parent.parent.rootPath + '/images/icons/iconArm.png')
     
     def depends(self):
-        return ["Shadow Hand and Arm"]
+        return Config.shadow_arm_plugin_config.dependencies

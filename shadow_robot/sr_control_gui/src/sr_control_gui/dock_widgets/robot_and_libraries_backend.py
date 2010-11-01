@@ -9,6 +9,7 @@ import paramiko
 import subprocess
 import socket
 import time
+from config import *
 
 class RunCommand(Qt.QThread):
     def __init__(self, command, final_status, library):
@@ -173,10 +174,10 @@ class Library(object):
     
 class Robot(Library):
     def __init__(self, name="", root_path=""):
-        start_cmd = "sudo /etc/init.d/robot start"
-        stop_cmd = "sudo /etc/init.d/robot stop"
+        start_cmd = Config.robot_code.start_cmd
+        stop_cmd = Config.robot_code.stop_cmd
         #to check the status we check that /proc/robot/bus/ is not empty
-        status_cmd = "ls /proc/robot/ | wc -l"
+        status_cmd = Config.robot_code.status_cmd
         Library.__init__(self, name=name, list_of_nodes=[],
                          start_cmd=start_cmd, stop_cmd=stop_cmd,
                          status_cmd=status_cmd, root_path=root_path)

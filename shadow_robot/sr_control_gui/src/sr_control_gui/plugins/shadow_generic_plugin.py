@@ -6,17 +6,8 @@ import rospy
 from shadowhand_ros import ShadowHand_ROS
 from PyQt4 import QtCore, QtGui, Qt
 
-import os, sys
-
-#Not very pretty....
-import subprocess
-process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subprocess.PIPE)
-rootPath = process.communicate()[0]
-rootPath = rootPath.split('\n')
-rootPath = rootPath[0]
-sys.path.append(rootPath+ "/src/sr_control_gui/plugins")
-
 from generic_plugin import GenericPlugin
+from config import *
 
 class ShadowGenericPlugin(GenericPlugin):  
     name = "Shadow Robot Generic Plugin"
@@ -38,4 +29,4 @@ class ShadowGenericPlugin(GenericPlugin):
         GenericPlugin.on_close(self)
     
     def depends(self):
-        return ["Shadow Hand"]
+        return Config.shadowhand_plugin_config.dependencies
