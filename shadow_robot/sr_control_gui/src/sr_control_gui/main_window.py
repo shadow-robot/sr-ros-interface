@@ -68,7 +68,7 @@ class MainWindow(QtGui.QMainWindow):
         file.addAction(self.exit)
         
         tools = self.menubar.addMenu('&Tools')
-        rxgraph = QtGui.QAction('RxPlot', self)
+        rxgraph = QtGui.QAction('RxGraph', self)
         self.connect(rxgraph, QtCore.SIGNAL('triggered()'), self.launch_rxgraph)
         robot_monitor = QtGui.QAction('Robot Monitor', self)
         self.connect(robot_monitor, QtCore.SIGNAL('triggered()'), self.launch_robot_monitor)
