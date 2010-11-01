@@ -9,7 +9,7 @@ from generic_dock_widget import GenericDockWidget
 from robot_and_libraries_backend import RobotAndLibrariesBackend, Library
 
 library_refresh_rate = 0.5
-
+library_timeout = 10
 
 class LoginForm(QtGui.QDialog):
     def __init__(self, parent, treeitem, title, library):
@@ -95,7 +95,7 @@ class LoginForm(QtGui.QDialog):
             self.reject()
         
         #restarting the timer
-        self.treeitem.timer.start(1000 / library_refresh_rate)
+        self.treeitem.timer.start()
         QtGui.QDialog.accept(self)
         
     def reject(self):
@@ -122,6 +122,7 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         
         self.green = QtGui.QColor(153, 231, 96)
         self.red = QtGui.QColor(236, 178, 178)
+        self.bright_red = QtGui.QColor(255, 78, 78)
         self.orange = QtGui.QColor(253, 166, 15)
         
         self.start_lib = QtGui.QAction('Start', self.menu)
@@ -148,29 +149,56 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         self.menu.addSeparator()
         self.menu.addAction(self.edit_ip_action)
        
+        self.error_starting_stopping_status = ""
+        self.error_starting_stopping_timer = QtCore.QTimer(parent)
+        parent.connect(self.error_starting_stopping_timer, QtCore.SIGNAL('timeout()'),
+                       self.check_error_starting_stopping)
+        self.error_starting_stopping_timer.setSingleShot(True)
+        self.error_starting_stopping_timer.setInterval(library_timeout * 1000)
+       
         self.timer = QtCore.QTimer(parent)
         parent.connect(self.timer, QtCore.SIGNAL('timeout()'), self.refresh_status)
-        self.timer.start(1000 / library_refresh_rate)
+        self.timer.setInterval(1000 / library_refresh_rate)
+        self.timer.start()
             
     def edit_ip(self):
         self.setFlags(self.flags() | QtCore.Qt.ItemIsEditable)
         self.parent.editItem(self, 3)
     
+    def check_error_starting_stopping(self):
+        print "Timeout"
+        self.library.status = "Error"
+        self.setData(2, QtCore.Qt.DisplayRole, "Error")
+        self.setBackgroundColor(2, QtGui.QColor(self.bright_red))
+        self.start_lib.setEnabled(True)
+        self.stop_lib.setEnabled(True)
+            
     def refresh_status(self):
         self.library.get_status()
         current_status = self.library.status
         self.setData(2, QtCore.Qt.DisplayRole, current_status)
-        if "ing" in current_status:
+
+        if current_status == "starting" or current_status == "stopping":
+            if not self.error_starting_stopping_timer.isActive():
+                self.error_starting_stopping_status = current_status
+
+                self.error_starting_stopping_timer.start()
             self.start_lib.setDisabled(True)
             self.stop_lib.setDisabled(True)
-            
             self.setBackgroundColor(2, QtGui.QColor(self.orange))
+            
         if current_status == "started":
+            if self.error_starting_stopping_timer.isActive():
+                if self.error_starting_stopping_status == "starting":
+                    self.error_starting_stopping_timer.stop()
             self.start_lib.setDisabled(True)
             self.stop_lib.setEnabled(True)
             
             self.setBackgroundColor(2, QtGui.QColor(self.green))
         if current_status == "stopped":
+            if self.error_starting_stopping_timer.isActive():
+                if self.error_starting_stopping_status == "stopping":
+                    self.error_starting_stopping_timer.stop()
             self.start_lib.setEnabled(True)
             self.stop_lib.setDisabled(True)
             
@@ -195,12 +223,12 @@ class LibraryItem(QtGui.QTreeWidgetItem):
     def stop_library(self):
         self.library.stop()
         self.setData(2, QtCore.Qt.DisplayRole, "stopping")
-        self.setBackgroundColor(0, QtGui.QColor(self.orange))
+        self.setBackgroundColor(2, QtGui.QColor(self.orange))
 
     def start_library(self):
         self.library.start()
         self.setData(2, QtCore.Qt.DisplayRole, "starting")
-        self.setBackgroundColor(0, QtGui.QColor(self.orange))
+        self.setBackgroundColor(2, QtGui.QColor(self.orange))
 
     def reboot_computer(self):
         print "rebooting"
@@ -216,7 +244,14 @@ class LibraryItem(QtGui.QTreeWidgetItem):
             self.setIcon(0, QtGui.QIcon(self.library.icon_local_path))
         else:
             LoginForm(self.parent, self, self.library.hostname + " login", self.library)
-        
+    
+    def close(self):
+        self.timer.stop()
+        try:
+            self.library.ssh_client.close()
+        except:
+            #the ssh client was already closed. Do nothing
+            nothing = True    
     
 class LibrariesWidget(QtGui.QWidget):
     def __init__(self, parent):
@@ -279,10 +314,10 @@ class LibrariesWidget(QtGui.QWidget):
         self.tree.setEditTriggers(Qt.QAbstractItemView.DoubleClicked)
         
         self.tree.setHeaderLabels(["", "ROS Nodes / Robot Code", "Status", "Computer"])
-        items = []
+        self.items = []
         
         for lib in self.robot_and_libraries_backend.libraries.values():
-            items.append(LibraryItem(lib, self.tree))
+            self.items.append(LibraryItem(lib, self.tree))
         
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.connect(self.tree,
@@ -291,7 +326,7 @@ class LibrariesWidget(QtGui.QWidget):
                 
         self.connect(self.tree, QtCore.SIGNAL('itemDoubleClicked (QTreeWidgetItem *, int)'),
                      self.edit_ip)
-        for item in items:
+        for item in self.items:
             self.tree.addTopLevelItem(item)
         listframe_layout.addWidget(self.tree)
         
@@ -314,7 +349,12 @@ class LibrariesWidget(QtGui.QWidget):
         point.setY(point.y() + 30)
         point = self.tree.mapToGlobal(point)
         item.showContextMenu(point)
-        
+    
+    def close(self):
+        for item in self.items:
+            item.close()
+            
+        QtGui.QWidget.close(self)
         
 class RobotsWidget(QtGui.QWidget):
     def __init__(self, parent):

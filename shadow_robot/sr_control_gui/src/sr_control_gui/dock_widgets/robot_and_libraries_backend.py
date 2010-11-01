@@ -50,7 +50,8 @@ class RunCommand(Qt.QThread):
                     all_name_found = False
                     break
             if all_name_found:
-                self.library.status = "started"
+                if "stopping" != self.library.status:
+                    self.library.status = "started"
             else:
                 if "starting" != self.library.status:
                     self.library.status = "stopped"
@@ -58,9 +59,11 @@ class RunCommand(Qt.QThread):
         elif self.final_status == "get_status_robot":
             output = output.split('\n')
             if len(output) > 1:
-                self.library.status = "started"
+                if "stopping" != self.library.status:
+                    self.library.status = "started"
             else:
-                self.library.status = "stopped"            
+                if "starting" != self.library.status:
+                    self.library.status = "stopped"            
             
         else:
             self.library.status = self.final_status
@@ -72,7 +75,6 @@ class RunCommand(Qt.QThread):
                                             password=self.library.password)
         except:
             print "Error", sys.exc_info()[0]
-            self.library.ssh_client.close()
             return
         
         stdin, stdout, stderr = self.library.ssh_client.exec_command("source ~/.bashrc.d/ros.sh; " + 
@@ -81,19 +83,22 @@ class RunCommand(Qt.QThread):
         if self.final_status == "get_status_robot":
             output = stdout.readlines()
             if int(output[0].strip('\n')) > 0:
-                self.library.status = "started"
+                if "stopping" != self.library.status:
+                    self.library.status = "started"
             else:
-                self.library.status = "stopped"
+                if "starting" != self.library.status:
+                    self.library.status = "stopped"
         
         else:
             if stderr.readlines() != []:
+                print stderr
                 error = "Couldn't run the command \"" 
                 error += self.command + "\"on the following ip: "
                 error += self.library.ip
                 for line in stderr.readlines():
                     error += "\n   " + line
                 rospy.logerr(error)
-        
+                
         self.library.ssh_client.close()
         
 class Library(object):
@@ -148,13 +153,14 @@ class Library(object):
             self.thread_status.start()
 
     def start(self):
+        self.thread_start.wait(1000)
         self.status = "starting"
         self.thread_start.start()
-
+        
     def stop(self):
+        self.thread_stop.wait(1000)
         self.status = "stopping"
         self.thread_stop.start()
-    
     
     def test_login_pwd(self, login, pwd):
         try:
@@ -170,7 +176,7 @@ class Robot(Library):
         start_cmd = "sudo /etc/init.d/robot start"
         stop_cmd = "sudo /etc/init.d/robot stop"
         #to check the status we check that /proc/robot/bus/ is not empty
-        status_cmd = "ls /proc/robot/nodes/ | wc -l"
+        status_cmd = "ls /proc/robot/ | wc -l"
         Library.__init__(self, name=name, list_of_nodes=[],
                          start_cmd=start_cmd, stop_cmd=stop_cmd,
                          status_cmd=status_cmd, root_path=root_path)
