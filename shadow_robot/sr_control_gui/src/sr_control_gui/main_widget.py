@@ -115,13 +115,21 @@ class MainWidget(QtGui.QWidget):
         refresh the activated plugins by checking if the ros nodes on which the 
         plugin depends are started or not.
         """
+        no_plugin_available = True
         for action_and_plugin in self.plugin_actions:
             dependencies = action_and_plugin[1].depends()
             activate_plugin = True
             for dependency in dependencies:
                 if self.parent.libraries[dependency].status != "started":
                     activate_plugin = False
+            
+            if activate_plugin:
+                no_plugin_available = False
+            
             action_and_plugin[0].setEnabled(activate_plugin)
+        
+        if no_plugin_available:
+            self.parent.statusBar().showMessage('No Plugins Available. Start the Libraries you need...', 2000)
         
         
         
