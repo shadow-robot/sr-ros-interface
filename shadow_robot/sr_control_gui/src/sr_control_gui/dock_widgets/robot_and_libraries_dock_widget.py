@@ -7,9 +7,7 @@ from PyQt4 import QtCore, QtGui, Qt
 
 from generic_dock_widget import GenericDockWidget
 from robot_and_libraries_backend import RobotAndLibrariesBackend, Library
-
-library_refresh_rate = 0.5
-library_timeout = 10
+from config import Config
 
 class LoginForm(QtGui.QDialog):
     def __init__(self, parent, treeitem, title, library):
@@ -154,11 +152,11 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         parent.connect(self.error_starting_stopping_timer, QtCore.SIGNAL('timeout()'),
                        self.check_error_starting_stopping)
         self.error_starting_stopping_timer.setSingleShot(True)
-        self.error_starting_stopping_timer.setInterval(library_timeout * 1000)
+        self.error_starting_stopping_timer.setInterval(Config.library_timeout * 1000)
        
         self.timer = QtCore.QTimer(parent)
         parent.connect(self.timer, QtCore.SIGNAL('timeout()'), self.refresh_status)
-        self.timer.setInterval(1000 / library_refresh_rate)
+        self.timer.setInterval(1000 / Config.library_refresh_rate)
         self.timer.start()
             
     def edit_ip(self):
