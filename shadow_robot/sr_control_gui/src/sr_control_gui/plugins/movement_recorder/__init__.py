@@ -316,11 +316,11 @@ class MovementRecorder(ShadowGenericPlugin):
     def activate(self):
         ShadowGenericPlugin.activate(self)
         
-        self.set_icon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/iconArmHand.png')
-        self.load_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/load.png'))
-        self.save_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/save.png'))
-        self.stop_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/stop.png'))
-        self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/play.png'))
+        self.set_icon(self.parent.parent.rootPath + '/images/icons/iconArmHand.png')
+        self.load_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/load.png'))
+        self.save_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/save.png'))
+        self.stop_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/stop.png'))
+        self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/play.png'))
         
         if self.first_time:                        
             self.steps = []

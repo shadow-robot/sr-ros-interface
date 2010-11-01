@@ -324,8 +324,8 @@ class GraspController(ShadowGenericPlugin):
     def activate(self):
         ShadowGenericPlugin.activate(self)
         
-        self.btn_save.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/save.png'))
-        self.set_icon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/iconHand.png')
+        self.btn_save.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/save.png'))
+        self.set_icon(self.parent.parent.rootPath + '/images/icons/iconHand.png')
         
         if self.is_activated:
             return

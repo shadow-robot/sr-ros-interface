@@ -46,4 +46,4 @@ class HandJointSlider(JointSlider):
 
     def sendupdate(self, dict):
         self.parent.parent.libraries["sr_library"].sendupdate_from_dict(dict)
-        self.set_icon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/iconHand.png')
+        self.set_icon(self.parent.parent.rootPath + '/images/icons/iconHand.png')

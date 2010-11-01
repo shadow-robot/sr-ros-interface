@@ -46,11 +46,11 @@ class MainWidget(QtGui.QWidget):
         plugin_id = 0
         
         cyberglove_menu = QtGui.QMenu("Cyberglove")
-        cyberglove_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/src/sr_control_gui/images/icons/iconGlove.png'))
+        cyberglove_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconGlove.png'))
         hand_menu = QtGui.QMenu("Shadow Hand")
-        hand_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/src/sr_control_gui/images/icons/iconHand.png'))
+        hand_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconHand.png'))
         arm_menu = QtGui.QMenu("Shadow Arm")
-        arm_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/src/sr_control_gui/images/icons/iconArm.png'))
+        arm_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconArm.png'))
         
         categories = [[cyberglove_menu, "cyberglove", 0],
                       [hand_menu, "shadowhand", 0],

@@ -45,12 +45,12 @@ class MainWindow(QtGui.QMainWindow):
         ##        
         self.setWindowTitle("Shadow Robot Controller")
         self.resize(1000, 600)
-        self.setWindowIcon(QtGui.QIcon(self.rootPath + '/src/sr_control_gui/images/icons/app_icon.png'))
+        self.setWindowIcon(QtGui.QIcon(self.rootPath + '/images/icons/app_icon.png'))
                 
         ####
         # TOOLBAR
         ##
-        self.exit = QtGui.QAction(QtGui.QIcon(self.rootPath + '/src/sr_control_gui/images/icons/application-exit.png'), 'Exit', self)
+        self.exit = QtGui.QAction(QtGui.QIcon(self.rootPath + '/images/icons/application-exit.png'), 'Exit', self)
         self.exit.setStatusTip('Exit application')
         self.connect(self.exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
         self.toolbar = self.addToolBar('Exit')

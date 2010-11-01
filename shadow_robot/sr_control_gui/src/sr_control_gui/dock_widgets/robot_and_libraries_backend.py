@@ -109,9 +109,9 @@ class Library(object):
         self.status = ""
         self.login = ""
         self.password = ""
-        self.icon_local_path = root_path + '/src/sr_control_gui/images/icons/local.png'
-        self.icon_remote_path = root_path + '/src/sr_control_gui/images/icons/remote.png'
-        self.icon_library_path = root_path + '/src/sr_control_gui/images/icons/ros.jpg'
+        self.icon_local_path = root_path + '/images/icons/local.png'
+        self.icon_remote_path = root_path + '/images/icons/remote.png'
+        self.icon_library_path = root_path + '/images/icons/ros.jpg'
         self.is_local = True
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -180,7 +180,7 @@ class Robot(Library):
         Library.__init__(self, name=name, list_of_nodes=[],
                          start_cmd=start_cmd, stop_cmd=stop_cmd,
                          status_cmd=status_cmd, root_path=root_path)
-        self.icon_library_path = root_path + '/src/sr_control_gui/images/icons/iconArmHand.png'
+        self.icon_library_path = root_path + '/images/icons/iconArmHand.png'
         
         self.thread_status = RunCommand(self.status_cmd, "get_status_robot", self)
    

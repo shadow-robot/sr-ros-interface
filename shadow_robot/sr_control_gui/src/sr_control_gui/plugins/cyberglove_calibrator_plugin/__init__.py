@@ -19,7 +19,7 @@ process = subprocess.Popen("rospack find sr_control_gui".split(), stdout=subproc
 rootPath = process.communicate()[0]
 rootPath = rootPath.split('\n')
 rootPath = rootPath[0]
-noimage_path = rootPath + '/src/sr_control_gui/images/image-missing.png'
+noimage_path = rootPath + '/images/image-missing.png'
 
 class StepDescription():
     def __init__(self):
@@ -119,7 +119,7 @@ class StepSelector(QtGui.QWidget):
         first_item = None
         steps = self.calibrer.calibration_steps
         index = 1
-        base_image_path = rootPath + '/src/sr_control_gui/images/glove_calibration/step'
+        base_image_path = rootPath + '/images/glove_calibration/step'
         for step in steps:
             item = QtGui.QListWidgetItem(step.step_name)
             if first_item == None:
@@ -249,7 +249,7 @@ class CybergloveCalibratorPlugin(CybergloveGenericPlugin):
 
     def activate(self):
         CybergloveGenericPlugin.activate(self)
-        self.set_icon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/iconGlove.png')
+        self.set_icon(self.parent.parent.rootPath + '/images/icons/iconGlove.png')
         if self.is_activated:
             return
         
@@ -274,14 +274,14 @@ class CybergloveCalibratorPlugin(CybergloveGenericPlugin):
         btn_calibrate = QtGui.QPushButton()
         btn_calibrate.setText("Calibrate")
         btn_calibrate.setToolTip("Calibrate the current selected step")
-        btn_calibrate.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/calibrate.png'))
+        btn_calibrate.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/calibrate.png'))
         btn_layout.addWidget(btn_calibrate)
         btn_frame.connect(btn_calibrate, QtCore.SIGNAL('clicked()'), self.calibrate_current_step)
         
         self.btn_save = QtGui.QPushButton()
         self.btn_save.setText("Save")
         self.btn_save.setToolTip("Save the current calibration")
-        self.btn_save.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/save.png'))
+        self.btn_save.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/save.png'))
         self.btn_save.setDisabled(True)
         btn_layout.addWidget(self.btn_save)
         btn_frame.connect(self.btn_save, QtCore.SIGNAL('clicked()'), self.save_calib)
@@ -289,7 +289,7 @@ class CybergloveCalibratorPlugin(CybergloveGenericPlugin):
         btn_load = QtGui.QPushButton()
         btn_load.setText("Load")
         btn_load.setToolTip("Load a Glove calibration")
-        btn_load.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/src/sr_control_gui/images/icons/load.png'))
+        btn_load.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/load.png'))
         btn_layout.addWidget(btn_load)
         btn_frame.connect(btn_load, QtCore.SIGNAL('clicked()'), self.load_calib)
         
