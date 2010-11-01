@@ -4,6 +4,7 @@ import roslib; roslib.load_manifest('sr_control_gui')
 from PyQt4 import QtCore, QtGui, Qt
 import rospy
 
+import sys
 import paramiko
 import subprocess
 import socket
@@ -65,15 +66,21 @@ class RunCommand(Qt.QThread):
             self.library.status = self.final_status
 
     def run_ssh_command(self):
-        self.library.ssh_client.connect(self.library.ip,
-                                username=self.library.login,
-                                password=self.library.password)
+        try:
+            self.library.ssh_client.connect(self.library.ip,
+                                            username=self.library.login,
+                                            password=self.library.password)
+        except:
+            print "Error", sys.exc_info()[0]
+            self.library.ssh_client.close()
+            return
         
-        stdin, stdout, stderr = self.library.ssh_client.exec_command("source ~/.bashrc.d/ros.sh; " +
-                                                                     self.command) 
+        stdin, stdout, stderr = self.library.ssh_client.exec_command("source ~/.bashrc.d/ros.sh; " + 
+                                                                     self.command)
+        
         if self.final_status == "get_status_robot":
             output = stdout.readlines()
-            if len(output) > 1:
+            if int(output[0].strip('\n')) > 0:
                 self.library.status = "started"
             else:
                 self.library.status = "stopped"

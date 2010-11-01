@@ -92,13 +92,19 @@ class LoginForm(QtGui.QDialog):
             self.treeitem.setIcon(0, QtGui.QIcon(self.library.icon_remote_path))
         else:
             rospy.logerr("Wrong password - setting local IP")
-            self.library.set_local_ip()
-            self.treeitem.setData(3, QtCore.Qt.DisplayRole, self.library.hostname)
-            self.treeitem.reboot_computer_action.setDisabled(True)
-            self.treeitem.setIcon(0, QtGui.QIcon(self.library.icon_local_path))
-            QtGui.QDialog.reject(self)
+            self.reject()
         
+        #restarting the timer
+        self.treeitem.timer.start(1000 / library_refresh_rate)
         QtGui.QDialog.accept(self)
+        
+    def reject(self):
+        self.library.set_local_ip()
+        self.treeitem.setData(3, QtCore.Qt.DisplayRole, self.library.hostname)
+        self.treeitem.reboot_computer_action.setDisabled(True)
+        self.treeitem.setIcon(0, QtGui.QIcon(self.library.icon_local_path))
+        
+        QtGui.QDialog.reject(self)
 
 class LibraryItem(QtGui.QTreeWidgetItem):
     def __init__(self, library, parent):
@@ -142,9 +148,9 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         self.menu.addSeparator()
         self.menu.addAction(self.edit_ip_action)
        
-        timer = QtCore.QTimer(parent)
-        parent.connect(timer, QtCore.SIGNAL('timeout()'), self.refresh_status)
-        timer.start(1000 / library_refresh_rate)
+        self.timer = QtCore.QTimer(parent)
+        parent.connect(self.timer, QtCore.SIGNAL('timeout()'), self.refresh_status)
+        self.timer.start(1000 / library_refresh_rate)
             
     def edit_ip(self):
         self.setFlags(self.flags() | QtCore.Qt.ItemIsEditable)
@@ -200,6 +206,7 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         print "rebooting"
     
     def change_ip(self, new_ip):
+        self.timer.stop()
         if self.library.set_ip(new_ip) == -1:
             rospy.logerr("Bad IP address specified - setting local IP")
             self.library.set_local_ip()
@@ -209,7 +216,8 @@ class LibraryItem(QtGui.QTreeWidgetItem):
             self.setIcon(0, QtGui.QIcon(self.library.icon_local_path))
         else:
             LoginForm(self.parent, self, self.library.hostname + " login", self.library)
-           
+        
+    
 class LibrariesWidget(QtGui.QWidget):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self, parent=parent)
