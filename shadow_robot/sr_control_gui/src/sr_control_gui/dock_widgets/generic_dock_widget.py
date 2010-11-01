@@ -16,8 +16,8 @@ class GenericDockWidget(QtGui.QDockWidget):
         if self.shown:
             self.hide()
             self.shown = False
-            self.parent().show_robot_and_libraries.setIcon(QtGui.QIcon(self.parent().rootPath + '/src/sr_control_gui/images/icons/robot_libraries_hidden.png'))
+            self.parent().show_robot_and_libraries.setText('Show Robot / Ros nodes')
         else:
             self.show()
             self.shown = True
-            self.parent().show_robot_and_libraries.setIcon(QtGui.QIcon(self.parent().rootPath + '/src/sr_control_gui/images/icons/robot_libraries_shown.png'))
+            self.parent().show_robot_and_libraries.setText('Hide Robot / Ros nodes')

@@ -90,12 +90,18 @@ class MainWindow(QtGui.QMainWindow):
         ##
         self.robot_and_libraries_dock = RobotAndLibrariesDockWidget(self)
         
-        self.show_robot_and_libraries = QtGui.QAction(QtGui.QIcon(self.rootPath + '/src/sr_control_gui/images/icons/robot_libraries_hidden.png'), 'Show or hide the available robots and libraries', self)
+        self.show_robot_and_libraries = QtGui.QAction('Show Robot / Ros nodes', self)
         self.show_robot_and_libraries.setStatusTip('Robot and libraries')
         self.connect(self.show_robot_and_libraries, QtCore.SIGNAL('triggered()'), self.robot_and_libraries_dock.show_hide)
+        
+        spacer = QtGui.QWidget()
+        spacer.setSizePolicy(Qt.QSizePolicy.Expanding, Qt.QSizePolicy.Expanding)
+                
         self.toolbar_docks = self.addToolBar('Docks')
+        self.toolbar_docks.addWidget(spacer)
         self.toolbar_docks.addAction(self.show_robot_and_libraries)
-
+        
+        
         self.addDockWidget(QtCore.Qt.TopDockWidgetArea, self.robot_and_libraries_dock)
         
         ####
