@@ -52,4 +52,6 @@ class GenericPlugin(IPlugin):
     def on_close(self):
         self.is_window_opened = False
         self.window.close()
-    #    print "toto parent"
+
+    def depends(self):
+        return []

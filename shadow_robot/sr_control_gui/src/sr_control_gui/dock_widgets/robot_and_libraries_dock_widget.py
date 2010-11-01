@@ -252,7 +252,7 @@ class LibraryItem(QtGui.QTreeWidgetItem):
             nothing = True    
     
 class LibrariesWidget(QtGui.QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, backend):
         QtGui.QWidget.__init__(self, parent=parent)
                
         layout = QtGui.QHBoxLayout()
@@ -260,7 +260,7 @@ class LibrariesWidget(QtGui.QWidget):
         list_frame = QtGui.QFrame(self)
         listframe_layout = QtGui.QVBoxLayout()
         
-        self.robot_and_libraries_backend = RobotAndLibrariesBackend()
+        self.robot_and_libraries_backend = backend
         
         list_of_nodes = ["/shadowhand"]
         
@@ -364,14 +364,14 @@ class RobotsWidget(QtGui.QWidget):
         self.setLayout(layout)
 
 class RobotAndLibrariesDockWidget(GenericDockWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, backend):
         GenericDockWidget.__init__(self, parent=parent)
         
         
         frame = QtGui.QFrame()
         layout = QtGui.QHBoxLayout()
         
-        libraries = LibrariesWidget(self)
+        libraries = LibrariesWidget(self, backend)
         robots = RobotsWidget(self)
         
         layout.addWidget(libraries)

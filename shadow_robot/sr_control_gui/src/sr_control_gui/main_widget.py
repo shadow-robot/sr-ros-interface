@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.ERROR)
 from yapsy.PluginManager import PluginManager, IPlugin
 from PyQt4 import Qt, QtCore, QtGui, QtWebKit
 import os, sys
+from config import Config
 
 class MainWidget(QtGui.QWidget):
     def __init__(self, parent):
@@ -64,7 +65,8 @@ class MainWidget(QtGui.QWidget):
             
             plugin.plugin_object.id = plugin_id
             action = QtGui.QAction(name, self)
-            self.plugin_actions.append(action)
+            action.setDisabled(True)
+            self.plugin_actions.append([action, plugin.plugin_object])
             self.connect(action, QtCore.SIGNAL('triggered()'), plugin.plugin_object.activate)
             
             for category in categories:
@@ -84,6 +86,14 @@ class MainWidget(QtGui.QWidget):
         self.parent.statusBar().showMessage(str(len(self.plugins)) + ' plugins loaded.', 500)
 
         ####
+        # Enable / Disable plugins depending on the loaded libraries
+        ##
+        self.timer = QtCore.QTimer(self)
+        self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.refresh_activated_plugins)
+        self.timer.setInterval(1000 / Config.main_widget_refresh_rate)
+        self.timer.start()
+
+        ####
         # Add view menu
         ##
         view = self.parent.menuBar().addMenu('&Window')
@@ -99,8 +109,19 @@ class MainWidget(QtGui.QWidget):
         
     def cascade(self):
         self.container.cascadeSubWindows()
-        
-        
+    
+    def refresh_activated_plugins(self):
+        """
+        refresh the activated plugins by checking if the ros nodes on which the 
+        plugin depends are started or not.
+        """
+        for action_and_plugin in self.plugin_actions:
+            dependencies = action_and_plugin[1].depends()
+            activate_plugin = True
+            for dependency in dependencies:
+                if self.parent.libraries[dependency].status != "started":
+                    activate_plugin = False
+            action_and_plugin[0].setEnabled(activate_plugin)
         
         
         

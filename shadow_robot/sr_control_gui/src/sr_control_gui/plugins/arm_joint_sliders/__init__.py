@@ -27,3 +27,6 @@ class ArmJointSlider(JointSlider):
     def sendupdate(self, dict):
         self.parent.parent.libraries["sr_library"].sendupdate_arm_from_dict(dict)
         self.set_icon(self.parent.parent.rootPath + '/images/icons/iconArm.png')
+    
+    def depends(self):
+        return ["Shadow Hand and Arm"]

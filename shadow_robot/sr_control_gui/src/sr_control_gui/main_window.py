@@ -21,6 +21,7 @@ rootPath = rootPath[0]
 sys.path.append(rootPath + '/src/sr_control_gui/dock_widgets')
 
 from robot_and_libraries_dock_widget import RobotAndLibrariesDockWidget
+from robot_and_libraries_backend import RobotAndLibrariesBackend
 from main_widget import MainWidget
 
 class ReloadGraspSignalWidget(Qt.QWidget):
@@ -81,14 +82,11 @@ class MainWindow(QtGui.QMainWindow):
         self.reload_grasp_signal_widget = ReloadGraspSignalWidget()            
 
         ####
-        # LIBRARIES
-        ##
-        self.libraries = {}
-
-        ####
         # DOCKS
         ##
-        self.robot_and_libraries_dock = RobotAndLibrariesDockWidget(self)
+        self.robot_and_libraries_backend = RobotAndLibrariesBackend()
+        
+        self.robot_and_libraries_dock = RobotAndLibrariesDockWidget(self, self.robot_and_libraries_backend)
         
         self.show_robot_and_libraries = QtGui.QAction('Show Robot / Ros nodes', self)
         self.show_robot_and_libraries.setStatusTip('Robot and libraries')
@@ -101,9 +99,13 @@ class MainWindow(QtGui.QMainWindow):
         self.toolbar_docks.addWidget(spacer)
         self.toolbar_docks.addAction(self.show_robot_and_libraries)
         
-        
         self.addDockWidget(QtCore.Qt.TopDockWidgetArea, self.robot_and_libraries_dock)
-        
+
+        ####
+        # LIBRARIES
+        ##
+        self.libraries = self.robot_and_libraries_backend.libraries
+                
         ####
         # MAIN WIDGET
         ##

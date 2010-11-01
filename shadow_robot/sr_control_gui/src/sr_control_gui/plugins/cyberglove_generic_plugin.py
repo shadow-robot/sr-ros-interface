@@ -46,3 +46,6 @@ class CybergloveGenericPlugin(GenericPlugin):
     def on_close(self):
         GenericPlugin.on_close(self)
         
+    def depends(self):
+        return ["Cyberglove"]
+        
