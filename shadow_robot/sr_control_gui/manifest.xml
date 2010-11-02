@@ -11,6 +11,9 @@
   <depend package="sensor_msgs"/>
   <depend package="cyberglove"/>
   <rosdep name="python-scipy"/>
+  <rosdep name="paramiko"/>
+  <rosdep name="pyqt4"/>
+  <rosdep name="yapsy"/>
   <export>
     <rosdoc config="rosdoc.yaml" />
     <python path="${prefix}/src/sr_control_gui"/>

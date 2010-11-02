@@ -1,0 +1,10 @@
+pyqt4:
+  ubuntu: python-qt4-dev python-qt4
+  debian: python-qt4-dev python-qt4
+
+yapsy:
+  ubuntu: |
+    sudo easy_install yapsy
+  debian: |
+    sudo easy_install yapsy
+
