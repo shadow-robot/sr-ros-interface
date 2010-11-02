@@ -84,13 +84,13 @@ class MainWindow(QtGui.QMainWindow):
         ####
         # DOCKS
         ##
-        self.robot_and_libraries_backend = RobotAndLibrariesBackend()
-        
-        self.robot_and_libraries_dock = RobotAndLibrariesDockWidget(self, self.robot_and_libraries_backend)
-        
         self.show_robot_and_libraries = QtGui.QAction('Show Robot / Ros nodes', self)
         self.show_robot_and_libraries.setIcon(QtGui.QIcon(self.rootPath + '/images/icons/show.png'))
         self.show_robot_and_libraries.setStatusTip('Robot and libraries')
+        
+        self.robot_and_libraries_backend = RobotAndLibrariesBackend()
+        self.robot_and_libraries_dock = RobotAndLibrariesDockWidget(self, self.robot_and_libraries_backend)
+        
         self.connect(self.show_robot_and_libraries, QtCore.SIGNAL('triggered()'), self.robot_and_libraries_dock.show_hide)
         
         spacer = QtGui.QWidget()

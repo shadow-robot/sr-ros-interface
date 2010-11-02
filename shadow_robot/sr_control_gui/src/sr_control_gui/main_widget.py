@@ -130,7 +130,7 @@ class MainWidget(QtGui.QWidget):
         
         if no_plugin_available:
             self.parent.statusBar().showMessage('No Plugins Available. Start the Libraries you need...', 2000)
-        
+            self.parent.robot_and_libraries_dock.show()
         
         
         
