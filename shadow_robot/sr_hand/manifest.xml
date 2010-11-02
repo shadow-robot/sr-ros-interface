@@ -18,13 +18,7 @@
   <depend package="diagnostic_msgs"/>
   <depend package="kdl_parser"/>
   <depend package="dynamic_reconfigure"/>
-  <depend package="robot_monitor"/>
-  <depend package="diagnostic_aggregator"/>
-  <depend package="robot_state_publisher"/>
-<!--  <depend package="rviz"/>
-  <depend package="gazebo_worlds"/> 
-  <depend package="pr2_gazebo_plugins"/>
-  <depend package="pr2_mechanism_controllers"/> -->
+  <depend package="sr_convenient_dependencies"/>
   <export>
 	<cpp cflags="-I${prefix}/include"/>
 	<python path="${prefix}/python_lib"/>
