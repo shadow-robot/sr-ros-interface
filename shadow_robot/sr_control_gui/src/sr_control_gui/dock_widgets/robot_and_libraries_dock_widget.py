@@ -313,7 +313,7 @@ class LibrariesWidget(QtGui.QWidget):
         self.tree = QtGui.QTreeWidget()
         self.tree.setEditTriggers(Qt.QAbstractItemView.DoubleClicked)
         
-        self.tree.setHeaderLabels(["", "ROS Nodes / Robot Code", "Status", "Computer", "Real / Virtual"])
+        self.tree.setHeaderLabels(["", "ROS Nodes / Robot Code", "Status", "Computer"])
         self.items = []
         
         for lib in self.robot_and_libraries_backend.libraries.values():
@@ -328,24 +328,6 @@ class LibrariesWidget(QtGui.QWidget):
                      self.edit_ip)
         for item in self.items:
             self.tree.addTopLevelItem(item)
-        for item in self.items:
-            if Config.library_shadowhand.name == item.library.name: 
-                virtual_real_combo_box = QtGui.QComboBox(self.tree)
-                virtual_real_combo_box.addItem("virtual")
-                virtual_real_combo_box.addItem("real")
-                self.tree.connect(virtual_real_combo_box, QtCore.SIGNAL('activated(QString)'), self.virtual_real_hand_choosed)
-                self.tree.setItemWidget(item, 4, virtual_real_combo_box)
-                
-            elif Config.library_shadow_arm_hand.name == item.library.name: 
-                virtual_real_combo_box = QtGui.QComboBox(self.tree)
-                virtual_real_combo_box.addItem("virtual arm / virtual hand")
-                virtual_real_combo_box.addItem("virtual arm / real hand")
-                virtual_real_combo_box.addItem("real arm / virtual hand")
-                virtual_real_combo_box.addItem("real arm / real hand")
-                virtual_real_combo_box.model().item(2).setEnabled(False)
-                virtual_real_combo_box.model().item(3).setEnabled(False)
-                self.tree.connect(virtual_real_combo_box, QtCore.SIGNAL('activated(QString)'), self.virtual_real_arm_hand_choosed)
-                self.tree.setItemWidget(item, 4, virtual_real_combo_box)
         listframe_layout.addWidget(self.tree)
         
         self.tree.resizeColumnToContents(0)
@@ -358,12 +340,6 @@ class LibrariesWidget(QtGui.QWidget):
         layout.addWidget(list_frame)
         self.setLayout(layout)
 
-    def virtual_real_hand_choosed(self, string):
-        print str(string)
-
-    def virtual_real_arm_hand_choosed(self, string):
-        print str(string)
-        
     def edit_ip(self, item, value):
         item.edit_ip()
     
