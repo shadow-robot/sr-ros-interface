@@ -144,7 +144,6 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         self.edit_ip_action = QtGui.QAction('Modify the IP address', self.menu)
         self.menu.connect(self.edit_ip_action, QtCore.SIGNAL('triggered()'), self.edit_ip)
         
-        
         if self.library.is_local:
             self.reboot_computer_action.setDisabled(True)
             self.setIcon(0, QtGui.QIcon(self.library.icon_local_path))
@@ -260,7 +259,6 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         
         cursor.setShape(QtCore.Qt.ArrowCursor)
         self.parent.setCursor(cursor)
-
     
     def close(self):
         self.timer.stop()
@@ -315,7 +313,7 @@ class LibrariesWidget(QtGui.QWidget):
         self.tree = QtGui.QTreeWidget()
         self.tree.setEditTriggers(Qt.QAbstractItemView.DoubleClicked)
         
-        self.tree.setHeaderLabels(["", "ROS Nodes / Robot Code", "Status", "Computer"])
+        self.tree.setHeaderLabels(["", "ROS Nodes / Robot Code", "Status", "Computer", "Real / Virtual"])
         self.items = []
         
         for lib in self.robot_and_libraries_backend.libraries.values():
@@ -330,17 +328,42 @@ class LibrariesWidget(QtGui.QWidget):
                      self.edit_ip)
         for item in self.items:
             self.tree.addTopLevelItem(item)
+        for item in self.items:
+            if Config.library_shadowhand.name == item.library.name: 
+                virtual_real_combo_box = QtGui.QComboBox(self.tree)
+                virtual_real_combo_box.addItem("virtual")
+                virtual_real_combo_box.addItem("real")
+                self.tree.connect(virtual_real_combo_box, QtCore.SIGNAL('activated(QString)'), self.virtual_real_hand_choosed)
+                self.tree.setItemWidget(item, 4, virtual_real_combo_box)
+                
+            elif Config.library_shadow_arm_hand.name == item.library.name: 
+                virtual_real_combo_box = QtGui.QComboBox(self.tree)
+                virtual_real_combo_box.addItem("virtual arm / virtual hand")
+                virtual_real_combo_box.addItem("virtual arm / real hand")
+                virtual_real_combo_box.addItem("real arm / virtual hand")
+                virtual_real_combo_box.addItem("real arm / real hand")
+                virtual_real_combo_box.model().item(2).setEnabled(False)
+                virtual_real_combo_box.model().item(3).setEnabled(False)
+                self.tree.connect(virtual_real_combo_box, QtCore.SIGNAL('activated(QString)'), self.virtual_real_arm_hand_choosed)
+                self.tree.setItemWidget(item, 4, virtual_real_combo_box)
         listframe_layout.addWidget(self.tree)
         
         self.tree.resizeColumnToContents(0)
         self.tree.resizeColumnToContents(1)
+        self.tree.resizeColumnToContents(4)
         #don't resize col 2 and 3 as they contain dynamic content
         
         list_frame.setLayout(listframe_layout)
 
         layout.addWidget(list_frame)
         self.setLayout(layout)
-    
+
+    def virtual_real_hand_choosed(self, string):
+        print str(string)
+
+    def virtual_real_arm_hand_choosed(self, string):
+        print str(string)
+        
     def edit_ip(self, item, value):
         item.edit_ip()
     
@@ -370,7 +393,6 @@ class RobotsWidget(QtGui.QWidget):
 class RobotAndLibrariesDockWidget(GenericDockWidget):
     def __init__(self, parent, backend):
         GenericDockWidget.__init__(self, parent=parent)
-        
         
         frame = QtGui.QFrame()
         layout = QtGui.QHBoxLayout()
