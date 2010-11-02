@@ -119,7 +119,7 @@ class MainWindow(QtGui.QMainWindow):
         self.statusBar().showMessage('Ready', 2000)
         self.connect(my_mdi_area, QtCore.SIGNAL("messageToStatusbar(QString)"),
                      self.statusBar(), QtCore.SLOT("showMessage(QString)"))
-
+        
     def launch_rxgraph(self):
         subprocess.Popen("rxgraph".split())
 

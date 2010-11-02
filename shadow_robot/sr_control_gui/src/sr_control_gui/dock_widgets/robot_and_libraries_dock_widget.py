@@ -237,7 +237,7 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         self.setBackgroundColor(2, QtGui.QColor(self.orange))
 
     def reboot_computer(self):
-        print "rebooting"
+        rospy.logerr("reboot not yet implemented")
     
     def change_ip(self, new_ip):
         cursor = Qt.QCursor()
@@ -313,7 +313,8 @@ class LibrariesWidget(QtGui.QWidget):
         self.tree = QtGui.QTreeWidget()
         self.tree.setEditTriggers(Qt.QAbstractItemView.DoubleClicked)
         
-        self.tree.setHeaderLabels(["", "ROS Nodes / Robot Code", "Status", "Computer"])
+        self.tree.setHeaderLabels(["", "ROS Nodes / Robot Code", "Status", "Computer", "Info"])
+        
         self.items = []
         
         for lib in self.robot_and_libraries_backend.libraries.values():
