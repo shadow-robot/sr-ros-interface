@@ -78,6 +78,10 @@ class LoginForm(QtGui.QDialog):
         self.btn_ok.setDisabled(True)
     
     def accept(self):
+        cursor = Qt.QCursor()
+        cursor.setShape(QtCore.Qt.WaitCursor)
+        self.setCursor(cursor)
+        
         login = str(self.login_input.text())
         pwd = str(self.pwd_input.text())
         
@@ -90,8 +94,13 @@ class LoginForm(QtGui.QDialog):
             self.treeitem.setIcon(0, QtGui.QIcon(self.library.icon_remote_path))
         else:
             rospy.logerr("Wrong password - setting local IP")
+            cursor.setShape(QtCore.Qt.ArrowCursor)
+            self.setCursor(cursor)
+        
             self.reject()
         
+        cursor.setShape(QtCore.Qt.ArrowCursor)
+        self.setCursor(cursor)
         #restarting the timer
         self.treeitem.timer.start()
         QtGui.QDialog.accept(self)
@@ -232,8 +241,14 @@ class LibraryItem(QtGui.QTreeWidgetItem):
         print "rebooting"
     
     def change_ip(self, new_ip):
+        cursor = Qt.QCursor()
+        cursor.setShape(QtCore.Qt.WaitCursor)
+        self.parent.setCursor(cursor)
+        
         self.timer.stop()
-        if self.library.set_ip(new_ip) == -1:
+        if new_ip == "local":
+            self.library.set_local_ip()
+        elif self.library.set_ip(new_ip) == -1:
             rospy.logerr("Bad IP address specified - setting local IP")
             self.library.set_local_ip()
         self.setData(3, QtCore.Qt.DisplayRole, self.library.hostname)
@@ -242,6 +257,10 @@ class LibraryItem(QtGui.QTreeWidgetItem):
             self.setIcon(0, QtGui.QIcon(self.library.icon_local_path))
         else:
             LoginForm(self.parent, self, self.library.hostname + " login", self.library)
+        
+        cursor.setShape(QtCore.Qt.ArrowCursor)
+        self.parent.setCursor(cursor)
+
     
     def close(self):
         self.timer.stop()
