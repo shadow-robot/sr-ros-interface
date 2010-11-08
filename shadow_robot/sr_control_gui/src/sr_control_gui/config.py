@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-
+"""
+File containing all the configuration parameters. 
+"""
 
 class GenericPluginConfig(object):
     dependencies = []

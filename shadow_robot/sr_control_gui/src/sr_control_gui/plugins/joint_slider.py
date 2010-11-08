@@ -12,12 +12,18 @@ from shadow_generic_plugin import ShadowGenericPlugin
 import math
 
 class Joint():
+    """
+    Contains the name, the min and the max for the joints.
+    """
     def __init__(self, name="", min=0, max=90):
         self.name = name
         self.min = min
         self.max = max
 
 class ExtendedSlider(QtGui.QWidget):
+    """
+    This slider displays the current position and the target as well.
+    """
     def __init__(self, joint, plugin_parent):
         QtGui.QWidget.__init__(self)
         self.plugin_parent = plugin_parent
@@ -105,6 +111,10 @@ class ExtendedSuperSlider(ExtendedSlider):
         return
 
 class JointSlider(ShadowGenericPlugin):  
+    """
+    A generic class used to easily create new joint slider plugins, for the user
+    to move the joints using sliders.
+    """
     name = "Joint Slider"
     
     def __init__(self, joints_list):

@@ -17,12 +17,18 @@ rootPath = rootPath[0]
 noimage_path = rootPath + '/images/image-missing.png'
 
 class StepDescription():
+    """
+    Stores the description / images path for a given step.
+    """
     def __init__(self):
         self.text = ""
         self.image_path = [noimage_path,noimage_path] 
         self.current_substep = 0
 
 class StepDescriber(QtGui.QWidget):
+    """
+    Displays the description / images for the current step.
+    """
     def __init__(self, parent):
         QtGui.QWidget.__init__(self, parent=parent)
         
@@ -54,6 +60,9 @@ class StepDescriber(QtGui.QWidget):
     
         
 class StepSelector(QtGui.QWidget):
+    """
+    The user can select the step to calibrate through this widget.
+    """
     def __init__(self, parent, calibrer):
         QtGui.QWidget.__init__(self, parent=parent)
                 
@@ -146,7 +155,10 @@ class StepSelector(QtGui.QWidget):
                 self.step_choosed(next_item, second_substep = True)
                           
         
-class GloveMappingWidget(QtGui.QWidget):
+class GloveCalibratingWidget(QtGui.QWidget):
+    """
+    Displays which joints have been calibrated.
+    """
     def __init__(self, parent, joint_names):
         QtGui.QWidget.__init__(self, parent=parent)
         self.frame = QtGui.QFrame()
@@ -228,7 +240,10 @@ class GloveMappingWidget(QtGui.QWidget):
             self.joints_frames[joint].setPalette(self.green_palette)
             self.frame.repaint()      
 
-class CybergloveCalibratorPlugin(CybergloveGenericPlugin):  
+class CybergloveCalibratorPlugin(CybergloveGenericPlugin): 
+    """
+    The plugin used to calibrate the glove.
+    """
     name = "Cyberglove Calibrator"
         
     def __init__(self):
@@ -254,8 +269,8 @@ class CybergloveCalibratorPlugin(CybergloveGenericPlugin):
 
         self.joint_names = self.parent.parent.libraries["cyberglove"].joints.keys()
         self.joint_names.sort()
-        self.glove_mapping_widget = GloveMappingWidget(self.frame, self.joint_names)
-        self.layout.addWidget(self.glove_mapping_widget)
+        self.glove_calibrating_widget = GloveCalibratingWidget(self.frame, self.joint_names)
+        self.layout.addWidget(self.glove_calibrating_widget)
         
         subframe = QtGui.QFrame()
         sublayout = QtGui.QHBoxLayout()
@@ -301,9 +316,9 @@ class CybergloveCalibratorPlugin(CybergloveGenericPlugin):
         
         for name in self.joint_names:
             if self.calibrer.is_step_done(name) == 0.5:
-                self.glove_mapping_widget.set_half_calibrated([name])
+                self.glove_calbrating_widget.set_half_calibrated([name])
             elif self.calibrer.is_step_done(name) == 1.0:
-                self.glove_mapping_widget.set_calibrated([name])
+                self.glove_calibrating_widget.set_calibrated([name])
         
         if self.calibrer.all_steps_done():
             self.btn_save.setEnabled(True)

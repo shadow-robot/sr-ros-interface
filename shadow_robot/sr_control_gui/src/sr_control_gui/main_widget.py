@@ -14,6 +14,9 @@ import os, sys
 from config import Config
 
 class MainWidget(QtGui.QWidget):
+    """
+    The MainWidget is a QMdiArea in which the plugins will be spawned.
+    """
     def __init__(self, parent):
         QtGui.QWidget.__init__(self)
         self.parent = parent

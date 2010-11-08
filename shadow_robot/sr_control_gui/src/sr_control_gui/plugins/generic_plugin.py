@@ -23,6 +23,10 @@ class MyMdiSubWindow(QtGui.QMdiSubWindow):
         #self.container.closeActiveSubWindow()
 
 class GenericPlugin(IPlugin):  
+    """
+    A generic plugin from which all the plugins inherit.
+    Opens a subwindow in the MainWidget.
+    """
     name = "GenericPlugin"
     
     def __init__(self):

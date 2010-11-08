@@ -12,6 +12,11 @@ from shadow_generic_plugin import ShadowGenericPlugin
 from main_window import ReloadGraspSignalWidget
 
 class Step(QtGui.QWidget):
+    """
+    A step in a sequence of steps which compose a full movement.
+    Contains add / remove steps buttons, loop control, pause / interpolation time, 
+    grasp type.
+    """
     def __init__(self, parent, step_index, plugin_parent):
         QtGui.QWidget.__init__(self, parent = parent)
         self.step_index = step_index
@@ -238,6 +243,9 @@ class Step(QtGui.QWidget):
             self.list_grasp.addItem(grasp_name)        
     
 class SignalWidget(Qt.QWidget):
+    """
+    Qt Signal used to state when a step is playing / stopped.
+    """
     isPlayingSig = QtCore.pyqtSignal(int)
     stoppedPlayingSig = QtCore.pyqtSignal(int)
     
@@ -245,7 +253,11 @@ class SignalWidget(Qt.QWidget):
         super(SignalWidget, self).__init__(parent)
 
 
-class MovementRecorder(ShadowGenericPlugin):  
+class MovementRecorder(ShadowGenericPlugin):
+    """
+    The movement recorder contains all the steps for a movement. Possibility to save / load 
+    a movement.
+    """
     name = "Movement Recorder"
             
     def __init__(self):

@@ -25,6 +25,10 @@ from robot_and_libraries_backend import RobotAndLibrariesBackend
 from main_widget import MainWidget
 
 class ReloadGraspSignalWidget(Qt.QWidget):
+    """
+    A Qt signal send when the grasps list has been changed. All the plugins
+    using the grasps subscribes to this signal and reload their grasps lists.
+    """
     reloadGraspSig = QtCore.pyqtSignal(int)
     
     def __init__(self, parent=None):
@@ -32,6 +36,9 @@ class ReloadGraspSignalWidget(Qt.QWidget):
 
 
 class MainWindow(QtGui.QMainWindow):
+    """
+    The main window's main widget is MainWidget.
+    """
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
         rospy.init_node('sr_control_gui')

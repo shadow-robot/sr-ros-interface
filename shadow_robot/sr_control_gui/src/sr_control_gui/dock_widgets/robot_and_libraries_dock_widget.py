@@ -10,6 +10,9 @@ from robot_and_libraries_backend import RobotAndLibrariesBackend, Library
 from config import *
 
 class LoginForm(QtGui.QDialog):
+    """
+    A login form when trying to connect through ssh to a distant computer.
+    """
     def __init__(self, parent, treeitem, title, library):
         QtGui.QDialog.__init__(self, parent)
         self.library = library
@@ -114,6 +117,9 @@ class LoginForm(QtGui.QDialog):
         QtGui.QDialog.reject(self)
 
 class LibraryItem(QtGui.QTreeWidgetItem):
+    """
+    A QTreeWidgetItem used to display / edit the information for a library (ROS node) item.
+    """
     def __init__(self, library, parent):
         data = []
         data.append("")
@@ -269,6 +275,10 @@ class LibraryItem(QtGui.QTreeWidgetItem):
             nothing = True    
     
 class LibrariesWidget(QtGui.QWidget):
+    """
+    Add the correct library to the libraries dict. And contains the QTreeWidget which will display
+    the info regarding the different available libraries.
+    """
     def __init__(self, parent, backend):
         QtGui.QWidget.__init__(self, parent=parent)
                
@@ -368,6 +378,9 @@ class RobotsWidget(QtGui.QWidget):
         self.setLayout(layout)
 
 class RobotAndLibrariesDockWidget(GenericDockWidget):
+    """
+    The dock containing the QTreeWidget which displays the robot / libraries info.
+    """
     def __init__(self, parent, backend):
         GenericDockWidget.__init__(self, parent=parent)
         

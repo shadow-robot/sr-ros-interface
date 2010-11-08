@@ -7,6 +7,9 @@ from joint_slider import Joint, JointSlider
 from config import Config
 
 class ArmJointSlider(JointSlider):  
+    """
+    Sliders to move the arm.
+    """
     name = "Arm Joint Sliders"
         
     def __init__(self):        

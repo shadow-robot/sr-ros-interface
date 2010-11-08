@@ -13,6 +13,9 @@ from grasps_parser import GraspParser
 from main_window import ReloadGraspSignalWidget
 
 class JointSelecter(QtGui.QWidget):
+    """
+    Select which joints to save in a new grasp
+    """
     def __init__(self, parent, all_joints):
         QtGui.QWidget.__init__(self, parent=parent)
         self.frame = QtGui.QFrame()
@@ -72,6 +75,9 @@ class JointSelecter(QtGui.QWidget):
             cb.setChecked(False)    
 
 class GraspSaver(QtGui.QDialog):
+    """
+    Save a new grasp from the current joints positions.
+    """
     def __init__(self, parent, all_joints, plugin_parent):
         QtGui.QDialog.__init__(self, parent)
         self.plugin_parent = plugin_parent
@@ -161,6 +167,9 @@ class GraspSaver(QtGui.QDialog):
         QtGui.QDialog.accept(self)
 
 class GraspChooser(QtGui.QWidget):
+    """
+    Choose a grasp from a list of grasps.
+    """
     def __init__(self, parent, plugin_parent, title):
         QtGui.QWidget.__init__(self)
         self.plugin_parent = plugin_parent
@@ -223,6 +232,9 @@ class GraspChooser(QtGui.QWidget):
     
         
 class GraspSlider(QtGui.QWidget):
+    """
+    Slide from one grasp to another.
+    """
     def __init__(self, parent, plugin_parent):
         QtGui.QWidget.__init__(self, parent)
         self.plugin_parent = plugin_parent
@@ -267,7 +279,10 @@ class GraspSlider(QtGui.QWidget):
     def changeValue(self, value):
         self.plugin_parent.interpolate_grasps(value)
 
-class GraspController(ShadowGenericPlugin):  
+class GraspController(ShadowGenericPlugin):
+    """
+    The grasp controller plugin: slide from one grasp to another, save new grasps
+    """
     name = "Grasp Controller"
         
     def __init__(self):        

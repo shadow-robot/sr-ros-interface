@@ -10,6 +10,9 @@ from generic_plugin import GenericPlugin
 from config import *
 
 class CybergloveGenericPlugin(GenericPlugin):  
+    """
+    The mother of all plugins using the cyberglove ROS interface.
+    """
     name = "Cyberglove Robot Generic Plugin"
     
     def __init__(self):

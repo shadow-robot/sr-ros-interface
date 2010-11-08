@@ -12,6 +12,9 @@ import time
 from config import *
 
 class RunCommand(Qt.QThread):
+    """
+    Run either a local or ssh command in a separate thread.
+    """
     def __init__(self, command, final_status, library):
         Qt.QThread.__init__(self)
         self.command = command
@@ -20,7 +23,6 @@ class RunCommand(Qt.QThread):
         self.final_status = final_status
     
     def run(self):
-        #TODO run the command
         if self.command != "":
             if self.library.is_local:
                 self.run_local_command()
@@ -31,10 +33,15 @@ class RunCommand(Qt.QThread):
                 self.run_ssh_command()
     
     def run_local_command(self):
+        """
+        Run a local command using subprocess
+        """
         process = subprocess.Popen(self.command.split(),
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         output = process.communicate()[0]
+        
+        #get status commands need special treatment of their output
         if self.final_status == "get_status":
             output = output.split('\n')
             
@@ -57,6 +64,7 @@ class RunCommand(Qt.QThread):
                 if "starting" != self.library.status:
                     self.library.status = "stopped"
         
+        # get status command for the robot code needs a special treatment as well
         elif self.final_status == "get_status_robot":
             output = output.split('\n')
             if len(output) > 1:
@@ -70,6 +78,9 @@ class RunCommand(Qt.QThread):
             self.library.status = self.final_status
 
     def run_ssh_command(self):
+        """
+        Run a command on a distant computer using ssh (paramiko library).
+        """
         try:
             self.library.ssh_client.connect(self.library.ip,
                                             username=self.library.login,
@@ -103,6 +114,9 @@ class RunCommand(Qt.QThread):
         self.library.ssh_client.close()
         
 class Library(object):
+    """
+    An object containing all the necessary information for a ROS node / library
+    """
     def __init__(self, name="", list_of_nodes=[], start_cmd="", stop_cmd="", status_cmd="", root_path=""):
         self.name = name
         self.ip = ""
@@ -173,6 +187,10 @@ class Library(object):
         return True
     
 class Robot(Library):
+    """
+    Contains all the needed information for the Robot code. Inherits from Library object 
+    because the two are almost the same.
+    """
     def __init__(self, name="", root_path=""):
         start_cmd = Config.robot_code.start_cmd
         stop_cmd = Config.robot_code.stop_cmd
@@ -186,6 +204,9 @@ class Robot(Library):
         self.thread_status = RunCommand(self.status_cmd, "get_status_robot", self)
    
 class RobotAndLibrariesBackend(object):
+    """
+    Contains a dict with the different Libraries (ROS nodes)/ Robot interfaces.
+    """
     def __init__(self):
         self.libraries = {}
         

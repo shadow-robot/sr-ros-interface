@@ -10,11 +10,9 @@ To start the GUI, run:
 rosrun sr_control_gui sr_control_gui
 \endverbatim
 
-The GUI is organized in tabs : 
-\li    \b Hand \b control provides sliders to control the hand joint by joint, displaying actual positions and current targets set by the sliders. It also provides a grasp manager which allows to go from one saved grasp to another smoothly, moving all the fingers at the same time. It is also possible to come back to the former grasp. Finally, grasps can be saved into the grasps.xml file, using the saver. Beware, only the selected joints (ticked in the joint chooser) will be writen to the file.
-\li    \b Visualisation provides various services to launch external useful programs, such as ROS utils. The main part, which is not implemented yet, will allow to choose which information should be displayed in Rviz.
-\li    \b Player is used to choose a file containing a list of grasps to replay step by step. Two options are available : playing them by clicking on play for each grasps, or playing the whole file with a given time between each grasp. This is design to be used with the record button on the menu. The field must be filled with a filename to save the grasps.
-\li    Accessories provides services to control some spare parts of the hand, such as the Shadow Arm, which can be controled like the hand, the Cyberglove (including a calibration service) or the Cybergrasp (not implemented yet). It is also possible to change the topics read by the program in order to change the hand controled.
+The Shadow Robot GUI is a modular app, used to control the Shadow Robot Dextrous Hand, the Arm and some accessories such as the cyberglove. It has been designed so that the user can easily create a new plugin if needed. 
+
+You can start/stop different ROS nodes and the robot code from the top panel. The available plugins will be enabled once the correct node is started (e.g. Hand Slider is available only if the Hand ROS node is started). Then to start the plugins go to the plugins menu and select the one you want to start.
 
 \section codeapi Code API
 

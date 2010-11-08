@@ -10,6 +10,9 @@ from generic_plugin import GenericPlugin
 from config import *
 
 class ShadowGenericPlugin(GenericPlugin):  
+    """
+    The mother of all plugins using the shadow robot ROS interface (Hand and Arm).
+    """
     name = "Shadow Robot Generic Plugin"
     
     def __init__(self):

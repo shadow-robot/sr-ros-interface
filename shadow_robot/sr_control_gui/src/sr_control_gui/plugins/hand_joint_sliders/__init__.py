@@ -6,6 +6,9 @@ import rospy
 from joint_slider import Joint, JointSlider
   
 class HandJointSlider(JointSlider):  
+    """
+    Hand joint sliders to move the hand joints with sliders.
+    """
     name = "Hand Joint Sliders"
         
     def __init__(self):

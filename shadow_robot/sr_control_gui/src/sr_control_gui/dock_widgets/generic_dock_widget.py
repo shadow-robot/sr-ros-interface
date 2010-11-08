@@ -6,6 +6,9 @@ import rospy
 from PyQt4 import QtCore, QtGui, Qt
 
 class GenericDockWidget(QtGui.QDockWidget):
+    """
+    The parent class for the dock widgets, which are docked in the MainWindow.
+    """
     def __init__(self, parent):
         QtGui.QDockWidget.__init__(self, parent=parent)
         self.shown = False
