@@ -94,3 +94,5 @@ shadow_robot/sr_control_gui/images/glove_calibration/tmp
 shadow_robot/sr_convenient_dependencies/bin
 shadow_robot/sr_convenient_dependencies/build
 shadow_robot/sr_convenient_dependencies/src
+shadow_robot/dataglove/dataglove_processing/include/dataglove_processing
+shadow_robot/dataglove/dataglove_processing/src/euslisp

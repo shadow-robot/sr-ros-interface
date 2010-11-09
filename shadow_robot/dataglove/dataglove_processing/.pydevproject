@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse-pydev version="1.0"?>
+
+<pydev_project>
+<pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
+<pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.6</pydev_property>
+<pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
+<path>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/particlefilter/shadow_robot/dataglove/dataglove_processing/src</path>
+<path>/home/ugo/ros/ros/core/roscpp/src</path>
+<path>/home/ugo/ros/ros/core/roscpp/lib</path>
+<path>/home/ugo/ros/ros/core/roslib/src</path>
+<path>/home/ugo/ros/ros/core/roslib/lib</path>
+<path>/home/ugo/ros/ros/core/genmsg_cpp/src</path>
+<path>/home/ugo/ros/ros/tools/rospack/lib</path>
+<path>/home/ugo/ros/ros/3rdparty/xmlrpcpp/src</path>
+<path>/home/ugo/ros/ros/3rdparty/xmlrpcpp/lib</path>
+<path>/home/ugo/ros/ros/core/rosconsole/src</path>
+<path>/home/ugo/ros/ros/core/rosconsole/lib</path>
+<path>/home/ugo/ros/ros/core/mk</path>
+<path>/usr/local/lib/python2.6/dist-packages/Yapsy-1.8-py2.6.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/ETS-3.4.1-py2.6.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/TraitsGUI-3.4.0-py2.6.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/TraitsBackendWX-3.4.0-py2.6.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/TraitsBackendQt-3.4.0-py2.6.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/Traits-3.4.0-py2.6-linux-i686.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/SetupDocs-1.0.4-py2.6.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/SciMath-3.0.5-py2.6-linux-i686.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/rosinstall-0.5.8-py2.6.egg</path>
+<path>/home/ugo/ros/ros/core/roslib/src</path>
+<path>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/particlefilter/shadow_robot/dataglove/dataglove_processing</path>
+<path>/home/ugo/ros_stacks_external/jsk-ros-pkg/openrave_planning/openrave/share/openrave</path>
+<path>/usr/lib/python2.6</path>
+<path>/usr/lib/python2.6/plat-linux2</path>
+<path>/usr/lib/python2.6/lib-tk</path>
+<path>/usr/lib/python2.6/lib-dynload</path>
+<path>/usr/lib/python2.6/dist-packages</path>
+<path>/usr/lib/python2.6/dist-packages/PIL</path>
+<path>/usr/lib/python2.6/dist-packages/gst-0.10</path>
+<path>/usr/lib/pymodules/python2.6</path>
+<path>/usr/lib/python2.6/dist-packages/gtk-2.0</path>
+<path>/usr/lib/pymodules/python2.6/gtk-2.0</path>
+<path>/usr/lib/python2.6/dist-packages/wx-2.8-gtk2-unicode</path>
+<path>/usr/local/lib/python2.6/dist-packages</path>
+</pydev_pathproperty>
+</pydev_project>
