@@ -12,10 +12,12 @@
 #define PARTICLE_HPP_
 
 #include "measure.hpp"
+#include <boost/smart_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace dataglove
 {
-class Particle
+class Particle : boost::noncopyable
 {
 public:
     Particle();
@@ -41,7 +43,7 @@ public:
      *
      * @param measure A measure.
      */
-    virtual void update( Measure measure ) = 0;
+    virtual void compute_probability( boost::shared_ptr<Measure> measure ) = 0;
 
     //accessors
     void set_weight( float weight );

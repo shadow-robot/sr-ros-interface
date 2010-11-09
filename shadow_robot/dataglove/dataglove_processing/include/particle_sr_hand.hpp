@@ -12,10 +12,13 @@
 #define PARTICLE_SR_HAND_CPP_
 
 #include "particle.hpp"
+#include "measure.hpp"
+
+#include <boost/smart_ptr.hpp>
 
 namespace dataglove
 {
-class ParticleSrHand : Particle
+class ParticleSrHand : public Particle
 {
 public:
     ParticleSrHand();
@@ -25,7 +28,7 @@ public:
     //particle filter functions
     virtual void init_model();
     virtual void prediction();
-    virtual void update( Measure measure );
+    virtual void compute_probability( boost::shared_ptr<Measure> measure );
 };
 }
 

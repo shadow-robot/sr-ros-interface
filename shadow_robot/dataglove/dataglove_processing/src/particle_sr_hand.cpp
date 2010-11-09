@@ -12,11 +12,13 @@
 
 namespace dataglove
 {
-ParticleSrHand::ParticleSrHand()
+ParticleSrHand::ParticleSrHand() :
+    Particle()
 {
 
 }
-ParticleSrHand::ParticleSrHand( int population_size )
+ParticleSrHand::ParticleSrHand( int population_size ) :
+    Particle(population_size)
 {
 
 }
@@ -34,7 +36,7 @@ void ParticleSrHand::prediction()
 
 }
 
-void ParticleSrHand::update( Measure measure )
+void ParticleSrHand::compute_probability( boost::shared_ptr<Measure> measure )
 {
 
 }

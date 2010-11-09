@@ -9,6 +9,7 @@
  */
 
 #include "particle.hpp"
+#include <ros/ros.h>
 
 namespace dataglove
 {
@@ -32,4 +33,9 @@ void Particle::init_weight( int population_size )
     weight = 1.0f / ((float)population_size);
 }
 
+float Particle::get_weight()
+{
+    return weight;
 }
+
+}//end namespace

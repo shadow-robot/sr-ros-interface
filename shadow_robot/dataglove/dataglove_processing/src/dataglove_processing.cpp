@@ -14,12 +14,20 @@ namespace dataglove
 {
 const unsigned int DatagloveProcessing::total_number_of_particles = 200;
 
-DatagloveProcessing::DatagloveProcessing()
+DatagloveProcessing::DatagloveProcessing() :
+    nh_tilde("~"), update_rate(0.0)
 {
+    particle_cloud.reserve(total_number_of_particles);
+
     for( unsigned int particle_index = 0; particle_index < total_number_of_particles; ++particle_index )
     {
         particle_cloud.push_back(new ParticleSrHand(total_number_of_particles));
     }
+
+    // set update frequency
+    double update_freq;
+    nh_tilde.param("update_frequency", update_freq, 20.0);
+    update_rate = ros::Rate(update_freq);
 }
 
 DatagloveProcessing::~DatagloveProcessing()
@@ -29,6 +37,36 @@ DatagloveProcessing::~DatagloveProcessing()
 
 void DatagloveProcessing::update()
 {
+    boost::ptr_vector<ParticleSrHand>::iterator particle;
+    for( particle = particle_cloud.begin(); particle != particle_cloud.end(); ++particle )
+    {
+        particle->prediction();
+        particle->compute_probability(last_measure);
+    }
+    resampling();
+
+    ros::spinOnce();
+    update_rate.sleep();
+}
+
+void DatagloveProcessing::resampling()
+{
 
 }
+
+std::vector<float> DatagloveProcessing::get_weights_vector()
+{
+    std::vector<float> weights;
+    boost::ptr_vector<ParticleSrHand>::iterator particle;
+    for( particle = particle_cloud.begin(); particle != particle_cloud.end(); ++particle )
+    {
+        weights.push_back(particle->get_weight());
+    }
+    return weights;
 }
+
+unsigned int DatagloveProcessing::get_total_number_of_particles()
+{
+    return total_number_of_particles;
+}
+}//end namespace

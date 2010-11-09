@@ -9,7 +9,6 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/dataglove_processing</url>
   <depend package="roscpp"/>
-
 </package>
 
 
