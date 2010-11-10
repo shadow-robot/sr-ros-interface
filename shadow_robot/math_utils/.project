@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>[PART_FILTER]dataglove_processing</name>
+	<name>[PART_FILTER]math_utils</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -23,7 +23,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.arguments</key>
-					<value></value>
+					<value>test</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.command</key>
@@ -31,7 +31,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.location</key>
-					<value>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/particlefilter/shadow_robot/dataglove/dataglove_processing</value>
+					<value>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/particlefilter/shadow_robot/math_utils</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.target.auto</key>
@@ -51,7 +51,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/particlefilter/shadow_robot/dataglove/dataglove_processing</value>
+					<value>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/particlefilter/shadow_robot/math_utils</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>

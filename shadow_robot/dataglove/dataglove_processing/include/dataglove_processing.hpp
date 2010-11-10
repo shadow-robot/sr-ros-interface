@@ -14,6 +14,8 @@
 #include <ros/ros.h>
 #include <vector>
 
+#include <gtest/gtest_prod.h>
+
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/smart_ptr.hpp>
 
@@ -34,8 +36,10 @@ public:
     //accessors
     unsigned int get_total_number_of_particles();
     std::vector<float> get_weights_vector();
+    std::vector<std::vector<float> > get_particle_positions_vector();
 
 private:
+    //ROS stuff
     ros::NodeHandle nh, nh_tilde;
     /// the rate at which the update loop of the particle filter is called
     ros::Rate update_rate;

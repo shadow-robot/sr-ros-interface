@@ -96,3 +96,5 @@ shadow_robot/sr_convenient_dependencies/build
 shadow_robot/sr_convenient_dependencies/src
 shadow_robot/dataglove/dataglove_processing/include/dataglove_processing
 shadow_robot/dataglove/dataglove_processing/src/euslisp
+shadow_robot/math_utils/Mersenne-1.1
+shadow_robot/math_utils/build

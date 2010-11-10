@@ -18,13 +18,12 @@
   <depend package="diagnostic_msgs"/>
   <depend package="kdl_parser"/>
   <depend package="dynamic_reconfigure"/>
-  <depend package="sr_convenient_dependencies"/>
+  <depend package="sr_convenient_dependencies"/> 
   <export>
-	<cpp cflags="-I${prefix}/include"/>
+	<cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lSrVirtual"/>
 	<python path="${prefix}/python_lib"/>
 	<python path="${prefix}/python_lib/grasp"/>
 	<python path="${prefix}/src"/>
-	
   </export>
 </package>
 

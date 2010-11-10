@@ -15,6 +15,9 @@
 #include "particle_sr_hand.hpp"
 #include "particle.hpp"
 #include "measure.hpp"
+#include <math_utils.hpp>
+#include <vector>
+#include <algorithm>
 
 #include <boost/smart_ptr.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -23,21 +26,77 @@
 
 using namespace dataglove;
 
-TEST(DatagloveProcessing, particleFilterInitialisation)
+TEST(DatagloveProcessing, pfInitWeights)
 {
-    boost::shared_ptr<DatagloveProcessing> dataglove_processing(new DatagloveProcessing());
+    DatagloveProcessing dataglove_processing;
 
-    unsigned int total_nb_particles = dataglove_processing->get_total_number_of_particles();
+    unsigned int total_nb_particles = dataglove_processing.get_total_number_of_particles();
     float average_weight = 1.0f / ((float)total_nb_particles);
 
     std::vector<float> weights;
-    weights = dataglove_processing->get_weights_vector();
+    weights = dataglove_processing.get_weights_vector();
     EXPECT_TRUE(weights.size() == total_nb_particles)<< "Expected Size = "<< total_nb_particles << " Received size = " << weights.size();
     std::vector<float>::iterator it;
     for( it = weights.begin(); it != weights.end(); ++it )
     {
         EXPECT_TRUE(*it == average_weight) << "Expected value = " << average_weight << " Received value = " << *it;
     }
+}
+
+TEST(DatagloveProcessing, pfInitPos)
+{
+    DatagloveProcessing dataglove_processing;
+    /*
+     * Test positions are random
+     */
+
+    std::vector<std::vector<float> > all_part_positions;
+    all_part_positions = dataglove_processing.get_particle_positions_vector();
+
+    std::vector<float> first_pos = all_part_positions[0];
+
+    EXPECT_TRUE(first_pos.size() == 28) << "Wrong number of joints: " << first_pos.size();
+
+    // ignore the first as it's the reference
+    for(unsigned int index=1; index < all_part_positions.size(); ++index)
+    {
+        //compare the 2 vectors
+        bool result = std::equal(first_pos.begin(), first_pos.end(), all_part_positions[index].begin());
+        // they should be different
+        EXPECT_FALSE(result) << "Two position vectors are exactly equal.";
+    }
+}
+
+bool test_random( float min, float max, int iteration )
+{
+    math_utils::MathUtils math_utils;
+    float result = 0.0f;
+    for( unsigned int i = 0; i < iteration; ++i )
+    {
+        result = math_utils.maut_random(min, max);
+        if( result < min )
+            return false;
+        if( result > max )
+            return false;
+    }
+    return true;
+}
+
+TEST(MathUtils, random)
+{
+    bool is_in_range;
+    is_in_range = test_random(-10.0f, 10.0f, 1000);
+    EXPECT_TRUE(is_in_range)<< "Range -10, 10";
+    is_in_range = test_random(0.0f, 10.0f, 1000);
+    EXPECT_TRUE(is_in_range) << "Range 0, 10";
+    is_in_range = test_random(-10.0f, 0.0f, 1000);
+    EXPECT_TRUE(is_in_range) << "Range -10, 0";
+    is_in_range = test_random(-20.0f, -2.0f, 1000);
+    EXPECT_TRUE(is_in_range) << "Range -20, 2";
+    is_in_range = test_random(2.0f, 20.0f, 1000);
+    EXPECT_TRUE(is_in_range) << "Range 2, 20";
+    is_in_range = test_random(0.4f, 0.4f, 1000);
+    EXPECT_TRUE(is_in_range) << "Range 0.4, 0.4";
 }
 
 // Run all the tests that were declared with TEST()

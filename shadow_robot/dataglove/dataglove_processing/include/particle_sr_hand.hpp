@@ -14,11 +14,19 @@
 #include "particle.hpp"
 #include "measure.hpp"
 
+#include <gtest/gtest_prod.h>
+
+#include <sr_hand/hand/virtual_shadowhand_library.h>
+#include <math_utils.hpp>
+
 #include <boost/smart_ptr.hpp>
+#include <vector>
+
+using namespace shadowrobot;
 
 namespace dataglove
 {
-class ParticleSrHand : public Particle
+class ParticleSrHand : public virtual VirtualShadowhandLibrary, public virtual Particle
 {
 public:
     ParticleSrHand();
@@ -29,6 +37,11 @@ public:
     virtual void init_model();
     virtual void prediction();
     virtual void compute_probability( boost::shared_ptr<Measure> measure );
+
+    std::vector<float> get_positions();
+private:
+    boost::shared_ptr<math_utils::MathUtils> math_utils;
+
 };
 }
 
