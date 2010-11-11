@@ -30,7 +30,7 @@ TEST(DatagloveProcessing, pfInitWeights)
 {
     DatagloveProcessing dataglove_processing;
 
-    unsigned int total_nb_particles = dataglove_processing.get_total_number_of_particles();
+    unsigned int total_nb_particles = dataglove_processing.total_number_of_particles;
     float average_weight = 1.0f / ((float)total_nb_particles);
 
     std::vector<float> weights;
@@ -55,7 +55,7 @@ TEST(DatagloveProcessing, pfInitPos)
 
     std::vector<float> first_pos = all_part_positions[0];
 
-    EXPECT_TRUE(first_pos.size() == 28) << "Wrong number of joints: " << first_pos.size();
+    EXPECT_TRUE(first_pos.size() == 28)<< "Wrong number of joints: " << first_pos.size();
 
     // ignore the first as it's the reference
     for(unsigned int index=1; index < all_part_positions.size(); ++index)
@@ -65,6 +65,36 @@ TEST(DatagloveProcessing, pfInitPos)
         // they should be different
         EXPECT_FALSE(result) << "Two position vectors are exactly equal.";
     }
+}
+
+TEST(DatagloveProcessing, sortByWeights)
+{
+    math_utils::MathUtils math_utils;
+    boost::ptr_vector<ParticleSrHand> test_cloud;
+
+    float rand = 0.0f;
+    for( unsigned int i = 0; i < 1000; ++i )
+    {
+        ParticleSrHand* part = new ParticleSrHand(1000);
+        rand = math_utils.maut_random(0.0f, 10.0f);
+        part->set_weight(rand);
+
+        test_cloud.push_back(part);
+    }
+
+    CompareParticleWeights compare_particle_weights;
+    test_cloud.sort(compare_particle_weights);
+
+    boost::ptr_vector<ParticleSrHand>::iterator particle;
+    particle = test_cloud.begin();
+    float current_weight = particle->get_weight();
+    particle++;
+    for( particle; particle != test_cloud.end(); ++particle )
+    {
+        EXPECT_TRUE(particle->get_weight() >= current_weight)<< "Badly sorted: "
+        <<particle->get_weight() <<" < " <<current_weight;
+    }
+
 }
 
 bool test_random( float min, float max, int iteration )

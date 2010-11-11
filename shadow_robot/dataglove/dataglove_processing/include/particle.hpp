@@ -42,12 +42,13 @@ public:
      * producing this measure given the current object position.
      *
      * @param measure A measure.
+     * @return the new weight
      */
-    virtual void compute_probability( boost::shared_ptr<Measure> measure ) = 0;
+    virtual float compute_probability( boost::shared_ptr<Measure> measure ) = 0;
 
     //accessors
-    void set_weight( float weight );
-    float get_weight();
+    float get_weight() const;
+    void set_weight(float new_weight);
 
 protected:
     float weight;

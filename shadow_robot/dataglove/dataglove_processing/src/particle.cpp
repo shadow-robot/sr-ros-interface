@@ -33,9 +33,14 @@ void Particle::init_weight( int population_size )
     weight = 1.0f / ((float)population_size);
 }
 
-float Particle::get_weight()
+float Particle::get_weight() const
 {
     return weight;
+}
+
+void Particle::set_weight(float new_weight)
+{
+    weight = new_weight;
 }
 
 }//end namespace

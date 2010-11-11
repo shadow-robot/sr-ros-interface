@@ -51,7 +51,7 @@ void ParticleSrHand::prediction()
 
 }
 
-void ParticleSrHand::compute_probability( boost::shared_ptr<Measure> measure )
+float ParticleSrHand::compute_probability( boost::shared_ptr<Measure> measure )
 {
 
 }

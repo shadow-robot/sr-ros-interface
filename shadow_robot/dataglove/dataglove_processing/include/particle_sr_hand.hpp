@@ -36,7 +36,7 @@ public:
     //particle filter functions
     virtual void init_model();
     virtual void prediction();
-    virtual void compute_probability( boost::shared_ptr<Measure> measure );
+    virtual float compute_probability( boost::shared_ptr<Measure> measure );
 
     std::vector<float> get_positions();
 private:

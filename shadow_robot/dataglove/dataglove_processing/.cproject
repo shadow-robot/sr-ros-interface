@@ -524,28 +524,20 @@
 				<pathentry include="/home/ugo/Projects/ROS_interfaces/sr-ros-interface/particlefilter/shadow_robot/sr_hand/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/visualization/rviz/src" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/laser_pipeline/laser_geometry/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/laser_pipeline/laser_geometry/msg/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/visualization/wxpropgrid/propgrid_install/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common/yaml_cpp/yaml-cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/robot_model/resource_retriever/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/visualization_common/ogre_tools/src" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/simulator_gazebo/gazebo_plugins/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/simulator_gazebo/gazebo_plugins/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/simulator_gazebo/gazebo_plugins/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/simulator_gazebo/gazebo_plugins/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/simulator_gazebo/gazebo_plugins/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/driver_common/driver_base/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/driver_common/driver_base/msg/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/driver_common/driver_base/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/diagnostics/self_test/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/diagnostics/self_test/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/driver_common/dynamic_reconfigure/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/driver_common/dynamic_reconfigure/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/driver_common/dynamic_reconfigure/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/driver_common/dynamic_reconfigure/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/driver_common/dynamic_reconfigure/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_simulator/pr2_gazebo_plugins/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_simulator/pr2_gazebo_plugins/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_simulator/pr2_gazebo_plugins/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_simulator/pr2_gazebo_plugins/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/simulator_gazebo/gazebo_tools/include" kind="inc" path="" system="true"/>
@@ -564,44 +556,27 @@
 				<pathentry include="/home/ugo/ros/stacks/vision_opencv/opencv2/opencv/include/opencv" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/vision_opencv/cv_bridge/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/image_common/polled_camera/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/image_common/polled_camera/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/image_common/polled_camera/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/image_common/image_transport/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/ros/tools/rxtools/src" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/diagnostics/diagnostic_aggregator/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_mechanism_controllers/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_mechanism_controllers/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_mechanism_controllers/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_mechanism_controllers/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_mechanism_controllers/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common_msgs/nav_msgs/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common_msgs/nav_msgs/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/nav_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/nav_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_common/pr2_msgs/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_common/pr2_msgs/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_common/pr2_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_common/pr2_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/visualization_common/visualization_msgs/msg/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/visualization_common/visualization_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/robot_mechanism_controllers/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/robot_mechanism_controllers/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/robot_mechanism_controllers/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common/actionlib/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common/actionlib/msg/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common/actionlib/msg_gen/cpp/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_controllers_msgs/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_controllers_msgs/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_controllers_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/pr2_controllers_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common_msgs/actionlib_msgs/msg/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/actionlib_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/trajectory_msgs/msg/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/trajectory_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/pr2_controller_manager/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/pr2_controller_interface/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/pr2_mechanism_msgs/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/pr2_mechanism_msgs/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/pr2_mechanism_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/pr2_mechanism_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/robot_model/robot_state_publisher/include" kind="inc" path="" system="true"/>
@@ -609,29 +584,18 @@
 				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/pr2_mechanism_model/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/pr2_hardware_interface/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/robot_model/kdl_parser/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/robot_model/kdl_parser/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/robot_model/kdl_parser/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/geometry/kdl/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/robot_model/urdf/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/robot_model/urdf/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/robot_model/urdf/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_mechanism/realtime_tools/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/geometry/eigen/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/control_toolbox/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/control_toolbox/include/control_toolbox/eigen2" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/control_toolbox/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/pr2_controllers/control_toolbox/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/geometry/tf/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/geometry/tf/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/geometry/tf/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/geometry/tf/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/geometry/tf/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/sensor_msgs/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common_msgs/sensor_msgs/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common_msgs/sensor_msgs/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/sensor_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/sensor_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common_msgs/geometry_msgs/msg/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/geometry_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/geometry/bullet/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/ros/core/message_filters/include" kind="inc" path="" system="true"/>
@@ -641,8 +605,6 @@
 				<pathentry include="/home/ugo/ros/stacks/common/pluginlib" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common/tinyxml/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/diagnostics/diagnostic_updater/include" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common_msgs/diagnostic_msgs/msg/cpp" kind="inc" path="" system="true"/>
-				<pathentry include="/home/ugo/ros/stacks/common_msgs/diagnostic_msgs/srv/cpp" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/diagnostic_msgs/msg_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/stacks/common_msgs/diagnostic_msgs/srv_gen/cpp/include" kind="inc" path="" system="true"/>
 				<pathentry include="/home/ugo/ros/ros/tools/rosrecord/include" kind="inc" path="" system="true"/>
