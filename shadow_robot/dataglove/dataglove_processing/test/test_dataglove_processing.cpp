@@ -10,6 +10,7 @@
 
 #include <ros/ros.h>
 #include <gtest/gtest.h>
+#include "gtest/gtest_prod.h"
 
 #include "dataglove_processing.hpp"
 #include "particle_sr_hand.hpp"
@@ -26,7 +27,13 @@
 
 using namespace dataglove;
 
-TEST(DatagloveProcessing, pfInitWeights)
+namespace dataglove
+{
+class DatagloveProcessingTest : public ::testing::Test
+{
+
+};
+TEST(DatagloveProcessingTest, pfInitWeights)
 {
     DatagloveProcessing dataglove_processing;
 
@@ -43,7 +50,7 @@ TEST(DatagloveProcessing, pfInitWeights)
     }
 }
 
-TEST(DatagloveProcessing, pfInitPos)
+TEST(DatagloveProcessingTest, pfInitPos)
 {
     DatagloveProcessing dataglove_processing;
     /*
@@ -67,7 +74,7 @@ TEST(DatagloveProcessing, pfInitPos)
     }
 }
 
-TEST(DatagloveProcessing, sortByWeights)
+TEST(DatagloveProcessingTest, sortByWeights)
 {
     math_utils::MathUtils math_utils;
     boost::ptr_vector<ParticleSrHand> test_cloud;
@@ -97,6 +104,28 @@ TEST(DatagloveProcessing, sortByWeights)
 
 }
 
+TEST(DatagloveProcessingTest, resampling)
+{
+    DatagloveProcessing dataglove_processing;
+    math_utils::MathUtils math_utils;
+
+    float rand = 0.0f;
+    for( unsigned int i = 0; i < dataglove_processing.total_number_of_particles; ++i )
+    {
+        ParticleSrHand* part = new ParticleSrHand(dataglove_processing.total_number_of_particles);
+        rand = math_utils.maut_random(0.0f, 0.001f);
+        part->set_weight(rand);
+
+        dataglove_processing.particle_cloud->push_back(part);
+    }
+
+    int resampled = dataglove_processing.resampling();
+    EXPECT_TRUE(resampled == 0)<< "No resampling";
+    EXPECT_TRUE(dataglove_processing.particle_cloud->size() == dataglove_processing.total_number_of_particles)
+    << "Wrong cloud size after resampling: " << dataglove_processing.particle_cloud->size() << "(expected: "
+    <<dataglove_processing.total_number_of_particles <<" )";
+}
+
 bool test_random( float min, float max, int iteration )
 {
     math_utils::MathUtils math_utils;
@@ -105,9 +134,9 @@ bool test_random( float min, float max, int iteration )
     {
         result = math_utils.maut_random(min, max);
         if( result < min )
-            return false;
+        return false;
         if( result > max )
-            return false;
+        return false;
     }
     return true;
 }
@@ -128,7 +157,7 @@ TEST(MathUtils, random)
     is_in_range = test_random(0.4f, 0.4f, 1000);
     EXPECT_TRUE(is_in_range) << "Range 0.4, 0.4";
 }
-
+}
 // Run all the tests that were declared with TEST()
 int main( int argc, char **argv )
 {

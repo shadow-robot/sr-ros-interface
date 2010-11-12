@@ -23,6 +23,14 @@ Particle::Particle( int population_size )
     init_weight(population_size);
 }
 
+Particle::Particle( boost::ptr_vector<Particle>::iterator particle, bool reset_weight, float average_weight )
+{
+    if( reset_weight )
+        weight = average_weight;
+    else
+        weight = particle->weight;
+}
+
 Particle::~Particle()
 {
 
@@ -38,7 +46,7 @@ float Particle::get_weight() const
     return weight;
 }
 
-void Particle::set_weight(float new_weight)
+void Particle::set_weight( float new_weight )
 {
     weight = new_weight;
 }

@@ -31,6 +31,7 @@ class ParticleSrHand : public virtual VirtualShadowhandLibrary, public virtual P
 public:
     ParticleSrHand();
     ParticleSrHand( int population_size );
+    ParticleSrHand( boost::ptr_vector<ParticleSrHand>::iterator particle, bool reset_weight, float average_weight );
     ~ParticleSrHand();
 
     //particle filter functions

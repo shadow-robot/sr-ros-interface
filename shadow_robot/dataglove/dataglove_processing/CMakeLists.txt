@@ -30,3 +30,4 @@ rosbuild_link_boost(dataglove_processing thread)
 
 #TESTS
 rosbuild_add_gtest(test/test_dataglove_processing test/test_dataglove_processing.cpp src/dataglove_processing.cpp src/measure.cpp src/measure.cpp src/particle.cpp src/particle_sr_hand.cpp)
+rosbuild_link_boost(dataglove_processing thread)

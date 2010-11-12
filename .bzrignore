@@ -77,3 +77,4 @@ shadow_robot/math_utils/build
 shadow_robot/dataglove/dataglove_processing/build
 ￼
 shadow_robot/dataglove/dataglove_processing/bin/dataglove_processing
+shadow_robot/dataglove/dataglove_processing/bin/test/test_dataglove_processing

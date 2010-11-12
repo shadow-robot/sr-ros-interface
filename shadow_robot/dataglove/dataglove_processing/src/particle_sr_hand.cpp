@@ -21,12 +21,24 @@ ParticleSrHand::ParticleSrHand() :
 
     init_model();
 }
+
 ParticleSrHand::ParticleSrHand( int population_size ) :
     VirtualShadowhandLibrary(), Particle(population_size)
 {
     math_utils = boost::shared_ptr<math_utils::MathUtils>(new math_utils::MathUtils());
 
     init_model();
+}
+
+ParticleSrHand::ParticleSrHand( boost::ptr_vector<ParticleSrHand>::iterator particle, bool reset_weight, float average_weight ) :
+    Particle(particle, reset_weight, average_weight)
+{
+    math_utils = boost::shared_ptr<math_utils::MathUtils>(new math_utils::MathUtils());
+    joints_map_mutex.lock();
+    particle->joints_map_mutex.lock();
+    joints_map.insert(particle->joints_map.begin(), particle->joints_map.end());
+    particle->joints_map_mutex.unlock();
+    joints_map_mutex.unlock();
 }
 
 ParticleSrHand::~ParticleSrHand()
@@ -53,7 +65,7 @@ void ParticleSrHand::prediction()
 
 float ParticleSrHand::compute_probability( boost::shared_ptr<Measure> measure )
 {
-
+    return 0.0f;
 }
 
 std::vector<float> ParticleSrHand::get_positions()

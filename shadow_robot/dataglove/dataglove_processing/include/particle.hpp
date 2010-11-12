@@ -12,6 +12,7 @@
 #define PARTICLE_HPP_
 
 #include "measure.hpp"
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -21,7 +22,13 @@ class Particle : boost::noncopyable
 {
 public:
     Particle();
+    /**
+     * initialises the weight to 1/population_size
+     * @param population_size the size of the cloud
+     */
     Particle( int population_size );
+    ///copy constructor
+    Particle( boost::ptr_vector<Particle>::iterator particle, bool reset_weight, float average_weight );
     ~Particle();
 
     //particle filter functions
@@ -48,7 +55,7 @@ public:
 
     //accessors
     float get_weight() const;
-    void set_weight(float new_weight);
+    void set_weight( float new_weight );
 
 protected:
     float weight;
