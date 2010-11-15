@@ -58,12 +58,19 @@ void ParticleSrHand::init_model()
     joints_map_mutex.unlock();
 }
 
+void ParticleSrHand::update()
+{
+    prediction();
+    squared_weight = compute_probability();
+    squared_weight *= squared_weight;
+}
+
 void ParticleSrHand::prediction()
 {
 
 }
 
-float ParticleSrHand::compute_probability( boost::shared_ptr<Measure> measure )
+float ParticleSrHand::compute_probability()
 {
     return 0.0f;
 }

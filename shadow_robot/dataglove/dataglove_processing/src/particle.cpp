@@ -51,4 +51,9 @@ void Particle::set_weight( float new_weight )
     weight = new_weight;
 }
 
+void Particle::set_last_measure( boost::shared_ptr<Measure> last_measure )
+{
+    last_measure = last_measure;
+}
+
 }//end namespace

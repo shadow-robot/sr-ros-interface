@@ -119,11 +119,37 @@ TEST(DatagloveProcessingTest, resampling)
         dataglove_processing.particle_cloud->push_back(part);
     }
 
+    int different_particles_before_resampling = 0;
+    boost::ptr_vector<ParticleSrHand>::iterator particle = dataglove_processing.particle_cloud->begin();
+    boost::ptr_vector<ParticleSrHand>::iterator old_particle = dataglove_processing.particle_cloud->begin();
+
+    particle ++;
+    for( particle; particle != dataglove_processing.particle_cloud->end(); ++particle )
+    {
+        if(particle == old_particle)
+            different_particles_before_resampling ++;
+    }
+
     int resampled = dataglove_processing.resampling();
-    EXPECT_TRUE(resampled == 0)<< "No resampling";
+    EXPECT_TRUE(resampled == 1)<< "No resampling";
     EXPECT_TRUE(dataglove_processing.particle_cloud->size() == dataglove_processing.total_number_of_particles)
     << "Wrong cloud size after resampling: " << dataglove_processing.particle_cloud->size() << "(expected: "
     <<dataglove_processing.total_number_of_particles <<" )";
+
+    /*
+     *check if the cloud has really been resampled:
+     */
+    //check if there are enough different particles
+    int different_particles_after_resampling = 0;
+    //check if there are less different particles than before.
+}
+
+
+TEST(DatagloveProcessingTest, updateCycle)
+{
+    DatagloveProcessing dataglove_processing;
+    int result = dataglove_processing.update_cycle();
+    EXPECT_TRUE(result == 0 || result == 1) << "Problem encountered while doing the update.";
 }
 
 bool test_random( float min, float max, int iteration )

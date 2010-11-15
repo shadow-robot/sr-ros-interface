@@ -12,13 +12,18 @@
 
 namespace dataglove
 {
-const unsigned int DatagloveProcessing::total_number_of_particles = 100;
+const unsigned int DatagloveProcessing::total_number_of_particles = 200;
 const float DatagloveProcessing::average_weight = 1.0f / ((float)DatagloveProcessing::total_number_of_particles);
 const unsigned int DatagloveProcessing::n_min = (int)(DatagloveProcessing::total_number_of_particles * 0.7f);
 
 DatagloveProcessing::DatagloveProcessing() :
     nh_tilde("~"), update_rate(0.0)
 {
+    //detect the optimal number of threads to use in the thread pool
+    int nb_possible_threads = boost::thread::hardware_concurrency();
+    ROS_INFO("will use %d threads", nb_possible_threads);
+    threadpool = boost::threadpool::pool(nb_possible_threads);
+
     math_utils = boost::shared_ptr<math_utils::MathUtils>(new math_utils::MathUtils());
     particle_cloud = boost::shared_ptr<boost::ptr_vector<ParticleSrHand> >(new boost::ptr_vector<ParticleSrHand>());
     particle_cloud_tmp = boost::shared_ptr<boost::ptr_vector<ParticleSrHand> >(new boost::ptr_vector<ParticleSrHand>());
@@ -30,6 +35,11 @@ DatagloveProcessing::DatagloveProcessing() :
     {
         particle_cloud->push_back(new ParticleSrHand(total_number_of_particles));
     }
+
+    mutex_sum_squared_weights = boost::shared_ptr<boost::mutex>(new boost::mutex());
+    mutex_sum_squared_weights->lock();
+    sum_squared_weights = 0.0f;
+    mutex_sum_squared_weights->unlock();
 
     // set update frequency
     double update_freq;
@@ -44,7 +54,18 @@ DatagloveProcessing::~DatagloveProcessing()
 
 }
 
-void DatagloveProcessing::update()
+int DatagloveProcessing::update()
+{
+    int result = update_cycle();
+
+    ros::spinOnce();
+    update_rate.sleep();
+
+    return result;
+}
+
+
+int DatagloveProcessing::update_cycle()
 {
     part_it_t particle;
 
@@ -54,19 +75,18 @@ void DatagloveProcessing::update()
      * n_eff = 1/(sum(weights^2))
      */
     n_eff = 0;
-    float sum_squared_weights = 0.0f;
-    float tmp = 0.0f;
     for( particle = particle_cloud->begin(); particle != particle_cloud->end(); ++particle )
     {
-        particle->prediction();
-        tmp = particle->compute_probability(last_measure);
-        sum_squared_weights += (tmp * tmp);
+        particle->set_last_measure(last_measure);
+
+        threadpool.schedule(boost::bind(&ParticleSrHand::update, &*particle));
+        //sum_squared_weights += (tmp * tmp);
     }
     n_eff = 1.0f / sum_squared_weights;
-    resampling();
 
-    ros::spinOnce();
-    update_rate.sleep();
+    //wait until all the tasks are finished
+    threadpool.wait();
+    return resampling();
 }
 
 int DatagloveProcessing::resampling()
@@ -77,7 +97,7 @@ int DatagloveProcessing::resampling()
      * n_eff = 1/(sum(weights^2))
      */
     if( n_eff > n_min )
-        return -1;
+        return 0;
 
     //reorder the vector by growing weights:
     particle_cloud->sort(compare_particle_weights);
@@ -104,7 +124,7 @@ int DatagloveProcessing::resampling()
     particle_cloud = particle_cloud_tmp;
     particle_cloud_tmp = boost::shared_ptr<boost::ptr_vector<ParticleSrHand> >(new boost::ptr_vector<ParticleSrHand>());
 
-    return 0;
+    return 1;
 }
 
 ParticleSrHand* DatagloveProcessing::roulette_wheel_selection( float fitness )

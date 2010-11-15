@@ -39,6 +39,30 @@ public:
     virtual void init_model() = 0;
 
     /**
+     * Runs the update cycle: first prediction()
+     * then compute_probability(last_measure)
+     *
+     */
+    virtual void update() = 0;
+
+    //accessors
+    float get_weight() const;
+    void set_weight( float new_weight );
+    void set_last_measure( boost::shared_ptr<Measure> last_measure );
+
+protected:
+    float weight;
+    float squared_weight;
+    int population_size;
+    boost::shared_ptr<Measure> last_measure;
+
+    /**
+     * Initialise the weight of the particle to 1/population_size
+     * @param population_size The size of the population.
+     */
+    void init_weight( int population_size );
+
+    /**
      * Apply a random force to the particle, thus "predicting" the next position
      * of the particle. Also called motion model.
      */
@@ -51,21 +75,8 @@ public:
      * @param measure A measure.
      * @return the new weight
      */
-    virtual float compute_probability( boost::shared_ptr<Measure> measure ) = 0;
+    virtual float compute_probability( ) = 0;
 
-    //accessors
-    float get_weight() const;
-    void set_weight( float new_weight );
-
-protected:
-    float weight;
-    int population_size;
-
-    /**
-     * Initialise the weight of the particle to 1/population_size
-     * @param population_size The size of the population.
-     */
-    void init_weight( int population_size );
 };
 }
 
