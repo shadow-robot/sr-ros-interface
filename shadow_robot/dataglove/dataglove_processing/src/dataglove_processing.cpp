@@ -14,7 +14,7 @@ namespace dataglove
 {
 const unsigned int DatagloveProcessing::total_number_of_particles = 200;
 const float DatagloveProcessing::average_weight = 1.0f / ((float)DatagloveProcessing::total_number_of_particles);
-const unsigned int DatagloveProcessing::n_min = (int)(DatagloveProcessing::total_number_of_particles * 0.7f);
+const float DatagloveProcessing::n_min = (DatagloveProcessing::total_number_of_particles * 0.7f);
 
 DatagloveProcessing::DatagloveProcessing() :
     nh_tilde("~"), update_rate(0.0)
@@ -31,22 +31,25 @@ DatagloveProcessing::DatagloveProcessing() :
     particle_cloud->reserve(total_number_of_particles);
     particle_cloud_tmp->reserve(total_number_of_particles);
 
+    n_eff_standard = 0.0f;
     for( unsigned int particle_index = 0; particle_index < total_number_of_particles; ++particle_index )
     {
         particle_cloud->push_back(new ParticleSrHand(total_number_of_particles));
+        n_eff_standard += (average_weight * average_weight);
     }
 
-    mutex_sum_squared_weights = boost::shared_ptr<boost::mutex>(new boost::mutex());
-    mutex_sum_squared_weights->lock();
-    sum_squared_weights = 0.0f;
-    mutex_sum_squared_weights->unlock();
+    n_eff_standard = 1.0f / n_eff_standard;
+
+    mutex_sum_weights = boost::shared_ptr<boost::mutex>(new boost::mutex());
+    sum_weights = boost::shared_ptr<float>(new float(0.0f));
+    sum_squared_weights = boost::shared_ptr<float>(new float(0.0f));
 
     // set update frequency
     double update_freq;
     nh_tilde.param("update_frequency", update_freq, 20.0);
     update_rate = ros::Rate(update_freq);
 
-    n_eff = 0;
+    n_eff = n_eff_standard;
 }
 
 DatagloveProcessing::~DatagloveProcessing()
@@ -64,7 +67,6 @@ int DatagloveProcessing::update()
     return result;
 }
 
-
 int DatagloveProcessing::update_cycle()
 {
     part_it_t particle;
@@ -79,13 +81,22 @@ int DatagloveProcessing::update_cycle()
     {
         particle->set_last_measure(last_measure);
 
-        threadpool.schedule(boost::bind(&ParticleSrHand::update, &*particle));
+        threadpool.schedule(boost::bind(&ParticleSrHand::update, &*particle, sum_weights.get(), mutex_sum_weights.get()));
         //sum_squared_weights += (tmp * tmp);
     }
-    n_eff = 1.0f / sum_squared_weights;
-
     //wait until all the tasks are finished
     threadpool.wait();
+
+    //Normalise the weights + set square weights at the same time.
+    for( particle = particle_cloud->begin(); particle != particle_cloud->end(); ++particle )
+    {
+        *sum_squared_weights += particle->set_weight(particle->get_weight() / (*sum_weights));
+    }
+
+    //recompute the n_eff (used to check if resampling is necessary or not)
+    n_eff = 1.0f / *sum_squared_weights;
+
+    //resample if necessary
     return resampling();
 }
 
@@ -118,12 +129,13 @@ int DatagloveProcessing::resampling()
     particle_cloud->clear();
 
     /*
-     * particle_cloud will now point to particle_cloud_tmp, and particle_cloud_tmp
-     * is then reset.
+     * particle_cloud will now point to particle_cloud_tmp and particle_cloud_tmp is
+     * then reset.
      */
     particle_cloud = particle_cloud_tmp;
     particle_cloud_tmp = boost::shared_ptr<boost::ptr_vector<ParticleSrHand> >(new boost::ptr_vector<ParticleSrHand>());
 
+    n_eff = n_eff_standard;
     return 1;
 }
 

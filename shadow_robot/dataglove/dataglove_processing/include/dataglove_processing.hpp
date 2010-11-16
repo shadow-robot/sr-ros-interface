@@ -62,7 +62,7 @@ public:
     //consts
     static const unsigned int total_number_of_particles;
     static const float average_weight;
-    static const unsigned int n_min;
+    static const float n_min;
 
 private:
     //ROS stuff
@@ -89,12 +89,14 @@ private:
     boost::shared_ptr<math_utils::MathUtils> math_utils;
     boost::shared_ptr<Measure> last_measure;
     //number of efficient particles (weight is big enough)
-    unsigned int n_eff;
+    float n_eff;
+    float n_eff_standard;
     //comparison structure
     CompareParticleWeights compare_particle_weights;
     ///sum_squared_weights needs to be thread safe
-    float sum_squared_weights;
-    boost::shared_ptr<boost::mutex> mutex_sum_squared_weights;
+    boost::shared_ptr<float> sum_weights;
+    boost::shared_ptr<float> sum_squared_weights;
+    boost::shared_ptr<boost::mutex> mutex_sum_weights;
 
     //functions
 

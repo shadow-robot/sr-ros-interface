@@ -41,15 +41,17 @@ public:
      * Runs the update cycle: first prediction()
      * then compute_probability(last_measure)
      *
+     * @param sum_weights a pointer to the Sum of weights for the whole cloud
+     * @param mutex_squared_weights a pointer to the mutex used to block this variable
      */
-    virtual void update();
+    virtual void update(float* sum_weights, boost::mutex* mutex_sum_weights);
 
     std::vector<float> get_positions();
 protected:
     boost::shared_ptr<math_utils::MathUtils> math_utils;
 
     virtual void prediction();
-    virtual float compute_probability();
+    virtual void compute_probability();
 
 };
 }

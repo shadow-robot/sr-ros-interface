@@ -29,6 +29,8 @@ Particle::Particle( boost::ptr_vector<Particle>::iterator particle, bool reset_w
         weight = average_weight;
     else
         weight = particle->weight;
+
+    squared_weight = weight * weight;
 }
 
 Particle::~Particle()
@@ -39,6 +41,7 @@ Particle::~Particle()
 void Particle::init_weight( int population_size )
 {
     weight = 1.0f / ((float)population_size);
+    squared_weight = weight * weight;
 }
 
 float Particle::get_weight() const
@@ -46,9 +49,12 @@ float Particle::get_weight() const
     return weight;
 }
 
-void Particle::set_weight( float new_weight )
+float Particle::set_weight( float new_weight )
 {
     weight = new_weight;
+    squared_weight = weight * weight;
+
+    return squared_weight;
 }
 
 void Particle::set_last_measure( boost::shared_ptr<Measure> last_measure )

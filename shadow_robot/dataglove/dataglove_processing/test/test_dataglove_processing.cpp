@@ -119,6 +119,9 @@ TEST(DatagloveProcessingTest, resampling)
         dataglove_processing.particle_cloud->push_back(part);
     }
 
+    //set n_eff to 0 to have resampling:
+    dataglove_processing.n_eff = 0.0f;
+
     int different_particles_before_resampling = 0;
     boost::ptr_vector<ParticleSrHand>::iterator particle = dataglove_processing.particle_cloud->begin();
     boost::ptr_vector<ParticleSrHand>::iterator old_particle = dataglove_processing.particle_cloud->begin();
@@ -127,7 +130,9 @@ TEST(DatagloveProcessingTest, resampling)
     for( particle; particle != dataglove_processing.particle_cloud->end(); ++particle )
     {
         if(particle == old_particle)
+        {
             different_particles_before_resampling ++;
+        }
     }
 
     int resampled = dataglove_processing.resampling();
@@ -144,12 +149,24 @@ TEST(DatagloveProcessingTest, resampling)
     //check if there are less different particles than before.
 }
 
-
 TEST(DatagloveProcessingTest, updateCycle)
 {
     DatagloveProcessing dataglove_processing;
     int result = dataglove_processing.update_cycle();
     EXPECT_TRUE(result == 0 || result == 1) << "Problem encountered while doing the update.";
+
+    boost::ptr_vector<ParticleSrHand>::iterator particle;
+    particle = dataglove_processing.particle_cloud->begin();
+    float recomputed_sum_squared_weights = 0.0f;
+    float recomputed_n_eff = 0.0f;
+    for( particle; particle != dataglove_processing.particle_cloud->end(); ++particle )
+    {
+        recomputed_sum_squared_weights += (particle->get_weight() * particle->get_weight());
+    }
+    recomputed_n_eff = 1.0f / recomputed_sum_squared_weights;
+
+    EXPECT_TRUE(*dataglove_processing.sum_squared_weights == recomputed_sum_squared_weights) << "sum squared weights = "<< *dataglove_processing.sum_squared_weights << " instead of "<<recomputed_sum_squared_weights;
+    EXPECT_TRUE(dataglove_processing.n_eff == recomputed_n_eff) << "N_eff = "<< dataglove_processing.n_eff << " instead of "<<recomputed_n_eff;
 }
 
 bool test_random( float min, float max, int iteration )

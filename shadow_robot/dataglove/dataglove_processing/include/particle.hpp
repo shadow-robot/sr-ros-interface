@@ -13,6 +13,7 @@
 
 #include "measure.hpp"
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/thread.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -42,12 +43,21 @@ public:
      * Runs the update cycle: first prediction()
      * then compute_probability(last_measure)
      *
+     * @param sum_squared_weights a pointer to the Sum of weights for the whole cloud
+     * @param mutex_sum_squared_weights a pointer to the mutex used to block this variable
      */
-    virtual void update() = 0;
+    virtual void update(float* sum_weights, boost::mutex* mutex_sum_weights) = 0;
+
 
     //accessors
     float get_weight() const;
-    void set_weight( float new_weight );
+
+    /**
+     * set the weight / squared weight for the current particle
+     * @param new_weight the new weight to set
+     * @return the squared weight value
+     */
+    float set_weight( float new_weight );
     void set_last_measure( boost::shared_ptr<Measure> last_measure );
 
 protected:
@@ -73,9 +83,8 @@ protected:
      * producing this measure given the current object position.
      *
      * @param measure A measure.
-     * @return the new weight
      */
-    virtual float compute_probability( ) = 0;
+    virtual void compute_probability( ) = 0;
 
 };
 }
