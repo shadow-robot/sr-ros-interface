@@ -46,8 +46,7 @@ public:
      * @param sum_squared_weights a pointer to the Sum of weights for the whole cloud
      * @param mutex_sum_squared_weights a pointer to the mutex used to block this variable
      */
-    virtual void update(float* sum_weights, boost::mutex* mutex_sum_weights) = 0;
-
+    virtual void update( float* sum_weights, boost::mutex* mutex_sum_weights, boost::shared_ptr<std::vector<boost::shared_ptr<Measure> > > last_measures_for_processing ) = 0;
 
     //accessors
     float get_weight() const;
@@ -58,13 +57,11 @@ public:
      * @return the squared weight value
      */
     float set_weight( float new_weight );
-    void set_last_measure( boost::shared_ptr<Measure> last_measure );
 
 protected:
     float weight;
     float squared_weight;
     int population_size;
-    boost::shared_ptr<Measure> last_measure;
 
     /**
      * Initialise the weight of the particle to 1/population_size
@@ -84,7 +81,7 @@ protected:
      *
      * @param measure A measure.
      */
-    virtual void compute_probability( ) = 0;
+    virtual void compute_probability( boost::shared_ptr<std::vector<boost::shared_ptr<Measure> > > last_measures_for_processing ) = 0;
 
 };
 }

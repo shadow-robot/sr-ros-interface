@@ -22,4 +22,8 @@ Measure::~Measure()
 
 }
 
+float Measure::compute_probability()
+{
+    return 0.5f;
+}
 }

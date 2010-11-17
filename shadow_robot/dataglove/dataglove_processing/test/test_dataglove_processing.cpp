@@ -146,7 +146,7 @@ TEST(DatagloveProcessingTest, resampling)
      */
     //check if there are enough different particles
     int different_particles_after_resampling = 0;
-    //check if there are less different particles than before.
+    //TODO: check if there are less different particles than before.
 }
 
 TEST(DatagloveProcessingTest, updateCycle)

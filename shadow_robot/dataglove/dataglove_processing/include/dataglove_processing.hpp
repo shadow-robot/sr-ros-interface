@@ -24,7 +24,6 @@
 #include "particle_sr_hand.hpp"
 #include "measure.hpp"
 
-
 namespace dataglove
 {
 struct CompareParticleWeights : std::binary_function<ParticleSrHand, ParticleSrHand, bool>
@@ -75,19 +74,34 @@ private:
 
     //type
     typedef boost::ptr_vector<ParticleSrHand>::iterator part_it_t;
-    typedef std::auto_ptr< boost::ptr_vector<ParticleSrHand> > part_auto_ptr_t;
+    typedef std::auto_ptr<boost::ptr_vector<ParticleSrHand> > part_auto_ptr_t;
 
     //variables
     /// stores the particle cloud
-    boost::shared_ptr< boost::ptr_vector<ParticleSrHand> > particle_cloud;
+    boost::shared_ptr<boost::ptr_vector<ParticleSrHand> > particle_cloud;
     /**
      *  needed when doing the resampling: temporary stores the
      *  new particle cloud, which is then retransfered to the
      *  particle_cloud variable.
      */
-    boost::shared_ptr< boost::ptr_vector<ParticleSrHand> > particle_cloud_tmp;
+    boost::shared_ptr<boost::ptr_vector<ParticleSrHand> > particle_cloud_tmp;
     boost::shared_ptr<math_utils::MathUtils> math_utils;
-    boost::shared_ptr<Measure> last_measure;
+
+    /**
+     * Pointer to a vector containing pointers to the measures which will be processed during the
+     * update cycle.
+     *
+     * This pointer will be pointed to last_measures_for_updates before the update cycle (=> point
+     * to the vector containing the new info).
+     */
+    boost::shared_ptr<std::vector<boost::shared_ptr<Measure> > > last_measures_for_processing;
+    /**
+     * Pointer to a vector into which pointers to the new measures are added.
+     *
+     * This vector will be emptied at the start of the update cycle, to store the new values between the updates.
+     */
+    boost::shared_ptr<std::vector<boost::shared_ptr<Measure> > > last_measures_for_updates;
+
     //number of efficient particles (weight is big enough)
     float n_eff;
     float n_eff_standard;

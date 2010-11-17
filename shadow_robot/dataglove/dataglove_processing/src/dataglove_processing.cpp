@@ -79,9 +79,7 @@ int DatagloveProcessing::update_cycle()
     n_eff = 0;
     for( particle = particle_cloud->begin(); particle != particle_cloud->end(); ++particle )
     {
-        particle->set_last_measure(last_measure);
-
-        threadpool.schedule(boost::bind(&ParticleSrHand::update, &*particle, sum_weights.get(), mutex_sum_weights.get()));
+        threadpool.schedule(boost::bind(&ParticleSrHand::update, &*particle, sum_weights.get(), mutex_sum_weights.get(), last_measures_for_processing));
         //sum_squared_weights += (tmp * tmp);
     }
     //wait until all the tasks are finished

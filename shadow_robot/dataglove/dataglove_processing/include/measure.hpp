@@ -13,10 +13,14 @@
 
 namespace dataglove
 {
+
 class Measure
 {
+public:
     Measure();
     ~Measure();
+
+    float compute_probability();
 };
 }
 

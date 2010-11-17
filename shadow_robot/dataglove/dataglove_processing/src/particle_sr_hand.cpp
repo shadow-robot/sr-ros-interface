@@ -58,10 +58,10 @@ void ParticleSrHand::init_model()
     joints_map_mutex.unlock();
 }
 
-void ParticleSrHand::update(float* sum_weights, boost::mutex* mutex_sum_weights)
+void ParticleSrHand::update( float* sum_weights, boost::mutex* mutex_sum_weights, boost::shared_ptr<std::vector<boost::shared_ptr<Measure> > > last_measures_for_processing )
 {
     prediction();
-    compute_probability();
+    compute_probability(last_measures_for_processing);
 
     mutex_sum_weights->lock();
     *sum_weights += weight;
@@ -73,9 +73,14 @@ void ParticleSrHand::prediction()
 
 }
 
-void ParticleSrHand::compute_probability()
+void ParticleSrHand::compute_probability( boost::shared_ptr<std::vector<boost::shared_ptr<Measure> > > last_measures_for_processing )
 {
-    weight = 1.0f;
+    std::vector<boost::shared_ptr<Measure> >::iterator measure;
+    measure = last_measures_for_processing->begin();
+    for( measure; measure != last_measures_for_processing->end(); ++measure )
+    {
+        weight *= measure->get()->compute_probability();
+    }
 }
 
 std::vector<float> ParticleSrHand::get_positions()
