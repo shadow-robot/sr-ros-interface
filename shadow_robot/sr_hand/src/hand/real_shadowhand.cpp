@@ -183,14 +183,12 @@ JointData RealShadowhand::getJointData( std::string joint_name )
 
 SRArticulatedRobot::JointsMap RealShadowhand::getAllJointsData()
 {
-    joints_map_mutex.lock();
     //update the map for each joints
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
         getJointData(it->first);
 
     JointsMap tmp = JointsMap(joints_map);
 
-    joints_map_mutex.unlock();
     //return the map
     return tmp;
 }
