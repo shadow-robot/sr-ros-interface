@@ -1,0 +1,14 @@
+<package>
+  <description brief="sr_object_manipulation_launch">
+
+     sr_object_manipulation_launch
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_object_manipulation_launch</url>
+
+</package>
+
+

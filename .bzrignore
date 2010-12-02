@@ -95,3 +95,5 @@ shadow_robot/sr_convenient_dependencies/bin
 shadow_robot/sr_convenient_dependencies/build
 shadow_robot/sr_convenient_dependencies/src
 shadow_robot/dataglove/doc
+shadow_robot/sr_object_manipulation/sr_object_manipulation_launch/bin
+shadow_robot/sr_object_manipulation/sr_object_manipulation_launch/build

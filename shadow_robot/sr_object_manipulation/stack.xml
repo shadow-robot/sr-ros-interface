@@ -1,0 +1,9 @@
+<stack>
+  <description brief="sr_object_manipulation">sr_object_manipulation</description>
+  <author>Maintained by Ugo Cupcic</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_object_manipulation</url>
+  <depend stack="ros" />
+
+</stack>

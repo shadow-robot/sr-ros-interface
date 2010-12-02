@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="tf" type="static_transform_publisher" name="world_to_kinect_rgb" 
+    args="0 0.3 0.5 0 3.14159 1.0 /world /kinect_rgb 10" machine="threedsensor"/>
+  
+  <node pkg="tf" type="static_transform_publisher" name="kinect_rgb_to_kinect_depth" 
+    args="-0.03 0.0 0.0 0.0 0.0 0.0 /kinect_rgb /kinect_depth 10" machine="threedsensor"/>
+</launch>
