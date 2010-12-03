@@ -17,8 +17,8 @@
       <param name="publish_bad_fit_markers" value="false" />
       
       <!--topic remapping-->
-      <remap from="cloud_old_in" to="kinect/points2" />
-      <remap from="cloud_new_in" to="kinect/points2" />
+      <remap from="cloud_old_in" to="kinect/depth/points2" />
+      <remap from="cloud_new_in" to="kinect/depth/points2" />
       <remap from="object_detection_srv" to="object_detection" />
       <remap from="markers_out" to="tabletop_detector_markers" />
       

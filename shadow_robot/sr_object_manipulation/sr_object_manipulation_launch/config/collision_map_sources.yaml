@@ -1,5 +1,5 @@
 cloud_sources:
-  - name: kinect/points
+  - name: kinect/depth/points
     frame_subsample: 1
     point_subsample: 1
     sensor_frame: kinect_depth

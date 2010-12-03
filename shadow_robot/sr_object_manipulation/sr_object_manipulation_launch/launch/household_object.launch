@@ -2,10 +2,10 @@
 
   <!-- load database connection parameters -->
   <rosparam command="load" 
-            file="$(find sr_object_manipulation_launch)/config/household_object_server.yaml"/>
+            file="$(find sr_object_manipulation_launch)/config/household_object_server.yaml"/> 
 
   <!-- start the database wrapper node -->
   <node pkg="household_objects_database" name="objects_database_node" 
-        type="objects_database_node" respawn="true" output="screen"/>
+        type="objects_database_node" respawn="true" output="screen" machine="household_database"/> 
 
 </launch>
