@@ -64,8 +64,7 @@ class MainWidget(QtGui.QWidget):
         for plugin in self.plugins:
             plugin.plugin_object.set_parent(self)
             name = plugin.plugin_object.name
-            
-            
+                        
             plugin.plugin_object.id = plugin_id
             action = QtGui.QAction(name, self)
             action.setDisabled(True)

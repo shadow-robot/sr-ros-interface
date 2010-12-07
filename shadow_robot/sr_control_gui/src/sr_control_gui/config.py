@@ -42,6 +42,10 @@ class ShadowArmHandConfig(GenericRosNodeConfig):
 class ShadowArmPluginConfig(GenericPluginConfig):
     dependencies = ["Shadow Hand and Arm"]
 
+class SrObjectSelectionConfig(GenericPluginConfig):
+    name = "Object Selection Plugin"
+    list_of_nodes = ["/tabletop_node"]
+
 class CybergloveConfig(GenericRosNodeConfig):
     name = "Cyberglove"
     list_of_nodes = ["/cyberglove"]
@@ -84,7 +88,8 @@ class Config(object):
     shadowhand_plugin_config = ShadowHandPluginConfig()
     cyberglove_generic_plugin_config = CybergloveGenericPluginConfig()
     shadow_arm_plugin_config = ShadowArmPluginConfig()
-    
+    sr_object_selection_config = SrObjectSelectionConfig()
+
     #Other GUI config
     main_widget_refresh_rate = 0.5
 
