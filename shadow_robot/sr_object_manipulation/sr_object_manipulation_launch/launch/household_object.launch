@@ -6,6 +6,7 @@
 
   <!-- start the database wrapper node -->
   <node pkg="household_objects_database" name="objects_database_node" 
-        type="objects_database_node" respawn="true" output="screen" machine="household_database"/> 
+        type="objects_database_node" respawn="true" output="screen" machine="household_database"> 
+  </node>
 
 </launch>

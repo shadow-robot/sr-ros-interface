@@ -2,13 +2,16 @@
 
     <node pkg="tabletop_object_detector" name="tabletop_node" type="tabletop_node" respawn="false" output="screen" machine="dataprocessing">
       <!-- object recognition -->
-      <param name="use_database" value="false"/>
+      <param name="use_database" value="true"/>
+
+      <param name="model_set" type="string" value="REDUCED_MODEL_SET" />
+
       <param name="get_model_mesh_srv" value="/objects_database_node/get_model_mesh"/>
       <param name="get_model_list_srv" value="/objects_database_node/get_model_list"/>
 
       <!--operational parameters-->
       <param name="perform_fit_merge" value="true" />
-      <param name="fit_merge_threshold" value="0.05" />
+      <param name="fit_merge_threshold" value="0.3" />
       
       <!-- which debug markers will be published-->
       <param name="publish_table_marker" value="true" />
@@ -26,7 +29,7 @@
       <!-- remove this entire block and processing and filtering will -->
       <!-- be done with default settings, in the incoming cloud frame -->
       <param name="processing_frame" value="kinect_depth" />
-      <param name="up_direction" value="1.0" />
+      <param name="up_direction" value="-1.0" />
       <param name="z_filter_min" value="0.35" />
       <param name="z_filter_max" value="1.0" />
       <param name="table_z_filter_min" value="0.01" />

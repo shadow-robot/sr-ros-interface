@@ -1,18 +1,9 @@
 min_sensor_dist: .05
-self_see_default_padding: .01
+self_see_default_padding: .04
 self_see_default_scale: 1.0
 self_see_links:
-  - name: forearm_motor
+  - name: srh
     padding: .04
-  - name: wrist 
-    padding: .04
-  - name: palm
-    padding: .04
-  - name: ffknuckle
-    padding: .04
-  - name: ffproximal
-    padding: .04
-  - name: ffmiddle
-    padding: .04
-  - name: ffdistal
-    padding: .04
+
+
+
