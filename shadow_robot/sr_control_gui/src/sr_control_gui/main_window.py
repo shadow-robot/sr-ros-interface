@@ -34,6 +34,15 @@ class ReloadGraspSignalWidget(Qt.QWidget):
     def __init__(self, parent=None):
         super(ReloadGraspSignalWidget, self).__init__(parent)
 
+class ReloadObjectSignalWidget(Qt.QWidget):
+    """
+    A Qt signal send when the grasps list has been changed. All the plugins
+    using the grasps subscribes to this signal and reload their grasps lists.
+    """
+    reloadObjectSig = QtCore.pyqtSignal(int)
+    
+    def __init__(self, parent=None):
+        super(ReloadObjectSignalWidget, self).__init__(parent)
 
 class MainWindow(QtGui.QMainWindow):
     """
@@ -86,7 +95,8 @@ class MainWindow(QtGui.QMainWindow):
         ###
         # SIGNALS
         ##
-        self.reload_grasp_signal_widget = ReloadGraspSignalWidget()            
+        self.reload_grasp_signal_widget = ReloadGraspSignalWidget()        
+        self.reload_object_signal_widget = ReloadObjectSignalWidget()           
 
         ####
         # DOCKS
