@@ -28,19 +28,17 @@ class ObjectChooser(QtGui.QWidget):
     def draw(self):
         self.frame = QtGui.QFrame(self)
 
-        self.list = QtGui.QListWidget()
-        first_item = self.refresh_list()  
-        self.connect(self.list, QtCore.SIGNAL('itemClicked(QListWidgetItem*)'), self.object_choosed)
-            
-        self.connect(self.list, QtCore.SIGNAL('itemDoubleClicked(QListWidgetItem*)'), self.double_click)
-        self.list.setViewMode(QtGui.QListView.ListMode)
-        self.list.setResizeMode(QtGui.QListView.Adjust)
-        self.list.setItemSelected(first_item, True)
-        #self.object_choosed(first_item, first_time=True)
+        self.tree = QtGui.QTreeWidget()
+        self.connect(self.tree, QtCore.SIGNAL('itemDoubleClicked (QTreeWidgetItem *, int)'),
+                     self.double_click)
+        self.tree.setHeaderLabels(["Object Name", "Maker", "tags"])
+        self.tree.resizeColumnToContents(0)
+        self.tree.resizeColumnToContents(1)
+        self.tree.resizeColumnToContents(2)
         
         self.layout = QtGui.QVBoxLayout()
         self.layout.addWidget(self.title)
-        self.layout.addWidget(self.list)
+        self.layout.addWidget(self.tree)
         
         ###
         # SIGNALS
@@ -54,23 +52,35 @@ class ObjectChooser(QtGui.QWidget):
         self.setLayout(layout)
         self.show()
         
-    def double_click(self, item):
-        self.object = self.plugin_parent.found_objects[str(item.text())]
-        print str(item.text())
-    
-    def object_choosed(self, item, first_time=False):
-        self.object = self.plugin_parent.found_objects[str(item.text())]
-            
-    def refresh_list(self, value = 0):
-        self.list.clear()   
+    def double_click(self, item, value):
+        self.object = self.plugin_parent.found_objects[str(item.text(0))]
+        print str(item.text(0)), " double clicked"
+                
+    def refresh_list(self, value=0):
+        self.tree.clear()
         first_item = None
-        tmp = self.plugin_parent.found_objects.keys()
-        tmp.sort()
-        for object_name in tmp:
-            item = QtGui.QListWidgetItem(object_name)
+        object_names = self.plugin_parent.found_objects.keys()
+        object_names.sort()
+        for object_name in object_names:
+            item = QtGui.QTreeWidgetItem(self.tree)
             if first_item == None:
                 first_item = item
-            self.list.addItem(item)
+            
+            item.setText(0, object_name)
+            obj = self.plugin_parent.found_objects[object_name]
+            item.setText(1, obj.maker)
+            
+            tags = ""
+            for tag in obj.tags:
+                tags += str(tag) + " ; "
+            item.setText(2, tags)
+            
+            self.tree.resizeColumnToContents(0)
+            self.tree.resizeColumnToContents(1)
+            self.tree.resizeColumnToContents(2)
+            
+            #print "add"
+            #self.tree.addTopLevelItem(item)
         return first_item
     
     
@@ -111,14 +121,14 @@ class ObjectSelection(GenericPlugin):
         try:
             objects = self.service_object_detector(True, True)
         except rospy.ServiceException, e:
-            print "Service did not process request: %s"%str(e)
+            print "Service did not process request: %s" % str(e)
         
         self.number_of_unrecognized_objects = 0
         for index, cmi in zip(range(0, len(objects.detection.cluster_model_indices)), objects.detection.cluster_model_indices):
             # object not recognized
             if cmi == -1:
                 self.number_of_unrecognized_objects += 1
-                tmp_name = "unrecognized_"+str(self.number_of_unrecognized_objects)
+                tmp_name = "unrecognized_" + str(self.number_of_unrecognized_objects)
                 self.found_objects[tmp_name] = objects.detection[index]
         
         # for the recognized objects
@@ -128,14 +138,11 @@ class ObjectSelection(GenericPlugin):
             try:
                 model_desc = self.service_db_get_model_description(model_id)
             except rospy.ServiceException, e:
-                print "Service did not process request: %s"%str(e)
+                print "Service did not process request: %s" % str(e)
             
             self.found_objects[model_desc.name] = model_desc
         
-        
         self.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].emit(1)
-        #print self.found_objects
-            
             
     
     def activate(self):
