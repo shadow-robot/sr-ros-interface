@@ -39,11 +39,10 @@
 
   </node>
 
-  <node name="cluster_bounding_box_finder" pkg="object_manipulator" type="cluster_bounding_box_finder_server.py" output="screen" respawn="false" machine="dataprocessing"/>
-
   <node pkg="tabletop_collision_map_processing" name="tabletop_collision_map_processing"
         type="tabletop_collision_map_processing_node" respawn="false" output="screen" machine="dataprocessing">
     <param name="get_model_mesh_srv"
 	   value="/objects_database_node/get_model_mesh" />
   </node>
+
 </launch>

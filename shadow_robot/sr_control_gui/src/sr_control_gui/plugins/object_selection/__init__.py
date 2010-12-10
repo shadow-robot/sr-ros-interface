@@ -12,6 +12,9 @@ from tabletop_object_detector.srv import TabletopDetection
 from tabletop_object_detector.msg import TabletopDetectionResult
 from household_objects_database_msgs.srv import GetModelDescription
 from tabletop_collision_map_processing.srv import TabletopCollisionMapProcessing
+from object_manipulation_msgs.srv import FindClusterBoundingBox, FindClusterBoundingBoxRequest
+import object_manipulator.draw_functions as draw_functions
+from object_manipulator.convert_functions import *
 
 class ObjectChooser(QtGui.QWidget):
     """
@@ -97,7 +100,9 @@ class ObjectSelection(GenericPlugin):
         self.service_object_detector = None
         self.service_db_get_model_description = None
         self.service_tabletop_collision_map = None
-        
+        self.draw_functions = None
+        self.graspable_objects = None
+
         self.found_objects = {}
         self.number_of_unrecognized_objects = 0
 
@@ -136,6 +141,8 @@ class ObjectSelection(GenericPlugin):
 
         self.object_chooser.draw()
 
+        self.draw_functions = draw_functions.DrawFunctions('grasp_markers')
+
         GenericPlugin.activate(self)
 
     def detect_objects(self):
@@ -167,8 +174,27 @@ class ObjectSelection(GenericPlugin):
         
         self.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].emit(1)
         
-        self.process_collision_map(objects.detection)
-    
+        tabletop_collision_map_res = self.process_collision_map(objects.detection)
+        self.graspable_objects = tabletop_collision_map_res.graspable_objects
+
+        if len(self.graspable_objects) > 0: 
+            for graspable_object in self.graspable_objects:
+                (box_pose, box_dims) = self.call_find_cluster_bounding_box(graspable_object.cluster)
+                if box_pose == None:
+                    return
+        
+                print box_pose
+                print box_dims
+
+                box_mat = pose_to_mat(box_pose.pose)
+                box_ranges = [[-box_dims.x/2, -box_dims.y/2, -box_dims.z/2],
+                              [box_dims.x/2, box_dims.y/2, box_dims.z/2]]
+
+                self.draw_functions.draw_rviz_box(box_mat, box_ranges, 'world', 
+                                                  ns = 'bounding box', 
+                                                  color = [0,0,1], opaque = 0.25, duration = 60)
+
+
     def process_collision_map(self, detection):
         res = 0
         try:
@@ -176,7 +202,31 @@ class ObjectSelection(GenericPlugin):
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
         
-        print res
+        return res
+
+    def call_find_cluster_bounding_box(self, cluster):
+        print "---"
+        print "BOUNDING BOX"
+        print cluster
+        
+        req = FindClusterBoundingBoxRequest()
+        req.cluster = cluster
+        service_name = "find_cluster_bounding_box"
+        rospy.loginfo("waiting for find_cluster_bounding_box service")
+        rospy.wait_for_service(service_name)
+        rospy.loginfo("service found")
+        serv = rospy.ServiceProxy(service_name, FindClusterBoundingBox)
+        try:
+            res = serv(req)
+        except rospy.ServiceException, e:
+            rospy.logerr("error when calling find_cluster_bounding_box: %s"%e)
+            return 0
+        if not res.error_code:
+            return (res.pose, res.box_dims)
+        else:
+            return (None, None)
+        
+
     
     def on_close(self):
         GenericPlugin.on_close(self)

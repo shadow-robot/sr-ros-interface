@@ -23,4 +23,7 @@
 
   <!-- build the collision map -->
   <include file="$(find sr_object_manipulation_launch)/launch/collision_map.launch"/>
+  
+  <!-- start the manipulator related nodes -->
+  <include file="$(find sr_object_manipulation_launch)/launch/manipulator.launch"/>
 </launch>

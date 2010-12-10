@@ -11,6 +11,7 @@
   <depend package="tabletop_object_detector"/>
   <depend package="tabletop_collision_map_processing"/>
   <depend package="sensor_msgs"/>
+  <depend package="object_manipulator"/>
   <depend package="cyberglove"/>
   <rosdep name="python-scipy"/>
   <rosdep name="paramiko"/>
