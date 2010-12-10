@@ -1,13 +1,7 @@
 <launch>
-  
-  <node pkg="nodelet" type="nodelet" name="kinect_manager" args="manager" output="screen" machine="threedsensor"/>
-
-  <node pkg="nodelet" type="nodelet" name="kinect" args="load kinect_camera/KinectDriverNodelet kinect_manager" output="screen" machine="threedsensor">
-    <remap from="camera" to="kinect" />
-    <param name="device_id" value="0" />
-    <!-- TODO Different calibration files for the two cameras! -->
-    <param name="rgb/camera_info_url"   value="file://$(find kinect_camera)/info/calibration_rgb.yaml" />
-    <param name="depth/camera_info_url" value="file://$(find kinect_camera)/info/calibration_depth.yaml" />
+  <node pkg="point_cloud_converter" name="point_cloud_converter" type="point_cloud_converter" machine="threedsensor" output="screen">
+    <remap from="points2_in" to="/camera/depth/points2"/>
+    <remap from="points_out" to="/camera/depth/points"/>
   </node>
 
 </launch>

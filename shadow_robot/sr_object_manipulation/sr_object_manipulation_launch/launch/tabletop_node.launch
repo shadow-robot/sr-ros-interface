@@ -11,7 +11,7 @@
 
       <!--operational parameters-->
       <param name="perform_fit_merge" value="true" />
-      <param name="fit_merge_threshold" value="0.3" />
+      <param name="fit_merge_threshold" value="0.1" />
       
       <!-- which debug markers will be published-->
       <param name="publish_table_marker" value="true" />
@@ -20,15 +20,15 @@
       <param name="publish_bad_fit_markers" value="false" />
       
       <!--topic remapping-->
-      <remap from="cloud_old_in" to="kinect/depth/points2" />
-      <remap from="cloud_new_in" to="kinect/depth/points2" />
+      <remap from="cloud_old_in" to="camera/depth/points2" />
+      <remap from="cloud_new_in" to="camera/depth/points2" />
       <remap from="object_detection_srv" to="object_detection" />
       <remap from="markers_out" to="tabletop_detector_markers" />
       
       <!-- processing and filtering frame -->
       <!-- remove this entire block and processing and filtering will -->
       <!-- be done with default settings, in the incoming cloud frame -->
-      <param name="processing_frame" value="kinect_depth" />
+      <param name="processing_frame" value="openni_depth" />
       <param name="up_direction" value="-1.0" />
       <param name="z_filter_min" value="0.35" />
       <param name="z_filter_max" value="1.0" />

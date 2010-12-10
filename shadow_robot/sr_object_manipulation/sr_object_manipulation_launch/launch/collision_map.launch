@@ -3,7 +3,7 @@
     <remap from="robot_description" to="hand_description"/>
 
     <!-- The default padding to be added for the body parts the robot can see -->
-    <param name="self_see_default_padding" type="double" value="0.04" />
+    <param name="self_see_default_padding" type="double" value="0.01" />
     
     <!-- The default scaling to be added for the body parts the robot can see -->
     <param name="self_see_default_scale" type="double" value="1.0" />
@@ -29,7 +29,7 @@
     <param name="dimension_z" type="double" value="0.25" />
 
     <!-- set the resolution (1.0 cm) -->
-    <param name="resolution" type="double" value="0.04" />
+    <param name="resolution" type="double" value="0.01" />
     
     <!-- cloud sources -->
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/collision_map_sources.yaml" />   
@@ -37,5 +37,13 @@
     <!-- links to filter -->
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/self_filter.yaml" />  
 
+  </node>
+
+  <node name="cluster_bounding_box_finder" pkg="object_manipulator" type="cluster_bounding_box_finder_server.py" output="screen" respawn="false" machine="dataprocessing"/>
+
+  <node pkg="tabletop_collision_map_processing" name="tabletop_collision_map_processing"
+        type="tabletop_collision_map_processing_node" respawn="false" output="screen" machine="dataprocessing">
+    <param name="get_model_mesh_srv"
+	   value="/objects_database_node/get_model_mesh" />
   </node>
 </launch>

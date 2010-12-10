@@ -9,6 +9,7 @@
   <depend package="rospy"/>
   <depend package="sr_hand"/>
   <depend package="tabletop_object_detector"/>
+  <depend package="tabletop_collision_map_processing"/>
   <depend package="sensor_msgs"/>
   <depend package="cyberglove"/>
   <rosdep name="python-scipy"/>

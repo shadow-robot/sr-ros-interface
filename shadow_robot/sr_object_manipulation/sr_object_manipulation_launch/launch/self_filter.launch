@@ -5,10 +5,10 @@
    <node pkg="robot_self_filter" type="self_filter" respawn="true" output="screen">
 
      <!-- The topic for the input cloud -->
-     <remap from="cloud_in" to="/kinect/points" />
+     <remap from="cloud_in" to="/camera/depth/points2" />
 
      <!-- The topic for the output cloud -->
-     <remap from="cloud_out" to="/kinect/points_filtered" />
+     <remap from="cloud_out" to="/camera/points_filtered" />
 
      <!-- The frame of the sensor used to obtain the data to be
        filtered; This parameter is optional. If it is not specified,

@@ -6,7 +6,7 @@
   <include file="$(find sr_object_manipulation_launch)/machines/robot.machine"/>
 
   <!-- start the 3d acquisition -->
-<!--  <include file="$(find sr_object_manipulation_launch)/launch/threedsensor.launch"/>  -->
+  <include file="$(find sr_object_manipulation_launch)/launch/threedsensor.launch"/> 
 
   <!--  <include file="$(find kinect_camera)/launch/kinect_with_tf.launch"/>-->
   <include file="$(find sr_object_manipulation_launch)/launch/static_transform.launch"/>
@@ -22,5 +22,5 @@
   <include file="$(find sr_hand)/launch/srh_motor.launch"/>
 
   <!-- build the collision map -->
-  <include file="$(find sr_object_manipulation_launch)/launch/collision_map.launch"/> 
+  <include file="$(find sr_object_manipulation_launch)/launch/collision_map.launch"/>
 </launch>

@@ -11,7 +11,7 @@ from config import Config
 from tabletop_object_detector.srv import TabletopDetection
 from tabletop_object_detector.msg import TabletopDetectionResult
 from household_objects_database_msgs.srv import GetModelDescription
-
+from tabletop_collision_map_processing.srv import TabletopCollisionMapProcessing
 
 class ObjectChooser(QtGui.QWidget):
     """
@@ -96,6 +96,7 @@ class ObjectSelection(GenericPlugin):
 
         self.service_object_detector = None
         self.service_db_get_model_description = None
+        self.service_tabletop_collision_map = None
         
         self.found_objects = {}
         self.number_of_unrecognized_objects = 0
@@ -116,6 +117,27 @@ class ObjectSelection(GenericPlugin):
 
         self.is_activated = False
     
+    def activate(self):
+        if self.is_activated:
+            return
+        self.is_activated = True
+
+        if self.service_object_detector == None:
+            rospy.wait_for_service('object_detection')
+            self.service_object_detector = rospy.ServiceProxy('object_detection', TabletopDetection)
+
+        if self.service_db_get_model_description == None:
+            rospy.wait_for_service('objects_database_node/get_model_description')
+            self.service_db_get_model_description = rospy.ServiceProxy('objects_database_node/get_model_description', GetModelDescription)
+
+        if self.service_tabletop_collision_map == None:
+            rospy.wait_for_service('/tabletop_collision_map_processing/tabletop_collision_map_processing')
+            self.service_tabletop_collision_map = rospy.ServiceProxy('/tabletop_collision_map_processing/tabletop_collision_map_processing', TabletopCollisionMapProcessing)
+
+        self.object_chooser.draw()
+
+        GenericPlugin.activate(self)
+
     def detect_objects(self):
         self.found_objects.clear()
         try:
@@ -129,7 +151,8 @@ class ObjectSelection(GenericPlugin):
             if cmi == -1:
                 self.number_of_unrecognized_objects += 1
                 tmp_name = "unrecognized_" + str(self.number_of_unrecognized_objects)
-                self.found_objects[tmp_name] = objects.detection[index]
+                #TODO: change this
+                self.found_objects[tmp_name] = objects.detection[0]
         
         # for the recognized objects
         for model in objects.detection.models:
@@ -143,26 +166,18 @@ class ObjectSelection(GenericPlugin):
             self.found_objects[model_desc.name] = model_desc
         
         self.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].emit(1)
-            
-    
-    def activate(self):
         
-        if self.is_activated:
-            return
-        self.is_activated = True
-
-        if self.service_object_detector == None:
-            rospy.wait_for_service('object_detection', 1.0)
-            self.service_object_detector = rospy.ServiceProxy('object_detection', TabletopDetection)
-
-        if self.service_db_get_model_description == None:
-            rospy.wait_for_service('objects_database_node/get_model_description', 1.0)
-            self.service_db_get_model_description = rospy.ServiceProxy('objects_database_node/get_model_description', GetModelDescription)
-
-        self.object_chooser.draw()
-
-        GenericPlugin.activate(self)
-
+        self.process_collision_map(objects.detection)
+    
+    def process_collision_map(self, detection):
+        res = 0
+        try:
+            res = self.service_tabletop_collision_map.call(detection, True, True, True, True, "world")
+        except rospy.ServiceException, e:
+            print "Service did not process request: %s" % str(e)
+        
+        print res
+    
     def on_close(self):
         GenericPlugin.on_close(self)
 
