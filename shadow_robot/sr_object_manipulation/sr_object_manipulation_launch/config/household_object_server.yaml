@@ -1,5 +1,5 @@
 household_objects_database:
-  database_host: rosautobuilder
+  database_host: 10.1.1.18
   database_port: 5432
   database_user: willow
   database_pass: willow

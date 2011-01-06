@@ -13,7 +13,7 @@
      <!-- The frame of the sensor used to obtain the data to be
        filtered; This parameter is optional. If it is not specified,
        shadow points will be considered outside -->
-     <param name="sensor_frame" type="string" value="kinect_depth" />
+     <param name="sensor_frame" type="string" value="openni_camera" />
 
      <!-- Minimum distance to sensor (for point not to be considered inside) -->
      <param name="min_sensor_dist" type="double" value="0.01" />

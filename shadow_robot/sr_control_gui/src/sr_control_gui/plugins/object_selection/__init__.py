@@ -153,6 +153,9 @@ class ObjectSelection(GenericPlugin):
             print "Service did not process request: %s" % str(e)
         
         self.number_of_unrecognized_objects = 0
+        
+        print objects.detection
+        
         for index, cmi in zip(range(0, len(objects.detection.cluster_model_indices)), objects.detection.cluster_model_indices):
             # object not recognized
             if cmi == -1:
@@ -190,7 +193,7 @@ class ObjectSelection(GenericPlugin):
                 box_ranges = [[-box_dims.x/2, -box_dims.y/2, -box_dims.z/2],
                               [box_dims.x/2, box_dims.y/2, box_dims.z/2]]
 
-                self.draw_functions.draw_rviz_box(box_mat, box_ranges, 'world', 
+                self.draw_functions.draw_rviz_box(box_mat, box_ranges, 'fixed', 
                                                   ns = 'bounding box', 
                                                   color = [0,0,1], opaque = 0.25, duration = 60)
 
@@ -198,7 +201,7 @@ class ObjectSelection(GenericPlugin):
     def process_collision_map(self, detection):
         res = 0
         try:
-            res = self.service_tabletop_collision_map.call(detection, True, True, True, True, "world")
+            res = self.service_tabletop_collision_map.call(detection, True, True, True, True, "fixed")
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
         

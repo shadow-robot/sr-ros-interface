@@ -97,3 +97,9 @@ shadow_robot/sr_convenient_dependencies/src
 shadow_robot/dataglove/doc
 shadow_robot/sr_object_manipulation/sr_object_manipulation_launch/bin
 shadow_robot/sr_object_manipulation/sr_object_manipulation_launch/build
+shadow_robot/sr_hand/.dep.inc
+shadow_robot/sr_hand/CMakeCache.txt
+shadow_robot/sr_hand/CMakeFiles
+shadow_robot/sr_hand/Makefile-sr_hand.mk
+shadow_robot/sr_hand/nbproject
+shadow_robot/sr_object_manipulation/sr_object_manipulation_launch/cmake_install.cmake

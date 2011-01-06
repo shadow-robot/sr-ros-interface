@@ -31,7 +31,7 @@
     <param name="tf_prefix" type="string" value="srh/target" />
   </node>
   
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub" args="-0.25 0.4 0.05 0 0 0 /srh/position/forearm_motor world 100" />
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub" args="-0.25 0.4 0.05 0 0 0 fixed /srh/position/forearm_motor  100" />
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub" args="0 0 0 0 0 0 /srh/position/forearm_motor /srh/target/forearm_motor 100" />
   
   

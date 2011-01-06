@@ -15,7 +15,7 @@
     <!-- we do not want a separate map with occlusions alone -->
     <param name="publish_occlusion" type="bool" value="true" />
 
-    <param name="fixed_frame" type="string" value="world" />
+    <param name="fixed_frame" type="string" value="fixed" />
 
     <!-- define a box of size 0.5x0.5x0.5 around (0,  0, 0) in the robot frame -->
     <param name="robot_frame" type="string" value="/srh/position/forearm_motor" />

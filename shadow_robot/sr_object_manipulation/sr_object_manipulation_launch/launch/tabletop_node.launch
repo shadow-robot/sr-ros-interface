@@ -20,20 +20,20 @@
       <param name="publish_bad_fit_markers" value="false" />
       
       <!--topic remapping-->
-      <remap from="cloud_old_in" to="camera/depth/points2" />
-      <remap from="cloud_new_in" to="camera/depth/points2" />
+      <remap from="cloud_old_in" to="/camera/depth/points2" />
+      <remap from="cloud_new_in" to="/camera/depth/points2" />
       <remap from="object_detection_srv" to="object_detection" />
       <remap from="markers_out" to="tabletop_detector_markers" />
       
       <!-- processing and filtering frame -->
       <!-- remove this entire block and processing and filtering will -->
       <!-- be done with default settings, in the incoming cloud frame -->
-      <param name="processing_frame" value="openni_depth" />
-      <param name="up_direction" value="-1.0" />
-      <param name="z_filter_min" value="0.35" />
+      <param name="processing_frame" value="fixed" />
+      <param name="up_direction" value="1.0" />
+      <param name="z_filter_min" value="0" />
       <param name="z_filter_max" value="1.0" />
-      <param name="table_z_filter_min" value="0.01" />
-      <param name="table_z_filter_max" value="0.5" />		
+      <param name="table_z_filter_min" value="-0.2" />
+      <param name="table_z_filter_max" value="0.2" />		
     </node>
 
 </launch>
