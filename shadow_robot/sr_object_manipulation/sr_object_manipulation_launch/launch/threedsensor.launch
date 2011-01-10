@@ -1,7 +1,7 @@
 <launch>
-  <node pkg="point_cloud_converter" name="point_cloud_converter" type="point_cloud_converter" machine="threedsensor" output="screen">
+  <!--<node pkg="point_cloud_converter" name="point_cloud_converter" type="point_cloud_converter" machine="threedsensor" output="screen">
     <remap from="points2_in" to="/camera/depth/points2"/>
     <remap from="points_out" to="/camera/depth/points"/>
-  </node>
+  </node>-->
 
 </launch>

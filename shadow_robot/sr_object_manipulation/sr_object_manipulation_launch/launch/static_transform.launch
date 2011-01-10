@@ -2,7 +2,7 @@
   <include file="$(find sr_object_manipulation_launch)/machines/threedsensor.machine"/>
   
   <node pkg="tf" type="static_transform_publisher" name="fixed_to_kinect" 
-    args="-0.5 0 0.6 0.1 0.8 0 /fixed /openni_camera 100" machine="threedsensor"/>
+    args="0.8 0 0.65 0 2.6 0 /base_link /openni_camera 100" machine="threedsensor"/>
   
 <!--  <node pkg="tf" type="static_transform_publisher" name="kinect_rgb_to_kinect_depth" 
     args="-0.03 0.0 0.0 0.0 0.0 0.0 /openni_rgb /openni_depth 10" machine="threedsensor"/> -->

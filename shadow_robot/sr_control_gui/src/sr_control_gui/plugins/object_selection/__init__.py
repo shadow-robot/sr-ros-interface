@@ -71,12 +71,13 @@ class ObjectChooser(QtGui.QWidget):
             
             item.setText(0, object_name)
             obj = self.plugin_parent.found_objects[object_name]
-            item.setText(1, obj.maker)
+            if "unrecognized_" not in object_name:
+                item.setText(1, obj.maker)
             
-            tags = ""
-            for tag in obj.tags:
-                tags += str(tag) + " ; "
-            item.setText(2, tags)
+                tags = ""
+                for tag in obj.tags:
+                    tags += str(tag) + " ; "
+                item.setText(2, tags)
             
             self.tree.resizeColumnToContents(0)
             self.tree.resizeColumnToContents(1)
@@ -154,16 +155,14 @@ class ObjectSelection(GenericPlugin):
         
         self.number_of_unrecognized_objects = 0
         
-        print objects.detection
-        
         for index, cmi in zip(range(0, len(objects.detection.cluster_model_indices)), objects.detection.cluster_model_indices):
             # object not recognized
             if cmi == -1:
                 self.number_of_unrecognized_objects += 1
                 tmp_name = "unrecognized_" + str(self.number_of_unrecognized_objects)
                 #TODO: change this
-                self.found_objects[tmp_name] = objects.detection[0]
-        
+                self.found_objects[tmp_name] = objects.detection.clusters[0]
+                
         # for the recognized objects
         for model in objects.detection.models:
             model_id = model.model_id
@@ -178,40 +177,39 @@ class ObjectSelection(GenericPlugin):
         self.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].emit(1)
         
         tabletop_collision_map_res = self.process_collision_map(objects.detection)
-        self.graspable_objects = tabletop_collision_map_res.graspable_objects
-
-        if len(self.graspable_objects) > 0: 
-            for graspable_object in self.graspable_objects:
-                (box_pose, box_dims) = self.call_find_cluster_bounding_box(graspable_object.cluster)
-                if box_pose == None:
-                    return
         
-                print box_pose
-                print box_dims
-
-                box_mat = pose_to_mat(box_pose.pose)
-                box_ranges = [[-box_dims.x/2, -box_dims.y/2, -box_dims.z/2],
-                              [box_dims.x/2, box_dims.y/2, box_dims.z/2]]
-
-                self.draw_functions.draw_rviz_box(box_mat, box_ranges, 'fixed', 
-                                                  ns = 'bounding box', 
-                                                  color = [0,0,1], opaque = 0.25, duration = 60)
+        if tabletop_collision_map_res != 0:
+            self.graspable_objects = tabletop_collision_map_res.graspable_objects
+    
+            rospy.loginfo("Graspable object found")
+                
+            if self.graspable_objects != 0:
+                if len(self.graspable_objects) > 0: 
+                    for graspable_object in self.graspable_objects:
+                        (box_pose, box_dims) = self.call_find_cluster_bounding_box(graspable_object.cluster)
+                        if box_pose == None:
+                            return
+        
+                        box_mat = pose_to_mat(box_pose.pose)
+                        box_ranges = [[-box_dims.x/2, -box_dims.y/2, -box_dims.z/2],
+                                      [box_dims.x/2, box_dims.y/2, box_dims.z/2]]
+        
+                        self.draw_functions.draw_rviz_box(box_mat, box_ranges, 'base_link', 
+                                                          ns = 'bounding box', 
+                                                          color = [0,0,1], opaque = 0.25, duration = 60)
 
 
     def process_collision_map(self, detection):
         res = 0
         try:
-            res = self.service_tabletop_collision_map.call(detection, True, True, True, True, "fixed")
+            #reset_static_map, reset_collision_models, reset_attached_models, take_static_collision_map
+            res = self.service_tabletop_collision_map.call(detection, False, True, True, False, "base_link")
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
         
         return res
 
     def call_find_cluster_bounding_box(self, cluster):
-        print "---"
-        print "BOUNDING BOX"
-        print cluster
-        
         req = FindClusterBoundingBoxRequest()
         req.cluster = cluster
         service_name = "find_cluster_bounding_box"

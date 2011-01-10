@@ -1,6 +1,7 @@
 <launch>
-  
-  <node name="cluster_bounding_box_finder" pkg="object_manipulator"
-	type="cluster_bounding_box_finder_server.py" output="screen" respawn="false" />
 
+  <node name="cluster_bounding_box_finder" pkg="object_manipulator"
+	type="cluster_bounding_box_finder_server.py" output="screen" respawn="false">
+  </node>
+	
 </launch>
