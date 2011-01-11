@@ -1,0 +1,16 @@
+<package>
+  <description brief="sr_hand_palm_edc">
+
+     sr_hand_palm_edc
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_hand_palm_edc</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+
+</package>
+
+
