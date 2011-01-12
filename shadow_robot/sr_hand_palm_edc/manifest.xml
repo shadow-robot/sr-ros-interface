@@ -1,10 +1,10 @@
 <package>
   <description brief="sr_hand_palm_edc">
 
-     sr_hand_palm_edc
+     A package implementing the interface for the Shadow Robot Dextrous, etherCAT palm version, ROS interface.     
 
   </description>
-  <author>Ugo Cupcic</author>
+  <author>Hugo Elias</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_hand_palm_edc</url>
