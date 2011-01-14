@@ -1,0 +1,24 @@
+<stack>
+  <description brief="tabletop_object_perception">
+
+    One example of sensor data processing for manipulation
+    tasks. Containts functionality for object segmentation, object
+    recognition and collision environment management for manipulation.
+
+  </description>
+  <author>Maintained by Matei Ciocarlie</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tabletop_object_perception</url>
+  <depend stack="collision_environment" /> <!-- collision_environment_msgs, distance_field -->
+  <depend stack="common" /> <!-- actionlib -->
+  <depend stack="common_msgs" /> <!-- geometry_msgs, sensor_msgs, visualization_msgs -->
+  <depend stack="geometry" /> <!-- tf -->
+  <depend stack="motion_planning_common" /> <!-- geometric_shapes_msgs, mapping_msgs -->
+  <depend stack="object_manipulation" /> <!-- household_objects_database_msgs, object_manipulation_msgs -->
+  <depend stack="perception_pcl" /> <!-- pcl -->
+  <depend stack="pr2_common" /> <!-- pr2_msgs -->
+  <depend stack="ros" />
+  <depend stack="ros_comm" /> <!-- std_srvs, roscpp -->
+
+</stack>

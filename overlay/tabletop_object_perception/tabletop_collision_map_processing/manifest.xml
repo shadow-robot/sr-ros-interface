@@ -1,0 +1,33 @@
+<package>
+  <description brief="tabletop_collision_map_processing">
+
+    Populates and manages a collision environment using the results of
+    sensor processing from the tabletop_object_detector. Functionality
+    includes adding and removing detected objects from the collision
+    environment, and requesting static collision maps for obstacle
+    avoidance.
+
+  </description>
+  <author>Matei Ciocarlie</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tabletop_collision_map_processing</url>
+
+  <depend package="collision_environment_msgs"/>
+  <depend package="mapping_msgs"/>
+  <depend package="std_srvs"/>
+  <depend package="pr2_msgs"/>
+  <depend package="geometric_shapes_msgs"/>
+
+  <depend package="tf"/>
+  <depend package="actionlib"/>
+  <depend package="household_objects_database_msgs"/>
+  <depend package="object_manipulation_msgs"/>
+  <depend package="tabletop_object_detector"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltabletop_collision_map_processing"/>
+  </export>
+</package>
+
+

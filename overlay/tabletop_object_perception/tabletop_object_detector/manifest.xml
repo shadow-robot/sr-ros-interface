@@ -1,0 +1,29 @@
+<package>
+  <description brief="tabletop_object_detector">
+    Performs object segmentation and simple object recognition for
+    constrained scenes.
+  </description>
+
+  <author>Marius Muja and Matei Ciocarlie</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/object_detector</url>
+
+  <depend package="roscpp" />
+  <depend package="tf"/>
+
+  <depend package="visualization_msgs" />
+  <depend package="sensor_msgs"/>
+  <depend package="geometry_msgs" />
+
+  <depend package="pcl"/>
+  <depend package="distance_field"/>
+  <depend package="household_objects_database_msgs" />
+
+ <export>
+    <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp"/>
+ </export>
+
+</package>
+
+
