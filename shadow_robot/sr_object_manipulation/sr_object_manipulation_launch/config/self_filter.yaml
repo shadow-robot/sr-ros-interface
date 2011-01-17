@@ -2,8 +2,13 @@ min_sensor_dist: .05
 self_see_default_padding: .01
 self_see_default_scale: 1.0
 self_see_links:
+  - name: palm
+    padding: .01
+  - name: wrist
+    padding: .01
   - name: forearm_motor
     padding: .01
+    
 
 
 

@@ -203,9 +203,12 @@ class ObjectSelection(GenericPlugin):
         res = 0
         try:
             #reset_static_map, reset_collision_models, reset_attached_models, take_static_collision_map
-            res = self.service_tabletop_collision_map.call(detection, False, True, True, False, "base_link")
+            res = self.service_tabletop_collision_map.call(detection, True, True, True, True, "base_link")
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
+        
+        print res.collision_object_names
+        
         
         return res
 

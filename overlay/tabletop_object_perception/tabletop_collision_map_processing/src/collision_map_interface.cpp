@@ -128,7 +128,7 @@ std::string CollisionMapInterface::getNextObjectName()
 void CollisionMapInterface::takeStaticMap() 
 {  
   collision_environment_msgs::MakeStaticCollisionMapGoal static_map_goal;
-  static_map_goal.cloud_source = "full_cloud_filtered";
+  static_map_goal.cloud_source = "camera/depth/points";
   static_map_goal.number_of_clouds = 2;
   
   make_static_collision_map_client_.sendGoal(static_map_goal);

@@ -8,7 +8,9 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_object_manipulation_launch</url>
-
+  <depend package="robot_self_filter"/>
+  <depend package="household_objects_database"/>
+  <depend package="collision_map"/>
 </package>
 
 

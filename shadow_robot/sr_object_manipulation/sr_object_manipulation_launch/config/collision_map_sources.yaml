@@ -1,5 +1,5 @@
 cloud_sources:
   - name: camera/depth/points
-    frame_subsample: 1
+    frame_subsample: 5
     point_subsample: 1
     sensor_frame: openni_depth_frame

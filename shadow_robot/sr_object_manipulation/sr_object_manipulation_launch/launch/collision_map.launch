@@ -3,7 +3,8 @@
 
 	<node pkg="collision_map" type="collision_map_self_occ_node" name="collision_map_self_occ_node"
 		respawn="true"
-		output="screen" machine="dataprocessing">
+		output="screen"
+		machine="dataprocessing">
 		<remap from="robot_description" to="hand_description"/>
 
 		<!-- The default padding to be added for the body parts the robot can see
@@ -17,8 +18,7 @@
 			/>
 
 		<!-- if someone asks for a stable map, publish the static map on the dynamic
-			map
-			topic and no longer publish dynamic maps -->
+ 			 map topic and no longer publish dynamic maps -->
 		<param name="publish_static_over_dynamic_map" type="bool" value="true" />
 
 		<!-- we do not want a separate map with occlusions alone -->
@@ -30,15 +30,13 @@
 			-->
 		<param name="robot_frame" type="string" value="/srh/position/forearm_motor"
 			/>
-		<param name="sensor_frame" type="string" value="openni_depth_frame"
-			/>
 
 		<param name="origin_x" type="double" value="0.0" />
 		<param name="origin_y" type="double" value="0.0" />
 		<param name="origin_z" type="double" value="0.0" />
 
-		<param name="dimension_x" type="double" value="0.5" />
-		<param name="dimension_y" type="double" value="0.5" />
+		<param name="dimension_x" type="double" value="0.25" />
+		<param name="dimension_y" type="double" value="0.25" />
 		<param name="dimension_z" type="double" value="0.25" />
 
 		<!-- set the resolution (1.0 cm) -->
@@ -52,7 +50,8 @@
 
 	<node pkg="tabletop_collision_map_processing" name="tabletop_collision_map_processing"
 		type="tabletop_collision_map_processing_node"
-		respawn="false" output="screen"
+		respawn="false"
+		output="screen"
 		machine="dataprocessing">
 		<param name="get_model_mesh_srv" value="/objects_database_node/get_model_mesh"
 			/>
