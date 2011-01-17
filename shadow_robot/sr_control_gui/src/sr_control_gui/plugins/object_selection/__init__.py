@@ -26,6 +26,7 @@ class ObjectChooser(QtGui.QWidget):
         self.grasp = None
         self.title = QtGui.QLabel()
         self.title.setText(title)
+        self.draw_functions = None
 
 
     def draw(self):
@@ -43,6 +44,7 @@ class ObjectChooser(QtGui.QWidget):
         self.layout.addWidget(self.title)
         self.layout.addWidget(self.tree)
         
+        self.draw_functions = draw_functions.DrawFunctions('grasp_markers')
         ###
         # SIGNALS
         ##
@@ -57,7 +59,38 @@ class ObjectChooser(QtGui.QWidget):
         
     def double_click(self, item, value):
         self.object = self.plugin_parent.found_objects[str(item.text(0))]
-        print str(item.text(0)), " double clicked"
+        
+        graspable_object = self.object.graspable_object
+        (box_pose, box_dims) = self.call_find_cluster_bounding_box(graspable_object.cluster)
+        if box_pose == None:
+            return
+        
+        box_mat = pose_to_mat(box_pose.pose)
+        box_ranges = [[-box_dims.x / 2, -box_dims.y / 2, -box_dims.z / 2],
+                      [box_dims.x / 2, box_dims.y / 2, box_dims.z / 2]]
+
+        self.draw_functions.draw_rviz_box(box_mat, box_ranges, 'base_link',
+                                          ns='bounding box',
+                                          color=[0, 0, 1], opaque=0.25, duration=60)
+                
+    def call_find_cluster_bounding_box(self, cluster):
+        req = FindClusterBoundingBoxRequest()
+        req.cluster = cluster
+        service_name = "find_cluster_bounding_box"
+        rospy.loginfo("waiting for find_cluster_bounding_box service")
+        rospy.wait_for_service(service_name)
+        rospy.loginfo("service found")
+        serv = rospy.ServiceProxy(service_name, FindClusterBoundingBox)
+        try:
+            res = serv(req)
+        except rospy.ServiceException, e:
+            rospy.logerr("error when calling find_cluster_bounding_box: %s" % e)
+            return 0
+        if not res.error_code:
+            return (res.pose, res.box_dims)
+        else:
+            return (None, None)
+        
                 
     def refresh_list(self, value=0):
         self.tree.clear()
@@ -70,8 +103,8 @@ class ObjectChooser(QtGui.QWidget):
                 first_item = item
             
             item.setText(0, object_name)
-            obj = self.plugin_parent.found_objects[object_name]
-            if "unrecognized_" not in object_name:
+            obj = self.plugin_parent.found_objects[object_name].model_description
+            if "unknown_" not in object_name:
                 item.setText(1, obj.maker)
             
                 tags = ""
@@ -87,6 +120,19 @@ class ObjectChooser(QtGui.QWidget):
             #self.tree.addTopLevelItem(item)
         return first_item
     
+class TableObject(object):
+    """
+    Contains all the relevant info for an object.
+    A map of TableObject is stored in the ObjectSelection plugin.
+    """
+    def __init__(self):
+        self.graspable_object = None
+        self.graspable_object_name = None
+        self.model_description = None
+    
+class Model(object):
+    def __init__(self):
+        self.name = None
     
 class ObjectSelection(GenericPlugin):  
     """
@@ -101,9 +147,6 @@ class ObjectSelection(GenericPlugin):
         self.service_object_detector = None
         self.service_db_get_model_description = None
         self.service_tabletop_collision_map = None
-        self.draw_functions = None
-        self.graspable_objects = None
-
         self.found_objects = {}
         self.number_of_unrecognized_objects = 0
 
@@ -142,9 +185,25 @@ class ObjectSelection(GenericPlugin):
 
         self.object_chooser.draw()
 
-        self.draw_functions = draw_functions.DrawFunctions('grasp_markers')
 
         GenericPlugin.activate(self)
+
+    def get_object_name(self, model_id):
+        """
+        return the object name given its index (read from database, or 
+        create unique name if unknown object).
+        """
+        model = Model()
+        #todo make sure name is unique
+        if model_id == -1:
+            model.name = "unknown_"
+        else:
+            try:
+                model = self.service_db_get_model_description(model_id)
+            except rospy.ServiceException, e:
+                print "Service did not process request: %s" % str(e)
+                model.name = "unkown_recognition_failed" 
+        return model
 
     def detect_objects(self):
         self.found_objects.clear()
@@ -153,52 +212,23 @@ class ObjectSelection(GenericPlugin):
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
         
-        self.number_of_unrecognized_objects = 0
-        
-        for index, cmi in zip(range(0, len(objects.detection.cluster_model_indices)), objects.detection.cluster_model_indices):
-            # object not recognized
-            if cmi == -1:
-                self.number_of_unrecognized_objects += 1
-                tmp_name = "unrecognized_" + str(self.number_of_unrecognized_objects)
-                #TODO: change this
-                self.found_objects[tmp_name] = objects.detection.clusters[0]
-                
-        # for the recognized objects
-        for model in objects.detection.models:
-            model_id = model.model_id
-            
-            try:
-                model_desc = self.service_db_get_model_description(model_id)
-            except rospy.ServiceException, e:
-                print "Service did not process request: %s" % str(e)
-            
-            self.found_objects[model_desc.name] = model_desc
-        
-        self.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].emit(1)
-        
+        #take a new collision map + add the detected objects to the collision map and get graspable objects from them 
         tabletop_collision_map_res = self.process_collision_map(objects.detection)
         
         if tabletop_collision_map_res != 0:
-            self.graspable_objects = tabletop_collision_map_res.graspable_objects
-    
-            rospy.loginfo("Graspable object found")
+            for grasp_obj, grasp_obj_name in zip(tabletop_collision_map_res.graspable_objects, tabletop_collision_map_res.collision_object_names):
+                obj_tmp = TableObject()
+                obj_tmp.graspable_object = grasp_obj
+                obj_tmp.graspable_object_name = grasp_obj_name
                 
-            if self.graspable_objects != 0:
-                if len(self.graspable_objects) > 0: 
-                    for graspable_object in self.graspable_objects:
-                        (box_pose, box_dims) = self.call_find_cluster_bounding_box(graspable_object.cluster)
-                        if box_pose == None:
-                            return
+                model_index = grasp_obj.model_pose.model_id
+                obj_tmp.model_description = self.get_object_name(model_index)
+                
+                
+                self.found_objects[obj_tmp.model_description.name] = obj_tmp
+            
+        self.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].emit(1)
         
-                        box_mat = pose_to_mat(box_pose.pose)
-                        box_ranges = [[-box_dims.x/2, -box_dims.y/2, -box_dims.z/2],
-                                      [box_dims.x/2, box_dims.y/2, box_dims.z/2]]
-        
-                        self.draw_functions.draw_rviz_box(box_mat, box_ranges, 'base_link', 
-                                                          ns = 'bounding box', 
-                                                          color = [0,0,1], opaque = 0.25, duration = 60)
-
-
     def process_collision_map(self, detection):
         res = 0
         try:
@@ -207,30 +237,7 @@ class ObjectSelection(GenericPlugin):
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
         
-        print res.collision_object_names
-        
-        
         return res
-
-    def call_find_cluster_bounding_box(self, cluster):
-        req = FindClusterBoundingBoxRequest()
-        req.cluster = cluster
-        service_name = "find_cluster_bounding_box"
-        rospy.loginfo("waiting for find_cluster_bounding_box service")
-        rospy.wait_for_service(service_name)
-        rospy.loginfo("service found")
-        serv = rospy.ServiceProxy(service_name, FindClusterBoundingBox)
-        try:
-            res = serv(req)
-        except rospy.ServiceException, e:
-            rospy.logerr("error when calling find_cluster_bounding_box: %s"%e)
-            return 0
-        if not res.error_code:
-            return (res.pose, res.box_dims)
-        else:
-            return (None, None)
-        
-
     
     def on_close(self):
         GenericPlugin.on_close(self)
