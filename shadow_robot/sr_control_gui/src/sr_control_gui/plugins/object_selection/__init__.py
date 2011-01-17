@@ -15,6 +15,10 @@ from tabletop_collision_map_processing.srv import TabletopCollisionMapProcessing
 from object_manipulation_msgs.srv import FindClusterBoundingBox, FindClusterBoundingBoxRequest
 import object_manipulator.draw_functions as draw_functions
 from object_manipulator.convert_functions import *
+from object_manipulation_msgs.msg import PickupGoal, PickupAction
+from geometry_msgs.msg import Vector3Stamped
+import actionlib
+from actionlib_msgs.msg import *
 
 class ObjectChooser(QtGui.QWidget):
     """
@@ -61,6 +65,8 @@ class ObjectChooser(QtGui.QWidget):
         self.object = self.plugin_parent.found_objects[str(item.text(0))]
         
         graspable_object = self.object.graspable_object
+        
+        # draw a bounding box around the selected object
         (box_pose, box_dims) = self.call_find_cluster_bounding_box(graspable_object.cluster)
         if box_pose == None:
             return
@@ -72,7 +78,53 @@ class ObjectChooser(QtGui.QWidget):
         self.draw_functions.draw_rviz_box(box_mat, box_ranges, 'base_link',
                                           ns='bounding box',
                                           color=[0, 0, 1], opaque=0.25, duration=60)
-                
+        
+        # call the pickup service
+        self.pickup(graspable_object, self.object.graspable_object_name)
+        
+    def pickup(self, graspable_object, graspable_object_name):
+        rospy.loginfo("Picking up ")#+ graspable_object_name)
+        pickup_goal = PickupGoal()
+        pickup_goal.target = graspable_object
+        pickup_goal.collision_object_name = graspable_object_name
+        pickup_goal.collision_support_surface_name = self.plugin_parent.collision_support_surface_name
+        
+        pickup_goal.arm_name = "right_arm"
+        pickup_goal.desired_approach_distance = 0.1
+        pickup_goal.min_approach_distance = 0.05
+        
+        direction = Vector3Stamped()
+        direction.header.stamp = rospy.get_rostime()
+        direction.header.frame_id = "base_link";
+        direction.vector.x = 0;
+        direction.vector.y = 0;
+        direction.vector.z = 1;
+        pickup_goal.lift.direction = direction;
+        #request a vertical lift of 10cm after grasping the object
+        pickup_goal.lift.desired_distance = 0.1;
+        pickup_goal.lift.min_distance = 0.05;
+        #do not use tactile-based grasping or tactile-based lift
+        pickup_goal.use_reactive_lift = False;
+        pickup_goal.use_reactive_execution = False;
+        
+        
+        pickup_client = actionlib.SimpleActionClient('/object_manipulator/object_manipulator_pickup', PickupAction)
+        pickup_client.wait_for_server()
+        rospy.loginfo("Pickup server ready")
+        
+        pickup_client.send_goal(pickup_goal)
+        #timeout after 1sec
+        #TODO: change this when using the robot
+        pickup_client.wait_for_result(timeout=rospy.Duration.from_sec(1.0))
+        rospy.loginfo("Got Pickup results")
+        
+        pickup_result = pickup_client.get_result()
+        
+        if pickup_client.get_state() != GoalStatus.SUCCEEDED:
+            rospy.logerr("The pickup action has failed: " + str(pickup_result.manipulation_result.value) )
+        print pickup_result
+        
+               
     def call_find_cluster_bounding_box(self, cluster):
         req = FindClusterBoundingBoxRequest()
         req.cluster = cluster
@@ -148,6 +200,7 @@ class ObjectSelection(GenericPlugin):
         self.service_db_get_model_description = None
         self.service_tabletop_collision_map = None
         self.found_objects = {}
+        self.collision_support_surface_name = None
         self.number_of_unrecognized_objects = 0
 
         self.frame = QtGui.QFrame()
@@ -236,7 +289,7 @@ class ObjectSelection(GenericPlugin):
             res = self.service_tabletop_collision_map.call(detection, True, True, True, True, "base_link")
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
-        
+        self.collision_support_surface_name = res.collision_support_surface_name
         return res
     
     def on_close(self):

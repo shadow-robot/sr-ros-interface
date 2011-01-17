@@ -1,7 +1,16 @@
 <launch>
+	<!--<rosparam command="load" file="$(find sr_object_manipulation_launch)/config/hand_description.yaml"/>-->
 
-  <node name="cluster_bounding_box_finder" pkg="object_manipulator"
-	type="cluster_bounding_box_finder_server.py" output="screen" respawn="false">
-  </node>
-	
+	<node name="cluster_bounding_box_finder" pkg="object_manipulator"
+	type="cluster_bounding_box_finder_server.py"
+		output="screen"
+		respawn="false">
+	</node>
+
+	<node name="object_manipulator" pkg="object_manipulator" type="object_manipulator_node"
+		respawn="false"
+		output="screen">
+		<param name="default_database_planner" value="/objects_database_node/database_grasp_planning"
+			/>
+	</node>
 </launch>

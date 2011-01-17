@@ -35,9 +35,9 @@
 		<param name="origin_y" type="double" value="0.0" />
 		<param name="origin_z" type="double" value="0.0" />
 
-		<param name="dimension_x" type="double" value="0.25" />
-		<param name="dimension_y" type="double" value="0.25" />
-		<param name="dimension_z" type="double" value="0.25" />
+		<param name="dimension_x" type="double" value="0.75" />
+		<param name="dimension_y" type="double" value="0.75" />
+		<param name="dimension_z" type="double" value="0.75" />
 
 		<!-- set the resolution (1.0 cm) -->
 		<param name="resolution" type="double" value="0.01" />

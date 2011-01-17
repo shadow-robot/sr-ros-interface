@@ -11,6 +11,8 @@
   <depend package="robot_self_filter"/>
   <depend package="household_objects_database"/>
   <depend package="collision_map"/>
+  <depend package="object_manipulation_msgs"/>
+  <depend package="actionlib_msgs"/>
 </package>
 
 

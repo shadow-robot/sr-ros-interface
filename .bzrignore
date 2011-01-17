@@ -141,3 +141,6 @@ shadow_robot/Makefile
 shadow_robot/cmake_install.cmake
 overlay/.pydevproject
 shadow_robot/.pydevproject
+overlay/tabletop_object_perception/tabletop_collision_map_processing/srv/lisp
+overlay/tabletop_object_perception/tabletop_object_detector/msg/lisp
+overlay/tabletop_object_perception/tabletop_object_detector/srv/lisp
