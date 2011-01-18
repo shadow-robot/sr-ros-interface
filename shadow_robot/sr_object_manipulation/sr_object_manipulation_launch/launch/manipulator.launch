@@ -1,5 +1,5 @@
 <launch>
-	<!--<rosparam command="load" file="$(find sr_object_manipulation_launch)/config/hand_description.yaml"/>-->
+	<rosparam command="load" file="$(find sr_object_manipulation_launch)/config/hand_description.yaml"/>
 
 	<node name="cluster_bounding_box_finder" pkg="object_manipulator"
 	type="cluster_bounding_box_finder_server.py"

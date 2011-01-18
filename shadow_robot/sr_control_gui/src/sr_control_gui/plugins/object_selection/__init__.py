@@ -62,7 +62,8 @@ class ObjectChooser(QtGui.QWidget):
         self.show()
         
     def double_click(self, item, value):
-        self.object = self.plugin_parent.found_objects[str(item.text(0))]
+        object_name = str(item.text(0))
+        self.object = self.plugin_parent.found_objects[object_name]
         
         graspable_object = self.object.graspable_object
         
@@ -80,10 +81,11 @@ class ObjectChooser(QtGui.QWidget):
                                           color=[0, 0, 1], opaque=0.25, duration=60)
         
         # call the pickup service
-        self.pickup(graspable_object, self.object.graspable_object_name)
+        self.pickup(graspable_object, self.object.graspable_object_name, object_name)
         
-    def pickup(self, graspable_object, graspable_object_name):
-        rospy.loginfo("Picking up ")#+ graspable_object_name)
+    def pickup(self, graspable_object, graspable_object_name, object_name):
+        info_tmp = "Picking up "+ object_name
+        rospy.loginfo(info_tmp)
         pickup_goal = PickupGoal()
         pickup_goal.target = graspable_object
         pickup_goal.collision_object_name = graspable_object_name

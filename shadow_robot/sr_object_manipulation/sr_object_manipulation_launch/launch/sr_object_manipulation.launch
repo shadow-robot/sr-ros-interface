@@ -17,7 +17,7 @@
 	<include file="$(find sr_object_manipulation_launch)/launch/tabletop_node.launch"/>
 
 	<!-- start the hand -->
-	<include file="$(find sr_hand)/launch/sr_arm_motor.launch"/>
+	<!--<include file="$(find sr_hand)/launch/sr_arm_motor.launch"/>-->
 
 	<!-- build the collision map -->
 	<include file="$(find sr_object_manipulation_launch)/launch/collision_map.launch"/>

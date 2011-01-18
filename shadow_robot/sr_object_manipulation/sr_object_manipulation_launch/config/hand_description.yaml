@@ -1,13 +1,13 @@
 hand_description:
   right_arm:
-    hand_frame: forearm_motor
+    hand_frame: /srh/position/palm
     robot_frame: base_link
     attached_objects_name: attached
-    attach_link: r_gripper_r_finger_tip_link
-    hand_group_name: r_end_effector
+    attach_link: palm
+    hand_group_name: r_sr_hand
     arm_group_name: right_arm
-    hand_database_name: WILLOW_GRIPPER_2010
-    hand_joints: [r_gripper_l_finger_joint,r_gripper_r_finger_joint,r_gripper_r_finger_tip_joint,r_gripper_l_finger_tip_joint]
-    hand_touch_links: [r_gripper_palm_link,r_gripper_r_finger_tip_link,r_gripper_l_finger_tip_link,r_gripper_l_finger_link,r_gripper_r_finger_link]
-    hand_fingertip_links: [r_gripper_r_finger_tip_link,r_gripper_l_finger_tip_link]
-    hand_approach_direction: [1.0,0.0,0.0]
+    hand_database_name: SHADOW_HAND
+    hand_joints: [WRJ2,WRJ1,FFJ4,FFJ3,FFJ2,FFJ1,MFJ4,MFJ3,MFJ2,MFJ1,RFJ4,RFJ3,RFJ2,RFJ1,LFJ5,LFJ4,LFJ3,LFJ2,LFJ1,THJ5,THJ4,THJ3,THJ2,THJ1]
+    hand_touch_links: [ffdistal,mfdistal,rfdistal,lfdistal,thdistal]
+    hand_fingertip_links: [ffdistal,mfdistal,rfdistal,lfdistal,thdistal]
+    hand_approach_direction: [0.0,1.0,0.0]
