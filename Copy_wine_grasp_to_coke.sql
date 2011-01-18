@@ -1,0 +1,4 @@
+﻿insert into grasp
+(grasp_id,scaled_model_id,grasp_pregrasp_joints,grasp_grasp_joints,grasp_energy,grasp_pregrasp_position,grasp_grasp_position,grasp_source_id,grasp_pregrasp_clearance,grasp_cluster_rep,hand_name,grasp_table_clearance)
+select 1170000,18744,grasp_pregrasp_joints,grasp_grasp_joints,grasp_energy,grasp_pregrasp_position,grasp_grasp_position,grasp_source_id,grasp_pregrasp_clearance,grasp_cluster_rep,hand_name,grasp_table_clearance
+from grasp where grasp_id=1129853
