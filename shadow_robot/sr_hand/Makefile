@@ -291,6 +291,19 @@ shadowhand_virtual/fast:
 .PHONY : shadowhand_virtual/fast
 
 #=============================================================================
+# Target rules for targets named sr_kinematics
+
+# Build rule for target.
+sr_kinematics: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sr_kinematics
+.PHONY : sr_kinematics
+
+# fast build rule for target.
+sr_kinematics/fast:
+	$(MAKE) -f CMakeFiles/sr_kinematics.dir/build.make CMakeFiles/sr_kinematics.dir/build
+.PHONY : sr_kinematics/fast
+
+#=============================================================================
 # Target rules for targets named test
 
 # Build rule for target.
@@ -467,6 +480,21 @@ src/sr_diagnosticer.s:
 .PHONY : src/sr_diagnosticer.s
 
 # target to build an object file
+src/sr_kinematics.o:
+	$(MAKE) -f CMakeFiles/sr_kinematics.dir/build.make CMakeFiles/sr_kinematics.dir/src/sr_kinematics.o
+.PHONY : src/sr_kinematics.o
+
+# target to preprocess a source file
+src/sr_kinematics.i:
+	$(MAKE) -f CMakeFiles/sr_kinematics.dir/build.make CMakeFiles/sr_kinematics.dir/src/sr_kinematics.i
+.PHONY : src/sr_kinematics.i
+
+# target to generate assembly for a file
+src/sr_kinematics.s:
+	$(MAKE) -f CMakeFiles/sr_kinematics.dir/build.make CMakeFiles/sr_kinematics.dir/src/sr_kinematics.s
+.PHONY : src/sr_kinematics.s
+
+# target to build an object file
 src/sr_publisher.o:
 	$(MAKE) -f CMakeFiles/shadowarm_virtual.dir/build.make CMakeFiles/shadowarm_virtual.dir/src/sr_publisher.o
 	$(MAKE) -f CMakeFiles/shadowhand_virtual.dir/build.make CMakeFiles/shadowhand_virtual.dir/src/sr_publisher.o
@@ -525,6 +553,7 @@ help:
 	@echo "... rospack_gensrv"
 	@echo "... shadowarm_virtual"
 	@echo "... shadowhand_virtual"
+	@echo "... sr_kinematics"
 	@echo "... test"
 	@echo "... test-future"
 	@echo "... test-results"
@@ -551,6 +580,9 @@ help:
 	@echo "... src/sr_diagnosticer.o"
 	@echo "... src/sr_diagnosticer.i"
 	@echo "... src/sr_diagnosticer.s"
+	@echo "... src/sr_kinematics.o"
+	@echo "... src/sr_kinematics.i"
+	@echo "... src/sr_kinematics.s"
 	@echo "... src/sr_publisher.o"
 	@echo "... src/sr_publisher.i"
 	@echo "... src/sr_publisher.s"

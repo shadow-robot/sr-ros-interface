@@ -19,12 +19,16 @@
   <depend package="kdl_parser"/>
   <depend package="dynamic_reconfigure"/>
   <depend package="sr_convenient_dependencies"/>
+
+  <depend package="pr2_arm_kinematics"/>
+  <depend package="pr2_mechanism_controllers"/>
+  <depend package="arm_kinematics"/>
+
   <export>
 	<cpp cflags="-I${prefix}/include"/>
 	<python path="${prefix}/python_lib"/>
 	<python path="${prefix}/python_lib/grasp"/>
 	<python path="${prefix}/src"/>
-	
   </export>
 </package>
 

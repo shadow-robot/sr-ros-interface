@@ -1,6 +1,6 @@
 hand_description:
   right_arm:
-    hand_frame: /srh/position/palm
+    hand_frame: palm
     robot_frame: base_link
     attached_objects_name: attached
     attach_link: palm

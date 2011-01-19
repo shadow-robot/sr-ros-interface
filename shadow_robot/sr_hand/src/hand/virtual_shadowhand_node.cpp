@@ -105,7 +105,8 @@ int main(int argc, char** argv)
     }
   else
     {
-      shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new  SRSubscriber(virt_sh, tree));
+      //TODO: modify this once the kinematics is working for hand + arm
+      shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new  SRSubscriber(virt_sh));//, tree));
     }
   
   boost::thread thrd1( boost::bind( &run_diagnotics, shadowhand_diag ));

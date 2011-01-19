@@ -15,26 +15,34 @@
 			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 				<dictionary>
-					<key>org.eclipse.cdt.core.errorOutputParser</key>
-					<value>org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;</value>
+					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
+					<value>clean</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.enableCleanBuild</key>
+					<value>true</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.append_environment</key>
 					<value>true</value>
 				</dictionary>
 				<dictionary>
-					<key>org.eclipse.cdt.make.core.autoBuildTarget</key>
-					<value>all</value>
+					<key>org.eclipse.cdt.make.core.stopOnError</key>
+					<value>true</value>
 				</dictionary>
 				<dictionary>
-					<key>org.eclipse.cdt.make.core.build.arguments</key>
-					<value></value>
+					<key>org.eclipse.cdt.make.core.enabledIncrementalBuild</key>
+					<value>true</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.command</key>
 					<value>/usr/bin/make</value>
 				</dictionary>
 				<dictionary>
+<<<<<<< TREE
+					<key>org.eclipse.cdt.make.core.contents</key>
+					<value>org.eclipse.cdt.make.core.activeConfigSettings</value>
+=======
 					<key>org.eclipse.cdt.make.core.build.location</key>
 					<value>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/trunk/shadow_robot/cyberglove</value>
 				</dictionary>
@@ -45,17 +53,38 @@
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.target.clean</key>
 					<value>clean</value>
+>>>>>>> MERGE-SOURCE
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.target.inc</key>
 					<value>all</value>
 				</dictionary>
 				<dictionary>
-					<key>org.eclipse.cdt.make.core.buildArguments</key>
+					<key>org.eclipse.cdt.make.core.build.arguments</key>
 					<value></value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
+<<<<<<< TREE
+					<value>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/reverse-kinematic/shadow_robot/cyberglove</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.useDefaultBuildCmd</key>
+					<value>false</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.environment</key>
+					<value>VERBOSE=1|ROS_ROOT=/opt/ros/cturtle/ros|ROS_PACKAGE_PATH=/opt/ros/cturtle/stacks:/home/ugo/ros_stacks_external:/home/ugo/Projects/3_FT_DSTL/Software/ros:/home/ugo/Projects/ROS_interfaces/sr-ros-interface/reverse-kinematic/shadow_robot|PYTHONPATH=/opt/ros/cturtle/ros/core/roslib/src::/home/ugo/ros_stacks_external/jsk-ros-pkg/openrave_planning/openrave/share/openrave|PATH=/opt/ros/cturtle/ros/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/ugo/ros_stacks_external/jsk-ros-pkg/openrave_planning/openrave/bin|</value>
+					<value></value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.enableFullBuild</key>
+					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.target.auto</key>
+					<value>all</value>
+=======
 					<value>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/trunk/shadow_robot/cyberglove</value>
 				</dictionary>
 				<dictionary>
@@ -65,12 +94,17 @@
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.contents</key>
 					<value>org.eclipse.cdt.make.core.activeConfigSettings</value>
+>>>>>>> MERGE-SOURCE
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableAutoBuild</key>
 					<value>false</value>
 				</dictionary>
 				<dictionary>
+<<<<<<< TREE
+					<key>org.eclipse.cdt.make.core.build.target.clean</key>
+					<value>clean</value>
+=======
 					<key>org.eclipse.cdt.make.core.enableCleanBuild</key>
 					<value>true</value>
 				</dictionary>
@@ -85,18 +119,27 @@
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.environment</key>
 					<value>VERBOSE=1|ROS_ROOT=/opt/ros/cturtle/ros|ROS_PACKAGE_PATH=/opt/ros/cturtle/stacks:/home/ugo/ros_stacks_external:/home/ugo/Projects/3_FT_DSTL/Software/ros:/home/ugo/Projects/ROS_interfaces/sr-ros-interface/trunk/shadow_robot|PYTHONPATH=/opt/ros/cturtle/ros/core/roslib/src:/opt/ros/cturtle/ros/core/roslib/src::/home/ugo/ros_stacks_external/jsk-ros-pkg/openrave_planning/openrave/share/openrave:/home/ugo/ros_stacks_external/jsk-ros-pkg/openrave_planning/openrave/share/openrave|PATH=/opt/ros/cturtle/ros/bin:/opt/ros/cturtle/ros/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/ugo/ros_stacks_external/jsk-ros-pkg/openrave_planning/openrave/bin:/home/ugo/ros_stacks_external/jsk-ros-pkg/openrave_planning/openrave/bin|</value>
+>>>>>>> MERGE-SOURCE
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.fullBuildTarget</key>
 					<value>all</value>
 				</dictionary>
 				<dictionary>
-					<key>org.eclipse.cdt.make.core.stopOnError</key>
-					<value>true</value>
+					<key>org.eclipse.cdt.make.core.buildArguments</key>
+					<value></value>
 				</dictionary>
 				<dictionary>
-					<key>org.eclipse.cdt.make.core.useDefaultBuildCmd</key>
-					<value>false</value>
+					<key>org.eclipse.cdt.make.core.build.location</key>
+					<value>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/reverse-kinematic/shadow_robot/cyberglove</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.autoBuildTarget</key>
+					<value>all</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.core.errorOutputParser</key>
+					<value>org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>

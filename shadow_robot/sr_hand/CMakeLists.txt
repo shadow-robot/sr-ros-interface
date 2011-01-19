@@ -23,10 +23,14 @@ rosbuild_genmsg()
 
 rosbuild_add_boost_directories()
 
-
 #if you don't want to have the gazebo interface for the virtual hardware 
 # just comment this flag
 #SET( CMAKE_CXX_FLAGS "-D GAZEBO")
+##################
+#   KINEMATICS   #
+##################
+
+rosbuild_add_executable(sr_kinematics  src/sr_kinematics.cpp)
 
 ##################
 #  VIRTUAL ARM  #
