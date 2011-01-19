@@ -1,6 +1,11 @@
 <launch>
 	<rosparam command="load" file="$(find sr_object_manipulation_launch)/config/hand_description.yaml"/>
 
+	<!-- interpolated IK -->
+	<node name="interpolated_ik_node_right" pkg="interpolated_ik_motion_planner"
+		type="interpolated_ik_motion_planner.py"
+		args="r" respawn="false" />
+
 	<node name="cluster_bounding_box_finder" pkg="object_manipulator"
 	type="cluster_bounding_box_finder_server.py"
 		output="screen"
@@ -10,6 +15,10 @@
 	<node name="object_manipulator" pkg="object_manipulator" type="object_manipulator_node"
 		respawn="false"
 		output="screen">
+		<remap from="right_arm/interpolated_ik" to="/r_interpolated_ik_motion_plan"
+			/>
+		<remap from="right_arm/interpolated_ik_set_params" to="/r_interpolated_ik_motion_plan_set_params"
+			/>
 		<param name="default_database_planner" value="/objects_database_node/database_grasp_planning"
 			/>
 	</node>
