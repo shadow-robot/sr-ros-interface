@@ -303,7 +303,7 @@ std::vector<DiagnosticData> RealShadowhand::getDiagnostics()
     std::stringstream ss;
 
     //get the data from the hand
-    for( unsigned int index = 0; index < NUM_HAND_JOINTS + 4; ++index )
+    for( unsigned int index = 0; index < START_OF_ARM; ++index )
     {
         tmpData.joint_name = std::string(hand_joints[index].joint_name);
         tmpData.level = 0;

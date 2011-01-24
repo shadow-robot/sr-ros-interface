@@ -26,7 +26,7 @@ def talker():
         pub1 = rospy.Publisher('srh/sendupdate', sendupdate)
         rospy.init_node('shadowhand_command_publisher_python')
 
-        new_target = 90
+        new_target = 0
     
         data_to_send = [ joint(joint_name="FFJ0", joint_target=new_target),
                          joint(joint_name="FFJ3", joint_target=new_target) ]
