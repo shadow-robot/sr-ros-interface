@@ -7,8 +7,7 @@
   <!--
            shadowarm 
                         -->
-  <node pkg="sr_hand" name="shadowarm"
-	type="shadowarm_virtual" >
+  <node pkg="sr_hand" name="shadowarm" type="shadowarm_real" >
     <remap from="robot_description" to="arm_description"/>
     <param name="shadowhand_prefix" type="string" value="sr_arm/" />
     <param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
@@ -41,7 +40,7 @@
            shadowhand 
                          -->
   <node pkg="sr_hand" name="shadowhand"
-	type="shadowhand_virtual" >
+	type="shadowhand_real" >
     <remap from="robot_description" to="hand_description"/>
     <param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
     <param name="shadowhand_prefix" type="string" value="srh/" />

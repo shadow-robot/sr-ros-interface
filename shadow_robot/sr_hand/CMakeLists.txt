@@ -47,26 +47,26 @@ rosbuild_link_boost(shadowhand_virtual thread)
 ##################
 
 #uncomment those lines if you build for the real hand
-#include_directories(/usr/realtime/include/)
-#LINK_LIBRARIES(pthread)
-#add_library(robot STATIC IMPORTED) 
-#set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
-#rosbuild_add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
-#rosbuild_link_boost(shadowhand_real thread)
-#target_link_libraries(shadowhand_real robot)
+include_directories(/usr/realtime/include/)
+LINK_LIBRARIES(pthread)
+add_library(robot STATIC IMPORTED) 
+set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
+rosbuild_add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
+rosbuild_link_boost(shadowhand_real thread)
+target_link_libraries(shadowhand_real robot)
 
 ##################
 #    REAL ARM    #
 ##################
 
 #uncomment those lines if you build for the real hand
-#include_directories(/usr/realtime/include/)
-#LINK_LIBRARIES(pthread)
-#add_library(robot STATIC IMPORTED) 
-#set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
-#rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
-#rosbuild_link_boost(shadowharm_real thread)
-#target_link_libraries(shadowarm_real robot)
+include_directories(/usr/realtime/include/)
+LINK_LIBRARIES(pthread)
+add_library(robot STATIC IMPORTED) 
+set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
+rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
+rosbuild_link_boost(shadowharm_real thread)
+target_link_libraries(shadowarm_real robot)
 
 
 #####################################
