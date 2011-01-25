@@ -14,6 +14,8 @@
 			/>
 		<param name="root_name" type="string" value="shadowarm_base"/>
 		<param name="tip_name" type="string" value="palm"/>
+		<param name="maxIterations" type="int" value="2000"/>
+		<param name="epsilon" type="double" value="1"/>
 	</node>
 
 	<node pkg="sr_hand" name="sr_kinematics_ff" type="sr_kinematics">
@@ -131,7 +133,7 @@
 	</node>
 	
 	<node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm_np"
-		args="0.7 -0.1 -0.2 3.14 0 0 /base_link /shadowarm_base 100" machine="robot" />
+		args="0.7 -0.1 0.1 3.14 0 0 /base_link /shadowarm_base 100" machine="robot" />
 	
 	<!--
 	    Diagnostic Aggregator
