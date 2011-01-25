@@ -117,7 +117,7 @@ class ObjectChooser(QtGui.QWidget):
         pickup_client.send_goal(pickup_goal)
         #timeout after 1sec
         #TODO: change this when using the robot
-        pickup_client.wait_for_result(timeout=rospy.Duration.from_sec(1.0))
+        pickup_client.wait_for_result(timeout=rospy.Duration.from_sec(3.0))
         rospy.loginfo("Got Pickup results")
         
         pickup_result = pickup_client.get_result()
