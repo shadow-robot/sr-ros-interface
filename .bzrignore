@@ -156,3 +156,5 @@ overlay/interpolated_ik_motion_planner/interpolated_ik_motion_planner/test/.svn
 shadow_robot/sr_utilities/bin
 ￼
 shadow_robot/sr_utilities/build
+shadow_robot/sr_move_arm/bin
+shadow_robot/sr_move_arm/build
