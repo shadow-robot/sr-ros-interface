@@ -12,6 +12,7 @@
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
   <depend package="move_arm_msgs"/>
+  <depend package="object_manipulation_msgs"/>
   <depend package="actionlib"/>
   <depend package="actionlib_msgs"/>
   <depend package="sr_hand"/>

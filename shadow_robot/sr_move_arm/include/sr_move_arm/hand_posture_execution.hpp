@@ -15,9 +15,9 @@
 #include <sr_hand/sendupdate.h>
 
 #include <actionlib/server/simple_action_server.h>
-#include <move_arm_msgs/MoveArmAction.h>
-#include <move_arm_msgs/MoveArmResult.h>
-#include <move_arm_msgs/MoveArmStatistics.h>
+#include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
+#include <object_manipulation_msgs/GraspStatus.h>
+
 
 #include <trajectory_msgs/JointTrajectory.h>
 
@@ -25,27 +25,18 @@ using namespace ros;
 
 namespace shadowrobot
 {
-  enum MoveArmState {
-    MOVING,
-    PAUSE,
-    STOPPED
-  };
-
-  class SrMoveArmSimpleAction
+  class SrHandPostureExecutionSimpleAction
   {
   public:
-    SrMoveArmSimpleAction();
-    ~SrMoveArmSimpleAction();
+    SrHandPostureExecutionSimpleAction();
+    ~SrHandPostureExecutionSimpleAction();
 
   protected:
     NodeHandle nh, nh_tilde;
     Publisher pub;
-    void execute(const move_arm_msgs::MoveArmGoalConstPtr& Goal);
+    void execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& Goal);
 
-    boost::shared_ptr<actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction> > action_server;
-
-    move_arm_msgs::MoveArmResult move_arm_action_result;
-    move_arm_msgs::MoveArmFeedback move_arm_action_feedback;
+    boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> > action_server;
   };//end class
 }//end workspace
 
