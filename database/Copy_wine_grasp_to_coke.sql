@@ -11,7 +11,8 @@ grasp_cluster_rep=true
 where grasp_id=1170000;
 
 UPDATE grasp
-set grasp_pregrasp_position='{0,0,0.32,0.7071,0,0.7071,0}',
-grasp_grasp_position='{0,0,0.3,0.7071,0,0.7071,0}'
+set grasp_pregrasp_position='{0.0,0.0,0.281533,0.7071067811865476,0.7071067811865476,0.0,0.0}',
+
+grasp_grasp_position='{0.0,0.0,0.213018,0.7071067811865476,0.7071067811865476,0.0,0.0}'
 where grasp_id=1170000
 

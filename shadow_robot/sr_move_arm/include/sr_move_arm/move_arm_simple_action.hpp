@@ -25,12 +25,6 @@ using namespace ros;
 
 namespace shadowrobot
 {
-  enum MoveArmState {
-    MOVING,
-    PAUSE,
-    STOPPED
-  };
-
   class SrMoveArmSimpleAction
   {
   public:
@@ -39,11 +33,15 @@ namespace shadowrobot
 
   protected:
     NodeHandle nh, nh_tilde;
-    Publisher pub;
-    void execute(const move_arm_msgs::MoveArmGoalConstPtr& Goal);
+    Publisher sr_arm_target_pub;
+    Publisher sr_hand_target_pub;
+    void execute(const move_arm_msgs::MoveArmGoalConstPtr& goal);
 
     boost::shared_ptr<actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction> > action_server;
 
+    sr_hand::sendupdate sendupdate_msg;
+    std::vector<sr_hand::joint> joint_vector;
+    
     move_arm_msgs::MoveArmResult move_arm_action_result;
     move_arm_msgs::MoveArmFeedback move_arm_action_feedback;
   };//end class
