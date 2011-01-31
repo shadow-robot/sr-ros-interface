@@ -20,6 +20,8 @@
 #include <move_arm_msgs/MoveArmStatistics.h>
 
 #include <trajectory_msgs/JointTrajectory.h>
+#include <pr2_controllers_msgs/JointTrajectoryAction.h>
+#include <object_manipulation_msgs/GraspStatus.h>
 
 using namespace ros;
 
@@ -35,9 +37,14 @@ namespace shadowrobot
     NodeHandle nh, nh_tilde;
     Publisher sr_arm_target_pub;
     Publisher sr_hand_target_pub;
+
     void execute(const move_arm_msgs::MoveArmGoalConstPtr& goal);
+    void execute_trajectory(const pr2_controllers_msgs::JointTrajectoryGoalConstPtr& goal);
 
     boost::shared_ptr<actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction> > action_server;
+    boost::shared_ptr<actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction> > action_server_joint_trajectory;
+    ros::ServiceServer grasp_status_server;
+    bool check_grasp_status(object_manipulation_msgs::GraspStatus::Request &req, object_manipulation_msgs::GraspStatus::Response &res);
 
     sr_hand::sendupdate sendupdate_msg;
     std::vector<sr_hand::joint> joint_vector;

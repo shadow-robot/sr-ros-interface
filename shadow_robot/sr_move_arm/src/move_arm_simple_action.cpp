@@ -21,14 +21,30 @@ namespace shadowrobot
   {
     action_server = boost::shared_ptr<actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction> >(new actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction>("/right_arm/move_arm", boost::bind(&SrMoveArmSimpleAction::execute, this, _1)));
 
+    action_server_joint_trajectory = boost::shared_ptr<actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction> >(new actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction>(nh, "right_arm/joint_trajectory", boost::bind(&SrMoveArmSimpleAction::execute_trajectory, this, _1)));
+
     sr_arm_target_pub = nh.advertise<sr_hand::sendupdate>("/sr_arm/sendupdate", 2);
     sr_hand_target_pub = nh.advertise<sr_hand::sendupdate>("/sr_hand/sendupdate", 2);
 
+    grasp_status_server = nh.advertiseService("right_arm/grasp_status", &SrMoveArmSimpleAction::check_grasp_status, this);
+
     action_server->start();
+    action_server_joint_trajectory->start();
   }
 
   SrMoveArmSimpleAction::~SrMoveArmSimpleAction()
   {}
+
+  bool SrMoveArmSimpleAction::check_grasp_status(object_manipulation_msgs::GraspStatus::Request &req, object_manipulation_msgs::GraspStatus::Response &res)
+  {
+    ROS_ERROR("Not implemented yet");
+    return true;
+  }
+
+  void SrMoveArmSimpleAction::execute_trajectory(const pr2_controllers_msgs::JointTrajectoryGoalConstPtr& goal)
+  {
+    ROS_ERROR("Not implemented yet");
+  }
 
   void SrMoveArmSimpleAction::execute(const move_arm_msgs::MoveArmGoalConstPtr& goal)
   {
