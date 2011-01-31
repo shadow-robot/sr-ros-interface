@@ -9,7 +9,6 @@ import logging
 #enables the logging used by yapsy
 logging.basicConfig(level=logging.ERROR)
 
-import subprocess
 from yapsy.PluginManager import PluginManager
 from PyQt4 import QtCore, QtGui, Qt
 import os, sys

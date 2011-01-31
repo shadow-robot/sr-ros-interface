@@ -6,16 +6,18 @@
 	<param name="robot_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
 
 	<!--
-      Kinematics
-  -->
+	    Kinematics
+	-->
 
 	<node pkg="arm_kinematics" name="arm_kinematics" type="arm_kinematics">
-		<param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
+		<param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"
+			/>
 		<param name="root_name" type="string" value="shadowarm_base"/>
 		<param name="tip_name" type="string" value="palm"/>
 		<param name="maxIterations" type="int" value="100000"/>
 		<param name="epsilon" type="double" value="0.5"/>
 	</node>
+
 	<node pkg="arm_kinematics" name="ff_kinematics" type="arm_kinematics">
 		<param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
 		<param name="root_name" type="string" value="forearm_motor"/>
@@ -55,7 +57,6 @@
 
 
 
-	<!-- arm node -->
 	<node pkg="sr_hand" name="shadowarm"
 	type="shadowarm_virtual" machine="robot">
 		<remap from="robot_description" to="arm_description"/>
@@ -65,7 +66,10 @@
 		<param name="publish_frequency" type="double" value="20.0" />
 	</node>
 	<!-- Robot state publisher: publishes tf information regarding the positions
-		of the arm -->
+		of
+		the
+		arm
+		-->
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="robot_state_publisher_pos_arm"
 		machine="robot">
@@ -76,7 +80,10 @@
 	</node>
 
 	<!-- Robot state publisher: publishes tf information regarding the targets
-		of the arm -->
+		of
+		the
+		arm
+		-->
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="robot_state_publisher_target_arm"
 		machine="robot">
@@ -166,13 +173,12 @@
 		<rosparam command="load" file="$(find sr_hand)/shadowhand_analyzer.yaml"
 			/>
 	</node>
-	
+
 	<!--
 	    Trajectories / grasp execution
 	-->
 	<node pkg="sr_move_arm" type="move_arm_simple_action" name="move_arm_simple_action" machine="robot"/>
 	<node pkg="sr_move_arm" type="hand_posture_execution" name="hand_posture_execution" machine="robot"/>
-
 
 </launch>
 
