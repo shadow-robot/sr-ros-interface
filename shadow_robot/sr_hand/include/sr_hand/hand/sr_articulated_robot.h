@@ -21,6 +21,7 @@
 
 #include <boost/smart_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/noncopyable.hpp>
 
 #ifdef GAZEBO
 #include <sensor_msgs/JointState.h>
@@ -217,7 +218,7 @@ struct DiagnosticData
  * One (or more) ROS subscriber and publisher can then share the same instance
  * of a Shadowhand object to update the information contained in this object.
  */
-class SRArticulatedRobot
+class SRArticulatedRobot : boost::noncopyable
 {
 public:
     /**

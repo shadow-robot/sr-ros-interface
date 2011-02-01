@@ -63,7 +63,7 @@ class IKUtilities:
     #if wait_for_services = 0, you must call check_services_and_get_ik_info externally before running any of the IK/FK functions
     def __init__(self, whicharm, tf_listener = None, wait_for_services = 1): #whicharm is 'right' or 'left'
         #TODO: make this more generic
-        self.srvroot = '/arm_kinematics_ff/'
+        self.srvroot = '/arm_kinematics/'
 
         #set this to 0 to disable collision-aware IK
         self.perception_running = 0

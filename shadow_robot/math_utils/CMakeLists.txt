@@ -22,12 +22,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
+rosbuild_add_library(MathUtils src/math_utils.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
-rosbuild_add_boost_directories(ptr_container)
-rosbuild_add_executable(dataglove_processing src/dataglove_processing_node.cpp src/dataglove_processing.cpp src/measure.cpp src/measure.cpp src/particle.cpp src/particle_sr_hand.cpp)
-rosbuild_link_boost(dataglove_processing thread)
-
-#TESTS
-rosbuild_add_gtest(test/test_dataglove_processing test/test_dataglove_processing.cpp src/dataglove_processing.cpp src/measure.cpp src/measure.cpp src/particle.cpp src/particle_sr_hand.cpp)
-rosbuild_link_boost(dataglove_processing thread)
+#rosbuild_add_boost_directories()
+#rosbuild_link_boost(${PROJECT_NAME} thread)
+#rosbuild_add_executable(example examples/example.cpp)
+#target_link_libraries(example ${PROJECT_NAME})
