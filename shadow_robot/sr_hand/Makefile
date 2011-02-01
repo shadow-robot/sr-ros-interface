@@ -161,6 +161,19 @@ ROSBUILD_gensrv_lisp/fast:
 .PHONY : ROSBUILD_gensrv_lisp/fast
 
 #=============================================================================
+# Target rules for targets named SrVirtual
+
+# Build rule for target.
+SrVirtual: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 SrVirtual
+.PHONY : SrVirtual
+
+# fast build rule for target.
+SrVirtual/fast:
+	$(MAKE) -f CMakeFiles/SrVirtual.dir/build.make CMakeFiles/SrVirtual.dir/build
+.PHONY : SrVirtual/fast
+
+#=============================================================================
 # Target rules for targets named clean-test-results
 
 # Build rule for target.
@@ -385,18 +398,21 @@ examples/link_joints.s:
 
 # target to build an object file
 src/hand/sr_articulated_robot.o:
+	$(MAKE) -f CMakeFiles/SrVirtual.dir/build.make CMakeFiles/SrVirtual.dir/src/hand/sr_articulated_robot.o
 	$(MAKE) -f CMakeFiles/shadowarm_virtual.dir/build.make CMakeFiles/shadowarm_virtual.dir/src/hand/sr_articulated_robot.o
 	$(MAKE) -f CMakeFiles/shadowhand_virtual.dir/build.make CMakeFiles/shadowhand_virtual.dir/src/hand/sr_articulated_robot.o
 .PHONY : src/hand/sr_articulated_robot.o
 
 # target to preprocess a source file
 src/hand/sr_articulated_robot.i:
+	$(MAKE) -f CMakeFiles/SrVirtual.dir/build.make CMakeFiles/SrVirtual.dir/src/hand/sr_articulated_robot.i
 	$(MAKE) -f CMakeFiles/shadowarm_virtual.dir/build.make CMakeFiles/shadowarm_virtual.dir/src/hand/sr_articulated_robot.i
 	$(MAKE) -f CMakeFiles/shadowhand_virtual.dir/build.make CMakeFiles/shadowhand_virtual.dir/src/hand/sr_articulated_robot.i
 .PHONY : src/hand/sr_articulated_robot.i
 
 # target to generate assembly for a file
 src/hand/sr_articulated_robot.s:
+	$(MAKE) -f CMakeFiles/SrVirtual.dir/build.make CMakeFiles/SrVirtual.dir/src/hand/sr_articulated_robot.s
 	$(MAKE) -f CMakeFiles/shadowarm_virtual.dir/build.make CMakeFiles/shadowarm_virtual.dir/src/hand/sr_articulated_robot.s
 	$(MAKE) -f CMakeFiles/shadowhand_virtual.dir/build.make CMakeFiles/shadowhand_virtual.dir/src/hand/sr_articulated_robot.s
 .PHONY : src/hand/sr_articulated_robot.s
@@ -445,6 +461,21 @@ src/hand/virtual_shadowhand.i:
 src/hand/virtual_shadowhand.s:
 	$(MAKE) -f CMakeFiles/shadowhand_virtual.dir/build.make CMakeFiles/shadowhand_virtual.dir/src/hand/virtual_shadowhand.s
 .PHONY : src/hand/virtual_shadowhand.s
+
+# target to build an object file
+src/hand/virtual_shadowhand_library.o:
+	$(MAKE) -f CMakeFiles/SrVirtual.dir/build.make CMakeFiles/SrVirtual.dir/src/hand/virtual_shadowhand_library.o
+.PHONY : src/hand/virtual_shadowhand_library.o
+
+# target to preprocess a source file
+src/hand/virtual_shadowhand_library.i:
+	$(MAKE) -f CMakeFiles/SrVirtual.dir/build.make CMakeFiles/SrVirtual.dir/src/hand/virtual_shadowhand_library.i
+.PHONY : src/hand/virtual_shadowhand_library.i
+
+# target to generate assembly for a file
+src/hand/virtual_shadowhand_library.s:
+	$(MAKE) -f CMakeFiles/SrVirtual.dir/build.make CMakeFiles/SrVirtual.dir/src/hand/virtual_shadowhand_library.s
+.PHONY : src/hand/virtual_shadowhand_library.s
 
 # target to build an object file
 src/hand/virtual_shadowhand_node.o:
@@ -541,6 +572,7 @@ help:
 	@echo "... ROSBUILD_genmsg_py"
 	@echo "... ROSBUILD_gensrv_cpp"
 	@echo "... ROSBUILD_gensrv_lisp"
+	@echo "... SrVirtual"
 	@echo "... clean-test-results"
 	@echo "... edit_cache"
 	@echo "... examples/link_joints"
@@ -574,6 +606,9 @@ help:
 	@echo "... src/hand/virtual_shadowhand.o"
 	@echo "... src/hand/virtual_shadowhand.i"
 	@echo "... src/hand/virtual_shadowhand.s"
+	@echo "... src/hand/virtual_shadowhand_library.o"
+	@echo "... src/hand/virtual_shadowhand_library.i"
+	@echo "... src/hand/virtual_shadowhand_library.s"
 	@echo "... src/hand/virtual_shadowhand_node.o"
 	@echo "... src/hand/virtual_shadowhand_node.i"
 	@echo "... src/hand/virtual_shadowhand_node.s"

@@ -40,11 +40,19 @@ namespace shadowrobot
   bool SrMoveArmSimpleAction::check_grasp_status(object_manipulation_msgs::GraspStatus::Request &req, object_manipulation_msgs::GraspStatus::Response &res)
   {
     ROS_ERROR("Not implemented yet");
+    res.is_hand_occupied = true;
     return true;
   }
 
   void SrMoveArmSimpleAction::execute_trajectory(const pr2_controllers_msgs::JointTrajectoryGoalConstPtr& goal)
   {
+    if(action_server->isPreemptRequested() || !ros::ok())
+    {
+      ROS_INFO("Execute trajectory preempted.");
+      //set action state to preempted
+      action_server_joint_trajectory->setPreempted();
+    }
+      
     //initializes the joint names
     std::vector<std::string> joint_names = goal->trajectory.joint_names;
     for(unsigned int i = 0; i < joint_names.size(); ++i)
@@ -53,20 +61,35 @@ namespace shadowrobot
       joint.joint_name = joint_names[i];
       joint_vector_traj.push_back(joint);
     }
-
-    std::vector<trajectory_msgs::JointTrajectoryPoint> trajectory_points = goal->trajectory.points;
-    JointTrajectoryPoint trajectory_step;
+    sendupdate_msg_traj.sendupdate_length = joint_vector_traj.size();
     
+    std::vector<trajectory_msgs::JointTrajectoryPoint> trajectory_points = goal->trajectory.points;
+    trajectory_msgs::JointTrajectoryPoint trajectory_step;
+    
+    ros::Rate ts(1.0);
     //loop through the steps
     for(unsigned int index_step = 0; index_step < trajectory_points.size(); ++index_step)
     {
       trajectory_step = trajectory_points[index_step];
+
+      //update the targets
       for(unsigned index_pos = 0; index_pos < trajectory_points.size(); ++index_pos)
       {
-        trajectory_step.positions[index_pos];
-
+        joint_vector_traj[index_pos].joint_target = math_utils.to_degrees(trajectory_step.positions[index_pos]);       
       }
+      sendupdate_msg_traj.sendupdate_list = joint_vector_traj;
+      
+      sr_arm_target_pub.publish(sendupdate_msg_traj);
+      sr_hand_target_pub.publish(sendupdate_msg_traj);
+      
+      trajectory_step.time_from_start.sleep();
+      ROS_INFO("Step %d of %d done.", index_step + 1, (int)trajectory_points.size());
+
+      //added a 1sec sleep for slower movement
+      ts.sleep();
     }
+
+    action_server_joint_trajectory->setSucceeded(joint_trajectory_result);
   }
 
   void SrMoveArmSimpleAction::execute(const move_arm_msgs::MoveArmGoalConstPtr& goal)
@@ -96,7 +119,7 @@ namespace shadowrobot
     {
       sr_hand::joint joint;
       joint.joint_name = goal->motion_plan_request.goal_constraints.joint_constraints[i].joint_name;
-      joint.joint_target = goal->motion_plan_request.goal_constraints.joint_constraints[i].position * 57.29583;
+      joint.joint_target = math_utils.to_degrees(goal->motion_plan_request.goal_constraints.joint_constraints[i].position);
 
       joint_vector.push_back(joint);
     }
@@ -119,6 +142,7 @@ namespace shadowrobot
       action_server->setSucceeded(move_arm_action_result);
     }
 
+    ROS_INFO("Arm movement done");
   }
 }
 

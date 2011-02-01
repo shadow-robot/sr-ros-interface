@@ -23,6 +23,8 @@
 #include <pr2_controllers_msgs/JointTrajectoryAction.h>
 #include <object_manipulation_msgs/GraspStatus.h>
 
+#include <math_utils.hpp>
+
 using namespace ros;
 
 namespace shadowrobot
@@ -53,6 +55,10 @@ namespace shadowrobot
     
     move_arm_msgs::MoveArmResult move_arm_action_result;
     move_arm_msgs::MoveArmFeedback move_arm_action_feedback;
+
+    pr2_controllers_msgs::JointTrajectoryResult joint_trajectory_result;
+
+    math_utils::MathUtils math_utils;
   };//end class
 }//end workspace
 
