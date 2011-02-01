@@ -70,7 +70,7 @@ void RealArm::initializeMap()
   joints_map_mutex.unlock();
 }
 
-short VirtualArm::sendupdate(std::string joint_name, double target)
+short RealArm::sendupdate(std::string joint_name, double target)
 {
   joints_map_mutex.lock();
 
@@ -100,7 +100,7 @@ short VirtualArm::sendupdate(std::string joint_name, double target)
   return -1;
 }
 
-JointData VirtualArm::getJointData(std::string joint_name)
+JointData RealArm::getJointData(std::string joint_name)
 {
   joints_map_mutex.lock();
   JointsMap::iterator iter = joints_map.find(joint_name);
@@ -135,7 +135,7 @@ JointData VirtualArm::getJointData(std::string joint_name)
   return tmpData;
 }
 
-SRArticulatedRobot::JointsMap VirtualArm::getAllJointsData()
+SRArticulatedRobot::JointsMap RealArm::getAllJointsData()
 {
   //update the map for each joints
   for (JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
@@ -147,31 +147,31 @@ SRArticulatedRobot::JointsMap VirtualArm::getAllJointsData()
   return tmp;
 }
 
-short VirtualArm::setContrl(std::string contrlr_name, JointControllerData ctrlr_data)
+short RealArm::setContrl(std::string contrlr_name, JointControllerData ctrlr_data)
 {
   ROS_WARN("The setContrl method is not yet implemented");
   return 0;
 }
 
-JointControllerData VirtualArm::getContrl(std::string contrlr_name)
+JointControllerData RealArm::getContrl(std::string contrlr_name)
 {
   ROS_WARN("The getContrl method is not yet implemented");
   JointControllerData no_result;
   return no_result;
 }
 
-short VirtualArm::setConfig(std::vector<std::string> myConfig)
+short RealArm::setConfig(std::vector<std::string> myConfig)
 {
   ROS_WARN("The set config function is not implemented in the virtual arm.");
   return 0;
 }
 
-void VirtualArm::getConfig(std::string joint_name)
+void RealArm::getConfig(std::string joint_name)
 {
   ROS_WARN("The get config function is not implemented in the virtual arm.");
 }
 
-std::vector<DiagnosticData> VirtualArm::getDiagnostics()
+std::vector<DiagnosticData> RealArm::getDiagnostics()
 {
   joints_map_mutex.lock();
   std::vector<DiagnosticData> returnVect;
