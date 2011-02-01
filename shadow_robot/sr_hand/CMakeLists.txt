@@ -63,7 +63,7 @@ target_link_libraries(shadowhand_real robot)
 include_directories(/usr/realtime/include/)
 LINK_LIBRARIES(pthread)
 rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
-rosbuild_link_boost(shadowharm_real thread)
+rosbuild_link_boost(shadowarm_real thread)
 target_link_libraries(shadowarm_real robot)
 
 
