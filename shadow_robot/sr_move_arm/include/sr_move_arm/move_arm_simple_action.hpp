@@ -48,6 +48,8 @@ namespace shadowrobot
 
     sr_hand::sendupdate sendupdate_msg;
     std::vector<sr_hand::joint> joint_vector;
+    sr_hand::sendupdate sendupdate_msg_traj;
+    std::vector<sr_hand::joint> joint_vector_traj;
     
     move_arm_msgs::MoveArmResult move_arm_action_result;
     move_arm_msgs::MoveArmFeedback move_arm_action_feedback;

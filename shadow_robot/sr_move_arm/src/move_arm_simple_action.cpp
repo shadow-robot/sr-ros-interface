@@ -12,6 +12,8 @@
 #include <sr_hand/joints_data.h>
 #include <sr_hand/joint.h>
 
+#include <trajectory_msgs/JointTrajectory.h>
+#include <trajectory_msgs/JointTrajectoryPoint.h>
 
 namespace shadowrobot
 {
@@ -43,7 +45,28 @@ namespace shadowrobot
 
   void SrMoveArmSimpleAction::execute_trajectory(const pr2_controllers_msgs::JointTrajectoryGoalConstPtr& goal)
   {
-    ROS_ERROR("Not implemented yet");
+    //initializes the joint names
+    std::vector<std::string> joint_names = goal->trajectory.joint_names;
+    for(unsigned int i = 0; i < joint_names.size(); ++i)
+    {
+      sr_hand::joint joint;
+      joint.joint_name = joint_names[i];
+      joint_vector_traj.push_back(joint);
+    }
+
+    std::vector<trajectory_msgs::JointTrajectoryPoint> trajectory_points = goal->trajectory.points;
+    JointTrajectoryPoint trajectory_step;
+    
+    //loop through the steps
+    for(unsigned int index_step = 0; index_step < trajectory_points.size(); ++index_step)
+    {
+      trajectory_step = trajectory_points[index_step];
+      for(unsigned index_pos = 0; index_pos < trajectory_points.size(); ++index_pos)
+      {
+        trajectory_step.positions[index_pos];
+
+      }
+    }
   }
 
   void SrMoveArmSimpleAction::execute(const move_arm_msgs::MoveArmGoalConstPtr& goal)

@@ -160,3 +160,4 @@ shadow_robot/sr_move_arm/bin
 shadow_robot/sr_move_arm/build
 shadow_robot/sr_move_arm/arm_goal.yaml
 shadow_robot/sr_move_arm/hand_posture_goal.yaml
+shadow_robot/sr_move_arm/arm_traj_goal.yaml
