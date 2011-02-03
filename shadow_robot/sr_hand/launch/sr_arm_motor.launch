@@ -14,7 +14,7 @@
 			/>
 		<param name="root_name" type="string" value="shadowarm_base"/>
 		<param name="tip_name" type="string" value="palm"/>
-		<param name="maxIterations" type="int" value="100000"/>
+		<param name="maxIterations" type="int" value="1000000"/>
 		<param name="epsilon" type="double" value="0.01"/>
 	</node>
 

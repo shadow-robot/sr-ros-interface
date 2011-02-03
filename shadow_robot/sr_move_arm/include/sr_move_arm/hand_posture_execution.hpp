@@ -34,9 +34,13 @@ namespace shadowrobot
   protected:
     NodeHandle nh, nh_tilde;
     Publisher pub;
-    void execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& Goal);
+    void execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& goal);
 
     boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> > action_server;
+
+    Publisher sr_hand_target_pub;
+    sr_hand::sendupdate sendupdate_msg;
+    std::vector<sr_hand::joint> joint_vector;
   };//end class
 }//end workspace
 

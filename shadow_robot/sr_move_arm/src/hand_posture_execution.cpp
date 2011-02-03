@@ -17,17 +17,16 @@ namespace shadowrobot
   {
     action_server = boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> >(new actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction>("/right_arm/hand_posture_execution", boost::bind(&SrHandPostureExecutionSimpleAction::execute, this, _1)));
 
+    sr_hand_target_pub = nh.advertise<sr_hand::sendupdate>("/srh/sendupdate", 2);
+
     action_server->start();
   }
 
   SrHandPostureExecutionSimpleAction::~SrHandPostureExecutionSimpleAction()
   {}
 
-  void SrHandPostureExecutionSimpleAction::execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& Goal)
+  void SrHandPostureExecutionSimpleAction::execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& goal)
   {    
-    bool hand_in_correct_pose = true;
-
-    ros::Rate ts = ros::Rate(1.0);
     for(unsigned int i=0;i<2; ++i)
     {
       if(action_server->isPreemptRequested() || !ros::ok())
@@ -36,20 +35,86 @@ namespace shadowrobot
         //set action state to preempted
         action_server->setPreempted();
       }
-      ts.sleep();
     }
 
-    //TODO: Move the hand to the correct position
+    std::vector<std::string> joint_names = goal->grasp.pre_grasp_posture.name;
 
-    if(hand_in_correct_pose)
+    //TODO: add J1 + J2 and send to J0
+
+    joint_vector.clear();
+    for(unsigned int i = 0; i < joint_names.size(); ++i)
     {
-      action_server->setSucceeded();
+      sr_hand::joint joint;
+      joint.joint_name = joint_names[i];
+      joint_vector.push_back(joint);
     }
-    else
+    sendupdate_msg.sendupdate_length = joint_vector.size();
+
+    switch (goal->goal)
     {
+    case object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP: 
+      ROS_ERROR("GRASP!");
+
+      if (goal->grasp.grasp_posture.position.empty())
+      {
+	ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested grasp");
+	action_server->setAborted();
+	return;
+      }
+      for(unsigned int i = 0; i < goal->grasp.grasp_posture.position.size(); ++i)
+      {
+        joint_vector[i].joint_target = goal->grasp.grasp_posture.position[i];
+        ROS_ERROR("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
+      }
+      sendupdate_msg.sendupdate_list = joint_vector;
+
+      sr_hand_target_pub.publish(sendupdate_msg);
+      ROS_INFO("Hand in grasp position");
+      break;
+    
+    case object_manipulation_msgs::GraspHandPostureExecutionGoal::PRE_GRASP:
+      ROS_ERROR("PREGRASP!");
+
+      if (goal->grasp.pre_grasp_posture.position.empty())
+      {
+	ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested pre_grasp");
+	action_server->setAborted();
+	return;
+      }
+      //move to pregrasp
+      for(unsigned int i = 0; i < goal->grasp.pre_grasp_posture.position.size(); ++i)
+      {
+        joint_vector[i].joint_target = goal->grasp.pre_grasp_posture.position[i];
+        ROS_ERROR("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
+      }
+      sendupdate_msg.sendupdate_list = joint_vector;
+      
+      sr_hand_target_pub.publish(sendupdate_msg);
+      ROS_INFO("Hand in pregrasp position");
+      
+      break;
+    case object_manipulation_msgs::GraspHandPostureExecutionGoal::RELEASE:
+      ROS_ERROR("RELEASE!");
+
+      //open the hand completely
+      for(unsigned int i = 0; i < goal->grasp.pre_grasp_posture.position.size(); ++i)
+      {
+        joint_vector[i].joint_target = 0.0;
+        ROS_ERROR("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
+      }
+      sendupdate_msg.sendupdate_list = joint_vector;
+      
+      sr_hand_target_pub.publish(sendupdate_msg);
+      ROS_INFO("Hand opened");
+      break;
+    default:
+      ROS_ERROR("Shadow Robot grasp execution: unknown goal code (%d)", goal->goal);
       action_server->setAborted();
+      return;
     }
 
+    //TODO: check the actual state of the hand and compare to sent targets?
+    action_server->setSucceeded();
   }
 }
 

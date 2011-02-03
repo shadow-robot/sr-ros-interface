@@ -18,9 +18,8 @@
   <depend package="diagnostic_msgs"/>
   <depend package="kdl_parser"/>
   <depend package="dynamic_reconfigure"/>
-  <depend package="sr_convenient_dependencies"/>
   <depend package="pr2_arm_kinematics"/>
-  <depend package="pr2_mechanism_controllers"/>
+<!--  <depend package="pr2_mechanism_controllers"/> -->
   <depend package="arm_kinematics"/>
 
   <export>

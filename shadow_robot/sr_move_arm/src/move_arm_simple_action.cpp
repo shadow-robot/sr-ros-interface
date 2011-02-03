@@ -26,7 +26,7 @@ namespace shadowrobot
     action_server_joint_trajectory = boost::shared_ptr<actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction> >(new actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction>(nh, "right_arm/joint_trajectory", boost::bind(&SrMoveArmSimpleAction::execute_trajectory, this, _1)));
 
     sr_arm_target_pub = nh.advertise<sr_hand::sendupdate>("/sr_arm/sendupdate", 2);
-    sr_hand_target_pub = nh.advertise<sr_hand::sendupdate>("/sr_hand/sendupdate", 2);
+    sr_hand_target_pub = nh.advertise<sr_hand::sendupdate>("/srh/sendupdate", 2);
 
     grasp_status_server = nh.advertiseService("right_arm/grasp_status", &SrMoveArmSimpleAction::check_grasp_status, this);
 
@@ -55,6 +55,8 @@ namespace shadowrobot
       
     //initializes the joint names
     std::vector<std::string> joint_names = goal->trajectory.joint_names;
+    joint_vector.clear();
+    ros::Rate ts(4.0);
     for(unsigned int i = 0; i < joint_names.size(); ++i)
     {
       sr_hand::joint joint;
@@ -66,7 +68,6 @@ namespace shadowrobot
     std::vector<trajectory_msgs::JointTrajectoryPoint> trajectory_points = goal->trajectory.points;
     trajectory_msgs::JointTrajectoryPoint trajectory_step;
     
-    ros::Rate ts(1.0);
     //loop through the steps
     for(unsigned int index_step = 0; index_step < trajectory_points.size(); ++index_step)
     {
@@ -84,8 +85,6 @@ namespace shadowrobot
       
       trajectory_step.time_from_start.sleep();
       ROS_INFO("Step %d of %d done.", index_step + 1, (int)trajectory_points.size());
-
-      //added a 1sec sleep for slower movement
       ts.sleep();
     }
 
@@ -130,7 +129,6 @@ namespace shadowrobot
     sr_arm_target_pub.publish(sendupdate_msg);
     sr_hand_target_pub.publish(sendupdate_msg);
 
-    ts.sleep();
     arm_in_correct_position = true;
 
     if(arm_in_correct_position)
