@@ -11,16 +11,15 @@
  */
 
 #include <iostream>
-#include <kdl_parser/kdl_parser.hpp>
-#include <tf/transform_datatypes.h>
-#include <boost/algorithm/string/find.hpp>
 
 #include "sr_hand/sr_subscriber.h"
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
 namespace shadowrobot
 {
+
 /////////////////////////////////
 //    CONSTRUCTOR/DESTRUCTOR   //
 /////////////////////////////////
@@ -33,25 +32,6 @@ SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot )
     // Initialize the subscribers
     //////
     SRSubscriber::init();
-}
-
-SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot, KDL::Tree tree ) :
-    n_tilde("~")
-{
-    sr_articulated_robot = sr_art_robot;
-    //sr_kinematics = boost::shared_ptr<SrKinematics>(new SrKinematics(tree));
-
-    ///////
-    // Initialize the subscribers
-    //////
-    SRSubscriber::init();
-
-    // subscribe to reverseKinematics topic, set
-    // reverseKinematicsCallback function
-    std::string prefix;
-    std::string searched_param;
-    n_tilde.searchParam("shadowhand_prefix", searched_param);
-    n_tilde.param(searched_param, prefix, std::string());
 }
 
 SRSubscriber::~SRSubscriber()
@@ -81,7 +61,7 @@ void SRSubscriber::init()
 /////////////////////////////////
 //         CALLBACK            //
 /////////////////////////////////
-void SRSubscriber::sendupdateCallback( const sr_hand::sendupdateConstPtr& msg )
+void SRSubscriber::sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& msg )
 {
     //loop on all the sendupdate messages received (if > 0)
     int sendupdate_length = msg->sendupdate_length;
@@ -102,7 +82,7 @@ void SRSubscriber::sendupdateCallback( const sr_hand::sendupdateConstPtr& msg )
 
 }
 
-void SRSubscriber::contrlrCallback( const sr_hand::contrlrConstPtr& msg )
+void SRSubscriber::contrlrCallback( const sr_robot_msgs::contrlrConstPtr& msg )
 {
 
     vector<string> list_of_parameters = msg->list_of_parameters;
@@ -126,10 +106,10 @@ void SRSubscriber::contrlrCallback( const sr_hand::contrlrConstPtr& msg )
     sr_articulated_robot->setContrl(msg->contrlr_name, ctrl_data);
 }
 
-void SRSubscriber::configCallback( const sr_hand::configConstPtr& msg )
+void SRSubscriber::configCallback( const sr_robot_msgs::configConstPtr& msg )
 {
     ROS_ERROR("Configuration command callback not implemented yet");
 }
 
-}
-// end namespace
+} // end namespace
+

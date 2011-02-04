@@ -24,17 +24,17 @@
 #include <boost/smart_ptr.hpp>
 
 //messages
-#include <sr_hand/joints_data.h>
-#include <sr_hand/joint.h>
-#include <sr_hand/contrlr.h>
-#include <sr_hand/sendupdate.h>
-#include <sr_hand/config.h>
+#include <sr_robot_msgs/joints_data.h>
+#include <sr_robot_msgs/joint.h>
+#include <sr_robot_msgs/contrlr.h>
+#include <sr_robot_msgs/sendupdate.h>
+#include <sr_robot_msgs/config.h>
+#include <sr_robot_msgs/reverseKinematics.h>
 
 #include "sr_hand/hand/sr_articulated_robot.h"
 
 using namespace ros;
 using namespace shadowrobot;
-using namespace KDL;
 
 namespace shadowrobot
 {
@@ -52,13 +52,6 @@ public:
      * @param sh A Shadowhand object, where the information to be published comes from.
      */
     SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot );
-    /**
-     * Constructor initializing the ROS node, and setting the topic to which it subscribes.
-     *
-     * @param sh A Shadowhand object, where the information to be published comes from.
-     * @param tree The kinematic tree of the hand. Used to compute reverse kinematics.
-     */
-    SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot, KDL::Tree tree );
 
     /// Destructor
     ~SRSubscriber();
@@ -83,7 +76,7 @@ private:
      * @param msg the sendupdate message received. The sendupdate message, contains the number of
      * sendupdate commands and a vector of joints with names and targets.
      */
-    void sendupdateCallback( const sr_hand::sendupdateConstPtr& msg );
+    void sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& msg );
     ///The subscriber to the sendupdate topic.
     Subscriber sendupdate_sub;
 
@@ -92,7 +85,7 @@ private:
      * @param msg the contrlr message received. contrlr_name + list_of_parameters in a string array
      * e.g. [p:10] sets the p value of the specified controller to 10.
      */
-    void contrlrCallback( const sr_hand::contrlrConstPtr& msg );
+    void contrlrCallback( const sr_robot_msgs::contrlrConstPtr& msg );
     ///The subscriber to the contrlr topic
     Subscriber contrlr_sub;
 
@@ -100,7 +93,7 @@ private:
      * process the config command: send new parameters to the palm.
      * @param msg the config message received
      */
-    void configCallback( const sr_hand::configConstPtr& msg );
+    void configCallback( const sr_robot_msgs::configConstPtr& msg );
     ///The subscriber to the config topic
     Subscriber config_sub;
 }; // end class ShadowhandSubscriber

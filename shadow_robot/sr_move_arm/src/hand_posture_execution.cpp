@@ -17,7 +17,7 @@ namespace shadowrobot
   {
     action_server = boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> >(new actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction>("/right_arm/hand_posture_execution", boost::bind(&SrHandPostureExecutionSimpleAction::execute, this, _1)));
 
-    sr_hand_target_pub = nh.advertise<sr_hand::sendupdate>("/srh/sendupdate", 2);
+    sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
 
     action_server->start();
   }
@@ -44,7 +44,7 @@ namespace shadowrobot
     joint_vector.clear();
     for(unsigned int i = 0; i < joint_names.size(); ++i)
     {
-      sr_hand::joint joint;
+      sr_robot_msgs::joint joint;
       joint.joint_name = joint_names[i];
       joint_vector.push_back(joint);
     }

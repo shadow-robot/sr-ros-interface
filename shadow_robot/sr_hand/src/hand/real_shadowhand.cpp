@@ -8,14 +8,13 @@
  *
  */
 
+#include <ros/ros.h>
+
+#include "sr_hand/hand/real_shadowhand.h"
 //our robot code
 #include <robot/robot.h>
 #include <robot/hand.h>
 #include <robot/hand_protocol.h>
-
-#include <ros/ros.h>
-
-#include "sr_hand/hand/real_shadowhand.h"
 
 namespace shadowrobot
 {
@@ -183,14 +182,12 @@ JointData RealShadowhand::getJointData( std::string joint_name )
 
 SRArticulatedRobot::JointsMap RealShadowhand::getAllJointsData()
 {
-    joints_map_mutex.lock();
     //update the map for each joints
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
         getJointData(it->first);
 
     JointsMap tmp = JointsMap(joints_map);
 
-    joints_map_mutex.unlock();
     //return the map
     return tmp;
 }
@@ -305,7 +302,7 @@ std::vector<DiagnosticData> RealShadowhand::getDiagnostics()
     std::stringstream ss;
 
     //get the data from the hand
-    for( unsigned int index = 0; index < NUM_HAND_JOINTS + 4; ++index )
+    for( unsigned int index = 0; index < START_OF_ARM; ++index )
     {
         tmpData.joint_name = std::string(hand_joints[index].joint_name);
         tmpData.level = 0;

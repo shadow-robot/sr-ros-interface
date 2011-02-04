@@ -16,7 +16,7 @@
   <depend package="rospy"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
-  <depend package="sr_hand"/>
+  <depend package="sr_robot_msgs"/>
 <!--  <depend package="cybergrasp"/> -->
   <depend package="cyberglove"/>
 

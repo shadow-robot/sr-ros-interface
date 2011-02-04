@@ -12,7 +12,7 @@
 
 #include <ros/ros.h>
 #include <boost/smart_ptr.hpp>
-#include <sr_hand/sendupdate.h>
+#include <sr_robot_msgs/sendupdate.h>
 
 #include <actionlib/server/simple_action_server.h>
 #include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
@@ -39,8 +39,8 @@ namespace shadowrobot
     boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> > action_server;
 
     Publisher sr_hand_target_pub;
-    sr_hand::sendupdate sendupdate_msg;
-    std::vector<sr_hand::joint> joint_vector;
+    sr_robot_msgs::sendupdate sendupdate_msg;
+    std::vector<sr_robot_msgs::joint> joint_vector;
   };//end class
 }//end workspace
 

@@ -9,8 +9,8 @@
 
 #include "sr_move_arm/move_arm_simple_action.hpp"
 
-#include <sr_hand/joints_data.h>
-#include <sr_hand/joint.h>
+#include <sr_robot_msgs/joints_data.h>
+#include <sr_robot_msgs/joint.h>
 
 #include <trajectory_msgs/JointTrajectory.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
@@ -25,8 +25,8 @@ namespace shadowrobot
 
     action_server_joint_trajectory = boost::shared_ptr<actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction> >(new actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction>(nh, "right_arm/joint_trajectory", boost::bind(&SrMoveArmSimpleAction::execute_trajectory, this, _1)));
 
-    sr_arm_target_pub = nh.advertise<sr_hand::sendupdate>("/sr_arm/sendupdate", 2);
-    sr_hand_target_pub = nh.advertise<sr_hand::sendupdate>("/srh/sendupdate", 2);
+    sr_arm_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/sr_arm/sendupdate", 2);
+    sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
 
     grasp_status_server = nh.advertiseService("right_arm/grasp_status", &SrMoveArmSimpleAction::check_grasp_status, this);
 
@@ -59,7 +59,7 @@ namespace shadowrobot
     ros::Rate ts(4.0);
     for(unsigned int i = 0; i < joint_names.size(); ++i)
     {
-      sr_hand::joint joint;
+      sr_robot_msgs::joint joint;
       joint.joint_name = joint_names[i];
       joint_vector_traj.push_back(joint);
     }
@@ -116,7 +116,7 @@ namespace shadowrobot
     joint_vector.clear();
     for( unsigned int i=0; i < goal->motion_plan_request.goal_constraints.joint_constraints.size(); ++i )
     {
-      sr_hand::joint joint;
+      sr_robot_msgs::joint joint;
       joint.joint_name = goal->motion_plan_request.goal_constraints.joint_constraints[i].joint_name;
       joint.joint_target = math_utils.to_degrees(goal->motion_plan_request.goal_constraints.joint_constraints[i].position);
 

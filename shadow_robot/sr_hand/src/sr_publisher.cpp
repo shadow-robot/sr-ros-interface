@@ -15,8 +15,8 @@
 #include <ros/ros.h>
 
 //messages
-#include <sr_hand/joints_data.h>
-#include <sr_hand/joint.h>
+#include <sr_robot_msgs/joints_data.h>
+#include <sr_robot_msgs/joint.h>
 #include <sensor_msgs/JointState.h>
 
 //generic C/C++ include
@@ -56,7 +56,7 @@ SRPublisher::SRPublisher( boost::shared_ptr<SRArticulatedRobot> sh ) :
 
     //publishes standard joints data (pos, targets, temp, current, ...)
     full_topic = prefix + "shadowhand_data";
-    sr_pub = node.advertise<sr_hand::joints_data> (full_topic, 2);
+    sr_pub = node.advertise<sr_robot_msgs::joints_data> (full_topic, 2);
 }
 
 SRPublisher::~SRPublisher()
@@ -72,8 +72,8 @@ void SRPublisher::publish()
 {
     SRArticulatedRobot::JointsMap joints_map = sr_articulated_robot->getAllJointsData();
 
-    sr_hand::joints_data msg;
-    std::vector<sr_hand::joint> jointVector;
+    sr_robot_msgs::joints_data msg;
+    std::vector<sr_robot_msgs::joint> jointVector;
 
     sensor_msgs::JointState jointstate_pos_msg;
     sensor_msgs::JointState jointstate_target_msg;
@@ -83,7 +83,7 @@ void SRPublisher::publish()
 
     for( SRArticulatedRobot::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
-        sr_hand::joint joint;
+        sr_robot_msgs::joint joint;
         JointData currentData = it->second;
 
         joint.joint_name = it->first;

@@ -26,11 +26,6 @@ rosbuild_add_boost_directories()
 #if you don't want to have the gazebo interface for the virtual hardware 
 # just comment this flag
 #SET( CMAKE_CXX_FLAGS "-D GAZEBO")
-##################
-#   KINEMATICS   #
-##################
-
-rosbuild_add_executable(sr_kinematics  src/sr_kinematics.cpp)
 
 ##################
 #  VIRTUAL ARM  #
@@ -66,6 +61,18 @@ rosbuild_link_boost(shadowhand_virtual thread)
 #rosbuild_add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
 #rosbuild_link_boost(shadowhand_real thread)
 #target_link_libraries(shadowhand_real robot)
+
+##################
+#    REAL ARM    #
+##################
+
+#uncomment those lines if you build for the real hand
+#include_directories(/usr/realtime/include/)
+#LINK_LIBRARIES(pthread)
+#rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
+#rosbuild_link_boost(shadowarm_real thread)
+#target_link_libraries(shadowarm_real robot)
+
 
 #####################################
 #   dynamic parameters reconfigure  #

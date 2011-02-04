@@ -17,7 +17,7 @@
   <depend package="object_manipulation_msgs"/>
   <depend package="actionlib"/>
   <depend package="actionlib_msgs"/>
-  <depend package="sr_hand"/>
+  <depend package="sr_robot_msgs"/>
   <depend package="math_utils"/>
 
 </package>
