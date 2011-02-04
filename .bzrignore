@@ -176,3 +176,7 @@ shadow_robot/dataglove/dataglove_processing/build
 shadow_robot/dataglove/dataglove_processing/bin/dataglove_processing
 shadow_robot/dataglove/dataglove_processing/bin/test/test_dataglove_processing
 >>>>>>> MERGE-SOURCE
+shadow_robot/sr_robot_msgs/bin
+shadow_robot/sr_robot_msgs/build
+shadow_robot/sr_robot_msgs/msg_gen
+shadow_robot/sr_robot_msgs/src
