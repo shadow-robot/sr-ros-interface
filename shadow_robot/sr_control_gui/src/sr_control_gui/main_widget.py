@@ -45,7 +45,7 @@ class MainWidget(QtGui.QWidget):
         self.manager.loadPlugins()
                 
         self.plugins = self.manager.getPluginsOfCategory("Default")
-        
+
         self.plugin_actions = []
         plugin_id = 0
         
@@ -61,7 +61,7 @@ class MainWidget(QtGui.QWidget):
                       [arm_menu, "shadowarm", 0],
                       [QtGui.QMenu("Other"), "", 0]]
         
-        for plugin in self.plugins:
+        for plugin in self.plugins:            
             plugin.plugin_object.set_parent(self)
             name = plugin.plugin_object.name
             

@@ -11,6 +11,7 @@
   <depend package="roslib"/>
   <export>
     <cpp cflags="-I${prefix}/include"/>
+    <python path="${prefix}/src"/>
   </export>
 
 </package>

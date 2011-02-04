@@ -11,9 +11,7 @@
  *
  */
 
-#include <kdl_parser/kdl_parser.hpp>
 #include <ros/ros.h>
-#include <kdl/tree.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/smart_ptr.hpp>
@@ -26,7 +24,6 @@
 
 using namespace std;
 using namespace ros;
-using namespace KDL;
 using namespace shadowrobot;
 //using namespace shadowhand_config_server;
 
@@ -68,45 +65,11 @@ int main(int argc, char** argv)
   NodeHandle n;
 
   boost::shared_ptr<VirtualShadowhand> virt_sh(new VirtualShadowhand());
-  boost::shared_ptr<SRSubscriber> shadowhand_subscriber;
+  boost::shared_ptr<SRSubscriber> shadowhand_subscriber(new SRSubscriber(virt_sh));
 
 
   boost::shared_ptr<SRPublisher> shadowhand_pub( new SRPublisher(virt_sh));
   boost::shared_ptr<SRDiagnosticer> shadowhand_diag( new SRDiagnosticer(virt_sh, sr_hand_hardware));
-
-  // gets the location of the robot description on the parameter server
-  string full_param_name;
-  n.searchParam("robot_description",full_param_name);
-
-  string robot_desc_string;
-  n.param(full_param_name, robot_desc_string, string());
-  Tree tree;
-  if (!kdl_parser::treeFromString(robot_desc_string, tree))
-    {
-      ROS_ERROR("Failed to construct kdl tree");
-    }
-  else
-    {
-      ROS_DEBUG("kdl tree loaded!");
-    }
-  
-  //  ShadowhandConfigServer shadowhand_config_server;
-
-  if (tree.getNrOfSegments() == 0)
-    {
-      ROS_WARN("ShadowHand subscriber got an empty tree and cannot do inverse kinematics");
-      shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new SRSubscriber(virt_sh));
-    }
-  else if (tree.getNrOfSegments() == 1)
-    {
-      ROS_WARN("ShadowHand subscriber got an empty tree and cannot do inverse kinematics");
-
-      shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new SRSubscriber(virt_sh));
-    }
-  else
-    {
-      shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new  SRSubscriber(virt_sh, tree));
-    }
   
   boost::thread thrd1( boost::bind( &run_diagnotics, shadowhand_diag ));
   boost::thread thrd2( boost::bind( &run_publisher, shadowhand_pub ));

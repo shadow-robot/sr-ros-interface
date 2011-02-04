@@ -11,53 +11,21 @@
  */
 
 #include <iostream>
-#include <kdl_parser/kdl_parser.hpp>
 
 #include "sr_hand/sr_subscriber.h"
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
-namespace
-{
-vector<string> init_end_effector_names()
-{
-    vector<string> endeffnames;
-    endeffnames.push_back("ffdistal");
-    return endeffnames;
-}
-
-//TODO do this properly
-KDL::JntArray init_joints_min()
-{
-    KDL::JntArray jmin(19);
-    for( unsigned int i = 0; i < 19; ++i )
-        jmin(i) = 0.0;
-    return jmin;
-}
-KDL::JntArray init_joints_max()
-{
-    KDL::JntArray jmax(19);
-    for( unsigned int i = 0; i < 19; ++i )
-        jmax(i) = KDL::PI / 2.0;
-
-    return jmax;
-}
-}
-
 namespace shadowrobot
 {
-
-const vector<string> SRSubscriber::end_effector_names = init_end_effector_names();
-const KDL::JntArray SRSubscriber::joints_min = init_joints_min();
-const KDL::JntArray SRSubscriber::joints_max = init_joints_max();
 
 /////////////////////////////////
 //    CONSTRUCTOR/DESTRUCTOR   //
 /////////////////////////////////
 
 SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot ) :
-    n_tilde("~"), treeFkSolverPos(sr_kinematic_tree), treeIkSolverVel(sr_kinematic_tree, vector<string> ()), treeSolverPos_NR_JL(sr_kinematic_tree, vector<string> (), KDL::JntArray(),
-                                                                                                                                 KDL::JntArray(), treeFkSolverPos, treeIkSolverVel, 100, 1e-6)
+    n_tilde("~") 
 {
     sr_articulated_robot = sr_art_robot;
 
@@ -65,29 +33,6 @@ SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot )
     // Initialize the subscribers
     //////
     SRSubscriber::init();
-}
-
-SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot, KDL::Tree tree ) :
-    n_tilde("~"), sr_kinematic_tree(tree), treeFkSolverPos(sr_kinematic_tree), treeIkSolverVel(sr_kinematic_tree, end_effector_names), treeSolverPos_NR_JL(sr_kinematic_tree, end_effector_names,
-                                                                                                                                                           joints_min, joints_max, treeFkSolverPos,
-                                                                                                                                                           treeIkSolverVel, 100, 1e-6)
-
-{
-    sr_articulated_robot = sr_art_robot;
-
-    ///////
-    // Initialize the subscribers
-    //////
-    SRSubscriber::init();
-
-    // subscribe to reverseKinematics topic, set
-    // reverseKinematicsCallback function
-    std::string prefix;
-    std::string searched_param;
-    n_tilde.searchParam("shadowhand_prefix", searched_param);
-    n_tilde.param(searched_param, prefix, std::string());
-    std::string full_topic = prefix + "reverseKinematics";
-    reverse_kinematics_sub = node.subscribe(full_topic, 10, &SRSubscriber::reverseKinematicsCallback, this);
 }
 
 SRSubscriber::~SRSubscriber()
@@ -167,46 +112,6 @@ void SRSubscriber::contrlrCallback( const sr_robot_msgs::contrlrConstPtr& msg )
 void SRSubscriber::configCallback( const sr_robot_msgs::configConstPtr& msg )
 {
     ROS_ERROR("Configuration command callback not implemented yet");
-}
-
-void SRSubscriber::reverseKinematicsCallback( const sr_robot_msgs::reverseKinematicsConstPtr& msg )
-{
-    //get cartesian target from the received message
-    ROS_ERROR("toto1");
-    //KDL::Frames 
-    std::map<std::string, KDL::Frame> cartesian_targets;
-    cartesian_targets["ffdistal"] = KDL::Frame(KDL::Vector(0.027, -0.050, 0.376));
-    //KDL::Frame(KDL::Vector(0.027,0.050,0.376)));
-
-    ROS_ERROR("toto2: %d", sr_kinematic_tree.getNrOfSegments());
-    sr_kinematic_tree.getSegment("ffdistal");
-    ROS_ERROR("glasp");
-
-    //current positions used as a guess for the inverse kinematics
-    KDL::JntArray current_positions(sr_kinematic_tree.getNrOfSegments());
-    for( unsigned int i = 0; i < sr_kinematic_tree.getNrOfSegments(); ++i )
-    {
-        //      ROS_ERROR("segment[%d]: %s",i, shadowhand_kinematic_tree[i]);
-        current_positions(i) = 0.0;
-    }
-    //TODO read data from the hand
-    KDL::JntArray computed_positions(sr_kinematic_tree.getNrOfSegments());
-
-    ROS_ERROR("toto3");
-    int kinematics_status = -1;
-    kinematics_status = treeSolverPos_NR_JL.CartToJnt(current_positions, cartesian_targets, computed_positions);
-    ROS_ERROR("toto4");
-    if( kinematics_status < 0 )
-    {
-        ROS_WARN("Could not calculate inverse kinematics");
-    }
-    else
-    {
-        for( unsigned int i = 0; i < 19; ++i )
-        {
-            ROS_ERROR("joint[%d] = %f", i, computed_positions(i));
-        }
-    }
 }
 
 } // end namespace

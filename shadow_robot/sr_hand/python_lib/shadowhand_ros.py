@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('sr_control_gui')
+import roslib; roslib.load_manifest('sr_hand')
 import time
 import os
 import math
@@ -7,7 +7,7 @@ import rospy
 import subprocess
 import threading
 import rosgraph.masterapi
-from sr_hand.msg import sendupdate, joint, joints_data
+from sr_robot_msgs.msg import sendupdate, joint, joints_data
 from sensor_msgs.msg import *
 from grasps_parser import GraspParser
 from grasps_interpoler import GraspInterpoler
@@ -29,7 +29,6 @@ class ShadowHand_ROS():
         initializes the hand publisher and subscriber to the default 
         values of shadowhand_data and sendupdate 
         """
-        #print "Creating good library"
         self.allJoints = [Joint("THJ1", "smart_motor_th1"), 
                            Joint("THJ2", "smart_motor_th2", -30, 30), 
                            Joint("THJ3", "smart_motor_th3",-15, 15),

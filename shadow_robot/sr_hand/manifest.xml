@@ -18,15 +18,13 @@
   <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
   <depend package="diagnostic_msgs"/>
-  <depend package="kdl_parser"/>
+<!--  <depend package="kdl_parser"/> -->
   <depend package="dynamic_reconfigure"/>
 
   <export>
 	<cpp cflags="-I${prefix}/include"/>
 	<python path="${prefix}/python_lib"/>
 	<python path="${prefix}/python_lib/grasp"/>
-	<python path="${prefix}/src"/>
-	
   </export>
 </package>
 

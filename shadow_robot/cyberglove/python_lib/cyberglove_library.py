@@ -1,4 +1,4 @@
-import roslib; roslib.load_manifest('sr_control_gui')
+import roslib; roslib.load_manifest('cyberglove')
 import time
 import os
 import math
@@ -6,7 +6,7 @@ import rospy
 import subprocess
 import threading
 import rosgraph.masterapi
-from sr_hand.msg import sendupdate, joint, joints_data
+from sr_robot_msgs.msg import sendupdate, joint, joints_data
 from sensor_msgs.msg import *
 
 class Joint():
