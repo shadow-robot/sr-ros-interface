@@ -119,7 +119,7 @@ void SRSubscriber::init()
 /////////////////////////////////
 //         CALLBACK            //
 /////////////////////////////////
-void SRSubscriber::sendupdateCallback( const sr_hand::sendupdateConstPtr& msg )
+void SRSubscriber::sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& msg )
 {
     //loop on all the sendupdate messages received (if > 0)
     int sendupdate_length = msg->sendupdate_length;
@@ -140,7 +140,7 @@ void SRSubscriber::sendupdateCallback( const sr_hand::sendupdateConstPtr& msg )
 
 }
 
-void SRSubscriber::contrlrCallback( const sr_hand::contrlrConstPtr& msg )
+void SRSubscriber::contrlrCallback( const sr_robot_msgs::contrlrConstPtr& msg )
 {
 
     vector<string> list_of_parameters = msg->list_of_parameters;
@@ -164,12 +164,12 @@ void SRSubscriber::contrlrCallback( const sr_hand::contrlrConstPtr& msg )
     sr_articulated_robot->setContrl(msg->contrlr_name, ctrl_data);
 }
 
-void SRSubscriber::configCallback( const sr_hand::configConstPtr& msg )
+void SRSubscriber::configCallback( const sr_robot_msgs::configConstPtr& msg )
 {
     ROS_ERROR("Configuration command callback not implemented yet");
 }
 
-void SRSubscriber::reverseKinematicsCallback( const sr_hand::reverseKinematicsConstPtr& msg )
+void SRSubscriber::reverseKinematicsCallback( const sr_robot_msgs::reverseKinematicsConstPtr& msg )
 {
     //get cartesian target from the received message
     ROS_ERROR("toto1");

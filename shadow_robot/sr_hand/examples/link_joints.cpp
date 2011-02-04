@@ -25,9 +25,9 @@
 #include <string>
 
 //messages
-#include <sr_hand/joints_data.h>
-#include <sr_hand/joint.h>
-#include <sr_hand/sendupdate.h>
+#include <sr_robot_msgs/joints_data.h>
+#include <sr_robot_msgs/joint.h>
+#include <sr_robot_msgs/sendupdate.h>
 
 /// the name of the parent joint
 std::string parent_name = "FFJ3";
@@ -45,7 +45,7 @@ ros::Publisher pub;
  * 
  * @param msg message of type sr_hand::joints_data
  */
-void callback(const sr_hand::joints_dataConstPtr& msg)
+void callback(const sr_robot_msgs::joints_dataConstPtr& msg)
 {    
   //loop on all the sendupdate messages received (if > 0)
   int msg_length = msg->joints_list_length;
@@ -71,11 +71,11 @@ void callback(const sr_hand::joints_dataConstPtr& msg)
 	  float target = msg->joints_list[index_msg].joint_position;
 
 	  //form a sendupdate msg.
-	  sr_hand::sendupdate msg;
-	  std::vector<sr_hand::joint> jointVector;
+	  sr_robot_msgs::sendupdate msg;
+	  std::vector<sr_robot_msgs::joint> jointVector;
 
 	  //fill the message
-	  sr_hand::joint joint;
+	  sr_robot_msgs::joint joint;
 	  joint.joint_name = child_name;
 	  joint.joint_target = target;
 	  jointVector.push_back(joint);
@@ -115,9 +115,9 @@ int main(int argc, char** argv)
 
   /**
    * init the publisher on the topic /srh/sendupdate
-   * publishing messages of the type sr_hand::sendupdate.
+   * publishing messages of the type sr_robot_msgs::sendupdate.
    */
-  pub = node.advertise<sr_hand::sendupdate>("/srh/sendupdate", 2);
+  pub = node.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
 
   //subscribe until interrupted.
   while( ros::ok() )

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('sr_hand')
 import rospy
-from sr_hand.msg import sendupdate, joint, joints_data
+from sr_robot_msgs.msg import sendupdate, joint, joints_data
 from sensor_msgs.msg import *
 
 parent_name = "FFJ3"

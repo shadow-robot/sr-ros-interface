@@ -11,14 +11,16 @@
   <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://www.shadowrobot.com</url>
+  <depend package="roslib"/>
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
+  <depend package="sr_robot_msgs"/>
   <depend package="diagnostic_msgs"/>
   <depend package="kdl_parser"/>
   <depend package="dynamic_reconfigure"/>
-  <depend package="sr_convenient_dependencies"/>
+
   <export>
 	<cpp cflags="-I${prefix}/include"/>
 	<python path="${prefix}/python_lib"/>

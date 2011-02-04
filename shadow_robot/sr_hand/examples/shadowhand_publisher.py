@@ -8,7 +8,7 @@ This is an example showing how to publish command messages to the hand.
 import roslib; roslib.load_manifest('sr_hand')
 import rospy
 
-from sr_hand.msg import joint, sendupdate, contrlr
+from sr_robot_msgs.msg import joint, sendupdate, contrlr
 
 def talker():
     """

@@ -6,7 +6,7 @@ This is a simple subscriber example, subscribing to the srh/shadowhand_data topi
 
 import roslib; roslib.load_manifest('sr_hand')
 import rospy
-from sr_hand.msg import joints_data, joint
+from sr_robot_msgs.msg import joints_data, joint
 
 def callback(joint_data):
     """
