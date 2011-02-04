@@ -1,0 +1,18 @@
+<package>
+  <description brief="sr_robot_msgs">
+
+     sr_robot_msgs contains some messages used in the shadow_robot stack.
+
+  </description>
+  <author>Ugo Cupcic/ugo@shadowrobot.com</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_robot_msgs</url>
+  <depend package="roslib"/>
+  <export>
+    <cpp cflags="-I${prefix}/include"/>
+  </export>
+
+</package>
+
+
