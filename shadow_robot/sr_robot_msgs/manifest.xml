@@ -1,0 +1,14 @@
+<package>
+  <description brief="sr_robot_msgs">
+
+     sr_robot_msgs
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_robot_msgs</url>
+
+</package>
+
+
