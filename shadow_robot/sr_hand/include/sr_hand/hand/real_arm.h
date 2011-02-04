@@ -10,6 +10,8 @@
 #ifndef REAL_ARM_H_
 #define REAL_ARM_H_
 
+#include <robot/config.h>
+
 #include "sr_hand/hand/sr_articulated_robot.h"
 
 namespace shadowrobot

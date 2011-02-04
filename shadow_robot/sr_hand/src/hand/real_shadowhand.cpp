@@ -8,14 +8,13 @@
  *
  */
 
+#include <ros/ros.h>
+
+#include "sr_hand/hand/real_shadowhand.h"
 //our robot code
 #include <robot/robot.h>
 #include <robot/hand.h>
 #include <robot/hand_protocol.h>
-
-#include <ros/ros.h>
-
-#include "sr_hand/hand/real_shadowhand.h"
 
 namespace shadowrobot
 {
