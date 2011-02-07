@@ -39,7 +39,7 @@ namespace shadowrobot
 
   bool SrMoveArmSimpleAction::check_grasp_status(object_manipulation_msgs::GraspStatus::Request &req, object_manipulation_msgs::GraspStatus::Response &res)
   {
-    ROS_ERROR("Not implemented yet");
+    ROS_ERROR("Not implemented yet; check using tactile sensors?");
     res.is_hand_occupied = true;
     return true;
   }
@@ -56,7 +56,7 @@ namespace shadowrobot
     //initializes the joint names
     std::vector<std::string> joint_names = goal->trajectory.joint_names;
     joint_vector.clear();
-    ros::Rate ts(4.0);
+    //ros::Rate ts(4.0);
     for(unsigned int i = 0; i < joint_names.size(); ++i)
     {
       sr_robot_msgs::joint joint;
@@ -74,7 +74,7 @@ namespace shadowrobot
       trajectory_step = trajectory_points[index_step];
 
       //update the targets
-      for(unsigned index_pos = 0; index_pos < trajectory_points.size(); ++index_pos)
+      for(unsigned index_pos = 0; index_pos < trajectory_step.positions.size(); ++index_pos)
       {
         joint_vector_traj[index_pos].joint_target = math_utils.to_degrees(trajectory_step.positions[index_pos]);       
       }
@@ -85,7 +85,7 @@ namespace shadowrobot
       
       trajectory_step.time_from_start.sleep();
       ROS_INFO("Step %d of %d done.", index_step + 1, (int)trajectory_points.size());
-      ts.sleep();
+      //ts.sleep();
     }
 
     action_server_joint_trajectory->setSucceeded(joint_trajectory_result);

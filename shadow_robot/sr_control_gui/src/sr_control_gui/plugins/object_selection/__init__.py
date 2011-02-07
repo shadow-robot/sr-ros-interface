@@ -93,7 +93,7 @@ class ObjectChooser(QtGui.QWidget):
         
         pickup_goal.arm_name = "right_arm"
         pickup_goal.desired_approach_distance = 0.1
-        pickup_goal.min_approach_distance = 0.05
+        pickup_goal.min_approach_distance = 0.02
         
         direction = Vector3Stamped()
         direction.header.stamp = rospy.get_rostime()

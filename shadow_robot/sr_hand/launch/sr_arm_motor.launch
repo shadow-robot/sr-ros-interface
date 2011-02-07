@@ -177,7 +177,7 @@
 	<!--
 	    Trajectories / grasp execution
 	-->
-	<node pkg="sr_move_arm" type="move_arm_simple_action" name="move_arm_simple_action" machine="robot"/>
+	<node pkg="sr_move_arm" type="move_arm_simple_action" name="move_arm_simple_action"  machine="robot"/>
 	<node pkg="sr_move_arm" type="hand_posture_execution" name="hand_posture_execution" machine="robot"/>
 
 </launch>
