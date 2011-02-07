@@ -4,15 +4,14 @@ select 1170000,18744,grasp_pregrasp_joints,grasp_grasp_joints,grasp_energy,grasp
 from grasp where grasp_id=1129853;
 
 
-UPDATE grasp
-set grasp_pregrasp_joints='{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}',
-grasp_grasp_joints='{0,0,0,50,20,20,0,50,20,20,0,50,20,20,0,0,50,20,20,30,0,0,30,80}',
-grasp_cluster_rep=true
-where grasp_id=1170000;
+update grasp 
+set grasp_pregrasp_joints='{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}',
+grasp_grasp_joints='{-25,78,40,0,78,40,0,74,40,0,-25,71,40,-14,70,0,19,27}'
+where grasp_id=1170000
 
 UPDATE grasp
-set grasp_pregrasp_position='{0.0,0.0,0.281533,0.7071067811865476,0.7071067811865476,0.0,0.0}',
+set grasp_pregrasp_position='{0.0,0.0,0.241533,0.7071067811865476,0.7071067811865476,0.0,0.0}',
 
-grasp_grasp_position='{0.0,0.0,0.213018,0.7071067811865476,0.7071067811865476,0.0,0.0}'
+grasp_grasp_position='{0.0,0.0,0.188,0.7071067811865476,0.7071067811865476,0.0,0.0}'
 where grasp_id=1170000
 

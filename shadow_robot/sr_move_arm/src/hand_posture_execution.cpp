@@ -27,15 +27,13 @@ namespace shadowrobot
 
   void SrHandPostureExecutionSimpleAction::execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& goal)
   {    
-    for(unsigned int i=0;i<2; ++i)
+    if(action_server->isPreemptRequested() || !ros::ok())
     {
-      if(action_server->isPreemptRequested() || !ros::ok())
-      {
-        ROS_INFO("Change Hand Pose action preempted.");
-        //set action state to preempted
-        action_server->setPreempted();
-      }
+      ROS_INFO("Change Hand Pose action preempted.");
+      //set action state to preempted
+      action_server->setPreempted();
     }
+
 
     std::vector<std::string> joint_names = goal->grasp.pre_grasp_posture.name;
 
