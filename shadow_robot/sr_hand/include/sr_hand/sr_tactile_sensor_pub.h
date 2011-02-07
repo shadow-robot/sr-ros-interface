@@ -42,7 +42,11 @@ private:
     NodeHandle node, n_tilde;
     Rate publish_rate;
 
-    Publisher sr_jointstate_pub;
+    std::vector<std::string> sensor_touch_names;
+    std::vector<std::string> sensor_temp_names;
+
+    std::vector<Publisher> sr_touch_pubs;
+    std::vector<Publisher> sr_temp_pubs;
 }; // end class ShadowhandTactileSensorPublisher
 
 } // end namespace

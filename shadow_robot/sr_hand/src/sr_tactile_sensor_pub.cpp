@@ -15,10 +15,7 @@
 #include <ros/ros.h>
 
 //messages
-#include <shadowhand/joints_data.h>
-#include <shadowhand/joint.h>
-#include <sensor_msgs/JointState.h>
-#include "cybergrasp/cybergraspforces.h"
+#include <std_msgs/Float64.h>
 
 //generic C/C++ include
 #include <vector>
@@ -59,7 +56,7 @@ SRTactileSensorPublisher::SRTactileSensorPublisher() :
 
     // set publish frequency
     double publish_freq;
-    n_tilde.param("publish_frequency", publish_freq, 50.0);
+    n_tilde.param("publish_frequency", publish_freq, 20.0);
     publish_rate = Rate(publish_freq);
 
     //publishes JointState messages for the robot_state_publisher
@@ -67,8 +64,35 @@ SRTactileSensorPublisher::SRTactileSensorPublisher() :
     std::string searched_param;
     n_tilde.searchParam("shadowhand_prefix", searched_param);
     n_tilde.param(searched_param, prefix, std::string());
-    std::string full_topic = prefix + "joint_states";
-    sr_jointstate_pub = node.advertise<sensor_msgs::JointState> (full_topic, 100);
+    std::string full_topic_touch = "touch/";
+    std::string full_topic_temp = "temp/";
+    std::vector<std::string> names;
+    names.push_back("ff");
+    names.push_back("mf");
+    names.push_back("rf");
+    names.push_back("lf");
+    names.push_back("th");
+
+    sensor_touch_names.push_back("FF_Touch");
+    sensor_touch_names.push_back("MF_Touch");
+    sensor_touch_names.push_back("RF_Touch");
+    sensor_touch_names.push_back("LF_Touch");
+    sensor_touch_names.push_back("TH_Touch");
+
+    sensor_temp_names.push_back("FF_Touch_Temp");
+    sensor_temp_names.push_back("MF_Touch_Temp");
+    sensor_temp_names.push_back("RF_Touch_Temp");
+    sensor_temp_names.push_back("LF_Touch_Temp");
+    sensor_temp_names.push_back("TH_Touch_Temp");
+
+    for( unsigned int i=0; i<5; ++i)
+      {
+        std::string top_touch = full_topic_touch + names[i];
+	sr_touch_pubs.push_back(n_tilde.advertise<std_msgs::Float64> (top_touch, 20));
+
+        std::string top_temp = full_topic_temp + names[i];
+	sr_temp_pubs.push_back(n_tilde.advertise<std_msgs::Float64> (top_temp, 20));
+      }
 }
 
 /////////////////////////////////
@@ -76,29 +100,28 @@ SRTactileSensorPublisher::SRTactileSensorPublisher() :
 /////////////////////////////////
 void SRTactileSensorPublisher::publish()
 {
-    sensor_msgs::JointState jointstate_msg;
+  std_msgs::Float64 msg_temp;
+  std_msgs::Float64 msg_touch;
 
-    for( unsigned int i = 148; i < 174; ++i )
+
+  for( unsigned int i = 0; i < sensor_touch_names.size(); ++i )
     {
-        //broken sensor
-        if( i == 161 || i == 170 )
-            continue;
-        std::stringstream nametmp;
-        nametmp << "finger_sensor_e." << i;
-        struct sensor s;
-        std::string name = nametmp.str();
-        int res = robot_name_to_sensor(name.c_str(), &s);
+        struct sensor s1, s2;
+        int res1 = robot_name_to_sensor(sensor_touch_names[i].c_str(), &s1);
+        int res2 = robot_name_to_sensor(sensor_temp_names[i].c_str(), &s2);
 
         /* Check the return value to see if the sensor was found */
-        if( res )
-            ROS_ERROR("Can't open sensor %s\n", name.c_str());
+        if( res1 )
+            ROS_ERROR("Can't open sensor %s\n", sensor_touch_names[i].c_str());
+        if( res2 )
+            ROS_ERROR("Can't open sensor %s\n", sensor_temp_names[i].c_str());
 
-        jointstate_msg.name.push_back(name);
-        jointstate_msg.effort.push_back(robot_read_sensor(&s));
+        msg_touch.data = robot_read_sensor(&s1);
+        msg_temp.data = robot_read_sensor(&s2);
+        
+        sr_touch_pubs[i].publish(msg_touch);
+        sr_temp_pubs[i].publish(msg_temp);
     }
-
-    //publish JointState message
-    sr_jointstate_pub.publish(jointstate_msg);
 
     ros::spinOnce();
     publish_rate.sleep();
