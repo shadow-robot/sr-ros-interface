@@ -1,8 +1,7 @@
 <launch>
   <machine name="local" address="localhost" ros-root="$(env ROS_ROOT)" ros-package-path="$(env ROS_PACKAGE_PATH)" default="true"/>
   
-<--
-<--  We now start nodes that need it direcly as root  -->
+<!--
 <machine name="local-root" user="root" address="bli" ros-root="$(env ROS_ROOT)" ros-package-path="$(env ROS_PACKAGE_PATH)"/>
 -->
 </launch>
