@@ -1,9 +1,9 @@
 <launch>
-  <include file="$(find sr_hand_ethercat)/srh.machine" />
+  <include file="$(find sr_edc_launch)/sr_edc.machine" />
   <param name="/use_sim_time" value="false"/>
 
   <!-- Uses special defs file for Alpha 2.0 hardware on PRE -->
-  <include file="$(find srh_defs)/launch/upload_sr_edc.launch" />
+  <include file="$(find sr_edc_defs)/launch/upload_sr_edc.launch" />
 
   <!-- Should be loaded before starting/running pr2_etherCAT node -->
   <rosparam command="load" file="$(find sr_edc_launch)/sr_edc_sensor_gain_offset.yaml" />
