@@ -55,8 +55,7 @@ namespace shadowrobot
       
     //initializes the joint names
     std::vector<std::string> joint_names = goal->trajectory.joint_names;
-    joint_vector.clear();
-    //ros::Rate ts(4.0);
+    joint_vector_traj.clear();
     for(unsigned int i = 0; i < joint_names.size(); ++i)
     {
       sr_robot_msgs::joint joint;
@@ -64,6 +63,9 @@ namespace shadowrobot
       joint_vector_traj.push_back(joint);
     }
     sendupdate_msg_traj.sendupdate_length = joint_vector_traj.size();
+
+    ROS_DEBUG("Trajectory received: %d joints / %d msg length", goal->trajectory.joint_names.size(), sendupdate_msg_traj.sendupdate_length);
+
     
     std::vector<trajectory_msgs::JointTrajectoryPoint> trajectory_points = goal->trajectory.points;
     trajectory_msgs::JointTrajectoryPoint trajectory_step;
@@ -74,9 +76,12 @@ namespace shadowrobot
       trajectory_step = trajectory_points[index_step];
 
       //update the targets
-      for(unsigned index_pos = 0; index_pos < trajectory_step.positions.size(); ++index_pos)
+      for(unsigned index_pos = 0; index_pos < sendupdate_msg_traj.sendupdate_length; ++index_pos)
       {
-        joint_vector_traj[index_pos].joint_target = math_utils.to_degrees(trajectory_step.positions[index_pos]);       
+        joint_vector_traj[index_pos].joint_target = math_utils.to_degrees(trajectory_step.positions[index_pos]);
+
+        ROS_DEBUG("traj[%s]: %f", joint_vector_traj[index_pos].joint_name.c_str(), joint_vector_traj[index_pos].joint_target);
+
       }
       sendupdate_msg_traj.sendupdate_list = joint_vector_traj;
       
@@ -84,8 +89,9 @@ namespace shadowrobot
       sr_hand_target_pub.publish(sendupdate_msg_traj);
       
       trajectory_step.time_from_start.sleep();
-      ROS_INFO("Step %d of %d done.", index_step + 1, (int)trajectory_points.size());
-      //ts.sleep();
+      ROS_DEBUG("Step %d of %d done.", index_step + 1, (int)trajectory_points.size());
+
+      ROS_DEBUG("End step----");
     }
 
     action_server_joint_trajectory->setSucceeded(joint_trajectory_result);
@@ -140,7 +146,7 @@ namespace shadowrobot
       action_server->setSucceeded(move_arm_action_result);
     }
 
-    ROS_INFO("Arm movement done");
+    ROS_DEBUG("Arm movement done");
   }
 }
 
