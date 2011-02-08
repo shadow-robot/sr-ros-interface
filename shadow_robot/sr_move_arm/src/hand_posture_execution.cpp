@@ -15,7 +15,7 @@ namespace shadowrobot
   SrHandPostureExecutionSimpleAction::SrHandPostureExecutionSimpleAction() :
     nh_tilde("~")
   {
-    action_server = boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> >(new actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction>("/right_arm/hand_posture_execution", boost::bind(&SrHandPostureExecutionSimpleAction::execute, this, _1)));
+    action_server = boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> >(new actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction>("/right_arm/hand_posture_execution", boost::bind(&SrHandPostureExecutionSimpleAction::execute, this, _1), false));
 
     sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
 
@@ -51,7 +51,7 @@ namespace shadowrobot
     switch (goal->goal)
     {
     case object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP: 
-      ROS_ERROR("GRASP!");
+      ROS_DEBUG("GRASP!");
 
       if (goal->grasp.grasp_posture.position.empty())
       {
@@ -62,16 +62,16 @@ namespace shadowrobot
       for(unsigned int i = 0; i < goal->grasp.grasp_posture.position.size(); ++i)
       {
         joint_vector[i].joint_target = goal->grasp.grasp_posture.position[i];
-        ROS_ERROR("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
+        ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
       sendupdate_msg.sendupdate_list = joint_vector;
 
       sr_hand_target_pub.publish(sendupdate_msg);
-      ROS_INFO("Hand in grasp position");
+      ROS_DEBUG("Hand in grasp position");
       break;
     
     case object_manipulation_msgs::GraspHandPostureExecutionGoal::PRE_GRASP:
-      ROS_ERROR("PREGRASP!");
+      ROS_DEBUG("PREGRASP!");
 
       if (goal->grasp.pre_grasp_posture.position.empty())
       {
@@ -83,27 +83,27 @@ namespace shadowrobot
       for(unsigned int i = 0; i < goal->grasp.pre_grasp_posture.position.size(); ++i)
       {
         joint_vector[i].joint_target = goal->grasp.pre_grasp_posture.position[i];
-        ROS_ERROR("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
+        ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
       sendupdate_msg.sendupdate_list = joint_vector;
       
       sr_hand_target_pub.publish(sendupdate_msg);
-      ROS_INFO("Hand in pregrasp position");
+      ROS_DEBUG("Hand in pregrasp position");
       
       break;
     case object_manipulation_msgs::GraspHandPostureExecutionGoal::RELEASE:
-      ROS_ERROR("RELEASE!");
+      ROS_DEBUG("RELEASE!");
 
       //open the hand completely
       for(unsigned int i = 0; i < goal->grasp.pre_grasp_posture.position.size(); ++i)
       {
         joint_vector[i].joint_target = 0.0;
-        ROS_ERROR("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
+        ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
       sendupdate_msg.sendupdate_list = joint_vector;
       
       sr_hand_target_pub.publish(sendupdate_msg);
-      ROS_INFO("Hand opened");
+      ROS_DEBUG("Hand opened");
       break;
     default:
       ROS_ERROR("Shadow Robot grasp execution: unknown goal code (%d)", goal->goal);

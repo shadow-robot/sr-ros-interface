@@ -3,4 +3,4 @@
 default_collision_operations:
   - object1: r_end_effector
     object2: right_arm
-    operation: enable
+    operation: disable

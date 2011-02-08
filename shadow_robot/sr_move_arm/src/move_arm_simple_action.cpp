@@ -21,9 +21,9 @@ namespace shadowrobot
   SrMoveArmSimpleAction::SrMoveArmSimpleAction() :
     nh_tilde("~")
   {
-    action_server = boost::shared_ptr<actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction> >(new actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction>("/right_arm/move_arm", boost::bind(&SrMoveArmSimpleAction::execute, this, _1)));
+    action_server = boost::shared_ptr<actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction> >(new actionlib::SimpleActionServer<move_arm_msgs::MoveArmAction>("/right_arm/move_arm", boost::bind(&SrMoveArmSimpleAction::execute, this, _1), false));
 
-    action_server_joint_trajectory = boost::shared_ptr<actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction> >(new actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction>(nh, "right_arm/joint_trajectory", boost::bind(&SrMoveArmSimpleAction::execute_trajectory, this, _1)));
+    action_server_joint_trajectory = boost::shared_ptr<actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction> >(new actionlib::SimpleActionServer<pr2_controllers_msgs::JointTrajectoryAction>(nh, "right_arm/joint_trajectory", boost::bind(&SrMoveArmSimpleAction::execute_trajectory, this, _1), false));
 
     sr_arm_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/sr_arm/sendupdate", 2);
     sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
@@ -64,7 +64,7 @@ namespace shadowrobot
     }
     sendupdate_msg_traj.sendupdate_length = joint_vector_traj.size();
 
-    ROS_DEBUG("Trajectory received: %d joints / %d msg length", goal->trajectory.joint_names.size(), sendupdate_msg_traj.sendupdate_length);
+    ROS_DEBUG("Trajectory received: %d joints / %d msg length", (int)goal->trajectory.joint_names.size(), sendupdate_msg_traj.sendupdate_length);
 
     
     std::vector<trajectory_msgs::JointTrajectoryPoint> trajectory_points = goal->trajectory.points;
@@ -76,7 +76,7 @@ namespace shadowrobot
       trajectory_step = trajectory_points[index_step];
 
       //update the targets
-      for(unsigned index_pos = 0; index_pos < sendupdate_msg_traj.sendupdate_length; ++index_pos)
+      for(unsigned int index_pos = 0; index_pos < (unsigned int)sendupdate_msg_traj.sendupdate_length; ++index_pos)
       {
         joint_vector_traj[index_pos].joint_target = math_utils.to_degrees(trajectory_step.positions[index_pos]);
 
