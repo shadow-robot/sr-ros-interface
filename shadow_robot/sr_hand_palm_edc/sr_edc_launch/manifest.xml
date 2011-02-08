@@ -1,13 +1,29 @@
 <package>
   <description brief="sr_edc_launch">
 
-     sr_edc_launch
+     Package with launch files to start the needed nodes for the Shadow Robot Palm EDC.
 
   </description>
   <author>Yann Sionneau</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_edc_launch</url>
+
+  <depend package="roscpp" />
+  <depend package="diagnostic_aggregator" />
+  <depend package="diagnostic_updater" />
+  <depend package="diagnostic_msgs" />  
+  <depend package="self_test" />  
+  <depend package="urdf" />
+  <depend package="xacro"/>
+  <depend package="convex_decomposition"/>
+  <depend package="ivcon"/>
+
+  <depend package="srh_controller_configuration"/>
+  <depend package="srh_calibration_controllers"/>
+
+  <depend package="robot_mechanism_controllers"/>
+
 
 </package>
 

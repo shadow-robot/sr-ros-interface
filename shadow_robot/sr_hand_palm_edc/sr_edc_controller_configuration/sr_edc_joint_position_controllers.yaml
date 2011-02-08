@@ -1,0 +1,178 @@
+# Shadow Hand Defines .. Need Fixing as PID values are not correct
+
+sh_ffj0_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_ffj0_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_ffj3_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_ffj3_joint
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_ffj4_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_ffj4_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+sh_mfj0_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_mfj0_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_mfj3_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_mfj3_joint
+  pid:
+    p: 2.0
+    i: 0.5   
+    d: 0.0
+    i_clamp: 1.0
+sh_mfj4_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_mfj4_joint
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+
+sh_rfj0_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_rfj0_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_rfj3_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_rfj3_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_rfj4_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_rfj4_joint
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+
+sh_lfj0_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_lfj0_joint
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_lfj3_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_lfj3_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_lfj4_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_lfj4_joint
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_lfj5_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_lfj5_joint
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+
+sh_thj1_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_thj1_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_thj2_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_thj2_joint
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_thj3_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_thj3_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_thj4_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_thj4_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_thj5_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_thj5_joint
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+
+sh_wrj1_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_wrj1_joint
+  pid:
+    p: 4.0
+    i: 1.0
+    d: 0.0
+    i_clamp: 1.0
+sh_wrj2_position_controller:
+  type: sr_edc_calibration_controllers/SrhPositionController
+  joint: sr_edc_wrj2_joint
+  pid:
+    p: -4.0
+    i: -1.0
+    d: 0.0
+    i_clamp: 1.0
+
+

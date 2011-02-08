@@ -1,0 +1,110 @@
+
+# Shadow Hand Defines 
+
+cal_sh_ffj0:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_ffj0_joint
+  actuator: srh_ffj0
+  transmission: ffj0_joint_trans
+cal_sh_ffj3:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_ffj3_joint
+  actuator: srh_ffj3
+  transmission: ffj3_joint_trans
+cal_sh_ffj4:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_ffj4_joint
+  actuator: srh_ffj4
+  transmission: ffj4_joint_trans
+
+
+cal_sh_mfj0:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_mfj0_joint
+  actuator: srh_mfj0
+  transmission: mfj0_joint_trans
+cal_sh_mfj3:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_mfj3_joint
+  actuator: srh_mfj3
+  transmission: mfj3_joint_trans
+cal_sh_mfj4:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_mfj4_joint
+  actuator: srh_mfj4
+  transmission: mfj4_joint_trans
+
+cal_sh_rfj0:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_rfj0_joint
+  actuator: srh_rfj0
+  transmission: rfj0_joint_trans
+cal_sh_rfj3:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_rfj3_joint
+  actuator: srh_rfj3
+  transmission: rfj3_joint_trans
+cal_sh_rfj4:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_rfj4_joint
+  actuator: srh_rfj4
+  transmission: rfj4_joint_trans
+
+cal_sh_lfj0:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_lfj0_joint
+  actuator: srh_lfj0
+  transmission: lfj0_joint_trans
+cal_sh_lfj3:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_lfj3_joint
+  actuator: srh_lfj3
+  transmission: lfj3_joint_trans
+cal_sh_lfj4:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_lfj4_joint
+  actuator: srh_lfj4
+  transmission: lfj4_joint_trans
+cal_sh_lfj5:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_lfj5_joint
+  actuator: srh_lfj5
+  transmission: lfj5_joint_trans
+
+
+cal_sh_thj1:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_thj1_joint
+  actuator: srh_thj1
+  transmission: thj1_joint_trans
+cal_sh_thj2:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_thj2_joint
+  actuator: srh_thj2
+  transmission: thj2_joint_trans
+cal_sh_thj3:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_thj3_joint
+  actuator: srh_thj3
+  transmission: thj3_joint_trans
+cal_sh_thj4:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_thj4_joint
+  actuator: srh_thj4
+  transmission: thj4_joint_trans
+cal_sh_thj5:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_thj5_joint
+  actuator: srh_thj5
+  transmission: thj5_joint_trans
+
+cal_sh_wrj1:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_wrj1_joint
+  actuator: srh_wrj1
+  transmission: wrj1_joint_trans
+cal_sh_wrj2:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: sr_edc_wrj2_joint
+  actuator: srh_wrj2
+  transmission: wrj2_joint_trans

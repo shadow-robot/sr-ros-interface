@@ -1,0 +1,13 @@
+<launch>
+  <!-- Load definitions needed for realtime loop
+       Starts dummy calibration controllers for hand.
+       Then loads position controller for hand
+        -->
+
+  <include file="$(find sr_edc_launch)/realtime.launch" />
+
+  <!-- Default controllers (position controllers) -->
+  <include file="$(find sr_edc_controller_configuration)/sr_edc_default_controllers.launch" />
+
+
+</launch>

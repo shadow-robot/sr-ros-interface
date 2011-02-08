@@ -1,0 +1,14 @@
+<package>
+  <description brief="sr_edc_defs">
+
+     sr_edc_defs
+
+  </description>
+  <author>Derek King</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_edc_defs</url>
+
+</package>
+
+

@@ -1,0 +1,73 @@
+# First Finger (Index finger)
+sh_ffj0_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_ffj0_joint
+sh_ffj3_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_ffj3_joint
+sh_ffj4_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_ffj4_joint
+
+# Middle Finger
+sh_mfj0_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_mfj0_joint
+sh_mfj3_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_mfj3_joint
+sh_mfj4_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_mfj4_joint
+
+# Ring Finger
+sh_rfj0_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_rfj0_joint
+sh_rfj3_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_rfj3_joint
+sh_rfj4_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_rfj4_joint
+
+# Little Finger
+sh_lfj0_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_lfj0_joint
+sh_lfj3_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_lfj3_joint
+sh_lfj4_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_lfj4_joint
+sh_lfj5_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_lfj5_joint
+
+# Thumb
+sh_thj1_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_thj1_joint
+sh_thj2_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_thj2_joint
+sh_thj3_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_thj3_joint
+sh_thj4_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_thj4_joint
+sh_thj5_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_thj5_joint
+
+# Wrist
+sh_wrj1_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_wrj1_joint
+sh_wrj2_effort_controller:
+  type: robot_mechanism_controllers/JointEffortController
+  joint: sr_dmotor_wrj2_joint
+
+

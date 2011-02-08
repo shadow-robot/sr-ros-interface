@@ -1,0 +1,25 @@
+<launch>
+  <include file="$(find sr_hand_ethercat)/srh.machine" />
+  <param name="/use_sim_time" value="false"/>
+
+  <!-- Uses special defs file for Alpha 2.0 hardware on PRE -->
+  <include file="$(find srh_defs)/launch/upload_sr_edc.launch" />
+
+  <!-- Should be loaded before starting/running pr2_etherCAT node -->
+  <rosparam command="load" file="$(find sr_edc_launch)/sr_edc_sensor_gain_offset.yaml" />
+
+  <!-- pr2_etherCAT -->
+  <node name="realtime_loop" machine="local" pkg="pr2_etherCAT" type="pr2_etherCAT" args="-i eth0 -x /robot_description"/>
+
+
+  <rosparam command="load" ns="sr_edc" file="$(find sr_edc_controller_configuration)/sr_edc_calibration_controllers.yaml" />
+
+  <node name="calibrate_sr_edc" pkg="pr2_bringup" type="calibrate.py" output="screen" 
+        args="cal_sh_ffj0 cal_sh_ffj3 cal_sh_ffj4 cal_sh_mfj0 cal_sh_mfj3 cal_sh_mfj4 cal_sh_rfj0 cal_sh_rfj3 cal_sh_rfj4 cal_sh_lfj0 cal_sh_lfj3 cal_sh_lfj4 cal_sh_lfj5 cal_sh_thj1 cal_sh_thj2 cal_sh_thj3 cal_sh_thj4 cal_sh_thj5 cal_sh_wrj1 cal_sh_wrj2"/>
+
+
+  <!-- Default controllers -->
+  <include file="$(find sr_edc_controller_configuration)/sr_edc_default_controllers.launch" />
+
+</launch>
+
