@@ -1,4 +1,4 @@
-#include <srh_ethercat_hardware/sr0x.h>
+#include <sr_edc_ethercat_drivers/sr0x.h>
 
 #include <dll/ethercat_dll.h>
 #include <al/ethercat_AL.h>
@@ -126,7 +126,7 @@ void DualMotorActuator::initialize(const SRH_Actuator_Mapping &mapping)
   force_sensor_.name_ = string(mapping.name) + "_force";
   force_sensor_.state_.state_.resize(3,0.0);
 
-  srh_ethercat_hardware::ActuatorInfo ai;
+  sr_edc_ethercat_drivers::ActuatorInfo ai;
   ai.name = string(mapping.name);
   ai.slow_motor_current_limit  = mapping.slow_motor_current_limit;  
   ai.quick_motor_current_limit = mapping.quick_motor_current_limit;

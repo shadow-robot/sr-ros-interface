@@ -1,4 +1,4 @@
-#include <srh_ethercat_hardware/srdmotor.h>
+#include <sr_edc_ethercat_drivers/srdmotor.h>
 
 #include <iomanip>
 
@@ -419,7 +419,7 @@ bool SRDMotor::unpackState(unsigned char *this_buffer, unsigned char *prev_buffe
     
     // Add measured data as motor trace sample
     {
-      srh_ethercat_hardware::MotorTraceSample &s(actuator->motor_trace_sample_);
+      sr_edc_ethercat_drivers::MotorTraceSample &s(actuator->motor_trace_sample_);
       s.slow_effort_limit = actuator->slow_effort_limit_;
       s.quick_effort_limit = actuator->quick_effort_limit_;
       s.motor_current = state->last_measured_current_;

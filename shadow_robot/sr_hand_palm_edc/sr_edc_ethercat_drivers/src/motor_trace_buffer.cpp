@@ -1,6 +1,6 @@
-#include <srh_ethercat_hardware/motor_trace_buffer.h>
+#include <sr_edc_ethercat_drivers/motor_trace_buffer.h>
 
-namespace srh_ethercat_hardware
+namespace sr_edc_ethercat_drivers
 {
 
 /**
@@ -27,16 +27,16 @@ void MotorTraceBuffer::reset()
 
 /** \brief Initializes motor trace publisher
  */
-bool MotorTraceBuffer::initialize(const srh_ethercat_hardware::ActuatorInfo &actuator_info)
+bool MotorTraceBuffer::initialize(const sr_edc_ethercat_drivers::ActuatorInfo &actuator_info)
 {
   std::string topic("motor_trace");
   if (!actuator_info.name.empty())
     topic = topic + "/" + actuator_info.name;
-  publisher_ = new realtime_tools::RealtimePublisher<srh_ethercat_hardware::MotorTrace>(ros::NodeHandle(), topic, 1, true);
+  publisher_ = new realtime_tools::RealtimePublisher<sr_edc_ethercat_drivers::MotorTrace>(ros::NodeHandle(), topic, 1, true);
   if (publisher_ == NULL) 
     return false;
 
-  srh_ethercat_hardware::MotorTrace &msg(publisher_->msg_);
+  sr_edc_ethercat_drivers::MotorTrace &msg(publisher_->msg_);
   msg.actuator_info = actuator_info;
   msg.samples.reserve(trace_size_);
 
@@ -60,7 +60,7 @@ void MotorTraceBuffer::checkPublish()
   if ((publisher_==NULL) || (!publisher_->trylock())) 
     return;
   
-  srh_ethercat_hardware::MotorTrace &msg(publisher_->msg_);
+  sr_edc_ethercat_drivers::MotorTrace &msg(publisher_->msg_);
   
   msg.header.stamp = ros::Time::now();  
   msg.reason = publish_reason_;
@@ -104,7 +104,7 @@ void MotorTraceBuffer::flagPublish(const std::string &reason, int level, int del
 
 /**  \brief Adds sample to motor trace.        
  */
-void MotorTraceBuffer::sample(const srh_ethercat_hardware::MotorTraceSample &s)
+void MotorTraceBuffer::sample(const sr_edc_ethercat_drivers::MotorTraceSample &s)
 {
 
   { // Add motor trace sample to trace buffer

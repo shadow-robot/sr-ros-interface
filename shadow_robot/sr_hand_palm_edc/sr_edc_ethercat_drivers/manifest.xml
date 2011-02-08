@@ -9,7 +9,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_edc_ethercat_drivers</url>
   <depend package="roscpp"/>
-  <depend packag="roslib"/>
+  <depend package="roslib"/>
   <depend package="ethercat_hardware"/>
 
   <export>
@@ -17,5 +17,3 @@
   </export>
 
 </package>
-
-

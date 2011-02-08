@@ -1,0 +1,5 @@
+string name
+float64 slow_motor_current_limit
+float64 quick_motor_current_limit
+float64 duty_limit
+float64 max_duty

@@ -1,4 +1,4 @@
-#include <srh_ethercat_hardware/srbridge.h>
+#include <sr_edc_ethercat_drivers/srbridge.h>
 
 #include <iomanip>
 #include <sstream>

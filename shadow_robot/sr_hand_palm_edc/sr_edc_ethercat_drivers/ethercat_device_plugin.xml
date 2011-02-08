@@ -1,4 +1,4 @@
-<library path="lib/libsrh_ethercat_hardware" >
+<library path="lib/libsr_edc_ethercat_drivers" >
   <class name="0" type="SRBridge" base_class_type="EthercatDevice">
     <description>
       SRBridge - Bridge EtherCAT between palm (sensors data) EtherCAT and Motor Control EtherCAT

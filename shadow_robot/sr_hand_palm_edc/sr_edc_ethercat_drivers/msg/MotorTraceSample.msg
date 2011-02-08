@@ -1,0 +1,13 @@
+float64 commanded_effort
+float64 slow_effort_limit
+float64 quick_effort_limit
+float64 motor_current
+float64 motor_supply_voltage
+float64 hbridge_duty
+float64 temperature
+float64 force_sensor_1
+float64 force_sensor_2
+float64 force_sensor_3
+float64 motor_velocity
+float64 velocity
+float64 position

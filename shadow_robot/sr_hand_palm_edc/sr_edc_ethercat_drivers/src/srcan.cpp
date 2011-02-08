@@ -1,4 +1,4 @@
-#include <srh_ethercat_hardware/srcan.h>
+#include <sr_edc_ethercat_drivers/srcan.h>
 
 #include <iomanip>
 #include <sys/time.h>
