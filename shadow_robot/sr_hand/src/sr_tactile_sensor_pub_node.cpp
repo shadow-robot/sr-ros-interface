@@ -12,7 +12,7 @@
 
 #include "sr_hand/sr_tactile_sensor_pub.h"
 
-using namespace shadowhand_tactile_sensor_publisher;
+using namespace shadowrobot;
 
   /////////////////////////////////
   //           MAIN              //
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "shadowhand_tactile_sensor_publisher");
   NodeHandle n;
 
-  ShadowhandTactileSensorPublisher shadowhand_pub;
+  SRTactileSensorPublisher shadowhand_pub;
 
   while( ok() )
     {

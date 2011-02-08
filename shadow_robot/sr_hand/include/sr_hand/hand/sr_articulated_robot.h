@@ -44,7 +44,6 @@ struct JointData
     double min;
     double max;
     short isJointZero;
-
 #ifdef GAZEBO
     /**
      * GAZEBO has one publisher / subscriber per joint. We store those in
@@ -53,40 +52,44 @@ struct JointData
      */
     int publisher_index;
 #endif
+    ros::Time last_pos_time;
+    double last_pos;
+    double velocity;
+
+
 
 #ifdef GAZEBO
     JointData() :
-    position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0),
-    min(0.0), max(90.0), isJointZero(0), publisher_index(0)
+        position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0), publisher_index(0), last_pos_time(0.0), last_pos(0.0), velocity(0.0)
     {
     }
 
     JointData(JointData& jd) :
     position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
-    flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index)
+            flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
 
     JointData(const JointData& jd) :
     position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
-    flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index)
+            flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
 #else
     JointData() :
-        position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0)
+        position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0), last_pos_time(0.0), last_pos(0.0), velocity(0.0)
     {
     }
 
     JointData( JointData& jd ) :
         position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force), flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max),
-                isJointZero(jd.isJointZero)
+                isJointZero(jd.isJointZero), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
 
     JointData( const JointData& jd ) :
         position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force), flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max),
-                isJointZero(jd.isJointZero)
+                isJointZero(jd.isJointZero), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
 #endif
@@ -301,7 +304,6 @@ public:
      */
     virtual std::vector<DiagnosticData> getDiagnostics() = 0;
 
-protected:
     /// A mapping between the joint names and the information regarding those joints.
     JointsMap joints_map;
 
@@ -311,6 +313,8 @@ protected:
     boost::mutex joints_map_mutex;
     boost::mutex parameters_map_mutex;
     boost::mutex controllers_map_mutex;
+
+protected:
 
 #ifdef GAZEBO
     std::vector<ros::Publisher> gazebo_publishers;

@@ -62,6 +62,10 @@ rosbuild_link_boost(shadowhand_virtual thread)
 #rosbuild_link_boost(shadowhand_real thread)
 #target_link_libraries(shadowhand_real robot)
 
+#tactile sensors
+#rosbuild_add_executable(sr_tactile src/sr_tactile_sensor_pub.cpp src/sr_tactile_sensor_pub_node.cpp)
+#target_link_libraries(sr_tactile robot)
+
 ##################
 #    REAL ARM    #
 ##################

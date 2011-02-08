@@ -78,13 +78,22 @@ void SRPublisher::publish()
     sensor_msgs::JointState jointstate_pos_msg;
     sensor_msgs::JointState jointstate_target_msg;
 
-    jointstate_pos_msg.header.stamp = ros::Time::now();
-    jointstate_target_msg.header.stamp = ros::Time::now();
+    ros::Time now = ros::Time::now();
+    jointstate_pos_msg.header.stamp = now; 
+    jointstate_target_msg.header.stamp = now;
 
     for( SRArticulatedRobot::JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
         sr_robot_msgs::joint joint;
         JointData currentData = it->second;
+
+        //compute the angular velocity of the joint
+        if(currentData.last_pos_time.toSec() != 0.0)
+        {
+            currentData.velocity = (currentData.position - currentData.last_pos);
+            currentData.velocity /= (now - currentData.last_pos_time).toSec();
+            ROS_DEBUG("Velocity = (%f - %f)/(%f) = %f", currentData.position, currentData.last_pos, (now - currentData.last_pos_time).toSec(), currentData.velocity);
+        }
 
         joint.joint_name = it->first;
         jointstate_pos_msg.name.push_back(it->first);
@@ -95,7 +104,7 @@ void SRPublisher::publish()
         jointstate_target_msg.effort.push_back(0.0);
 
         jointstate_pos_msg.position.push_back(toRad(currentData.position));
-        jointstate_pos_msg.velocity.push_back(0.0);
+        jointstate_pos_msg.velocity.push_back(currentData.velocity);
         jointstate_pos_msg.effort.push_back(currentData.force);
 
         joint.joint_position = currentData.position;
@@ -103,6 +112,16 @@ void SRPublisher::publish()
         joint.joint_torque = currentData.force;
         joint.joint_temperature = currentData.temperature;
         joint.joint_current = currentData.current;
+
+        //update data for the velocity
+        currentData.last_pos_time = now;
+        currentData.last_pos = currentData.position;
+
+        sr_articulated_robot->joints_map_mutex.lock();
+        sr_articulated_robot->joints_map[it->first] = JointData(currentData);
+        sr_articulated_robot->joints_map_mutex.unlock();
+
+        ROS_DEBUG("last_pos_time[%s] = %f / %f", it->first.c_str(), currentData.last_pos_time.toSec(), joints_map[it->first].last_pos_time.toSec());
 
         jointVector.push_back(joint);
     }
