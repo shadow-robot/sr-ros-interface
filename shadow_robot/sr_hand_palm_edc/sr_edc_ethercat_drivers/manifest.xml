@@ -1,7 +1,7 @@
 <package>
   <description brief="sr_edc_ethercat_drivers">
 
-     sr_edc_ethercat_drivers
+     A package implementing an interface for the Shadow Robot Dextrous, etherCAT palm version, ROS interface.
 
   </description>
   <author>Yann Sionneau</author>
