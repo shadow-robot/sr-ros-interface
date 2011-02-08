@@ -1,0 +1,16 @@
+<package>
+  <description brief="sr_edc_ethercat_drivers">
+
+     sr_edc_ethercat_drivers
+
+  </description>
+  <author>Yann Sionneau</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_edc_ethercat_drivers</url>
+  <depend package="roscpp"/>
+  <depend package="roslib"/>
+
+</package>
+
+

@@ -1,0 +1,14 @@
+<package>
+  <description brief="sr_edc_launch">
+
+     sr_edc_launch
+
+  </description>
+  <author>Yann Sionneau</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_edc_launch</url>
+
+</package>
+
+
