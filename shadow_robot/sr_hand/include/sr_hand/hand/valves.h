@@ -37,7 +37,6 @@ namespace shadowrobot
   private:
     void valve_command(const std_msgs::Float64ConstPtr& msg, int index_valve);
 
-    std::vector<std::string> valves_names;
     std::vector<struct sensor> valves_sensors;
 
     std::vector<ros::Publisher> valves_publishers;
@@ -45,6 +44,8 @@ namespace shadowrobot
 
     ros::NodeHandle n_tilde;
     ros::Rate publish_rate;
+
+    void init_subs_and_pubs(int index_joint);
   };
 
 }//end namespace
