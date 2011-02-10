@@ -103,7 +103,6 @@ void SRTactileSensorPublisher::publish()
   std_msgs::Float64 msg_temp;
   std_msgs::Float64 msg_touch;
 
-
   for( unsigned int i = 0; i < sensor_touch_names.size(); ++i )
     {
         struct sensor s1, s2;

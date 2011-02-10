@@ -17,7 +17,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-rosbuild_genmsg()
+#rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
@@ -70,6 +70,14 @@ rosbuild_link_boost(shadowhand_virtual thread)
 #rosbuild_link_boost(shadowarm_real thread)
 #target_link_libraries(shadowarm_real robot)
 
+##################
+#     VALVES     #
+##################
+#include_directories(/usr/realtime/include/)
+#LINK_LIBRARIES(pthread)
+#rosbuild_add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
+#rosbuild_link_boost(sr_valves thread)
+#target_link_libraries(sr_valves robot)
 
 #####################################
 #   dynamic parameters reconfigure  #
