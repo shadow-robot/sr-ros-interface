@@ -22,7 +22,6 @@ namespace shadowrobot
   {
 
     /* We need to attach the program to the robot, or fail if we cannot. */
-
     if (robot_init() < 0)
     {
       ROS_FATAL("Robot interface broken\n");
@@ -30,7 +29,6 @@ namespace shadowrobot
     }
 
     /* We need to attach the program to the hand as well, or fail if we cannot. */
-  
     if (hand_init() < 0)
     {
       ROS_FATAL("Arm interface broken\n");
@@ -39,7 +37,7 @@ namespace shadowrobot
 
     // set publish frequency
     double publish_freq;
-    n_tilde.param("publish_frequency", publish_freq, 20.0);
+    n_tilde.param("publish_frequency", publish_freq, 10.0);
     publish_rate = ros::Rate(publish_freq);
 
 #ifdef HAND_MUSCLE
@@ -54,30 +52,6 @@ namespace shadowrobot
       init_subs_and_pubs(i);
     }
 #endif
-
-
-
-/*
-  for(unsigned int i=0; i<valves_names.size(); ++i)
-  {
-  struct sensor s;
-  int res = robot_name_to_sensor(valves_names[i].c_str(), &s);
-  if( res )
-  ROS_FATAL("Can't open sensor %s", valves_names[i].c_str());
-
-  valves_sensors.push_back(s);
-  }
-
-  for( unsigned int i=0; i<valves_names.size(); ++i)
-  {
-  std::string topic = valves_names[i] + "/status";
-  valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
-
-  topic = valves_names[i] + "/cmd";
-  valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, i)));
-  }
-
-*/
   }
 
   Valves::~Valves()
@@ -105,11 +79,12 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index] << "_Pressure";
       std::string valve_name = ss_valve_name.str();
+      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       std::string topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
       topic = valve_name + "/cmd";
-      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, 5*index_joint)));
+      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, valves_sensors.size()-1)));
 
       //Pressure_Target
       ss_valve_name.str(std::string());
@@ -118,11 +93,12 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index] << "_Target";
       valve_name = ss_valve_name.str();
+      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
       topic = valve_name + "/cmd";
-      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, 5*index_joint+1)));
+      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, valves_sensors.size() - 1 )));
 
       //Muscles
       ss_valve_name.str(std::string());
@@ -131,11 +107,12 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index];
       valve_name = ss_valve_name.str();
+      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
       topic = valve_name + "/cmd";
-      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, 5*index_joint + 2)));
+      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, valves_sensors.size()-1 )));
 
       //Fill
       ss_valve_name.str(std::string());
@@ -144,11 +121,12 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index] << "_Fill";
       valve_name = ss_valve_name.str();
+      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
       topic = valve_name + "/cmd";
-      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, 5*index_joint+3)));
+      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, valves_sensors.size()-1)));
 
       //Empty
       ss_valve_name.str(std::string());
@@ -157,11 +135,12 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index] << "_Empty";
       valve_name = ss_valve_name.str();
+      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
       topic = valve_name + "/cmd";
-      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, 5*index_joint+4)));
+      valves_subscribers.push_back(n_tilde.subscribe<std_msgs::Float64>(topic, 10, boost::bind(&Valves::valve_command, this, _1, valves_sensors.size() -1)));
     }
 
   }
@@ -181,11 +160,7 @@ namespace shadowrobot
  */
   void Valves::valve_command(const std_msgs::Float64ConstPtr& msg, int index_valve)
   {
-/*    ROS_ERROR_STREAM("Valve["<< index_valve
-                     << "] "<< valves_names[index_valve]);
-*/
     //@fixme: do some clipping on the value first?
-    
     robot_update_sensor(&(valves_sensors[index_valve]), msg->data);
   }
 
@@ -200,14 +175,14 @@ namespace shadowrobot
     for( unsigned int i = 0; i < valves_sensors.size(); ++i )
     {
       msg_valves.data = robot_read_sensor(&(valves_sensors[i]));
-  
+
       valves_publishers[i].publish(msg_valves);
     }
 
     ros::spinOnce();
     publish_rate.sleep();
+  
   }
-
 } //end namespace
 
 
