@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 import roslib; roslib.load_manifest('sr_control_gui')
@@ -15,8 +16,8 @@ from tabletop_collision_map_processing.srv import TabletopCollisionMapProcessing
 from object_manipulation_msgs.srv import FindClusterBoundingBox, FindClusterBoundingBoxRequest
 import object_manipulator.draw_functions as draw_functions
 from object_manipulator.convert_functions import *
-from object_manipulation_msgs.msg import PickupGoal, PickupAction
-from geometry_msgs.msg import Vector3Stamped
+from object_manipulation_msgs.msg import PickupGoal, PickupAction, PlaceGoal, PlaceAction
+from geometry_msgs.msg import Vector3Stamped, PoseStamped
 import actionlib
 from actionlib_msgs.msg import *
 
@@ -31,6 +32,7 @@ class ObjectChooser(QtGui.QWidget):
         self.title = QtGui.QLabel()
         self.title.setText(title)
         self.draw_functions = None
+        self.pickup_result = None
 
 
     def draw(self):
@@ -82,6 +84,83 @@ class ObjectChooser(QtGui.QWidget):
         
         # call the pickup service
         self.pickup(graspable_object, self.object.graspable_object_name, object_name)
+
+        self.place_object(graspable_object, self.object.graspable_object_name, object_name)
+
+    def place_object(self, graspable_object, graspable_object_name, object_name ):
+        """
+        place the object somewhere else
+        """
+        if self.pickup_result == None:
+            rospy.logwarn("No objects where picked up. Aborting place object action.")
+            return
+
+        info_tmp = "Placing "+object_name
+        rospy.loginfo(info_tmp)
+
+        place_goal = PlaceGoal()
+
+        #place at the prepared location
+        #TODO: set up place_location
+        tmp_place_pose = PoseStamped()
+        tmp_place_pose.header.stamp = rospy.get_rostime()
+        tmp_place_pose.header.frame_id = "base_link"
+        tmp_place_pose.pose.position.x = -0.206178
+        tmp_place_pose.pose.position.y = -0.090464
+        tmp_place_pose.pose.position.z = 0.213945
+        tmp_place_pose.pose.orientation.x = 0.201193
+        tmp_place_pose.pose.orientation.y = -0.978126
+        tmp_place_pose.pose.orientation.z = -0.017124
+        tmp_place_pose.pose.orientation.w = -0.049985
+        
+        place_goal.place_pose = tmp_place_pose
+
+        place_goal.collision_object_name = graspable_object_name
+        place_goal.collision_support_surface_name = self.plugin_parent.collision_support_surface_name
+
+        #information about which grasp was executed on the object,
+        #returned by the pickup action
+        place_goal.grasp = self.pickup_result.grasp
+        #use the right rm to place
+        place_goal.arm_name = "right_arm"
+        #padding used when determining if the requested place location
+        #would bring the object in collision with the environment
+        place_goal.place_padding = 0.02
+        #how much the gripper should retreat after placing the object
+        place_goal.desired_retreat_distance = 0.1
+        place_goal.min_retreat_distance = 0.05
+        #we will be putting down the object along the "vertical" direction
+        #which is along the z axis in the base_link frame
+        direction = Vector3Stamped()
+        direction.header.stamp = rospy.get_rostime()
+        direction.header.frame_id = "base_link"
+        direction.vector.x = 0
+        direction.vector.y = 0
+        direction.vector.z = -1
+        place_goal.approach.direction = direction
+        #request a vertical put down motion of 10cm before placing the object 
+        place_goal.approach.desired_distance = 0.1
+        place_goal.approach.min_distance = 0.05
+        #we are not using tactile based placing
+        place_goal.use_reactive_place = False
+
+        place_client = actionlib.SimpleActionClient('/object_manipulator/object_manipulator_place', PlaceAction)
+        place_client.wait_for_server()
+        rospy.loginfo("Place server ready")
+        
+        place_client.send_goal(place_goal)
+        #timeout after 1sec
+        #TODO: change this when using the robot
+        place_client.wait_for_result(timeout=rospy.Duration.from_sec(90.0))
+        rospy.loginfo("Got Place results")
+        
+        place_result = place_client.get_result()
+        
+        if place_client.get_state() != GoalStatus.SUCCEEDED:
+            rospy.logerr("The place action has failed: " + str(place_result.manipulation_result.value) )
+        print place_result
+
+
         
     def pickup(self, graspable_object, graspable_object_name, object_name):
         info_tmp = "Picking up "+ object_name
@@ -102,8 +181,8 @@ class ObjectChooser(QtGui.QWidget):
         direction.vector.y = 0;
         direction.vector.z = 1;
         pickup_goal.lift.direction = direction;
-        #request a vertical lift of 10cm after grasping the object
-        pickup_goal.lift.desired_distance = 0.1;
+        #request a vertical lift of 15cm after grasping the object
+        pickup_goal.lift.desired_distance = 0.15;
         pickup_goal.lift.min_distance = 0.05;
         #do not use tactile-based grasping or tactile-based lift
         pickup_goal.use_reactive_lift = False;
@@ -117,14 +196,14 @@ class ObjectChooser(QtGui.QWidget):
         pickup_client.send_goal(pickup_goal)
         #timeout after 1sec
         #TODO: change this when using the robot
-        pickup_client.wait_for_result(timeout=rospy.Duration.from_sec(3.0))
+        pickup_client.wait_for_result(timeout=rospy.Duration.from_sec(90.0))
         rospy.loginfo("Got Pickup results")
         
-        pickup_result = pickup_client.get_result()
+        self.pickup_result = pickup_client.get_result()
         
         if pickup_client.get_state() != GoalStatus.SUCCEEDED:
-            rospy.logerr("The pickup action has failed: " + str(pickup_result.manipulation_result.value) )
-        print pickup_result
+            rospy.logerr("The pickup action has failed: " + str(self.pickup_result.manipulation_result.value) )
+        print self.pickup_result
         
                
     def call_find_cluster_bounding_box(self, cluster):
