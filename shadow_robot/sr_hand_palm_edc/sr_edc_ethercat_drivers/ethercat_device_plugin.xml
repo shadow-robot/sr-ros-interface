@@ -19,4 +19,9 @@
       SR0X - dummy driver to skip ethercat slave #1 on dev board
     </description>
   </class>
+  <class name="6" type="SR06" base_class_type="EthercatDevice">
+    <description>
+      SR06 etherCAT driver
+    </description>
+  </class>
 </library>

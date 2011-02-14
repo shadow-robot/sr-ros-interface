@@ -242,6 +242,9 @@ SR0X::~SR0X()
 void SR0X::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 {
   EthercatDevice::construct(sh,start_address);
+  //FIXME: Here 0 is the number of FMMU used by the slave, is this really 0 ?
+/*  EtherCAT_FMMU_Config *fmmu = new EtherCAT_FMMU_Config( 0 );
+  sh->set_fmmu_config(fmmu);*/
 }
 
 int SR0X::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_unprogrammed)
