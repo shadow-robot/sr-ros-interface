@@ -83,9 +83,9 @@ class ObjectChooser(QtGui.QWidget):
                                           color=[0, 0, 1], opaque=0.25, duration=60)
         
         # call the pickup service
-        self.pickup(graspable_object, self.object.graspable_object_name, object_name)
-
-        self.place_object(graspable_object, self.object.graspable_object_name, object_name)
+        res = self.pickup(graspable_object, self.object.graspable_object_name, object_name)
+        if res == 0: #correctly picked up
+            self.place_object(graspable_object, self.object.graspable_object_name, object_name)
 
     def place_object(self, graspable_object, graspable_object_name, object_name ):
         """
@@ -105,15 +105,15 @@ class ObjectChooser(QtGui.QWidget):
         tmp_place_pose = PoseStamped()
         tmp_place_pose.header.stamp = rospy.get_rostime()
         tmp_place_pose.header.frame_id = "base_link"
-        tmp_place_pose.pose.position.x = -0.206178
+        tmp_place_pose.pose.position.x = -0.16178
         tmp_place_pose.pose.position.y = -0.090464
         tmp_place_pose.pose.position.z = 0.213945
-        tmp_place_pose.pose.orientation.x = 0.201193
-        tmp_place_pose.pose.orientation.y = -0.978126
-        tmp_place_pose.pose.orientation.z = -0.017124
-        tmp_place_pose.pose.orientation.w = -0.049985
+        tmp_place_pose.pose.orientation.x = 1.0
+        tmp_place_pose.pose.orientation.y = 0
+        tmp_place_pose.pose.orientation.z = 0
+        tmp_place_pose.pose.orientation.w = 0
         
-        place_goal.place_pose = tmp_place_pose
+        place_goal.place_locations.append(tmp_place_pose)
 
         place_goal.collision_object_name = graspable_object_name
         place_goal.collision_support_surface_name = self.plugin_parent.collision_support_surface_name
@@ -203,7 +203,9 @@ class ObjectChooser(QtGui.QWidget):
         
         if pickup_client.get_state() != GoalStatus.SUCCEEDED:
             rospy.logerr("The pickup action has failed: " + str(self.pickup_result.manipulation_result.value) )
-        print self.pickup_result
+            return -1
+
+        return 0
         
                
     def call_find_cluster_bounding_box(self, cluster):
@@ -342,7 +344,7 @@ class ObjectSelection(GenericPlugin):
     def detect_objects(self):
         self.found_objects.clear()
         try:
-            objects = self.service_object_detector(True, True)
+            objects = self.service_object_detector(True, True, 1)
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
         
@@ -355,7 +357,7 @@ class ObjectSelection(GenericPlugin):
                 obj_tmp.graspable_object = grasp_obj
                 obj_tmp.graspable_object_name = grasp_obj_name
                 
-                model_index = grasp_obj.model_pose.model_id
+                model_index = grasp_obj.potential_models[0].model_id
                 obj_tmp.model_description = self.get_object_name(model_index)
                 
                 
@@ -369,8 +371,10 @@ class ObjectSelection(GenericPlugin):
             #reset_static_map, reset_collision_models, reset_attached_models, take_static_collision_map
             res = self.service_tabletop_collision_map.call(detection, True, True, True, True, "base_link")
         except rospy.ServiceException, e:
-            print "Service did not process request: %s" % str(e)
-        self.collision_support_surface_name = res.collision_support_surface_name
+            rospy.logerr("Service did not process request: %s" % str(e))
+
+        if res != 0:
+            self.collision_support_surface_name = res.collision_support_surface_name
         return res
     
     def on_close(self):

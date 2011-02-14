@@ -5,6 +5,7 @@
 		respawn="true"
 		output="screen"
 		machine="dataprocessing">
+
 		<remap from="robot_description" to="hand_description"/>
 
 		<!-- The default padding to be added for the body parts the robot can see
