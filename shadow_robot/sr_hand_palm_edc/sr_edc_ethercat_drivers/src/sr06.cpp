@@ -17,6 +17,8 @@
 
 #include <math.h>
 
+using namespace std;
+
 typedef unsigned char       int8u;
 typedef   signed char       int8s;
 
@@ -37,14 +39,15 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 
 SR06::SR06() : SR0X()
 {
-  
+	counter_ = 0; 
 }
-/*
+
 SR06::~SR06()
 {
-	SR0X::~SR0X();
+	delete sh_->get_fmmu_config();
+	delete sh_->get_pd_config();
 }
-*/
+
 void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 {
 	SR0X::construct(sh, start_address);
@@ -99,5 +102,34 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
   return SR0X::initialize(hw, allow_unprogrammed);
  
+}
+
+void SR06::diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *) {
+stringstream name;
+  name << "EtherCAT Device #" << setw(2) << setfill('0') 
+       << sh_->get_ring_position() << " (Product SIX)";
+  d.name = name.str();
+  d.summary(d.OK, "OK");
+  stringstream hwid;
+  hwid << sh_->get_product_code() << "-" << sh_->get_serial();
+  d.hardware_id = hwid.str();
+
+  d.clear();
+  d.addf("Position", "%02d", sh_->get_ring_position());
+  d.addf("Product Code", "%d", sh_->get_product_code());
+  d.addf("Serial Number", "%d", sh_->get_serial());
+  d.addf("Revision", "%d", sh_->get_revision());
+  d.addf("Counter", "%d", ++counter_);
+
+  EthercatDevice::ethercatDiagnostics(d, 2);
+}
+
+void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
+{
+}
+
+bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
+{
+  return true;
 }
 
