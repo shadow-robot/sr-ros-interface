@@ -21,6 +21,8 @@ from geometry_msgs.msg import Vector3Stamped, PoseStamped
 import actionlib
 from actionlib_msgs.msg import *
 
+from tf import transformations
+
 class ObjectChooser(QtGui.QWidget):
     """
     Display the list of found objects
@@ -104,14 +106,17 @@ class ObjectChooser(QtGui.QWidget):
         #TODO: set up place_location
         tmp_place_pose = PoseStamped()
         tmp_place_pose.header.stamp = rospy.get_rostime()
-        tmp_place_pose.header.frame_id = "base_link"
-        tmp_place_pose.pose.position.x = -0.16178
-        tmp_place_pose.pose.position.y = -0.090464
-        tmp_place_pose.pose.position.z = 0.213945
-        tmp_place_pose.pose.orientation.x = 1.0
-        tmp_place_pose.pose.orientation.y = 0
-        tmp_place_pose.pose.orientation.z = 0
-        tmp_place_pose.pose.orientation.w = 0
+        tmp_place_pose.header.frame_id = "/base_link"
+        tmp_place_pose.pose.position.x = -0.15
+        tmp_place_pose.pose.position.y = 0
+        tmp_place_pose.pose.position.z = 0
+
+        q=transformations.quaternion_about_axis(0.0, (1,0,0))
+
+        tmp_place_pose.pose.orientation.x = q[0]
+        tmp_place_pose.pose.orientation.y = q[1]
+        tmp_place_pose.pose.orientation.z = q[2]
+        tmp_place_pose.pose.orientation.w = q[3]
         
         place_goal.place_locations.append(tmp_place_pose)
 
@@ -171,7 +176,7 @@ class ObjectChooser(QtGui.QWidget):
         pickup_goal.collision_support_surface_name = self.plugin_parent.collision_support_surface_name
         
         pickup_goal.arm_name = "right_arm"
-        pickup_goal.desired_approach_distance = 0.1
+        pickup_goal.desired_approach_distance = 0.05
         pickup_goal.min_approach_distance = 0.02
         
         direction = Vector3Stamped()
@@ -182,8 +187,8 @@ class ObjectChooser(QtGui.QWidget):
         direction.vector.z = 1;
         pickup_goal.lift.direction = direction;
         #request a vertical lift of 15cm after grasping the object
-        pickup_goal.lift.desired_distance = 0.15;
-        pickup_goal.lift.min_distance = 0.05;
+        pickup_goal.lift.desired_distance = 0.2;
+        pickup_goal.lift.min_distance = 0.03;
         #do not use tactile-based grasping or tactile-based lift
         pickup_goal.use_reactive_lift = False;
         pickup_goal.use_reactive_execution = False;
