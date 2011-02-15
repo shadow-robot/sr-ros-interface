@@ -8,6 +8,7 @@ hand_description:
     arm_group_name: right_arm
     hand_database_name: SHADOW_HAND
     hand_joints: [FFJ4,FFJ3,FFJ0,MFJ4,MFJ3,MFJ0,RFJ4,RFJ3,RFJ0,LFJ5,LFJ4,LFJ3,LFJ0,THJ5,THJ4,THJ3,THJ2,THJ1]
-    hand_touch_links: [ffdistal,mfdistal,rfdistal,lfdistal,thdistal]
+    hand_touch_links: [ffdistal,mfdistal,rfdistal,lfdistal,thdistal,ffmiddle,mfmiddle,rfmiddle,lfmiddle,thmiddle,ffproximal,mfproximal,rfproximal,lfproximal,thproximal,ffknuckle,mfknuckle,rfknuckle,lfknuckle,thknuckle,thhub,palm]
+    
     hand_fingertip_links: [ffdistal,mfdistal,rfdistal,lfdistal,thdistal]
     hand_approach_direction: [0.0,-1.0,0.0]
