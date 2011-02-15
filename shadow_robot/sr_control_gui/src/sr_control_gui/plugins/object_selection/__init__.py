@@ -285,16 +285,27 @@ class ObjectSelection(GenericPlugin):
         self.service_db_get_model_description = None
         self.service_tabletop_collision_map = None
         self.found_objects = {}
+        self.raw_objects = None
         self.collision_support_surface_name = None
-        self.number_of_unrecognized_objects = 0
+        self.unknown_object_counter = 1 #starts at 1 as it's only used for display
 
         self.frame = QtGui.QFrame()
         self.layout = QtGui.QVBoxLayout()
+        subframe = QtGui.QFrame()
+        sublayout = QtGui.QHBoxLayout()
         self.btn_refresh = QtGui.QPushButton()
         self.btn_refresh.setText("Detect Objects")
         self.btn_refresh.setFixedWidth(130)
         self.frame.connect(self.btn_refresh, QtCore.SIGNAL('clicked()'), self.detect_objects)
-        self.layout.addWidget(self.btn_refresh)
+
+        self.btn_collision_map = QtGui.QPushButton()
+        self.btn_collision_map.setText("Refresh Collision Map")
+        self.frame.connect(self.btn_collision_map, QtCore.SIGNAL('clicked()'), self.process_collision_map)
+        self.btn_collision_map.setDisabled(True)
+        sublayout.addWidget(self.btn_refresh)
+        sublayout.addWidget(self.btn_collision_map)
+        subframe.setLayout(sublayout)
+        self.layout.addWidget(subframe)
         
         self.object_chooser = ObjectChooser(self.window, self, "Objects Detected")
         self.layout.addWidget(self.object_chooser)
@@ -334,7 +345,8 @@ class ObjectSelection(GenericPlugin):
         model = Model()
         #todo make sure name is unique
         if model_id == -1:
-            model.name = "unknown_"
+            model.name = "unknown_" + str(self.unknown_object_counter)
+            self.unknown_object_counter += 1
         else:
             try:
                 model = self.service_db_get_model_description(model_id)
@@ -346,12 +358,12 @@ class ObjectSelection(GenericPlugin):
     def detect_objects(self):
         self.found_objects.clear()
         try:
-            objects = self.service_object_detector(True, True, 1)
+            self.raw_objects = self.service_object_detector(True, True, 1)
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
         
         #take a new collision map + add the detected objects to the collision map and get graspable objects from them 
-        tabletop_collision_map_res = self.process_collision_map(objects.detection)
+        tabletop_collision_map_res = self.process_collision_map()
         
         print tabletop_collision_map_res.collision_object_names
 
@@ -370,13 +382,15 @@ class ObjectSelection(GenericPlugin):
                 
                 self.found_objects[obj_tmp.model_description.name] = obj_tmp
             
+        if self.raw_objects != None:
+            self.btn_collision_map.setEnabled(True)
         self.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].emit(1)
         
-    def process_collision_map(self, detection):
+    def process_collision_map(self):
         res = 0
         try:
             #reset_static_map, reset_collision_models, reset_attached_models, take_static_collision_map
-            res = self.service_tabletop_collision_map.call(detection, True, True, True, True, "base_link")
+            res = self.service_tabletop_collision_map.call(self.raw_objects.detection, True, True, True, True, "base_link")
         except rospy.ServiceException, e:
             rospy.logerr("Service did not process request: %s" % str(e))
 
