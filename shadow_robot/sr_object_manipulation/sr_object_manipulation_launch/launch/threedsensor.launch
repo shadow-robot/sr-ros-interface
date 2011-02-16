@@ -1,10 +1,3 @@
 <launch>
 	<include file="$(find sr_object_manipulation_launch)/machines/threedsensor.machine"/>
-
-	<node pkg="point_cloud_converter" name="point_cloud_converter" type="point_cloud_converter"
-		machine="threedsensor" output="screen">
-		<remap from="points2_in" to="/camera/depth/points2"/>
-		<remap from="points_out" to="/full_cloud_filtered"/>
-	</node>
-
 </launch>

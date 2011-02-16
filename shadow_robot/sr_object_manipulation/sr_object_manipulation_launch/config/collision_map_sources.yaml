@@ -1,5 +1,9 @@
 cloud_sources:
-  - name: full_cloud_filtered
-    frame_subsample: 5
+  - name: kinect_known
+    frame_subsample: 1
     point_subsample: 1
-    sensor_frame: openni_depth_frame
+    sensor_frame: openni_rgb_optical_frame
+    dynamic_publish: true
+    static_publish: true
+    dynamic_until_static_publish: false
+    dynamic_buffer_size: 10

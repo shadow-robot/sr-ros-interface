@@ -1,27 +1,27 @@
 <launch>
-	<!-- specifies the machines on which the nodes will be run -->
-	<include file="$(find sr_object_manipulation_launch)/machines/threedsensor.machine"/>
-	<include file="$(find sr_object_manipulation_launch)/machines/dataprocessing.machine"/>
-	<include file="$(find sr_object_manipulation_launch)/machines/household_database.machine"/>
-	<include file="$(find sr_object_manipulation_launch)/machines/robot.machine"/>
+  <!-- specifies the machines on which the nodes will be run -->
+  <include file="$(find sr_object_manipulation_launch)/machines/threedsensor.machine"/>
+  <include file="$(find sr_object_manipulation_launch)/machines/dataprocessing.machine"/>
+  <include file="$(find sr_object_manipulation_launch)/machines/household_database.machine"/>
+  <include file="$(find sr_object_manipulation_launch)/machines/robot.machine"/>
 
-	<!-- start the 3d acquisition and filter the robot from the point cloud-->
-	<include file="$(find sr_object_manipulation_launch)/launch/threedsensor.launch"/>
-	<!--<include file="$(find sr_object_manipulation_launch)/launch/self_filter.launch"/>-->
+  <!-- start the 3d acquisition and filter the robot from the point cloud-->
+  <include file="$(find sr_object_manipulation_launch)/launch/threedsensor.launch"/>
+  <include file="$(find sr_object_manipulation_launch)/launch/self_filter.launch"/>
 
-	<!-- <include file="$(find kinect_camera)/launch/kinect_with_tf.launch"/>-->
-	<include file="$(find sr_object_manipulation_launch)/launch/static_transform.launch"/>
+  <!-- <include file="$(find kinect_camera)/launch/kinect_with_tf.launch"/>-->
+  <include file="$(find sr_object_manipulation_launch)/launch/static_transform.launch"/>
 
-	<!-- start the object detection and recognition -->
-	<include file="$(find sr_object_manipulation_launch)/launch/household_object.launch"/>
-	<include file="$(find sr_object_manipulation_launch)/launch/tabletop_node.launch"/>
+  <!-- start the object detection and recognition -->
+  <include file="$(find sr_object_manipulation_launch)/launch/household_object.launch"/>
+  <include file="$(find sr_object_manipulation_launch)/launch/tabletop_node.launch"/>
 
-	<!-- start the hand -->
-	<!--<include file="$(find sr_hand)/launch/sr_arm_motor.launch"/>-->
+  <!-- start the hand -->
+  <!--<include file="$(find sr_hand)/launch/sr_arm_motor.launch"/>-->
 
-	<!-- build the collision map -->
-	<include file="$(find sr_object_manipulation_launch)/launch/collision_map.launch"/>
+  <!-- build the collision map -->
+  <include file="$(find sr_object_manipulation_launch)/launch/collision_map.launch"/>
 
-	<!-- start the manipulator related nodes -->
-	<include file="$(find sr_object_manipulation_launch)/launch/manipulator.launch"/>
+  <!-- start the manipulator related nodes -->
+  <include file="$(find sr_object_manipulation_launch)/launch/manipulator.launch"/>
 </launch>
