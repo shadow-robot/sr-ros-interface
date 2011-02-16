@@ -3,7 +3,7 @@ cloud_sources:
     frame_subsample: 1
     point_subsample: 1
     sensor_frame: openni_rgb_optical_frame
-    dynamic_publish: true
+    dynamic_publish: false
     static_publish: true
-    dynamic_until_static_publish: false
+    dynamic_until_static_publish: true
     dynamic_buffer_size: 10

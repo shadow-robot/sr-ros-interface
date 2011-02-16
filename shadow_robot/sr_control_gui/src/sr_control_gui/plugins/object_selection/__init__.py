@@ -86,8 +86,25 @@ class ObjectChooser(QtGui.QWidget):
         
         # call the pickup service
         res = self.pickup(graspable_object, self.object.graspable_object_name, object_name)
+
+        #TODO: set up place_location
+        initial_pose = PoseStamped()
+        initial_pose.header.stamp = rospy.get_rostime()
+        initial_pose.header.frame_id = "/base_link"
+        initial_pose.pose.position.x = -0.15
+        initial_pose.pose.position.y = 0
+        initial_pose.pose.position.z = 0
+        q=transformations.quaternion_about_axis(0.0, (1,0,0))
+        initial_pose.pose.orientation.x = q[0]
+        initial_pose.pose.orientation.y = q[1]
+        initial_pose.pose.orientation.z = q[2]
+        initial_pose.pose.orientation.w = q[3]
+
+        list_of_poses = self.compute_list_of_poses(initial_pose)
+        print list_of_poses
+    
         if res == 0: #correctly picked up
-            self.place_object(graspable_object, self.object.graspable_object_name, object_name)
+            self.place_object(graspable_object, self.object.graspable_object_name, object_name, list_of_poses)
         
     def pickup(self, graspable_object, graspable_object_name, object_name):
         info_tmp = "Picking up "+ object_name
@@ -134,9 +151,9 @@ class ObjectChooser(QtGui.QWidget):
 
         return 0
 
-    def place_object(self, graspable_object, graspable_object_name, object_name ):
+    def place_object(self, graspable_object, graspable_object_name, object_name, list_of_poses ):
         """
-        place the object somewhere else
+        place the given object in the given pose
         """
         if self.pickup_result == None:
             rospy.logwarn("No objects where picked up. Aborting place object action.")
@@ -148,22 +165,9 @@ class ObjectChooser(QtGui.QWidget):
         place_goal = PlaceGoal()
 
         #place at the prepared location
-        #TODO: set up place_location
-        tmp_place_pose = PoseStamped()
-        tmp_place_pose.header.stamp = rospy.get_rostime()
-        tmp_place_pose.header.frame_id = "/base_link"
-        tmp_place_pose.pose.position.x = -0.15
-        tmp_place_pose.pose.position.y = 0
-        tmp_place_pose.pose.position.z = 0
 
-        q=transformations.quaternion_about_axis(0.0, (1,0,0))
-
-        tmp_place_pose.pose.orientation.x = q[0]
-        tmp_place_pose.pose.orientation.y = q[1]
-        tmp_place_pose.pose.orientation.z = q[2]
-        tmp_place_pose.pose.orientation.w = q[3]
         
-        place_goal.place_locations.append(tmp_place_pose)
+        place_goal.place_locations = list_of_poses
 
         place_goal.collision_object_name = graspable_object_name
         place_goal.collision_support_surface_name = self.plugin_parent.collision_support_surface_name
@@ -209,6 +213,65 @@ class ObjectChooser(QtGui.QWidget):
         if place_client.get_state() != GoalStatus.SUCCEEDED:
             rospy.logerr("The place action has failed: " + str(place_result.manipulation_result.value) )
         print place_result
+
+    def compute_list_of_poses(self, initial_pose, rect_w=0.1, rect_h=0.05, resolution=0.02):
+        list_of_poses = []
+        '''
+        Computes a list of possible poses in a rectangle of 2*rect_w by 2*rect_h, with the given resolution. 
+        In our case, rect_w is along the x axis, and rect_h along the y_axis.
+        '''
+
+        initial_pose.pose.position.x = -0.15
+        initial_pose.pose.position.y = -0.10
+        initial_pose.pose.position.z = 0
+        
+        current_x = initial_pose.pose.position.x - rect_w
+        stop_x    = initial_pose.pose.position.x + rect_w
+        current_y = initial_pose.pose.position.y - rect_h
+        start_y   = current_y
+        stop_y    = initial_pose.pose.position.y + rect_h
+
+        while current_x <= stop_x:
+            current_x += resolution
+            current_y = start_y
+            print "x = ", current_x, " < ", stop_x, " : ", current_x < stop_x
+            while current_y <= stop_y:
+                current_y += resolution
+                print "y = ", current_y, " < ", stop_y + rect_h, " : ", current_y < stop_y + rect_h
+                
+                current_pose = PoseStamped()
+                current_pose.header.stamp = rospy.get_rostime()
+                current_pose.header.frame_id = "/base_link"
+                current_pose.pose.position.x = current_x
+                current_pose.pose.position.y = current_y
+                current_pose.pose.position.z = initial_pose.pose.position.z
+                current_pose.pose.orientation.x = initial_pose.pose.orientation.x
+                current_pose.pose.orientation.y = initial_pose.pose.orientation.y
+                current_pose.pose.orientation.z = initial_pose.pose.orientation.z
+                current_pose.pose.orientation.w = initial_pose.pose.orientation.w
+
+                list_of_poses.append(current_pose)
+
+        self.draw_place_area(initial_pose.pose, rect_w, rect_h, list_of_poses)
+
+        return list_of_poses
+
+
+    def draw_place_area(self, pose, rect_w, rect_h, list_of_poses):
+        '''
+        Displays all the possible placing locations that are going to be tried.
+        '''
+        for pose_stamped, index in zip(list_of_poses, range(0,len(list_of_poses))):
+            pose = pose_stamped.pose
+
+            mat = pose_to_mat(pose)
+            ranges = [[pose.position.x - 0.0025, pose.position.y - 0.0025, 0.01],
+                      [pose.position.x + 0.0025, pose.position.y + 0.0025, 0.1]]
+
+            self.draw_functions.draw_rviz_box(mat, ranges, 'base_link',
+                                              ns='place_'+str(index),
+                                              color=[1, 0.6, 0], opaque=0.25, duration=0)
+            
 
     def call_find_cluster_bounding_box(self, cluster):
         req = FindClusterBoundingBoxRequest()
