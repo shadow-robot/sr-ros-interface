@@ -4,6 +4,19 @@
 #include <ethercat_hardware/ethercat_device.h>
 #include <sr_edc_ethercat_drivers/sr0x.h>
 
+typedef unsigned char       int8u;
+typedef   signed char       int8s;
+
+typedef unsigned short      int16u;
+typedef   signed short      int16s;
+
+typedef unsigned int        int32u;
+typedef   signed int        int32s;
+
+extern "C" {
+	#include "/home/fallen/Pic32/trunk/nodes/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
+}
+
 class SR06 : public SR0X
 {
 public:
@@ -17,6 +30,10 @@ public:
   bool unpackState(unsigned char *this_buffer, unsigned char *prev_buffer);
 protected:
   int counter_;
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING data_;
+  EthercatDirectCom com_;
+  ros::NodeHandle nodehandle_;
+  ros::Publisher lfj5_pub_;
 };
 
 #endif /* SR06_H */
