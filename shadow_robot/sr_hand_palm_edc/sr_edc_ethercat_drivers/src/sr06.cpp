@@ -66,7 +66,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 					true);
 	start_address += command_size_;
 	status_base_ = start_address;
-
+	status_size_ = ETHERCAT_OUTGOING_DATA_SIZE;
 	EC_FMMU *statusFMMU = new EC_FMMU(start_address,
 					ETHERCAT_OUTGOING_DATA_SIZE,
 					0x00, 
@@ -155,8 +155,10 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   std_msgs::String msg;
   std::stringstream ss;
 
+  memcpy(&data_, tbuffer, ETHERCAT_OUTGOING_DATA_SIZE);
+
 //  ss << data_.LFJ5;
-  ss << tbuffer->LFJ5;
+  ss << tbuffer->LFJ4 << " ; " << tbuffer->LFJ5 << " ; " << tbuffer->THJ1;
   msg.data = ss.str();
 
   lfj5_pub_.publish(msg);
