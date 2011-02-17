@@ -52,6 +52,19 @@ SR06::~SR06()
 void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 {
 	SR0X::construct(sh, start_address);
+
+	command_base_ = start_address;
+	command_size_ = ETHERCAT_INCOMING_DATA_SIZE;
+	EC_FMMU *commandFMMU = new EC_FMMU(start_address, 
+					ETHERCAT_INCOMING_DATA_SIZE, 
+					0x00, 
+					0x07, 
+					EC_PALM_EDC_COMMAND_PHY_BASE, 
+					0x00, 
+					false, 
+					true, 
+					true);
+	start_address += command_size_;
 	status_base_ = start_address;
 
 	EC_FMMU *statusFMMU = new EC_FMMU(start_address,
@@ -64,25 +77,10 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 					false, 
 					true);
 
-	start_address += ETHERCAT_OUTGOING_DATA_SIZE;
-	command_base_ = start_address;
-
-	EC_FMMU *commandFMMU = new EC_FMMU(start_address, 
-					ETHERCAT_INCOMING_DATA_SIZE, 
-					0x00, 
-					0x07, 
-					EC_PALM_EDC_COMMAND_PHY_BASE, 
-					0x00, 
-					false, 
-					true, 
-					true);
-
-	start_address += ETHERCAT_INCOMING_DATA_SIZE;
-
 	EtherCAT_FMMU_Config *fmmu = new EtherCAT_FMMU_Config(2);
 
-	(*fmmu)[0] = *statusFMMU;
-	(*fmmu)[1] = *commandFMMU;
+	(*fmmu)[0] = *commandFMMU;
+	(*fmmu)[1] = *statusFMMU;
 	sh->set_fmmu_config(fmmu);
 
 //	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(0);
@@ -95,13 +93,12 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 //	EC_SyncMan *statusSM = new EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE);
 //	statusSM->ChannelEnable = true;
 
-	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE);
-	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_BUFFERED, EC_WRITTEN_FROM_MASTER);;
+	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_BUFFERED, EC_WRITTEN_FROM_MASTER);;
+	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE);
 
 	(*pd)[0].ChannelEnable = true;
-
+	(*pd)[0].ALEventEnable = true;
 	(*pd)[1].ChannelEnable = true;
-	(*pd)[1].ALEventEnable = true;
 
 	sh->set_pd_config(pd);
 
@@ -146,18 +143,20 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
 //  ROS_INFO("SR06::unpackState");
-//  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
 //  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *pbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(prev_buffer + command_size_);
 //  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING data;
 
-  readData(&com_, EC_PALM_EDC_DATA_PHY_BASE, &data_, ETHERCAT_OUTGOING_DATA_SIZE);
+//  really bad to call readData in a real-time thread.
+//  readData(&com_, EC_PALM_EDC_DATA_PHY_BASE, &data_, ETHERCAT_OUTGOING_DATA_SIZE);
 
 //  ROS_INFO("data : LFJ4 = 0x%04X ; LFJ5 = 0x%04X ; THJ1 = 0x%04X", data_.LFJ4, data_.LFJ5, data_.THJ1);
 
   std_msgs::String msg;
   std::stringstream ss;
 
-  ss << data_.LFJ5;
+//  ss << data_.LFJ5;
+  ss << tbuffer->LFJ5;
   msg.data = ss.str();
 
   lfj5_pub_.publish(msg);
