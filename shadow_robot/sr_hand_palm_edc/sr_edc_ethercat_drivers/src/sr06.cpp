@@ -14,7 +14,7 @@
 #include <sstream>
 #include <iomanip>
 #include <boost/foreach.hpp>
-#include "std_msgs/String.h"
+#include <std_msgs/Int16.h>
 #include <math.h>
 
 using namespace std;
@@ -32,6 +32,8 @@ extern "C" {
 	#include "/home/fallen/Pic32/trunk/nodes/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
 }
 
+#define MAX_ITER  1000
+
 #define ETHERCAT_OUTGOING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING)
 #define ETHERCAT_INCOMING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING)
 
@@ -40,7 +42,7 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 SR06::SR06() : SR0X(), com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
 {
 	counter_ = 0;
-	lfj5_pub_ = nodehandle_.advertise<std_msgs::String>("lfj5", 1000);
+	lfj5_pub_ = nodehandle_.advertise<std_msgs::Int16>("lfj5", 1000);
 }
 
 SR06::~SR06()
@@ -52,6 +54,10 @@ SR06::~SR06()
 void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 {
 	SR0X::construct(sh, start_address);
+	ROS_INFO("ETHERCAT_OUTGOING_DATA_SIZE = %d", ETHERCAT_OUTGOING_DATA_SIZE);
+	ROS_INFO("ETHERCAT_INCOMING_DATA_SIZE = %d", ETHERCAT_INCOMING_DATA_SIZE);
+	ROS_INFO("EC_PALM_EDC_COMMAND_PHY_BASE = 0x%04X", EC_PALM_EDC_COMMAND_PHY_BASE);
+	ROS_INFO("EC_PALM_EDC_DATA_PHY_BASE = 0x%04X", EC_PALM_EDC_DATA_PHY_BASE);
 
 	command_base_ = start_address;
 	command_size_ = ETHERCAT_INCOMING_DATA_SIZE;
@@ -151,17 +157,20 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 //  readData(&com_, EC_PALM_EDC_DATA_PHY_BASE, &data_, ETHERCAT_OUTGOING_DATA_SIZE);
 
 //  ROS_INFO("data : LFJ4 = 0x%04X ; LFJ5 = 0x%04X ; THJ1 = 0x%04X", data_.LFJ4, data_.LFJ5, data_.THJ1);
+  static unsigned int i = 0;
 
-  std_msgs::String msg;
-  std::stringstream ss;
+  if (i >= MAX_ITER) {
+    i = 0;
 
-  memcpy(&data_, tbuffer, ETHERCAT_OUTGOING_DATA_SIZE);
+    memcpy(&data_, tbuffer, ETHERCAT_OUTGOING_DATA_SIZE);
+    
+    std_msgs::Int16 msg;
 
-//  ss << data_.LFJ5;
-  ss << tbuffer->LFJ4 << " ; " << tbuffer->LFJ5 << " ; " << tbuffer->THJ1;
-  msg.data = ss.str();
+    msg.data = tbuffer->LFJ5;
 
-  lfj5_pub_.publish(msg);
+    lfj5_pub_.publish(msg);
+  } else
+    i++;
 
   return true;
 }
