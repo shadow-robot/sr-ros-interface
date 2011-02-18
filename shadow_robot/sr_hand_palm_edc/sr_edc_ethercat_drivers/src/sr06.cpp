@@ -157,8 +157,8 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     return true;
   } else if (i * nb_publish_by_unpack_const < nb_sensors_const) {
     std_msgs::Int16 msg;
-    unsigned int j;
-    for (j = 0 ; j < (unsigned int)nb_publish_by_unpack_const ; ++j) 
+    unsigned char j;
+    for (j = 0 ; j < nb_publish_by_unpack_const ; ++j) 
   {
       unsigned short int k = i * nb_publish_by_unpack_const + j;
       msg.data = *((signed short int *)tbuffer + k + 2);
