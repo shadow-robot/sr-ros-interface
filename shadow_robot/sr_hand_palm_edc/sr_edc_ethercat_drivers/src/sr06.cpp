@@ -33,7 +33,11 @@ extern "C" {
 	#include "/home/fallen/Pic32/trunk/nodes/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
 }
 
-#define MAX_ITER  1000
+const unsigned short int SR06::device_pub_freq_const = 1000;
+const unsigned short int SR06::ros_pub_freq_const = 100;
+const unsigned short int SR06::max_iter_const = device_pub_freq_const / ros_pub_freq_const;
+const unsigned char SR06::nb_sensors_const = 36;
+const unsigned char SR06::nb_publish_by_unpack_const = (nb_sensors_const % max_iter_const) ? (nb_sensors_const / max_iter_const) + 1 : (nb_sensors_const / max_iter_const);
 
 #define ETHERCAT_OUTGOING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING)
 #define ETHERCAT_INCOMING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING)
@@ -42,8 +46,18 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 
 SR06::SR06() : SR0X(), com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
 {
+	char topic_name[4];
+	unsigned char i;
 	counter_ = 0;
-	realtime_pub_ = new realtime_tools::RealtimePublisher<std_msgs::Int16>(nodehandle_, "lfj5", 1000);
+	for (i = 0 ; i < nb_sensors_const ; ++i) {
+		sprintf(topic_name, "j%d", i);
+		realtime_pub_.push_back(new realtime_tools::RealtimePublisher<std_msgs::Int16>(nodehandle_, topic_name, 1000));
+	}
+	ROS_INFO("device_pub_freq_const = %d", device_pub_freq_const);
+	ROS_INFO("ros_pub_freq_const = %d", ros_pub_freq_const);
+	ROS_INFO("max_iter_const = %d", max_iter_const);
+	ROS_INFO("nb_sensors_const = %d", nb_sensors_const);
+	ROS_INFO("nb_publish_by_unpack_const = %d", nb_publish_by_unpack_const);
 }
 
 SR06::~SR06()
@@ -138,18 +152,24 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
   static unsigned int i = 0;
 
-  if (i >= MAX_ITER) {
+  if (i == max_iter_const) { // 10 == 100 Hz
     i = 0;
-    
+    return true;
+  } else if (i * nb_publish_by_unpack_const < nb_sensors_const) {
     std_msgs::Int16 msg;
+    unsigned int j;
+    for (j = 0 ; j < (unsigned int)nb_publish_by_unpack_const ; ++j) 
+  {
+      unsigned short int k = i * nb_publish_by_unpack_const + j;
+      msg.data = *((signed short int *)tbuffer + k + 2);
+      if (realtime_pub_[k]->trylock()){
+        realtime_pub_[k]->msg_ =  msg;
+        realtime_pub_[k]->unlockAndPublish();
+      }
+   }
 
-    msg.data = tbuffer->LFJ5;
-    if (realtime_pub_->trylock()){
-      realtime_pub_->msg_ =  msg;
-      realtime_pub_->unlockAndPublish();
-    }
-  } else
-    i++;
+  }
+  ++i;
 
   return true;
 }

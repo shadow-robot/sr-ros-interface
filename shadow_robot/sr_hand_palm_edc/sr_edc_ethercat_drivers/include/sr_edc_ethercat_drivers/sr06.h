@@ -35,7 +35,14 @@ protected:
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING data_;
   EthercatDirectCom com_;
   ros::NodeHandle nodehandle_;
-  realtime_tools::RealtimePublisher<std_msgs::Int16> *realtime_pub_;
+  std::vector< realtime_tools::RealtimePublisher<std_msgs::Int16> *> realtime_pub_;
+
+private:
+  static const unsigned char nb_sensors_const;
+  static const unsigned short int max_iter_const;
+  static const unsigned short int ros_pub_freq_const;
+  static const unsigned short int device_pub_freq_const;
+  static const unsigned char nb_publish_by_unpack_const;
 };
 
 #endif /* SR06_H */
