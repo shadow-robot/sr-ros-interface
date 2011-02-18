@@ -54,10 +54,6 @@ SR06::~SR06()
 void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 {
 	SR0X::construct(sh, start_address);
-	ROS_INFO("ETHERCAT_OUTGOING_DATA_SIZE = %d", ETHERCAT_OUTGOING_DATA_SIZE);
-	ROS_INFO("ETHERCAT_INCOMING_DATA_SIZE = %d", ETHERCAT_INCOMING_DATA_SIZE);
-	ROS_INFO("EC_PALM_EDC_COMMAND_PHY_BASE = 0x%04X", EC_PALM_EDC_COMMAND_PHY_BASE);
-	ROS_INFO("EC_PALM_EDC_DATA_PHY_BASE = 0x%04X", EC_PALM_EDC_DATA_PHY_BASE);
 
 	command_base_ = start_address;
 	command_size_ = ETHERCAT_INCOMING_DATA_SIZE;
@@ -89,15 +85,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 	(*fmmu)[1] = *statusFMMU;
 	sh->set_fmmu_config(fmmu);
 
-//	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(0);
 	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(2);
-
-//	EC_SyncMan *commandSM = new EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_BUFFERED, EC_WRITTEN_FROM_MASTER);
-//	commandSM->ChannelEnable = true;
-//	commandSM->ALEventEnable = true;
-
-//	EC_SyncMan *statusSM = new EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE);
-//	statusSM->ChannelEnable = true;
 
 	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_BUFFERED, EC_WRITTEN_FROM_MASTER);;
 	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE);
@@ -137,32 +125,20 @@ stringstream name;
   d.addf("Serial Number", "%d", sh_->get_serial());
   d.addf("Revision", "%d", sh_->get_revision());
   d.addf("Counter", "%d", ++counter_);
-  d.addf("LFJ5", "0x%04X", data_.LFJ5);
   EthercatDevice::ethercatDiagnostics(d, 2);
 }
 
 void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 {
-  //ROS_INFO("SR06::packCommand");
 }
 
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
-//  ROS_INFO("SR06::unpackState");
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
-//  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *pbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(prev_buffer + command_size_);
-//  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING data;
-
-//  really bad to call readData in a real-time thread.
-//  readData(&com_, EC_PALM_EDC_DATA_PHY_BASE, &data_, ETHERCAT_OUTGOING_DATA_SIZE);
-
-//  ROS_INFO("data : LFJ4 = 0x%04X ; LFJ5 = 0x%04X ; THJ1 = 0x%04X", data_.LFJ4, data_.LFJ5, data_.THJ1);
   static unsigned int i = 0;
 
   if (i >= MAX_ITER) {
     i = 0;
-
-    memcpy(&data_, tbuffer, ETHERCAT_OUTGOING_DATA_SIZE);
     
     std_msgs::Int16 msg;
 
