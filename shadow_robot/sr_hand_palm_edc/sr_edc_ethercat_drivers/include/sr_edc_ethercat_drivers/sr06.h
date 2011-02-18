@@ -3,6 +3,8 @@
 
 #include <ethercat_hardware/ethercat_device.h>
 #include <sr_edc_ethercat_drivers/sr0x.h>
+#include <realtime_tools/realtime_publisher.h>
+#include <std_msgs/Int16.h>
 
 typedef unsigned char       int8u;
 typedef   signed char       int8s;
@@ -33,7 +35,7 @@ protected:
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING data_;
   EthercatDirectCom com_;
   ros::NodeHandle nodehandle_;
-  ros::Publisher lfj5_pub_;
+  realtime_tools::RealtimePublisher<std_msgs::Int16> *realtime_pub_;
 };
 
 #endif /* SR06_H */

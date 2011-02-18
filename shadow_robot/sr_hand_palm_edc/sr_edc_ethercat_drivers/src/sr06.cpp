@@ -10,6 +10,7 @@
 #include <al/ethercat_AL.h>
 #include <dll/ethercat_device_addressed_telegram.h>
 #include <dll/ethercat_frame.h>
+#include <realtime_tools/realtime_publisher.h>
 
 #include <sstream>
 #include <iomanip>
@@ -42,7 +43,7 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 SR06::SR06() : SR0X(), com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
 {
 	counter_ = 0;
-	lfj5_pub_ = nodehandle_.advertise<std_msgs::Int16>("lfj5", 1000);
+	realtime_pub_ = new realtime_tools::RealtimePublisher<std_msgs::Int16>(nodehandle_, "lfj5", 1000);
 }
 
 SR06::~SR06()
@@ -143,8 +144,10 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     std_msgs::Int16 msg;
 
     msg.data = tbuffer->LFJ5;
-
-    lfj5_pub_.publish(msg);
+    if (realtime_pub_->trylock()){
+      realtime_pub_->msg_ =  msg;
+      realtime_pub_->unlockAndPublish();
+    }
   } else
     i++;
 
