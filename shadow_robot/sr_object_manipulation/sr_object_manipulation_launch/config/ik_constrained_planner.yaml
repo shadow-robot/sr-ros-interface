@@ -1,0 +1,42 @@
+## This file should be loaded under ompl_planning
+x:
+  min: -1.5
+  max: 1.5
+  resolution: 0.005
+y:
+  min: -1.5
+  max: 1.5
+  resolution: 0.005
+z:
+  min: 0.0
+  max: 2.0
+  resolution: 0.005
+
+## the list of groups for which motion planning can be performed
+groups: 
+  - right_arm 
+
+## the planner configurations; each config must have a type, which specifies
+## the planner to be used; other parameters can be specified as well, depending 
+## on the planner
+
+right_arm:
+  planner_configs:
+    - SBLkConfig1 
+    - LBKPIECEkConfig1
+  kinematics_solver: sr_kinematics
+  tip_name: palm
+  root_name: shadowarm_base
+
+planner_configs:
+  SBLkConfig1:
+    type: kinematic::SBL
+    projection: 0 1
+    celldim: 1 1
+    range: 0.5
+
+  LBKPIECEkConfig1:
+    type: kinematic::LBKPIECE
+    projection: 5 6
+    celldim: 0.1 0.1
+    

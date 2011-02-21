@@ -1,10 +1,10 @@
 hand_description:
   right_arm:
     hand_frame: palm
-    robot_frame: base_link
+    robot_frame: /base_link
     attached_objects_name: attached
     attach_link: palm
-    hand_group_name: r_sr_hand
+    hand_group_name: r_end_effector
     arm_group_name: right_arm
     hand_database_name: SHADOW_HAND
     hand_joints: [FFJ4,FFJ3,FFJ0,MFJ4,MFJ3,MFJ0,RFJ4,RFJ3,RFJ0,LFJ5,LFJ4,LFJ3,LFJ0,THJ5,THJ4,THJ3,THJ2,THJ1]

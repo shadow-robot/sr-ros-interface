@@ -3,8 +3,10 @@
 
 	<!-- interpolated IK -->
 	<node name="interpolated_ik_node_right" pkg="interpolated_ik_motion_planner"
-		type="interpolated_ik_motion_planner.py"
-		args="r" respawn="false" />
+	      type="interpolated_ik_motion_planner.py" args="r" respawn="false">
+	  <param name="robot_prefix" value = "sr"/>
+	  <param name="collision_aware_ik" value = "0"/>
+	</node>
 
 	<node name="cluster_bounding_box_finder" pkg="object_manipulator"
 	type="cluster_bounding_box_finder_server.py"
@@ -19,7 +21,7 @@
 			/>
 		<remap from="right_arm/interpolated_ik_set_params" to="/r_interpolated_ik_motion_plan_set_params"
 			/>
-		<remap from="right_arm/get_ik_solver_info" to="/arm_kinematics/get_ik_solver_info"/>
+		<remap from="right_arm/get_ik_solver_info" to="/sr_right_arm_kinematics/get_ik_solver_info"/>
 		<param name="default_database_planner" value="/objects_database_node/database_grasp_planning"
 			/>
 	</node>
@@ -27,5 +29,32 @@
 	<node pkg="trajectory_filter_server" name="trajectory_filter_unnormalizer" type="trajectory_filter_server" output="screen">
 	  <rosparam command="load" file="$(find trajectory_filter_server)/config/filter_unnormalize.yaml"/>
 	</node>
+
+
+
+	<!-- 
+	     IK constrained planned 
+	-->
+	<!--
+	<node  pkg="ik_constrained_planner" type="motion_planner" name="ik_constrained_planner" respawn="false" output="screen">
+	  <remap from="robot_description" to="robot_description" />  
+	  <remap from="collision_map" to="collision_map_occ" />
+	  <remap from="collision_map_update" to="collision_map_occ_update" />
+	  
+	  <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/ik_constrained_planner.yaml" />
+	  
+	  <param name="state_delay" type="double" value="0.01" />
+	  <param name="pointcloud_padd" type="double" value="0.00" />
+	  <param name="object_padd" type="double" value="0.04" />
+	  
+	  <param name="refresh_interval_collision_map" type="double" value="5.0" />
+	  <param name="refresh_interval_kinematic_state" type="double" value="1.0" />
+	  <param name="bounding_planes" type="string" value="0 0 1 -0.01" />
+	  <param name="verbose_collisions" type="bool" value="false" />
+	  
+	  <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />			
+	</node>
+	-->
+
 
 </launch>
