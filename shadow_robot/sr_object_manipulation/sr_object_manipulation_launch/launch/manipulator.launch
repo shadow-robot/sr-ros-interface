@@ -1,11 +1,14 @@
 <launch>
-	<rosparam command="load" file="$(find sr_object_manipulation_launch)/config/hand_description.yaml"/>
+	<rosparam command="load" file="$(find sr_object_manipulation_launch)/config/hand_description.yaml"/>	  
+	<rosparam command="load" file="$(find sr_object_manipulation_launch)/config/right_arm_ik_start_angles.yaml"/>
+
 
 	<!-- interpolated IK -->
 	<node name="interpolated_ik_node_right" pkg="interpolated_ik_motion_planner"
 	      type="interpolated_ik_motion_planner.py" args="r" respawn="false">
 	  <param name="robot_prefix" value = "sr"/>
 	  <param name="collision_aware_ik" value = "0"/>
+	  <remap from="~ik_start_angles" to="/right_arm_ik_start_angles"/>
 	</node>
 
 	<node name="cluster_bounding_box_finder" pkg="object_manipulator"
