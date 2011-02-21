@@ -102,11 +102,12 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 
 	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(2);
 
-	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_BUFFERED, EC_WRITTEN_FROM_MASTER);;
+	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);;
 	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE);
 
 	(*pd)[0].ChannelEnable = true;
 	(*pd)[0].ALEventEnable = true;
+	(*pd)[0].WriteEvent = true;
 	(*pd)[1].ChannelEnable = true;
 
 	sh->set_pd_config(pd);
@@ -145,6 +146,14 @@ stringstream name;
 
 void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 {
+	ROS_INFO("packCommand !");
+	SR0X::packCommand(buffer, halt, reset);
+	ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
+	signed short int motor[20] = {0};
+	for (int i = 0 ; i < 20 ; ++i)
+		motor[i] = 0x4242;
+	command->EDC_command = EDC_COMMAND_SENSOR_DATA;
+	memcpy(command->motor_torque_demand, motor, sizeof(command->motor_torque_demand));
 }
 
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
