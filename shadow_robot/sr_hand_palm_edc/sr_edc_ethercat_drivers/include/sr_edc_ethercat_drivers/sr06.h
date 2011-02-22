@@ -33,7 +33,7 @@ public:
 protected:
   int counter_;
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING data_;
-  EthercatDirectCom com_;
+//  EthercatDirectCom com_;
   ros::NodeHandle nodehandle_;
   std::vector< realtime_tools::RealtimePublisher<std_msgs::Int16> *> realtime_pub_;
 

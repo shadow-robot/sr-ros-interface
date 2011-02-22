@@ -44,7 +44,7 @@ const unsigned char SR06::nb_publish_by_unpack_const = (nb_sensors_const % max_i
 
 PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 
-SR06::SR06() : SR0X(), com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
+SR06::SR06() : SR0X()//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
 {
 	char topic_name[4];
 	unsigned char i;
@@ -103,7 +103,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(2);
 
 	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);;
-	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE);
+	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE, EC_QUEUED);
 
 	(*pd)[0].ChannelEnable = true;
 	(*pd)[0].ALEventEnable = true;
@@ -120,7 +120,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
   int retval = SR0X::initialize(hw, allow_unprogrammed);
 
-  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
+//  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
 
   return retval; 
 }
@@ -146,7 +146,7 @@ stringstream name;
 
 void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 {
-	ROS_INFO("packCommand !");
+//	ROS_INFO("packCommand !");
 	SR0X::packCommand(buffer, halt, reset);
 	ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
 	signed short int motor[20] = {0};
@@ -161,6 +161,19 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
   static unsigned int i = 0;
 
+/*uint32_t event_req;
+uint32_t event_mask;
+uint8_t spi_config;
+EthercatDirectCom com(EtherCAT_DataLinkLayer::instance());
+
+readData(&com, 0x204, &event_mask, 4);
+readData(&com, 0x220, &event_req, 4);
+readData(&com, 0x150, &spi_config, 1);
+
+ROS_ERROR("event_req == %08X", event_req);
+ROS_ERROR("event_mask == %08X", event_mask);
+ROS_ERROR("spi_config == %02X", spi_config);
+*/
   if (i == max_iter_const) { // 10 == 100 Hz
     i = 0;
     return true;
