@@ -180,7 +180,7 @@ class ObjectChooser(QtGui.QWidget):
         place_goal.arm_name = "right_arm"
         #padding used when determining if the requested place location
         #would bring the object in collision with the environment
-        place_goal.place_padding = 0.02
+        place_goal.place_padding = 0.01
         #how much the gripper should retreat after placing the object
         place_goal.desired_retreat_distance = 0.1
         place_goal.min_retreat_distance = 0.05
@@ -258,14 +258,14 @@ class ObjectChooser(QtGui.QWidget):
         '''
         for pose_stamped, index in zip(list_of_poses, range(0,len(list_of_poses))):
             pose = pose_stamped.pose
-            y = pose.position.y
-            pose.position.y = pose.position.x
-            pose.position.x = y
+            #y = pose.position.y
+            #pose.position.y = pose.position.x
+            #pose.position.x = y
             pose.position.z = 0.005
 
             mat = pose_to_mat(pose)
             self.draw_functions.draw_rviz_sphere(mat, 0.005, frame='/base_link', ns='place_'+str(index), 
-                                                id=index, duration = 90, color=[0.25,0.5,1.0], opaque=0.5 )
+                                                id=index, duration = 90, color=[0.5,0.5,0.0], opaque=1.0 )
             
 
     def call_find_cluster_bounding_box(self, cluster):

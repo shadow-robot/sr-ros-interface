@@ -1,6 +1,6 @@
 cloud_sources:
   - name: kinect_known
-    frame_subsample: 1
+    frame_subsample: 4
     point_subsample: 1
     sensor_frame: openni_rgb_optical_frame
     dynamic_publish: false

@@ -7,7 +7,7 @@
     
     <!-- The default padding to be added for the body parts the robot can see
     -->
-    <param name="self_see_default_padding" type="double" value="0.04" />
+    <param name="self_see_default_padding" type="double" value="0.01" />
     <!-- The default scaling to be added for the body parts the robot can see
     -->
     <param name="self_see_default_scale" type="double" value="1.0" />
@@ -39,7 +39,7 @@
     <param name="dimension_z" type="double" value="1.0" />
     
     <!-- set the resolution (1.0 cm) -->
-    <param name="resolution" type="double" value="0.02" />
+    <param name="resolution" type="double" value="0.01" />
     
     <!-- cloud sources -->
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/collision_map_sources.yaml"

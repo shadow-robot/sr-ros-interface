@@ -7,7 +7,7 @@
 	<node name="interpolated_ik_node_right" pkg="interpolated_ik_motion_planner"
 	      type="interpolated_ik_motion_planner.py" args="r" respawn="false">
 	  <param name="robot_prefix" value = "sr"/>
-	  <param name="collision_aware_ik" value = "0"/>
+	  <param name="collision_aware_ik" value = "1"/>
 	  <remap from="~ik_start_angles" to="/right_arm_ik_start_angles"/>
 	</node>
 
@@ -20,13 +20,15 @@
 	<node name="object_manipulator" pkg="object_manipulator" type="object_manipulator_node"
 		respawn="false"
 		output="screen">
-		<remap from="right_arm/interpolated_ik" to="/r_interpolated_ik_motion_plan"
-			/>
-		<remap from="right_arm/interpolated_ik_set_params" to="/r_interpolated_ik_motion_plan_set_params"
-			/>
-		<remap from="right_arm/get_ik_solver_info" to="/sr_right_arm_kinematics/get_ik_solver_info"/>
-		<param name="default_database_planner" value="/objects_database_node/database_grasp_planning"
-			/>
+	  <remap from="right_arm/constraint_aware_ik" to="/sr_right_arm_kinematics/get_constraint_aware_ik" />    
+	  <remap from="right_arm/interpolated_ik" to="/r_interpolated_ik_motion_plan"/>
+	  <remap from="right_arm/get_fk" to="/sr_right_arm_kinematics/get_fk" />    
+
+	  <remap from="right_arm/interpolated_ik_set_params" to="/r_interpolated_ik_motion_plan_set_params"
+		 />
+	  <remap from="right_arm/get_ik_solver_info" to="/sr_right_arm_kinematics/get_ik_solver_info"/>
+	  <param name="default_database_planner" value="/objects_database_node/database_grasp_planning"
+		 />
 	</node>
 
 	<node pkg="trajectory_filter_server" name="trajectory_filter_unnormalizer" type="trajectory_filter_server" output="screen">
