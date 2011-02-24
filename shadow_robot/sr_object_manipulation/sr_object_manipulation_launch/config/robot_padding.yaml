@@ -5,4 +5,4 @@ link_padding:
   - link: r_end_effector
     padding: .01
   - link: attached
-    padding: .01
+    padding: .0

@@ -31,7 +31,7 @@
     <remap from="cloud_out" to="/kinect_known" />
     <param name="sensor_frame" type="string" value="openni_rgb_optical_frame" />			
     <param name="fixed_frame" type="string" value="base_link" />
-    <param name="object_padd" type="double" value=".01" />
+    <param name="object_padd" type="double" value=".0" />
     <param name="object_scale" type="double" value="1.0" />
   </node>
 
