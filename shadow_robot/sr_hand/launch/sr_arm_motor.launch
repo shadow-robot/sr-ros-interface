@@ -162,8 +162,10 @@
 		for
 		both
 		positions and targets. -->
+	<node pkg="tf" type="static_transform_publisher" name="world_to_base_link"
+		args="-0.05 -0.75 0.0 1.57 0 0  world base_link 100" machine="robot" />
 	<node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm"
-		args="-0.05 -0.75 0.0 1.57 0 0  base_link /sr_arm/position/shadowarm_base 100" machine="robot" />
+		args="0.0 -0.0 0.0 0 0 0  base_link /sr_arm/position/shadowarm_base 100" machine="robot" />
 	<node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm"
 		args="0 0 0 0 0 0  /sr_arm/position/shadowarm_base /sr_arm/target/shadowarm_base 100" machine="robot"/>
 
@@ -183,7 +185,7 @@
 	</node>
 	
 	<node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm_np"
-		args="-0.05 -0.75 0.0 1.57 0 0 /base_link /shadowarm_base 100" machine="robot" />
+		args="0.0 0.0 0.0 0.0 0 0 /base_link /shadowarm_base 100" machine="robot" />
 	
 	<!--
 	    Diagnostic Aggregator

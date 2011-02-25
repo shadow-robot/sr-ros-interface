@@ -17,11 +17,12 @@ from object_manipulation_msgs.srv import FindClusterBoundingBox, FindClusterBoun
 import object_manipulator.draw_functions as draw_functions
 from object_manipulator.convert_functions import *
 from object_manipulation_msgs.msg import PickupGoal, PickupAction, PlaceGoal, PlaceAction
-from geometry_msgs.msg import Vector3Stamped, PoseStamped
+from geometry_msgs.msg import Vector3Stamped, PoseStamped, Pose
 import actionlib
 from actionlib_msgs.msg import *
 
 from tf import transformations
+import tf
 
 class ObjectChooser(QtGui.QWidget):
     """
@@ -35,7 +36,7 @@ class ObjectChooser(QtGui.QWidget):
         self.title.setText(title)
         self.draw_functions = None
         self.pickup_result = None
-
+        self.listener = tf.TransformListener()
 
     def draw(self):
         self.frame = QtGui.QFrame(self)
@@ -93,16 +94,16 @@ class ObjectChooser(QtGui.QWidget):
             initial_pose = PoseStamped()
             initial_pose.header.stamp = rospy.get_rostime()
             initial_pose.header.frame_id = "/base_link"
-            initial_pose.pose.position.x = -0.15
-            initial_pose.pose.position.y = -0.1
-            initial_pose.pose.position.z = -.05
+            initial_pose.pose.position.x = 0.0
+            initial_pose.pose.position.y = 0.0
+            initial_pose.pose.position.z = 0.0
             q=transformations.quaternion_about_axis(0.0, (1,0,0))
             initial_pose.pose.orientation.x = q[0]
             initial_pose.pose.orientation.y = q[1]
             initial_pose.pose.orientation.z = q[2]
             initial_pose.pose.orientation.w = q[3]
 
-            list_of_poses = self.compute_list_of_poses(initial_pose)
+            list_of_poses = self.compute_list_of_poses(initial_pose, graspable_object)
 
             self.place_object(graspable_object, self.object.graspable_object_name, object_name, list_of_poses)
         
@@ -215,7 +216,7 @@ class ObjectChooser(QtGui.QWidget):
             rospy.logerr("The place action has failed: " + str(place_result.manipulation_result.value) )
         print place_result
 
-    def compute_list_of_poses(self, initial_pose, rect_w=0.1, rect_h=0.05, resolution=0.02):
+    def compute_list_of_poses(self, initial_pose, graspable_object, rect_w=0.01, rect_h=0.01, resolution=0.02):
         '''
         Computes a list of possible poses in a rectangle of 2*rect_w by 2*rect_h, with the given resolution. 
         In our case, rect_w is along the x axis, and rect_h along the y_axis.
@@ -247,25 +248,33 @@ class ObjectChooser(QtGui.QWidget):
 
                 list_of_poses.append(current_pose)
 
-        self.draw_place_area(list_of_poses)
+        self.draw_place_area(list_of_poses, graspable_object)
 
         return list_of_poses
 
-
-    def draw_place_area(self, list_of_poses):
+    def draw_place_area(self, list_of_poses, graspable_object):
         '''
         Displays all the possible placing locations that are going to be tried.
         '''
-        for pose_stamped, index in zip(list_of_poses, range(0,len(list_of_poses))):
-            pose = pose_stamped.pose
-            #y = pose.position.y
-            #pose.position.y = pose.position.x
-            #pose.position.x = y
-            pose.position.z = 0.005
+        #try:
+        (trans_palm,rot_palm) = self.listener.lookupTransform('/base_link', '/palm', rospy.Time(0))
+        #except:
+        #    return
 
-            mat = pose_to_mat(pose)
-            self.draw_functions.draw_rviz_sphere(mat, 0.005, frame='/base_link', ns='place_'+str(index), 
-                                                id=index, duration = 90, color=[0.5,0.5,0.0], opaque=1.0 )
+        for index,pose_stamped in enumerate(list_of_poses):
+            pose_tmp = Pose()
+            pose_tmp.position.x = pose_stamped.pose.position.x + trans_palm[0]
+            pose_tmp.position.y = pose_stamped.pose.position.y + trans_palm[1]
+            pose_tmp.position.z = 0.01
+
+            pose_tmp.orientation.x = pose_stamped.pose.orientation.x
+            pose_tmp.orientation.y = pose_stamped.pose.orientation.y
+            pose_tmp.orientation.z = pose_stamped.pose.orientation.z
+            pose_tmp.orientation.w = pose_stamped.pose.orientation.w
+
+            mat = pose_to_mat(pose_tmp)
+            self.draw_functions.draw_rviz_box(mat, [.01,.01,.01], frame='/base_link', ns='place_'+str(index), 
+                                              id=1000+index, duration = 90, color=[0.5,0.5,0.0], opaque=1.0 )
             
 
     def call_find_cluster_bounding_box(self, cluster):
