@@ -160,7 +160,8 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
   static unsigned int i = 0;
-
+  static unsigned int errors = 0;
+  static unsigned int num_rxed_packets = 0;
 /*uint32_t event_req;
 uint32_t event_mask;
 uint8_t spi_config;
@@ -174,6 +175,12 @@ ROS_ERROR("event_req == %08X", event_req);
 ROS_ERROR("event_mask == %08X", event_mask);
 ROS_ERROR("spi_config == %02X", spi_config);
 */
+  ++num_rxed_packets;
+  if (tbuffer->EDC_command == EDC_COMMAND_INVALID)
+  {
+    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets\n", ++errors, num_rxed_packets);
+  }
+
   if (i == max_iter_const) { // 10 == 100 Hz
     i = 0;
     return true;
