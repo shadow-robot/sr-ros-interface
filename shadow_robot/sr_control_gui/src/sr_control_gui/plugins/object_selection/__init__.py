@@ -216,7 +216,7 @@ class ObjectChooser(QtGui.QWidget):
             rospy.logerr("The place action has failed: " + str(place_result.manipulation_result.value) )
         print place_result
 
-    def compute_list_of_poses(self, initial_pose, graspable_object, rect_w=0.01, rect_h=0.01, resolution=0.02):
+    def compute_list_of_poses(self, initial_pose, graspable_object, rect_w=0.10, rect_h=0.10, resolution=0.02):
         '''
         Computes a list of possible poses in a rectangle of 2*rect_w by 2*rect_h, with the given resolution. 
         In our case, rect_w is along the x axis, and rect_h along the y_axis.
