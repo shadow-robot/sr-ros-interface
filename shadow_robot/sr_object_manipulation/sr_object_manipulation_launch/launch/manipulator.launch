@@ -29,6 +29,9 @@
 	  <remap from="right_arm/get_ik_solver_info" to="/sr_right_arm_kinematics/get_ik_solver_info"/>
 	  <param name="default_database_planner" value="/objects_database_node/database_grasp_planning"
 		 />
+
+	  <remap from="right_arm/reactive_grasp" to="/reactive_grasp/right" />  
+	  <remap from="right_arm/reactive_lift" to="/reactive_lift/right" />      
 	</node>
 
 	<node pkg="trajectory_filter_server" name="trajectory_filter_unnormalizer" type="trajectory_filter_server" output="screen">

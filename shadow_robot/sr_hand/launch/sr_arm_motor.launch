@@ -203,6 +203,11 @@
 	<node pkg="sr_move_arm" type="move_arm_simple_action" name="move_arm_simple_action"  machine="robot"/>
 	<node pkg="sr_move_arm" type="hand_posture_execution" name="hand_posture_execution" machine="robot"/>
 
+	<node name="reactive_grasp_node_right" pkg="sr_move_arm" 
+	      type="reactive_grasp_server.py" args="r" respawn="false" output="screen">
+	  <param name="use_slip_controller" value="True"/>
+	  <param name="use_slip_detection" value="True"/>
+	</node>
 
 </launch>
 

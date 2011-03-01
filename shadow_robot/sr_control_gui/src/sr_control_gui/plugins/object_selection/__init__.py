@@ -130,8 +130,8 @@ class ObjectChooser(QtGui.QWidget):
         pickup_goal.lift.desired_distance = 0.07;
         pickup_goal.lift.min_distance = 0.03;
         #do not use tactile-based grasping or tactile-based lift
-        pickup_goal.use_reactive_lift = False;
-        pickup_goal.use_reactive_execution = False;
+        pickup_goal.use_reactive_lift = True;
+        pickup_goal.use_reactive_execution = True;
         
         
         pickup_client = actionlib.SimpleActionClient('/object_manipulator/object_manipulator_pickup', PickupAction)
