@@ -92,3 +92,4 @@ rosbuild_link_boost(shadowhand_virtual thread)
 ###############
 
 rosbuild_add_executable(examples/link_joints examples/link_joints.cpp)
+rosbuild_add_executable(examples/tactile examples/tactile.cpp)
