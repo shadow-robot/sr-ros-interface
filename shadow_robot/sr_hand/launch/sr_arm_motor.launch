@@ -200,7 +200,34 @@
 	<!--
 	    Trajectories / grasp execution
 	-->
-	<node pkg="sr_move_arm" type="move_arm_simple_action" name="move_arm_simple_action"  machine="robot"/>
+<!--	<node pkg="sr_move_arm" type="move_arm_simple_action" name="move_arm_simple_action"  machine="robot"/>  -->
+
+        <node pkg="sr_mechanism_controllers" type="joint_trajectory_action_controller" name="sr_joint_trajectory_action_controller"/>
+
+        <node pkg="move_arm" type="move_arm_simple_action" name="move_arm_simple_action">
+	  <remap from="robot_description" to="robot_description" />
+	  <remap from="joint_state" to="joint_states" />
+	  <remap from="arm_ik" to="/sr_right_arm_kinematics/get_constraint_aware_ik" />	
+	  <remap from="arm_fk" to="/sr_right_arm_kinematics/get_fk" />	
+
+	  <remap from="filter_trajectory" to="/trajectory_filter_unnormalizer/filter_trajectory" />
+	  
+	  <remap from="get_trajectory_validity" to="environment_server/get_trajectory_validity" />	
+	  <remap from="get_environment_safety" to="environment_server/get_environment_safety" />	
+	  <remap from="get_execution_safety" to="environment_server/get_execution_safety" />	
+	  <remap from="get_group_info" to="environment_server/get_group_info" />	
+	  <remap from="get_robot_state" to="environment_server/get_robot_state" />	
+	  <remap from="get_state_validity" to="environment_server/get_state_validity" />	
+	  	  
+	  <param name="group" type="string" value="right_arm" />
+	  <param name="ik_allowed_time" type="double" value="2.0" />
+	  <param name="trajectory_filter_allowed_time" type="double" value="2.0" />
+	  <param name="group" type="string" value="right_arm" />
+	  <param name="controller_action_name" type="string" value="/r_arm_controller/joint_trajectory_action" />
+	  	  
+	  <param name="pause_allowed_time" type="double" value="15.0" />
+	</node>
+
 	<node pkg="sr_move_arm" type="hand_posture_execution" name="hand_posture_execution" machine="robot"/>
 
 	<node name="reactive_grasp_node_right" pkg="sr_move_arm" 

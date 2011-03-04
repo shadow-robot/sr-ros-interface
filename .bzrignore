@@ -181,3 +181,5 @@ shadow_robot/sr_robot_msgs/build
 shadow_robot/sr_robot_msgs/msg_gen
 shadow_robot/sr_robot_msgs/src
 overlay/tabletop_object_perception.bk
+shadow_robot/sr_mechanism_controllers/bin
+shadow_robot/sr_mechanism_controllers/build

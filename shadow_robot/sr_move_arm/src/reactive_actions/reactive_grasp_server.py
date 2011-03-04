@@ -149,22 +149,25 @@ class ReactiveGraspActionServer(object):
             self.rg_state = "rg"
             (trajectory, object_name, table_name, forward_step) = self.init_reactive_grasp(goal)
 
+
+            print "REACTIVE GRASP CB: approach_pose = ", goal.final_grasp_pose
             #perform the reactive grasp
             #self.cm.switch_to_cartesian_mode()
-            result = self.rg.reactive_grasp(None, goal.final_grasp_pose, trajectory, 
-                                            self.side_step, self.back_step, 
-                                            self.approach_num_tries, self.goal_pos_thres,
-                                            self.grasp_num_tries, forward_step, 
-                                            object_name, table_name,
-                                            self.grasp_adjust_x_step, self.grasp_adjust_z_step, self.grasp_adjust_num_tries)
-            self.rg.check_preempt()
+            result = 0
+            #result = self.rg.reactive_grasp(None, goal.final_grasp_pose, trajectory, 
+            #                                self.side_step, self.back_step, 
+            #                                self.approach_num_tries, self.goal_pos_thres,
+            #                                self.grasp_num_tries, forward_step, 
+            #                                object_name, table_name,
+            #                                self.grasp_adjust_x_step, self.grasp_adjust_z_step, self.grasp_adjust_num_tries)
+            #self.rg.check_preempt()
 
             #rospy.loginfo("switching back to joint controllers")
             #self.cm.switch_to_joint_mode()
             self.rg_state = "off"
 
             if result == 0:
-                self.rg.broadcast_phase(ManipulationPhase.SUCCEEDED, send_feedback = 0)
+                #self.rg.broadcast_phase(ManipulationPhase.SUCCEEDED, send_feedback = 0)
                 self._grasp_result.manipulation_result.value = ManipulationResult.SUCCESS
                 self._as.set_succeeded(self._grasp_result)
             else:
@@ -184,19 +187,13 @@ class ReactiveGraspActionServer(object):
             self._grasp_result.manipulation_result.value = ManipulationResult.ERROR
             self._as.set_aborted(self._grasp_result)
 
-
-
-    ##pull relevant parts out of the goal for both reactive grasp and approach
     def init_reactive_grasp(self, goal):
-
-        self.rg.check_preempt()
-
+        """
+        pull relevant parts out of the goal for both reactive grasp and approach
+        """
         #pull trajectory angles out of JointTrajectory
         if len(goal.trajectory.points) > 0:
-            trajectory = [goal.trajectory.points[i].positions for i in range(len(goal.trajectory.points))]
-            print "trajectory:"
-            for angles in trajectory:
-                print pplist(angles)
+            trajectory = goal.trajectory
         else:
             trajectory = None
 
@@ -211,8 +208,6 @@ class ReactiveGraspActionServer(object):
         else:
             forward_step = self.forward_step
 
-        self.rg.check_preempt()
-
         return (trajectory, object_name, table_name, forward_step)
 
 
@@ -224,11 +219,11 @@ class ReactiveGraspActionServer(object):
         rospy.loginfo("got reactive approach request")
         try:
             self.rg_state = "approach"
-
-            rospy.logerr("NOT IMPLEMENTED YET")
+            
+            self.rg.reactive_approach(goal)
 
             self.rg_state = "off"
-            self.rg.check_preempt()
+            #self.rg.check_preempt()
 
             if result == 0:
                 self.rg.broadcast_phase(ManipulationPhase.SUCCEEDED, send_feedback = 0)
@@ -316,9 +311,9 @@ class ReactiveGraspActionServer(object):
     ##do a compliant close using the fingertip sensors (stops at the first detected 
     #contact and moves the arm so that the contact stays in place)
     def compliant_close_callback(self, req):
-        rospy.loginfo("executing compliant grasp--switching to Cartesian controllers")
+        rospy.loginfo("executing compliant grasp")
 
-        rospy.logerr("NOT IMPLEMENTED YET")
+        #self.rg.compliant_close()
         
         return EmptyResponse()
 
