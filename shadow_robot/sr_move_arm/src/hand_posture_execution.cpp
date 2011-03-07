@@ -13,9 +13,11 @@ namespace shadowrobot
 {
 
   SrHandPostureExecutionSimpleAction::SrHandPostureExecutionSimpleAction() :
-    nh_tilde("~")
+    nh_tilde("~"), hand_occupied(false)
   {
     action_server = boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> >(new actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction>("/right_arm/hand_posture_execution", boost::bind(&SrHandPostureExecutionSimpleAction::execute, this, _1), false));
+
+    get_status_server = nh.advertiseService("/right_arm/grasp_status", &SrHandPostureExecutionSimpleAction::getStatusCallback, this);    
 
     sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
 
@@ -25,6 +27,23 @@ namespace shadowrobot
   SrHandPostureExecutionSimpleAction::~SrHandPostureExecutionSimpleAction()
   {}
 
+  bool SrHandPostureExecutionSimpleAction::getStatusCallback(object_manipulation_msgs::GraspStatus::Request &request,
+                                                             object_manipulation_msgs::GraspStatus::Response &response)
+  {
+    double gripper_value;
+
+    ROS_ERROR("Check if the hand is occupied or not, possibly using tactile sensors");
+
+    if(!hand_occupied)
+    {
+      response.is_hand_occupied = false;
+    }
+    else 
+    {
+      response.is_hand_occupied = true;
+    }
+    return true;
+  }
   void SrHandPostureExecutionSimpleAction::execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& goal)
   {    
     if(action_server->isPreemptRequested() || !ros::ok())
@@ -68,6 +87,9 @@ namespace shadowrobot
 
       sr_hand_target_pub.publish(sendupdate_msg);
       ROS_DEBUG("Hand in grasp position");
+
+      hand_occupied = true;
+
       break;
     
     case object_manipulation_msgs::GraspHandPostureExecutionGoal::PRE_GRASP:
@@ -90,6 +112,8 @@ namespace shadowrobot
       sr_hand_target_pub.publish(sendupdate_msg);
       ROS_DEBUG("Hand in pregrasp position");
       
+      hand_occupied = false;
+
       break;
     case object_manipulation_msgs::GraspHandPostureExecutionGoal::RELEASE:
       ROS_DEBUG("RELEASE!");
@@ -104,6 +128,9 @@ namespace shadowrobot
       
       sr_hand_target_pub.publish(sendupdate_msg);
       ROS_DEBUG("Hand opened");
+
+      hand_occupied = false;
+
       break;
     default:
       ROS_ERROR("Shadow Robot grasp execution: unknown goal code (%d)", goal->goal);

@@ -210,7 +210,7 @@
 	  <remap from="arm_ik" to="/sr_right_arm_kinematics/get_constraint_aware_ik" />	
 	  <remap from="arm_fk" to="/sr_right_arm_kinematics/get_fk" />	
 
-	  <remap from="filter_trajectory" to="/trajectory_filter_unnormalizer/filter_trajectory" />
+	  <remap from="filter_trajectory" to="/trajectory_filter/filter_trajectory_with_constraints" />
 	  
 	  <remap from="get_trajectory_validity" to="environment_server/get_trajectory_validity" />	
 	  <remap from="get_environment_safety" to="environment_server/get_environment_safety" />	

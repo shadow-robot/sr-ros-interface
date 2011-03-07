@@ -53,11 +53,13 @@ namespace shadowrobot
 
     ROS_DEBUG("Trajectory received: %d joints / %d msg length", (int)goal->trajectory.joint_names.size(), sendupdate_msg_traj.sendupdate_length);
 
+    ros::Rate tmp_rate(1.0);
     
     std::vector<trajectory_msgs::JointTrajectoryPoint> trajectory_points = goal->trajectory.points;
     trajectory_msgs::JointTrajectoryPoint trajectory_step;
     
     //loop through the steps
+    ros::Duration sleeping_time(0.0), last_time(0.0);
     for(unsigned int index_step = 0; index_step < trajectory_points.size(); ++index_step)
     {
       trajectory_step = trajectory_points[index_step];
@@ -74,8 +76,12 @@ namespace shadowrobot
       
       sr_arm_target_pub.publish(sendupdate_msg_traj);
       sr_hand_target_pub.publish(sendupdate_msg_traj);
-    }
 
+      sleeping_time.sleep();
+      sleeping_time = trajectory_step.time_from_start - last_time + ros::Duration(0.05);
+      last_time = trajectory_step.time_from_start;
+    }
+    
     pr2_controllers_msgs::JointTrajectoryResult joint_trajectory_result;
     action_server->setSucceeded(joint_trajectory_result);
   }

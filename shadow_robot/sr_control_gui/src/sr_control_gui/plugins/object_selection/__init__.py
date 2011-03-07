@@ -127,11 +127,11 @@ class ObjectChooser(QtGui.QWidget):
         direction.vector.z = 1;
         pickup_goal.lift.direction = direction;
         #request a vertical lift of 15cm after grasping the object
-        pickup_goal.lift.desired_distance = 0.07;
-        pickup_goal.lift.min_distance = 0.03;
+        pickup_goal.lift.desired_distance = 0.25;
+        pickup_goal.lift.min_distance = 0.2;
         #do not use tactile-based grasping or tactile-based lift
-        pickup_goal.use_reactive_lift = True;
-        pickup_goal.use_reactive_execution = True;
+        pickup_goal.use_reactive_lift = False;
+        pickup_goal.use_reactive_execution = False;
         
         
         pickup_client = actionlib.SimpleActionClient('/object_manipulator/object_manipulator_pickup', PickupAction)
@@ -216,7 +216,7 @@ class ObjectChooser(QtGui.QWidget):
             rospy.logerr("The place action has failed: " + str(place_result.manipulation_result.value) )
         print place_result
 
-    def compute_list_of_poses(self, initial_pose, graspable_object, rect_w=0.10, rect_h=0.10, resolution=0.02):
+    def compute_list_of_poses(self, initial_pose, graspable_object, rect_w=0.20, rect_h=0.20, resolution=0.02):
         '''
         Computes a list of possible poses in a rectangle of 2*rect_w by 2*rect_h, with the given resolution. 
         In our case, rect_w is along the x axis, and rect_h along the y_axis.

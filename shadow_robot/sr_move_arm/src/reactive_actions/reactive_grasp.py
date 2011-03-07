@@ -57,10 +57,11 @@ class ReactiveGrasper(object):
         self.sr_hand_target_pub = rospy.Publisher('/srh/sendupdate', sendupdate)
         self.sr_arm_target_pub = rospy.Publisher('/sr_arm/sendupdate', sendupdate)
         self.move_arm_client = None
+
         if which_arm == 'r':
-            self.move_arm_client = SimpleActionClient( "/right_arm/move_arm", MoveArmAction )
+            self.move_arm_client = SimpleActionClient( "/move_right_arm", MoveArmAction )
         else:
-            self.move_arm_client = SimpleActionClient( "/left_arm/move_arm", MoveArmAction )
+            self.move_arm_client = SimpleActionClient( "/move_left_arm", MoveArmAction )
         self.move_arm_client.wait_for_server()        
 
         #dictionary for ManipulationPhase
@@ -77,7 +78,7 @@ class ReactiveGrasper(object):
         self.reactive_grasp_result_dict = {"success":0, "ran out of grasp tries":1, "ran out of approach tries":2, 
                                            "aborted":3, "grasp infeasible":4}
 
-        rospy.loginfo("done with ReactiveGrasper init for the %s arm"%self.whicharm)
+        rospy.logerr("done with ReactiveGrasper init for the %s arm"%self.whicharm)
 
     def broadcast_phase(self, phase):
         """

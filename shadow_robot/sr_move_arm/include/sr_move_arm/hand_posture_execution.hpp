@@ -35,12 +35,17 @@ namespace shadowrobot
     NodeHandle nh, nh_tilde;
     Publisher pub;
     void execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& goal);
+    bool getStatusCallback(object_manipulation_msgs::GraspStatus::Request &request,
+                           object_manipulation_msgs::GraspStatus::Response &response);
 
     boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> > action_server;
 
     Publisher sr_hand_target_pub;
+    ServiceServer get_status_server;
     sr_robot_msgs::sendupdate sendupdate_msg;
     std::vector<sr_robot_msgs::joint> joint_vector;
+
+    bool hand_occupied;
   };//end class
 }//end workspace
 

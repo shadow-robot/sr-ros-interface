@@ -13,6 +13,8 @@ import actionlib
 from object_manipulator.convert_functions import *
 import reactive_grasp
 
+from actionlib_msgs.msg import GoalStatus
+
 from std_srvs.srv import Empty, EmptyResponse
 
 ##preempt exception
@@ -23,7 +25,6 @@ class ReactiveGrasperWithPreempt(reactive_grasp.ReactiveGrasper):
     reactive grasp class with overloaded preempt
     """
     def __init__(self, rg_as, lift_as, approach_as, place_as, which_arm='r', slip_detection=False ):
-        
         reactive_grasp.ReactiveGrasper.__init__(self, which_arm, slip_detection)
 
         #add the action servers so we can check for preempts and send feedback
