@@ -97,7 +97,7 @@
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/joint_limits.yaml"/>
   </node>
 
-  <node pkg="ompl_planning" type="motion_planner" name="ompl_planning" output="screen">
+  <node pkg="ompl_ros_interface" type="ompl_ros" name="ompl_planning" respawn="true" output="screen">
     <remap from="robot_description" to="robot_description" />  
     <remap from="collision_map" to="collision_map_occ" />
     <remap from="collision_map_update" to="collision_map_occ_update" />

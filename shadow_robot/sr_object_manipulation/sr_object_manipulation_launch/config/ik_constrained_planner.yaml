@@ -1,18 +1,26 @@
-## This file should be loaded under ompl_planning
-
-## the list of groups for which motion planning can be performed
-group_list:
-  right_arm
+# the list of groups for which motion planning can be performed
+groups: 
+  - right_arm 
 
 ## the planner configurations; each config must have a type, which specifies
 ## the planner to be used; other parameters can be specified as well, depending 
 ## on the planner
 
-planner_configs:
+right_arm:
+  planner_type: JointPlanner
+  planner_configs:
+    - RRTkConfig2
+    - SBLkConfig1 
+    - SBLkConfig2
+    - KPIECEkConfig1
+    - KPIECEkConfig2l
+    - LBKPIECEkConfig2l
+  kinematics_solver: arm_kinematics_constraint_aware/KDLArmKinematicsPlugin
+  tip_name: palm
+  root_name: shadowarm_base
+  projection_evaluator: joint_state
   
-  armIKConfig1:
-    type: GAIK
-
+planner_configs:  
   pRRTkConfig1:
     type: kinematic::pRRT
     range: 0.75
@@ -75,10 +83,5 @@ planner_configs:
     type: kinematic::LBKPIECE
     projection: link palm
     celldim: 0.1 0.1 0.1
-
-## the definition of the planners that go in each group
-groups:
-
-  - name: right_arm
-    planner_configs:
-      RRTkConfig2 SBLkConfig2 KPIECEkConfig1 KPIECEkConfig2l LBKPIECEkConfig2l armIKConfig1
+    
+publish_diagnostics: true
