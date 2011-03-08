@@ -33,6 +33,8 @@ namespace shadowrobot
     double gripper_value;
 
     ROS_ERROR("Check if the hand is occupied or not, possibly using tactile sensors");
+    response.is_hand_occupied = true;
+    return true;
 
     if(!hand_occupied)
     {

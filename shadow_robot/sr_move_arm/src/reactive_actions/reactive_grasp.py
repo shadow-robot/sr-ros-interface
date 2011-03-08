@@ -88,7 +88,7 @@ class ReactiveGrasper(object):
         self._phase_pub.publish(phase)
     
 
-    def reactive_grasp(self, approach_pose, grasp_pose, joint_path = None, side_step = .015, back_step = .03,
+    def reactive_grasp(self, approach_pose, grasp_pose, joint_path = None, pregrasp_posture = None, grasp_posture = None, side_step = .015, back_step = .03,
                        approach_num_tries = 10, goal_pos_thres = 0.01, grasp_num_tries = 2, 
                        forward_step = 0.03, object_name = "points", table_name = "table", 
                        grasp_adjust_x_step = .02, grasp_adjust_z_step = .015, grasp_adjust_num_tries = 3):
@@ -102,8 +102,6 @@ class ReactiveGrasper(object):
             approach_pose = create_pose_stamped(current_trans+current_rot)
         
         self.check_preempt()
-
-        print "REACTIVE GRASP: approach_pose = ", approach_pose
 
         #compute (unit) approach direction in base_link frame
         approach_dir = self.compute_approach_dir(approach_pose, grasp_pose)
@@ -129,7 +127,7 @@ class ReactiveGrasper(object):
 
             #if both fingers were touching, or we got to the grasp goal, or we're touching the table, try to close the fingers
             rospy.loginfo("starting compliant_close")
-            self.compliant_close()
+            self.compliant_close(grasp_posture)
 
             self.check_preempt()
         
@@ -151,7 +149,7 @@ class ReactiveGrasper(object):
                 rospy.loginfo("trying approach again with new goal, pos: "+pplist(goal_pos)+" rot: "+pplist(goal_rot))
 
                 #open the gripper back up
-                self.open_and_reset_fingertips(reset = 1)
+                self.open_and_reset_fingertips(pregrasp_posture, reset = 1)
                 
             else:
                 rospy.loginfo("ran out of grasp tries!")
@@ -193,7 +191,36 @@ class ReactiveGrasper(object):
             
         return self.reactive_approach_result_dict["success"]
 
-    def compliant_close(self):
+
+    def reactive_lift(self, goal):
+        """
+        Lifts the object while monitoring for contacts.
+        """
+        #follow the joint_path if one is given
+        joint_path = goal.trajectory
+        if joint_path != None:
+            self.check_preempt()
+            joint_names = joint_path.joint_names
+
+            for trajectory_step in joint_path.points:
+                sendupdate_msg = []
+        
+                for (joint_name, joint_target) in zip(joint_names, trajectory_step.positions):
+                    # convert targets to degrees
+                    sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target * 57.325))
+                
+                self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+                self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+            
+                rospy.sleep( trajectory_step.time_from_start )
+        else:
+            #if no joint_path is given, go to the current_goal_pose
+            rospy.logerr("TODO: Implement this. Get current pose, add the lift and set this as the command_cartesian target.")
+            self.command_cartesian( goal.lift )
+            
+        return self.reactive_approach_result_dict["success"]
+
+    def compliant_close(self, grasp_posture = None):
         """
         Close compliantly. We're not using the grasps from the database here.
 
@@ -204,11 +231,15 @@ class ReactiveGrasper(object):
         self.broadcast_phase(ManipulationPhase.CLOSING)
         use_slip_controller_to_close = self.using_slip_detection
 
+        if grasp_posture == None:
+            rospy.logerr("No grasp posture given, aborting")
+            return
+
         #TODO: good compliant close - someone from HANDLE?
         #   Counter-move the arm to keep the touching fingers in-place while closing? 
         #Here we're only sending dummy targets to the hand.
-        joint_names = ["FFJ0", "FFJ3", "MFJ0", "MFJ3", "THJ4", "THJ5"]
-        joint_targets = [30,80,30,80,70,50]
+        joint_names = grasp_posture.name
+        joint_targets = grasp_posture.position
         sendupdate_msg = []
         
         for (joint_name, joint_target) in zip(joint_names, joint_targets):
@@ -221,11 +252,7 @@ class ReactiveGrasper(object):
         Check if we have a good grasp on the object.
         """
         rospy.logerr("TODO: really check if we have a good grasp")
-        if self.is_first_grasp < 5: 
-            self.is_first_grasp += 1
-            time.sleep(0.4)
-            return False
-        self.is_first_grasp = 0
+
         return True
 
     def compute_approach_dir(self, approach_pose, grasp_pose):
@@ -285,13 +312,12 @@ class ReactiveGrasper(object):
       
         return pose_stamped
 
-    def open_and_reset_fingertips(self, reset = 0):
+    def open_and_reset_fingertips(self, pregrasp_posture, reset = 0):
         """
         Open the hand
         """
-        rospy.logerr("TODO: Open the hand properly here.")
-        joint_names = ["FFJ0", "FFJ3", "MFJ0", "MFJ3", "THJ4", "THJ5"]
-        joint_targets = [0,0,0,0,0,0]
+        joint_names = pregrasp_posture.name
+        joint_targets = pregrasp_posture.position
         sendupdate_msg = []
         
         for (joint_name, joint_target) in zip(joint_names, joint_targets):

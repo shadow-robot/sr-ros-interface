@@ -148,22 +148,21 @@ class ReactiveGraspActionServer(object):
         rospy.loginfo("got reactive grasp request")
         try:
             self.rg_state = "rg"
-            (trajectory, object_name, table_name, forward_step) = self.init_reactive_grasp(goal)
+            
+            (trajectory, object_name, table_name, forward_step, pregrasp_posture, grasp_posture) = self.init_reactive_grasp(goal)
 
-
-            print "REACTIVE GRASP CB: approach_pose = ", goal.final_grasp_pose
             #perform the reactive grasp
             #self.cm.switch_to_cartesian_mode()
             result = 0
-            #result = self.rg.reactive_grasp(None, goal.final_grasp_pose, trajectory, 
-            #                                self.side_step, self.back_step, 
-            #                                self.approach_num_tries, self.goal_pos_thres,
-            #                                self.grasp_num_tries, forward_step, 
-            #                                object_name, table_name,
-            #                                self.grasp_adjust_x_step, self.grasp_adjust_z_step, self.grasp_adjust_num_tries)
-            #self.rg.check_preempt()
+            result = self.rg.reactive_grasp(None, goal.final_grasp_pose, trajectory, pregrasp_posture, grasp_posture,
+                                            self.side_step, self.back_step, 
+                                            self.approach_num_tries, self.goal_pos_thres,
+                                            self.grasp_num_tries, forward_step, 
+                                            object_name, table_name,
+                                            self.grasp_adjust_x_step, self.grasp_adjust_z_step, self.grasp_adjust_num_tries)
+            self.rg.check_preempt()
 
-            #rospy.loginfo("switching back to joint controllers")
+            #rospy.loginfo("swicthing back to joint controllers")
             #self.cm.switch_to_joint_mode()
             self.rg_state = "off"
 
@@ -178,7 +177,7 @@ class ReactiveGraspActionServer(object):
 
         except Preempted:
             rospy.loginfo("reactive grasp preempted, returning")
-            self.rg.broadcast_phase(ManipulationPhase.ABORTED, send_feedback = 0)
+            self.rg.broadcast_phase(ManipulationPhase.ABORDOED, send_feedback = 0)
             self._grasp_result.manipulation_result.value = ManipulationResult.FAILED       
             self._as.set_preempted(self._grasp_result)
 
@@ -209,7 +208,7 @@ class ReactiveGraspActionServer(object):
         else:
             forward_step = self.forward_step
 
-        return (trajectory, object_name, table_name, forward_step)
+        return (trajectory, object_name, table_name, forward_step, goal.pre_grasp_posture, goal.grasp_posture)
 
 
 
@@ -221,16 +220,21 @@ class ReactiveGraspActionServer(object):
         try:
             self.rg_state = "approach"
             
+            rospy.logerr("approaching")
             self.rg.reactive_approach(goal)
+
+            rospy.logerr("Approach finished")
 
             self.rg_state = "off"
             #self.rg.check_preempt()
 
             if result == 0:
+                rospy.logerr("Approach suceeded")
                 self.rg.broadcast_phase(ManipulationPhase.SUCCEEDED, send_feedback = 0)
                 self._grasp_result.manipulation_result.value = ManipulationResult.SUCCESS
                 self._approach_as.set_succeeded(self._grasp_result)
             else:
+                rospy.logerr("Approach failed")
                 self.rg.broadcast_phase(ManipulationPhase.FAILED, send_feedback = 0)
                 self._grasp_result.manipulation_result.value = ManipulationResult.FAILED
                 self._approach_as.set_aborted(self._grasp_result)
@@ -254,6 +258,8 @@ class ReactiveGraspActionServer(object):
             rospy.loginfo("got reactive lift request")
             
             rospy.logerr("NOT IMPLEMENTED YET")
+
+            success = self.rg.reactive_lift(goal)
 
             self.rg_state = "off"
 

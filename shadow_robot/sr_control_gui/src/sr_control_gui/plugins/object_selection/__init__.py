@@ -86,7 +86,6 @@ class ObjectChooser(QtGui.QWidget):
                                           color=[0, 0, 1], opaque=0.25, duration=60)
         
         # call the pickup service
-        print "GRASPABLE_OBJECT: ", self.object.graspable_object_name
         res = self.pickup(graspable_object, self.object.graspable_object_name, object_name)
             
         if res == 0: #correctly picked up
@@ -130,8 +129,8 @@ class ObjectChooser(QtGui.QWidget):
         pickup_goal.lift.desired_distance = 0.25;
         pickup_goal.lift.min_distance = 0.2;
         #do not use tactile-based grasping or tactile-based lift
-        pickup_goal.use_reactive_lift = False;
-        pickup_goal.use_reactive_execution = False;
+        pickup_goal.use_reactive_lift = True;
+        pickup_goal.use_reactive_execution = True;
         
         
         pickup_client = actionlib.SimpleActionClient('/object_manipulator/object_manipulator_pickup', PickupAction)
