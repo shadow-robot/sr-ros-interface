@@ -169,6 +169,8 @@ class ReactiveGrasper(object):
         #check the position of the palm compared to the position of the object
         #adjust if necessary
 
+        current_sleep_time = rospy.Duration(0.0)
+        last_time = rospy.Duration(0.0)
         #follow the joint_path if one is given
         if joint_path != None:
             self.check_preempt()
@@ -184,7 +186,9 @@ class ReactiveGrasper(object):
                 self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
                 self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
             
-                rospy.sleep( trajectory_step.time_from_start )
+                current_sleep_time = trajectory_step.time_from_start - last_time
+                rospy.sleep( current_sleep_time )
+                last_time = trajectory_step.time_from_start
         else:
             #if no joint_path is given, go to the current_goal_pose
             self.command_cartesian( current_goal_pose )
@@ -198,6 +202,9 @@ class ReactiveGrasper(object):
         """
         #follow the joint_path if one is given
         joint_path = goal.trajectory
+        last_time = rospy.Duration(0.0)
+        current_sleep_time = rospy.Duration(0.0)
+        
         if joint_path != None:
             self.check_preempt()
             joint_names = joint_path.joint_names
@@ -211,14 +218,51 @@ class ReactiveGrasper(object):
                 
                 self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
                 self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
-            
-                rospy.sleep( trajectory_step.time_from_start )
+                
+                current_sleep_time = trajectory_step.time_from_start - last_time
+                rospy.sleep( current_sleep_time )
+                last_time = trajectory_step.time_from_start
+
         else:
             #if no joint_path is given, go to the current_goal_pose
             rospy.logerr("TODO: Implement this. Get current pose, add the lift and set this as the command_cartesian target.")
             self.command_cartesian( goal.lift )
             
         return self.reactive_approach_result_dict["success"]
+
+    def reactive_place(self, goal):
+        """
+        Lifts the object while monitoring for contacts.
+        """
+        #follow the joint_path if one is given
+        joint_path = goal.trajectory
+        last_time = rospy.Duration(0.0)
+        current_sleep_time = rospy.Duration(0.0)
+        
+        if joint_path != None:
+            self.check_preempt()
+            joint_names = joint_path.joint_names
+
+            for trajectory_step in joint_path.points:
+                sendupdate_msg = []
+        
+                for (joint_name, joint_target) in zip(joint_names, trajectory_step.positions):
+                    # convert targets to degrees
+                    sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target * 57.325))
+                
+                self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+                self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+                
+                current_sleep_time = trajectory_step.time_from_start - last_time
+                rospy.sleep( current_sleep_time )
+                last_time = trajectory_step.time_from_start
+
+        else:
+            #if no joint_path is given, try to go to the final_place_pose directly
+            self.command_cartesian( goal.final_place_pose )
+            
+        return self.reactive_approach_result_dict["success"]
+
 
     def compliant_close(self, grasp_posture = None):
         """

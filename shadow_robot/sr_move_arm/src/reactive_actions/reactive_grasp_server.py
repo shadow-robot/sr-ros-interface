@@ -257,17 +257,18 @@ class ReactiveGraspActionServer(object):
         try:
             rospy.loginfo("got reactive lift request")
             
-            rospy.logerr("NOT IMPLEMENTED YET")
-
             success = self.rg.reactive_lift(goal)
 
             self.rg_state = "off"
 
-            if success:
+            if success == 0:
+                rospy.logerr("Reactive lift request ended: SUCCESS" )
+
                 self.rg.broadcast_phase(ManipulationPhase.SUCCEEDED, send_feedback = 0)
                 self._lift_result.manipulation_result.value = ManipulationResult.SUCCESS
                 self._lift_as.set_succeeded(self._lift_result)
             else:
+                rospy.logerr("Reactive lift request ended: FAILED" )
                 self.rg.broadcast_phase(ManipulationPhase.FAILED, send_feedback = 0)
                 self._lift_result.manipulation_result.value = ManipulationResult.FAILED
                 self._lift_as.set_aborted(self._lift_result)
@@ -293,13 +294,13 @@ class ReactiveGraspActionServer(object):
         try:
             rospy.loginfo("got reactive place request")
 
-            rospy.logerr("NOT IMPLEMENTED YET")
+            success = self.rg.reactive_place(goal)
 
             #place and open when the object hits the table
-            self.rg_state = "place"
+            result = self.rg_state = "place"
 
             self._place_result.manipulation_result.value = ManipulationResult.SUCCESS
-            if result == 1:
+            if result == 0:
                 self.rg.broadcast_phase(ManipulationPhase.SUCCEEDED, send_feedback = 0)
             self._place_as.set_succeeded(self._place_result)
 
