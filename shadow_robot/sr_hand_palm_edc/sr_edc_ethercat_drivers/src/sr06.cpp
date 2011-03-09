@@ -102,7 +102,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 
 	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(2);
 
-	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);;
+	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);
 	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE, EC_QUEUED);
 
 	(*pd)[0].ChannelEnable = true;
@@ -146,13 +146,18 @@ stringstream name;
 
 void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 {
+	static unsigned char j = 0;
 //	ROS_INFO("packCommand !");
 	SR0X::packCommand(buffer, halt, reset);
 	ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
 	signed short int motor[20] = {0};
 	for (int i = 0 ; i < 20 ; ++i)
 		motor[i] = 0x4242;
-	command->EDC_command = EDC_COMMAND_SENSOR_DATA;
+	if ( ++j % 2)
+		command->EDC_command = EDC_COMMAND_SENSOR_DATA;
+	else
+		command->EDC_command = EDC_COMMAND_SENSOR_CHANNEL_NUMBERS;
+	command->padding = 0x42;
 	memcpy(command->motor_torque_demand, motor, sizeof(command->motor_torque_demand));
 }
 
@@ -162,6 +167,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   static unsigned int i = 0;
   static unsigned int errors = 0;
   static unsigned int num_rxed_packets = 0;
+  unsigned int j;
 /*uint32_t event_req;
 uint32_t event_mask;
 uint8_t spi_config;
@@ -178,9 +184,15 @@ ROS_ERROR("spi_config == %02X", spi_config);
   ++num_rxed_packets;
   if (tbuffer->EDC_command == EDC_COMMAND_INVALID)
   {
-    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets\n", ++errors, num_rxed_packets);
+//    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets\n", ++errors, num_rxed_packets);
   }
-
+/*
+  for (j = 0 ; j < 20 ; ++j)
+  {
+  	ROS_ERROR("Motor[%d] : torque == %hd ; SG_L == %hu ; SG_R == %hu ; temp == %hd ; current == %hd ; flags == %hu\n", j, tbuffer->motor[j].torque, tbuffer->motor[j].SG_L, tbuffer->motor[j].SG_R, tbuffer->motor[j].temperature, tbuffer->motor[j].current, tbuffer->motor[j].flags);
+  }
+ */
+  ROS_ERROR("Motor[8] : torque == %hd ; SG_L == %hu ; SG_R == %hu ; temp == %hd ; current == %hd ; flags == %hu\n", tbuffer->motor[8].torque, tbuffer->motor[8].SG_L, tbuffer->motor[8].SG_R, tbuffer->motor[8].temperature, tbuffer->motor[8].current, tbuffer->motor[8].flags);
   if (i == max_iter_const) { // 10 == 100 Hz
     i = 0;
     return true;
