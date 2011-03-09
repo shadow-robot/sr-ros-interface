@@ -19,7 +19,9 @@ namespace shadowrobot
   JointTrajectoryActionController::JointTrajectoryActionController() :
     nh_tilde("~")
   {
-    action_server = boost::shared_ptr<JTAS> (new JTAS("/r_arm_controller/joint_trajectory_action", boost::bind(&JointTrajectoryActionController::execute_trajectory, this, _1), false));
+    action_server = boost::shared_ptr<JTAS> (new JTAS("/r_arm_controller/joint_trajectory_action", 
+                                                      boost::bind(&JointTrajectoryActionController::execute_trajectory, this, _1), 
+                                                      false ));
 
     sr_arm_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/sr_arm/sendupdate", 2);
     sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
@@ -34,8 +36,7 @@ namespace shadowrobot
 
   void JointTrajectoryActionController::execute_trajectory(const pr2_controllers_msgs::JointTrajectoryGoalConstPtr& goal)
   {
-    ROS_ERROR("TODO: Implement me!");
-   
+    bool success = true;
 
     sr_robot_msgs::sendupdate sendupdate_msg_traj;
     std::vector<sr_robot_msgs::joint> joint_vector_traj;
@@ -64,6 +65,16 @@ namespace shadowrobot
     {
       trajectory_step = trajectory_points[index_step];
 
+      //check if preempted
+      if (action_server->isPreemptRequested() || !ros::ok())
+      {
+        ROS_INFO("Joint Trajectory Action Preempted");
+        // set the action state to preempted
+        action_server->setPreempted();
+        success = false;
+        break;
+      }
+
       //update the targets
       for(unsigned int index_pos = 0; index_pos < (unsigned int)sendupdate_msg_traj.sendupdate_length; ++index_pos)
       {
@@ -83,7 +94,10 @@ namespace shadowrobot
     }
     
     pr2_controllers_msgs::JointTrajectoryResult joint_trajectory_result;
-    action_server->setSucceeded(joint_trajectory_result);
+    if(success)
+      action_server->setSucceeded(joint_trajectory_result);
+    else
+      action_server->setAborted(joint_trajectory_result);
   }
 }
 
