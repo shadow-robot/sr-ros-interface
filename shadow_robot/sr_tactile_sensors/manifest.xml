@@ -1,0 +1,16 @@
+<package>
+  <description brief="sr_tactile_sensors">
+
+     sr_tactile_sensors
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_tactile_sensors</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+
+</package>
+
+
