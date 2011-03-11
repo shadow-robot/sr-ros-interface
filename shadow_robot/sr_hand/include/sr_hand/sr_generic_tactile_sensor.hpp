@@ -35,19 +35,17 @@ namespace shadowrobot
 
   protected:
     /** 
-     * Gets the data from the sensor or generate
-     * a value if it's a simulated sensor.
+     * Needs to be implemented in the inheriting class
      * 
      * @return the pressure value
      */
-    virtual double get_touch_data();
+    virtual double get_touch_data() = 0;
     /** 
-     * Gets the data from the sensor or generate
-     * a value if it's a simulated sensor.
+     * Needs to be implemented in the inheriting class
      * 
      * @return the temperature value
      */
-    virtual double get_temp_data();
+    virtual double get_temp_data() = 0;
 
   private:
     ros::Publisher touch_pub, temp_pub;
@@ -72,8 +70,6 @@ namespace shadowrobot
     std::vector<SrGenericTactileSensor> tactile_sensors;
     ros::NodeHandle n_tilde;
     ros::Rate publish_rate;
-
-    virtual void init_tactile_sensors();
   };
 }
 

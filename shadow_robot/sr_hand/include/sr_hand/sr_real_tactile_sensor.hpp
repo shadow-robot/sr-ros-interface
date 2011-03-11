@@ -55,9 +55,6 @@ namespace shadowrobot
   public:
     SrRealTactileSensorManager();
     ~SrRealTactileSensorManager();
-
-  protected:
-    virtual void init_tactile_sensors();
   };
 }
 
