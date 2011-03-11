@@ -1,7 +1,7 @@
 <package>
   <description brief="sr_tactile_sensors">
 
-     sr_tactile_sensors
+    An interface to the tactile sensors used in the Shadow Dextrous Hand. Also Contains a virtual set of sensors.
 
   </description>
   <author>Ugo Cupcic</author>

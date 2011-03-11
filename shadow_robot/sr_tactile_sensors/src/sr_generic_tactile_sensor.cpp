@@ -54,6 +54,85 @@ namespace shadowrobot
   SrTactileSensorManager::~SrTactileSensorManager()
   {}
 
+  std::vector<std::vector<std::string> >  SrTactileSensorManager::get_all_names()
+  {
+    std::vector<std::vector<std::string> > all_names_vector;
+    std::vector<std::string> names, sensor_touch_names, sensor_temp_names;
+
+    std::string tmp;
+    XmlRpc::XmlRpcValue my_list;
+    int list_size;
+    bool bad_params = false;
+
+    n_tilde.getParam("display_names", my_list);
+    if(my_list.getType() != XmlRpc::XmlRpcValue::TypeArray)
+      bad_params = true;
+    list_size = my_list.size();
+    for (int32_t i = 0; i < list_size; ++i)
+    {
+      if(my_list[i].getType() != XmlRpc::XmlRpcValue::TypeString)
+        bad_params = true;
+      names.push_back( static_cast<std::string>(my_list[i]) );
+    }
+
+    n_tilde.getParam("sensor_touch_names", my_list);
+    if(my_list.getType() != XmlRpc::XmlRpcValue::TypeArray)
+      bad_params = true;
+    if(my_list.size() != list_size)
+      bad_params = true;
+    list_size = my_list.size();
+    for (int32_t i = 0; i < list_size; ++i)
+    {
+      if(my_list[i].getType() != XmlRpc::XmlRpcValue::TypeString)
+        bad_params = true;
+      sensor_touch_names.push_back( static_cast<std::string>(my_list[i]) );
+    }
+
+    n_tilde.getParam("sensor_temp_names", my_list);
+    if(my_list.getType() != XmlRpc::XmlRpcValue::TypeArray)
+      bad_params = true;
+    if(my_list.size() != list_size)
+      bad_params = true;
+    for (int32_t i = 0; i < list_size; ++i)
+    {
+      if(my_list[i].getType() != XmlRpc::XmlRpcValue::TypeString)
+        bad_params = true;
+      sensor_temp_names.push_back( static_cast<std::string>(my_list[i]) );
+    }
+
+    if(bad_params)
+    {
+      ROS_ERROR("Error while reading the parameter for the tactile sensors; using standard parameters");
+      names.clear();
+      sensor_touch_names.clear();
+      sensor_temp_names.clear();
+
+      names.push_back("ff");
+      names.push_back("mf");
+      names.push_back("rf");
+      names.push_back("lf");
+      names.push_back("th");
+
+      sensor_touch_names.push_back("FF_Touch");
+      sensor_touch_names.push_back("MF_Touch");
+      sensor_touch_names.push_back("RF_Touch");
+      sensor_touch_names.push_back("LF_Touch");
+      sensor_touch_names.push_back("TH_Touch");
+
+      sensor_temp_names.push_back("FF_Touch_Temp");
+      sensor_temp_names.push_back("MF_Touch_Temp");
+      sensor_temp_names.push_back("RF_Touch_Temp");
+      sensor_temp_names.push_back("LF_Touch_Temp");
+      sensor_temp_names.push_back("TH_Touch_Temp");
+    }
+
+    all_names_vector.push_back(names);
+    all_names_vector.push_back(sensor_touch_names);
+    all_names_vector.push_back(sensor_temp_names);
+
+    return all_names_vector;
+  }
+
   void SrTactileSensorManager::publish_all()
   {
     for(unsigned int i=0; i < tactile_sensors.size(); ++i)

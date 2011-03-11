@@ -71,6 +71,20 @@ namespace shadowrobot
     std::vector<boost::shared_ptr<SrGenericTactileSensor> > tactile_sensors;
     ros::NodeHandle n_tilde;
     ros::Rate publish_rate;
+
+    /** 
+     * Get all the necessary names for the tactile sensors:
+     * the display names, the touch sensor name (for the robot),
+     * the temperature sensor name (for the robot).
+     *
+     * Those names are read from the parameter server. They are stored
+     * in params/sensor_names.yaml
+     * 
+     * @return a vector containing 3 vectors for the display_names,
+     *         the sensor_touch_names and the sensor_temp_names ; in
+     *         this order.
+     */
+    std::vector<std::vector<std::string> > get_all_names();
   };
 }
 

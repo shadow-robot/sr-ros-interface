@@ -60,32 +60,15 @@ namespace shadowrobot
   SrRealTactileSensorManager::SrRealTactileSensorManager() :
     SrTactileSensorManager()
   {
-    std::vector<std::string> names, sensor_touch_names, sensor_temp_names;
-    names.push_back("ff");
-    names.push_back("mf");
-    names.push_back("rf");
-    names.push_back("lf");
-    names.push_back("th");
-
-    sensor_touch_names.push_back("FF_Touch");
-    sensor_touch_names.push_back("MF_Touch");
-    sensor_touch_names.push_back("RF_Touch");
-    sensor_touch_names.push_back("LF_Touch");
-    sensor_touch_names.push_back("TH_Touch");
-
-    sensor_temp_names.push_back("FF_Touch_Temp");
-    sensor_temp_names.push_back("MF_Touch_Temp");
-    sensor_temp_names.push_back("RF_Touch_Temp");
-    sensor_temp_names.push_back("LF_Touch_Temp");
-    sensor_temp_names.push_back("TH_Touch_Temp");
+    std::vector<std::vector<std::string> > all_names = get_all_names();
 
     for( unsigned int i=0; i<5; ++i)
     {
       tactile_sensors.push_back(
         boost::shared_ptr<SrRealTactileSensor>(
-          new SrRealTactileSensor(names[i],
-                                  sensor_touch_names[i],
-                                  sensor_temp_names[i]) ));
+          new SrRealTactileSensor(all_names[0][i],
+                                  all_names[1][i],
+                                  all_names[2][i]) ));
     }
   }
 
