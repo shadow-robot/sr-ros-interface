@@ -9,7 +9,7 @@
  * 
  */
 
-#include "sr_hand/sr_generic_tactile_sensor.hpp"
+#include "sr_tactile_sensors/sr_generic_tactile_sensor.hpp"
 
 namespace shadowrobot
 {

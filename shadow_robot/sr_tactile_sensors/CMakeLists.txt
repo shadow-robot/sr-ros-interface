@@ -21,10 +21,24 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+#############################
+#  VIRTUAL TACTILE SENSORS  #
+#############################
+rosbuild_add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+
+
+#############################
+#   REAL TACTILE SENSORS    #
+#############################
+## Uncomment the following lines if you want access to the real tactile sensors
+#include_directories(/usr/realtime/include/)
+#LINK_LIBRARIES(pthread)
+#add_library(robot STATIC IMPORTED)
+#set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
+#rosbuild_add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+#target_link_libraries(sr_tactile_real robot)
+
+###############
+#   EXAMPLES  #
+###############
+rosbuild_add_executable(examples/tactile examples/tactile.cpp)

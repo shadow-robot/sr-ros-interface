@@ -1,48 +1,63 @@
 /**
- * @file   sr_virtual_tactile_sensor.cpp
+ * @file   sr_real_tactile_sensor.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
  * 
- * @brief  This is the virtual implementation of the SrGenericTactileSensor. It
- * computes virtual data.
+ * @brief  This is the implementation of the SrGenericTactileSensor. It
+ * fetches data from the real sensors.
  * 
  * 
  */
 
-#include "sr_hand/sr_virtual_tactile_sensor.hpp"
+#include "sr_tactile_sensors/sr_real_tactile_sensor.hpp"
 
 namespace shadowrobot
 {
 /**********************************
  *         TACTILE SENSOR         *
  **********************************/
-  SrVirtualTactileSensor::SrVirtualTactileSensor(std::string name,
-                                                 std::string touch_name,
-                                                 std::string temp_name) :
+  SrRealTactileSensor::SrRealTactileSensor(std::string name,
+                                           std::string touch_name,
+                                           std::string temp_name) :
     SrGenericTactileSensor(name, touch_name, temp_name)
   {
+    res_temp = robot_name_to_sensor(temp_name.c_str(), &sensor_touch);
+    res_touch = robot_name_to_sensor(touch_name.c_str(), &sensor_touch);
+
+    if(res_temp)
+    {
+      ROS_ERROR("Can't open sensor %s", temp_name.c_str());
+    }
+    if(res_touch)
+    {
+      ROS_ERROR("Can't open sensor %s", touch_name.c_str());
+    }
   }
 
-  SrVirtualTactileSensor::~SrVirtualTactileSensor()
+  SrRealTactileSensor::~SrRealTactileSensor()
   {}
 
-  double SrVirtualTactileSensor::get_touch_data()
+  double SrRealTactileSensor::get_temp_data()
   {
-    ROS_ERROR("touch");
-    return 0.0;
+    if(res_temp)
+      return 0.0;
+
+    return robot_read_sensor(&sensor_temp);
   }
 
-  double SrVirtualTactileSensor::get_temp_data()
+  double SrRealTactileSensor::get_touch_data()
   {
-    ROS_ERROR("Temp");
-    return 0.0;
+    if(res_touch)
+      return 0.0;
+
+    return robot_read_sensor(&sensor_touch);
   }
 
 
 /**********************************
  *     TACTILE SENSOR MANAGER     *
  **********************************/
-  SrVirtualTactileSensorManager::SrVirtualTactileSensorManager() :
+  SrRealTactileSensorManager::SrRealTactileSensorManager() :
     SrTactileSensorManager()
   {
     std::vector<std::string> names, sensor_touch_names, sensor_temp_names;
@@ -66,19 +81,21 @@ namespace shadowrobot
 
     for( unsigned int i=0; i<5; ++i)
     {
-      tactile_sensors.push_back( SrVirtualTactileSensor(names[i],
-                                                        sensor_touch_names[i],
-                                                        sensor_temp_names[i]) );
+      tactile_sensors.push_back( SrRealTactileSensor(names[i],
+                                                     sensor_touch_names[i],
+                                                     sensor_temp_names[i]) );
     }
   }
 
-  SrVirtualTactileSensorManager::~SrVirtualTactileSensorManager()
+  SrRealTactileSensorManager::~SrRealTactileSensorManager()
   {}
 }
 
 
 /** 
- * Initializes a set of virtual tactile sensors and publish.
+ * The main function initializes the links with the robot, initializes
+ * this ROS publisher regularly publishes data
+ * regarding the finger tips tactile sensors
  * 
  * @param argc 
  * @param argv 
@@ -90,7 +107,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "sr_tactile_sensor");
   ros::NodeHandle n;
 
-  shadowrobot::SrVirtualTactileSensorManager tact_sens_mgr;
+  shadowrobot::SrRealTactileSensorManager tact_sens_mgr;
 
   while( ros::ok() )
     tact_sens_mgr.publish_all();
