@@ -28,13 +28,11 @@ namespace shadowrobot
 
   double SrVirtualTactileSensor::get_touch_data()
   {
-    ROS_ERROR("touch");
     return 0.0;
   }
 
   double SrVirtualTactileSensor::get_temp_data()
   {
-    ROS_ERROR("Temp");
     return 0.0;
   }
 
@@ -66,9 +64,11 @@ namespace shadowrobot
 
     for( unsigned int i=0; i<5; ++i)
     {
-      tactile_sensors.push_back( SrVirtualTactileSensor(names[i],
-                                                        sensor_touch_names[i],
-                                                        sensor_temp_names[i]) );
+      tactile_sensors.push_back(
+        boost::shared_ptr<SrVirtualTactileSensor>(
+          new SrVirtualTactileSensor(names[i],
+                                     sensor_touch_names[i],
+                                     sensor_temp_names[i]) ));
     }
   }
 

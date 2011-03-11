@@ -16,6 +16,7 @@
 
 #include <ros/ros.h>
 
+#include <boost/smart_ptr.hpp>
 #include <std_msgs/Float64.h>
 
 namespace shadowrobot
@@ -67,7 +68,7 @@ namespace shadowrobot
     void publish_all();
 
   protected:
-    std::vector<SrGenericTactileSensor> tactile_sensors;
+    std::vector<boost::shared_ptr<SrGenericTactileSensor> > tactile_sensors;
     ros::NodeHandle n_tilde;
     ros::Rate publish_rate;
   };

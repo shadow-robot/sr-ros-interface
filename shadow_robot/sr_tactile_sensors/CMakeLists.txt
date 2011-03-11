@@ -41,4 +41,4 @@ rosbuild_add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src
 ###############
 #   EXAMPLES  #
 ###############
-rosbuild_add_executable(examples/tactile examples/tactile.cpp)
+rosbuild_add_executable(tactile_example examples/tactile.cpp)

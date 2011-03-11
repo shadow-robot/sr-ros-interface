@@ -35,13 +35,13 @@ namespace shadowrobot
     /**
      * Reads the value from the sensor
      *
-     * @return the pressure value
+     * @return the pressure value ; -1000 if sensor not found
      */
     virtual double get_touch_data();
     /**
      * Reads the value from the sensor
      *
-     * @return the pressure value
+     * @return the pressure value ; -1000 if sensor not found
      */
     virtual double get_temp_data();
 

@@ -40,7 +40,7 @@ namespace shadowrobot
   double SrRealTactileSensor::get_temp_data()
   {
     if(res_temp)
-      return 0.0;
+      return -1000.0;
 
     return robot_read_sensor(&sensor_temp);
   }
@@ -48,7 +48,7 @@ namespace shadowrobot
   double SrRealTactileSensor::get_touch_data()
   {
     if(res_touch)
-      return 0.0;
+      return -1000.0;
 
     return robot_read_sensor(&sensor_touch);
   }
@@ -81,9 +81,11 @@ namespace shadowrobot
 
     for( unsigned int i=0; i<5; ++i)
     {
-      tactile_sensors.push_back( SrRealTactileSensor(names[i],
-                                                     sensor_touch_names[i],
-                                                     sensor_temp_names[i]) );
+      tactile_sensors.push_back(
+        boost::shared_ptr<SrRealTactileSensor>(
+          new SrRealTactileSensor(names[i],
+                                  sensor_touch_names[i],
+                                  sensor_temp_names[i]) ));
     }
   }
 

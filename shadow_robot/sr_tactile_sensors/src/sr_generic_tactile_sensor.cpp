@@ -57,7 +57,7 @@ namespace shadowrobot
   void SrTactileSensorManager::publish_all()
   {
     for(unsigned int i=0; i < tactile_sensors.size(); ++i)
-      tactile_sensors[i].publish_current_values();
+      tactile_sensors[i]->publish_current_values();
 
     publish_rate.sleep();
     ros::spinOnce();
