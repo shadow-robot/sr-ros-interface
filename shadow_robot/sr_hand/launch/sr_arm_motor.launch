@@ -2,13 +2,13 @@
 	<include file="$(find sr_object_manipulation_launch)/machines/robot.machine"/>
 	<!-- send parameters for collision checking; this includes parameters for the self filter -->
 	<rosparam command="load" ns="robot_description_collision" file="$(find sr_object_manipulation_launch)/config/collision_checks_both_arms.yaml" />
-	
+
 	<!-- send parameters for multidof -->
 	<rosparam command="load" ns="robot_description_planning" file="$(find sr_object_manipulation_launch)/config/multi_dof_joints.yaml" />
-	
+
 	<!-- send parameters needed for motion planning -->
 	<rosparam command="load" ns="robot_description_planning" file="$(find sr_object_manipulation_launch)/config/planning_groups.yaml" />
-	
+
 	<param name="arm_description" textfile="$(find sr_hand)/model/robots/sr_arm_motor.urdf"/>
 	<param name="hand_description" textfile="$(find sr_hand)/model/robots/shadowhand_motor.urdf"/>
 	<param name="robot_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
@@ -16,13 +16,13 @@
 	<!--
 	    Kinematics
 	-->
-	<node pkg="arm_kinematics_constraint_aware" type="arm_kinematics_constraint_aware" name="sr_right_arm_kinematics" output="screen">    
+	<node pkg="arm_kinematics_constraint_aware" type="arm_kinematics_constraint_aware" name="sr_right_arm_kinematics" output="screen">
 
 	  <!-- Collision environment parameters -->
 	  <remap from="robot_description" to="/robot_description" />
 	  <remap from="collision_map" to="collision_map_occ" />
 	  <remap from="collision_map_update" to="collision_map_occ_update" />
-	  
+
 	  <param name="pointcloud_padd" type="double" value="0.0" />
 	  <param name="object_padd" type="double" value="0.0" />
 
@@ -34,9 +34,9 @@
 	  <param name="joint_states_safety_timeout" type="double" value="1.0" />
 	  <param name="tf_safety_timeout" type="double" value="1.0" />
 	  <param name="bounding_planes" type="string" value="0 0 1 -0.01" />
- 
-	  <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />		
-	  <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/kdl_sr_arm_kinematics.yaml" />		
+
+	  <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />
+	  <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/kdl_sr_arm_kinematics.yaml" />
 	</node>
 <!--
 	<node pkg="arm_kinematics" name="ff_kinematics" type="arm_kinematics">
@@ -116,7 +116,7 @@
 
 
 	<!--
-           shadowhand 
+           shadowhand
                          -->
 	<node pkg="sr_hand" name="shadowhand"
 	type="shadowhand_virtual" machine="robot">
@@ -174,19 +174,19 @@
 	<node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target"
 		args="0 0 0 -1.571 3.141 -1.571 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100"
 		machine="robot"/>
-	
+
 	<!-- merge the arm / hand joint_states topics to publish onto /joint_states -->
 	<node pkg="sr_utilities" type="joint_states_merger.py" name="joint_states_merger"/>
-	
+
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="robot_state_publisher_full_pos"
 		machine="robot">
 		<param name="publish_frequency" type="double" value="10.0" />
 	</node>
-	
+
 	<node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm_np"
 		args="0.0 0.0 0.0 0.0 0 0 /base_link /shadowarm_base 100" machine="robot" />
-	
+
 	<!--
 	    Diagnostic Aggregator
                           -->
@@ -207,35 +207,38 @@
         <node pkg="move_arm" type="move_arm_simple_action" name="move_arm_simple_action">
 	  <remap from="robot_description" to="robot_description" />
 	  <remap from="joint_state" to="joint_states" />
-	  <remap from="arm_ik" to="/sr_right_arm_kinematics/get_constraint_aware_ik" />	
-	  <remap from="arm_fk" to="/sr_right_arm_kinematics/get_fk" />	
+	  <remap from="arm_ik" to="/sr_right_arm_kinematics/get_constraint_aware_ik" />
+	  <remap from="arm_fk" to="/sr_right_arm_kinematics/get_fk" />
 
 	  <remap from="filter_trajectory" to="/trajectory_filter/filter_trajectory_with_constraints" />
-	  
-	  <remap from="get_trajectory_validity" to="environment_server/get_trajectory_validity" />	
-	  <remap from="get_environment_safety" to="environment_server/get_environment_safety" />	
-	  <remap from="get_execution_safety" to="environment_server/get_execution_safety" />	
-	  <remap from="get_group_info" to="environment_server/get_group_info" />	
-	  <remap from="get_robot_state" to="environment_server/get_robot_state" />	
-	  <remap from="get_state_validity" to="environment_server/get_state_validity" />	
-	  	  
+
+	  <remap from="get_trajectory_validity" to="environment_server/get_trajectory_validity" />
+	  <remap from="get_environment_safety" to="environment_server/get_environment_safety" />
+	  <remap from="get_execution_safety" to="environment_server/get_execution_safety" />
+	  <remap from="get_group_info" to="environment_server/get_group_info" />
+	  <remap from="get_robot_state" to="environment_server/get_robot_state" />
+	  <remap from="get_state_validity" to="environment_server/get_state_validity" />
+
 	  <param name="group" type="string" value="right_arm" />
 	  <param name="ik_allowed_time" type="double" value="2.0" />
 	  <param name="trajectory_filter_allowed_time" type="double" value="2.0" />
 	  <param name="group" type="string" value="right_arm" />
 	  <param name="controller_action_name" type="string" value="/r_arm_controller/joint_trajectory_action" />
-	  	  
+
 	  <param name="pause_allowed_time" type="double" value="15.0" />
 	</node>
 
 	<node pkg="sr_move_arm" type="hand_posture_execution" name="hand_posture_execution" machine="robot"/>
 
-	<node name="reactive_grasp_node_right" pkg="sr_move_arm" 
+	<node name="reactive_grasp_node_right" pkg="sr_move_arm"
 	      type="reactive_grasp_server.py" args="r" respawn="false" output="screen">
 	  <param name="use_slip_controller" value="True"/>
 	  <param name="use_slip_detection" value="True"/>
 	</node>
 
+	<node pkg="sr_tactile_sensors" name="sr_tactile_v" type="sr_tactile_virtual">
+	  <rosparam file="$(find sr_tactile_sensors)/params/sensor_names.yaml" command="load"/>
+	</node>
 </launch>
 
 

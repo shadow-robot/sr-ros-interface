@@ -3,7 +3,7 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Wed Jan 26 10:32:10 2011
  *
- * @brief  
+ * @brief  Sends target for the Dextrous hand to go into a given grasp or pregrasp position.
  *
  */
 
@@ -17,7 +17,7 @@ namespace shadowrobot
   {
     action_server = boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> >(new actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction>("/right_arm/hand_posture_execution", boost::bind(&SrHandPostureExecutionSimpleAction::execute, this, _1), false));
 
-    get_status_server = nh.advertiseService("/right_arm/grasp_status", &SrHandPostureExecutionSimpleAction::getStatusCallback, this);    
+    get_status_server = nh.advertiseService("/right_arm/grasp_status", &SrHandPostureExecutionSimpleAction::getStatusCallback, this);
 
     sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
 
@@ -40,14 +40,14 @@ namespace shadowrobot
     {
       response.is_hand_occupied = false;
     }
-    else 
+    else
     {
       response.is_hand_occupied = true;
     }
     return true;
   }
   void SrHandPostureExecutionSimpleAction::execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& goal)
-  {    
+  {
     if(action_server->isPreemptRequested() || !ros::ok())
     {
       ROS_INFO("Change Hand Pose action preempted.");
@@ -57,8 +57,6 @@ namespace shadowrobot
 
 
     std::vector<std::string> joint_names = goal->grasp.pre_grasp_posture.name;
-
-    //TODO: add J1 + J2 and send to J0
 
     joint_vector.clear();
     for(unsigned int i = 0; i < joint_names.size(); ++i)
@@ -71,7 +69,7 @@ namespace shadowrobot
 
     switch (goal->goal)
     {
-    case object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP: 
+    case object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP:
       ROS_DEBUG("GRASP!");
 
       if (goal->grasp.grasp_posture.position.empty())
@@ -93,7 +91,7 @@ namespace shadowrobot
       hand_occupied = true;
 
       break;
-    
+
     case object_manipulation_msgs::GraspHandPostureExecutionGoal::PRE_GRASP:
       ROS_DEBUG("PREGRASP!");
 
@@ -110,10 +108,10 @@ namespace shadowrobot
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
       sendupdate_msg.sendupdate_list = joint_vector;
-      
+
       sr_hand_target_pub.publish(sendupdate_msg);
       ROS_DEBUG("Hand in pregrasp position");
-      
+
       hand_occupied = false;
 
       break;
@@ -127,7 +125,7 @@ namespace shadowrobot
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
       sendupdate_msg.sendupdate_list = joint_vector;
-      
+
       sr_hand_target_pub.publish(sendupdate_msg);
       ROS_DEBUG("Hand opened");
 

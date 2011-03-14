@@ -26,7 +26,7 @@ class ReactiveGrasper(object):
     def __init__(self, which_arm = 'r', slip_detection = False):
         self.using_slip_detection = slip_detection
         self.whicharm = which_arm
-        
+
         #force to use when closing hard
         self.close_force = 100
         if self.using_slip_detection:
@@ -37,8 +37,8 @@ class ReactiveGrasper(object):
 
         #collision name of support surface
         self._table_name = "table"
-        
-        #root and tip name for listening 
+
+        #root and tip name for listening
         #to the current palm pose
         self.tf_listener = tf.TransformListener()
         self.root_name = "base_link"
@@ -53,7 +53,7 @@ class ReactiveGrasper(object):
         #broadcast the current phase of the manipulation
         self._phase_pub = rospy.Publisher('/reactive_manipulation_phase', ManipulationPhase)
 
-        #send targets to the arm / hand        
+        #send targets to the arm / hand
         self.sr_hand_target_pub = rospy.Publisher('/srh/sendupdate', sendupdate)
         self.sr_arm_target_pub = rospy.Publisher('/sr_arm/sendupdate', sendupdate)
         self.move_arm_client = None
@@ -62,7 +62,7 @@ class ReactiveGrasper(object):
             self.move_arm_client = SimpleActionClient( "/move_right_arm", MoveArmAction )
         else:
             self.move_arm_client = SimpleActionClient( "/move_left_arm", MoveArmAction )
-        self.move_arm_client.wait_for_server()        
+        self.move_arm_client.wait_for_server()
 
         #dictionary for ManipulationPhase
         self.manipulation_phase_dict = {}
@@ -71,11 +71,11 @@ class ReactiveGrasper(object):
                 self.manipulation_phase_dict[eval('ManipulationPhase.'+element)] = element
 
         #dictionary of return values for reactive approach
-        self.reactive_approach_result_dict = {"success":0, "within goal threshold":1, "both fingers touching":2, "ran out of tries":3, 
+        self.reactive_approach_result_dict = {"success":0, "within goal threshold":1, "both fingers touching":2, "ran out of tries":3,
                                               "touching table":4, "saw palm contact":5, "grasp infeasible":6}
 
         #dictionary of return values for reactive_grasp
-        self.reactive_grasp_result_dict = {"success":0, "ran out of grasp tries":1, "ran out of approach tries":2, 
+        self.reactive_grasp_result_dict = {"success":0, "ran out of grasp tries":1, "ran out of approach tries":2,
                                            "aborted":3, "grasp infeasible":4}
 
         rospy.logerr("done with ReactiveGrasper init for the %s arm"%self.whicharm)
@@ -86,21 +86,21 @@ class ReactiveGrasper(object):
         """
         rospy.loginfo("broadcasting reactive phase %s"%self.manipulation_phase_dict[phase])
         self._phase_pub.publish(phase)
-    
+
 
     def reactive_grasp(self, approach_pose, grasp_pose, joint_path = None, pregrasp_posture = None, grasp_posture = None, side_step = .015, back_step = .03,
-                       approach_num_tries = 10, goal_pos_thres = 0.01, grasp_num_tries = 2, 
-                       forward_step = 0.03, object_name = "points", table_name = "table", 
+                       approach_num_tries = 10, goal_pos_thres = 0.01, grasp_num_tries = 2,
+                       forward_step = 0.03, object_name = "points", table_name = "table",
                        grasp_adjust_x_step = .02, grasp_adjust_z_step = .015, grasp_adjust_num_tries = 3):
         self._table_name = table_name
 
         self.check_preempt()
-        
+
         #if approach_pose is not specified, use the current pose of the hand
         if approach_pose == None:
             (current_trans,current_rot) = self.tf_listener.lookupTransform(self.root_name, self.tip_name, rospy.Time(0))
             approach_pose = create_pose_stamped(current_trans+current_rot)
-        
+
         self.check_preempt()
 
         #compute (unit) approach direction in base_link frame
@@ -111,8 +111,8 @@ class ReactiveGrasper(object):
         while 1:
             if approach_num_tries:
                 #try the approach, unless the reactive approach is disabled (approach_num_tries is 0)
-                approach_result = self.reactive_approach(approach_dir, current_goal_pose, joint_path, 
-                                                         side_step, back_step, 
+                approach_result = self.reactive_approach(approach_dir, current_goal_pose, joint_path,
+                                                         side_step, back_step,
                                                          approach_num_tries, goal_pos_thres)
                 #quit if the approach ran out of tries (couldn't get around the object)
                 if approach_result == self.reactive_approach_result_dict["ran out of tries"]:
@@ -130,7 +130,7 @@ class ReactiveGrasper(object):
             self.compliant_close(grasp_posture)
 
             self.check_preempt()
-        
+
             #check if the grasp is okay
             if self.check_good_grasp():
                 return self.reactive_grasp_result_dict["success"]
@@ -143,26 +143,26 @@ class ReactiveGrasper(object):
                 current_goal_pose = self.return_rel_pose(move_forward_vect, self.root_name, current_goal_pose)
 
                 joint_path = None
-          
+
                 #print the new goal
                 (goal_pos, goal_rot) = pose_stamped_to_lists(self.tf_listener, current_goal_pose, self.root_name)
                 rospy.loginfo("trying approach again with new goal, pos: "+pplist(goal_pos)+" rot: "+pplist(goal_rot))
 
                 #open the gripper back up
                 self.open_and_reset_fingertips(pregrasp_posture, reset = 1)
-                
+
             else:
                 rospy.loginfo("ran out of grasp tries!")
                 return self.reactive_grasp_result_dict["ran out of grasp tries"]
-    
+
 
     def reactive_approach(self, approach_dir, current_goal_pose, joint_path = None,
-                          side_step = .015, back_step = .03, 
+                          side_step = .015, back_step = .03,
                           num_tries = 10, goal_pos_thres = 0.01):
         """
         Stops and goes back a little in case of a contact.
         """
-        
+
         rospy.logerr("REACTIVE APPROACH")
         self.broadcast_phase(ManipulationPhase.MOVING_TO_GRASP)
 
@@ -178,21 +178,21 @@ class ReactiveGrasper(object):
 
             for trajectory_step in joint_path.points:
                 sendupdate_msg = []
-        
+
                 for (joint_name, joint_target) in zip(joint_names, trajectory_step.positions):
                     # convert targets to degrees
                     sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target * 57.325))
-                
+
                 self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
                 self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
-            
+
                 current_sleep_time = trajectory_step.time_from_start - last_time
                 rospy.sleep( current_sleep_time )
                 last_time = trajectory_step.time_from_start
         else:
             #if no joint_path is given, go to the current_goal_pose
             self.command_cartesian( current_goal_pose )
-            
+
         return self.reactive_approach_result_dict["success"]
 
 
@@ -204,21 +204,21 @@ class ReactiveGrasper(object):
         joint_path = goal.trajectory
         last_time = rospy.Duration(0.0)
         current_sleep_time = rospy.Duration(0.0)
-        
+
         if joint_path != None:
             self.check_preempt()
             joint_names = joint_path.joint_names
 
             for trajectory_step in joint_path.points:
                 sendupdate_msg = []
-        
+
                 for (joint_name, joint_target) in zip(joint_names, trajectory_step.positions):
                     # convert targets to degrees
                     sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target * 57.325))
-                
+
                 self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
                 self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
-                
+
                 current_sleep_time = trajectory_step.time_from_start - last_time
                 rospy.sleep( current_sleep_time )
                 last_time = trajectory_step.time_from_start
@@ -227,7 +227,7 @@ class ReactiveGrasper(object):
             #if no joint_path is given, go to the current_goal_pose
             rospy.logerr("TODO: Implement this. Get current pose, add the lift and set this as the command_cartesian target.")
             self.command_cartesian( goal.lift )
-            
+
         return self.reactive_approach_result_dict["success"]
 
     def reactive_place(self, goal):
@@ -238,21 +238,21 @@ class ReactiveGrasper(object):
         joint_path = goal.trajectory
         last_time = rospy.Duration(0.0)
         current_sleep_time = rospy.Duration(0.0)
-        
+
         if joint_path != None:
             self.check_preempt()
             joint_names = joint_path.joint_names
 
             for trajectory_step in joint_path.points:
                 sendupdate_msg = []
-        
+
                 for (joint_name, joint_target) in zip(joint_names, trajectory_step.positions):
                     # convert targets to degrees
                     sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target * 57.325))
-                
+
                 self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
                 self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
-                
+
                 current_sleep_time = trajectory_step.time_from_start - last_time
                 rospy.sleep( current_sleep_time )
                 last_time = trajectory_step.time_from_start
@@ -260,7 +260,7 @@ class ReactiveGrasper(object):
         else:
             #if no joint_path is given, try to go to the final_place_pose directly
             self.command_cartesian( goal.final_place_pose )
-            
+
         return self.reactive_approach_result_dict["success"]
 
 
@@ -268,7 +268,7 @@ class ReactiveGrasper(object):
         """
         Close compliantly. We're not using the grasps from the database here.
 
-        @target the target of the grasp: it is a GraspableObject msg, containing: a point cloud, a ROI, 
+        @target the target of the grasp: it is a GraspableObject msg, containing: a point cloud, a ROI,
         and a list of potential models
         """
         self.check_preempt()
@@ -280,15 +280,15 @@ class ReactiveGrasper(object):
             return
 
         #TODO: good compliant close - someone from HANDLE?
-        #   Counter-move the arm to keep the touching fingers in-place while closing? 
+        #   Counter-move the arm to keep the touching fingers in-place while closing?
         #Here we're only sending dummy targets to the hand.
         joint_names = grasp_posture.name
         joint_targets = grasp_posture.position
         sendupdate_msg = []
-        
+
         for (joint_name, joint_target) in zip(joint_names, joint_targets):
             sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
-        
+
         self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
 
     def check_good_grasp(self):
@@ -320,7 +320,7 @@ class ReactiveGrasper(object):
         """
         convert a relative vector in frame to a pose in the base_link frame
         if start_pose is not specified, uses current pose of the wrist
-        if orthogonal_to_vect and orthogonal_to_vect_frame are specified, first convert vector to be orthogonal to orthogonal_to_vect 
+        if orthogonal_to_vect and orthogonal_to_vect_frame are specified, first convert vector to be orthogonal to orthogonal_to_vect
         """
 
         #if start_pose is not specified, use the current Cartesian pose of the wrist
@@ -333,7 +333,7 @@ class ReactiveGrasper(object):
         #convert the vector in frame to base_link frame
         if frame != self.root_name:
             vector3_stamped = create_vector3_stamped(vector, frame)
-            base_link_vector = vector3_stamped_to_list(self.tf_listener, vector3_stamped, self.root_name)    
+            base_link_vector = vector3_stamped_to_list(self.tf_listener, vector3_stamped, self.root_name)
         else:
             base_link_vector = vector
 
@@ -342,18 +342,18 @@ class ReactiveGrasper(object):
             #first convert it to the base_link frame if it's not already
             if orthogonal_to_vect_frame != self.root_name:
                 ortho_vector3_stamped = create_vector3_stamped(orthogonal_to_vect, orthogonal_to_vect_frame)
-                ortho_base_link_vector = vector3_stamped_to_list(self.tf_listener, ortho_vector3_stamped, self.root_name)    
+                ortho_base_link_vector = vector3_stamped_to_list(self.tf_listener, ortho_vector3_stamped, self.root_name)
             else:
                 ortho_base_link_vector = orthogonal_to_vect
 
             #now project the desired vector onto the orthogonal vector and subtract out that component
             base_link_vector = self.make_orthogonal(base_link_vector, ortho_base_link_vector)
-            
+
         #add the desired vector to the position
         new_trans = [x+y for (x,y) in zip(start_trans, base_link_vector)]
         #create a new poseStamped
         pose_stamped = create_pose_stamped(new_trans+start_rot)
-      
+
         return pose_stamped
 
     def open_and_reset_fingertips(self, pregrasp_posture, reset = 0):
@@ -363,10 +363,10 @@ class ReactiveGrasper(object):
         joint_names = pregrasp_posture.name
         joint_targets = pregrasp_posture.position
         sendupdate_msg = []
-        
+
         for (joint_name, joint_target) in zip(joint_names, joint_targets):
             sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
-        
+
         self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
 
     def command_cartesian(self, pose, frame_id='base_link'):
@@ -393,9 +393,9 @@ class ReactiveGrasper(object):
         pc.constraint_region_shape.type = Shape.BOX
         pc.constraint_region_shape.dimensions = [0.02, 0.02, 0.02]
         pc.constraint_region_orientation.w = 1.0
-        
+
         goalA.motion_plan_request.goal_constraints.position_constraints.append(pc)
-        
+
         oc = OrientationConstraint()
         oc.header.stamp = rospy.Time.now()
         oc.header.frame_id = self.root_name
@@ -406,13 +406,13 @@ class ReactiveGrasper(object):
         oc.absolute_pitch_tolerance = 0.04
         oc.absolute_yaw_tolerance = 0.04
         oc.weight = 1.
-        
+
         goalA.motion_plan_request.goal_constraints.orientation_constraints.append(oc)
- 
+
         self.move_arm_client.send_goal(goalA)
         finished_within_time = False
         finished_within_time = self.move_arm_client.wait_for_result()
-        
+
         if not finished_within_time:
             self.move_arm_client.cancel_goal()
             rospy.logout('Timed out achieving goal A')

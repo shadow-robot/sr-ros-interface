@@ -226,19 +226,6 @@ rospack_genmsg/fast:
 .PHONY : rospack_genmsg/fast
 
 #=============================================================================
-# Target rules for targets named rospack_genmsg_all
-
-# Build rule for target.
-rospack_genmsg_all: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rospack_genmsg_all
-.PHONY : rospack_genmsg_all
-
-# fast build rule for target.
-rospack_genmsg_all/fast:
-	$(MAKE) -f CMakeFiles/rospack_genmsg_all.dir/build.make CMakeFiles/rospack_genmsg_all.dir/build
-.PHONY : rospack_genmsg_all/fast
-
-#=============================================================================
 # Target rules for targets named rospack_genmsg_libexe
 
 # Build rule for target.
@@ -538,7 +525,6 @@ help:
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
 	@echo "... rospack_genmsg"
-	@echo "... rospack_genmsg_all"
 	@echo "... rospack_genmsg_libexe"
 	@echo "... rospack_gensrv"
 	@echo "... shadowarm_virtual"
