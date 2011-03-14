@@ -2,11 +2,11 @@
  * @file   sr_generic_tactile_sensor.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
- * 
+ *
  * @brief  This is a generic parent class for the tactile sensors used in the
- * Shadow Robot Dextrous Hand. 
- * 
- * 
+ * Shadow Robot Dextrous Hand.
+ *
+ *
  */
 
 #include "sr_tactile_sensors/sr_generic_tactile_sensor.hpp"
@@ -49,10 +49,40 @@ namespace shadowrobot
     double publish_freq;
     n_tilde.param("publish_frequency", publish_freq, 20.0);
     publish_rate = ros::Rate(publish_freq);
+
+    //initializing the thresholds to test if the hand is holding
+    //something or not (compared agains the pressure value).
+    double tmp[5]={90,90,90,90,10};
+    is_hand_occupied_thresholds = std::vector<double>(tmp, tmp+5);
+
+    is_hand_occupied_server = n_tilde.advertiseService("is_hand_occupied", &SrTactileSensorManager::is_hand_occupied_cb, this);
   }
 
   SrTactileSensorManager::~SrTactileSensorManager()
   {}
+
+  bool SrTactileSensorManager::is_hand_occupied_cb(sr_robot_msgs::is_hand_occupied::Request  &req,
+                                                   sr_robot_msgs::is_hand_occupied::Response &res )
+  {
+    bool success = true;
+
+    bool is_occupied = true;
+
+    for(unsigned int i=0; i < tactile_sensors.size(); ++i)
+    {
+      ROS_ERROR("%f, %f", tactile_sensors[i]->get_touch_data(), is_hand_occupied_thresholds[i] );
+
+      if(tactile_sensors[i]->get_touch_data() < is_hand_occupied_thresholds[i])
+      {
+        is_occupied = false;
+        break;
+      }
+    }
+
+    res.hand_occupied = is_occupied;
+
+    return success;
+  }
 
   std::vector<std::vector<std::string> >  SrTactileSensorManager::get_all_names()
   {

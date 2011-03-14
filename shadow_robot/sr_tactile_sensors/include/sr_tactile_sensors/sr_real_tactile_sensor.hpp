@@ -2,11 +2,11 @@
  * @file   sr_real_tactile_sensor.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
- * 
+ *
  * @brief  This is the implementation of the SrGenericTactileSensor. It
  * fetches data from the real sensors.
- * 
- * 
+ *
+ *
  */
 
 
@@ -27,11 +27,10 @@ namespace shadowrobot
   class SrRealTactileSensor : public SrGenericTactileSensor
   {
   public:
-    SrRealTactileSensor(std::string name, std::string touch_name, 
+    SrRealTactileSensor(std::string name, std::string touch_name,
                         std::string temp_name);
     ~SrRealTactileSensor();
 
-  protected:
     /**
      * Reads the value from the sensor
      *
