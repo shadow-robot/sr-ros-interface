@@ -3,7 +3,7 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Wed Jan 26 10:32:10 2011
  *
- * @brief  
+ * @brief
  *
  */
 
@@ -13,6 +13,7 @@
 #include <ros/ros.h>
 #include <boost/smart_ptr.hpp>
 #include <sr_robot_msgs/sendupdate.h>
+#include <sr_robot_msgs/is_hand_occupied.h>
 
 #include <actionlib/server/simple_action_server.h>
 #include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
@@ -42,6 +43,7 @@ namespace shadowrobot
 
     Publisher sr_hand_target_pub;
     ServiceServer get_status_server;
+    ServiceClient is_hand_occupied_client;
     sr_robot_msgs::sendupdate sendupdate_msg;
     std::vector<sr_robot_msgs::joint> joint_vector;
 
@@ -49,10 +51,10 @@ namespace shadowrobot
   };//end class
 }//end workspace
 
-#endif SR_MOVE_ARM_SIMPLE_ACTION_H
-
 /* For the emacs weenies in the crowd.
 Local Variables:
    c-basic-offset: 2
 End:
 */
+
+#endif SR_MOVE_ARM_SIMPLE_ACTION_H

@@ -15,6 +15,8 @@ namespace shadowrobot
   SrHandPostureExecutionSimpleAction::SrHandPostureExecutionSimpleAction() :
     nh_tilde("~"), hand_occupied(false)
   {
+    is_hand_occupied_client = nh.serviceClient<sr_robot_msgs::is_hand_occupied>("/sr_tactile_v/is_hand_occupied");
+
     action_server = boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> >(new actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction>("/right_arm/hand_posture_execution", boost::bind(&SrHandPostureExecutionSimpleAction::execute, this, _1), false));
 
     get_status_server = nh.advertiseService("/right_arm/grasp_status", &SrHandPostureExecutionSimpleAction::getStatusCallback, this);
@@ -32,20 +34,17 @@ namespace shadowrobot
   {
     double gripper_value;
 
-    ROS_ERROR("Check if the hand is occupied or not, possibly using tactile sensors");
-    response.is_hand_occupied = true;
-    return true;
-
-    if(!hand_occupied)
-    {
-      response.is_hand_occupied = false;
-    }
+    sr_robot_msgs::is_hand_occupied srv;
+    if( is_hand_occupied_client.call(srv) )
+      response.is_hand_occupied = srv.response.hand_occupied;
     else
     {
-      response.is_hand_occupied = true;
+      ROS_ERROR("Called to is_hand_occupied service failed.");
+      return false;
     }
     return true;
   }
+
   void SrHandPostureExecutionSimpleAction::execute(const object_manipulation_msgs::GraspHandPostureExecutionGoalConstPtr& goal)
   {
     if(action_server->isPreemptRequested() || !ros::ok())
