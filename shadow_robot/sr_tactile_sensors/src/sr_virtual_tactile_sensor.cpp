@@ -2,11 +2,11 @@
  * @file   sr_virtual_tactile_sensor.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
- * 
+ *
  * @brief  This is the virtual implementation of the SrGenericTactileSensor. It
  * computes virtual data.
- * 
- * 
+ *
+ *
  */
 
 #include "sr_tactile_sensors/sr_virtual_tactile_sensor.hpp"
@@ -105,14 +105,12 @@ namespace shadowrobot
   SrVirtualTactileSensorManager::~SrVirtualTactileSensorManager()
   {}
 }
-
-
-/** 
+/**
  * Initializes a set of virtual tactile sensors and publish.
- * 
- * @param argc 
- * @param argv 
- * 
+ *
+ * @param argc
+ * @param argv
+ *
  * @return -1 if error linking with the robot (i.e. robot code not started)
  */
 int main(int argc, char** argv)
@@ -129,7 +127,7 @@ int main(int argc, char** argv)
 }
 
 /* For the emacs weenies in the crowd.
-Local Variables:
+   Local Variables:
    c-basic-offset: 2
-End:
+   End:
 */

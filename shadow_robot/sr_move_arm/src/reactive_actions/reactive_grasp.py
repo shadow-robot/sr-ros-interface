@@ -78,7 +78,7 @@ class ReactiveGrasper(object):
         self.reactive_grasp_result_dict = {"success":0, "ran out of grasp tries":1, "ran out of approach tries":2,
                                            "aborted":3, "grasp infeasible":4}
 
-        rospy.logerr("done with ReactiveGrasper init for the %s arm"%self.whicharm)
+        rospy.logdebug("done with ReactiveGrasper init for the %s arm"%self.whicharm)
 
     def broadcast_phase(self, phase):
         """
@@ -89,7 +89,7 @@ class ReactiveGrasper(object):
 
 
     def reactive_grasp(self, approach_pose, grasp_pose, joint_path = None, pregrasp_posture = None, grasp_posture = None, side_step = .015, back_step = .03,
-                       approach_num_tries = 10, goal_pos_thres = 0.01, grasp_num_tries = 2,
+                       approach_num_tries = 10, goal_pos_thres = 0.01, grasp_num_tries = 4,
                        forward_step = 0.03, object_name = "points", table_name = "table",
                        grasp_adjust_x_step = .02, grasp_adjust_z_step = .015, grasp_adjust_num_tries = 3):
         self._table_name = table_name
@@ -133,11 +133,13 @@ class ReactiveGrasper(object):
 
             #check if the grasp is okay
             if self.check_good_grasp():
+                rospy.loginfo("Grasp successfully achieved")
                 return self.reactive_grasp_result_dict["success"]
 
             #if the grasp is not okay
             num_tries += 1
             if num_tries < grasp_num_tries:
+                rospy.logwarn("Failed to grasp: trying once more")
                 #move the goal forward along the approach direction by forward_step
                 move_forward_vect = approach_dir*forward_step
                 current_goal_pose = self.return_rel_pose(move_forward_vect, self.root_name, current_goal_pose)
@@ -163,7 +165,7 @@ class ReactiveGrasper(object):
         Stops and goes back a little in case of a contact.
         """
 
-        rospy.logerr("REACTIVE APPROACH")
+        rospy.loginfo("Executing a reactive approach")
         self.broadcast_phase(ManipulationPhase.MOVING_TO_GRASP)
 
         #check the position of the palm compared to the position of the object
@@ -271,6 +273,7 @@ class ReactiveGrasper(object):
         @target the target of the grasp: it is a GraspableObject msg, containing: a point cloud, a ROI,
         and a list of potential models
         """
+        rospy.loginfo("Closing the hand compliantly")
         self.check_preempt()
         self.broadcast_phase(ManipulationPhase.CLOSING)
         use_slip_controller_to_close = self.using_slip_detection
@@ -284,12 +287,15 @@ class ReactiveGrasper(object):
         #Here we're only sending dummy targets to the hand.
         joint_names = grasp_posture.name
         joint_targets = grasp_posture.position
+
         sendupdate_msg = []
 
         for (joint_name, joint_target) in zip(joint_names, joint_targets):
             sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
 
         self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+        rospy.logwarn("sleeping a little after closing the hand")
+        rospy.sleep(0.5)
 
     def check_good_grasp(self):
         """

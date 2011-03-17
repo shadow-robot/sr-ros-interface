@@ -234,6 +234,7 @@
 	      type="reactive_grasp_server.py" args="r" respawn="false" output="screen">
 	  <param name="use_slip_controller" value="True"/>
 	  <param name="use_slip_detection" value="True"/>
+	  <param name="grasp_num_tries" value="4"/>
 	</node>
 
 	<node pkg="sr_tactile_sensors" name="sr_tactile_v" type="sr_tactile_virtual">

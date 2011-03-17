@@ -131,8 +131,7 @@ class ObjectChooser(QtGui.QWidget):
         #do not use tactile-based grasping or tactile-based lift
         pickup_goal.use_reactive_lift = True;
         pickup_goal.use_reactive_execution = True;
-        
-        
+            
         pickup_client = actionlib.SimpleActionClient('/object_manipulator/object_manipulator_pickup', PickupAction)
         pickup_client.wait_for_server()
         rospy.loginfo("Pickup server ready")

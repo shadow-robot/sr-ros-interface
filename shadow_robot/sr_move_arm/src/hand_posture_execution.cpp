@@ -32,11 +32,17 @@ namespace shadowrobot
   bool SrHandPostureExecutionSimpleAction::getStatusCallback(object_manipulation_msgs::GraspStatus::Request &request,
                                                              object_manipulation_msgs::GraspStatus::Response &response)
   {
-    double gripper_value;
+    response.is_hand_occupied = false;
 
     sr_robot_msgs::is_hand_occupied srv;
     if( is_hand_occupied_client.call(srv) )
+    {
       response.is_hand_occupied = srv.response.hand_occupied;
+      if( srv.response.hand_occupied)
+        ROS_INFO("The hand is occupied");
+      else
+        ROS_INFO("The hand is empty");
+    }
     else
     {
       ROS_ERROR("Called to is_hand_occupied service failed.");

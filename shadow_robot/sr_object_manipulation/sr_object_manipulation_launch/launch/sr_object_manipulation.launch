@@ -13,8 +13,10 @@
   <include file="$(find sr_object_manipulation_launch)/launch/static_transform.launch"/>
 
   <!-- start the object detection and recognition -->
+  <!--
   <include file="$(find sr_object_manipulation_launch)/launch/household_object.launch"/>
   <include file="$(find sr_object_manipulation_launch)/launch/tabletop_node.launch"/>
+  -->
 
   <!-- start the hand -->
   <!--<include file="$(find sr_hand)/launch/sr_arm_motor.launch"/>-->

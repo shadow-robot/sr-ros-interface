@@ -52,7 +52,7 @@ namespace shadowrobot
 
     //initializing the thresholds to test if the hand is holding
     //something or not (compared agains the pressure value).
-    double tmp[5]={110,110,110,110,10};
+    double tmp[5]={50,50,50,50,0};
     is_hand_occupied_thresholds = std::vector<double>(tmp, tmp+5);
 
     is_hand_occupied_server = n_tilde.advertiseService("is_hand_occupied", &SrTactileSensorManager::is_hand_occupied_cb, this);

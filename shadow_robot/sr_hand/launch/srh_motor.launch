@@ -24,8 +24,8 @@
 		<param name="publish_frequency" type="double" value="10.0" />
 		<param name="tf_prefix" type="string" value="srh/position" />
 	</node>
-	
-	
+
+
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="srh_robot_state_publisher_pos_test"
 		machine="robot">
@@ -33,9 +33,9 @@
 		<remap from="joint_states" to="srh/position/joint_states" />
 		<param name="publish_frequency" type="double" value="10.0" />
 	</node>
-	
+
 	<!-- Robot state publisher: publishes tf information regarding the  targets
-		of the hand 
+		of the hand
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="srh_robot_state_publisher_target"
 		machine="robot">
