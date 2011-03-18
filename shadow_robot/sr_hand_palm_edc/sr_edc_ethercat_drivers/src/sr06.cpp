@@ -30,7 +30,7 @@ typedef unsigned int        int32u;
 typedef   signed int        int32s;
 
 extern "C" {
-	#include "/home/fallen/Pic32/trunk/nodes/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
+	#include "/home/hand/0220_palm_edc_ethercat_protocol.h"
 }
 
 const unsigned short int SR06::device_pub_freq_const = 1000;
@@ -41,6 +41,8 @@ const unsigned char SR06::nb_publish_by_unpack_const = (nb_sensors_const % max_i
 
 #define ETHERCAT_OUTGOING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING)
 #define ETHERCAT_INCOMING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING)
+
+#define ETHERCAT_CAN_BRIDGE_DATA_SIZE sizeof(ETHERCAT_CAN_BRIDGE_DATA)
 
 PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 
@@ -71,9 +73,10 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 	SR0X::construct(sh, start_address);
 
 	command_base_ = start_address;
-	command_size_ = ETHERCAT_INCOMING_DATA_SIZE;
+	command_size_ = ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
+	ROS_ERROR("First FMMU (command) : start_address : 0x%08X ; size : 0x%08X ; phy addr : 0x%08X\n", start_address, ETHERCAT_INCOMING_DATA_SIZE, EC_PALM_EDC_COMMAND_PHY_BASE);
 	EC_FMMU *commandFMMU = new EC_FMMU(start_address, 
-					ETHERCAT_INCOMING_DATA_SIZE, 
+					ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE, 
 					0x00, 
 					0x07, 
 					EC_PALM_EDC_COMMAND_PHY_BASE, 
@@ -81,11 +84,15 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 					false, 
 					true, 
 					true);
-	start_address += command_size_;
+	start_address += ETHERCAT_INCOMING_DATA_SIZE;
+	start_address += ETHERCAT_CAN_BRIDGE_DATA_SIZE;
+
 	status_base_ = start_address;
-	status_size_ = ETHERCAT_OUTGOING_DATA_SIZE;
+	
+	ROS_ERROR("Second FMMU (status) : start_address : 0x%08X ; size : 0x%08X ; phy addr : 0x%08X\n", start_address, ETHERCAT_OUTGOING_DATA_SIZE, EC_PALM_EDC_DATA_PHY_BASE);
+
 	EC_FMMU *statusFMMU = new EC_FMMU(start_address,
-					ETHERCAT_OUTGOING_DATA_SIZE,
+					ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,
 					0x00, 
 					0x07, 
 					EC_PALM_EDC_DATA_PHY_BASE, 
@@ -93,24 +100,38 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 					true, 
 					false, 
 					true);
+	
+	status_size_ = ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE; 
 
 	EtherCAT_FMMU_Config *fmmu = new EtherCAT_FMMU_Config(2);
 
 	(*fmmu)[0] = *commandFMMU;
 	(*fmmu)[1] = *statusFMMU;
+	
 	sh->set_fmmu_config(fmmu);
 
-	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(2);
+	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(4);
 
 	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);
-	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE, EC_QUEUED);
+	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE, ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);
+	(*pd)[2] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE, EC_QUEUED);
+	(*pd)[3] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_IN_BASE, ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED);
+
+
 
 	(*pd)[0].ChannelEnable = true;
 	(*pd)[0].ALEventEnable = true;
 	(*pd)[0].WriteEvent = true;
 	(*pd)[1].ChannelEnable = true;
+	(*pd)[1].ALEventEnable = true;
+	(*pd)[1].WriteEvent = true;
+
+	(*pd)[2].ChannelEnable = true;
+	(*pd)[3].ChannelEnable = true;
 
 	sh->set_pd_config(pd);
+
+	ROS_ERROR("status_size_ : %d ; command_size_ : %d\n", status_size_, command_size_);
 
 	ROS_INFO("Finished to construct the SR06 driver");
 }
@@ -146,24 +167,46 @@ stringstream name;
 
 void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 {
-	static unsigned char j = 0;
+	static unsigned short int j = 0;
+	static unsigned short int k = 0;
 //	ROS_INFO("packCommand !");
 	SR0X::packCommand(buffer, halt, reset);
 	ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
+	ETHERCAT_CAN_BRIDGE_DATA	*message = (ETHERCAT_CAN_BRIDGE_DATA *)(buffer + ETHERCAT_INCOMING_DATA_SIZE);
 	signed short int motor[20] = {0};
-	for (int i = 0 ; i < 20 ; ++i)
-		motor[i] = 0x4242;
-	if ( ++j % 2)
+	for (int i = 0 ; i < 20 ; ++i) {
+		motor[i] = i << 8;
+		motor[i] += (i + 1);
+	}
+
+//	motor[8] = 0x4143;
+	if ( j < 2000)
+	{
+		ROS_ERROR("EDC_COMMAND_SENSOR_DATA !\n");
 		command->EDC_command = EDC_COMMAND_SENSOR_DATA;
-	else
-		command->EDC_command = EDC_COMMAND_SENSOR_CHANNEL_NUMBERS;
-	command->padding = 0x42;
+		++j;
+	}
+	else {
+		k++;
+		ROS_ERROR("EDC_COMMAND_CAN_TEST_MODE !\n");
+		command->EDC_command = EDC_COMMAND_CAN_TEST_MODE;
+	}
 	memcpy(command->motor_torque_demand, motor, sizeof(command->motor_torque_demand));
+
+	message->can_bus = 1;
+	message->message_length = 2;
+	message->message_id = 0x10; // CAN_NUM_DATA_REQUEST
+//	for (int i = 0 ; i < message->message_length ; ++i)
+//		message->message_data[i] = i;
+
+	message->message_data[0] = k % 5; // asking for which_data 0, 1, 2, 3 and 4 
+	message->message_data[1] = 0; // talking to motor_ID 0x08 , so which_motor must be 0
 }
 
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
+  ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
   static unsigned int i = 0;
   static unsigned int errors = 0;
   static unsigned int num_rxed_packets = 0;
@@ -184,7 +227,7 @@ ROS_ERROR("spi_config == %02X", spi_config);
   ++num_rxed_packets;
   if (tbuffer->EDC_command == EDC_COMMAND_INVALID)
   {
-//    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets\n", ++errors, num_rxed_packets);
+    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets\n", ++errors, num_rxed_packets);
   }
 /*
   for (j = 0 ; j < 20 ; ++j)
@@ -193,6 +236,9 @@ ROS_ERROR("spi_config == %02X", spi_config);
   }
  */
   ROS_ERROR("Motor[8] : torque == %hd ; SG_L == %hu ; SG_R == %hu ; temp == %hd ; current == %hd ; flags == %hu\n", tbuffer->motor[8].torque, tbuffer->motor[8].SG_L, tbuffer->motor[8].SG_R, tbuffer->motor[8].temperature, tbuffer->motor[8].current, tbuffer->motor[8].flags);
+
+  ROS_ERROR("CAN debug : can_bus : %d ; message_length : %d ; message_id : 0x%04X ; message_data : 0x%02X 0x%02X 0x%02X 0x%02X\n", can_data->can_bus, can_data->message_length, can_data->message_id, can_data->message_data[0], can_data->message_data[1], can_data->message_data[2], can_data->message_data[3]);
+
   if (i == max_iter_const) { // 10 == 100 Hz
     i = 0;
     return true;
