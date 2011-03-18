@@ -9,6 +9,7 @@ import scipy, time
 from object_manipulator.convert_functions import *
 from object_manipulation_msgs.msg import GripperTranslation, ManipulationPhase
 from sr_robot_msgs.msg import sendupdate, joint
+from sr_robot_msgs.srv import which_fingers_are_touching
 
 from actionlib import SimpleActionClient
 from motion_planning_msgs.msg import *
@@ -63,6 +64,12 @@ class ReactiveGrasper(object):
         else:
             self.move_arm_client = SimpleActionClient( "/move_left_arm", MoveArmAction )
         self.move_arm_client.wait_for_server()
+
+        #client to the tactile sensor manager.
+        rospy.loginfo("Waiting for service which_fingers_are_touching")
+        rospy.wait_for_service('/sr_tactile_v/which_fingers_are_touching')
+        rospy.loginfo("OK service which_fingers_are_touching found.")
+        self.which_fingers_are_touching_client = rospy.ServiceProxy('/sr_tactile_v/which_fingers_are_touching', which_fingers_are_touching)
 
         #dictionary for ManipulationPhase
         self.manipulation_phase_dict = {}
@@ -269,7 +276,7 @@ class ReactiveGrasper(object):
         return self.reactive_approach_result_dict["success"]
 
 
-    def compliant_close(self, grasp_posture = None, pregrasp_posture = None, nb_steps = 20, iteration_time=0.2):
+    def compliant_close(self, grasp_posture = None, pregrasp_posture = None):
         """
         Close compliantly. We're going to interpolate from pregrasp to grasp, sending
         data each iteration_time. We stop the fingers when they come in contact with something
@@ -303,21 +310,79 @@ class ReactiveGrasper(object):
         pregrasp_targets = pregrasp_posture.position
         #QUESTION: Should we make sure grasp and pregrasp have the same order?
 
+        current_targets = self.close_until_force(joint_names, pregrasp_targets, grasp_targets, [100.,100.,100.,100.,0.])
+
+        #now that all the fingers are touching the object, we're going to close
+        #with a stronger grasp.
+        rospy.sleep(.5)
+        rospy.loginfo("Now closing with stronger grasp.")
+
+        current_targets = self.close_until_force(joint_names, current_targets, grasp_targets, [117,117,113,111,0], "All the fingers are now grasping the object strongly.")
+
+        rospy.logwarn("Waiting a little after closing the hand")
+        rospy.sleep(0.5)
+
+    def close_until_force(self, joint_names, pregrasp, grasp, forces_threshold, success_msg = "All the fingers are now touching the object.", nb_steps = 20, iteration_time=0.2):
+        """
+        Closes the hand from pregrasp to grasp
+        until the given forces are reached.
+
+        @return returns the positions reached when the forces were reached.
+        """
+        current_targets = []
+        for pos in pregrasp:
+            current_targets.append(pos)
+
         #loop on all the iteration steps. The target for a given finger
         # is :
         #      target = pregrasp + (grasp - pregrasp) * (i / TOTAL_NB_OF_STEPS)
+        fingers_touching = [0,0,0,0,0]
+
         for i_step in range(0, nb_steps + 1):
             sendupdate_msg = []
-            for (joint_name, grasp_target, pregrasp_target) in zip(joint_names, grasp_targets, pregrasp_targets):
-                joint_target = pregrasp_target + float(grasp_target - pregrasp_target)*(float(i_step) / float(nb_steps) )
-                sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
-                rospy.logdebug("["+joint_name+"]: (p/g/t) = "+str(pregrasp_target)+"/"+str(grasp_target)+"/"+str(joint_target) + " ("+
-                               str(float(i_step) / float(nb_steps))+"%)")
+            fingers_touch_index = {"FF":0, "MF":1, "RF":2, "LF":3, "TH":4}
+            for (index, joint_name, grasp_target, pregrasp_target) in zip(range(0,len(joint_names)),joint_names, grasp, pregrasp):
+                # only update the finger that are not touching
+                # takes the first 2 letters of the names (= finger name)
+                # and check the index from the dict defined before the for loop.
+                # return -1 if the finger is not in the dict
+                touch_index = fingers_touch_index.get(joint_name[:2], -1)
+                if touch_index == -1:
+                    touching = 0
+                else:
+                    touching = fingers_touching[touch_index]
+                if touching == 0:
+                    joint_target = pregrasp_target + float(grasp_target - pregrasp_target)*(float(i_step) / float(nb_steps) )
+                    current_targets[index] = joint_target
+                    sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
+                    rospy.logdebug("["+joint_name+"]: (p/g/t) = "+str(pregrasp_target)+"/"+str(grasp_target)+"/"+str(joint_target) + " ("+
+                                   str(float(i_step) / float(nb_steps))+"%)")
 
             self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
             rospy.sleep(iteration_time)
-        rospy.logwarn("Waiting a little after closing the hand")
-        rospy.sleep(0.2)
+            #check which fingers are touching
+            which_fingers_are_touching_response = []
+            try:
+                which_fingers_are_touching_response = self.which_fingers_are_touching_client(forces_threshold)
+            except rospy.ServiceException, e:
+                rospy.logerr("Couldn't call the service which_fingers_are_touching")
+
+            #check if all the fingers are touching
+            fingers_touching = which_fingers_are_touching_response.touch_forces
+            all_fingers_touching = True
+
+            #we don't check the thumb as the dummy tactile sensors are not
+            # working properly for the thumb
+            for value in fingers_touching[:4]:
+                if value == 0.0:
+                    all_fingers_touching = False
+                    break
+            #stop when all the fingers are touching the object
+            if all_fingers_touching:
+                rospy.loginfo(success_msg)
+                break
+
+        return current_targets
 
     def check_good_grasp(self):
         """

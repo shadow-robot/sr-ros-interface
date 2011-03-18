@@ -56,6 +56,7 @@ namespace shadowrobot
     is_hand_occupied_thresholds = std::vector<double>(tmp, tmp+5);
 
     is_hand_occupied_server = n_tilde.advertiseService("is_hand_occupied", &SrTactileSensorManager::is_hand_occupied_cb, this);
+    which_fingers_are_touching_server = n_tilde.advertiseService("which_fingers_are_touching", &SrTactileSensorManager::which_fingers_are_touching_cb, this);
   }
 
   SrTactileSensorManager::~SrTactileSensorManager()
@@ -77,6 +78,25 @@ namespace shadowrobot
 
     res.hand_occupied = is_occupied;
 
+    return true;
+  }
+
+  bool SrTactileSensorManager::which_fingers_are_touching_cb(sr_robot_msgs::which_fingers_are_touching::Request  &req,
+                                                             sr_robot_msgs::which_fingers_are_touching::Response &res )
+  {
+    std::vector<double> touch_values(5);
+    ROS_ASSERT(tactile_sensors.size() == 5);
+
+    double value_tmp = 0.0;
+    for(unsigned int i=0; i < tactile_sensors.size(); ++i)
+    {
+      value_tmp = tactile_sensors[i]->get_touch_data();
+      if(value_tmp < req.force_thresholds[i])
+        touch_values[i] = 0.0;
+      else
+        touch_values[i] = value_tmp;
+    }
+    res.touch_forces = touch_values;
     return true;
   }
 
