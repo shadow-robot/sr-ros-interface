@@ -125,9 +125,12 @@ class ReactiveGrasper(object):
                 rospy.loginfo("reactive approach is disabled, moving to the goal")
                 self.move_cartesian_step(grasp_pose, timeout = 10.0, settling_time = 5.0, blocking = 1)
 
-            #if both fingers were touching, or we got to the grasp goal, or we're touching the table, try to close the fingers
+            #go to the pregrasp posture
+            rospy.loginfo("Going to pregrasp posture.")
+            self.open_and_reset_fingertips(pregrasp_posture, reset = 1)
+            #then start closing the hand compliantly
             rospy.loginfo("starting compliant_close")
-            self.compliant_close(grasp_posture)
+            self.compliant_close(grasp_posture, pregrasp_posture)
 
             self.check_preempt()
 
@@ -266,12 +269,17 @@ class ReactiveGrasper(object):
         return self.reactive_approach_result_dict["success"]
 
 
-    def compliant_close(self, grasp_posture = None):
+    def compliant_close(self, grasp_posture = None, pregrasp_posture = None, nb_steps = 20, iteration_time=0.2):
         """
-        Close compliantly. We're not using the grasps from the database here.
+        Close compliantly. We're going to interpolate from pregrasp to grasp, sending
+        data each iteration_time. We stop the fingers when they come in contact with something
+        using the feedback from the tactile sensors.
 
-        @target the target of the grasp: it is a GraspableObject msg, containing: a point cloud, a ROI,
-        and a list of potential models
+        @grasp_posture: the posture of the hand for the grasp - joint names and positions
+        @pregrasp_posture: the posture of the hand when doing the approach. We assume
+                           that the grasp and pregrasp have the same joint order.
+        @nb_steps: the number of steps used in the interpolation.
+        @iteration_time: how long do we wait between 2 steps.
         """
         rospy.loginfo("Closing the hand compliantly")
         self.check_preempt()
@@ -282,26 +290,40 @@ class ReactiveGrasper(object):
             rospy.logerr("No grasp posture given, aborting")
             return
 
+        if pregrasp_posture == None:
+            rospy.logerr("No pregrasp posture given, aborting - FIXME")
+            #doesn't need to abort here, could read current position from the hand and take
+            #those as the pregrasp.
+            return
+
         #TODO: good compliant close - someone from HANDLE?
         #   Counter-move the arm to keep the touching fingers in-place while closing?
-        #Here we're only sending dummy targets to the hand.
         joint_names = grasp_posture.name
-        joint_targets = grasp_posture.position
+        grasp_targets = grasp_posture.position
+        pregrasp_targets = pregrasp_posture.position
+        #QUESTION: Should we make sure grasp and pregrasp have the same order?
 
-        sendupdate_msg = []
+        #loop on all the iteration steps. The target for a given finger
+        # is :
+        #      target = pregrasp + (grasp - pregrasp) * (i / TOTAL_NB_OF_STEPS)
+        for i_step in range(0, nb_steps + 1):
+            sendupdate_msg = []
+            for (joint_name, grasp_target, pregrasp_target) in zip(joint_names, grasp_targets, pregrasp_targets):
+                joint_target = pregrasp_target + float(grasp_target - pregrasp_target)*(float(i_step) / float(nb_steps) )
+                sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
+                rospy.logdebug("["+joint_name+"]: (p/g/t) = "+str(pregrasp_target)+"/"+str(grasp_target)+"/"+str(joint_target) + " ("+
+                               str(float(i_step) / float(nb_steps))+"%)")
 
-        for (joint_name, joint_target) in zip(joint_names, joint_targets):
-            sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
-
-        self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
-        rospy.logwarn("sleeping a little after closing the hand")
-        rospy.sleep(0.5)
+            self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+            rospy.sleep(iteration_time)
+        rospy.logwarn("Waiting a little after closing the hand")
+        rospy.sleep(0.2)
 
     def check_good_grasp(self):
         """
         Check if we have a good grasp on the object.
         """
-        rospy.logerr("TODO: really check if we have a good grasp")
+        rospy.logerr("TODO: really check if we have a good grasp - shake the object maybe?")
 
         return True
 

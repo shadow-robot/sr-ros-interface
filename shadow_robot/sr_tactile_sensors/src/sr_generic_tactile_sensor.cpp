@@ -52,7 +52,7 @@ namespace shadowrobot
 
     //initializing the thresholds to test if the hand is holding
     //something or not (compared agains the pressure value).
-    double tmp[5]={50,50,50,50,0};
+    double tmp[5]={117,117,113,111,0};
     is_hand_occupied_thresholds = std::vector<double>(tmp, tmp+5);
 
     is_hand_occupied_server = n_tilde.advertiseService("is_hand_occupied", &SrTactileSensorManager::is_hand_occupied_cb, this);
@@ -68,8 +68,6 @@ namespace shadowrobot
 
     for(unsigned int i=0; i < tactile_sensors.size(); ++i)
     {
-      ROS_ERROR("%f, %f", tactile_sensors[i]->get_touch_data(), is_hand_occupied_thresholds[i] );
-
       if(tactile_sensors[i]->get_touch_data() < is_hand_occupied_thresholds[i])
       {
         is_occupied = false;
