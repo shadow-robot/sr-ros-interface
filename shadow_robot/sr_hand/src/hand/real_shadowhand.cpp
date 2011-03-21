@@ -334,7 +334,7 @@ std::vector<DiagnosticData> RealShadowhand::getDiagnostics()
                 {
                     at_least_one_error_flag = true;
                     ss << "NFAULT ";
-                    ROS_ERROR( "[%s]: NFAULT", hand_joints[index].joint_name );
+                    ROS_WARN( "[%s]: NFAULT", hand_joints[index].joint_name );
                 }
                 if( f.temperature_cutout )
                 {
