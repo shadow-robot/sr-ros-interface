@@ -59,12 +59,12 @@ self_see_links:
   - name: thmiddle
     padding: .02
   - name: thproximal
-    padding: .02   
+    padding: .02
   - name: wrist
-    padding: .02   
-  - name: base_link
-    padding: .02   
-  
+    padding: .02
+  - name: /base_link
+    padding: .02
+
 
 
 

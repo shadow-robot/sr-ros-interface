@@ -235,6 +235,8 @@
 	  <param name="use_slip_controller" value="True"/>
 	  <param name="use_slip_detection" value="True"/>
 	  <param name="grasp_num_tries" value="4"/>
+
+	  <rosparam file="$(find sr_move_arm)/config/tactile_thresholds.yaml" command="load"/>
 	</node>
 
 	<node pkg="sr_tactile_sensors" name="sr_tactile_v" type="sr_tactile_virtual">

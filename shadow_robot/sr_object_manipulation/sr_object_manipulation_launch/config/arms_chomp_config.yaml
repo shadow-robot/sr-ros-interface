@@ -42,7 +42,7 @@ joint_velocity_limits:
       WRJ2: 1.0
       WRJ1: 1.0
 
-reference_frame: base_link
+reference_frame: /base_link
 
 collision_space:
   size_x: 3.0

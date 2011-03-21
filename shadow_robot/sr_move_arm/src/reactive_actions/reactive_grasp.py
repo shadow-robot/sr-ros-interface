@@ -45,9 +45,6 @@ class ReactiveGrasper(object):
         self.root_name = "base_link"
         self.tip_name = "palm"
 
-        #TODO: remove this dummy var
-        self.is_first_grasp = 0
-
         #for taking photos of each step
         self._photo = 0
 
@@ -70,6 +67,10 @@ class ReactiveGrasper(object):
         rospy.wait_for_service('/sr_tactile_v/which_fingers_are_touching')
         rospy.loginfo("OK service which_fingers_are_touching found.")
         self.which_fingers_are_touching_client = rospy.ServiceProxy('/sr_tactile_v/which_fingers_are_touching', which_fingers_are_touching)
+
+        #load tactile thresholds
+        self.light_touch_thresholds = rospy.get_param('~light_touch_thresholds', [100.,100.,100.,100.,0.0])
+        self.grasp_touch_thresholds = rospy.get_param('~grasp_touch_thresholds', [117.,117.,113.,111.,0.0])
 
         #dictionary for ManipulationPhase
         self.manipulation_phase_dict = {}
@@ -310,17 +311,17 @@ class ReactiveGrasper(object):
         pregrasp_targets = pregrasp_posture.position
         #QUESTION: Should we make sure grasp and pregrasp have the same order?
 
-        current_targets = self.close_until_force(joint_names, pregrasp_targets, grasp_targets, [100.,100.,100.,100.,0.])
+        current_targets = self.close_until_force(joint_names, pregrasp_targets, grasp_targets, self.light_touch_thresholds)
 
         #now that all the fingers are touching the object, we're going to close
         #with a stronger grasp.
-        rospy.sleep(.5)
+        rospy.sleep(1)
         rospy.loginfo("Now closing with stronger grasp.")
 
-        current_targets = self.close_until_force(joint_names, current_targets, grasp_targets, [117,117,113,111,0], "All the fingers are now grasping the object strongly.")
+        current_targets = self.close_until_force(joint_names, current_targets, grasp_targets, self.grasp_touch_thresholds, "All the fingers are now grasping the object strongly.")
 
         rospy.logwarn("Waiting a little after closing the hand")
-        rospy.sleep(0.5)
+        rospy.sleep(1)
 
     def close_until_force(self, joint_names, pregrasp, grasp, forces_threshold, success_msg = "All the fingers are now touching the object.", nb_steps = 20, iteration_time=0.2):
         """
