@@ -165,3 +165,5 @@ shadow_robot/sr_utilities/bin
 shadow_robot/sr_robot_msgs/srv_gen
 shadow_robot/sr_tactile_sensors/bin
 shadow_robot/sr_tactile_sensors/build
+bin
+build

@@ -1,5 +1,5 @@
 <launch>
-  <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/hand_description.yaml"/>	  
+  <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/hand_description.yaml"/>
   <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/right_arm_ik_start_angles.yaml"/>
 
 
@@ -20,22 +20,23 @@
   <node name="object_manipulator" pkg="object_manipulator" type="object_manipulator_node"
 	respawn="false"
 	output="screen">
-    <remap from="right_arm/constraint_aware_ik" to="/sr_right_arm_kinematics/get_constraint_aware_ik" />    
+    <remap from="right_arm/constraint_aware_ik" to="/sr_right_arm_kinematics/get_constraint_aware_ik" />
     <remap from="right_arm/interpolated_ik" to="/r_interpolated_ik_motion_plan"/>
     <remap from="right_arm/interpolated_ik_set_params" to="/r_interpolated_ik_motion_plan_set_params"/>
-    <remap from="right_arm/get_fk" to="/sr_right_arm_kinematics/get_fk" />    
+    <remap from="right_arm/get_fk" to="/sr_right_arm_kinematics/get_fk" />
     <remap from="right_arm/get_ik_solver_info" to="/sr_right_arm_kinematics/get_ik_solver_info"/>
 
-    <remap from="right_arm/move_arm" to="/move_right_arm" />    
+    <remap from="right_arm/move_arm" to="/move_right_arm" />
+      <param name="default_cluster_planner" value="/sr_grasp_planner/plan_point_cluster_grasp" />
     <param name="default_database_planner" value="/objects_database_node/database_grasp_planning"/>
 
-    <remap from="right_arm/reactive_grasp" to="/reactive_grasp/right" />  
-    <remap from="right_arm/grasp_status" to="/right_arm/grasp_status" /> 
-    <remap from="right_arm/reactive_lift" to="/reactive_lift/right" />  
+    <remap from="right_arm/reactive_grasp" to="/reactive_grasp/right" />
+    <remap from="right_arm/grasp_status" to="/right_arm/grasp_status" />
+    <remap from="right_arm/reactive_lift" to="/reactive_lift/right" />
 
     <remap from="right_arm/joint_trajectory" to="r_arm_controller/joint_trajectory_action"/>
 
-    <remap from="filter_trajectory" to="/trajectory_filter/filter_trajectory_with_constraints" />    
+    <remap from="filter_trajectory" to="/trajectory_filter/filter_trajectory_with_constraints" />
   </node>
 
 
@@ -47,10 +48,10 @@
   <node pkg="trajectory_filter_server" name="trajectory_filter" type="trajectory_filter_server" output="screen">
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/joint_limits.yaml"/>
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/filters.yaml"/>
-  
+
     <remap from="robot_description" to="robot_description" />
     <remap from="collision_map" to="collision_map_occ" />
-    <remap from="collision_map_update" to="collision_map_occ_update" />    
+    <remap from="collision_map_update" to="collision_map_occ_update" />
     <param name="refresh_interval_collision_map" type="double" value="0.0" />
     <param name="refresh_interval_kinematic_state" type="double" value="1.0" />
     <param name="bounding_planes" type="string" value="0 0 1 -0.01" />
@@ -58,7 +59,7 @@
 
     <param name="pointcloud_padd" type="double" value="0.00" />
 
-    <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />		
+    <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />
   </node>
 
   <rosparam ns="/robot_description_planning" command="load" file="$(find sr_object_manipulation_launch)/config/planning_groups.yaml" />
@@ -68,7 +69,7 @@
     <param name="animate_path" value="false"/>
     <param name="animate_endeffector" value="false"/>
     <param name="animate_endeffector_segment" value="palm"/>
-    
+
     <param name="trajectory_duration" value="5.0"/>
     <param name="trajectory_discretization" value="0.05"/>
     <param name="learning_rate" value="0.05" />
@@ -91,34 +92,34 @@
     <param name="hmc_stochasticity" value="0.0" />
     <param name="hmc_annealing_factor" value="0.99" />
 
-    <remap from="filter_trajectory" to="/trajectory_filter/filter_trajectory_with_constraints" />		
+    <remap from="filter_trajectory" to="/trajectory_filter/filter_trajectory_with_constraints" />
 
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/joint_limits.yaml"/>
   </node>
 
   <node pkg="ompl_ros_interface" type="ompl_ros" name="ompl_planning" respawn="true" output="screen">
-    <remap from="robot_description" to="robot_description" />  
+    <remap from="robot_description" to="robot_description" />
     <remap from="collision_map" to="collision_map_occ" />
     <remap from="collision_map_update" to="collision_map_occ_update" />
-    
+
     <!-- if we are moving the base, it is best to maintain the map in a fixed frame since identified objects that are being published
 	 are not necessarily updated -->
     <!--    <param name="planner_frame_id" type="string" value="odom_combined" /> -->
 
-    <!-- planner configs -->	  
+    <!-- planner configs -->
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/ik_constrained_planner.yaml" />
 
     <param name="state_delay" type="double" value="0.01" />
     <param name="pointcloud_padd" type="double" value="0.00" />
     <param name="object_padd" type="double" value="0.04" />
-    
+
     <param name="refresh_interval_collision_map" type="double" value="5.0" />
     <param name="refresh_interval_kinematic_state" type="double" value="1.0" />
     <param name="bounding_planes" type="string" value="0 0 1 -0.01" />
     <param name="verbose_collisions" type="bool" value="true" />
 
-    <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />			
+    <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />
   </node>
 
 </launch>
