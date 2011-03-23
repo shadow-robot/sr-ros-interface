@@ -18,6 +18,8 @@ namespace shadowrobot
   {
     grasp_planner = boost::shared_ptr<SrGraspPlanner>(new SrGraspPlanner());
 
+    find_cluster_bounding_box_client = nh.serviceClient<object_manipulation_msgs::FindClusterBoundingBox>("/find_cluster_bounding_box");
+
     grasp_server = nh_tilde.advertiseService("plan_point_cluster_grasp",
                                              &SrGraspPlannerServer::get_grasp_planning_callback,
                                              this);
@@ -29,14 +31,39 @@ namespace shadowrobot
   bool SrGraspPlannerServer::get_grasp_planning_callback( object_manipulation_msgs::GraspPlanning::Request &request,
                                                           object_manipulation_msgs::GraspPlanning::Response &response )
   {
-    ROS_ERROR("Implement the callback");
+    ROS_INFO("Planning grasps for %s", request.collision_object_name.c_str());
+
+    object_manipulation_msgs::FindClusterBoundingBox srv;
+    object_manipulation_msgs::ClusterBoundingBox bounding_box;
+    srv.request.cluster = request.target.cluster;
+    ROS_DEBUG_STREAM("Cluster for the unknown object"<<srv.request.cluster);
+
+    if( find_cluster_bounding_box_client.call(srv) == 1)
+    {
+      ROS_DEBUG_STREAM("Response Pose "<<srv.response.pose
+                       << "Response Box Dims "<<srv.response.box_dims);
+
+      bounding_box.pose_stamped = srv.response.pose;
+      bounding_box.dimensions = srv.response.box_dims;
+    }
+    else
+    {
+      ROS_ERROR("Failed to get the bounding box for the unknown object");
+      response.error_code.value = response.error_code.OTHER_ERROR;
+      return false;
+    }
+
     tf::StampedTransform transform;
-    try{
+    try
+    {
       tf_listener.lookupTransform("/base_link", "/palm",
                                   ros::Time(0), transform);
     }
-    catch (tf::TransformException ex){
-      ROS_ERROR("%s",ex.what());
+    catch (tf::TransformException ex)
+    {
+      ROS_ERROR("Listen for transform error: %s",ex.what());
+      response.error_code.value = response.error_code.OTHER_ERROR;
+      return false;
     }
     geometry_msgs::Pose current_pose;
     current_pose.position.x = transform.getOrigin().getX();
@@ -47,10 +74,18 @@ namespace shadowrobot
     current_pose.orientation.z = transform.getRotation().getZ();
     current_pose.orientation.w = transform.getRotation().getW();
 
-    response.grasps = grasp_planner->compute_list_of_grasps(request.target, current_pose);
+    response.grasps = grasp_planner->compute_list_of_grasps(bounding_box, current_pose);
 
-    response.error_code.value = response.error_code.SUCCESS;
-    return true;
+    if( response.grasps.size() != 0)
+    {
+      response.error_code.value = response.error_code.SUCCESS;
+      return true;
+    }
+    else
+    {
+      response.error_code.value = response.error_code.OTHER_ERROR;
+      return false;
+    }
   }
 
 }

@@ -16,6 +16,9 @@
 
 #include "sr_grasp_planner/sr_grasp_planner.hpp"
 #include <object_manipulation_msgs/GraspPlanning.h>
+#include <object_manipulation_msgs/FindClusterBoundingBox.h>
+
+
 #include <tf/transform_listener.h>
 #include <boost/smart_ptr.hpp>
 
@@ -37,6 +40,9 @@ namespace shadowrobot
      * the possible grasps
      */
     ros::ServiceServer grasp_server;
+
+    /** A client used to get the bounding box for the cluster */
+    ros::ServiceClient find_cluster_bounding_box_client;
 
     /**
      * The grasp planning callback for the grasp_server.

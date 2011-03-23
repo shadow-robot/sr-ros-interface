@@ -17,6 +17,8 @@
 	respawn="false">
   </node>
 
+  <node name="sr_grasp_planner" pkg="sr_grasp_planner" type="sr_grasp_planner"/>
+
   <node name="object_manipulator" pkg="object_manipulator" type="object_manipulator_node"
 	respawn="false"
 	output="screen">

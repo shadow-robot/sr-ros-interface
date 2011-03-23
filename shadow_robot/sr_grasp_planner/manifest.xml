@@ -11,6 +11,7 @@
   <url>http://ros.org/wiki/sr_grasp_planner</url>
   <depend package="roscpp"/>
   <depend package="tf"/>
+  <depend package="eigen"/>
   <depend package="object_manipulation_msgs"/>
   <depend package="geometry_msgs"/>
   <depend package="visualization_msgs"/>

@@ -48,35 +48,35 @@ class ObjectChooser(QtGui.QWidget):
         self.tree.resizeColumnToContents(0)
         self.tree.resizeColumnToContents(1)
         self.tree.resizeColumnToContents(2)
-        
+
         self.layout = QtGui.QVBoxLayout()
         self.layout.addWidget(self.title)
         self.layout.addWidget(self.tree)
-        
+
         self.draw_functions = draw_functions.DrawFunctions('grasp_markers')
         ###
         # SIGNALS
         ##
         self.plugin_parent.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].connect(self.refresh_list)
-        
+
         self.frame.setLayout(self.layout)
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.frame)
         self.frame.show()
         self.setLayout(layout)
         self.show()
-        
+
     def double_click(self, item, value):
         object_name = str(item.text(0))
         self.object = self.plugin_parent.found_objects[object_name]
-        
+
         graspable_object = self.object.graspable_object
-        
+
         # draw a bounding box around the selected object
         (box_pose, box_dims) = self.call_find_cluster_bounding_box(graspable_object.cluster)
         if box_pose == None:
             return
-        
+
         box_mat = pose_to_mat(box_pose.pose)
         box_ranges = [[-box_dims.x / 2, -box_dims.y / 2, -box_dims.z / 2],
                       [box_dims.x / 2, box_dims.y / 2, box_dims.z / 2]]
@@ -84,10 +84,10 @@ class ObjectChooser(QtGui.QWidget):
         self.draw_functions.draw_rviz_box(box_mat, box_ranges, '/base_link',
                                           ns='bounding box',
                                           color=[0, 0, 1], opaque=0.25, duration=60)
-        
+
         # call the pickup service
         res = self.pickup(graspable_object, self.object.graspable_object_name, object_name)
-            
+
         if res == 0: #correctly picked up
         #TODO: set up place_location
             initial_pose = PoseStamped()
@@ -105,7 +105,7 @@ class ObjectChooser(QtGui.QWidget):
             list_of_poses = self.compute_list_of_poses(initial_pose, graspable_object)
 
             self.place_object(graspable_object, self.object.graspable_object_name, object_name, list_of_poses)
-        
+
     def pickup(self, graspable_object, graspable_object_name, object_name):
         info_tmp = "Picking up "+ object_name
         rospy.loginfo(info_tmp)
@@ -113,11 +113,11 @@ class ObjectChooser(QtGui.QWidget):
         pickup_goal.target = graspable_object
         pickup_goal.collision_object_name = graspable_object_name
         pickup_goal.collision_support_surface_name = self.plugin_parent.collision_support_surface_name
-        
+
         pickup_goal.arm_name = "right_arm"
         pickup_goal.desired_approach_distance = 0.05
         pickup_goal.min_approach_distance = 0.02
-        
+
         direction = Vector3Stamped()
         direction.header.stamp = rospy.get_rostime()
         direction.header.frame_id = "/base_link";
@@ -131,19 +131,19 @@ class ObjectChooser(QtGui.QWidget):
         #do not use tactile-based grasping or tactile-based lift
         pickup_goal.use_reactive_lift = True;
         pickup_goal.use_reactive_execution = True;
-            
+
         pickup_client = actionlib.SimpleActionClient('/object_manipulator/object_manipulator_pickup', PickupAction)
         pickup_client.wait_for_server()
         rospy.loginfo("Pickup server ready")
-        
+
         pickup_client.send_goal(pickup_goal)
         #timeout after 1sec
         #TODO: change this when using the robot
         pickup_client.wait_for_result(timeout=rospy.Duration.from_sec(90.0))
         rospy.loginfo("Got Pickup results")
-        
+
         self.pickup_result = pickup_client.get_result()
-        
+
         if pickup_client.get_state() != GoalStatus.SUCCEEDED:
             rospy.logerr("The pickup action has failed: " + str(self.pickup_result.manipulation_result.value) )
             return -1
@@ -165,7 +165,7 @@ class ObjectChooser(QtGui.QWidget):
 
         #place at the prepared location
 
-        
+
         place_goal.place_locations = list_of_poses
 
         place_goal.collision_object_name = graspable_object_name
@@ -192,7 +192,7 @@ class ObjectChooser(QtGui.QWidget):
         direction.vector.y = 0
         direction.vector.z = -1
         place_goal.approach.direction = direction
-        #request a vertical put down motion of 10cm before placing the object 
+        #request a vertical put down motion of 10cm before placing the object
         place_goal.approach.desired_distance = 0.1
         place_goal.approach.min_distance = 0.05
         #we are not using tactile based placing
@@ -201,22 +201,22 @@ class ObjectChooser(QtGui.QWidget):
         place_client = actionlib.SimpleActionClient('/object_manipulator/object_manipulator_place', PlaceAction)
         place_client.wait_for_server()
         rospy.loginfo("Place server ready")
-        
+
         place_client.send_goal(place_goal)
         #timeout after 1sec
         #TODO: change this when using the robot
         place_client.wait_for_result(timeout=rospy.Duration.from_sec(90.0))
         rospy.loginfo("Got Place results")
-        
+
         place_result = place_client.get_result()
-        
+
         if place_client.get_state() != GoalStatus.SUCCEEDED:
             rospy.logerr("The place action has failed: " + str(place_result.manipulation_result.value) )
         print place_result
 
     def compute_list_of_poses(self, initial_pose, graspable_object, rect_w=0.20, rect_h=0.20, resolution=0.02):
         '''
-        Computes a list of possible poses in a rectangle of 2*rect_w by 2*rect_h, with the given resolution. 
+        Computes a list of possible poses in a rectangle of 2*rect_w by 2*rect_h, with the given resolution.
         In our case, rect_w is along the x axis, and rect_h along the y_axis.
         '''
         list_of_poses = []
@@ -232,7 +232,7 @@ class ObjectChooser(QtGui.QWidget):
             current_y = start_y
             while current_y <= stop_y:
                 current_y += resolution
-                
+
                 current_pose = PoseStamped()
                 current_pose.header.stamp = rospy.get_rostime()
                 current_pose.header.frame_id = "/base_link"
@@ -271,9 +271,9 @@ class ObjectChooser(QtGui.QWidget):
             pose_tmp.orientation.w = pose_stamped.pose.orientation.w
 
             mat = pose_to_mat(pose_tmp)
-            self.draw_functions.draw_rviz_box(mat, [.01,.01,.01], frame='/base_link', ns='place_'+str(index), 
+            self.draw_functions.draw_rviz_box(mat, [.01,.01,.01], frame='/base_link', ns='place_'+str(index),
                                               id=1000+index, duration = 90, color=[0.5,0.5,0.0], opaque=1.0 )
-            
+
 
     def call_find_cluster_bounding_box(self, cluster):
         req = FindClusterBoundingBoxRequest()
@@ -292,8 +292,8 @@ class ObjectChooser(QtGui.QWidget):
             return (res.pose, res.box_dims)
         else:
             return (None, None)
-        
-                
+
+
     def refresh_list(self, value=0):
         self.tree.clear()
         first_item = None
@@ -303,25 +303,25 @@ class ObjectChooser(QtGui.QWidget):
             item = QtGui.QTreeWidgetItem(self.tree)
             if first_item == None:
                 first_item = item
-            
+
             item.setText(0, object_name)
             obj = self.plugin_parent.found_objects[object_name].model_description
             if "unknown_" not in object_name:
                 item.setText(1, obj.maker)
-            
+
                 tags = ""
                 for tag in obj.tags:
                     tags += str(tag) + " ; "
                 item.setText(2, tags)
-            
+
             self.tree.resizeColumnToContents(0)
             self.tree.resizeColumnToContents(1)
             self.tree.resizeColumnToContents(2)
-            
+
             #print "add"
             #self.tree.addTopLevelItem(item)
         return first_item
-    
+
 class TableObject(object):
     """
     Contains all the relevant info for an object.
@@ -331,18 +331,18 @@ class TableObject(object):
         self.graspable_object = None
         self.graspable_object_name = None
         self.model_description = None
-    
+
 class Model(object):
     def __init__(self):
         self.name = None
-    
-class ObjectSelection(GenericPlugin):  
+
+class ObjectSelection(GenericPlugin):
     """
-    Contact the tabletop object detector to get a list of the objects on top 
+    Contact the tabletop object detector to get a list of the objects on top
     of the table. Then possibility to select a detected object for picking it up.
     """
     name = "Object Selection"
-        
+
     def __init__(self):
         GenericPlugin.__init__(self)
 
@@ -371,15 +371,15 @@ class ObjectSelection(GenericPlugin):
         sublayout.addWidget(self.btn_collision_map)
         subframe.setLayout(sublayout)
         self.layout.addWidget(subframe)
-        
+
         self.object_chooser = ObjectChooser(self.window, self, "Objects Detected")
         self.layout.addWidget(self.object_chooser)
-        
+
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
 
         self.is_activated = False
-    
+
     def activate(self):
         if self.is_activated:
             return
@@ -404,7 +404,7 @@ class ObjectSelection(GenericPlugin):
 
     def get_object_name(self, model_id):
         """
-        return the object name given its index (read from database, or 
+        return the object name given its index (read from database, or
         create unique name if unknown object).
         """
         model = Model()
@@ -417,7 +417,7 @@ class ObjectSelection(GenericPlugin):
                 model = self.service_db_get_model_description(model_id)
             except rospy.ServiceException, e:
                 print "Service did not process request: %s" % str(e)
-                model.name = "unkown_recognition_failed" 
+                model.name = "unkown_recognition_failed"
         return model
 
     def detect_objects(self):
@@ -426,10 +426,10 @@ class ObjectSelection(GenericPlugin):
             self.raw_objects = self.service_object_detector(True, True, 1)
         except rospy.ServiceException, e:
             print "Service did not process request: %s" % str(e)
-        
-        #take a new collision map + add the detected objects to the collision map and get graspable objects from them 
+
+        #take a new collision map + add the detected objects to the collision map and get graspable objects from them
         tabletop_collision_map_res = self.process_collision_map()
-        
+
         print tabletop_collision_map_res.collision_object_names
 
         if tabletop_collision_map_res != 0:
@@ -437,20 +437,20 @@ class ObjectSelection(GenericPlugin):
                 obj_tmp = TableObject()
                 obj_tmp.graspable_object = grasp_obj
                 obj_tmp.graspable_object_name = grasp_obj_name
-                
+
                 if len(grasp_obj.potential_models) > 0:
                     model_index = grasp_obj.potential_models[0].model_id
                 else:
                     model_index = -1
                 obj_tmp.model_description = self.get_object_name(model_index)
-                
-                
+
+
                 self.found_objects[obj_tmp.model_description.name] = obj_tmp
-            
+
         if self.raw_objects != None:
             self.btn_collision_map.setEnabled(True)
         self.parent.parent.reload_object_signal_widget.reloadObjectSig['int'].emit(1)
-        
+
     def process_collision_map(self):
         res = 0
         try:
@@ -462,10 +462,10 @@ class ObjectSelection(GenericPlugin):
         if res != 0:
             self.collision_support_surface_name = res.collision_support_surface_name
         return res
-    
+
     def on_close(self):
         GenericPlugin.on_close(self)
 
     def depends(self):
         return Config.sr_object_selection_config.dependencies
-                
+
