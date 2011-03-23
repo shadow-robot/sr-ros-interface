@@ -1,4 +1,10 @@
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
+	   xmlns:xacro="http://ros.org/wiki/xacro">
 
   <include filename="$(find sr_hand)/model/hand_urdf/finger/distal/distal.transmission.xacro" />
 
@@ -25,9 +31,22 @@
 	</geometry>
       </collision>
     </link>
-    <gazebo reference="${link_prefix}distal">
-      <material>Gazebo/Grey</material>
-    </gazebo>
+    
+	<gazebo reference="${link_prefix}distal">
+		<material>Gazebo/Grey</material>
+		<selfCollide>false</selfCollide>
+		<sensor:contact name="${link_prefix}distal_touch_sensor">
+			<updateRate>100.0</updateRate>
+			<geom>${link_prefix}distal_geom</geom>
+			<controller:gazebo_ros_bumper name="${link_prefix}distal_bumper_controller" plugin="libgazebo_ros_bumper.so">
+				<alwaysOn>true</alwaysOn>
+				<frameName>${link_prefix}distal</frameName>
+				<updateRate>100.0</updateRate>
+				<bumperTopicName>/${link_prefix}distal_bumper</bumperTopicName>
+				<interface:bumper name="${link_prefix}distal_gazebo_ros_bumper_iface" />
+			</controller:gazebo_ros_bumper>
+		</sensor:contact>      
+	</gazebo>
     
     <joint name="${joint_prefix}J1" type="revolute">
       <parent link="${parent}"/>
