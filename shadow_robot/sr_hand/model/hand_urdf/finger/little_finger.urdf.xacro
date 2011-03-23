@@ -1,4 +1,10 @@
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+        xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
 
   <include filename="$(find sr_hand)/model/hand_urdf/finger/knuckle/knuckle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/proximal/proximal.urdf.xacro" />
@@ -33,6 +39,18 @@
       </collision>
     </link>
     <gazebo reference="lfknuckle">
+      <sensor:contact name="lfknuckle_contact_sensor">
+        <geom>lfknuckle_geom</geom>
+       <updateRate>100.0</updateRate>
+        <controller:gazebo_ros_bumper name="lfknuckle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <frameName>lfknuckle</frameName>
+          <bumperTopicName>lfknuckle_bumper</bumperTopicName>
+          <interface:bumper name="lfknuckle_gazebo_ros_bumper_iface" />
+        </controller:gazebo_ros_bumper>
+      </sensor:contact>
+
       <material>PR2/Grey2</material>
     </gazebo>
     
