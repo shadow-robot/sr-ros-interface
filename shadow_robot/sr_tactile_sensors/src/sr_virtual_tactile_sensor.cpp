@@ -18,7 +18,7 @@ namespace shadowrobot
 /**********************************
  *         TACTILE SENSOR         *
  **********************************/
-  SrGazeboVirtualTactileSensor::SrGazeboVirtualTactileSensor(std::string name,
+  SrVirtualTactileSensor::SrVirtualTactileSensor(std::string name,
                                                  std::string touch_name,
                                                  std::string temp_name) :
     SrGenericTactileSensor(name, touch_name, temp_name),
@@ -32,13 +32,13 @@ namespace shadowrobot
     tmp += "J0";
     names_joints_linked.push_back(tmp);
 
-    sub = nh.subscribe("/srh/shadowhand_data", 2, &SrGazeboVirtualTactileSensor::callback, this);
+    sub = nh.subscribe("/srh/shadowhand_data", 2, &SrVirtualTactileSensor::callback, this);
   }
 
-  SrGazeboVirtualTactileSensor::~SrGazeboVirtualTactileSensor()
+  SrVirtualTactileSensor::~SrVirtualTactileSensor()
   {}
 
-  void SrGazeboVirtualTactileSensor::callback(const sr_robot_msgs::joints_dataConstPtr& msg)
+  void SrVirtualTactileSensor::callback(const sr_robot_msgs::joints_dataConstPtr& msg)
   {
     double tmp_value = 0.0;
     int msg_length = msg->joints_list_length;
@@ -63,7 +63,7 @@ namespace shadowrobot
     touch_mutex.unlock();
   }
 
-  double SrGazeboVirtualTactileSensor::get_touch_data()
+  double SrVirtualTactileSensor::get_touch_data()
   {
     double return_value;
     touch_mutex.lock();
@@ -73,7 +73,7 @@ namespace shadowrobot
     return return_value;
   }
 
-  double SrGazeboVirtualTactileSensor::get_temp_data()
+  double SrVirtualTactileSensor::get_temp_data()
   {
     double return_value;
     temp_mutex.lock();
@@ -87,7 +87,7 @@ namespace shadowrobot
 /**********************************
  *     TACTILE SENSOR MANAGER     *
  **********************************/
-  SrGazeboVirtualTactileSensorManager::SrGazeboVirtualTactileSensorManager() :
+  SrVirtualTactileSensorManager::SrVirtualTactileSensorManager() :
     SrTactileSensorManager()
   {
     std::vector<std::vector<std::string> > all_names = get_all_names();
@@ -95,14 +95,14 @@ namespace shadowrobot
     for( unsigned int i=0; i<5; ++i)
     {
       tactile_sensors.push_back(
-        boost::shared_ptr<SrGazeboVirtualTactileSensor>(
-          new SrGazeboVirtualTactileSensor(all_names[0][i],
+        boost::shared_ptr<SrVirtualTactileSensor>(
+          new SrVirtualTactileSensor(all_names[0][i],
                                      all_names[1][i],
                                      all_names[2][i]) ));
     }
   }
 
-  SrGazeboVirtualTactileSensorManager::~SrGazeboVirtualTactileSensorManager()
+  SrVirtualTactileSensorManager::~SrVirtualTactileSensorManager()
   {}
 }
 
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "sr_tactile_sensor");
   ros::NodeHandle n;
 
-  shadowrobot::SrGazeboVirtualTactileSensorManager tact_sens_mgr;
+  shadowrobot::SrVirtualTactileSensorManager tact_sens_mgr;
 
   while( ros::ok() )
     tact_sens_mgr.publish_all();

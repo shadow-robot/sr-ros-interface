@@ -24,7 +24,7 @@
 
 namespace shadowrobot
 {
-  class SrGazeboVirtualTactileSensor : public SrGenericTactileSensor
+  class SrVirtualTactileSensor : public SrGenericTactileSensor
   {
   public:
     /** 
@@ -39,9 +39,9 @@ namespace shadowrobot
      * 
      * @return 
      */
-    SrGazeboVirtualTactileSensor(std::string name, std::string touch_name, 
+    SrVirtualTactileSensor(std::string name, std::string touch_name,
                            std::string temp_name);
-    ~SrGazeboVirtualTactileSensor();
+    ~SrVirtualTactileSensor();
 
   protected:
     /**
@@ -82,11 +82,11 @@ namespace shadowrobot
     void callback(const sr_robot_msgs::joints_dataConstPtr& msg);
   };
 
-  class SrGazeboVirtualTactileSensorManager : public SrTactileSensorManager
+  class SrVirtualTactileSensorManager : public SrTactileSensorManager
   {
   public:
-    SrGazeboVirtualTactileSensorManager();
-    ~SrGazeboVirtualTactileSensorManager();
+    SrVirtualTactileSensorManager();
+    ~SrVirtualTactileSensorManager();
   };
 }
 
