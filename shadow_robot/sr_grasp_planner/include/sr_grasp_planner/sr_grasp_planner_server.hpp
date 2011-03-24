@@ -18,8 +18,8 @@
 #include <object_manipulation_msgs/GraspPlanning.h>
 #include <object_manipulation_msgs/FindClusterBoundingBox.h>
 
-
 #include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
 #include <boost/smart_ptr.hpp>
 
 namespace shadowrobot
@@ -57,7 +57,6 @@ namespace shadowrobot
 
     /** A transform listener to get the hand pose */
     tf::TransformListener tf_listener;
-
   };
 }
 

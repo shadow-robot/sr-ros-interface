@@ -12,11 +12,16 @@
 #define _SR_GRASP_PLANNER_H_
 
 #include <ros/ros.h>
+
+#include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
+
 #include <object_manipulation_msgs/Grasp.h>
 #include <object_manipulation_msgs/GraspableObject.h>
 #include <object_manipulation_msgs/ClusterBoundingBox.h>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/Pose.h>
+
 #include <Eigen/Core>
 
 namespace shadowrobot
@@ -36,6 +41,11 @@ namespace shadowrobot
 
     static const double default_approach_distance;
     static const unsigned short default_number_of_computed_grasps;
+
+    /** A transform listener */
+    tf::TransformListener tf_listener;
+    /** A transform broadcaster to broadcast the object pose*/
+    tf::TransformBroadcaster tf_broadcaster;
   };
 }
 

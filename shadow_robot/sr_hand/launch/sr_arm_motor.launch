@@ -181,7 +181,7 @@
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="robot_state_publisher_full_pos"
 		machine="robot">
-		<param name="publish_frequency" type="double" value="10.0" />
+		<param name="publish_frequency" type="double" value="20.0" />
 	</node>
 
 	<node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm_np"
