@@ -11,7 +11,7 @@
 #include "sr_tactile_sensors/sr_gazebo_virtual_tactile_sensor.hpp"
 #include <boost/algorithm/string.hpp>
 #include <string>
-
+#include <math.h>
 #include <ros/ros.h>
 
 namespace shadowrobot
@@ -33,13 +33,16 @@ namespace shadowrobot
   void SrGazeboVirtualTactileSensor::callback(const gazebo_plugins::ContactsState& msg)
   {
     double tmp_value;
+    const ::geometry_msgs::Vector3& v = msg.states[0].wrenches[0].force;
 
-    // Parse the message to retrieve the relevant touch pressure information
     ROS_INFO("Touch by %s", msg.header.frame_id.c_str());
-    tmp_value = 0;
+    // Parse the message to retrieve the relevant touch pressure information
+    // Currently just taking the first contact.
+    // More sophisticated analysis can be done to take the contact that is the most aligned with the distal link normal
+    tmp_value = sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2));
 
     touch_mutex.lock();
-    touch_value++;
+    touch_value = tmp_value;
     touch_mutex.unlock();
   }
 
