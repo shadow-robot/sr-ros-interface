@@ -15,14 +15,31 @@
 
 #include <ros/ros.h>
 
+#include <boost/thread.hpp>
+
 #include "sr_tactile_sensors/sr_generic_tactile_sensor.hpp"
+
+#include <sr_robot_msgs/joints_data.h>
+#include <sr_robot_msgs/joint.h>
 
 namespace shadowrobot
 {
   class SrVirtualTactileSensor : public SrGenericTactileSensor
   {
   public:
-    SrVirtualTactileSensor(std::string name, std::string touch_name, 
+    /** 
+     * The Virtual Tactile sensors. For those sensor, we subscribe to
+     * the data coming from the hand and update the tactile sensor
+     * value based on this information. This should be extended to subscribe
+     * to a Gazebo touch sensor.
+     * 
+     * @param name the display name of the sensor
+     * @param touch_name the actual name of the touch sensor
+     * @param temp_name the actual name of the temperature sensor
+     * 
+     * @return 
+     */
+    SrVirtualTactileSensor(std::string name, std::string touch_name,
                            std::string temp_name);
     ~SrVirtualTactileSensor();
 
@@ -39,6 +56,30 @@ namespace shadowrobot
      * @return the temperature value
      */
     virtual double get_temp_data();
+
+  private:
+    ros::NodeHandle nh;
+    boost::mutex touch_mutex, temp_mutex;
+    double touch_value, temp_value;
+
+    /**
+     * The names from which we get the joint position.
+     */
+    std::vector<std::string> names_joints_linked;
+    /**
+     * Subscribes to the shadowhand_data topic and updates
+     * the touch_value based on the joint positions
+     */
+    ros::Subscriber sub;
+    /** 
+     * Callback function called when a msg is received on the
+     * shadowhand__data topic. Update the touch_value based on
+     * the joint positions of the joints contained in
+     * names_joints_linked.
+     * 
+     * @param msg the message containing the joint positions
+     */
+    void callback(const sr_robot_msgs::joints_dataConstPtr& msg);
   };
 
   class SrVirtualTactileSensorManager : public SrTactileSensorManager
