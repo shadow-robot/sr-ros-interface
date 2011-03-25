@@ -28,11 +28,10 @@
       <updateRate>1000.0</updateRate>
     </controller:gazebo_ros_controller_manager>
   </gazebo>
-  <link name="world"/>
   <link name="shadowarm_base">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="0.4"/>
+      <mass value="5000"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
@@ -53,11 +52,6 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="base_fix" type="fixed">
-    <parent link="world"/>
-    <child link="shadowarm_base"/>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </joint>
   <link name="shadowarm_trunk">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.27025"/>

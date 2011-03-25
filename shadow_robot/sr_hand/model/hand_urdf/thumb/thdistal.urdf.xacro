@@ -1,5 +1,10 @@
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
-
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+        xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
   <include filename="$(find sr_hand)/model/hand_urdf/thumb/thdistal.transmission.xacro" />
 
   <xacro:macro name="thdistal" params="parent">
@@ -7,7 +12,7 @@
     <link name="thdistal">
       <inertial>
 	<mass value="0.016" />
-	<origin xyz="-0.02263 0 0.02263" rpy="0 0 0"/> 
+	<origin xyz="-0.02263 0 0.02263" rpy="0 0 0"/>
 	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
 	izz="0.0" />
       </inertial>
@@ -28,7 +33,19 @@
       </collision>
     </link>
     <gazebo reference="thdistal">
+      <sensor:contact name="thdistal_contact_sensor">
+        <geom>thdistal_geom</geom>
+       <updateRate>100.0</updateRate>
+        <controller:gazebo_ros_bumper name="thdistal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <frameName>thdistal</frameName>
+          <bumperTopicName>thdistal_bumper</bumperTopicName>
+          <interface:bumper name="thdistal_gazebo_ros_bumper_iface" />
+        </controller:gazebo_ros_bumper>
+      </sensor:contact>
       <material>Gazebo/Grey</material>
+  	  <selfCollide>false</selfCollide>
     </gazebo>
 
     <joint name="THJ1" type="revolute">
@@ -44,5 +61,5 @@
     <xacro:thdistal_transmission />
 
   </xacro:macro>
-  
+
 </robot>

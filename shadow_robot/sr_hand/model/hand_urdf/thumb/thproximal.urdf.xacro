@@ -1,4 +1,10 @@
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+        xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
 
   <include filename="$(find sr_hand)/model/hand_urdf/thumb/thproximal.transmission.xacro" />
 
@@ -28,6 +34,18 @@
       </collision>
     </link>
     <gazebo reference="thproximal">
+      <sensor:contact name="thproximal_contact_sensor">
+        <geom>thproximal_geom</geom>
+       <updateRate>100.0</updateRate>
+        <controller:gazebo_ros_bumper name="thproximal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <frameName>thproximal</frameName>
+          <bumperTopicName>thproximal_bumper</bumperTopicName>
+          <interface:bumper name="thproximal_gazebo_ros_bumper_iface" />
+        </controller:gazebo_ros_bumper>
+      </sensor:contact>
+
       <material>Gazebo/Grey</material>
     </gazebo>
     
