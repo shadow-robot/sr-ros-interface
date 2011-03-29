@@ -2,23 +2,55 @@
  * @file   link_joints.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Jul  8 16:57:22 2010
- * 
- * @brief This is an example to show how to get data from the hand, 
+ *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+ * @brief This is an example to show how to get data from the hand,
  * read the position for a specific joint and send this as the target to
- * another joint. 
+ * another joint.
  *
  * To test this program, just start the hand, rviz visualizer, the control GUI
  * and this example (in 4 different consoles):
- * \verbatim 
- roslaunch sr_hand srh_motor.launch 
+ * \verbatim
+ roslaunch sr_hand srh_motor.launch
  roslaunch sr_hand rviz_motor.launch
- rosrun sr_control_gui __init__.py 
+ rosrun sr_control_gui __init__.py
  rosrun sr_hand link_joints
  \endverbatim
- * If you move the joint slider for FFJ3, then MFJ3 will move as well. 
+ * If you move the joint slider for FFJ3, then MFJ3 will move as well.
  *
  *
- * 
+ *
  */
 
 #include <ros/ros.h>
@@ -39,14 +71,14 @@ ros::Subscriber sub;
 //a ros publisher (will be instantiated later on)
 ros::Publisher pub;
 
-/** 
- * The callback function is called each time a message is received on the 
+/**
+ * The callback function is called each time a message is received on the
  * topic /srh/shadowhand_data
- * 
+ *
  * @param msg message of type sr_hand::joints_data
  */
 void callback(const sr_robot_msgs::joints_dataConstPtr& msg)
-{    
+{
   //loop on all the sendupdate messages received (if > 0)
   int msg_length = msg->joints_list_length;
   if( msg_length == 0)
@@ -60,9 +92,9 @@ void callback(const sr_robot_msgs::joints_dataConstPtr& msg)
     {
       //get the sensor name
       std::string sensor_name = msg->joints_list[index_msg].joint_name;
-      
+
       /**
-       * if it's the parent joint, read the target, and send it to the 
+       * if it's the parent joint, read the target, and send it to the
        * child.
        */
       if(sensor_name.compare(parent_name) == 0)
@@ -92,12 +124,12 @@ void callback(const sr_robot_msgs::joints_dataConstPtr& msg)
 
 }
 
-/** 
+/**
  * The main: initialise a ros node, a subscriber and a publisher
- * 
- * @param argc 
- * @param argv 
- * 
+ *
+ * @param argc
+ * @param argv
+ *
  * @return 0 on success
  */
 int main(int argc, char** argv)
@@ -107,7 +139,7 @@ int main(int argc, char** argv)
   ros::NodeHandle node;
 
   /**
-   * init the subscriber and subscribe to the topic 
+   * init the subscriber and subscribe to the topic
    * /srh/shadowhand_data, using the callback function
    * callback()
    */
