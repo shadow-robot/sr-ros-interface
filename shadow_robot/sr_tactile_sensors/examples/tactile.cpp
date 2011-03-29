@@ -52,11 +52,11 @@ int main(int argc, char** argv)
 
   ros::NodeHandle node_tactile;
 
-  sub[0] = node_tactile.subscribe("/sr_tactile_gazebo/touch/ff", 2,  callback_ff);
-  sub[1] = node_tactile.subscribe("/sr_tactile_gazebo/touch/mf", 2,  callback_mf);
-  sub[2] = node_tactile.subscribe("/sr_tactile_gazebo/touch/rf", 2,  callback_rf);
-  sub[3] = node_tactile.subscribe("/sr_tactile_gazebo/touch/lf", 2,  callback_lf);
-  sub[4] = node_tactile.subscribe("/sr_tactile_gazebo/touch/th", 2,  callback_th);
+  sub[0] = node_tactile.subscribe("/sr_tactile/touch/ff", 2,  callback_ff);
+  sub[1] = node_tactile.subscribe("/sr_tactile/touch/mf", 2,  callback_mf);
+  sub[2] = node_tactile.subscribe("/sr_tactile/touch/rf", 2,  callback_rf);
+  sub[3] = node_tactile.subscribe("/sr_tactile/touch/lf", 2,  callback_lf);
+  sub[4] = node_tactile.subscribe("/sr_tactile/touch/th", 2,  callback_th);
   
   ros::Rate publish_rate = ros::Rate(20.0);
   std_msgs::Float64::_data_type cur_data[5] = {0};
