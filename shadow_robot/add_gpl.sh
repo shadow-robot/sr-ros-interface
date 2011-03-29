@@ -2,7 +2,7 @@
 
 echo 'Adding the GPL header to the cpp files'
 
-for cpp_file in  `find . -name *.cpp`; do
+for cpp_file in  `find . -name *.hpp`; do
     echo "   -> "${cpp_file}
 
     a=5
