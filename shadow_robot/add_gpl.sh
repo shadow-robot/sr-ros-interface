@@ -2,17 +2,17 @@
 
 echo 'Adding the GPL header to the cpp files'
 
-for cpp_file in  `find . -name *.hpp`; do
+for cpp_file in  `find . -name *.py`; do
     echo "   -> "${cpp_file}
 
-    a=5
+    a=1
 
     while read line
     do
 	a=$(($a+1));
 	#echo -e "$line \ n"
 	sed -i "${a}i ${line}" ${cpp_file}
-    done <gpl_licence_c.txt
+    done <gpl_licence_python.txt
     #sed -i  '5i \ *\n * blablalbla' $i
 
 done
