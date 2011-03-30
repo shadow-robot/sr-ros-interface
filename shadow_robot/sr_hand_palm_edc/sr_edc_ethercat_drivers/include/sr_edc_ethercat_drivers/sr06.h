@@ -5,6 +5,8 @@
 #include <sr_edc_ethercat_drivers/sr0x.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Int16.h>
+#include <sr_edc_ethercat_drivers/SimpleMotorFlasher.h>
+#include <pthread.h>
 
 typedef unsigned char       int8u;
 typedef   signed char       int8s;
@@ -28,6 +30,7 @@ public:
   
   SR06();
   ~SR06();
+  bool SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res);
   void packCommand(unsigned char *buffer, bool halt, bool reset);
   bool unpackState(unsigned char *this_buffer, unsigned char *prev_buffer);
 protected:
@@ -43,6 +46,12 @@ private:
   static const unsigned short int ros_pub_freq_const;
   static const unsigned short int device_pub_freq_const;
   static const unsigned char nb_publish_by_unpack_const;
+  std::string firmware_file_name;
+  pthread_mutex_t producing;
+  ros::ServiceServer serviceServer;
+  ETHERCAT_CAN_BRIDGE_DATA can_message_;
+  bool flashing;
+  bool can_message_sent;
 };
 
 #endif /* SR06_H */
