@@ -8,6 +8,14 @@ yaml:
 libdc1394-dev:
   debian: libdc1394-22-dev
 
+libspnav0:
+  ubuntu: libspnav0
+  debian: libspnav0
+
+libspnav-dev:
+  ubuntu: libspnav0
+  debian: libspnav0
+
 yapsy:
   ubuntu: |
     sudo easy_install yapsy
