@@ -2,16 +2,17 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b sr_robot_msgs is ... 
+\b This package contains messages specific to our packages. They are defined in a separate package to minimize the dependencies between packages. If you develop a node to interact with ours, most of the time, you only need to depend on this package (and not on sr_hand).
 
-<!-- 
+<!--
 Provide an overview of your package.
 -->
 
 
+<!--
 \section codeapi Code API
 
-<!--
+
 Provide links to specific auto-generated API documentation within your
 package that is of particular interest to a reader. Doxygen will
 document pretty much every part of your code, so do your best here to
