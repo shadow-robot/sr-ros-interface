@@ -72,7 +72,7 @@ void RealShadowhand::initializeMap()
     tmpData.force = 0.0;
     tmpData.flags = "";
 
-    for( unsigned int i = 0; i < NUM_HAND_JOINTS + 4; i++ )
+    for( unsigned int i = 0; i < START_OF_ARM; i++ )
     {
         std::string name = hand_joints[i].joint_name;
         tmpData.jointIndex = i;
