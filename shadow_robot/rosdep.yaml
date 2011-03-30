@@ -13,8 +13,8 @@ libspnav0:
   debian: libspnav0
 
 libspnav-dev:
-  ubuntu: libspnav0
-  debian: libspnav0
+  ubuntu: libspnav-dev
+  debian: libspnav-dev
 
 yapsy:
   ubuntu: |
