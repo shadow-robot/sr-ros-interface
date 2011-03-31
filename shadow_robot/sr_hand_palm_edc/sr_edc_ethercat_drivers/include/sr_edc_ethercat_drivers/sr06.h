@@ -33,6 +33,7 @@ public:
   bool SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res);
   void packCommand(unsigned char *buffer, bool halt, bool reset);
   bool unpackState(unsigned char *this_buffer, unsigned char *prev_buffer);
+  bool can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet);
 protected:
   int counter_;
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING data_;
@@ -52,6 +53,7 @@ private:
   ETHERCAT_CAN_BRIDGE_DATA can_message_;
   bool flashing;
   bool can_message_sent;
+  bool can_packet_acked;
 };
 
 #endif /* SR06_H */

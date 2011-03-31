@@ -105,8 +105,16 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 	const char *section_name;
 	unsigned int section_size = 0;
 	unsigned int section_addr = 0;
+	unsigned char addrl;
+	unsigned char addrh;
+	unsigned char addru;
+	int nb_sections;
+	unsigned int smallest_start_address = 0x7fff;
+	unsigned int biggest_end_address = 0;
+	unsigned int total_size = 0;
 
 	ROS_ERROR("DEBUT DU SERVICE\n");
+
 	bfd_init();
 
 	fd = bfd_openr(req.firmware.c_str(), NULL);
@@ -125,32 +133,40 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 
 	ROS_ERROR("firmware %s's format is : %s.", req.firmware.c_str(), fd->xvec->name);
 
-	s = fd->sections;
 
-/*	if (s == NULL)
-		ROS_FATAL("This binary contains no section.");
-*/
-	if (bfd_get_section_flags (fd, s) & (SEC_LOAD))
+	ROS_ERROR("Sending magic CAN packet to put the motor in bootloading mode");
+	cmd_sent = 0;
+	while ( !cmd_sent )
 	{
-		if (bfd_section_lma (fd, s) == bfd_section_vma (fd, s))
+		if ( !(err = pthread_mutex_trylock(&producing)) )
 		{
-			section_name = bfd_section_name (fd, s);
-			section_size = (unsigned int) bfd_section_size (fd, s);
-			section_addr = (unsigned int) bfd_section_lma (fd, s);
-			binary_content = (bfd_byte *)malloc(section_size);
-
-			if (binary_content == NULL)
-				ROS_FATAL("Error allocating memory for binary_content");
-
-			bfd_get_section_contents(fd, s, binary_content, 0, bfd_section_size (fd, s));
-		} else {
-			ROS_FATAL("something went wrong while parsing %s.", req.firmware.c_str());
+			flashing = true;
+			can_message_.message_length = 8;
+			can_message_.can_bus = 1;
+			can_message_.message_id = 0x0400 | (req.motor_id << 5) | 0b1010;
+			can_message_.message_data[0] = 0x55;
+			can_message_.message_data[1] = 0xAA;
+			can_message_.message_data[2] = 0x55;
+			can_message_.message_data[3] = 0xAA;
+			can_message_.message_data[4] = 0x55;
+			can_message_.message_data[5] = 0xAA;
+			can_message_.message_data[6] = 0x55;
+			can_message_.message_data[7] = 0xAA;
+			cmd_sent = 1;
+			unlock(&producing);
 		}
-	} else {
-		ROS_FATAL("something went wrong while parsing %s.", req.firmware.c_str());
+		else
+		{
+			check_for_trylock_error(err);
+		}
 	}
-//	}
-	
+	can_message_sent = false;
+	can_packet_acked = false;
+	while ( !can_packet_acked )
+	{
+		usleep(1);
+	}
+	sleep(1);
 
 	ROS_ERROR("Sending the ERASE FLASH command\n");
 	// First we send the erase command
@@ -159,7 +175,6 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 	{
 		if ( !(err = pthread_mutex_trylock(&producing)) )
 		{
-			flashing = true;
 			can_message_.message_length = 1;
 			can_message_.can_bus = 1;
 			can_message_.message_id = 0x0600 | (req.motor_id << 5) | ERASE_FLASH_COMMAND;
@@ -172,109 +187,123 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 		}
 	}
 	can_message_sent = false;
-	while ( !can_message_sent )
+	can_packet_acked = false;
+	while ( !can_packet_acked )
 	{
-//		ros::Duration d(0, 10E7);
-//		d.sleep();
 		usleep(1);
 	}
-	sleep(2);
-/*
-	ROS_ERROR("Sending the WRITE FLASH command with the address\n");
-	// Then we send the write command with the address
-	cmd_sent = 0;
-	while (! cmd_sent )
+	
+	for (s = fd->sections ; s ; s = s->next)
 	{
-		if ( !(err = pthread_mutex_trylock(&producing)) )
+		if (bfd_get_section_flags (fd, s) & (SEC_LOAD))
 		{
-			can_message_.message_length = 3;
-			can_message_.can_bus = 1;
-			can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_COMMAND;
-			can_message_.message_data[2] = 0x00;
-			can_message_.message_data[1] = 0x04; // User application start address is 0x4C0
-			can_message_.message_data[0] = 0xc0;
-			cmd_sent = 1;
-			unlock(&producing);
-		}
-		else
-		{
-			check_for_trylock_error(err);
+			if (bfd_section_lma (fd, s) == bfd_section_vma (fd, s))
+			{
+				section_addr = (unsigned int) bfd_section_lma (fd, s);
+				if (section_addr >= 0x7fff)
+					continue;
+				nb_sections++;
+				section_size = (unsigned int) bfd_section_size (fd, s);
+				smallest_start_address = min(section_addr, smallest_start_address);
+				biggest_end_address = max(biggest_end_address, section_addr + section_size);
+			}
 		}
 	}
+	total_size = biggest_end_address - smallest_start_address;
+	binary_content = (bfd_byte *)malloc(total_size);
+	if (binary_content == NULL)
+		ROS_FATAL("Error allocating memory for binary_content");
+	memset(binary_content, 0xFF, total_size);
+	
 
-	can_message_sent = false;
-	while ( !can_message_sent )
+	for (s = fd->sections ; s ; s = s->next)
 	{
-//		ros::Duration d(0, 10E7);
-//		d.sleep();
-//		usleep(100);
-		sleep(2);
-	}
-*/
-	unsigned int pos = 0;
-	ROS_ERROR("Sending the firmware data\n");
-	// Then we send the data to be written into PIC18F Flash memory	
-//	while ( (size = read(fd, &buffer, 8))  > 0)
-	while ( pos < ((section_size % 32) == 0 ? section_size : (section_size + 32 - (section_size % 32))) )
-	{
-		if ((pos % 32) == 0)
+		if (bfd_get_section_flags (fd, s) & (SEC_LOAD))
 		{
-			cmd_sent = 0;
-			while (! cmd_sent )
+			if (bfd_section_lma (fd, s) == bfd_section_vma (fd, s))
 			{
-				if ( !(err = pthread_mutex_trylock(&producing)) )
-				{
-					can_message_.message_length = 3;
-					can_message_.can_bus = 1;
-					can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_COMMAND;
-					can_message_.message_data[2] = 0x00;
-					can_message_.message_data[1] = 0x04 + ((pos + 0xc0) >> 8); // User application start address is 0x4C0
-					can_message_.message_data[0] = 0xc0 + pos;
-					ROS_ERROR("Sending write address : 0x%02X%02X%02X", can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
-					cmd_sent = 1;
-					unlock(&producing);
-				}
-				else
-				{
-					check_for_trylock_error(err);
-				}
-			}
-			can_message_sent = false;
-			while ( !can_message_sent )
-			{
-				usleep(1);
-			}
-			usleep(100);
-		}
-		
-		cmd_sent = 0;
-		while (! cmd_sent )
-		{
-			if ( !(err = pthread_mutex_trylock(&producing)) )
-			{
-				ROS_ERROR("Sending data ... position == %d", pos);
-				can_message_.message_length = 8;
-				can_message_.can_bus = 1;
-				can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_COMMAND;
-				bzero(can_message_.message_data, 8);
-				for (unsigned char j = 0 ; j < 8 ; ++j)
-					can_message_.message_data[j] = (pos > section_size) ? 0 : *(binary_content + pos + j);
-				pos += 8;
-				cmd_sent = 1;
-				unlock(&producing);
+				section_addr = (unsigned int) bfd_section_lma (fd, s);
+				if (section_addr >= 0x7fff)
+					continue;
+				section_size = (unsigned int) bfd_section_size (fd, s);
+				bfd_get_section_contents(fd, s, binary_content + (section_addr - smallest_start_address), 0, section_size);
 			}
 			else
 			{
-				check_for_trylock_error(err);
+				ROS_FATAL("something went wrong while parsing %s.", req.firmware.c_str());
 			}
 		}
-		can_message_sent = false;
-		while ( !can_message_sent )
+		else
 		{
-			usleep(1);
+			ROS_FATAL("something went wrong while parsing %s.", req.firmware.c_str());
 		}
-		usleep(100);
 	}
+	addrl = smallest_start_address & 0xff;
+	addrh = (smallest_start_address & 0xff00) >> 8;
+	addru = smallest_start_address >> 16;
+
+				unsigned int pos = 0;
+				ROS_ERROR("Sending the firmware data\n");
+				while ( pos < ((total_size % 32) == 0 ? total_size : (total_size + 32 - (total_size % 32))) )
+				{
+					if ((pos % 32) == 0)
+					{
+						cmd_sent = 0;
+						while (! cmd_sent )
+						{
+							if ( !(err = pthread_mutex_trylock(&producing)) )
+							{
+								can_message_.message_length = 3;
+								can_message_.can_bus = 1;
+								can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_COMMAND;
+								can_message_.message_data[2] = addru + ((pos + addrl + (addrh << 8)) >> 16);
+								can_message_.message_data[1] = addrh + ((pos + addrl) >> 8); // User application start address is 0x4C0
+								can_message_.message_data[0] = addrl + pos;
+								ROS_ERROR("Sending write address : 0x%02X%02X%02X", can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
+								cmd_sent = 1;
+								unlock(&producing);
+							}
+							else
+							{
+								check_for_trylock_error(err);
+							}
+						}
+						can_message_sent = false;
+						can_packet_acked = false;
+						while ( !can_packet_acked )
+						{
+							usleep(1);
+						}
+					}
+		
+					cmd_sent = 0;
+					while (! cmd_sent )
+					{
+						if ( !(err = pthread_mutex_trylock(&producing)) )
+						{
+							ROS_ERROR("Sending data ... position == %d", pos);
+							can_message_.message_length = 8;
+							can_message_.can_bus = 1;
+							can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_COMMAND;
+							bzero(can_message_.message_data, 8);
+							for (unsigned char j = 0 ; j < 8 ; ++j)
+								can_message_.message_data[j] = (pos > total_size) ? 0xFF : *(binary_content + pos + j);
+							pos += 8;
+							cmd_sent = 1;
+							unlock(&producing);
+						}
+						else
+						{
+							check_for_trylock_error(err);
+						}
+					}
+					can_message_sent = false;
+					can_packet_acked = false;
+					while ( !can_packet_acked )
+					{
+						usleep(1);
+					}
+				}
 
 //	close(fd); // We do not need the file anymore
 	bfd_close(fd);
@@ -297,13 +326,12 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 		}
 	}
 		
-
 	can_message_sent = false;
-	while ( !can_message_sent )
+	can_packet_acked = false;
+	while ( !can_packet_acked )
 	{
 		usleep(1);
 	}
-	usleep(100);
 
 	flashing = false;
 
@@ -331,6 +359,7 @@ SR06::SR06() : SR0X()//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance
 
 	flashing = false;
 	can_message_sent = false;
+	can_packet_acked = true;
 	res = pthread_mutex_init(&producing, NULL);
 
 	check_for_pthread_mutex_init_error(res);
@@ -458,13 +487,13 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 	}
 
 //	motor[8] = 0x4143;
-	if ( j < 20)
+	if ( !flashing )
 	{
 //		ROS_ERROR("EDC_COMMAND_SENSOR_DATA !\n");
 		command->EDC_command = EDC_COMMAND_SENSOR_DATA;
-		++j;
 	}
-	else {
+	else 
+	{
 //		k++;
 //		ROS_ERROR("EDC_COMMAND_CAN_TEST_MODE !\n");
 		command->EDC_command = EDC_COMMAND_CAN_TEST_MODE;
@@ -476,7 +505,7 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 	}
 	memcpy(command->motor_torque_demand, motor, sizeof(command->motor_torque_demand));
 
-	if (flashing && !can_message_sent) {
+	if (flashing && !can_packet_acked && !can_message_sent) {
 		if ( !(res = pthread_mutex_trylock(&producing)) ) {
 			ROS_ERROR("We send a CAN message for flashing !");
 			memcpy(message, &can_message_, sizeof(can_message_));
@@ -527,10 +556,48 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 */
 }
 
+bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
+{
+  int i;
+
+  if ( (can_message_.message_id & 0x0400) && ((can_message_.message_id & 0x0F) == 0b1010) )
+    return true; // This is a magic packet, it is not acked
+
+  if (packet->message_length != can_message_.message_length)
+    return false;
+  ROS_ERROR("Length is OK");
+
+  for (i = 0 ; i < packet->message_length ; ++i)
+  {
+    ROS_ERROR("packet sent, data[%d] : %02X ; ack, data[%d] : %02X", i, can_message_.message_data[i], i, packet->message_data[i]);
+    if (packet->message_data[i] != can_message_.message_data[i])
+      return false;
+  }
+  ROS_ERROR("Data is OK");
+
+  if ( ! (0x0600 & packet->message_id) )
+    return false;
+
+  ROS_ERROR("This is bootloading stuff");
+
+  if ( !(0x0010) & packet->message_id)
+    return false;
+
+  ROS_ERROR("This is an ACK");
+
+  if ( (packet->message_id & 0b0000011111101111) != (can_message_.message_id & 0b0000011111101111) )
+    return false;
+
+  ROS_ERROR("SID is OK");
+
+  ROS_ERROR("Everything is OK, this is our ACK !");
+  return true;
+}
+
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
-//  ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
+  ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
   static unsigned int i = 0;
   static unsigned int num_rxed_packets = 0;
 /*uint32_t event_req;
@@ -559,7 +626,15 @@ ROS_ERROR("spi_config == %02X", spi_config);
  */
 //  ROS_ERROR("Motor[8] : torque == %hd ; SG_L == %hu ; SG_R == %hu ; temp == %hd ; current == %hd ; flags == %hu\n", tbuffer->motor[8].torque, tbuffer->motor[8].SG_L, tbuffer->motor[8].SG_R, tbuffer->motor[8].temperature, tbuffer->motor[8].current, tbuffer->motor[8].flags);
 
-//  ROS_ERROR("CAN debug : can_bus : %d ; message_length : %d ; message_id : 0x%04X ; message_data : 0x%02X 0x%02X 0x%02X 0x%02X\n", can_data->can_bus, can_data->message_length, can_data->message_id, can_data->message_data[0], can_data->message_data[1], can_data->message_data[2], can_data->message_data[3]);
+//  ROS_ERROR("CAN debug RXed : can_bus : %d ; message_length : %d ; message_id : 0x%04X ; message_data : 0x%02X 0x%02X 0x%02X 0x%02X\n", can_data->can_bus, can_data->message_length, can_data->message_id, can_data->message_data[0], can_data->message_data[1], can_data->message_data[2], can_data->message_data[3]);
+
+  if (flashing)
+  {
+    if (can_data_is_ack(can_data))
+    {
+      can_packet_acked = true;
+    }
+  }
 
   if (i == max_iter_const) { // 10 == 100 Hz
     i = 0;
