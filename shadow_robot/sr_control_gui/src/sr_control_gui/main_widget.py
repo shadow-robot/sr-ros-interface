@@ -20,11 +20,7 @@ import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 from shadowhand_ros import ShadowHand_ROS
 
-import logging
-#enables the logging used by yapsy
-logging.basicConfig(level=logging.ERROR)
-
-from yapsy.PluginManager import PluginManager, IPlugin
+from plugin_manager import PluginManager
 from PyQt4 import Qt, QtCore, QtGui, QtWebKit
 import os, sys
 from config import Config
@@ -40,7 +36,7 @@ class MainWidget(QtGui.QWidget):
         self.container = QtGui.QMdiArea(self)
         self.container.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.container.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        
+
         self.layout.addWidget(self.container)
         self.setLayout(self.layout)
         ####
@@ -48,54 +44,48 @@ class MainWidget(QtGui.QWidget):
         ##
         # Create plugin manager
         self.manager = PluginManager()
-        
+
         self.manager.setPluginPlaces([self.parent.rootPath + "/src/sr_control_gui/plugins"])
 
         # Add the plugins to the menubar in tool menu
         tools = self.parent.menuBar().addMenu('&Plugins')
         self.parent.statusBar().showMessage('Loading plugins...', 500)
-        
+
         # Load plugins
-        nb_plugins_found = self.manager.locatePlugins()
+        nb_plugins_found = self.manager.loadPlugins()
         rospy.loginfo(str(nb_plugins_found) + " plugins found")
-        self.manager.loadPlugins()
-                
-        self.plugins = self.manager.getPluginsOfCategory("Default")
+
+        self.plugins = self.manager.getPluginsOfCategory(["Default"])
 
         self.plugin_actions = []
-        plugin_id = 0
-        
+
         cyberglove_menu = QtGui.QMenu("Cyberglove")
         cyberglove_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconGlove.png'))
         hand_menu = QtGui.QMenu("Shadow Hand")
         hand_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconHand.png'))
         arm_menu = QtGui.QMenu("Shadow Arm")
         arm_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconArm.png'))
-        
+
         categories = [[cyberglove_menu, "cyberglove", 0],
                       [hand_menu, "shadowhand", 0],
                       [arm_menu, "shadowarm", 0],
                       [QtGui.QMenu("Other"), "", 0]]
-        
-        for plugin in self.plugins:            
-            plugin.plugin_object.set_parent(self)
-            name = plugin.plugin_object.name
-            
-            
-            plugin.plugin_object.id = plugin_id
+
+        for plugin in self.plugins:
+            plugin.set_parent(self)
+            name = plugin.plugin_name
+
             action = QtGui.QAction(name, self)
             action.setDisabled(True)
-            self.plugin_actions.append([action, plugin.plugin_object])
-            self.connect(action, QtCore.SIGNAL('triggered()'), plugin.plugin_object.activate)
-            
+            self.plugin_actions.append([action, plugin])
+            self.connect(action, QtCore.SIGNAL('triggered()'), plugin.activate)
+
             for category in categories:
                 if category[1] in plugin.description.lower():
                     category[0].addAction(action)
                     category[2] = category[2] + 1
                     break
-                    
-            plugin_id += 1
-        
+
         for category in categories:
             if category[1] == "":
                 tools.addSeparator()
@@ -122,35 +112,38 @@ class MainWidget(QtGui.QWidget):
         action = QtGui.QAction("Cascade the windows", self)
         self.connect(action, QtCore.SIGNAL('triggered()'), self.cascade)
         view.addAction(action)
-            
+
     def tile(self):
         self.container.tileSubWindows()
-        
+
     def cascade(self):
         self.container.cascadeSubWindows()
-    
+
     def refresh_activated_plugins(self):
         """
-        refresh the activated plugins by checking if the ros nodes on which the 
+        refresh the activated plugins by checking if the ros nodes on which the
         plugin depends are started or not.
         """
         no_plugin_available = True
         for action_and_plugin in self.plugin_actions:
             dependencies = action_and_plugin[1].depends()
             activate_plugin = True
-            for dependency in dependencies:
-                if self.parent.libraries[dependency].status != "started":
-                    activate_plugin = False
-            
-            if activate_plugin:
-                no_plugin_available = False
-            
+            if dependencies == None:
+                activate_plugin = False
+            else:
+                for dependency in dependencies:
+                    if self.parent.libraries[dependency].status != "started":
+                        activate_plugin = False
+
+                    if activate_plugin:
+                        no_plugin_available = False
+
             action_and_plugin[0].setEnabled(activate_plugin)
-        
+
         if no_plugin_available:
             self.parent.statusBar().showMessage('No Plugins Available. Start the Libraries you need...', 2000)
             self.parent.robot_and_libraries_dock.show()
-        
-        
-        
-        
+
+
+
+
