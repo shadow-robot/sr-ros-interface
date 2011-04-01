@@ -86,8 +86,8 @@
     <parent link="shadowarm_base"/>
     <child link="shadowarm_trunk"/>
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
-    <axis xyz="0 0 1"/>
-    <limit effort="10" lower="-1.57079632679" upper="0.785398163397" velocity="1.0"/>
+    <axis xyz="0 0 -1"/>
+    <limit effort="10" lower="-0.785398163397" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="200.5"/>
   </joint>
   <transmission name="trunk_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
@@ -104,7 +104,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="-1.57079632679 0 -1.57079632679" xyz="0 0.067 0"/>
+      <origin rpy="-1.57079632679 -1.57079632679 -1.57079632679" xyz="0 0.067 0"/>
       <geometry name="shadowarm_upperarm_visual">
         <mesh filename="package://sr_hand/model/meshes/arm/upper_arm.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -125,7 +125,7 @@
     <parent link="shadowarm_trunk"/>
     <child link="shadowarm_upperarm"/>
     <origin rpy="0 0 0" xyz="0 -0.134 0.5405"/>
-    <axis xyz="0 1 0"/>
+    <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
@@ -203,7 +203,7 @@
     <parent link="shadowarm_lowerarm"/>
     <child link="shadowarm_handsupport_motor"/>
     <origin rpy="0 0 0" xyz="0.131 0 -0.08"/>
-    <axis xyz="1 0 0"/>
+    <axis xyz="-1 0 0"/>
     <limit effort="10" lower="-1.57079632679" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="10.5"/>
   </joint>
