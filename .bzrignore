@@ -122,3 +122,6 @@ shadow_robot/sr_robot_msgs/msg/lisp
 shadow_robot/sr_hand/model/hand_urdf/shadowhand_motor.gv
 shadow_robot/sr_hand/model/hand_urdf/shadowhand_motor.pdf
 shadow_robot/sr_hand/model/hand_urdf/shadowhand_motor_old.pdf
+sr_arm_motor_org.pdf
+sr_arm_motor.pdf
+sr_arm_motor.gv
