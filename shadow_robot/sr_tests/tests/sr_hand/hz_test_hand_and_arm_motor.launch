@@ -3,6 +3,6 @@
   <include file="$(find sr_hand)/launch/sr_arm_motor.launch"/>
 
   <!-- test the publish rates -->
-  <test test-name="hztest_sr_hand_and_arm_motor_1" pkg="sr_tests" type="hztest" time-limite="50" name="hztest_sr_hand_and_arm_motor_1">
+  <test test-name="hztest_sr_hand_and_arm_motor_1" pkg="sr_tests" type="hztest.py" time-limit="50" name="hztest_sr_hand_and_arm_motor_1">
   </test>
 </launch>
