@@ -16,4 +16,15 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_motor.launch)
+
+IF($ENV{GAZEBO} EQUAL 1)
+  MESSAGE("Testing with Gazebo support")
+  rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_gazebo_motor_1.launch)
+  rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_gazebo_motor_2.launch)
+ELSE($ENV{GAZEBO} EQUAL 1)
+  MESSAGE("Testing without Gazebo support")
+  rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_motor.launch)
+  rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_muscle.launch)
+ENDIF($ENV{GAZEBO} EQUAL 1)
+
+

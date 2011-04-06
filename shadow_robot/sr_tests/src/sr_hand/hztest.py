@@ -46,6 +46,8 @@ class MyHzTest(unittest.TestCase):
     end_time   = 0
     finished   = False
 
+    ok_topic_is_there = False
+
     def __init__(self, *args):
         """
         """
@@ -65,6 +67,12 @@ class MyHzTest(unittest.TestCase):
         self.topic_pub    = rospy.get_param('~publish_topic', '/srh/sendupdate')
         self.pub = rospy.Publisher(self.topic_pub, sendupdate)
 
+        self.wait_for_topic = rospy.get_param('~wait_for_topic', '')
+        if self.wait_for_topic != '':
+            rospy.Subscriber(self.wait_for_topic, rospy.AnyMsg, self.wait_for_topic_callback)
+            while not self.ok_topic_is_there:
+                time.sleep(0.5)
+
         timeout_t = time.time() + self.test_duration + TEST_TIMEOUT
         print "Timeout: ", timeout_t
         while not rospy.is_shutdown() and not self.success and not self.finished and time.time() < timeout_t:
@@ -72,6 +80,7 @@ class MyHzTest(unittest.TestCase):
             self.publish_freq.sleep()
 
         print " realtime:",time.time()," simtime:",rospy.get_rostime().to_sec()," time elapsed:",(self.end_time - self.start_time)," msg count:",self.msg_count
+
         self.assert_(self.success)
 
     def publish_sendupdate(self):
@@ -95,6 +104,9 @@ class MyHzTest(unittest.TestCase):
                          joint(joint_name="THJ4", joint_target=new_target)
                          ]
         self.pub.publish(sendupdate( len(data_to_send), data_to_send ) )
+
+    def wait_for_topic_callback(self, msg):
+        self.ok_topic_is_there = True
 
     def callback(self, msg):
         self.msg_count += 1
