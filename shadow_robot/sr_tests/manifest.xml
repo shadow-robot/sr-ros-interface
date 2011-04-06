@@ -14,6 +14,7 @@
   <depend package="sr_tactile_sensors"/>
   <depend package="sr_remappers"/>
   <depend package="sr_control_gui"/>
+  <depend package="sr_robot_msgs"/>
 
 </package>
 
