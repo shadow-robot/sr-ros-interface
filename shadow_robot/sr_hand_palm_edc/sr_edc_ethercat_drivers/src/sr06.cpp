@@ -42,17 +42,19 @@ const unsigned short int SR06::ros_pub_freq_const = 100;
 const unsigned short int SR06::max_iter_const = device_pub_freq_const / ros_pub_freq_const;
 const unsigned char SR06::nb_sensors_const = 36;
 const unsigned char SR06::nb_publish_by_unpack_const = (nb_sensors_const % max_iter_const) ? (nb_sensors_const / max_iter_const) + 1 : (nb_sensors_const / max_iter_const);
+const unsigned int SR06::max_retry = 10;
 
 #define ETHERCAT_OUTGOING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING)
 #define ETHERCAT_INCOMING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING)
 
 #define ETHERCAT_CAN_BRIDGE_DATA_SIZE sizeof(ETHERCAT_CAN_BRIDGE_DATA)
 
-#define WRITE_FLASH_COMMAND	0x00
-#define READ_FLASH_COMMAND	0x01
-#define ERASE_FLASH_COMMAND	0x02
-#define RESET_COMMAND		0x03
-#define READ_VERSION_COMMAND	0x04
+#define WRITE_FLASH_DATA_COMMAND	0x00
+#define READ_FLASH_COMMAND		0x01
+#define ERASE_FLASH_COMMAND		0x02
+#define RESET_COMMAND			0x03
+#define READ_VERSION_COMMAND		0x04
+#define WRITE_FLASH_ADDRESS_COMMAND	0x05
 
 PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 
@@ -95,12 +97,108 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 						exit(1); \
 					}
 
+void SR06::erase_flash(void)
+{
+	unsigned char cmd_sent;
+	unsigned int wait_time;
+	bool timedout;
+	unsigned int timeout;
+	int err;
+	
+	do {
+		ROS_ERROR("Sending the ERASE FLASH command\n");
+		// First we send the erase command
+		cmd_sent = 0;
+		while (! cmd_sent )
+		{
+			if ( !(err = pthread_mutex_trylock(&producing)) )
+			{
+				can_message_.message_length = 1;
+				can_message_.can_bus = 1;
+				can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | ERASE_FLASH_COMMAND;
+				cmd_sent = 1;
+				unlock(&producing);
+			}
+			else
+			{
+				check_for_trylock_error(err);
+			}
+		}
+		wait_time = 0;
+		timeout = 3000;
+		can_message_sent = false;
+		can_packet_acked = false;
+		timedout = false;
+		while ( !can_packet_acked )
+		{
+			usleep(1000);
+			if (wait_time > timeout)
+			{
+				timedout = true;
+				break;
+			}
+			wait_time++;
+		}
+	
+		if (timedout)
+		{
+			ROS_ERROR("ERASE command timedout, resending it !");
+		}
+	} while (timedout);	
+
+}
+
+bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char baddrh, unsigned char baddru)
+{
+	unsigned int cmd_sent;
+	int err;
+	unsigned int wait_time;
+	bool timedout;
+	unsigned int timeout;
+			cmd_sent = 0;
+			while ( !cmd_sent )
+			{
+				if ( !(err = pthread_mutex_trylock(&producing)) )
+				{
+					ROS_ERROR("Sending READ data ... position : %d", pos);
+					can_message_.can_bus = 1;
+					can_message_.message_length = 3;
+					can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | READ_FLASH_COMMAND;
+					can_message_.message_data[2] = baddru + ((offset + baddrl + (baddrh << 8)) >> 16);
+					can_message_.message_data[1] = baddrh + ((offset + baddrl) >> 8); // User application start address is 0x4C0
+					can_message_.message_data[0] = baddrl + offset;
+					cmd_sent = 1;
+					unlock(&producing);
+				}
+				else
+				{
+					check_for_trylock_error(err);
+				}
+	
+			}
+			timedout = false;
+			wait_time = 0;
+			timeout = 100;
+			can_message_sent = false;
+			can_packet_acked = false;
+			while ( !can_packet_acked )
+			{
+				usleep(1000);
+				if (wait_time > timeout)
+				{
+					timedout = true;
+					break;
+				}
+				wait_time++;
+			}
+	return timedout;
+}
+
 bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res)
 {
 	int err;
 	unsigned char cmd_sent;
 	bfd *fd;
-	bfd_byte *binary_content = NULL;
 	asection *s;
 	const char *section_name;
 	unsigned int section_size = 0;
@@ -112,6 +210,12 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 	unsigned int smallest_start_address = 0x7fff;
 	unsigned int biggest_end_address = 0;
 	unsigned int total_size = 0;
+	int timeout, wait_time;
+	bool timedout;
+
+	motor_being_flashed = req.motor_id;
+	binary_content = NULL;
+	flashing = true;
 
 	ROS_ERROR("DEBUT DU SERVICE\n");
 
@@ -133,6 +237,37 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 
 	ROS_ERROR("firmware %s's format is : %s.", req.firmware.c_str(), fd->xvec->name);
 
+	ROS_ERROR("Sending dummy packet");
+	cmd_sent = 0;
+	while ( !cmd_sent )
+	{
+		if ( !(err = pthread_mutex_trylock(&producing)) )
+		{
+			can_message_.message_length = 0;
+			can_message_.can_bus = 1;
+			can_message_.message_id = 0;
+			cmd_sent = 1;
+			unlock(&producing);
+		}
+		else
+		{
+			check_for_trylock_error(err);
+		}
+	}
+	wait_time = 0;
+	timeout = 1;
+	timedout = false;
+	can_message_sent = false;
+	can_packet_acked = false;
+	while ( !can_packet_acked )
+	{
+		usleep(1000); // 1 ms
+		wait_time++;
+		if (wait_time > timeout) {
+			timedout = true;
+			break;
+		}
+	}
 
 	ROS_ERROR("Sending magic CAN packet to put the motor in bootloading mode");
 	cmd_sent = 0;
@@ -140,7 +275,6 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 	{
 		if ( !(err = pthread_mutex_trylock(&producing)) )
 		{
-			flashing = true;
 			can_message_.message_length = 8;
 			can_message_.can_bus = 1;
 			can_message_.message_id = 0x0400 | (req.motor_id << 5) | 0b1010;
@@ -160,39 +294,74 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 			check_for_trylock_error(err);
 		}
 	}
+	wait_time = 0;
+	timeout = 100;
+	timedout = false;
 	can_message_sent = false;
 	can_packet_acked = false;
 	while ( !can_packet_acked )
 	{
-		usleep(1);
+		usleep(1000); // 1 ms
+		wait_time++;
+		if (wait_time > timeout) {
+			timedout = true;
+			break;
+		}
 	}
+
+	if ( timedout ) {
+		ROS_ERROR("First magic CAN packet timedout");
+		ROS_ERROR("Sending another magic CAN packet to put the motor in bootloading mode");
+		cmd_sent = 0;
+		while ( !cmd_sent )
+		{
+			if ( !(err = pthread_mutex_trylock(&producing)) )
+			{
+				can_message_.message_length = 8;
+				can_message_.can_bus = 1;
+				can_message_.message_id = 0x0600 | (req.motor_id << 5) | 0b1010;
+				can_message_.message_data[0] = 0x55;
+				can_message_.message_data[1] = 0xAA;
+				can_message_.message_data[2] = 0x55;
+				can_message_.message_data[3] = 0xAA;
+				can_message_.message_data[4] = 0x55;
+				can_message_.message_data[5] = 0xAA;
+				can_message_.message_data[6] = 0x55;
+				can_message_.message_data[7] = 0xAA;
+				cmd_sent = 1;
+				unlock(&producing);
+			}
+			else
+			{
+				check_for_trylock_error(err);
+			}
+		}	
+		wait_time = 0;
+		timeout = 100;
+		timedout = false;
+		can_message_sent = false;
+		can_packet_acked = false;
+		while ( !can_packet_acked )
+		{
+			usleep(1000); // 1 ms
+			wait_time++;
+			if (wait_time > timeout) {
+				timedout = true;
+				break;
+			}
+		}
+		if (timedout)
+		{
+			ROS_FATAL("None of the magic packets were ACKed");
+			ROS_BREAK();
+		}
+				
+	}
+
+	erase_flash();
+
 	sleep(1);
 
-	ROS_ERROR("Sending the ERASE FLASH command\n");
-	// First we send the erase command
-	cmd_sent = 0;
-	while (! cmd_sent )
-	{
-		if ( !(err = pthread_mutex_trylock(&producing)) )
-		{
-			can_message_.message_length = 1;
-			can_message_.can_bus = 1;
-			can_message_.message_id = 0x0600 | (req.motor_id << 5) | ERASE_FLASH_COMMAND;
-			cmd_sent = 1;
-			unlock(&producing);
-		}
-		else
-		{
-			check_for_trylock_error(err);
-		}
-	}
-	can_message_sent = false;
-	can_packet_acked = false;
-	while ( !can_packet_acked )
-	{
-		usleep(1);
-	}
-	
 	for (s = fd->sections ; s ; s = s->next)
 	{
 		if (bfd_get_section_flags (fd, s) & (SEC_LOAD))
@@ -242,71 +411,123 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 	addrh = (smallest_start_address & 0xff00) >> 8;
 	addru = smallest_start_address >> 16;
 
-				unsigned int pos = 0;
-				ROS_ERROR("Sending the firmware data\n");
-				while ( pos < ((total_size % 32) == 0 ? total_size : (total_size + 32 - (total_size % 32))) )
+	pos = 0;
+	unsigned int packet = 0;
+	ROS_ERROR("Sending the firmware data\n");
+	while ( pos < ((total_size % 32) == 0 ? total_size : (total_size + 32 - (total_size % 32))) )
+	{
+		if ((pos % 32) == 0)
+		{
+			send_address:
+			packet = 0;
+			do {
+				cmd_sent = 0;
+				while (! cmd_sent )
 				{
-					if ((pos % 32) == 0)
+					if ( !(err = pthread_mutex_trylock(&producing)) )
 					{
-						cmd_sent = 0;
-						while (! cmd_sent )
-						{
-							if ( !(err = pthread_mutex_trylock(&producing)) )
-							{
-								can_message_.message_length = 3;
-								can_message_.can_bus = 1;
-								can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_COMMAND;
-								can_message_.message_data[2] = addru + ((pos + addrl + (addrh << 8)) >> 16);
-								can_message_.message_data[1] = addrh + ((pos + addrl) >> 8); // User application start address is 0x4C0
-								can_message_.message_data[0] = addrl + pos;
-								ROS_ERROR("Sending write address : 0x%02X%02X%02X", can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
-								cmd_sent = 1;
-								unlock(&producing);
-							}
-							else
-							{
-								check_for_trylock_error(err);
-							}
-						}
-						can_message_sent = false;
-						can_packet_acked = false;
-						while ( !can_packet_acked )
-						{
-							usleep(1);
-						}
+						can_message_.message_length = 3;
+						can_message_.can_bus = 1;
+						can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_ADDRESS_COMMAND;
+						can_message_.message_data[2] = addru + ((pos + addrl + (addrh << 8)) >> 16);
+						can_message_.message_data[1] = addrh + ((pos + addrl) >> 8); // User application start address is 0x4C0
+						can_message_.message_data[0] = addrl + pos;
+						ROS_ERROR("Sending write address : 0x%02X%02X%02X", can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
+						cmd_sent = 1;
+						unlock(&producing);
 					}
-		
-					cmd_sent = 0;
-					while (! cmd_sent )
+					else
 					{
-						if ( !(err = pthread_mutex_trylock(&producing)) )
-						{
-							ROS_ERROR("Sending data ... position == %d", pos);
-							can_message_.message_length = 8;
-							can_message_.can_bus = 1;
-							can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_COMMAND;
-							bzero(can_message_.message_data, 8);
-							for (unsigned char j = 0 ; j < 8 ; ++j)
-								can_message_.message_data[j] = (pos > total_size) ? 0xFF : *(binary_content + pos + j);
-							pos += 8;
-							cmd_sent = 1;
-							unlock(&producing);
-						}
-						else
-						{
-							check_for_trylock_error(err);
-						}
-					}
-					can_message_sent = false;
-					can_packet_acked = false;
-					while ( !can_packet_acked )
-					{
-						usleep(1);
+						check_for_trylock_error(err);
 					}
 				}
+				wait_time = 0;
+				timedout = false;
+				timeout = 100;
+				can_message_sent = false;
+				can_packet_acked = false;
+				while ( !can_packet_acked )
+				{
+					usleep(1000);
+					if (wait_time > timeout)
+					{
+						timedout = true;
+						break;
+					}
+					wait_time++;
+				}
+				if (timedout)
+					ROS_ERROR("WRITE ADDRESS timedout ");
+			} while ( timedout );
+		}
+		cmd_sent = 0;
+		while (! cmd_sent )
+		{
+			if ( !(err = pthread_mutex_trylock(&producing)) )
+			{
+				ROS_ERROR("Sending data ... position == %d", pos);
+				can_message_.message_length = 8;
+				can_message_.can_bus = 1;
+				can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_DATA_COMMAND;
+				bzero(can_message_.message_data, 8);
+				for (unsigned char j = 0 ; j < 8 ; ++j)
+					can_message_.message_data[j] = (pos > total_size) ? 0xFF : *(binary_content + pos + j);
+				pos += 8;
+				cmd_sent = 1;
+				unlock(&producing);
+			}
+			else
+			{
+				check_for_trylock_error(err);
+			}
+		}
+		packet++;	
+		timedout = false;
+		wait_time = 0;
+		timeout = 100;
+		can_message_sent = false;
+		can_packet_acked = false;
+		while ( !can_packet_acked )
+		{
+			usleep(1000);
+			if (wait_time > timeout)
+			{
+				timedout = true;
+				break;
+			}
+			wait_time++;
+		}
+		if ( timedout )
+		{
+			ROS_ERROR("A WRITE data packet has been lost, resending the 32 bytes block !");
+			pos -= packet*8;
+			goto send_address;
+		}
+	}
 
 //	close(fd); // We do not need the file anymore
 	bfd_close(fd);
+
+	// Now we have to read back the flash content
+	pos = 0;
+	unsigned int retry;
+	while (pos < total_size)
+	{
+		retry = 0;
+		do {
+			timedout = read_flash(pos, addrl, addrh, addru);
+			if ( ! timedout )
+				pos += 8;
+			retry++;
+			if (retry > max_retry)
+			{
+				ROS_FATAL("Too much retry for READ back, try flashing again");
+				return true;
+			}
+		} while ( timedout );
+	}
+	
+	free(binary_content);
 	ROS_ERROR("Sending the RESET command to PIC18F");
 	// Then we send the RESET command to PIC18F
 	cmd_sent = 0;
@@ -358,7 +579,7 @@ SR06::SR06() : SR0X()//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance
 	ROS_INFO("nb_publish_by_unpack_const = %d", nb_publish_by_unpack_const);
 
 	flashing = false;
-	can_message_sent = false;
+	can_message_sent = true;
 	can_packet_acked = true;
 	res = pthread_mutex_init(&producing, NULL);
 
@@ -560,8 +781,22 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
 {
   int i;
 
-  if ( (can_message_.message_id & 0x0400) && ((can_message_.message_id & 0x0F) == 0b1010) )
-    return true; // This is a magic packet, it is not acked
+//  if ( (can_message_.message_id & 0x0400) && ((can_message_.message_id & 0x0F) == 0b1010) )
+//    return true; // This is a magic packet, it is not acked
+/*  srand(time(NULL));
+  if ( (rand() & 0x0F) == 0x0F )
+  {
+    ROS_ERROR("We do not ACK the previous packet ! ERROR");
+    return false;
+  }*/
+
+  if (packet->message_id == 0)
+    return false;
+
+  ROS_ERROR("ack sid : %04X", packet->message_id);
+
+  if ( (packet->message_id & 0b0000011111111111) == (0x0600 | (motor_being_flashed << 5) | 0x10 | READ_FLASH_COMMAND))
+    return ( !memcmp(packet->message_data, binary_content + pos, 8) );
 
   if (packet->message_length != can_message_.message_length)
     return false;
@@ -574,18 +809,18 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
       return false;
   }
   ROS_ERROR("Data is OK");
-
-  if ( ! (0x0600 & packet->message_id) )
+//  ROS_ERROR("packet sent, msgID : %04X ; ack, msgID : %04X", can_message_.message_id, packet->message_id);
+/*  if ( ! (0x0600 & packet->message_id) )
     return false;
 
-  ROS_ERROR("This is bootloading stuff");
+  ROS_ERROR("This is bootloading stuff");*/
 
-  if ( !(0x0010) & packet->message_id)
+  if ( !(0x0010 & packet->message_id))
     return false;
 
   ROS_ERROR("This is an ACK");
 
-  if ( (packet->message_id & 0b0000011111101111) != (can_message_.message_id & 0b0000011111101111) )
+  if ( (packet->message_id & 0b0000000111101111) != (can_message_.message_id & 0b0000000111101111) )
     return false;
 
   ROS_ERROR("SID is OK");
@@ -628,7 +863,7 @@ ROS_ERROR("spi_config == %02X", spi_config);
 
 //  ROS_ERROR("CAN debug RXed : can_bus : %d ; message_length : %d ; message_id : 0x%04X ; message_data : 0x%02X 0x%02X 0x%02X 0x%02X\n", can_data->can_bus, can_data->message_length, can_data->message_id, can_data->message_data[0], can_data->message_data[1], can_data->message_data[2], can_data->message_data[3]);
 
-  if (flashing)
+  if (flashing & !can_packet_acked)
   {
     if (can_data_is_ack(can_data))
     {

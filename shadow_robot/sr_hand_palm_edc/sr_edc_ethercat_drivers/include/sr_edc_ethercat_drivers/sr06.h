@@ -7,6 +7,7 @@
 #include <std_msgs/Int16.h>
 #include <sr_edc_ethercat_drivers/SimpleMotorFlasher.h>
 #include <pthread.h>
+#include <bfd.h>
 
 typedef unsigned char       int8u;
 typedef   signed char       int8s;
@@ -34,6 +35,8 @@ public:
   void packCommand(unsigned char *buffer, bool halt, bool reset);
   bool unpackState(unsigned char *this_buffer, unsigned char *prev_buffer);
   bool can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet);
+  void erase_flash();
+  bool read_flash(unsigned int offset, unsigned char baddrl, unsigned char baddrh, unsigned char baddru);
 protected:
   int counter_;
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING data_;
@@ -43,6 +46,7 @@ protected:
 
 private:
   static const unsigned char nb_sensors_const;
+  static const unsigned int max_retry;
   static const unsigned short int max_iter_const;
   static const unsigned short int ros_pub_freq_const;
   static const unsigned short int device_pub_freq_const;
@@ -54,6 +58,9 @@ private:
   bool flashing;
   bool can_message_sent;
   bool can_packet_acked;
+  bfd_byte *binary_content; // buffer containing the binary content to be flashed
+  unsigned int pos; // position in binary_content buffer
+  unsigned int motor_being_flashed;
 };
 
 #endif /* SR06_H */
