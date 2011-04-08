@@ -2,7 +2,7 @@
  * @file   sr_real_tactile_sensor.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
- * 
+ *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -21,8 +21,8 @@
 *
  * @brief  This is the implementation of the SrGenericTactileSensor. It
  * fetches data from the real sensors.
- * 
- * 
+ *
+ *
  */
 
 #include "sr_tactile_sensors/sr_real_tactile_sensor.hpp"
@@ -37,7 +37,14 @@ namespace shadowrobot
                                            std::string temp_name) :
     SrGenericTactileSensor(name, touch_name, temp_name)
   {
-    res_temp = robot_name_to_sensor(temp_name.c_str(), &sensor_touch);
+    /* We need to attach the program to the robot, or fail if we cannot. */
+    if (robot_init() < 0)
+    {
+      ROS_FATAL("Robot interface broken\n");
+      ROS_BREAK();
+    }
+
+    res_temp = robot_name_to_sensor(temp_name.c_str(), &sensor_temp);
     res_touch = robot_name_to_sensor(touch_name.c_str(), &sensor_touch);
 
     if(res_temp)
@@ -93,14 +100,14 @@ namespace shadowrobot
 }
 
 
-/** 
+/**
  * The main function initializes the links with the robot, initializes
  * this ROS publisher regularly publishes data
  * regarding the finger tips tactile sensors
- * 
- * @param argc 
- * @param argv 
- * 
+ *
+ * @param argc
+ * @param argv
+ *
  * @return -1 if error linking with the robot (i.e. robot code not started)
  */
 int main(int argc, char** argv)
