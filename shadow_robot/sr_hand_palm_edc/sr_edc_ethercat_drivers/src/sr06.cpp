@@ -857,48 +857,16 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 		message->message_length = 0;
 	}
 
-/*	message->can_bus = 1;
-	message->message_id = 0x10; // CAN_NUM_DATA_REQUEST
-//	for (int i = 0 ; i < message->message_length ; ++i)
-//		message->message_data[i] = i;
-
-	if ( (flash_address % 32) == 0 )
-	{
-		message->message_data[0] = 0x00; // WRITE_FLASH_COMMAND
-		message->message_data[1] = (flash_address & 0xff0000) >> 16;
-		message->message_data[2] = (flash_address & 0xff00) >> 8;
-		message->message_data[3] = (flash_address & 0xff);
-		message->message_length = 4;
-		flash_address = 0x000003a0;
-	} else {
-		message->message_data[0] = 0x00;
-		message->message_data[1] = 0xDE;
-		message->message_data[2] = 0xAD;
-		message->message_data[3] = 0xBA;
-		message->message_data[4] = 0xBE;
-		message->message_data[5] = 0x01;
-		message->message_data[6] = 0x02;
-		message->message_data[7] = 0x03;
-		message->message_length = 8;
-	}
-//	message->message_length = 1;
-//	message->message_id = 0xffff;
-//	message->message_data[0] = 0x08;
-*/
 }
 
+/**
+ *
+ *
+ *
+ */
 bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
 {
   int i;
-
-//  if ( (can_message_.message_id & 0x0400) && ((can_message_.message_id & 0x0F) == 0b1010) )
-//    return true; // This is a magic packet, it is not acked
-/*  srand(time(NULL));
-  if ( (rand() & 0x0F) == 0x0F )
-  {
-    ROS_ERROR("We do not ACK the previous packet ! ERROR");
-    return false;
-  }*/
 
   if (packet->message_id == 0)
     return false;
@@ -919,11 +887,6 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
       return false;
   }
   ROS_ERROR("Data is OK");
-//  ROS_ERROR("packet sent, msgID : %04X ; ack, msgID : %04X", can_message_.message_id, packet->message_id);
-/*  if ( ! (0x0600 & packet->message_id) )
-    return false;
-
-  ROS_ERROR("This is bootloading stuff");*/
 
   if ( !(0x0010 & packet->message_id))
     return false;
@@ -945,19 +908,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
   static unsigned int i = 0;
   static unsigned int num_rxed_packets = 0;
-/*uint32_t event_req;
-uint32_t event_mask;
-uint8_t spi_config;
-EthercatDirectCom com(EtherCAT_DataLinkLayer::instance());
-
-readData(&com, 0x204, &event_mask, 4);
-readData(&com, 0x220, &event_req, 4);
-readData(&com, 0x150, &spi_config, 1);
-
-ROS_ERROR("event_req == %08X", event_req);
-ROS_ERROR("event_mask == %08X", event_mask);
-ROS_ERROR("spi_config == %02X", spi_config);
-*/
+ 
   ++num_rxed_packets;
   if (tbuffer->EDC_command == EDC_COMMAND_INVALID)
   {

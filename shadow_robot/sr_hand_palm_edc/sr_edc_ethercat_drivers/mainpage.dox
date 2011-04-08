@@ -22,9 +22,7 @@ Provide an overview of your package.
 
 \section basic basic workflow
 
-\htmlonly
-<img src="pr2_etherCAT.svg" height="1000" />
-\endhtmlonly
+\image html pr2_etherCAT.svg
 
 The pr2_etherCAT node has a controlLoop() which is an infinite loop that runs EthercatHarware::update()
 
