@@ -2,12 +2,48 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b sr_edc_ethercat_drivers is ... 
+\b sr_edc_ethercat_drivers is the low level communication library that allows you to communicate with the SR EDC EtherCAT hand.
+
+This package takes care of the low level EtherCAT protocol, it sends data to the PIC32 which is on the palm, and receives back informations from it.
+
+It implements the driver for the Ethercat slave device which is on the SR EDC EtherCAT hand.
+
+It is implemented as plugins.
+
+When the pr2_etherCAT node runs, it discovers the EtherCAT slaves which are present on the EtherCAT bus, and loads dynamically the class needed to control each slave.
+
+This package implements those classes, to control the EtherCAT slaves on the SR EDC EtherCAT hand, and links them into a library so that pr2_etherCAT can load driver classes from it.
+
+This document will describe how the EtherCAT driver works, but first we have to understand how the pr2_etherCAT node works.
 
 <!-- 
 Provide an overview of your package.
 -->
 
+\section basic basic workflow
+
+\htmlonly
+<img src="pr2_etherCAT.svg" height="1000" />
+\endhtmlonly
+
+The pr2_etherCAT node has a controlLoop() which is an infinite loop that runs EthercatHarware::update()
+
+EthercatHardware::update() will do two things : 
+
+- Loop over EtherCAT slaves and run their packCommand() function.
+- Loop again over EtherCAT slaves and run their unpackState() function.
+
+The loop frequency is 1 kHz.
+
+Basically, the node sends a command to each slave, and then receive the state of each slave, in a loop.
+
+\section packcommand packCommand()
+
+This function is called once per millisecond by the controlLoop of pr2_etherCAT node on each etherCAT slave.
+packCommand() is the function that fills the buffers to be sent via EtherCAT to the SR EDC EtherCAT hand.
+Several commands can be packed, the sr06 driver for example is sending two commands.
+
+In this case the command_size_ attribute should be the sum of the size of the two commands.
 
 \section codeapi Code API
 

@@ -4,7 +4,6 @@ namespace sr_edc_ethercat_drivers
 {
 
 /**
- * \param Number of samples to keep in buffer.  1000 samples = 1second @ 1kHz
  *
  */
 MotorTraceBuffer::MotorTraceBuffer(unsigned trace_size) : 

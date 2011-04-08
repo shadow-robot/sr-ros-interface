@@ -63,7 +63,7 @@ public:
   /*!
    * \brief Loads offset and gain values from parameter server for given actuator variable
    * If either offset or gain parameter cannot be loaded, will use default_adj values instead.
-   * Paramater names are in form : /srh/<actuator_name>/<variable>/(offset|gain)
+   * Paramater names are in form : /srh/actuator_name/variable/(offset|gain)
    * Example : /srh/srh_ffj0/position/offset
    * \param actuator_name name of actuator ie sr_dmotor_ffj0
    * \param variable_name name variable 
@@ -85,7 +85,6 @@ public:
   /*!
    * \brief Initializes DualMotorActuator.  
    *        Tries pulling actuator gain/offset settings from parameter server using actuator name
-   * \param name Name for actuator
    */
   void initialize(const SRH_Actuator_Mapping &mapping);
   static double degreesToRadians(double degrees);

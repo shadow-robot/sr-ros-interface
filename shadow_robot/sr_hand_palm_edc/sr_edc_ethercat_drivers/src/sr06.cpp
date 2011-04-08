@@ -97,6 +97,11 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 						exit(1); \
 					}
 
+/** \brief Erase the PIC18F Flash memory
+ *
+ *  This function fills the can_message_ struct with a CAN message
+ *  which tells the bootloader of the PIC18F to erase its Flash memory
+ */
 void SR06::erase_flash(void)
 {
 	unsigned char cmd_sent;
@@ -148,6 +153,24 @@ void SR06::erase_flash(void)
 
 }
 
+/** \brief Function that reads back 8 bytes from PIC18F program memory
+ *
+ *  Flash memory is the program memory on the PIC18F
+ *  This function is here to read back what we flashed into the PIC18F
+ *  To check that there was no flashing transmission or writting error
+ *  during the Flashing process.
+ *  8 bytes will be read, from address (baddru << 16) + (baddrh << 8) + baddrl + offset
+ *  This function will fill the can_message_ structure with the correct value
+ *  to allow the packCommand() function to send the correct etherCAT message
+ *  to the PIC32 which will then send the correct CAN message to the PIC18F
+ *
+ * @param offset The position of the 8 bytes we want to read, relative to the base address
+ * @param baddrl least significant byte of the base address
+ * @param baddrh middle byte of the base address
+ * @param baddru upper byte of the base address
+ * 
+ * @return Returns true if the command has timed out, false if the command was properly acknowledged
+ */
 bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char baddrh, unsigned char baddru)
 {
 	unsigned int cmd_sent;
@@ -194,6 +217,32 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
 	return timedout;
 }
 
+/** \brief ROS Service that flashes a new firmware into a SimpleMotor board
+ *
+ *  This function is a ROS Service, aimed at flashing a new firmware into the
+ *  PIC18F of a SimpleMotor board through a CAN bootloader protocol.
+ * 
+ *  The CAN bootloader allows for several commands to be executed : read_flash, erase_flash, write_flash, reboot, read_version
+ * 
+ *  This service will fill a can_message_ structure and then switch a few boolean values to "false" in order to trigger
+ *  the message to be sent by the SR06::packCommand() function. And then repeat the process for another message, and so on.
+ * 
+ *  This service will first read all the sections of the firmware using libbfd and find out the lowest and highest addresses containing code.
+ *  Then it will allocate an array to contain the firmware's code. The size is (highest_addr - lowest_addr).
+ *
+ *  - Then it will send a MAGIC PACKET command to the PIC18F which will make it reboot in bootloader mode (regardless of whether it was already in
+ *  bootloader mode or whether it was running the SimpleMotor code)
+ *  - Then it will send an ERASE_FLASH command to the PIC18F.
+ *  - Then it will send a WRITE_FLASH_ADDRESS_COMMAND to tell the PIC18F
+ *  where we wanna write, and then 4 WRITE_FLASH_DATA commands (we write by blocks of 32 bytes). This process is repeated untill we've written
+ *  all the firmware code, padding with 0x00 bytes in the end if the size is not a multiple of 32 bytes.
+ *  The process starts at address (lowest_addr) and ends at (hiest_addr) + a few padding bytes if necessary.
+ *
+ *  @param req The Request, contains the ID of the motor we want to flash via req.motor_id, and the path of the firmware to flash in req.firmware
+ *  @param res The Response, it is always SUCCESS for now.
+ *
+ *  @return This returns always true, the real return value is in the res parameter
+ */
 bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res)
 {
 	int err;
@@ -562,6 +611,11 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 	return true;
 }
 
+/** \brief Constructor of the SR06 driver
+ *
+ *  This is the Constructor of the driver. it creates a bunch of real time publishers to publich the joints data
+ *  initializes a few boolean values, a mutex and creates the Flashing service.
+ */
 SR06::SR06() : SR0X()//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
 {
 	char topic_name[4];
@@ -588,12 +642,46 @@ SR06::SR06() : SR0X()//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance
 	serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::SimpleMotorFlasher, this);
 }
 
+/** \brief Desctructor of the SR06 driver
+ *
+ *  This is the Destructor of the driver. it frees the FMMUs and SyncManagers which have been allocated during the construct.
+ */
 SR06::~SR06()
 {
 	delete sh_->get_fmmu_config();
 	delete sh_->get_pd_config();
 }
 
+/** \brief Construct function, run at startup to set SyncManagers and FMMUs
+ *
+ *  The role of this function is to setup the SyncManagers and the FMMUs used by this EtherCAT slave.
+ *  This slave is using two Mailboxes on two different memory areas.
+ * 
+ *  Here we are setting up the way of communicating between ROS and the PIC32 using the EtherCAT protocol.
+ *
+ *  We communicate using Shared Memory areas.
+ *
+ *  The FMMUs are usefull to map the logical memory used by ROS to the Physical memory of the EtherCAT slave chip (ET1200 chip).
+ *  So that the chip, receiving the packet will know that the data at address 0x10000 is in reality to be written at physical address 0x1000 of the chip memory for example.
+ *  It is the mapping between the EtherCAT bus address space and each slave's chip own memory address space.
+ *  
+ *  The SyncManagers are usefull to give a safe way of accessing this Shared Memory, using a consumer / producer model. There are features like interruptions to tell the consumer that there is something to consume or to tell the producer that the Mailbox is empty and then ready to receive a new message.
+ *
+ *  - One Mailbox contains the commands, written by ROS, read by the PIC32
+ *  - One Mailbox contains the status, written back by the PIC32, read by ROS
+ * 
+ *  That's basically one Mailbox for upstream and one Mailbox for downstream.
+ *
+ * - The first Mailbox contains in fact two commands, one is the torque demand, the other is a can command used in CAN_TEST_MODE to communicate with the SimpleMotor for test purposes, or to reflash a new firmware in bootloading mode.
+ *  This Mailbox is at logicial address 0x10000 and mapped via a FMMU to physical address 0x1000 (the first address of user memory)
+ * - The second Mailbox contains in fact two status, they are the response of the two previously described commands. One is the status containing the joints data, sensor data, finger tips data and motor data. The other is the can command response in CAN_TEST_MODE. When doing a flashing in bootloading mode this is usually an acknowledgment from the bootloader. 
+ * This Mailbox is at logical address 0x10038 and mapped via a FMMU to physical address 0x1038.
+ *
+ * This function sets the two private members command_size_ and status_size_ to be the size of each Mailbox.
+ * It is important for these numbers to be accurate since they are used by the EthercatHardware class when manipulating the buffers.
+ * If you need to have several commands like in this SR06 driver, put the sum of the size, same thing for the status.
+ *
+ */
 void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 {
 	SR0X::construct(sh, start_address);
@@ -662,6 +750,9 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 	ROS_INFO("Finished to construct the SR06 driver");
 }
 
+/**
+ *
+ */
 int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_unprogrammed)
 {
 
@@ -672,6 +763,10 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   return retval; 
 }
 
+/** \brief This function gives some diagnostics data
+ *
+ *  This function provides diagnostics data that can be displayed by the runtime_monitor node
+ */
 void SR06::diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *) {
 stringstream name;
   name << "EtherCAT Device #" << setw(2) << setfill('0') 
@@ -691,6 +786,21 @@ stringstream name;
   EthercatDevice::ethercatDiagnostics(d, 2);
 }
 
+/** \brief packs the commands before sending them to the EtherCAT bus
+ *
+ *  This is one of the most important function of this driver.
+ *  This function is called earch millisecond (1 kHz freq) by the EthercatHardware::update() function
+ *  in the controlLoop() of the pr2_etherCAT node. 
+ *
+ *  This function is called with a buffer as a parameter, the buffer provided is where we write the commands to send via EtherCAT.
+ * 
+ *  We just cast the buffer to our structure type, fill the structure with our data, then add the structure size to the buffer address to shift into memory and access the second command.
+ *  The buffer has been allocated with command_size_ bytes, which is the sum of the two command size, so we have to put the two commands one next to the other.
+ *  In fact we access the buffer using this kind of code : \code
+ *  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
+ *  ETHERCAT_CAN_BRIDGE_DATA        *message = (ETHERCAT_CAN_BRIDGE_DATA *)(buffer + ETHERCAT_INCOMING_DATA_SIZE);
+ *  \endcode
+ */
 void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 {
 	static unsigned short int j = 0;
