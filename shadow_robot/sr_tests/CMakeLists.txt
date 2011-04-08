@@ -16,9 +16,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-
 IF($ENV{GAZEBO} EQUAL 1)
   MESSAGE("Testing with Gazebo support")
+  set($ENV(GAZEBO_NO_X) 1)
   rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_gazebo_motor_1.launch)
   rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_gazebo_motor_2.launch)
 ELSE($ENV{GAZEBO} EQUAL 1)
@@ -26,5 +26,3 @@ ELSE($ENV{GAZEBO} EQUAL 1)
   rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_motor.launch)
   rosbuild_add_rostest(tests/sr_hand/hz_test_hand_and_arm_muscle.launch)
 ENDIF($ENV{GAZEBO} EQUAL 1)
-
-

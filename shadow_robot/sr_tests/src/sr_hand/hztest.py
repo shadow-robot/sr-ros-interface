@@ -34,7 +34,7 @@ import time
 MIN_MSGS        = 1
 TEST_TIMEOUT    = 360.0
 
-class MyHzTest(unittest.TestCase):
+class SRHzTest(unittest.TestCase):
     """
     """
     hz_target = None
@@ -46,13 +46,25 @@ class MyHzTest(unittest.TestCase):
     end_time   = 0
     finished   = False
 
-    ok_topic_is_there = False
+    target_percentage = 0
+    target_increment  = 0.05
 
     def __init__(self, *args):
         """
         """
         rospy.init_node(NAME, anonymous=True)
-        super(MyHzTest, self).__init__(*args)
+
+        self.joints_dict = {"FFJ0": {"min": 0, "max": 90, "current":0},
+                            "FFJ3": {"min": 0, "max": 90, "current":0},
+                            "MFJ0": {"min": 0, "max": 90, "current":0},
+                            "MFJ3": {"min": 0, "max": 90, "current":0},
+                            "RFJ0": {"min": 0, "max": 90, "current":0},
+                            "RFJ3": {"min": 0, "max": 90, "current":0},
+                            "LFJ0": {"min": 0, "max": 90, "current":0},
+                            "LFJ3": {"min": 0, "max": 90, "current":0}
+                            }
+
+        super(SRHzTest, self).__init__(*args)
         self.success = False
 
     def test_hz(self):
@@ -69,9 +81,9 @@ class MyHzTest(unittest.TestCase):
 
         self.wait_for_topic = rospy.get_param('~wait_for_topic', '')
         if self.wait_for_topic != '':
-            rospy.Subscriber(self.wait_for_topic, rospy.AnyMsg, self.wait_for_topic_callback)
-            while not self.ok_topic_is_there:
-                time.sleep(0.5)
+            rospy.wait_for_message(self.wait_for_topic, rospy.AnyMsg)
+            time.sleep(1.0)
+            print "[TEST] starting the test"
 
         timeout_t = time.time() + self.test_duration + TEST_TIMEOUT
         print "Timeout: ", timeout_t
@@ -89,24 +101,23 @@ class MyHzTest(unittest.TestCase):
         Arguments:
         - `self`:
         """
-        new_target = 10
-        data_to_send = [ joint(joint_name="FFJ0", joint_target=new_target),
-                         joint(joint_name="FFJ3", joint_target=new_target),
-                         joint(joint_name="MFJ0", joint_target=new_target),
-                         joint(joint_name="MFJ3", joint_target=new_target),
-                         joint(joint_name="RFJ0", joint_target=new_target),
-                         joint(joint_name="RFJ3", joint_target=new_target),
-                         joint(joint_name="LFJ0", joint_target=new_target),
-                         joint(joint_name="LFJ3", joint_target=new_target),
-                         joint(joint_name="THJ1", joint_target=new_target),
-                         joint(joint_name="THJ2", joint_target=new_target),
-                         joint(joint_name="THJ3", joint_target=new_target),
-                         joint(joint_name="THJ4", joint_target=new_target)
-                         ]
-        self.pub.publish(sendupdate( len(data_to_send), data_to_send ) )
+        data_to_send = []
 
-    def wait_for_topic_callback(self, msg):
-        self.ok_topic_is_there = True
+        for joint_name in self.joints_dict.keys():
+            tmp_target = self.joints_dict[joint_name]["min"] + \
+                (self.joints_dict[joint_name]["max"] - self.joints_dict[joint_name]["min"]) \
+                * self.target_percentage
+            tmp_target = 0
+            data_to_send.append(joint(joint_name=joint_name, joint_target=tmp_target))
+
+        self.target_percentage += self.target_increment
+        if self.target_increment > 0 and self.target_percentage >= 1.0:
+            self.target_increment = - self.target_increment
+        else:
+            if self.target_increment < 0 and self.target_percentage <= 0.0:
+                self.target_increment = - self.target_increment
+
+        self.pub.publish(sendupdate( len(data_to_send), data_to_send ) )
 
     def callback(self, msg):
         self.msg_count += 1
@@ -132,6 +143,8 @@ class MyHzTest(unittest.TestCase):
           self.success = False
 
 if __name__ == '__main__':
-    rostest.run(PKG, sys.argv[0], MyHzTest, sys.argv)
+    print sys.argv[0]
+    print sys.argv
+    rostest.run(PKG, sys.argv[0], SRHzTest, sys.argv)
 
 
