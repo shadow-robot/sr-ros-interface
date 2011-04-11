@@ -40,6 +40,7 @@ Basically, the node sends a command to each slave, and then receive the state of
 This function is called once per millisecond by the controlLoop of pr2_etherCAT node on each etherCAT slave.
 packCommand() is the function that fills the buffers to be sent via EtherCAT to the SR EDC EtherCAT hand.
 Several commands can be packed, the sr06 driver for example is sending two commands.
+See the SR06::packCommand() for more information about this function.
 
 In this case the command_size_ attribute should be the sum of the size of the two commands.
 
