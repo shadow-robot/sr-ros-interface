@@ -238,6 +238,12 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
  *  all the firmware code, padding with 0x00 bytes in the end if the size is not a multiple of 32 bytes.
  *  The process starts at address (lowest_addr) and ends at (hiest_addr) + a few padding bytes if necessary.
  *
+ *  You can call this service using this command : 
+ *
+ *  \code rosservice call SimpleMotorFlasher "/home/hand/simplemotor.hex" 8 \endcode
+ *
+ *  This will flash the "simplemotor.hex" firmware to the motor 8
+ *
  *  @param req The Request, contains the ID of the motor we want to flash via req.motor_id, and the path of the firmware to flash in req.firmware
  *  @param res The Response, it is always SUCCESS for now.
  *
@@ -859,10 +865,13 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 
 }
 
-/**
+/** \brief This function checks if the can packet in the unpackState() this_buffer is an ACK
  *
+ *  This function checks several things on the can packet in this_buffer, it compares it with the
+ *  can_message_ private member in several ways (SID, length, data) to check if it's an ACK.
  *
- *
+ *  @param packet The packet from this_buffer of unpackState() that we want to check if it's an ACK
+ *  @return Returns true if packet is an ACK of can_message_ packet.
  */
 bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
 {
@@ -902,6 +911,24 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
   return true;
 }
 
+/** \brief This functions receives data from the EtherCAT bus
+ *
+ *  This function allows the driver to get the data present on the EtherCAT bus and intended for us.
+ *
+ *  It gives us access to the logical memory registered during the construct().
+ *
+ *  In order to be able to do differentials two buffers are kept, this_buffer is the actual data that has just been received
+ *  and prev_buffer is the previous buffer received from the EtherCAT bus.
+ *
+ *  We access the data sent by PIC32 here using the same tricks we used in packCommand().
+ *  \code
+ *  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
+ *  ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
+ *  \endcode
+ *
+ * @param this_buffer The data just being received by EtherCAT
+ * @param prev_buffer The previous data received by EtherCAT
+ */
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
