@@ -29,7 +29,7 @@
 	<selfCollide>true</selfCollide>
     </gazebo>
       
-    <joint name="elbow_abduction" type="revolute">
+    <joint name="ElbowJSwing" type="revolute">
       <parent link="${parent}"/>
       <child link="shadowarm_lowerarm"/>   
       <origin xyz="0 0 0.369" rpy="0 0 0" />

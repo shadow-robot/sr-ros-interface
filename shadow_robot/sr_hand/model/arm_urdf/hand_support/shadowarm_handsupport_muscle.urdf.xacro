@@ -29,7 +29,7 @@
       <selfCollide>true</selfCollide>
     </gazebo>
     
-    <joint name="forearm_rotation" type="revolute">
+    <joint name="ElbowJRotate" type="revolute">
       <parent link="${parent}"/>
       <child link="shadowarm_handsupport_muscle"/>   
       <origin xyz="0.131 0 -0.08" rpy="0 0 0" />

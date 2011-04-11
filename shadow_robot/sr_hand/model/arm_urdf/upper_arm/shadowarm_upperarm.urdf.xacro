@@ -29,7 +29,7 @@
       <selfCollide>true</selfCollide>
     </gazebo>
   
-    <joint name="shoulder_rotation" type="revolute">
+    <joint name="ShoulderJSwing" type="revolute">
       <parent link="${parent}"/>
       <child link="shadowarm_upperarm"/>   
       <origin xyz="0 -0.134 0.5405" rpy="0 -${M_PI} 0" />

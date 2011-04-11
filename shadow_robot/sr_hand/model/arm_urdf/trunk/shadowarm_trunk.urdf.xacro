@@ -30,7 +30,7 @@
 	<selfCollide>true</selfCollide>
       </gazebo>
 
-    <joint name="trunk_rotation" type="revolute">
+    <joint name="ShoulderJRotate" type="revolute">
       <parent link="${parent}"/>
       <child link="shadowarm_trunk"/>   
       <origin xyz="0 0 0.01" rpy="0 0 0" />

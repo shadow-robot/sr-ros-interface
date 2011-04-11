@@ -82,7 +82,7 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="trunk_rotation" type="revolute">
+  <joint name="ShoulderJRotate" type="revolute">
     <parent link="shadowarm_base"/>
     <child link="shadowarm_trunk"/>
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
@@ -92,7 +92,7 @@
   </joint>
   <transmission name="trunk_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="trunk_rotation"/>
-    <joint name="trunk_rotation"/>
+    <joint name="ShadowJRotate"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -121,7 +121,7 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="shoulder_rotation" type="revolute">
+  <joint name="ShoulderJSwing" type="revolute">
     <parent link="shadowarm_trunk"/>
     <child link="shadowarm_upperarm"/>
     <origin rpy="0 -3.14159265359 0" xyz="0 -0.134 0.5405"/>
@@ -131,7 +131,7 @@
   </joint>
   <transmission name="shoulder_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="shoulder_rotation"/>
-    <joint name="shoulder_rotation"/>
+    <joint name="ShoulderJSwing"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -160,7 +160,7 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="elbow_abduction" type="revolute">
+  <joint name="ElbowJSwing" type="revolute">
     <parent link="shadowarm_upperarm"/>
     <child link="shadowarm_lowerarm"/>
     <origin rpy="0 0 0" xyz="0 0 0.369"/>
@@ -170,7 +170,7 @@
   </joint>
   <transmission name="elbow_abduction_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="elbow_abduction"/>
-    <joint name="elbow_abduction"/>
+    <joint name="ElbowJSwing"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -199,7 +199,7 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="forearm_rotation" type="revolute">
+  <joint name="ElbowJRotate" type="revolute">
     <parent link="shadowarm_lowerarm"/>
     <child link="shadowarm_handsupport_motor"/>
     <origin rpy="0 0 0" xyz="0.08 0 0.131"/>
@@ -209,7 +209,7 @@
   </joint>
   <transmission name="forearm_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="forearm_rotation"/>
-    <joint name="forearm_rotation"/>
+    <joint name="ElbowJRotate"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
