@@ -177,19 +177,19 @@
   </transmission>
   <link name="shadowarm_handsupport_muscle">
     <inertial>
-      <origin rpy="0 1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.75"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 0 -1.57079632679" xyz="-0.04 0 0"/>
+      <origin rpy="1.57079632679 0 0" xyz="0 0 -0.04"/>
       <geometry name="shadowarm_handsupport_visual">
         <mesh filename="package://sr_hand/model/meshes/arm/elbow_rotate_muscle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="LightGrey"/>
     </visual>
     <collision>
-      <origin rpy="0 1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="shadowarm_handsupport_collision">
         <cylinder length="0.001" radius="0.06"/>
       </geometry>
@@ -202,7 +202,7 @@
   <joint name="ElbowJRotate" type="revolute">
     <parent link="shadowarm_lowerarm"/>
     <child link="shadowarm_handsupport_muscle"/>
-    <origin rpy="0 0 0" xyz="0.131 0 -0.08"/>
+    <origin rpy="0 0 0" xyz="0.08 0 0.131"/>
     <axis xyz="1 0 0"/>
     <limit effort="10" lower="-1.57079632679" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="10.5"/>
