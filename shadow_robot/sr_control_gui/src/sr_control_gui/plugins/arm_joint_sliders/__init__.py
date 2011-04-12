@@ -29,10 +29,10 @@ class ArmJointSlider(JointSlider):
     name = "Arm Joint Sliders"
 
     def __init__(self):
-        joints_list = [Joint("trunk_rotation", -45, 90),
-                       Joint("shoulder_rotation", 0, 90),
-                       Joint("elbow_abduction", 0, 120),
-                       Joint("forearm_rotation", -90, 90)
+        joints_list = [Joint("ShoulderJRotate", -45, 60),
+                       Joint("ShoulderJSwing", 0, 80),
+                       Joint("ElbowJSwing", 0, 120),
+                       Joint("ElbowJRotate", -80, 80)
                        ]
 
         JointSlider.__init__(self, joints_list)

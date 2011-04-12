@@ -40,13 +40,26 @@ namespace shadowrobot
     SrGenericTactileSensor(name, touch_name, temp_name),
     touch_value(0.0), temp_value(0.0)
   {
-    //fills the vector of joint names: we're taking J3 and J0
-    std::string tmp = boost::to_upper_copy(name);
-    tmp += "J3";
-    names_joints_linked.push_back(tmp);
-    tmp = boost::to_upper_copy(name);
-    tmp += "J0";
-    names_joints_linked.push_back(tmp);
+	if(name.find("th")!=std::string::npos )
+	{
+		//fills the vector of joint names: we're taking J2 and J1 for TH
+		std::string tmp = boost::to_upper_copy(name);
+		tmp += "J2";
+		names_joints_linked.push_back(tmp);
+		tmp = boost::to_upper_copy(name);
+		tmp += "J1";
+		names_joints_linked.push_back(tmp);
+	}
+	else
+	{
+		//fills the vector of joint names: we're taking J3 and J0
+		std::string tmp = boost::to_upper_copy(name);
+		tmp += "J3";
+		names_joints_linked.push_back(tmp);
+		tmp = boost::to_upper_copy(name);
+		tmp += "J0";
+		names_joints_linked.push_back(tmp);
+	}
 
     sub = nh.subscribe("/srh/shadowhand_data", 2, &SrVirtualTactileSensor::callback, this);
   }

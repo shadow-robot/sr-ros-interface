@@ -79,7 +79,7 @@ void VirtualArm::initializeMap()
     int tmp_index = 0;
     tmpData.publisher_index = tmp_index;
 #endif
-    joints_map["trunk_rotation"] = tmpData;
+    joints_map["ShoulderJRotate"] = tmpData;
     tmpData.min = 0.0;
     tmpData.max = 90.0;
 #ifdef GAZEBO 
@@ -88,7 +88,7 @@ void VirtualArm::initializeMap()
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
 #endif
-    joints_map["shoulder_rotation"] = tmpData;
+    joints_map["ShoulderJSwing"] = tmpData;
     tmpData.min = 0.0;
     tmpData.max = 120.0;
 #ifdef GAZEBO 
@@ -97,7 +97,7 @@ void VirtualArm::initializeMap()
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
 #endif
-    joints_map["elbow_abduction"] = tmpData;
+    joints_map["ElbowJSwing"] = tmpData;
     tmpData.min = -90.0;
     tmpData.max = 90.0;
 #ifdef GAZEBO 
@@ -106,7 +106,7 @@ void VirtualArm::initializeMap()
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
 #endif
-    joints_map["forearm_rotation"] = tmpData;
+    joints_map["ElbowJRotate"] = tmpData;
 
     joints_map_mutex.unlock();
 }

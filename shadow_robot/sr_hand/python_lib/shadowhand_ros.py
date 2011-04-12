@@ -67,10 +67,10 @@ class ShadowHand_ROS():
                            Joint("WRJ2", "smart_motor_wr2", -30, 10),
                            ]
         self.handJoints = []
-        self.armJoints = [Joint("trunk_rotation", "", -45, 90),
-                          Joint("shoulder_rotation", "", 0, 90),
-                          Joint("elbow_abduction", "", 0,120),
-                          Joint("forearm_rotation", "", -90,90)
+        self.armJoints = [Joint("ShoulderJRotate", "", -45, 60),
+                          Joint("ShoulderJSwing", "", 0, 80),
+                          Joint("ElbowJSwing", "", 0,120),
+                          Joint("ElbowJRotate", "", -80,80)
                          ]
         self.lastMsg = 0
         self.lastArmMsg = 0

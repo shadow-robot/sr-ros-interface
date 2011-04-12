@@ -4,7 +4,7 @@
   <include filename="$(find sr_hand)/model/arm_urdf/full_arm_muscle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/full_hand_muscle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/gazebo/gazebo.urdf.xacro" />
-  
+
   <xacro:sr_arm_muscle>
   </xacro:sr_arm_muscle>
 
@@ -17,8 +17,8 @@
     velocity="1.0" />
     <dynamics damping="3.5"/>
   </joint>
-  
+
   <xacro:shadowhand_muscle>
   </xacro:shadowhand_muscle>
 
-</robot> 
+</robot>

@@ -6,7 +6,7 @@
 
     <link name="shadowarm_handsupport_muscle">
       <inertial>
-	<origin xyz="0 0 0" rpy="0 0 0" />
+	<origin xyz="0 0 0" rpy="0 ${M_PI/2} 0" />
 	<mass value="0.75" />
 	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"  izz="0.0" />
       </inertial>
@@ -28,10 +28,10 @@
       <material>Gazebo/Grey</material>
       <selfCollide>true</selfCollide>
     </gazebo>
-    
-    <joint name="forearm_rotation" type="revolute">
+
+    <joint name="ElbowJRotate" type="revolute">
       <parent link="${parent}"/>
-      <child link="shadowarm_handsupport_muscle"/>   
+      <child link="shadowarm_handsupport_muscle"/>
       <origin xyz="0.131 0 -0.08" rpy="0 0 0" />
       <axis xyz="1 0 0" />
       <limit lower="-${M_PI/2}" upper="${M_PI/2}"
@@ -40,7 +40,7 @@
     </joint>
 
     <xacro:shadowarm_handsupport_muscle_transmission />
-    
+
   </xacro:macro>
-  
+
 </robot>
