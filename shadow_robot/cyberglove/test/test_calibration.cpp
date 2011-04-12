@@ -37,7 +37,7 @@
 using namespace ros;
 using namespace xml_calibration_parser;
 
-std::string path_to_calibration = "/home/ugo/Projects/cyberglove/cyberglove_ROS_interface/cyberglove/test/cyberglove_test.cal";
+std::string path_to_calibration = "test/cyberglove_test.cal";
 
 float epsilon = 0.01f;
 

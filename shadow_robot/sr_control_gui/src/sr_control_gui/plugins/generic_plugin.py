@@ -16,9 +16,8 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from yapsy.IPlugin import IPlugin
-
 from PyQt4 import QtCore, QtGui, Qt
+from plugin_manager import Plugin
 from config import *
 
 class MyMdiSubWindow(QtGui.QMdiSubWindow):
@@ -29,35 +28,37 @@ class MyMdiSubWindow(QtGui.QMdiSubWindow):
         self.container = 0
         self.parent = parent
         QtGui.QMdiSubWindow.__init__(self)
-        
+
     def set_container(self, container):
         self.container = container
-        
+
     def closeEvent(self, event):
         self.parent.on_close()
         self.container.removeSubWindow(self)
         #self.container.closeActiveSubWindow()
 
-class GenericPlugin(IPlugin):  
+class GenericPlugin(Plugin):
     """
     A generic plugin from which all the plugins inherit.
     Opens a subwindow in the MainWidget.
     """
     name = "GenericPlugin"
-    
+
     def __init__(self):
+        Plugin.__init__(self)
+        self.dependencies = Config.generic_plugin_config.dependencies
         self.id = 0
-        self.parent = 0        
+        self.parent = 0
         self.window = MyMdiSubWindow(self)
         #self.window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.window.widget()
         self.window.setWindowTitle(self.name)
         self.is_window_opened = False
-        
+
     def set_parent(self, parent):
         self.parent = parent
         self.window.set_container(self.parent.container)
-                
+
     def activate(self):
         if not self.is_window_opened:
             self.parent.container.addSubWindow(self.window)
@@ -65,14 +66,11 @@ class GenericPlugin(IPlugin):
             self.is_window_opened = True
         else:
             self.parent.container.setActiveSubWindow(self.window)
-            
-    
+
+
     def set_icon(self, path):
         self.window.setWindowIcon(QtGui.QIcon(path))
-    
+
     def on_close(self):
         self.is_window_opened = False
         self.window.close()
-
-    def depends(self):
-        return Config.generic_plugin_config.dependencies

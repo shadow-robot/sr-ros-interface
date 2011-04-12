@@ -1,6 +1,6 @@
 <package>
   <description brief="Control interface for Shadow hardware">
-    sr_control_gui is a graphic application which integrates anything needed by the end-user to control the hand. 
+    sr_control_gui is a graphic application which integrates anything needed by the end-user to control the hand.
   </description>
   <author>Sacha Aury, Ugo Cupcic / ugo@shadowrobot.com, contact@shadowrobot.com</author>
   <license>GPL</license>
@@ -13,7 +13,6 @@
   <rosdep name="python-scipy"/>
   <rosdep name="paramiko"/>
   <rosdep name="pyqt4"/>
-  <rosdep name="yapsy"/>
   <export>
     <rosdoc config="rosdoc.yaml" />
     <python path="${prefix}/src/sr_control_gui"/>

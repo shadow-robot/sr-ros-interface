@@ -92,7 +92,7 @@
   </joint>
   <transmission name="trunk_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="trunk_rotation"/>
-    <joint name="ShadowJRotate"/>
+    <joint name="ShoulderJRotate"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -177,7 +177,7 @@
   </transmission>
   <link name="shadowarm_handsupport_muscle">
     <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 1.57079632679 0" xyz="0 0 0"/>
       <mass value="0.75"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>

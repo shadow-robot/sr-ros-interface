@@ -92,7 +92,7 @@
   </joint>
   <transmission name="trunk_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="trunk_rotation"/>
-    <joint name="ShadowJRotate"/>
+    <joint name="ShoulderJRotate"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
