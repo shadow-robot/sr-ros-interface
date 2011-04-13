@@ -86,7 +86,7 @@
     <parent link="shadowarm_base"/>
     <child link="shadowarm_trunk"/>
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
-    <axis xyz="0 0 -1"/>
+    <axis xyz="0 0 1"/>
     <limit effort="10" lower="-0.785398163397" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="200.5"/>
   </joint>
@@ -203,7 +203,7 @@
     <parent link="shadowarm_lowerarm"/>
     <child link="shadowarm_handsupport_muscle"/>
     <origin rpy="0 0 0" xyz="0.08 0 0.131"/>
-    <axis xyz="1 0 0"/>
+    <axis xyz="0 0 -1"/>
     <limit effort="10" lower="-1.57079632679" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="10.5"/>
   </joint>
