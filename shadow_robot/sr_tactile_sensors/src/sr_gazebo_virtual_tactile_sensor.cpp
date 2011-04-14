@@ -37,7 +37,7 @@ namespace shadowrobot
  **********************************/
   SrGazeboVirtualTactileSensor::SrGazeboVirtualTactileSensor(std::string name,
                                                              std::string gazebo_bumper_topic) :
-    SrGenericTactileSensor(name, "", ""),
+    SrGenericTactileSensor(name, ""),
     touch_value(0.0)
   {
     sub = nh.subscribe(gazebo_bumper_topic, 2, &SrGazeboVirtualTactileSensor::callback, this);
@@ -71,11 +71,6 @@ namespace shadowrobot
     touch_mutex.unlock();
 
     return return_value;
-  }
-
-  double SrGazeboVirtualTactileSensor::get_temp_data()
-  {
-    return 0;
   }
 
 

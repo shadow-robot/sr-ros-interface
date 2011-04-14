@@ -2,7 +2,7 @@
  * @file   sr_virtual_tactile_sensor.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
- * 
+ *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -21,8 +21,8 @@
 *
  * @brief  This is the virtual implementation of the SrGenericTactileSensor. It
  * computes virtual data.
- * 
- * 
+ *
+ *
  */
 
 #include "sr_tactile_sensors/sr_virtual_tactile_sensor.hpp"
@@ -35,10 +35,9 @@ namespace shadowrobot
  *         TACTILE SENSOR         *
  **********************************/
   SrVirtualTactileSensor::SrVirtualTactileSensor(std::string name,
-                                                 std::string touch_name,
-                                                 std::string temp_name) :
-    SrGenericTactileSensor(name, touch_name, temp_name),
-    touch_value(0.0), temp_value(0.0)
+                                                 std::string touch_name ) :
+    SrGenericTactileSensor(name, touch_name),
+    touch_value(0.0)
   {
 	if(name.find("th")!=std::string::npos )
 	{
@@ -102,17 +101,6 @@ namespace shadowrobot
     return return_value;
   }
 
-  double SrVirtualTactileSensor::get_temp_data()
-  {
-    double return_value;
-    temp_mutex.lock();
-    return_value = temp_value;
-    temp_mutex.unlock();
-
-    return return_value;
-  }
-
-
 /**********************************
  *     TACTILE SENSOR MANAGER     *
  **********************************/
@@ -126,8 +114,7 @@ namespace shadowrobot
       tactile_sensors.push_back(
         boost::shared_ptr<SrVirtualTactileSensor>(
           new SrVirtualTactileSensor(all_names[0][i],
-                                     all_names[1][i],
-                                     all_names[2][i]) ));
+                                     all_names[1][i]) ));
     }
   }
 
@@ -136,12 +123,12 @@ namespace shadowrobot
 }
 
 
-/** 
+/**
  * Initializes a set of virtual tactile sensors and publish.
- * 
- * @param argc 
- * @param argv 
- * 
+ *
+ * @param argc
+ * @param argv
+ *
  * @return -1 if error linking with the robot (i.e. robot code not started)
  */
 int main(int argc, char** argv)

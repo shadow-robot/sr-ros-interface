@@ -33,9 +33,8 @@ namespace shadowrobot
  *         TACTILE SENSOR         *
  **********************************/
   SrRealTactileSensor::SrRealTactileSensor(std::string name,
-                                           std::string touch_name,
-                                           std::string temp_name) :
-    SrGenericTactileSensor(name, touch_name, temp_name)
+                                           std::string touch_name ) :
+    SrGenericTactileSensor(name, touch_name)
   {
     /* We need to attach the program to the robot, or fail if we cannot. */
     if (robot_init() < 0)
@@ -44,13 +43,8 @@ namespace shadowrobot
       ROS_BREAK();
     }
 
-    res_temp = robot_name_to_sensor(temp_name.c_str(), &sensor_temp);
     res_touch = robot_name_to_sensor(touch_name.c_str(), &sensor_touch);
 
-    if(res_temp)
-    {
-      ROS_ERROR("Can't open sensor %s", temp_name.c_str());
-    }
     if(res_touch)
     {
       ROS_ERROR("Can't open sensor %s", touch_name.c_str());
@@ -59,14 +53,6 @@ namespace shadowrobot
 
   SrRealTactileSensor::~SrRealTactileSensor()
   {}
-
-  double SrRealTactileSensor::get_temp_data()
-  {
-    if(res_temp)
-      return -1000.0;
-
-    return robot_read_sensor(&sensor_temp);
-  }
 
   double SrRealTactileSensor::get_touch_data()
   {
