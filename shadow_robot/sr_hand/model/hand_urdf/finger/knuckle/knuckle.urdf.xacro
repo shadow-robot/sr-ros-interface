@@ -1,9 +1,15 @@
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+        xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
 
   <include filename="$(find sr_hand)/model/hand_urdf/finger/knuckle/knuckle.transmission.xacro" />
 
   <xacro:macro name="knuckle" params="link_prefix joint_prefix parent *origin">
-  
+
     <link name="${link_prefix}knuckle">
       <inertial>
 	<!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
@@ -27,9 +33,20 @@
       </collision>
     </link>
     <gazebo reference="${link_prefix}knuckle">
+      <sensor:contact name="${link_prefix}knuckle_contact_sensor">
+        <geom>${link_prefix}knuckle_geom</geom>
+       <updateRate>100.0</updateRate>
+        <controller:gazebo_ros_bumper name="${link_prefix}knuckle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <frameName>${link_prefix}knuckle</frameName>
+          <bumperTopicName>${link_prefix}knuckle_bumper</bumperTopicName>
+          <interface:bumper name="${link_prefix}knuckle_gazebo_ros_bumper_iface" />
+        </controller:gazebo_ros_bumper>
+      </sensor:contact>
       <material>PR2/Grey2</material>
     </gazebo>
-    
+
     <joint name="${joint_prefix}J4" type="revolute">
       <parent link="${parent}"/>
       <child link="${link_prefix}knuckle"/>
@@ -44,5 +61,5 @@
     <xacro:knuckle_transmission />
 
   </xacro:macro>
-  
+
 </robot>

@@ -1,16 +1,22 @@
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
 
   <include filename="$(find sr_hand)/model/hand_urdf/finger/knuckle/knuckle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/proximal/proximal.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/middle/middle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/distal/distal.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/lfmetacarpal/lfmetacarpal.urdf.xacro" />
-  
+
   <xacro:macro name="little_finger" params="link_prefix joint_prefix parent">
-  
+
     <xacro:lfmetacarpal parent="${parent}" >
     </xacro:lfmetacarpal>
-    
+
     <link name="lfknuckle">
       <inertial>
 	<origin xyz="0 0 0.06579" rpy="0 0 0" />
@@ -33,9 +39,21 @@
       </collision>
     </link>
     <gazebo reference="lfknuckle">
+      <sensor:contact name="lfknuckle_contact_sensor">
+        <geom>lfknuckle_geom</geom>
+       <updateRate>100.0</updateRate>
+        <controller:gazebo_ros_bumper name="lfknuckle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <frameName>lfknuckle</frameName>
+          <bumperTopicName>lfknuckle_bumper</bumperTopicName>
+          <interface:bumper name="lfknuckle_gazebo_ros_bumper_iface" />
+        </controller:gazebo_ros_bumper>
+      </sensor:contact>
+
       <material>PR2/Grey2</material>
     </gazebo>
-    
+
     <joint name="LFJ4" type="revolute">
       <parent link="lfmetacarpal"/>
       <child link="lfknuckle"/>
@@ -53,16 +71,16 @@
       <motorTorqueConstant>1</motorTorqueConstant>
       <pulsesPerRevolution>90000</pulsesPerRevolution>
     </transmission>
-    
+
     <xacro:proximal link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${link_prefix}knuckle" >
     </xacro:proximal>
-    
+
     <xacro:middle link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${link_prefix}proximal" >
     </xacro:middle>
-    
+
     <xacro:distal link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${link_prefix}middle" >
     </xacro:distal>
-    
+
   </xacro:macro>
-  
+
 </robot>
