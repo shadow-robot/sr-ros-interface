@@ -23,15 +23,15 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_boost_directories()
 
-
+SET(gazebo_support $ENV{GAZEBO})
 #if you don't want to have the gazebo interface for the virtual hardware
 # just comment this flag
-IF($ENV{GAZEBO} EQUAL 1)
+IF(DEFINED gazebo_support)
   SET( CMAKE_CXX_FLAGS "-D GAZEBO")
   MESSAGE("Compiling with Gazebo support")
-ELSE($ENV{GAZEBO} EQUAL 1)
+ELSE(DEFINED gazebo_support)
   MESSAGE("Compiling without Gazebo support")
-ENDIF($ENV{GAZEBO} EQUAL 1)
+ENDIF(DEFINED gazebo_support)
 
 ##################
 #  VIRTUAL ARM  #
