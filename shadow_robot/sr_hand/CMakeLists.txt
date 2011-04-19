@@ -23,15 +23,45 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_boost_directories()
 
+
+###################
+#  CONFIGURATION  #
+###################
+
+#Gazebo
 SET(gazebo_support $ENV{GAZEBO})
-#if you don't want to have the gazebo interface for the virtual hardware
-# just comment this flag
+MESSAGE("--------- Shadow Robot Package Configuration:")
 IF(DEFINED gazebo_support)
   SET( CMAKE_CXX_FLAGS "-D GAZEBO")
-  MESSAGE("Compiling with Gazebo support")
+  MESSAGE(" [x] Gazebo support")
 ELSE(DEFINED gazebo_support)
-  MESSAGE("Compiling without Gazebo support")
+  MESSAGE(" [ ] Gazebo support")
 ENDIF(DEFINED gazebo_support)
+
+# Real Hand
+SET(real_hand $ENV{REAL_HAND})
+IF(DEFINED real_hand)
+  MESSAGE(" [x] Real Hand.")
+ELSE(DEFINED real_hand)
+  MESSAGE(" [ ] Real Hand.")
+ENDIF(DEFINED real_hand)
+
+#Real Arm
+SET(real_arm $ENV{REAL_ARM})
+IF(DEFINED real_arm)
+  MESSAGE(" [x] Real Arm.")
+ELSE(DEFINED real_arm)
+  MESSAGE(" [ ] Real Arm.")
+ENDIF(DEFINED real_arm)
+
+#Valves
+SET(valves $ENV{VALVES})
+IF(DEFINED valves)
+  MESSAGE(" [x] Valves.")
+ELSE(DEFINED valves)
+  MESSAGE(" [ ] Valves.")
+ENDIF(DEFINED valves)
+MESSAGE("---------")
 
 ##################
 #  VIRTUAL ARM  #
@@ -52,33 +82,37 @@ rosbuild_link_boost(shadowhand_virtual thread)
 ##################
 
 ##uncomment those lines if you build for the real hand
-#include_directories(/usr/realtime/include/)
-#LINK_LIBRARIES(pthread)
-#add_library(robot STATIC IMPORTED)
-#set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
-#rosbuild_add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
-#rosbuild_link_boost(shadowhand_real thread)
-#target_link_libraries(shadowhand_real robot)
+IF(DEFINED real_hand)
+  include_directories(/usr/realtime/include/)
+  LINK_LIBRARIES(pthread)
+  add_library(robot STATIC IMPORTED)
+  set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
+  rosbuild_add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
+  rosbuild_link_boost(shadowhand_real thread)
+  target_link_libraries(shadowhand_real robot)
+ENDIF(DEFINED real_hand)
 
 ##################
 #    REAL ARM    #
 ##################
-
-#uncomment those lines if you build for the real hand
-#include_directories(/usr/realtime/include/)
-#LINK_LIBRARIES(pthread)
-#rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
-#rosbuild_link_boost(shadowarm_real thread)
-#target_link_libraries(shadowarm_real robot)
+IF(DEFINED real_arm)
+  include_directories(/usr/realtime/include/)
+  LINK_LIBRARIES(pthread)
+  rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
+  rosbuild_link_boost(shadowarm_real thread)
+  target_link_libraries(shadowarm_real robot)
+ENDIF(DEFINED real_arm)
 
 ##################
 #     VALVES     #
 ##################
-#include_directories(/usr/realtime/include/)
-#LINK_LIBRARIES(pthread)
-#rosbuild_add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
-#rosbuild_link_boost(sr_valves thread)
-#target_link_libraries(sr_valves robot)
+IF(DEFINED valves)
+  include_directories(/usr/realtime/include/)
+  LINK_LIBRARIES(pthread)
+  rosbuild_add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
+  rosbuild_link_boost(sr_valves thread)
+  target_link_libraries(sr_valves robot)
+ENDIF(DEFINED valves)
 
 #####################################
 #   dynamic parameters reconfigure  #
