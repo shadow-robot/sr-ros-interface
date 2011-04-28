@@ -1165,8 +1165,8 @@
   <joint name="THJ1" type="revolute">
     <parent link="thmiddle"/>
     <child link="thdistal"/>
-    <origin rpy="0 0 0" xyz="0 0 0.032"/>
-    <axis xyz="0 -1 0"/>
+    <origin rpy="0 0 -1.570796327" xyz="0 0 0.032"/>
+    <axis xyz="1 0 0"/>
     <limit effort="10" lower="0" upper="1.571" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>

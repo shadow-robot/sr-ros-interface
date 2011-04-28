@@ -21,6 +21,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
+
+
 #############################
 #  VIRTUAL TACTILE SENSORS  #
 #############################
@@ -38,6 +40,11 @@ rosbuild_add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_
 #set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
 #rosbuild_add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
 #target_link_libraries(sr_tactile_real robot)
+
+#############################
+#  RVIZ MARKER FOR TACTILES #
+#############################
+rosbuild_add_executable(sr_tactile_rviz_marker src/sr_tactile_rviz_marker.cpp)
 
 ###############
 #   EXAMPLES  #
