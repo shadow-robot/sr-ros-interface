@@ -89,3 +89,4 @@ shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/msg/lisp
 shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/src/sr_edc_ethercat_drivers
 shadow_robot/sr_hand_palm_edc/sr_edc_launch/bin
 shadow_robot/sr_hand_palm_edc/sr_edc_launch/build
+external/0220_palm_edc
