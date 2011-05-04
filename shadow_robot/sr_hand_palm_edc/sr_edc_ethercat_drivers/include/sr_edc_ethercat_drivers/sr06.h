@@ -19,7 +19,7 @@ typedef unsigned int        int32u;
 typedef   signed int        int32s;
 
 extern "C" {
-	#include "external/0220_palm_edc_ethercat_protocol.h"
+	#include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
 }
 
 class SR06 : public SR0X
