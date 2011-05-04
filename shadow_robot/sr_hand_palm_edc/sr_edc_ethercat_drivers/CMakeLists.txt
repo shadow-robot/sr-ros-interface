@@ -11,13 +11,15 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 rosbuild_init()
 
-MESSAGE("----")
-MESSAGE(" Fetching the latest headers ...")
 ADD_CUSTOM_COMMAND(
   OUTPUT headers.txt
   COMMAND "${PROJECT_SOURCE_DIR}/update_header.sh"
 )
-MESSAGE("----")
+
+# headers.txt isn't a real file. It's just a name for the dependency
+# used in the compile line. It causes the build process to update /
+# checkout the file 0220_palm_edc_ethercat_protocol.h into
+# include/external/0220_palm_edc/
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
