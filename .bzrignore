@@ -91,3 +91,7 @@ shadow_robot/sr_hand_palm_edc/sr_edc_launch/bin
 shadow_robot/sr_hand_palm_edc/sr_edc_launch/build
 external/0220_palm_edc
 include/external/0220_palm_edc
+capture.pcap
+doc
+srv_gen
+tmp

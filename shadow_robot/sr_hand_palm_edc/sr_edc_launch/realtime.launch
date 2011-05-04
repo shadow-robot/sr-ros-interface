@@ -13,7 +13,7 @@
   <rosparam command="load" ns="srh" file="$(find sr_edc_launch)/sr_edc_sensor_gain_offset.yaml" />
 
   <!-- pr2_etherCAT -->
-  <node name="realtime_loop" machine="local" pkg="pr2_etherCAT" type="pr2_etherCAT" args="-i eth0 -x /robot_description"/>
+  <node name="realtime_loop" machine="local" pkg="pr2_etherCAT" type="pr2_etherCAT" args="-i eth1 -x /robot_description"/>
 
   <!-- Controller manager messages to joint and controller diagnostics -->
   <include file="$(find sr_edc_controller_configuration)/sr_edc_controller_manager.launch" />
