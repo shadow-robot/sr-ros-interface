@@ -34,7 +34,7 @@ typedef unsigned int        int32u;
 typedef   signed int        int32s;
 
 extern "C" {
-	#include <0220_palm_edc_ethercat_protocol.h>
+	#include "external/0220_palm_edc_ethercat_protocol.h"
 }
 
 const unsigned short int SR06::device_pub_freq_const = 1000;
@@ -109,7 +109,7 @@ void SR06::erase_flash(void)
 	bool timedout;
 	unsigned int timeout;
 	int err;
-	
+
 	do {
 		ROS_ERROR("Sending the ERASE FLASH command\n");
 		// First we send the erase command
@@ -144,12 +144,12 @@ void SR06::erase_flash(void)
 			}
 			wait_time++;
 		}
-	
+
 		if (timedout)
 		{
 			ROS_ERROR("ERASE command timedout, resending it !");
 		}
-	} while (timedout);	
+	} while (timedout);
 
 }
 
@@ -168,7 +168,7 @@ void SR06::erase_flash(void)
  * @param baddrl least significant byte of the base address
  * @param baddrh middle byte of the base address
  * @param baddru upper byte of the base address
- * 
+ *
  * @return Returns true if the command has timed out, false if the command was properly acknowledged
  */
 bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char baddrh, unsigned char baddru)
@@ -197,7 +197,7 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
 				{
 					check_for_trylock_error(err);
 				}
-	
+
 			}
 			timedout = false;
 			wait_time = 0;
@@ -221,12 +221,12 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
  *
  *  This function is a ROS Service, aimed at flashing a new firmware into the
  *  PIC18F of a SimpleMotor board through a CAN bootloader protocol.
- * 
+ *
  *  The CAN bootloader allows for several commands to be executed : read_flash, erase_flash, write_flash, reboot, read_version
- * 
+ *
  *  This service will fill a can_message_ structure and then switch a few boolean values to "false" in order to trigger
  *  the message to be sent by the SR06::packCommand() function. And then repeat the process for another message, and so on.
- * 
+ *
  *  This service will first read all the sections of the firmware using libbfd and find out the lowest and highest addresses containing code.
  *  Then it will allocate an array to contain the firmware's code. The size is (highest_addr - lowest_addr).
  *
@@ -238,7 +238,7 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
  *  all the firmware code, padding with 0x00 bytes in the end if the size is not a multiple of 32 bytes.
  *  The process starts at address (lowest_addr) and ends at (hiest_addr) + a few padding bytes if necessary.
  *
- *  You can call this service using this command : 
+ *  You can call this service using this command :
  *
  *  \code rosservice call SimpleMotorFlasher "/home/hand/simplemotor.hex" 8 \endcode
  *
@@ -390,7 +390,7 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 			{
 				check_for_trylock_error(err);
 			}
-		}	
+		}
 		wait_time = 0;
 		timeout = 100;
 		timedout = false;
@@ -410,7 +410,7 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 			ROS_FATAL("None of the magic packets were ACKed");
 			ROS_BREAK();
 		}
-				
+
 	}
 
 	erase_flash();
@@ -438,7 +438,7 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 	if (binary_content == NULL)
 		ROS_FATAL("Error allocating memory for binary_content");
 	memset(binary_content, 0xFF, total_size);
-	
+
 
 	for (s = fd->sections ; s ; s = s->next)
 	{
@@ -536,7 +536,7 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 				check_for_trylock_error(err);
 			}
 		}
-		packet++;	
+		packet++;
 		timedout = false;
 		wait_time = 0;
 		timeout = 100;
@@ -581,7 +581,7 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 			}
 		} while ( timedout );
 	}
-	
+
 	free(binary_content);
 	ROS_ERROR("Sending the RESET command to PIC18F");
 	// Then we send the RESET command to PIC18F
@@ -601,7 +601,7 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 			check_for_trylock_error(err);
 		}
 	}
-		
+
 	can_message_sent = false;
 	can_packet_acked = false;
 	while ( !can_packet_acked )
@@ -662,7 +662,7 @@ SR06::~SR06()
  *
  *  The role of this function is to setup the SyncManagers and the FMMUs used by this EtherCAT slave.
  *  This slave is using two Mailboxes on two different memory areas.
- * 
+ *
  *  Here we are setting up the way of communicating between ROS and the PIC32 using the EtherCAT protocol.
  *
  *  We communicate using Shared Memory areas.
@@ -670,17 +670,17 @@ SR06::~SR06()
  *  The FMMUs are usefull to map the logical memory used by ROS to the Physical memory of the EtherCAT slave chip (ET1200 chip).
  *  So that the chip, receiving the packet will know that the data at address 0x10000 is in reality to be written at physical address 0x1000 of the chip memory for example.
  *  It is the mapping between the EtherCAT bus address space and each slave's chip own memory address space.
- *  
+ *
  *  The SyncManagers are usefull to give a safe way of accessing this Shared Memory, using a consumer / producer model. There are features like interruptions to tell the consumer that there is something to consume or to tell the producer that the Mailbox is empty and then ready to receive a new message.
  *
  *  - One Mailbox contains the commands, written by ROS, read by the PIC32
  *  - One Mailbox contains the status, written back by the PIC32, read by ROS
- * 
+ *
  *  That's basically one Mailbox for upstream and one Mailbox for downstream.
  *
  * - The first Mailbox contains in fact two commands, one is the torque demand, the other is a can command used in CAN_TEST_MODE to communicate with the SimpleMotor for test purposes, or to reflash a new firmware in bootloading mode.
  *  This Mailbox is at logicial address 0x10000 and mapped via a FMMU to physical address 0x1000 (the first address of user memory)
- * - The second Mailbox contains in fact two status, they are the response of the two previously described commands. One is the status containing the joints data, sensor data, finger tips data and motor data. The other is the can command response in CAN_TEST_MODE. When doing a flashing in bootloading mode this is usually an acknowledgment from the bootloader. 
+ * - The second Mailbox contains in fact two status, they are the response of the two previously described commands. One is the status containing the joints data, sensor data, finger tips data and motor data. The other is the can command response in CAN_TEST_MODE. When doing a flashing in bootloading mode this is usually an acknowledgment from the bootloader.
  * This Mailbox is at logical address 0x10038 and mapped via a FMMU to physical address 0x1038.
  *
  * This function sets the two private members command_size_ and status_size_ to be the size of each Mailbox.
@@ -695,39 +695,39 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 	command_base_ = start_address;
 	command_size_ = ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
 	ROS_ERROR("First FMMU (command) : start_address : 0x%08X ; size : 0x%08X ; phy addr : 0x%08X\n", start_address, ETHERCAT_INCOMING_DATA_SIZE, EC_PALM_EDC_COMMAND_PHY_BASE);
-	EC_FMMU *commandFMMU = new EC_FMMU(start_address, 
-					ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE, 
-					0x00, 
-					0x07, 
-					EC_PALM_EDC_COMMAND_PHY_BASE, 
-					0x00, 
-					false, 
-					true, 
+	EC_FMMU *commandFMMU = new EC_FMMU(start_address,
+					ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,
+					0x00,
+					0x07,
+					EC_PALM_EDC_COMMAND_PHY_BASE,
+					0x00,
+					false,
+					true,
 					true);
 	start_address += ETHERCAT_INCOMING_DATA_SIZE;
 	start_address += ETHERCAT_CAN_BRIDGE_DATA_SIZE;
 
 	status_base_ = start_address;
-	
+
 	ROS_ERROR("Second FMMU (status) : start_address : 0x%08X ; size : 0x%08X ; phy addr : 0x%08X\n", start_address, ETHERCAT_OUTGOING_DATA_SIZE, EC_PALM_EDC_DATA_PHY_BASE);
 
 	EC_FMMU *statusFMMU = new EC_FMMU(start_address,
 					ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,
-					0x00, 
-					0x07, 
-					EC_PALM_EDC_DATA_PHY_BASE, 
-					0x00, 
-					true, 
-					false, 
+					0x00,
+					0x07,
+					EC_PALM_EDC_DATA_PHY_BASE,
+					0x00,
+					true,
+					false,
 					true);
-	
-	status_size_ = ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE; 
+
+	status_size_ = ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
 
 	EtherCAT_FMMU_Config *fmmu = new EtherCAT_FMMU_Config(2);
 
 	(*fmmu)[0] = *commandFMMU;
 	(*fmmu)[1] = *statusFMMU;
-	
+
 	sh->set_fmmu_config(fmmu);
 
 	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(4);
@@ -766,7 +766,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
 //  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
 
-  return retval; 
+  return retval;
 }
 
 /** \brief This function gives some diagnostics data
@@ -775,7 +775,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
  */
 void SR06::diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *) {
 stringstream name;
-  name << "EtherCAT Device #" << setw(2) << setfill('0') 
+  name << "EtherCAT Device #" << setw(2) << setfill('0')
        << sh_->get_ring_position() << " (Product SIX)";
   d.name = name.str();
   d.summary(d.OK, "OK");
@@ -796,10 +796,10 @@ stringstream name;
  *
  *  This is one of the most important function of this driver.
  *  This function is called earch millisecond (1 kHz freq) by the EthercatHardware::update() function
- *  in the controlLoop() of the pr2_etherCAT node. 
+ *  in the controlLoop() of the pr2_etherCAT node.
  *
  *  This function is called with a buffer as a parameter, the buffer provided is where we write the commands to send via EtherCAT.
- * 
+ *
  *  We just cast the buffer to our structure type, fill the structure with our data, then add the structure size to the buffer address to shift into memory and access the second command.
  *  The buffer has been allocated with command_size_ bytes, which is the sum of the two command size, so we have to put the two commands one next to the other.
  *  In fact we access the buffer using this kind of code : \code
@@ -829,7 +829,7 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 //		ROS_ERROR("EDC_COMMAND_SENSOR_DATA !\n");
 		command->EDC_command = EDC_COMMAND_SENSOR_DATA;
 	}
-	else 
+	else
 	{
 //		k++;
 //		ROS_ERROR("EDC_COMMAND_CAN_TEST_MODE !\n");
@@ -935,7 +935,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
   static unsigned int i = 0;
   static unsigned int num_rxed_packets = 0;
- 
+
   ++num_rxed_packets;
   if (tbuffer->EDC_command == EDC_COMMAND_INVALID)
   {
@@ -965,7 +965,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   } else if (i * nb_publish_by_unpack_const < nb_sensors_const) {
     std_msgs::Int16 msg;
     unsigned char j;
-    for (j = 0 ; j < nb_publish_by_unpack_const ; ++j) 
+    for (j = 0 ; j < nb_publish_by_unpack_const ; ++j)
   {
       unsigned short int k = i * nb_publish_by_unpack_const + j;
       msg.data = *((signed short int *)tbuffer + k + 2);

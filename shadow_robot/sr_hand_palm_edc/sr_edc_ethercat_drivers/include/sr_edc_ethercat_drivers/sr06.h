@@ -19,7 +19,7 @@ typedef unsigned int        int32u;
 typedef   signed int        int32s;
 
 extern "C" {
-	#include "/home/hand/0220_palm_edc_ethercat_protocol.h"
+	#include "external/0220_palm_edc_ethercat_protocol.h"
 }
 
 class SR06 : public SR0X
@@ -28,7 +28,7 @@ public:
   void construct(EtherCAT_SlaveHandler *sh, int &start_address);
   int initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_unprogrammed=true);
   void diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *);
-  
+
   SR06();
   ~SR06();
   bool SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res);

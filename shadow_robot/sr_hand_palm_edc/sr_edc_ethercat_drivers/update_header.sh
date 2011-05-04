@@ -2,7 +2,7 @@
 
 START_PATH=`pwd`
 
-cd "../external"
+cd "../include/external"
 
 if [ -d 0220_palm_edc ] ; then
     chmod -R a+w 0220_palm_edc
