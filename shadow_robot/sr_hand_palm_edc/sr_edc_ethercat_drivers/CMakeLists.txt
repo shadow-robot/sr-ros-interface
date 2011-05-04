@@ -11,6 +11,14 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 rosbuild_init()
 
+MESSAGE("----")
+MESSAGE(" Fetching the latest headers ...")
+ADD_CUSTOM_COMMAND(
+  OUTPUT headers.txt
+  COMMAND "${PROJECT_SOURCE_DIR}/update_header.sh"
+)
+MESSAGE("----")
+
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
@@ -27,5 +35,5 @@ rosbuild_gensrv()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
-rosbuild_add_library(sr_edc_ethercat_drivers src/sr0x.cpp src/sr06.cpp src/srbridge.cpp src/srcan.cpp src/srdmotor.cpp src/motor_trace_buffer.cpp)
+rosbuild_add_library(sr_edc_ethercat_drivers src/sr0x.cpp src/sr06.cpp src/srbridge.cpp src/srcan.cpp src/srdmotor.cpp src/motor_trace_buffer.cpp headers.txt)
 rosbuild_add_link_flags(sr_edc_ethercat_drivers -lbfd)
