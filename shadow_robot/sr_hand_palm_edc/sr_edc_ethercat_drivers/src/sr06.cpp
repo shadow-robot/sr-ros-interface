@@ -34,7 +34,7 @@ typedef unsigned int        int32u;
 typedef   signed int        int32s;
 
 extern "C" {
-	#include "external/0220_palm_edc_ethercat_protocol.h"
+	#include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
 }
 
 const unsigned short int SR06::device_pub_freq_const = 1000;
