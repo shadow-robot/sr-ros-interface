@@ -6,7 +6,6 @@ for cpp_file in  `find . -name *.h`; do
     echo "   -> "${cpp_file}
 
     a=5
-
     while read line
     do
 	a=$(($a+1));
