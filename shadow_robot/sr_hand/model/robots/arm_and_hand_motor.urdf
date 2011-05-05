@@ -217,7 +217,7 @@
   <joint name="arm_link" type="revolute">
     <parent link="shadowarm_handsupport_motor"/>
     <child link="forearm_motor"/>
-    <origin rpy="1.57079632679 0 1.57079632679" xyz="0 0 0"/>
+    <origin rpy="0 0 1.57079632679" xyz="0 0 0"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="0" velocity="1.0"/>
     <dynamics damping="3.5"/>
