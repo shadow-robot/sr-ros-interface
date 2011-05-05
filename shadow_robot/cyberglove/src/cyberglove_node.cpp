@@ -2,7 +2,7 @@
  * @file   cyberglove_node.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Thu Apr 22 10:21:50 2010
- * 
+ *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -21,8 +21,8 @@
 *
  * @brief  The cyberglove node publishes data collected from a
  * Cyberglove.
- * 
- * 
+ *
+ *
  */
 
 #include <ros/ros.h>
@@ -41,12 +41,12 @@ using namespace cyberglove_service;
 /////////////////////////////////
 
 
-/** 
+/**
  *  Start the cyberglove publisher.
  *
- * @param argc 
- * @param argv 
- * 
+ * @param argc
+ * @param argv
+ *
  * @return -1 if error (e.g. no glove found)
  */
 int main(int argc, char** argv)
@@ -54,16 +54,28 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "cyberglove_publisher");
   //NodeHandle n;
   boost::shared_ptr<CyberglovePublisher> cyberglove_pub(new CyberglovePublisher());
-  
-  CybergloveService service(cyberglove_pub);  
+
+  CybergloveService service(cyberglove_pub);
 
   while( ros::ok() )
+  {
+    if(cyberglove_pub->isPublishing())
     {
-      if(cyberglove_pub->isPublishing()){
-        cyberglove_pub->publish();
-        }
-      //else{ros::spinOnce();sleep(100);}
+      cyberglove_pub->publish();
     }
+    else
+    {
+      ros::spinOnce();
+      sleep(100);
+    }
+  }
 
   return 0;
 }
+
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/

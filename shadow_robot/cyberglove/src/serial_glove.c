@@ -1,5 +1,5 @@
 
-/** 
+/**
 @file
   This program talks to a cyberglove on the serial port
 
@@ -44,7 +44,7 @@ FILE * serial;
 
 static float values[GLOVE_SIZE];
 
- 
+
 float glove_positions[GLOVE_SIZE];
 
 int gloveButtonValue=0;
@@ -57,7 +57,8 @@ char glove_message[100];
 struct termios termios_save;
 static int serial_port_fd = -1;
 
-void open_board(char *port) {
+void open_board(char *port)
+{
   struct termios termios_p;
 
   serial_port_fd = open(port, O_RDWR | O_NOCTTY); //will return a file descriptor based on an actual file
@@ -83,10 +84,10 @@ void open_board(char *port) {
 
 
   memcpy(&termios_save, &termios_p, sizeof(struct termios));
-  
+
   //! trying the following lines to restart serial port, see read_stepping() function
   tcsetattr(serial_port_fd, TCSANOW, &termios_p);
-  tcflush(serial_port_fd, TCOFLUSH);  
+  tcflush(serial_port_fd, TCOFLUSH);
   tcflush(serial_port_fd, TCIFLUSH);
 
   //  unsigned char out_data[2]={0xff, 0};
@@ -95,15 +96,12 @@ void open_board(char *port) {
   sleep(1);
 }
 
-
-
-
-
 /**
 called by read_values
 *b is length GLOVE_SIZE + 2 because the first two characters returned are G and ' '
 */
-int read_stepping(int fd, unsigned char *b, int n) {
+int read_stepping(int fd, unsigned char *b, int n)
+{
   int i=0;
   //fd_set fdset;
   int res=0;
@@ -113,7 +111,7 @@ int read_stepping(int fd, unsigned char *b, int n) {
 
   do {
     res=read(fd, &b[i], remain);
-    if (res>0) { 
+    if (res>0) {
       remain -= res;
       i += res;
     };
@@ -133,7 +131,8 @@ int read_stepping(int fd, unsigned char *b, int n) {
   return (remain!=0);
 }
 
-void  writeg(int fd, char *b, int n) {
+void  writeg(int fd, char *b, int n)
+{
   int i;
   for (i=0;i<n;i++) {
     write(fd, &b[i], 1);
@@ -142,8 +141,9 @@ void  writeg(int fd, char *b, int n) {
 }
 
 //read the position values from the glove
-void read_values(float *dest) {
- restart:
+void read_values(float *dest)
+{
+restart:
   glove_start_reads++;
   tcflush(serial_port_fd, TCIFLUSH);
   tcflush(serial_port_fd, TCOFLUSH);
@@ -163,12 +163,12 @@ void read_values(float *dest) {
   if (ch[0]!='G') {
     //error(0,0,"NO G");
     //    log_message("%s: Failure reading glove: No G", timestamp());
-    goto restart; 
+    goto restart;
   };
 
   //! if any of the values are zero restart read as not considered reliable
   for (i=0; i<GLOVE_SIZE; i++) {
-    if (ch[i+1]==0) { 
+    if (ch[i+1]==0) {
       //error(0,0,"Restart %d!", i);
       goto restart;
     };
@@ -179,19 +179,20 @@ void read_values(float *dest) {
   }
 
 
-  strcpy(glove_message, "");  
+  strcpy(glove_message, "");
   glove_reads++;
 }
 
 //read the button value from the glove
-int read_button_value() {
- restartButtonRead:
+int read_button_value()
+{
+restartButtonRead:
   tcflush(serial_port_fd, TCIFLUSH);
   tcflush(serial_port_fd, TCOFLUSH);
   writeg(serial_port_fd, "?W", 2);
   unsigned char ch[3]={0};    //assigns 0 to the first char
 
-  //TODO : this should be reduced ? 
+  //TODO : this should be reduced ?
   usleep(GLOVE_SIZE*10);
 
   if (read_stepping(serial_port_fd, &ch, 3)) {
@@ -203,27 +204,28 @@ int read_button_value() {
 
 
 int setup_glove(const char* path_to_glove)
- {
+{
   open_board(path_to_glove);
 
   int i;
-  for (i=0;i<GLOVE_SIZE;i++) 
-    {
-      values[i]=0.0;
-      glove_positions[i] = 0.0;
-    }
-  
+  for (i=0;i<GLOVE_SIZE;i++)
+  {
+    values[i]=0.0;
+    glove_positions[i] = 0.0;
+  }
+
   return 0;
- }
+}
 
 
 //at end of file
 //static void compute_setpoints(void);
- 
+
 
 
 //! sample the glove values - need to call setup_glove first
-float* glove_get_values() {
+float* glove_get_values()
+{
   read_values(values);
 
   int i;
@@ -234,3 +236,9 @@ float* glove_get_values() {
 }
 
 
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
