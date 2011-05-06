@@ -98,6 +98,7 @@ namespace cyberglove
 
     int get_nb_msgs_received();
 
+    static const unsigned short glove_size;
   private:
     boost::shared_ptr<cereal::CerealPort> cereal_port;
 
@@ -106,7 +107,6 @@ namespace cyberglove
     int nb_msgs_received, glove_pos_index;
     std::vector<float> glove_positions;
 
-    static const short glove_size;
 
     int current_value;
 

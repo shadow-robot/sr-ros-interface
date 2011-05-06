@@ -37,7 +37,7 @@ namespace cyberglove_freq
 
 namespace cyberglove
 {
-  const short CybergloveSerial::glove_size = 22;
+  const unsigned short CybergloveSerial::glove_size = 22;
 
   CybergloveSerial::CybergloveSerial(std::string serial_port, boost::function<void(std::vector<float>, bool)> callback) :
     nb_msgs_received(0), glove_pos_index(0), current_value(0), light_on(true), button_on(true)
@@ -148,7 +148,7 @@ namespace cyberglove
         //glove sensor value
       default:
         //last char if the status indication is transmitted
-        if( glove_pos_index == 22 )
+        if( glove_pos_index == glove_size )
         {
           //the status bit 1 corresponds to the button
           if(current_value & 2)
@@ -193,30 +193,6 @@ void callback(std::vector<float> glove_pos, bool light_on)
   }
 }
 
-int main(int argc, char** argv)
-{
-  boost::shared_ptr<cyberglove::CybergloveSerial> serial_glove(new cyberglove::CybergloveSerial("/dev/ttyUSB0", boost::bind(&callback, _1, _2)));
-
-  int res = -1;
-
-  cyberglove_freq::CybergloveFreq frequency;
-  res = serial_glove->set_frequency(frequency.hundred_hz);
-  res = serial_glove->set_filtering(false);
-  res = serial_glove->set_transmit_info(true);
-
-
-  res = serial_glove->start_stream();
-
-  int test_length = 10;
-
-  sleep(test_length);
-  std::cout << "Stopping" << std::endl;
-
-  int nb_msgs = serial_glove->get_nb_msgs_received();
-  std::cout << "Nb messages received = "<< nb_msgs
-            << " frequency = " << (double)nb_msgs/( (double)test_length ) << "Hz" << std::endl;
-
-}
 
 /* For the emacs weenies in the crowd.
 Local Variables:

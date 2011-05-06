@@ -30,15 +30,14 @@
 #include <string>
 #include <sstream>
 
-#include "cyberglove/serial_glove.h"
 #include "cyberglove/cyberglove_publisher.h"
 #include "cyberglove/cyberglove_service.h"
 
 using namespace ros;
 
-namespace cyberglove_service{
+namespace cyberglove{
 
-CybergloveService::CybergloveService(boost::shared_ptr<cyberglove_publisher::CyberglovePublisher> publish)
+CybergloveService::CybergloveService(boost::shared_ptr<CyberglovePublisher> publish)
  :  node("~"), pub(publish)
 {
   service_start = node.advertiseService("start",&CybergloveService::start,this);

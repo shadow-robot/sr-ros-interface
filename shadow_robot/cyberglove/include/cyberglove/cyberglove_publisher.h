@@ -33,6 +33,9 @@
 
 #include <ros/ros.h>
 #include <vector>
+#include <boost/smart_ptr.hpp>
+
+#include "cyberglove/serial_glove.hpp"
 
 //messages
 #include <sensor_msgs/JointState.h>
@@ -40,7 +43,7 @@
 
 using namespace ros;
 
-namespace cyberglove_publisher{
+namespace cyberglove{
 
   class CyberglovePublisher
   {
@@ -53,7 +56,6 @@ namespace cyberglove_publisher{
 
     Publisher cyberglove_pub;
     void initialize_calibration(std::string path_to_calibration);
-    void publish();
     bool isPublishing();
     void setPublishing(bool value);
   private:
@@ -65,6 +67,19 @@ namespace cyberglove_publisher{
     NodeHandle node, n_tilde;
     Rate sampling_rate;
     unsigned int publish_counter_max, publish_counter_index;
+
+    ///the actual connection with the cyberglove is done here.
+    boost::shared_ptr<CybergloveSerial> serial_glove;
+
+    /**
+     * The callback function: called each time a full message
+     * is received. This function is bound to the serial_glove
+     * object using boost::bind.
+     *
+     * @param glove_pos A vector containing the current raw joints positions.
+     * @param light_on true if the light is on, false otherwise.
+     */
+    void glove_callback(std::vector<float> glove_pos, bool light_on);
 
     std::string path_to_glove;
     bool publishing;
@@ -81,10 +96,7 @@ namespace cyberglove_publisher{
 
     std::vector<float> calibration_values;
 
-    std::vector< float* > glove_positions;
-
-    bool checkGloveState();
-
+    std::vector<std::vector<float> > glove_positions;
   }; // end class CyberglovePublisher
 
 } // end namespace

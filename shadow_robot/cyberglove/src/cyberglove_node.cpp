@@ -31,10 +31,8 @@
 #include "cyberglove/cyberglove_service.h"
 #include "cyberglove/Start.h"
 #include <boost/smart_ptr.hpp>
-using namespace cyberglove_publisher;
-using namespace cyberglove_service;
 
-
+using namespace cyberglove;
 
 /////////////////////////////////
 //           MAIN              //
@@ -57,18 +55,7 @@ int main(int argc, char** argv)
 
   CybergloveService service(cyberglove_pub);
 
-  while( ros::ok() )
-  {
-    if(cyberglove_pub->isPublishing())
-    {
-      cyberglove_pub->publish();
-    }
-    else
-    {
-      ros::spinOnce();
-      sleep(100);
-    }
-  }
+  ros::spin();
 
   return 0;
 }

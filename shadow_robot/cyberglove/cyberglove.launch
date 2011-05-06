@@ -6,9 +6,16 @@
   <node pkg="cyberglove" name="cyberglove" type="cyberglove">
     <param name="cyberglove_prefix" type="string" value="/cyberglove" />
     <!-- We're doing some oversampling. You can set the frequency at which
-	 the data are sampled as well as the frequency at which they're published -->
+	 the data are sampled as well as the frequency at which they're published
+	 possible values:
+	   - -1  -> fastest frequency (around 120Hz with our test glove)
+	   - 100 -> 100 Hz
+	   - 45  -> 45 Hz
+	   - 10  -> 10 Hz
+	   - 1  -> 1 Hz
+    -->
     <param name="sampling_frequency" type="double" value="100.0" />
-    <param name="publish_frequency" type="double" value="100.0" />
+    <param name="publish_frequency" type="double" value="10.0" />
     <param name="path_to_glove" type="string" value="/dev/ttyUSB0" />
     <param name="path_to_calibration" type="string" value="$(find
     sr_control_gui)/param/cyberglove.cal" />
