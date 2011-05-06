@@ -176,6 +176,7 @@ namespace cyberglove{
   /////////////////////////////////
   void CyberglovePublisher::glove_callback(std::vector<float> glove_pos, bool light_on)
   {
+    //if the light is off, we don't publish any data.
     if( !light_on )
     {
       publishing = false;
