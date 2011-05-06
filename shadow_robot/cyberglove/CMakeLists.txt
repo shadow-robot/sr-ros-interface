@@ -25,6 +25,13 @@ rosbuild_add_executable(cyberglove src/cyberglove_publisher.cpp src/cyberglove_n
 
 rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/xml_calibration_parser.cpp )
 
+
+
+
+rosbuild_add_executable(test_serial src/serial_glove.cpp)
+target_link_libraries(test_serial cereal_port)
+
+
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)

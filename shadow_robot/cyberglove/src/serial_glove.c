@@ -12,11 +12,10 @@
   serial_glove.c
    (C) Shadow Robot Company 2006
    GPL
+
 */
 
 //! sudo cc -c -I/usr/realtime/include/ serial_glove.c -o serial_glove.o
-
-
 
 #include <stdio.h>
 #include <error.h>
@@ -125,7 +124,7 @@ int read_stepping(int fd, unsigned char *b, int n)
       return 1;
     };
 
-    if (remain) usleep (remain * 500); //wait for more characters to appear on the port
+    if (remain) usleep (1); //wait for more characters to appear on the port
   } while ( /* (counter<10) && */ remain);
 
   return (remain!=0);
@@ -151,7 +150,7 @@ restart:
   int i;
   unsigned char ch[GLOVE_SIZE+2]={0}; //assigns 0 to the first char
 
-  usleep(GLOVE_SIZE*10);
+  usleep(1);//GLOVE_SIZE*10);
   //  int res=read(serial_port_fd, &ch, GLOVE_SIZE+2);
   //  if (res<0) error(1,errno, "reading from serial port");
   if (read_stepping(serial_port_fd, &ch, GLOVE_SIZE+2)) {
@@ -193,7 +192,7 @@ restartButtonRead:
   unsigned char ch[3]={0};    //assigns 0 to the first char
 
   //TODO : this should be reduced ?
-  usleep(GLOVE_SIZE*10);
+  usleep(1);//GLOVE_SIZE*10);
 
   if (read_stepping(serial_port_fd, &ch, 3)) {
     goto restartButtonRead;
