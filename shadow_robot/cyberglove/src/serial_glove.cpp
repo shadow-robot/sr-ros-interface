@@ -40,7 +40,7 @@ namespace cyberglove
   const unsigned short CybergloveSerial::glove_size = 22;
 
   CybergloveSerial::CybergloveSerial(std::string serial_port, boost::function<void(std::vector<float>, bool)> callback) :
-    nb_msgs_received(0), glove_pos_index(0), current_value(0), light_on(true), button_on(true)
+    nb_msgs_received(0), glove_pos_index(0), current_value(0), light_on(true), button_on(true), no_errors(true)
   {
     cereal_port = boost::shared_ptr<cereal::CerealPort>(new cereal::CerealPort());
 
@@ -137,37 +137,51 @@ namespace cyberglove
         //the line starts with S, followed by the sensors
       case 'S':
         ++nb_msgs_received;
+        //reset the index to 0
         glove_pos_index = 0;
-        break;
-
-        //full message received: call the callback function now
-      case 0:
-        callback_function(glove_positions, light_on);
+        //reset no_errors to true for the new message
+        no_errors = true;
         break;
 
         //glove sensor value
       default:
-        //last char if the status indication is transmitted
-        if( glove_pos_index == glove_size )
+        switch( glove_pos_index )
         {
+        case glove_size:
+          //the last char of the msg is the status
+
           //the status bit 1 corresponds to the button
           if(current_value & 2)
             button_on = true;
           else
             button_on = false;
-
           //the status bit 2 corresponds to the light
           if(current_value & 4)
             light_on = true;
           else
             light_on = false;
-        }
-        else
-        {
+
+          break;
+
+        case glove_size + 1:
+          //the last char of the line should be 0
+          //if it is 0, then the full message has been received,
+          //and we call the callback function.
+          if( current_value == 0 && no_errors)
+            callback_function(glove_positions, light_on);
+          break;
+
+        default:
+          //this is a joint data from the glove
+          //the value in the message should never be 0.
+          if( current_value == 0)
+            no_errors = false;
           // the values sent by the glove are in the range [1;254]
           //   -> we convert them to float in the range [0;1]
           glove_positions[glove_pos_index] = (((float)current_value) - 1.0f) / 254.0f;
+          break;
         }
+
         ++glove_pos_index;
         break;
       }

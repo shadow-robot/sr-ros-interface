@@ -8,7 +8,6 @@
     <!-- We're doing some oversampling. You can set the frequency at which
 	 the data are sampled as well as the frequency at which they're published
 	 possible values:
-	   - -1  -> fastest frequency (around 120Hz with our test glove)
 	   - 100 -> 100 Hz
 	   - 45  -> 45 Hz
 	   - 10  -> 10 Hz

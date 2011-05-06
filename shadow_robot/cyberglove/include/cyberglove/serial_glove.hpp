@@ -99,6 +99,7 @@ namespace cyberglove
     int get_nb_msgs_received();
 
     static const unsigned short glove_size;
+
   private:
     boost::shared_ptr<cereal::CerealPort> cereal_port;
 
@@ -113,6 +114,8 @@ namespace cyberglove
     boost::function<void(std::vector<float>, bool)> callback_function;
 
     bool light_on, button_on;
+
+    bool no_errors;
   };
 }
 

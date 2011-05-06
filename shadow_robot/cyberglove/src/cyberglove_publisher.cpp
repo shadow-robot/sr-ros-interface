@@ -81,9 +81,6 @@ namespace cyberglove{
 
     switch( (int)sampling_freq)
     {
-    case -1:
-      res = serial_glove->set_frequency(frequency.fastest);
-      break;
     case 100:
       res = serial_glove->set_frequency(frequency.hundred_hz);
       break;
