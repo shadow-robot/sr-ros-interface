@@ -28,7 +28,7 @@
 
 namespace cyberglove_freq
 {
-  const std::string CybergloveFreq::fastest = "t 1152 0\r"; //fastest speed
+  const std::string CybergloveFreq::fastest = "t 1152 0\r"; //fastest speed, just for testing
   const std::string CybergloveFreq::hundred_hz = "t 1152 1\r"; //100Hz
   const std::string CybergloveFreq::fourtyfive_hz = "t 2560 1\r"; //45Hz
   const std::string CybergloveFreq::ten_hz = "t 11520 1\r"; //10Hz
@@ -42,26 +42,24 @@ namespace cyberglove
   CybergloveSerial::CybergloveSerial(std::string serial_port, boost::function<void(std::vector<float>, bool)> callback) :
     nb_msgs_received(0), glove_pos_index(0), current_value(0), light_on(true), button_on(true), no_errors(true)
   {
-    cereal_port = boost::shared_ptr<cereal::CerealPort>(new cereal::CerealPort());
-
-    std::cout << "Opening serial port "<< serial_port ;
-    cereal_port->open(serial_port.c_str());
-
-    std::cout << " result : " << cereal_port->portOpen() << std::endl;
-
-    callback_function = callback;
-
     //initialize the vector of positions with 0s
     for (int i = 0; i < glove_size; ++i)
     {
       glove_positions.push_back(0);
     }
+
+    //open the serial port
+    cereal_port = boost::shared_ptr<cereal::CerealPort>(new cereal::CerealPort());
+    cereal_port->open(serial_port.c_str());
+
+    //set the callback function
+    callback_function = callback;
   }
 
   CybergloveSerial::~CybergloveSerial()
   {
     cereal_port->stopStream();
-
+    //stop the cyberglove transmission
     cereal_port->write("^c", 2);
   }
 
@@ -121,6 +119,7 @@ namespace cyberglove
 
     cereal_port->startReadStream(boost::bind(&CybergloveSerial::stream_callback, this, _1, _2));
 
+    //start streaming by writing S to the serial port
     cereal_port->write("S", 1);
     cereal_port->flush();
 
@@ -129,13 +128,14 @@ namespace cyberglove
 
   void CybergloveSerial::stream_callback(char* world, int length)
   {
+    //read each received char.
     for (int i = 0; i < length; ++i)
     {
       current_value = (int)(unsigned char)world[i];
       switch( current_value )
       {
-        //the line starts with S, followed by the sensors
       case 'S':
+        //the line starts with S, followed by the sensors values
         ++nb_msgs_received;
         //reset the index to 0
         glove_pos_index = 0;
@@ -143,12 +143,12 @@ namespace cyberglove
         no_errors = true;
         break;
 
-        //glove sensor value
       default:
+        //this is a glove sensor value, a status byte or a "message end"
         switch( glove_pos_index )
         {
         case glove_size:
-          //the last char of the msg is the status
+          //the last char of the msg is the status byte
 
           //the status bit 1 corresponds to the button
           if(current_value & 2)
@@ -193,20 +193,6 @@ namespace cyberglove
     return nb_msgs_received;
   }
 }
-
-void callback(std::vector<float> glove_pos, bool light_on)
-{
-  if(light_on)
-  {
-    std::cout << "Data received: ";
-    for (unsigned int i = 0; i < glove_pos.size(); ++i)
-    {
-      std::cout << glove_pos[i] << " ";
-    }
-    std::cout << std::endl;
-  }
-}
-
 
 /* For the emacs weenies in the crowd.
 Local Variables:
