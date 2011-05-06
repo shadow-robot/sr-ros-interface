@@ -28,8 +28,9 @@
 
 namespace cyberglove_freq
 {
-  const std::string CybergloveFreq::hundred_hz = "t 1152 1\r"; //100Hz not possible with this glove
-  const std::string CybergloveFreq::fourtyfive_hz = "t 2560 1\r"; //fastest frequency with this glove
+  const std::string CybergloveFreq::fastest = "t 1152 0\r"; //fastest speed
+  const std::string CybergloveFreq::hundred_hz = "t 1152 1\r"; //100Hz
+  const std::string CybergloveFreq::fourtyfive_hz = "t 2560 1\r"; //45Hz
   const std::string CybergloveFreq::ten_hz = "t 11520 1\r"; //10Hz
   const std::string CybergloveFreq::one_hz = "t 57600 2\r"; //1Hz
 }
@@ -38,8 +39,8 @@ namespace cyberglove
 {
   const short CybergloveSerial::glove_size = 22;
 
-  CybergloveSerial::CybergloveSerial(std::string serial_port, boost::function<void(std::vector<int>)> callback) :
-    nb_msgs_received(0), glove_pos_index(0), current_value(0)
+  CybergloveSerial::CybergloveSerial(std::string serial_port, boost::function<void(std::vector<float>, bool)> callback) :
+    nb_msgs_received(0), glove_pos_index(0), current_value(0), light_on(true), button_on(true)
   {
     cereal_port = boost::shared_ptr<cereal::CerealPort>(new cereal::CerealPort());
 
@@ -64,9 +65,43 @@ namespace cyberglove
     cereal_port->write("^c", 2);
   }
 
-  int CybergloveSerial::set_filtering(int value)
+  int CybergloveSerial::set_filtering(bool value)
   {
-    //TODO: implement this
+    if( value ) //Filtering will be on
+    {
+      cereal_port->write("f 1\r", 4);
+      std::cout << " - Data filtered" << std::endl;
+    }
+    else // Filtering off
+    {
+      cereal_port->write("f 0\r", 4);
+      std::cout << " - Data not filtered" << std::endl;
+    }
+    cereal_port->flush();
+
+    //wait for the command to be applied
+    sleep(1);
+
+    return 0;
+  }
+
+  int CybergloveSerial::set_transmit_info(bool value)
+  {
+    if( value ) //transmit info will be on
+    {
+      cereal_port->write("u 1\r", 4);
+      std::cout << " - Additional info transmitted" << std::endl;
+    }
+    else // transmit info off
+    {
+      cereal_port->write("u 0\r", 4);
+      std::cout << " - Additional info not transmitted" << std::endl;
+    }
+    cereal_port->flush();
+
+    //wait for the command to be applied
+    sleep(1);
+
     return 0;
   }
 
@@ -74,6 +109,8 @@ namespace cyberglove
   {
     cereal_port->write(frequency.c_str(), frequency.size());
     cereal_port->flush();
+
+    //wait for the command to be applied
     sleep(1);
     return 0;
   }
@@ -95,28 +132,45 @@ namespace cyberglove
     for (int i = 0; i < length; ++i)
     {
       current_value = (int)(unsigned char)world[i];
-      //the line starts with S (83 in ASCII), followed by the sensors
-      if( current_value == 83 )
+      switch( current_value )
       {
+        //the line starts with S, followed by the sensors
+      case 'S':
         ++nb_msgs_received;
         glove_pos_index = 0;
-        //std::cout << std::endl;
-      }
-      else
-      {
-        //if not the end of the line
-        if( current_value != 0 )
+        break;
+
+        //full message received: call the callback function now
+      case 0:
+        callback_function(glove_positions, light_on);
+        break;
+
+        //glove sensor value
+      default:
+        //last char if the status indication is transmitted
+        if( glove_pos_index == 22 )
         {
-          //glove_positions[glove_pos_index] = (((float)current_value) - 1.0f) / 254.0f;
-          glove_positions[glove_pos_index] = current_value;
-          ++glove_pos_index;
+          //the status bit 1 corresponds to the button
+          if(current_value & 2)
+            button_on = true;
+          else
+            button_on = false;
+
+          //the status bit 2 corresponds to the light
+          if(current_value & 4)
+            light_on = true;
+          else
+            light_on = false;
         }
-        else //full message received, call the callback function now
+        else
         {
-          callback_function(glove_positions);
+          // the values sent by the glove are in the range [1;254]
+          //   -> we convert them to float in the range [0;1]
+          glove_positions[glove_pos_index] = (((float)current_value) - 1.0f) / 254.0f;
         }
+        ++glove_pos_index;
+        break;
       }
-      //  std::cout << (int)(unsigned char)world[i] << " ";
     }
   }
 
@@ -126,36 +180,41 @@ namespace cyberglove
   }
 }
 
-void callback(std::vector<int> glove_pos)
+void callback(std::vector<float> glove_pos, bool light_on)
 {
-  std::cout << "Data received: ";
-  for (unsigned int i = 0; i < glove_pos.size(); ++i)
+  if(light_on)
   {
-    std::cout << glove_pos[i] << " ";
+    std::cout << "Data received: ";
+    for (unsigned int i = 0; i < glove_pos.size(); ++i)
+    {
+      std::cout << glove_pos[i] << " ";
+    }
+    std::cout << std::endl;
   }
-  std::cout << std::endl;
 }
 
 int main(int argc, char** argv)
 {
-  boost::shared_ptr<cyberglove::CybergloveSerial> serial_glove(new cyberglove::CybergloveSerial("/dev/ttyUSB0", boost::bind(&callback, _1)));
+  boost::shared_ptr<cyberglove::CybergloveSerial> serial_glove(new cyberglove::CybergloveSerial("/dev/ttyUSB0", boost::bind(&callback, _1, _2)));
 
   int res = -1;
-  res = serial_glove->set_filtering(0);
-  std::cout << "FILTERING SET TO : " << res << std::endl;
 
   cyberglove_freq::CybergloveFreq frequency;
-  res = serial_glove->set_frequency(frequency.one_hz);
-  std::cout << "PERIOD SET TO : " << res << std::endl;
+  res = serial_glove->set_frequency(frequency.hundred_hz);
+  res = serial_glove->set_filtering(false);
+  res = serial_glove->set_transmit_info(true);
+
 
   res = serial_glove->start_stream();
 
-  sleep(5);
+  int test_length = 10;
+
+  sleep(test_length);
   std::cout << "Stopping" << std::endl;
 
   int nb_msgs = serial_glove->get_nb_msgs_received();
   std::cout << "Nb messages received = "<< nb_msgs
-            << " frequency = " << nb_msgs/5 << "Hz" << std::endl;
+            << " frequency = " << (double)nb_msgs/( (double)test_length ) << "Hz" << std::endl;
 
 }
 

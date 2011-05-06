@@ -74,6 +74,7 @@ namespace cyberglove_freq
 {
   struct CybergloveFreq
   {
+    static const std::string fastest;
     static const std::string hundred_hz;
     static const std::string fourtyfive_hz;
     static const std::string ten_hz;
@@ -86,10 +87,11 @@ namespace cyberglove
   class CybergloveSerial
   {
   public:
-    CybergloveSerial(std::string serial_port, boost::function<void(std::vector<int>)> callback);
+    CybergloveSerial(std::string serial_port, boost::function<void(std::vector<float>, bool)> callback);
     ~CybergloveSerial();
 
-    int set_filtering(int value);
+    int set_filtering(bool value);
+    int set_transmit_info(bool value);
     int set_frequency(std::string frequency);
 
     int start_stream();
@@ -102,13 +104,15 @@ namespace cyberglove
     void stream_callback(char* world, int length);
 
     int nb_msgs_received, glove_pos_index;
-    std::vector<int> glove_positions;
+    std::vector<float> glove_positions;
 
     static const short glove_size;
 
     int current_value;
 
-    boost::function<void(std::vector<int>)> callback_function;
+    boost::function<void(std::vector<float>, bool)> callback_function;
+
+    bool light_on, button_on;
   };
 }
 
