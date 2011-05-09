@@ -15,11 +15,14 @@
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="std_msgs"/>
+  <depend package="std_srvs"/>
   <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
   <depend package="diagnostic_msgs"/>
 <!--  <depend package="kdl_parser"/> -->
   <depend package="dynamic_reconfigure"/>
+
+  <depend package="gazebo"/>
 
   <export>
 	<cpp cflags="-I${prefix}/include"/>
