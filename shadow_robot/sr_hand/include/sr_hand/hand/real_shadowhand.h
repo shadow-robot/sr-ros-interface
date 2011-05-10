@@ -2,7 +2,7 @@
  * @file   real_shadowhand.h
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:51:10 2010
- * 
+ *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -20,9 +20,9 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
  * @brief The real shadowhand is the ROS interface to Shadow Robot robotic hand.
- * 
+ *
  * @todo Make sure it works with the motor hand.
- * 
+ *
  */
 
 #ifndef   	REAL_SHADOWHAND_H_
@@ -31,14 +31,19 @@
 #include <robot/config.h>
 #include "sr_hand/hand/sr_articulated_robot.h"
 
+namespace debug_values_offsets
+{
+  enum debug_values_offsets;
+}
+
 namespace shadowrobot
 {
 /**
  * The real shadowhand class is a class used to access the C code of the Dextrous Hand.
  */
-class RealShadowhand : public SRArticulatedRobot
-{
-public:
+  class RealShadowhand : public SRArticulatedRobot
+  {
+  public:
     /**
      * Constructor for the real Shadowhand: initialize the connection to the robot and also initialize the
      * joint_map containing the mapping between joint_names and their data.
@@ -66,12 +71,19 @@ public:
     virtual short setConfig( std::vector<std::string> myConfig );
     virtual void getConfig( std::string joint_name );
     virtual std::vector<DiagnosticData> getDiagnostics();
-protected:
+  protected:
     /***
      * Initializes the mapping between the joint_names and their data. This function fetches the joint_names from
      * the robot code.
      */
     void initializeMap();
-}; //end class
+  }; //end class
 }
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
+
 #endif 	    /* !REAL_SHADOWHAND_H_ */

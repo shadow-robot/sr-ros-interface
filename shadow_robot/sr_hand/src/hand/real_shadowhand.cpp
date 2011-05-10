@@ -32,6 +32,29 @@
 #include <robot/hand.h>
 #include <robot/hand_protocol.h>
 
+namespace debug_values_offsets
+{
+  enum debug_values_offsets
+  {
+    sensor_pid_last_in,
+    sensor_pid_istate,
+    sensor_pid_last_d,
+    sensor_pid_last_out,
+    pid_last_in,
+    pid_istate,
+    pid_last_d,
+    pid_last_out,
+    strain_gauge_offset_0,
+    strain_gauge_offset_1,
+    num_setup_msgs_received,
+    num_sensor_msgs_received,
+    sensor_val_motor_p,
+    sensor_val_motor_sensor,
+    h_bridge_duty,
+    duty_temp
+  };
+}
+
 namespace shadowrobot
 {
 RealShadowhand::RealShadowhand() :
@@ -291,102 +314,98 @@ void RealShadowhand::getConfig( std::string joint_name )
     ROS_WARN("The get config function is not yet implement in the real shadow hand.");
 }
 
-/*
- char* ShadowhandDiagnosticer::get_setpoint_name(uint16_t s_num)
- {
- //  struct sensor temp;
- static char name_buff[256];
-
- snprintf(name_buff, 256, "%s.%d", "smart_motor_setpoints", s_num);
-
- //TODO: get the sensor name
- if (0==robot_channel_to_sensor("smart_motor_setpoints", s_num, &temp))
- {
- const char *name = robot_sensor_calibration_name(&temp);
- return (char*)name;
- }
- return name_buff;
- }*/
-
 std::vector<DiagnosticData> RealShadowhand::getDiagnostics()
 {
-    std::vector<DiagnosticData> returnVector;
+  std::vector<DiagnosticData> returnVector;
 
-    DiagnosticData tmpData;
+  DiagnosticData tmpData;
 
-    //concatenate the flags in a stringstream
-    std::stringstream ss;
+  //concatenate the flags in a stringstream
+  std::stringstream ss;
 
-    //get the data from the hand
-    for( unsigned int index = 0; index < START_OF_ARM; ++index )
+  //get the data from the hand
+  for( unsigned int index = 0; index < START_OF_ARM; ++index )
+  {
+    tmpData.joint_name = std::string(hand_joints[index].joint_name);
+    tmpData.level = 0;
+
+    tmpData.position = robot_read_sensor(&hand_joints[index].position);
+    tmpData.target = robot_read_sensor(&hand_joints[index].joint_target);
+
+    //more information
+    if( hand_joints[index].a.smartmotor.has_sensors )
     {
-        tmpData.joint_name = std::string(hand_joints[index].joint_name);
-        tmpData.level = 0;
+      struct sensor s;
+      int res;
+      res = robot_channel_to_sensor(&hand_joints[index].a.smartmotor.debug_nodename, debug_values_offsets::num_sensor_msgs_received);
+      if (res)
+        ROS_ERROR_STREAM( "Error reading sensor: " << res);
+      tmpData.num_sensor_msgs_received = s->v.f;
 
-        tmpData.position = robot_read_sensor(&hand_joints[index].position);
-        tmpData.target = robot_read_sensor(&hand_joints[index].joint_target);
+      tmpData.temperature = robot_read_sensor(&hand_joints[index].a.smartmotor.temperature);
+      tmpData.current = robot_read_sensor(&hand_joints[index].a.smartmotor.current);
+      tmpData.force = robot_read_sensor(&hand_joints[index].a.smartmotor.torque);
 
-        //more information
-        if( hand_joints[index].a.smartmotor.has_sensors )
+      //check for error_flags
+      uint64_t uuid = robot_node_id(hand_joints[index].a.smartmotor.nodename);
+      struct hand_protocol_flags fl;
+      fl = hand_protocol_get_status_flags(uuid);
+      if( fl.valid )
+      {
+        struct hand_protocol_flags_smart_motor f;
+        f = fl.u.smart_motor;
+
+        //empty the stringstream
+        ss.str("");
+
+        bool at_least_one_error_flag = false;
+        if( f.nfault_pin )
         {
-            tmpData.temperature = robot_read_sensor(&hand_joints[index].a.smartmotor.temperature);
-            tmpData.current = robot_read_sensor(&hand_joints[index].a.smartmotor.current);
-            tmpData.force = robot_read_sensor(&hand_joints[index].a.smartmotor.torque);
-
-            //check for error_flags
-            uint64_t uuid = robot_node_id(hand_joints[index].a.smartmotor.nodename);
-            struct hand_protocol_flags fl;
-            fl = hand_protocol_get_status_flags(uuid);
-            if( fl.valid )
-            {
-                struct hand_protocol_flags_smart_motor f;
-                f = fl.u.smart_motor;
-
-                //empty the stringstream
-                ss.str("");
-
-                bool at_least_one_error_flag = false;
-                if( f.nfault_pin )
-                {
-                    at_least_one_error_flag = true;
-                    ss << "NFAULT ";
-                    ROS_WARN( "[%s]: NFAULT", hand_joints[index].joint_name );
-                }
-                if( f.temperature_cutout )
-                {
-                    at_least_one_error_flag = true;
-                    ss << "TEMP ";
-                }
-                if( f.current_throttle )
-                {
-                    at_least_one_error_flag = true;
-                    ss << "CURRENT ";
-                }
-                if( f.force_hard_limit )
-                {
-                    at_least_one_error_flag = true;
-                    ss << "FORCE ";
-                }
-                if( hand_protocol_dead(uuid) )
-                {
-                    at_least_one_error_flag = true;
-                    ss << "DEAD ";
-                }
-
-                //set the message flags
-                tmpData.flags = ss.str();
-                //if a flag is up, then print a warning as well
-                if( at_least_one_error_flag )
-                {
-                    ROS_WARN( "[%s]: %s", hand_joints[index].joint_name, (ss.str()).c_str());
-                    tmpData.level = 1;
-                }
-            }
+          at_least_one_error_flag = true;
+          ss << "NFAULT ";
+          ROS_WARN( "[%s]: NFAULT", hand_joints[index].joint_name );
+        }
+        if( f.temperature_cutout )
+        {
+          at_least_one_error_flag = true;
+          ss << "TEMP ";
+        }
+        if( f.current_throttle )
+        {
+          at_least_one_error_flag = true;
+          ss << "CURRENT ";
+        }
+        if( f.force_hard_limit )
+        {
+          at_least_one_error_flag = true;
+          ss << "FORCE ";
+        }
+        if( hand_protocol_dead(uuid) )
+        {
+          at_least_one_error_flag = true;
+          ss << "DEAD ";
         }
 
-        returnVector.push_back(tmpData);
+        //set the message flags
+        tmpData.flags = ss.str();
+        //if a flag is up, then print a warning as well
+        if( at_least_one_error_flag )
+        {
+          ROS_WARN( "[%s]: %s", hand_joints[index].joint_name, (ss.str()).c_str());
+          tmpData.level = 1;
+        }
+      }
     }
 
-    return returnVector;
+    returnVector.push_back(tmpData);
+  }
+
+  return returnVector;
 }
 } //end namespace
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
