@@ -349,10 +349,9 @@ std::vector<DiagnosticData> RealShadowhand::getDiagnostics()
       std::string flags = build_error_flags(robot_node_id(hand_joints[index].a.smartmotor.nodename));
       tmpData.flags = flags;
     }
-  }
 
-  returnVector.push_back(tmpData);
-}
+    returnVector.push_back(tmpData);
+  }
 
   return returnVector;
 }
