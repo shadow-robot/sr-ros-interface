@@ -37,15 +37,16 @@ extern "C" {
 	#include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
 }
 
-const unsigned short int SR06::device_pub_freq_const = 1000;
-const unsigned short int SR06::ros_pub_freq_const = 100;
-const unsigned short int SR06::max_iter_const = device_pub_freq_const / ros_pub_freq_const;
-const unsigned char SR06::nb_sensors_const = 36;
-const unsigned char SR06::nb_publish_by_unpack_const = (nb_sensors_const % max_iter_const) ? (nb_sensors_const / max_iter_const) + 1 : (nb_sensors_const / max_iter_const);
-const unsigned int SR06::max_retry = 10;
-
 #define ETHERCAT_OUTGOING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING)
 #define ETHERCAT_INCOMING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING)
+
+const unsigned short int SR06::device_pub_freq_const      = 1000;
+const unsigned short int SR06::ros_pub_freq_const         = 100;
+const unsigned short int SR06::max_iter_const             = device_pub_freq_const / ros_pub_freq_const;
+const unsigned int       SR06::nb_sensors_const           = ETHERCAT_OUTGOING_DATA_SIZE/2; //36;
+const unsigned char      SR06::nb_publish_by_unpack_const = (nb_sensors_const % max_iter_const) ? (nb_sensors_const / max_iter_const) + 1 : (nb_sensors_const / max_iter_const);
+const unsigned int       SR06::max_retry                  = 10;
+
 
 #define ETHERCAT_CAN_BRIDGE_DATA_SIZE sizeof(ETHERCAT_CAN_BRIDGE_DATA)
 
@@ -255,7 +256,7 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
 	unsigned char cmd_sent;
 	bfd *fd;
 	asection *s;
-	const char *section_name;
+	//const char *section_name;
 	unsigned int section_size = 0;
 	unsigned int section_addr = 0;
 	unsigned char addrl;
@@ -622,30 +623,54 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
  *  This is the Constructor of the driver. it creates a bunch of real time publishers to publich the joints data
  *  initializes a few boolean values, a mutex and creates the Flashing service.
  */
-SR06::SR06() : SR0X()//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
-{
-	char topic_name[4];
-	unsigned char i;
-	int res;
-	counter_ = 0;
-	for (i = 0 ; i < nb_sensors_const ; ++i) {
-		sprintf(topic_name, "j%d", i);
-		realtime_pub_.push_back(new realtime_tools::RealtimePublisher<std_msgs::Int16>(nodehandle_, topic_name, 1000));
-	}
-	ROS_INFO("device_pub_freq_const = %d", device_pub_freq_const);
-	ROS_INFO("ros_pub_freq_const = %d", ros_pub_freq_const);
-	ROS_INFO("max_iter_const = %d", max_iter_const);
-	ROS_INFO("nb_sensors_const = %d", nb_sensors_const);
-	ROS_INFO("nb_publish_by_unpack_const = %d", nb_publish_by_unpack_const);
+//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
 
-	flashing = false;
-	can_message_sent = true;
-	can_packet_acked = true;
+SR06::SR06()
+: SR0X(),
+  which_motors(0),
+  which_data_from_motors(0),
+  flashing(false),
+  can_message_sent(true),
+  can_packet_acked(true)
+{
+//        mutmut = boost::mutex();
+        pthread_mutex_lock(&mutex);
+	//char          topic_name[16];
+	//unsigned char i;
+	int           res;
+	counter_ = 0;
+
+	ROS_ERROR("There are %d sensors\n", ETHERCAT_OUTGOING_DATA_SIZE/2);
+	ROS_ERROR("There are %d sensors\n", nb_sensors_const);
+
+        ros::Rate tmp(1);
+	for (unsigned int i = 0 ; i < nb_sensors_const ; ++i)
+	{
+                std::stringstream ss;
+                ss << "j" << i;
+		//sprintf(topic_name, "j%d", i);
+                std::string topic_name = ss.str();
+		ROS_ERROR("Topic: %s  /  %d\n", topic_name.c_str(), nb_sensors_const);
+		realtime_pub_.push_back(new realtime_tools::RealtimePublisher<std_msgs::Int16>(nodehandle_, topic_name, 100));
+                ros::spinOnce();
+                tmp.sleep();
+	}
+
+	ROS_ERROR("Done\n");
+
+	ROS_INFO(     "device_pub_freq_const = %d", device_pub_freq_const      );
+	ROS_INFO(        "ros_pub_freq_const = %d", ros_pub_freq_const         );
+	ROS_INFO(            "max_iter_const = %d", max_iter_const             );
+	ROS_INFO(          "nb_sensors_const = %d", nb_sensors_const           );
+	ROS_INFO("nb_publish_by_unpack_const = %d", nb_publish_by_unpack_const );
+
 	res = pthread_mutex_init(&producing, NULL);
 
 	check_for_pthread_mutex_init_error(res);
 
 	serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::SimpleMotorFlasher, this);
+
+        unlock(&mutex);
 }
 
 /** \brief Desctructor of the SR06 driver
@@ -671,17 +696,20 @@ SR06::~SR06()
  *  So that the chip, receiving the packet will know that the data at address 0x10000 is in reality to be written at physical address 0x1000 of the chip memory for example.
  *  It is the mapping between the EtherCAT bus address space and each slave's chip own memory address space.
  *
- *  The SyncManagers are usefull to give a safe way of accessing this Shared Memory, using a consumer / producer model. There are features like interruptions to tell the consumer that there is something to consume or to tell the producer that the Mailbox is empty and then ready to receive a new message.
+ *  The SyncManagers are usefull to give a safe way of accessing this Shared Memory, using a consumer / producer model. There are features like interrupts to tell the consumer
+ *  that there is something to consume or to tell the producer that the Mailbox is empty and then ready to receive a new message.
  *
  *  - One Mailbox contains the commands, written by ROS, read by the PIC32
  *  - One Mailbox contains the status, written back by the PIC32, read by ROS
  *
  *  That's basically one Mailbox for upstream and one Mailbox for downstream.
  *
- * - The first Mailbox contains in fact two commands, one is the torque demand, the other is a can command used in CAN_TEST_MODE to communicate with the SimpleMotor for test purposes, or to reflash a new firmware in bootloading mode.
- *  This Mailbox is at logicial address 0x10000 and mapped via a FMMU to physical address 0x1000 (the first address of user memory)
- * - The second Mailbox contains in fact two status, they are the response of the two previously described commands. One is the status containing the joints data, sensor data, finger tips data and motor data. The other is the can command response in CAN_TEST_MODE. When doing a flashing in bootloading mode this is usually an acknowledgment from the bootloader.
- * This Mailbox is at logical address 0x10038 and mapped via a FMMU to physical address 0x1038.
+ * - The first Mailbox contains in fact two commands, one is the torque demand, the other is a CAN command used in CAN_DIRECT_MODE to communicate with the SimpleMotor for
+ *   test purposes, or to reflash a new firmware in bootloading mode.
+ *   This Mailbox is at logicial address 0x10000 and mapped via a FMMU to physical address 0x1000 (the first address of user memory)
+ * - The second Mailbox contains in fact two status, they are the response of the two previously described commands. One is the status containing the joints data, sensor
+ *   data, finger tips data and motor data. The other is the can command response in CAN_DIRECT_MODE. When doing a flashing in bootloading mode this is usually an acknowledgment
+ *   from the bootloader. This Mailbox is at logical address 0x10038 and mapped via a FMMU to physical address 0x1038.
  *
  * This function sets the two private members command_size_ and status_size_ to be the size of each Mailbox.
  * It is important for these numbers to be accurate since they are used by the EthercatHardware class when manipulating the buffers.
@@ -696,14 +724,14 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 	command_size_ = ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
 	ROS_ERROR("First FMMU (command) : start_address : 0x%08X ; size : 0x%08X ; phy addr : 0x%08X\n", start_address, ETHERCAT_INCOMING_DATA_SIZE, EC_PALM_EDC_COMMAND_PHY_BASE);
 	EC_FMMU *commandFMMU = new EC_FMMU(start_address,
-					ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,
-					0x00,
-					0x07,
-					EC_PALM_EDC_COMMAND_PHY_BASE,
-					0x00,
-					false,
-					true,
-					true);
+					ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,		// Logical Start Address
+					0x00,									// Logical Start Bit
+					0x07,									// Logical End Bit
+					EC_PALM_EDC_COMMAND_PHY_BASE,						// Physical Start Address
+					0x00,									// Physical Start Bit
+					false,									// Read Enable
+					true,									// Write Enable
+					true);									// Channel Enable
 	start_address += ETHERCAT_INCOMING_DATA_SIZE;
 	start_address += ETHERCAT_CAN_BRIDGE_DATA_SIZE;
 
@@ -732,19 +760,21 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 
 	EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(4);
 
-	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE, ETHERCAT_INCOMING_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);
+	(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE,           ETHERCAT_INCOMING_DATA_SIZE,   EC_QUEUED, EC_WRITTEN_FROM_MASTER);
+	//(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE,           ETHERCAT_INCOMING_DATA_SIZE,   EC_BUFFERED, EC_WRITTEN_FROM_MASTER);
 	(*pd)[1] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE, ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);
-	(*pd)[2] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE, ETHERCAT_OUTGOING_DATA_SIZE, EC_QUEUED);
-	(*pd)[3] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_IN_BASE, ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED);
+	(*pd)[2] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE,              ETHERCAT_OUTGOING_DATA_SIZE,   EC_QUEUED);
+	(*pd)[3] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_IN_BASE,  ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED);
 
 
 
 	(*pd)[0].ChannelEnable = true;
 	(*pd)[0].ALEventEnable = true;
-	(*pd)[0].WriteEvent = true;
+	(*pd)[0].WriteEvent    = true;
+
 	(*pd)[1].ChannelEnable = true;
 	(*pd)[1].ALEventEnable = true;
-	(*pd)[1].WriteEvent = true;
+	(*pd)[1].WriteEvent    = true;
 
 	(*pd)[2].ChannelEnable = true;
 	(*pd)[3].ChannelEnable = true;
@@ -753,7 +783,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 
 	ROS_ERROR("status_size_ : %d ; command_size_ : %d\n", status_size_, command_size_);
 
-	ROS_INFO("Finished to construct the SR06 driver");
+	ROS_INFO("Finished constructing the SR06 driver");
 }
 
 /**
@@ -763,6 +793,10 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 {
 
   int retval = SR0X::initialize(hw, allow_unprogrammed);
+
+	ROS_ERROR("ETHERCAT_OUTGOING_DATA_SIZE = %d bytes\n", ETHERCAT_OUTGOING_DATA_SIZE);
+	ROS_ERROR("ETHERCAT_INCOMING_DATA_SIZE = %d bytes\n", ETHERCAT_INCOMING_DATA_SIZE);
+
 
 //  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
 
@@ -792,10 +826,38 @@ stringstream name;
   EthercatDevice::ethercatDiagnostics(d, 2);
 }
 
+
+void SR06::update_which_motors(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING   *command)
+{
+	if (which_motors == 0)
+		which_motors = 1;
+	else
+	{
+		which_motors = 0;
+
+		which_data_from_motors++;
+
+		if (which_data_from_motors > 4)
+			which_data_from_motors = 0;
+	}
+
+	command->which_motors = which_motors;
+
+	switch (which_data_from_motors)
+	{
+		case 0: command->from_motor_data_type = MOTOR_DATA_SGL;        break;
+		case 1: command->from_motor_data_type = MOTOR_DATA_SGR;        break;
+		case 2: command->from_motor_data_type = MOTOR_DATA_PWM;        break;
+		case 3: command->from_motor_data_type = MOTOR_DATA_FLAGS;      break;
+		case 4: command->from_motor_data_type = MOTOR_DATA_CURRENT;    break;
+	}
+}
+
+
 /** \brief packs the commands before sending them to the EtherCAT bus
  *
- *  This is one of the most important function of this driver.
- *  This function is called earch millisecond (1 kHz freq) by the EthercatHardware::update() function
+ *  This is one of the most important functions of this driver.
+ *  This function is called each millisecond (1 kHz freq) by the EthercatHardware::update() function
  *  in the controlLoop() of the pr2_etherCAT node.
  *
  *  This function is called with a buffer as a parameter, the buffer provided is where we write the commands to send via EtherCAT.
@@ -804,50 +866,59 @@ stringstream name;
  *  The buffer has been allocated with command_size_ bytes, which is the sum of the two command size, so we have to put the two commands one next to the other.
  *  In fact we access the buffer using this kind of code : \code
  *  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
- *  ETHERCAT_CAN_BRIDGE_DATA        *message = (ETHERCAT_CAN_BRIDGE_DATA *)(buffer + ETHERCAT_INCOMING_DATA_SIZE);
+ *  ETHERCAT_CAN_BRIDGE_DATA                       *message = (ETHERCAT_CAN_BRIDGE_DATA *)(buffer + ETHERCAT_INCOMING_DATA_SIZE);
  *  \endcode
  */
 void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 {
-	static unsigned short int j = 0;
+
 	int res;
-//	static unsigned short int k = 0;
-//	static unsigned long int flash_address = 0x00007FFE;
-//	ROS_INFO("packCommand !");
+
 	SR0X::packCommand(buffer, halt, reset);
-	ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
-	ETHERCAT_CAN_BRIDGE_DATA	*message = (ETHERCAT_CAN_BRIDGE_DATA *)(buffer + ETHERCAT_INCOMING_DATA_SIZE);
+
+	ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING   *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
+	ETHERCAT_CAN_BRIDGE_DATA	                 *message = (ETHERCAT_CAN_BRIDGE_DATA *)(buffer + ETHERCAT_INCOMING_DATA_SIZE);
 	signed short int motor[20] = {0};
-	for (int i = 0 ; i < 20 ; ++i) {
+
+	for (int i = 0 ; i < 20 ; ++i)
+	{
 		motor[i] = i << 8;
 		motor[i] += (i + 1);
 	}
 
-//	motor[8] = 0x4143;
+
 	if ( !flashing )
 	{
-//		ROS_ERROR("EDC_COMMAND_SENSOR_DATA !\n");
 		command->EDC_command = EDC_COMMAND_SENSOR_DATA;
 	}
 	else
 	{
-//		k++;
-//		ROS_ERROR("EDC_COMMAND_CAN_TEST_MODE !\n");
-		command->EDC_command = EDC_COMMAND_CAN_TEST_MODE;
-/*		flash_address += 8;
-		if (flash_address >= 0x00007FFE)
-		{
-			flash_address = 0x3a0; // starting of User Application
-		}*/
+		command->EDC_command = EDC_COMMAND_CAN_DIRECT_MODE;
 	}
-	memcpy(command->motor_torque_demand, motor, sizeof(command->motor_torque_demand));
 
-	if (flashing && !can_packet_acked && !can_message_sent) {
-		if ( !(res = pthread_mutex_trylock(&producing)) ) {
+	command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;			// Currently, the only data we send to motors is torque demand.
+	memcpy(command->motor_data, motor, sizeof(command->motor_data));
+	update_which_motors(command);
+
+	if (flashing && !can_packet_acked && !can_message_sent)
+	{
+		if ( !(res = pthread_mutex_trylock(&producing)) )
+		{
 			ROS_ERROR("We send a CAN message for flashing !");
 			memcpy(message, &can_message_, sizeof(can_message_));
 			can_message_sent = true;
-			ROS_ERROR("Sending : SID : 0x%04X ; bus : 0x%02X ; length : 0x%02X ; data : 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X", message->message_id, message->can_bus, message->message_length, message->message_data[0], message->message_data[1], message->message_data[2], message->message_data[3], message->message_data[4], message->message_data[5], message->message_data[6], message->message_data[7]);
+			ROS_ERROR("Sending : SID : 0x%04X ; bus : 0x%02X ; length : 0x%02X ; data : 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X", 	message->message_id,
+																				message->can_bus,
+																				message->message_length,
+																				message->message_data[0],
+																				message->message_data[1],
+																				message->message_data[2],
+																				message->message_data[3],
+																				message->message_data[4],
+																				message->message_data[5],
+																				message->message_data[6],
+																				message->message_data[7]);
+
 			unlock(&producing);
 		}
 		else
@@ -858,8 +929,8 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 	}
 	else
 	{
-		message->can_bus = 1;
-		message->message_id = 0x00;
+		message->can_bus        = 1;
+		message->message_id     = 0x00;
 		message->message_length = 0;
 	}
 
@@ -931,6 +1002,10 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
  */
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
+        int res = -1;
+        if ( !(res = pthread_mutex_trylock(&mutex)) )
+                return false;
+
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
   ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
   static unsigned int i = 0;
@@ -951,33 +1026,50 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
 //  ROS_ERROR("CAN debug RXed : can_bus : %d ; message_length : %d ; message_id : 0x%04X ; message_data : 0x%02X 0x%02X 0x%02X 0x%02X\n", can_data->can_bus, can_data->message_length, can_data->message_id, can_data->message_data[0], can_data->message_data[1], can_data->message_data[2], can_data->message_data[3]);
 
-  if (flashing & !can_packet_acked)
-  {
-    if (can_data_is_ack(can_data))
+    if (flashing & !can_packet_acked)
     {
-      can_packet_acked = true;
+        if (can_data_is_ack(can_data))
+        {
+            can_packet_acked = true;
+        }
     }
-  }
 
-  if (i == max_iter_const) { // 10 == 100 Hz
-    i = 0;
+    if (i == max_iter_const)
+    { // 10 == 100 Hz
+        i = 0;
+        unlock(&mutex);
+        return true;
+    }
+    else if (i * nb_publish_by_unpack_const < nb_sensors_const)
+    {
+
+        std_msgs::Int16 *msg = (std_msgs::Int16*)this_buffer;
+        unsigned int j;
+
+        for (j = 0 ; j < nb_sensors_const ; ++j)
+        {
+            if  (realtime_pub_[j]->trylock())
+            {
+                realtime_pub_[j]->msg_ =  msg[j];
+                realtime_pub_[j]->unlockAndPublish();
+            }
+}
+
+/*
+        for (j = 0 ; j < nb_publish_by_unpack_const ; ++j)
+        {
+            unsigned short int k = i * nb_publish_by_unpack_const + j;
+            msg.data = *((signed short int *)tbuffer + k + 2);
+            if  (realtime_pub_[k]->trylock())
+            {
+                realtime_pub_[k]->msg_ =  msg;
+                realtime_pub_[k]->unlockAndPublish();
+            }
+        }
+*/
+    }
+    ++i;
+    unlock(&mutex);
     return true;
-  } else if (i * nb_publish_by_unpack_const < nb_sensors_const) {
-    std_msgs::Int16 msg;
-    unsigned char j;
-    for (j = 0 ; j < nb_publish_by_unpack_const ; ++j)
-  {
-      unsigned short int k = i * nb_publish_by_unpack_const + j;
-      msg.data = *((signed short int *)tbuffer + k + 2);
-      if (realtime_pub_[k]->trylock()){
-        realtime_pub_[k]->msg_ =  msg;
-        realtime_pub_[k]->unlockAndPublish();
-      }
-   }
-
-  }
-  ++i;
-
-  return true;
 }
 
