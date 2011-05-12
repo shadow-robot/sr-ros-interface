@@ -37,10 +37,34 @@
 
 #include <boost/smart_ptr.hpp>
 #include <boost/thread.hpp>
+#include "boost/assign.hpp"
 
 #ifdef GAZEBO
 #include <sensor_msgs/JointState.h>
 #endif
+
+
+namespace debug_values
+{
+  ///a map containing the names and offsets of the smart motor node
+  static const std::map<const std::string, const unsigned int> names_and_offsets
+    = boost::assign::map_list_of ("Sensor PID last in",         0) \
+                                 ("Sensor PID iState",          1) \
+                                 ("Sensor PID last D",          2) \
+                                 ("Sensor PID last out",        3) \
+                                 ("PID last in",                4) \
+                                 ("PID iState",                 5) \
+                                 ("PID last D",                 6) \
+                                 ("PID last out",               7) \
+                                 ("Strain Gauge Offset 0",      8) \
+                                 ("Strain Gauge Offset 1",      9) \
+                                 ("Num setup Msgs received",   10) \
+                                 ("Num sensor Msgs received",  11) \
+                                 ("Sensor Val (motor set P)",  12) \
+                                 ("Sensor Val (motor sensor)", 13) \
+                                 ("H-Bridge Duty",             14) \
+                                 ("Duty Temp",                 15) ;
+}
 
 namespace shadowrobot
 {
@@ -198,6 +222,8 @@ namespace shadowrobot
     }
   };
 
+
+
 /**
  * The information being published by the Diagnostic publisher
  */
@@ -216,8 +242,8 @@ namespace shadowrobot
     ///the actual value of the target
     double target;
 
-    ///the channel number of the position sensor.
-    int position_sensor_num;
+    ///the debug values
+    std::map<std::string, int> debug_values;
     ///the actual value of the position
     double position;
 
@@ -229,7 +255,7 @@ namespace shadowrobot
     double force;
 
     //values read from the debug node.
-    int num_sensor_msgs_received;
+    uint64_t num_sensor_msgs_received;
 
   };
 

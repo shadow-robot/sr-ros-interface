@@ -31,11 +31,6 @@
 #include <robot/config.h>
 #include "sr_hand/hand/sr_articulated_robot.h"
 
-namespace debug_values_offsets
-{
-  enum debug_values_offsets;
-}
-
 namespace shadowrobot
 {
 /**
@@ -77,17 +72,6 @@ namespace shadowrobot
      * the robot code.
      */
     void initializeMap();
-
-  private:
-    /**
-     * Builds a string containing the flags read from the motor. This string
-     * is then published in the diagnostics.
-     *
-     * @param uuid the uuid of the smart_motor.
-     *
-     * @return the string containing the concatenated flags.
-     */
-    std::string build_error_flags(uint64_t uuid);
   }; //end class
 }
 
