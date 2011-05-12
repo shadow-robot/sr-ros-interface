@@ -52,6 +52,10 @@ namespace shadowrobot
     }
 
     initializeMap();
+
+    self_test = boost::shared_ptr<self_test::TestRunner>(new self_test::TestRunner());
+
+    self_test->add("Number of messages Received", this, &RealShadowhand::nb_messages_test);
   }
 
   RealShadowhand::~RealShadowhand()
@@ -295,6 +299,9 @@ namespace shadowrobot
 
   std::vector<DiagnosticData> RealShadowhand::getDiagnostics()
   {
+    //it's alright to do the tests when we're publishing the diagnostics
+    self_test->checkTest();
+
     std::vector<DiagnosticData> returnVector;
 
     DiagnosticData tmpData;
@@ -327,7 +334,7 @@ namespace shadowrobot
 
             res = robot_channel_to_sensor(debug_node_name.c_str(), iter->second, &sensor_tmp);
             tmpData.debug_values[iter->first] = robot_read_incoming(&sensor_tmp);
-            }
+          }
         }
 	//	else
 	//  ROS_ERROR_STREAM(tmpData.joint_name << ": no debug sensor" );
@@ -391,10 +398,106 @@ namespace shadowrobot
     return returnVector;
   }
 
+  ///////////////////
+  //    TESTS      //
+  ///////////////////
+
+  void RealShadowhand::nb_messages_test(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    //lock all the mutexes to make sure we're not publishing other messages
+    joints_map_mutex.lock();
+    parameters_map_mutex.lock();
+    controllers_map_mutex.lock();
+
+    //id should be motor board number
+    std::string ID = "1";
+    self_test->setID(ID.c_str());
+
+    int nb_msgs_sent = 0;
+    int nb_msgs_received = 0;
+    bool test_failed = true;
+    //set the palm transmit rate to max?
+
+    //sending lots of data to one joint (FFJ3)
+    std::string joint_name = "FFJ3";
+    JointsMap::iterator iter = joints_map.find(joint_name);
+
+    const int nb_msgs_to_send = 10000;
+    ros::Rate test_rate = ros::Rate(20);
+
+    struct sensor sensor_msgs_received;
+
+    if( iter != joints_map.end() )
+    {
+      JointData tmpData = joints_map.find(joint_name)->second;
+      int index_hand_joints = tmpData.jointIndex;
+      float target =  hand_joints[index_hand_joints].min_angle;
+
+      if( hand_joints[index_hand_joints].a.smartmotor.has_sensors )
+      {
+        sleep(1);
+
+        if( *(&hand_joints[index].a.smartmotor.debug_nodename) != NULL)
+        {
+          std::string debug_node_name = *(&hand_joints[index].a.smartmotor.debug_nodename);
+          res = robot_channel_to_sensor(debug_node_name.c_str(), debug_values::names_and_offsets["Num sensor Msgs received"], &sensor_msgs_received);
+
+          //check the number of messages already received when starting the test
+          nb_msgs_received = robot_read_incoming(&sensor_msgs_received) - nb_msgs_received;
+        }
+
+        sleep(1);
+
+        //check if no other messages have been received
+        if( nb_msgs_received != robot_read_incoming(&sensor_msgs_received))
+        {
+          status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "New messages were received on the joint[%s].", joint_name.c_str());
+        }
+        else //ok still the same number of messages
+        {
+          for(nb_msgs_sent; nb_msgs_sent < nb_msgs_to_send; ++nb_msgs_sent)
+          {
+            //send values to the sensor
+            robot_update_sensor(&hand_joints[index_hand_joints].joint_target, target);
+            test_rate.sleep();
+          }
+
+          //wait for all the messages to be received?
+          sleep(2);
+
+          //compute the number of messages received during the test
+          nb_msgs_received = robot_read_incoming(&sensor_msgs_received) - nb_msgs_received;
+
+          if( nb_msgs_sent == nb_msgs_received)
+          {
+            status.summary(diagnostics_msgs::DiagnosticStatus::OK, "%d messages sent, all received", nb_msgs_sent);
+          }
+          else
+          {
+            status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "%d messages sent, %d messages received", nb_msgs_sent, nb_msgs_received);
+          }
+        }// end if nb_msgs_received stable before test
+      }//end if smart_motor
+      else
+      {
+        status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "No messages sent: joint[%s] doesn't have any motor attached.", joint_name.c_str());
+
+      }
+    }
+    else
+    {
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "No messages sent: couldn't find joint %s", joint_name.c_str());
+    }
+    //test finished, unlocking all the mutexes
+    joints_map_mutex.lock();
+    parameters_map_mutex.lock();
+    controllers_map_mutex.lock();
+  }
+
 } //end namespace
 
 /* For the emacs weenies in the crowd.
-Local Variables:
+   Local Variables:
    c-basic-offset: 2
-End:
+   End:
 */

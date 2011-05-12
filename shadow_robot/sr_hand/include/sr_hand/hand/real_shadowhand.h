@@ -72,6 +72,15 @@ namespace shadowrobot
      * the robot code.
      */
     void initializeMap();
+
+    /**
+     * A test to check the number of messages received is the same as the
+     * number of messages sent
+     *
+     * @param status the test result.
+     */
+    void nb_messages_test(diagnostic_updater::DiagnosticStatusWrapper& status);
+
   }; //end class
 }
 

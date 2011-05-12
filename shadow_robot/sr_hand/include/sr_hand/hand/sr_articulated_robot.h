@@ -35,6 +35,10 @@
 #include <vector>
 #include <map>
 
+//self_test
+#include "diagnostic_msgs/SelfTest.h"
+#include "self_test/self_test.h"
+
 #include <boost/smart_ptr.hpp>
 #include <boost/thread.hpp>
 #include "boost/assign.hpp"
@@ -360,7 +364,8 @@ namespace shadowrobot
     boost::mutex controllers_map_mutex;
 
   protected:
-
+    ///this is the handle for the self tests.
+    boost::shared_ptr<self_test::TestRunner> self_test;
 #ifdef GAZEBO
     std::vector<ros::Publisher> gazebo_publishers;
     ros::Subscriber gazebo_subscriber;
