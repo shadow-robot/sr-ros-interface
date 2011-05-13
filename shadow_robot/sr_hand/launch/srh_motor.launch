@@ -7,8 +7,8 @@
     <remap from="robot_description" to="hand_description"/>
     <param name="shadowhand_prefix" type="string" value="srh/" />
     <param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
-    <param name="publish_frequency_diagnostics" type="double" value="0.5" />
-    <param name="publish_frequency" type="double" value="0.5" />
+    <param name="publish_frequency_diagnostics" type="double" value="1" />
+    <param name="publish_frequency" type="double" value="50" />
   </node>
 
   <!-- Robot state publisher: publishes tf information regarding the
