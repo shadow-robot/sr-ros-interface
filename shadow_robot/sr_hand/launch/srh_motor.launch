@@ -3,7 +3,7 @@
 
   <!-- shadowhand -->
   <node pkg="sr_hand" name="shadowhand"
-	type="shadowhand_virtual">
+	type="shadowhand_real">
     <remap from="robot_description" to="hand_description"/>
     <param name="shadowhand_prefix" type="string" value="srh/" />
     <param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
