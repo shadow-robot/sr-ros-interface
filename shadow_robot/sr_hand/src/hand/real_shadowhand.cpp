@@ -419,18 +419,16 @@ namespace shadowrobot
     unsigned int nb_msgs_received = 0;
     //set the palm transmit rate to max?
 
-    //sending lots of data to one joint (FFJ3)
-    std::string joint_name = "FFJ3";
-    JointsMap::iterator iter = joints_map.find(joint_name);
+    ros::Rate test_rate(sr_self_tests::msgs_frequency);
 
-    const unsigned int nb_msgs_to_send = 10;
-    ros::Rate test_rate = ros::Rate(100);
+    //sending lots of data to one joint
+    JointsMap::iterator iter = joints_map.find(sr_self_tests::joint_to_test);
 
     struct sensor sensor_msgs_received;
 
     if( iter != joints_map.end() )
     {
-      JointData tmpData = joints_map.find(joint_name)->second;
+      JointData tmpData = joints_map.find(sr_self_tests::joint_to_test)->second;
       int index_hand_joints = tmpData.jointIndex;
       float target =  hand_joints[index_hand_joints].min_angle;
 
@@ -455,19 +453,19 @@ namespace shadowrobot
         if( nb_msgs_received != robot_read_incoming(&sensor_msgs_received))
         {
           std::stringstream ss;
-          ss <<  "New messages were received on the joint[" <<  joint_name.c_str() << "]." ;
+          ss <<  "New messages were received on the joint[" <<  sr_self_tests::joint_to_test.c_str() << "]." ;
           status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str() );
         }
         else //ok still the same number of messages
         {
           ROS_INFO("Sending lots of messages.");
 
-          for(; nb_msgs_sent < nb_msgs_to_send; ++nb_msgs_sent)
+          for(; nb_msgs_sent < sr_self_tests::nb_targets_to_send; ++nb_msgs_sent)
           {
             //send values to the sensor
             robot_update_sensor(&hand_joints[index_hand_joints].joint_target, target);
             test_rate.sleep();
-            ROS_INFO_STREAM("msg "<< nb_msgs_sent<< "/"<<nb_msgs_to_send);
+            ROS_INFO_STREAM("msg "<< nb_msgs_sent<< "/"<<sr_self_tests::nb_targets_to_send);
           }
 
           ROS_INFO("Done sending the messages.");
@@ -495,7 +493,7 @@ namespace shadowrobot
       else
       {
         std::stringstream ss;
-        ss << "No messages sent: joint["<<joint_name<<"] doesn't have any motor attached";
+        ss << "No messages sent: joint["<<sr_self_tests::joint_to_test<<"] doesn't have any motor attached";
 
         status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str() );
 
@@ -504,7 +502,7 @@ namespace shadowrobot
     else
     {
       std::stringstream ss;
-      ss << "No messages sent: couldn't find joint "<<joint_name;
+      ss << "No messages sent: couldn't find joint "<<sr_self_tests::joint_to_test;
 
       status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str());
     }

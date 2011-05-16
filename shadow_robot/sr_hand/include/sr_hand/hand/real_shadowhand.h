@@ -31,6 +31,16 @@
 #include <robot/config.h>
 #include "sr_hand/hand/sr_articulated_robot.h"
 
+namespace sr_self_tests
+{
+  ///The number of targets to send during the test.
+  static const unsigned int nb_targets_to_send = 100;
+  //the rate at which we'll publish the data
+  static const int msgs_frequency = 100;
+  ///the name of the joint on which we want to run the test.
+  static const std::string joint_to_test = "FFJ3";
+}
+
 namespace shadowrobot
 {
 /**
