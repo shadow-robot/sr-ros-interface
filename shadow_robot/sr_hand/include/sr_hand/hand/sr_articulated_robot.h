@@ -41,7 +41,8 @@
 
 #include <boost/smart_ptr.hpp>
 #include <boost/thread.hpp>
-#include "boost/assign.hpp"
+#include <boost/assign.hpp>
+#include <boost/assign/std/vector.hpp>
 
 #ifdef GAZEBO
 #include <sensor_msgs/JointState.h>
@@ -68,6 +69,19 @@ namespace debug_values
                                  ("Sensor Val (motor sensor)", 13) \
                                  ("H-Bridge Duty",             14) \
                                  ("Duty Temp",                 15) ;
+  
+  ///The number of targets to send during the test.
+  static const unsigned int nb_targets_to_send = 100;
+
+  ///a tmp vector containing a list of targets. Is used to instantiate the joints_to_test map.
+  std::vector<double> joint_targets;
+  for(unsigned int i=0; i<nb_targets_to_send ; ++ i)
+    joint_targets += 0.0;
+
+  ///a vector containing the names of the joints to test, associated to the targets to send
+  static const std::map<const std::string, const std::vector<double> > joints_to_test
+    = boost::assign::map_list_of ( "FFJ3", const_cast<std::vector<double> >(joint_targets)) \
+                                 ( "FFJ0", const_cast<std::vector<double> >(joint_targets));
 }
 
 namespace shadowrobot
