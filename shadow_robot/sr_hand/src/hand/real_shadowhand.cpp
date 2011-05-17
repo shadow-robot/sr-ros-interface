@@ -55,7 +55,9 @@ namespace shadowrobot
 
     self_test = boost::shared_ptr<self_test::TestRunner>(new self_test::TestRunner());
 
-    self_test->add("Number of messages Received", this, &RealShadowhand::nb_messages_test);
+    self_test->add("Pretest", this, &RealShadowhand::pretest);
+    self_test->add("Number of messages Received", this, &RealShadowhand::test_messages);
+    self_test->add("Posttest", this, &RealShadowhand::posttest);
   }
 
   RealShadowhand::~RealShadowhand()
@@ -401,15 +403,67 @@ namespace shadowrobot
   ///////////////////
   //    TESTS      //
   ///////////////////
-
-  void RealShadowhand::nb_messages_test(diagnostic_updater::DiagnosticStatusWrapper& status)
+  void RealShadowhand::pretest(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    ROS_WARN("Starting the test: Number of messages Received");
+    ROS_INFO("Preparing the environment to run self tests.");
 
     //lock all the mutexes to make sure we're not publishing other messages
     joints_map_mutex.lock();
     parameters_map_mutex.lock();
     controllers_map_mutex.lock();
+
+    //TODO: set the palm transmit rate to max?
+
+    sleep(1);
+
+    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Pretest completed successfully.");
+  }
+
+  void RealShadowhand::posttest(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    ROS_INFO("Restoring the environment after the self tests.");
+
+    //test finished, unlocking all the mutexes
+    joints_map_mutex.unlock();
+    parameters_map_mutex.unlock();
+    controllers_map_mutex.unlock();
+
+    //TODO: reset the palm transmit rate to previous state?
+
+    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Postest completed successfully.");
+  }
+
+  void RealShadowhand::test_messages(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    ROS_WARN("Starting the test: Number of messages Received");
+
+    std::pair<unsigned char, std::string> test_result;
+    test_result.first = diagnostic_msgs::DiagnosticStatus::OK;
+
+    for(unsigned int index_freq=0; index_freq < sr_self_tests::msgs_frequency_size; ++index_freq)
+    {
+      ros::Rate test_rate(sr_self_tests::msgs_frequency[index_freq]);
+      for(unsigned int index_joint=0; index_joint < sr_self_tests::joints_to_test_size; ++index_joint)
+      {
+        std::pair<unsigned char, std::string> tmp_test_result;
+        tmp_test_result = test_messages_routine(sr_self_tests::joints_to_test[index_joint], sr_self_tests::nb_targets_to_send, test_rate);
+
+        if( tmp_test_result.first == diagnostic_msgs::DiagnosticStatus::ERROR)
+          test_result.first = diagnostic_msgs::DiagnosticStatus::ERROR;
+
+        std::stringstream ss;
+        ss << "\n[" << sr_self_tests::msgs_frequency[index_freq] << "Hz]: ";
+        ss << tmp_test_result.second;
+
+        test_result.second += ss.str();
+      }
+    }
+    status.summary(test_result.first, test_result.second);
+  }
+
+  std::pair<unsigned char, std::string> RealShadowhand::test_messages_routine(std::string joint_name, unsigned int repeat, ros::Rate rate)
+  {
+    std::pair<unsigned char, std::string> test_result;
 
     //id should be motor board number
     std::string ID = "1";
@@ -417,101 +471,98 @@ namespace shadowrobot
 
     unsigned int nb_msgs_sent = 0;
     unsigned int nb_msgs_received = 0;
-    //set the palm transmit rate to max?
-
-    ros::Rate test_rate(sr_self_tests::msgs_frequency);
 
     //sending lots of data to one joint
-    JointsMap::iterator iter = joints_map.find(sr_self_tests::joint_to_test);
+    JointsMap::iterator iter_joints_map = joints_map.find(joint_name);
 
     struct sensor sensor_msgs_received;
 
-    if( iter != joints_map.end() )
+    if( iter_joints_map == joints_map.end() )
     {
-      JointData tmpData = joints_map.find(sr_self_tests::joint_to_test)->second;
-      int index_hand_joints = tmpData.jointIndex;
-      float target =  hand_joints[index_hand_joints].min_angle;
+      std::stringstream ss;
+      ss << "No messages sent: couldn't find joint "<<joint_name;
 
-      if( hand_joints[index_hand_joints].a.smartmotor.has_sensors )
-      {
-        sleep(1);
+      test_result.first = diagnostic_msgs::DiagnosticStatus::ERROR;
+      test_result.second = ss.str();
+      return test_result;
+    }
 
-        ROS_INFO("Checking the current number of received messages");
+    //OK joint found
+    JointData tmpData = joints_map.find(joint_name)->second;
+    int index_hand_joints = tmpData.jointIndex;
+    float target =  hand_joints[index_hand_joints].min_angle;
 
-        int res;
-        std::string debug_node_name = *(&hand_joints[index_hand_joints].a.smartmotor.debug_nodename);
-        std::map<const std::string, const unsigned int>::const_iterator iter =  debug_values::names_and_offsets.find("Num sensor Msgs received");
+    //testing a joint which doesn't have a smartmotor
+    if( !hand_joints[index_hand_joints].a.smartmotor.has_sensors )
+    {
+      std::stringstream ss;
+      ss << "No messages sent: joint["<<joint_name<<"] doesn't have any motor attached";
 
-        res = robot_channel_to_sensor(debug_node_name.c_str(), iter->second, &sensor_msgs_received);
+      test_result.first = diagnostic_msgs::DiagnosticStatus::ERROR;
+      test_result.second = ss.str();
+      return test_result;
+    }
 
-        //check the number of messages already received when starting the test
-        nb_msgs_received = robot_read_incoming(&sensor_msgs_received) - nb_msgs_received;
+    ROS_DEBUG("Checking the current number of received messages");
 
-        sleep(1);
+    int res;
+    std::string debug_node_name = *(&hand_joints[index_hand_joints].a.smartmotor.debug_nodename);
+    std::map<const std::string, const unsigned int>::const_iterator iter_debug_values =  debug_values::names_and_offsets.find("Num sensor Msgs received");
 
-        //check if no other messages have been received
-        if( nb_msgs_received != robot_read_incoming(&sensor_msgs_received))
-        {
-          std::stringstream ss;
-          ss <<  "New messages were received on the joint[" <<  sr_self_tests::joint_to_test.c_str() << "]." ;
-          status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str() );
-        }
-        else //ok still the same number of messages
-        {
-          ROS_INFO("Sending lots of messages.");
+    res = robot_channel_to_sensor(debug_node_name.c_str(), iter_debug_values->second, &sensor_msgs_received);
 
-          for(; nb_msgs_sent < sr_self_tests::nb_targets_to_send; ++nb_msgs_sent)
-          {
-            //send values to the sensor
-            robot_update_sensor(&hand_joints[index_hand_joints].joint_target, target);
-            test_rate.sleep();
-            ROS_INFO_STREAM("msg "<< nb_msgs_sent<< "/"<<sr_self_tests::nb_targets_to_send);
-          }
+    //check the number of messages already received when starting the test
+    nb_msgs_received = robot_read_incoming(&sensor_msgs_received) - nb_msgs_received;
 
-          ROS_INFO("Done sending the messages.");
-          //wait for all the messages to be received?
-          sleep(0.5);
+    sleep(1);
 
-          ROS_INFO("Reading the number of received messages.");
-          //compute the number of messages received during the test
-          nb_msgs_received = robot_read_incoming(&sensor_msgs_received) - nb_msgs_received;
+    //check if no other messages have been received
+    if( nb_msgs_received != robot_read_incoming(&sensor_msgs_received))
+    {
+      std::stringstream ss;
+      ss <<  "New messages were received on the joint[" <<  joint_name.c_str() << "]." ;
+      test_result.first = diagnostic_msgs::DiagnosticStatus::ERROR;
+      test_result.second = ss.str();
 
-          if( nb_msgs_sent == nb_msgs_received)
-          {
-            std::stringstream ss;
-            ss <<  nb_msgs_sent << " messages sent, all received";
-            status.summary(diagnostic_msgs::DiagnosticStatus::OK,ss.str() );
-          }
-          else
-          {
-            std::stringstream ss;
-            ss << nb_msgs_sent << " messages sent, "<<nb_msgs_received << " messages received";
-            status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str() );
-          }
-        }// end if nb_msgs_received stable before test
-      }//end if smart_motor
-      else
-      {
-        std::stringstream ss;
-        ss << "No messages sent: joint["<<sr_self_tests::joint_to_test<<"] doesn't have any motor attached";
+      return test_result;
+    }
+    //ok still the same number of messages
 
-        status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str() );
+    ROS_DEBUG("Sending lots of messages.");
 
-      }
+    for(; nb_msgs_sent < repeat; ++nb_msgs_sent)
+    {
+      //send values to the sensor
+      robot_update_sensor(&hand_joints[index_hand_joints].joint_target, target);
+      rate.sleep();
+      ROS_DEBUG_STREAM("msg "<< nb_msgs_sent<< "/"<<sr_self_tests::nb_targets_to_send);
+    }
+
+    ROS_DEBUG("Done sending the messages.");
+    //wait for all the messages to be received?
+    sleep(0.5);
+
+    ROS_DEBUG("Reading the number of received messages.");
+    //compute the number of messages received during the test
+    nb_msgs_received = robot_read_incoming(&sensor_msgs_received) - nb_msgs_received;
+
+    if( nb_msgs_sent == nb_msgs_received)
+    {
+      std::stringstream ss;
+      ss <<  nb_msgs_sent << " messages sent, all received";
+      test_result.first = diagnostic_msgs::DiagnosticStatus::OK;
+      test_result.second = ss.str();
+      return test_result;
     }
     else
     {
       std::stringstream ss;
-      ss << "No messages sent: couldn't find joint "<<sr_self_tests::joint_to_test;
-
-      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str());
+      ss << nb_msgs_sent << " messages sent, "<<nb_msgs_received << " messages received";
+      test_result.first = diagnostic_msgs::DiagnosticStatus::ERROR;
+      test_result.second = ss.str();
+      return test_result;
     }
-    //test finished, unlocking all the mutexes
-    joints_map_mutex.unlock();
-    parameters_map_mutex.unlock();
-    controllers_map_mutex.unlock();
   }
-
 } //end namespace
 
 /* For the emacs weenies in the crowd.

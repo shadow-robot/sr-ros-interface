@@ -35,10 +35,16 @@ namespace sr_self_tests
 {
   ///The number of targets to send during the test.
   static const unsigned int nb_targets_to_send = 100;
+
+  ///the size of the msgs_frequency array
+  static const unsigned int msgs_frequency_size = 5;
   //the rate at which we'll publish the data
-  static const int msgs_frequency = 100;
+  static const int msgs_frequency[msgs_frequency_size] = {1, 5, 10, 20, 100};
+
+  ///the size of the joints_to_test array
+  static const unsigned int joints_to_test_size = 1;
   ///the name of the joint on which we want to run the test.
-  static const std::string joint_to_test = "FFJ3";
+  static const std::string joints_to_test[joints_to_test_size] = {"FFJ3"};
 }
 
 namespace shadowrobot
@@ -83,13 +89,50 @@ namespace shadowrobot
      */
     void initializeMap();
 
+      /////////////////
+     //    TESTS    //
+    /////////////////
+
+    /**
+     * A set of tasks to run before the tests:
+     *  - Ensure we don't use the ROS interface during the tests (lock
+     *    the mutexes).
+     *
+     *
+     * @param status the status of the pretest
+     */
+    void pretest(diagnostic_updater::DiagnosticStatusWrapper& status);
+
+    /**
+     * A set of tasks to run after the tests:
+     *  - release the mutexes
+     *
+     *
+     * @param status the status of the posttest
+     */
+    void posttest(diagnostic_updater::DiagnosticStatusWrapper& status);
+
     /**
      * A test to check the number of messages received is the same as the
-     * number of messages sent
+     * number of messages sent. Calls the test_messages_routine for each
+     * joint / frequency we're testing.
      *
      * @param status the test result.
      */
-    void nb_messages_test(diagnostic_updater::DiagnosticStatusWrapper& status);
+    void test_messages(diagnostic_updater::DiagnosticStatusWrapper& status);
+
+    /**
+     * The routine called during the test: test the number of received messages
+     * for a given joint, a given number of times and at a given frequency.
+     *
+     * @param joint_name the name of the joint to test
+     * @param repeat the number of messages to send
+     * @param rate the rate at which we send the messages
+     *
+     * @return a pair containing the status of the test (error or ok), and a message
+     *         to display.
+     */
+    std::pair<unsigned char, std::string> test_messages_routine(std::string joint_name, unsigned int repeat, ros::Rate rate);
 
   }; //end class
 }
