@@ -1,7 +1,5 @@
 <robot name="desk" xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider" xmlns:xacro="http://ros.org/wiki/xacro">
-  <material name="Green">
-    <color rgba="0.0 0.8 0.0 1.0"/>
-  </material>
+  <xacro:macro name="desk">
 
   <link name="desk_pillar">
     <inertial>
@@ -58,4 +56,6 @@
     <child link="desk_pillar"/>
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
   </joint>
+
+  </xacro:macro>
 </robot>
