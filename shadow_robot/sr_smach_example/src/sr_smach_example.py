@@ -126,23 +126,20 @@ class SafePosition(smach.State):
     """
     def __init__(self):
         smach.State.__init__(self, outcomes=['success','failed'],
-                             output_keys=['index_counter', 'max_counter'])
-
+                             output_keys=['index_counter', 'max_counter', 'last_targets'])
         self.pos = Position()
+        self.targets = sendupdate(len(self.pos.safe_pos_msg),
+                                  self.pos.safe_pos_msg)
 
     def execute(self, userdata):
         rospy.loginfo('Going to a Safe position')
 
-        for i in range(0,10):
-            self.pos.hand_publisher.publish(sendupdate(len(self.pos.safe_pos_msg),
-                                                       self.pos.safe_pos_msg))
-            self.pos.arm_publisher.publish(sendupdate(len(self.pos.safe_pos_msg),
-                                                      self.pos.safe_pos_msg))
+        self.pos.hand_publisher.publish(self.targets)
+        self.pos.arm_publisher.publish(self.targets)
 
-            time.sleep(.1)
+        userdata.last_targets = self.targets
         userdata.index_counter = 0
         userdata.max_counter = 0
-        time.sleep(1)
         return 'success'
 
 class FirstMove(smach.State):
@@ -151,21 +148,18 @@ class FirstMove(smach.State):
     """
     def __init__(self):
         smach.State.__init__(self, outcomes=['success','failed'],
-                             output_keys=['index_counter', 'max_counter'])
+                             output_keys=['index_counter', 'max_counter', 'last_targets'])
         self.pos = Position()
+        self.targets = sendupdate(len(self.pos.first_pos_msg),
+                                  self.pos.first_pos_msg)
 
     def execute(self, userdata):
         rospy.loginfo('Going to the first position')
 
-        for i in range(0,10):
-            self.pos.hand_publisher.publish(sendupdate(len(self.pos.first_pos_msg),
-                                                       self.pos.first_pos_msg))
-            self.pos.arm_publisher.publish(sendupdate(len(self.pos.first_pos_msg),
-                                                      self.pos.first_pos_msg))
-            time.sleep(.1)
+        self.pos.hand_publisher.publish(self.targets)
+        self.pos.arm_publisher.publish(self.targets)
 
-        time.sleep(1)
-
+        userdata.last_targets = self.targets
         userdata.index_counter = 0
         userdata.max_counter = 0
         return 'success'
@@ -176,7 +170,7 @@ class ComeCloser(smach.State):
     """
     def __init__(self):
         smach.State.__init__(self, outcomes=['success','failed'],
-                             output_keys=['index_counter', 'max_counter'])
+                             output_keys=['index_counter', 'max_counter', 'last_targets'])
         self.pos = Position()
         self.iteration = 0
         self.opened = True
@@ -188,9 +182,11 @@ class ComeCloser(smach.State):
         rospy.loginfo('Come Closer')
 
         if self.opened:
+            userdata.last_targets = self.finger_closed
             self.pos.hand_publisher.publish(self.finger_closed)
             self.opened = False
         else:
+            userdata.last_targets = self.finger_opened
             self.pos.hand_publisher.publish(self.finger_opened)
             self.opened = True
 
@@ -206,25 +202,28 @@ class BigMuscles(smach.State):
     """
     def __init__(self):
         smach.State.__init__(self, outcomes=['success', 'failed'],
-                             output_keys=['index_counter', 'max_counter'])
+                             output_keys=['index_counter', 'max_counter', 'last_targets'])
         self.pos = Position()
         self.iteration = 0
         self.big_muscles_start = False
+
+        self.target_1 = sendupdate(len(self.pos.big_muscles_end),
+                                   self.pos.big_muscles_end)
+        self.target_2 = sendupdate(len(self.pos.big_muscles_start),
+                                   self.pos.big_muscles_start)
 
     def execute(self, userdata):
         rospy.loginfo('Big Muscles')
 
         if self.big_muscles_start:
-            self.pos.hand_publisher.publish(sendupdate(len(self.pos.big_muscles_end),
-                                                       self.pos.big_muscles_end))
-            self.pos.arm_publisher.publish(sendupdate(len(self.pos.big_muscles_end),
-                                                      self.pos.big_muscles_end))
+            userdata.last_targets = self.target_1
+            self.pos.hand_publisher.publish(self.target_1)
+            self.pos.arm_publisher.publish(self.target_1)
             self.big_muscles_start = False
         else:
-            self.pos.hand_publisher.publish(sendupdate(len(self.pos.big_muscles_start),
-                                                       self.pos.big_muscles_start) )
-            self.pos.arm_publisher.publish(sendupdate(len(self.pos.big_muscles_start),
-                                                      self.pos.big_muscles_start) )
+            userdata.last_targets = self.target_2
+            self.pos.hand_publisher.publish(self.target_2)
+            self.pos.arm_publisher.publish(self.target_2)
             self.big_muscles_start = True
 
         self.iteration += 1
@@ -240,25 +239,44 @@ class WaitForRobot(smach.State):
     """
     def __init__(self):
         smach.State.__init__(self, outcomes=['success', 'in_progress', 'failed'],
-                             input_keys=['index_counter','max_counter'])
+                             input_keys=['index_counter','max_counter', 'last_targets'])
 
         self.goal_mutex = threading.Lock()
-        self.goal_reached = False
+        self.goal_hand_reached = False
+        self.goal_arm_reached = False
 
-        self.hand_subscriber = rospy.Subscriber('srh/shadowhand_data', joints_data, self.callback)
-        self.arm_subscriber = rospy.Subscriber('sr_arm/shadowhand_data', joints_data, self.callback)
+        self.pos = Position()
 
-    def callback(self, data):
+        self.hand_subscriber = rospy.Subscriber('srh/shadowhand_data', joints_data, self.callback_hand)
+        self.arm_subscriber = rospy.Subscriber('sr_arm/shadowhand_data', joints_data, self.callback_arm)
+
+    def callback_hand(self, data):
+        self.goal_mutex.acquire()
+        ok = True
         for joint_data in data.joints_list:
             error = (joint_data.joint_position - joint_data.joint_target)
             error *= error
 
-            self.goal_mutex.acquire()
-            if error < MAX_SQUARE_ERROR:
-                self.goal_reached = True
-            else:
-                self.goal_reached = False
-            self.goal_mutex.release()
+            if error > MAX_SQUARE_ERROR:
+                ok = False
+                break
+
+        self.goal_hand_reached = True
+        self.goal_mutex.release()
+
+    def callback_arm(self, data):
+        self.goal_mutex.acquire()
+        ok = True
+        for joint_data in data.joints_list:
+            error = (joint_data.joint_position - joint_data.joint_target)
+            error *= error
+
+            if error > MAX_SQUARE_ERROR:
+                ok = False
+                break
+
+        self.goal_arm_reached = ok
+        self.goal_mutex.release()
 
     def execute(self, userdata):
         rospy.loginfo('Come Closer')
@@ -266,7 +284,7 @@ class WaitForRobot(smach.State):
         #wait for a maximum of 30 seconds for the robot to reach its targets
         for i in range(0, 300):
             self.goal_mutex.acquire()
-            if self.goal_reached:
+            if self.goal_hand_reached and self.goal_arm_reached:
                 self.goal_mutex.release()
 
                 #dummy sleep as we're using the dummy hand
@@ -277,6 +295,11 @@ class WaitForRobot(smach.State):
                 else:
                     return 'success'
             self.goal_mutex.release()
+
+            #continue publishing the targets until we reach them
+            self.pos.hand_publisher.publish(userdata.last_targets)
+            self.pos.arm_publisher.publish(userdata.last_targets)
+
             time.sleep(.1)
 
         return 'failed'
@@ -304,7 +327,8 @@ def main():
         smach.StateMachine.add('WaitForRobot_1', WaitForRobot(),
                                transitions={'success':'FirstMove', 'in_progress':'GoToStartPos', 'failed':'GoToStopPos'},
                                remapping={'index_counter':'index_counter',
-                                          'max_counter':'max_counter'})
+                                          'max_counter':'max_counter',
+                                          'last_targets':'last_targets'})
 
         smach.StateMachine.add('FirstMove', FirstMove(),
                                transitions={'success':'WaitForRobot_2'})
@@ -314,7 +338,8 @@ def main():
                                             'in_progress':'FirstMove',
                                             'failed':'GoToStopPos'},
                                remapping={'index_counter':'index_counter',
-                                          'max_counter':'max_counter'})
+                                          'max_counter':'max_counter',
+                                          'last_targets':'last_targets'})
 
         smach.StateMachine.add('ComeCloser', ComeCloser(),
                                transitions={'success':'WaitForRobot_3', 'failed':'GoToStopPos'})
@@ -324,7 +349,8 @@ def main():
                                             'in_progress':'ComeCloser',
                                             'failed':'GoToStopPos'},
                                remapping={'index_counter':'index_counter',
-                                          'max_counter':'max_counter'})
+                                          'max_counter':'max_counter',
+                                          'last_targets':'last_targets'})
 
         smach.StateMachine.add('BigMuscles', BigMuscles(),
                                transitions={'success':'WaitForRobot_4', 'failed':'GoToStopPos', })
@@ -334,7 +360,8 @@ def main():
                                             'in_progress':'BigMuscles',
                                             'failed':'GoToStopPos'},
                                remapping={'index_counter':'index_counter',
-                                          'max_counter':'max_counter'})
+                                          'max_counter':'max_counter',
+                                          'last_targets':'last_targets'})
 
         smach.StateMachine.add('GoToStopPos', SafePosition())
 
