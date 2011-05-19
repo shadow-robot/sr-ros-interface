@@ -6,7 +6,6 @@
   <include filename="$(find sr_hand)/model/gazebo/gazebo.urdf.xacro" />
   <include filename="$(find sr_hand)/model/desk/desk.urdf.xacro" />
 
-
   <xacro:desk/>
 
   <joint name="base_fix" type="fixed">
@@ -21,7 +20,7 @@
   <joint name="arm_link" type="revolute">
     <parent link="shadowarm_handsupport_motor"/>
     <child link="forearm_motor"/>
-    <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}" />
+    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <axis xyz="0 -1 0" />
     <limit lower="0" upper="0" effort="10"
     velocity="1.0" />

@@ -28,7 +28,6 @@
       <updateRate>1000.0</updateRate>
     </controller:gazebo_ros_controller_manager>
   </gazebo>
-
   <link name="desk_pillar">
     <inertial>
       <origin xyz="0 0 0.5"/>
@@ -53,7 +52,6 @@
     <material>Gazebo/Green</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-
   <link name="desk_support">
     <inertial>
       <origin xyz="0 0 0.01"/>
@@ -78,16 +76,16 @@
     <material>Gazebo/Green</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-
   <joint name="desk_joint" type="fixed">
     <parent link="desk_support"/>
     <child link="desk_pillar"/>
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
   </joint>
-
-
-
-
+  <joint name="base_fix" type="fixed">
+    <parent link="desk_pillar"/>
+    <child link="shadowarm_base"/>
+    <origin rpy="0 0 0" xyz="0 0 1.0"/>
+  </joint>
   <link name="shadowarm_base">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -112,11 +110,6 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="base_fix" type="fixed">
-    <parent link="desk_pillar"/>
-    <child link="shadowarm_base"/>
-    <origin rpy="0 0 0" xyz="0 0 1.0"/>
-  </joint>
   <link name="shadowarm_trunk">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0.27025"/>
@@ -276,7 +269,7 @@
   <joint name="arm_link" type="revolute">
     <parent link="shadowarm_handsupport_motor"/>
     <child link="forearm_motor"/>
-    <origin rpy="0 0 1.57079632679" xyz="0 0 0"/>
+    <origin rpy="0 0 3.14159265359" xyz="0 0 0"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="0" velocity="1.0"/>
     <dynamics damping="3.5"/>

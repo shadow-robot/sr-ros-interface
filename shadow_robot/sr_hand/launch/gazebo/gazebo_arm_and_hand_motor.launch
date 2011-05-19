@@ -4,7 +4,6 @@
   <include file="$(find sr_hand)/launch/gazebo/empty_world.launch"/>
 
   <!-- spawn the arm model -->
-  <!--  <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'" /> -->
   <param name="robot_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
   <node name="spawn_hand" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -model arm_and_hand -x 0 -y 0 -z 0.0" respawn="false" output="screen" />
 
