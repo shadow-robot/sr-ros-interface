@@ -134,7 +134,6 @@ void VirtualArm::initializeMap()
     set_pos_client.call(model_srv);
 
     //sends the correct target to the controller
-    ROS_ERROR("sending data");
     for (int i = 0; i < 100; ++i)
     {
       sendupdate("ElbowJSwing", 120.0);
