@@ -8,6 +8,12 @@ from sr_robot_msgs.msg import sendupdate, joint, joints_data
 import time
 import threading
 
+
+MAX_ITER_COME_CLOSER = 4
+MAX_ITER_BIG_MUSCLES = 4
+MAX_SQUARE_ERROR = 10
+
+
 class Position(object):
     def __init__(self):
         self.safe_pos_msg = []
@@ -190,7 +196,7 @@ class ComeCloser(smach.State):
 
         self.iteration += 1
         userdata.index_counter = self.iteration
-        userdata.max_counter = 4
+        userdata.max_counter = MAX_ITER_COME_CLOSER
         return 'success'
 
 
@@ -224,7 +230,7 @@ class BigMuscles(smach.State):
         self.iteration += 1
 
         userdata.index_counter = self.iteration
-        userdata.max_counter = 4
+        userdata.max_counter = MAX_ITER_BIG_MUSCLES
         return 'success'
 
 class WaitForRobot(smach.State):
@@ -248,7 +254,7 @@ class WaitForRobot(smach.State):
             error *= error
 
             self.goal_mutex.acquire()
-            if error < 4.0:
+            if error < MAX_SQUARE_ERROR:
                 self.goal_reached = True
             else:
                 self.goal_reached = False
