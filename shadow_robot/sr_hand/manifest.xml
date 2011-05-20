@@ -21,6 +21,7 @@
   <depend package="diagnostic_msgs"/>
 <!--  <depend package="kdl_parser"/> -->
   <depend package="dynamic_reconfigure"/>
+  <depend package="self_test"/>
 
   <depend package="gazebo"/>
 

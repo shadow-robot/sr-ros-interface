@@ -35,10 +35,10 @@
 
 namespace shadowrobot
 {
-VirtualShadowhand::VirtualShadowhand() :
+  VirtualShadowhand::VirtualShadowhand() :
     SRArticulatedRobot()
-{
-#ifdef GAZEBO 
+  {
+#ifdef GAZEBO
     ROS_INFO("This ROS interface is built for Gazebo.");
     //initialises the subscriber to the Gazebo joint_states messages
     std::string prefix;
@@ -55,14 +55,14 @@ VirtualShadowhand::VirtualShadowhand() :
 
     srand(time(NULL));
     initializeMap();
-}
+  }
 
-VirtualShadowhand::~VirtualShadowhand()
-{
-}
+  VirtualShadowhand::~VirtualShadowhand()
+  {
+  }
 
-void VirtualShadowhand::initializeMap()
-{
+  void VirtualShadowhand::initializeMap()
+  {
     joints_map_mutex.lock();
     parameters_map_mutex.lock();
     controllers_map_mutex.lock();
@@ -81,7 +81,7 @@ void VirtualShadowhand::initializeMap()
 
     joints_map["FFJ0"] = tmpDataZero;
     controllers_map["FFJ0"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "ffdistal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     int tmp_index = 0;
@@ -89,7 +89,7 @@ void VirtualShadowhand::initializeMap()
 #endif
     joints_map["FFJ1"] = tmpData;
     controllers_map["FFJ1"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "ffmiddle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -97,7 +97,7 @@ void VirtualShadowhand::initializeMap()
 #endif
     joints_map["FFJ2"] = tmpData;
     controllers_map["FFJ2"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "ffproximal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -107,7 +107,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["FFJ3"] = tmpController;
     tmpData.min = -25.0;
     tmpData.max = 25.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "ffknuckle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -120,7 +120,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["MFJ0"] = tmpController;
     tmpData.min = 0.0;
     tmpData.max = 90.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "mfdistal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -128,7 +128,7 @@ void VirtualShadowhand::initializeMap()
 #endif
     joints_map["MFJ1"] = tmpData;
     controllers_map["MFJ1"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "mfmiddle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -136,7 +136,7 @@ void VirtualShadowhand::initializeMap()
 #endif
     joints_map["MFJ2"] = tmpData;
     controllers_map["MFJ2"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "mfproximal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -146,7 +146,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["MFJ3"] = tmpController;
     tmpData.min = -25.0;
     tmpData.max = 25.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "mfknuckle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -159,7 +159,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["RFJ0"] = tmpController;
     tmpData.min = 0.0;
     tmpData.max = 90.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "rfdistal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -167,7 +167,7 @@ void VirtualShadowhand::initializeMap()
 #endif
     joints_map["RFJ1"] = tmpData;
     controllers_map["RFJ1"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "rfmiddle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -175,7 +175,7 @@ void VirtualShadowhand::initializeMap()
 #endif
     joints_map["RFJ2"] = tmpData;
     controllers_map["RFJ2"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "rfproximal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -185,7 +185,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["RFJ3"] = tmpController;
     tmpData.min = -25.0;
     tmpData.max = 25.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "rfknuckle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -198,7 +198,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["LFJ0"] = tmpController;
     tmpData.min = 0.0;
     tmpData.max = 90.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "lfdistal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -206,7 +206,7 @@ void VirtualShadowhand::initializeMap()
 #endif
     joints_map["LFJ1"] = tmpData;
     controllers_map["LFJ1"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "lfmiddle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -214,7 +214,7 @@ void VirtualShadowhand::initializeMap()
 #endif
     joints_map["LFJ2"] = tmpData;
     controllers_map["LFJ2"] = tmpController;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "lfproximal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -224,7 +224,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["LFJ3"] = tmpController;
     tmpData.min = -25.0;
     tmpData.max = 25.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "lfknuckle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -234,7 +234,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["LFJ4"] = tmpController;
     tmpData.min = 0.0;
     tmpData.max = 45.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "lfmetacarpal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -245,7 +245,7 @@ void VirtualShadowhand::initializeMap()
 
     tmpData.min = 0.0;
     tmpData.max = 90.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "thdistal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -255,7 +255,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["THJ1"] = tmpController;
     tmpData.min = -30.0;
     tmpData.max = 30.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "thmiddle_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -265,7 +265,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["THJ2"] = tmpController;
     tmpData.min = -15.0;
     tmpData.max = 15.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "thhub_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -275,7 +275,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["THJ3"] = tmpController;
     tmpData.min = 0.0;
     tmpData.max = 75.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "thproximal_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -285,7 +285,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["THJ4"] = tmpController;
     tmpData.min = -60.0;
     tmpData.max = 60.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "thbase_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -296,7 +296,7 @@ void VirtualShadowhand::initializeMap()
 
     tmpData.min = -30.0;
     tmpData.max = 40.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "palm_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -306,7 +306,7 @@ void VirtualShadowhand::initializeMap()
     controllers_map["WRJ1"] = tmpController;
     tmpData.min = -30.0;
     tmpData.max = 10.0;
-#ifdef GAZEBO 
+#ifdef GAZEBO
     full_topic = topic_prefix + "wrist_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -353,10 +353,10 @@ void VirtualShadowhand::initializeMap()
     controllers_map_mutex.unlock();
     parameters_map_mutex.unlock();
     joints_map_mutex.unlock();
-}
+  }
 
-short VirtualShadowhand::sendupdate( std::string joint_name, double target )
-{
+  short VirtualShadowhand::sendupdate( std::string joint_name, double target )
+  {
     joints_map_mutex.lock();
 
     JointsMap::iterator iter = joints_map.find(joint_name);
@@ -367,69 +367,69 @@ short VirtualShadowhand::sendupdate( std::string joint_name, double target )
     //not found
     if( iter == joints_map.end() )
     {
-        ROS_DEBUG("Joint %s not found", joint_name.c_str());
+      ROS_DEBUG("Joint %s not found", joint_name.c_str());
 
-        joints_map_mutex.unlock();
-        return -1;
+      joints_map_mutex.unlock();
+      return -1;
     }
 
     //if joint 0, send 1/2 of the target to joint 1 and other half to
     //2;
     if( iter->second.isJointZero == 1 )
     {
-        //push target and position to the given target for Joint 0
-        JointData tmpData0 = JointData(iter->second);
-        if( target < tmpData0.min )
-            target = tmpData0.min;
-        if( target > tmpData0.max )
-            target = tmpData0.max;
+      //push target and position to the given target for Joint 0
+      JointData tmpData0 = JointData(iter->second);
+      if( target < tmpData0.min )
+        target = tmpData0.min;
+      if( target > tmpData0.max )
+        target = tmpData0.max;
 
 #ifndef GAZEBO
-        tmpData0.position = target;
+      tmpData0.position = target;
 #endif
-        tmpData0.target = target;
+      tmpData0.target = target;
 
-        joints_map[joint_name] = tmpData0;
+      joints_map[joint_name] = tmpData0;
 
-        ++iter;
-        JointData tmpData1 = JointData(iter->second);
+      ++iter;
+      JointData tmpData1 = JointData(iter->second);
 #ifdef GAZEBO
-        //gazebo targets are in radians
-        target_msg.data = toRad( target / 2.0 );
-        gazebo_publishers[tmpData1.publisher_index].publish(target_msg);
-        ros::spinOnce();
+      //gazebo targets are in radians
+      target_msg.data = toRad( target / 2.0 );
+      gazebo_publishers[tmpData1.publisher_index].publish(target_msg);
+      ros::spinOnce();
 #else
-        tmpData1.position = target / 2.0;
+      tmpData1.position = target / 2.0;
 #endif
-        tmpData1.target = target / 2.0;
+      tmpData1.target = target / 2.0;
 
-        joints_map[iter->first] = tmpData1;
+      joints_map[iter->first] = tmpData1;
 
-        ++iter;
-        JointData tmpData2 = JointData(iter->second);
+      ++iter;
+      JointData tmpData2 = JointData(iter->second);
 #ifdef GAZEBO
-        //gazebo targets are in radians
-        target_msg.data = toRad( target / 2.0 );
-        gazebo_publishers[tmpData2.publisher_index].publish(target_msg);
-        ros::spinOnce();
+      //gazebo targets are in radians
+      target_msg.data = toRad( target / 2.0 );
+      gazebo_publishers[tmpData2.publisher_index].publish(target_msg);
+      ros::spinOnce();
 #else
-        tmpData2.position = target / 2.0;
+      tmpData2.position = target / 2.0;
 #endif
-        tmpData2.target = target / 2.0;
+      tmpData2.target = target / 2.0;
 
-        joints_map[iter->first] = tmpData2;
+      joints_map[iter->first] = tmpData2;
 
-        joints_map_mutex.unlock();
-        return 0;
+      joints_map_mutex.unlock();
+      return 0;
     }
 
     //joint found
     JointData tmpData(iter->second);
 
     if( target < tmpData.min )
-        target = tmpData.min;
+      target = tmpData.min;
     if( target > tmpData.max )
-        target = tmpData.max;
+      target = tmpData.max;
 
 #ifdef GAZEBO
     //gazebo targets are in radians
@@ -445,10 +445,10 @@ short VirtualShadowhand::sendupdate( std::string joint_name, double target )
 
     joints_map_mutex.unlock();
     return 0;
-}
+  }
 
-JointData VirtualShadowhand::getJointData( std::string joint_name )
-{
+  JointData VirtualShadowhand::getJointData( std::string joint_name )
+  {
     joints_map_mutex.lock();
 
     JointsMap::iterator iter = joints_map.find(joint_name);
@@ -456,46 +456,46 @@ JointData VirtualShadowhand::getJointData( std::string joint_name )
     //joint found
     if( iter != joints_map.end() )
     {
-        //return the position
-        iter->second.temperature = ((double)(rand() % 100) / 100.0);
-        iter->second.current = ((double)(rand() % 100) / 100.0);
-        iter->second.force = ((double)(rand() % 100) / 100.0);
+      //return the position
+      iter->second.temperature = ((double)(rand() % 100) / 100.0);
+      iter->second.current = ((double)(rand() % 100) / 100.0);
+      iter->second.force = ((double)(rand() % 100) / 100.0);
 
-        JointData tmp = JointData(iter->second);
+      JointData tmp = JointData(iter->second);
 
-        joints_map_mutex.unlock();
-        return tmp;
+      joints_map_mutex.unlock();
+      return tmp;
     }
 
     ROS_ERROR("Joint %s not found.", joint_name.c_str());
     JointData noData;
     joints_map_mutex.unlock();
     return noData;
-}
+  }
 
-SRArticulatedRobot::JointsMap VirtualShadowhand::getAllJointsData()
-{
+  SRArticulatedRobot::JointsMap VirtualShadowhand::getAllJointsData()
+  {
     joints_map_mutex.lock();
 
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
-        JointData tmpData = it->second;
-        tmpData.temperature = ((double)(rand() % 100) / 100.0);
-        tmpData.current = ((double)(rand() % 100) / 100.0);
-        tmpData.force = ((double)(rand() % 100) / 100.0);
-        tmpData.jointIndex = 0;
-        tmpData.flags = "";
+      JointData tmpData = it->second;
+      tmpData.temperature = ((double)(rand() % 100) / 100.0);
+      tmpData.current = ((double)(rand() % 100) / 100.0);
+      tmpData.force = ((double)(rand() % 100) / 100.0);
+      tmpData.jointIndex = 0;
+      tmpData.flags = "";
 
-        joints_map[it->first] = tmpData;
+      joints_map[it->first] = tmpData;
     }
 
     JointsMap tmp_map = JointsMap(joints_map);
     joints_map_mutex.unlock();
     return tmp_map;
-}
+  }
 
-short VirtualShadowhand::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
-{
+  short VirtualShadowhand::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
+  {
     controllers_map_mutex.lock();
 
     ControllersMap::iterator iter = controllers_map.find(contrlr_name);
@@ -503,119 +503,124 @@ short VirtualShadowhand::setContrl( std::string contrlr_name, JointControllerDat
     //joint found
     if( iter != controllers_map.end() )
     {
-        controllers_map[iter->first] = ctrlr_data;
+      controllers_map[iter->first] = ctrlr_data;
     }
     else
     {
-        ROS_ERROR("Controller %s not found", contrlr_name.c_str());
+      ROS_ERROR("Controller %s not found", contrlr_name.c_str());
     }
 
     controllers_map_mutex.unlock();
     return 0;
-}
+  }
 
-JointControllerData VirtualShadowhand::getContrl( std::string contrlr_name )
-{
+  JointControllerData VirtualShadowhand::getContrl( std::string contrlr_name )
+  {
     controllers_map_mutex.lock();
     ControllersMap::iterator iter = controllers_map.find(contrlr_name);
 
     //joint found
     if( iter != controllers_map.end() )
     {
-        JointControllerData tmp = JointControllerData(iter->second);
-        controllers_map_mutex.unlock();
-        return tmp;
+      JointControllerData tmp = JointControllerData(iter->second);
+      controllers_map_mutex.unlock();
+      return tmp;
     }
 
     ROS_ERROR("Controller %s not found", contrlr_name.c_str() );
     JointControllerData no_result;
     controllers_map_mutex.unlock();
     return no_result;
-}
+  }
 
-short VirtualShadowhand::setConfig( std::vector<std::string> myConfig )
-{
+  short VirtualShadowhand::setConfig( std::vector<std::string> myConfig )
+  {
     ROS_WARN("The set config function is not implemented in the virtual shadowhand.");
     return 0;
-}
+  }
 
-void VirtualShadowhand::getConfig( std::string joint_name )
-{
+  void VirtualShadowhand::getConfig( std::string joint_name )
+  {
     ROS_WARN("The get config function is not implemented in the virtual shadowhand.");
-}
+  }
 
-std::vector<DiagnosticData> VirtualShadowhand::getDiagnostics()
-{
+  std::vector<DiagnosticData> VirtualShadowhand::getDiagnostics()
+  {
     joints_map_mutex.lock();
     std::vector<DiagnosticData> returnVect;
 
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
-        DiagnosticData tmpDiag;
-        tmpDiag.joint_name = it->first;
-        tmpDiag.level = 0;
-        tmpDiag.flags = "";
-        tmpDiag.target_sensor_num = 0;
-        tmpDiag.target = it->second.target;
-        tmpDiag.position_sensor_num = 0;
-        tmpDiag.position = it-> second.position;
+      DiagnosticData tmpDiag;
+      tmpDiag.joint_name = it->first;
+      tmpDiag.level = 0;
+      tmpDiag.flags = "";
+      tmpDiag.target_sensor_num = 0;
+      tmpDiag.target = it->second.target;
+      tmpDiag.position = it-> second.position;
 
-        returnVect.push_back(tmpDiag);
+      returnVect.push_back(tmpDiag);
     }
 
     joints_map_mutex.unlock();
     return returnVect;
-}
+  }
 
 #ifdef GAZEBO
-void VirtualShadowhand::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
-{
+  void VirtualShadowhand::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
+  {
     joints_map_mutex.lock();
 
     //loop on all the names in the joint_states message
     for(unsigned int index = 0; index < msg->name.size(); ++index)
     {
-        std::string joint_name = msg->name[index];
-        JointsMap::iterator iter = joints_map.find(joint_name);
-        //not found => can be a joint from the arm / hand
-        if(iter == joints_map.end())
+      std::string joint_name = msg->name[index];
+      JointsMap::iterator iter = joints_map.find(joint_name);
+      //not found => can be a joint from the arm / hand
+      if(iter == joints_map.end())
         continue;
 
-        //joint found
-        JointData tmpData(iter->second);
+      //joint found
+      JointData tmpData(iter->second);
 
-        tmpData.position = toDegrees(msg->position[index]);
-        tmpData.force = msg->effort[index];
+      tmpData.position = toDegrees(msg->position[index]);
+      tmpData.force = msg->effort[index];
 
-        joints_map[joint_name] = tmpData;
+      joints_map[joint_name] = tmpData;
     }
 
     //push the sum of J1+J2 to the J0s
     for(JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it)
     {
-        JointData tmpData = it->second;
-        if( tmpData.isJointZero == 1 )
-        {
-            std::string joint_name = it->first;
-            double position = 0.0;
+      JointData tmpData = it->second;
+      if( tmpData.isJointZero == 1 )
+      {
+        std::string joint_name = it->first;
+        double position = 0.0;
 
-            //get the position from joint 1
-            ++it;
-            JointData tmpData1 = JointData(it->second);
-            position += tmpData1.position;
+        //get the position from joint 1
+        ++it;
+        JointData tmpData1 = JointData(it->second);
+        position += tmpData1.position;
 
-            //get the position from joint 2
-            ++it;
-            JointData tmpData2 = JointData(it->second);
-            position += tmpData2.position;
+        //get the position from joint 2
+        ++it;
+        JointData tmpData2 = JointData(it->second);
+        position += tmpData2.position;
 
-            tmpData.position = position;
+        tmpData.position = position;
 
-            joints_map[joint_name] = tmpData;
-        }
+        joints_map[joint_name] = tmpData;
+      }
     }
 
     joints_map_mutex.unlock();
-}
+  }
 #endif
 } //end namespace
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
