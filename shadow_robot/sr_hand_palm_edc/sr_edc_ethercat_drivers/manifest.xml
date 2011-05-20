@@ -12,6 +12,7 @@
   <depend package="roslib"/>
   <depend package="ethercat_hardware"/>
   <depend package="std_msgs"/>
+  <rosdep name="libbfd"/>
   <export>
     <ethercat_hardware plugin="${prefix}/ethercat_device_plugin.xml" />
   </export>
