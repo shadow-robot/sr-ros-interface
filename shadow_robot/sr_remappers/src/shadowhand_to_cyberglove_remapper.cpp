@@ -41,7 +41,7 @@ using namespace ros;
 namespace shadowhand_to_cyberglove_remapper
 {
 
-const int ShadowhandToCybergloveRemapper::number_hand_joints = 20;
+const unsigned int ShadowhandToCybergloveRemapper::number_hand_joints = 20;
 
 ShadowhandToCybergloveRemapper::ShadowhandToCybergloveRemapper() :
     n_tilde("~")
@@ -107,7 +107,7 @@ void ShadowhandToCybergloveRemapper::jointstatesCallback( const sensor_msgs::Joi
     pub.sendupdate_length = number_hand_joints;
 
     std::vector<sr_robot_msgs::joint> table(number_hand_joints);
-    for( unsigned int i = 0; i < number_hand_joints; ++i )
+    for(unsigned int i = 0; i < number_hand_joints; ++i )
     {
         joint.joint_name = joints_names[i];
         joint.joint_target = vect[i];

@@ -122,3 +122,5 @@ bin
 build
 shadow_robot/cyberglove/bin/test/test_calibration
 test_serial
+￼
+shadow_robot/cyberglove/tmp

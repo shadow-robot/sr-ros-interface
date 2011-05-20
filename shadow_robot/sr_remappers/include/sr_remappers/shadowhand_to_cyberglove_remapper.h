@@ -54,7 +54,7 @@ class ShadowhandToCybergloveRemapper
   /**
    * Number of joints in the hand
    */
-  static const int number_hand_joints;
+  static const unsigned int number_hand_joints;
 
   /**
    * Init the vector containing the joints names
@@ -64,7 +64,7 @@ class ShadowhandToCybergloveRemapper
   /// ROS node handles
   NodeHandle node, n_tilde;
   /// Vector containing all the joints names for the shadowhand.
-  std::vector<std::string> joints_names; 
+  std::vector<std::string> joints_names;
   /// subscriber to the jointstates topic from the cyberglove
   Subscriber cyberglove_jointstates_sub;
   ///publish to the shadowhand sendupdate topic
@@ -83,7 +83,7 @@ class ShadowhandToCybergloveRemapper
    * @param msg the joint_states message
    */
   void jointstatesCallback(const sensor_msgs::JointStateConstPtr& msg);
-   
+
 }; // end class
 
 } //end namespace
