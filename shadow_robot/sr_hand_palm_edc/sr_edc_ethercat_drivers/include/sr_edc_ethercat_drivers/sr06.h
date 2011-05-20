@@ -8,6 +8,7 @@
 #include <sr_edc_ethercat_drivers/SimpleMotorFlasher.h>
 #include <pthread.h>
 #include <bfd.h>
+#include <boost/smart_ptr.hpp>
 
 typedef unsigned char       int8u;
 typedef   signed char       int8s;
@@ -44,7 +45,7 @@ protected:
     int                                                                  counter_;
     ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING                       data_;
     ros::NodeHandle                                                      nodehandle_;
-    std::vector< realtime_tools::RealtimePublisher<std_msgs::Int16> *>   realtime_pub_;
+    std::vector< boost::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::Int16> > >   realtime_pub_;
 
 private:
 
@@ -69,8 +70,19 @@ private:
     unsigned int                     pos; // position in binary_content buffer
     unsigned int                     motor_being_flashed;
 
+    ///counter for the number of empty buffer we're reading.
+    unsigned int                     zero_buffer_read;
+
     pthread_mutex_t mutex;
 };
+
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
+
 
 #endif /* SR06_H */
 
