@@ -2,12 +2,28 @@
  * @file   virtual_shadowhand.h
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:51:10 2010
- * 
+ *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief  The Virtual Shadowhand can be used as a simulator. As both the real hand and the virtual hand are children
  * from the shadowhand class, using a virtual or a real hand doesn't change anything in the way you call them in your
  * programs.
- * 
- * 
+ *
+ *
  */
 
 #ifndef   	VIRTUAL_SHADOWHAND_H_
@@ -110,6 +126,7 @@ protected:
     {
         return rad * 180.0 / 3.14159265;
     }
+
 }; //end class
 }
 #endif 	    /* !VIRTUAL_SHADOWHAND_H_ */

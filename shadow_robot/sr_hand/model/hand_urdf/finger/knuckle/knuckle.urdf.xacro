@@ -9,7 +9,7 @@
   <include filename="$(find sr_hand)/model/hand_urdf/finger/knuckle/knuckle.transmission.xacro" />
 
   <xacro:macro name="knuckle" params="link_prefix joint_prefix parent *origin">
-  
+
     <link name="${link_prefix}knuckle">
       <inertial>
 	<!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
@@ -19,7 +19,7 @@
 	izz="0.0" />
       </inertial>
       <visual>
-	<origin xyz="0 0 0.0005" rpy="${M_PI} -${M_PI/2} -${M_PI/2}" />
+	<origin xyz="0 0 0.0005" rpy="0 0 0" />
 	<geometry name="knuckle_visual">
       <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001" />
       </geometry>
@@ -33,7 +33,6 @@
       </collision>
     </link>
     <gazebo reference="${link_prefix}knuckle">
-
       <sensor:contact name="${link_prefix}knuckle_contact_sensor">
         <geom>${link_prefix}knuckle_geom</geom>
        <updateRate>100.0</updateRate>
@@ -45,10 +44,9 @@
           <interface:bumper name="${link_prefix}knuckle_gazebo_ros_bumper_iface" />
         </controller:gazebo_ros_bumper>
       </sensor:contact>
-
       <material>PR2/Grey2</material>
     </gazebo>
-    
+
     <joint name="${joint_prefix}J4" type="revolute">
       <parent link="${parent}"/>
       <child link="${link_prefix}knuckle"/>
@@ -63,5 +61,5 @@
     <xacro:knuckle_transmission />
 
   </xacro:macro>
-  
+
 </robot>

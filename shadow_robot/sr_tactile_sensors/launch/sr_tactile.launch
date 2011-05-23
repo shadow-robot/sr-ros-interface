@@ -1,6 +1,5 @@
 <launch>
   <node pkg="sr_tactile_sensors" name="sr_tactile_v" type="sr_tactile_virtual">
     <rosparam file="$(find sr_tactile_sensors)/params/sensor_names.yaml" command="load"/>
-    <rosparam name="publish_frequency" type="double" value="100.0"/>
   </node>
 </launch>

@@ -2,13 +2,29 @@
  * @file   shadowhand.h
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:50:47 2010
- * 
+ *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief  This is a parent class for the different types of Shadowhand we can
  * have. It makes it possible to swap from a virtual to a real hand while using
  * the same utilities to interact with the hand.
  * One (or more) ROS subscriber and publisher can then share the same instance
  * of a Shadowhand object to update the information contained in this object.
- * 
+ *
  */
 
 #ifndef   	SHADOWHAND_H_
@@ -19,21 +35,50 @@
 #include <vector>
 #include <map>
 
+//self_test
+#include "diagnostic_msgs/SelfTest.h"
+#include "self_test/self_test.h"
+
 #include <boost/smart_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/assign.hpp>
 
 #ifdef GAZEBO
 #include <sensor_msgs/JointState.h>
 #endif
+
+
+namespace debug_values
+{
+  ///a map containing the names and offsets of the smart motor node
+  static const std::map<const std::string, const unsigned int> names_and_offsets
+    = boost::assign::map_list_of ("Sensor PID last in",         0) \
+                                 ("Sensor PID iState",          1) \
+                                 ("Sensor PID last D",          2) \
+                                 ("Sensor PID last out",        3) \
+                                 ("PID last in",                4) \
+                                 ("PID iState",                 5) \
+                                 ("PID last D",                 6) \
+                                 ("PID last out",               7) \
+                                 ("Strain Gauge Offset 0",      8) \
+                                 ("Strain Gauge Offset 1",      9) \
+                                 ("Num setup Msgs received",   10) \
+                                 ("Num sensor Msgs received",  11) \
+                                 ("Sensor Val (motor set P)",  12) \
+                                 ("Sensor Val (motor sensor)", 13) \
+                                 ("H-Bridge Duty",             14) \
+                                 ("Duty Temp",                 15) ;
+}
+
 
 namespace shadowrobot
 {
 /**
  * This struct contains all the information regarding each joints.
  */
-struct JointData
-{
+  struct JointData
+  {
     double position;
     double target;
     double temperature;
@@ -59,48 +104,48 @@ struct JointData
 
 
 #ifdef GAZEBO
-    JointData() :
-        position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0), publisher_index(0), last_pos_time(0.0), last_pos(0.0), velocity(0.0)
+  JointData() :
+    position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0), publisher_index(0), last_pos_time(0.0), last_pos(0.0), velocity(0.0)
     {
     }
 
-    JointData(JointData& jd) :
+  JointData(JointData& jd) :
     position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
-            flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
+      flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
 
-    JointData(const JointData& jd) :
+  JointData(const JointData& jd) :
     position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force),
-            flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
+      flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
 #else
-    JointData() :
-        position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0), last_pos_time(0.0), last_pos(0.0), velocity(0.0)
+  JointData() :
+    position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0), last_pos_time(0.0), last_pos(0.0), velocity(0.0)
     {
     }
 
-    JointData( JointData& jd ) :
-        position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force), flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max),
-                isJointZero(jd.isJointZero), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
+  JointData( JointData& jd ) :
+    position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force), flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max),
+      isJointZero(jd.isJointZero), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
 
-    JointData( const JointData& jd ) :
-        position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force), flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max),
-                isJointZero(jd.isJointZero), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
+  JointData( const JointData& jd ) :
+    position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force), flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max),
+      isJointZero(jd.isJointZero), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
 #endif
 
-};
+  };
 
 /**
  * An enum containing all the different types of parameters for the controllers.
  */
-enum controller_parameters
-{
+  enum controller_parameters
+  {
     PARAM_sensor, //!<select the sensor that is being controller
     PARAM_target, //!< select the sensor to read the setpoint from
     PARAM_valve, //!< select which valve is being controlled, if appropriate
@@ -132,62 +177,64 @@ enum controller_parameters
     PARAM_type_of_setpoint
 //!< PARAM_type_of_setpoint
 
-};
+  };
 
 /**
  * Description of a parameter for a controller.
  */
-struct Parameters
-{
+  struct Parameters
+  {
     ///name of the parameter
     std::string name;
     ///value of the parameter
     std::string value;
 
-    Parameters() :
-        name(""), value("")
+  Parameters() :
+    name(""), value("")
     {
     }
 
-    Parameters( Parameters& param ) :
-        name(param.name), value(param.value)
+  Parameters( Parameters& param ) :
+    name(param.name), value(param.value)
     {
     }
 
-    Parameters( const Parameters& param ) :
-        name(param.name), value(param.value)
+  Parameters( const Parameters& param ) :
+    name(param.name), value(param.value)
     {
     }
-};
+  };
 
 /**
  * A vector containing all the Parameters for a given controller.
  */
-struct JointControllerData
-{
+  struct JointControllerData
+  {
     std::vector<Parameters> data;
 
-    JointControllerData() :
-        data()
+  JointControllerData() :
+    data()
     {
     }
 
-    JointControllerData( JointControllerData& jcd ) :
-        data(jcd.data)
+  JointControllerData( JointControllerData& jcd ) :
+    data(jcd.data)
     {
     }
 
-    JointControllerData( const JointControllerData& jcd ) :
-        data(jcd.data)
+  JointControllerData( const JointControllerData& jcd ) :
+    data(jcd.data)
     {
     }
-};
+  };
+
+
 
 /**
  * The information being published by the Diagnostic publisher
  */
-struct DiagnosticData
-{
+  struct DiagnosticData
+  {
     /// the name of the joint
     std::string joint_name;
     /// the level of alert: 0 = OK, 1 = WARNING, 2 = ERROR
@@ -201,8 +248,8 @@ struct DiagnosticData
     ///the actual value of the target
     double target;
 
-    ///the channel number of the position sensor.
-    int position_sensor_num;
+    ///the debug values
+    std::map<std::string, int> debug_values;
     ///the actual value of the position
     double position;
 
@@ -212,7 +259,11 @@ struct DiagnosticData
     double current;
     ///force value
     double force;
-};
+
+    //values read from the debug node.
+    uint64_t num_sensor_msgs_received;
+
+  };
 
 /**
  * @brief  This is a parent class for the different types of Shadowhand we can
@@ -223,7 +274,6 @@ struct DiagnosticData
  */
 class SRArticulatedRobot : boost::noncopyable
 {
-public:
     /**
      * empty constructor.
      */
@@ -314,14 +364,22 @@ public:
     boost::mutex parameters_map_mutex;
     boost::mutex controllers_map_mutex;
 
-protected:
-
+  protected:
+    ///this is the handle for the self tests.
+    boost::shared_ptr<self_test::TestRunner> self_test;
 #ifdef GAZEBO
     std::vector<ros::Publisher> gazebo_publishers;
     ros::Subscriber gazebo_subscriber;
 #endif
-}; //end class
+  }; //end class
 
 }//end namespace
+
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
 
 #endif 	    /* !SHADOWHAND_H_ */

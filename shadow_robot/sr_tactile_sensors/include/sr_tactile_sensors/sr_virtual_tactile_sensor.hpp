@@ -3,6 +3,22 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
  *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief  This is the virtual implementation of the SrGenericTactileSensor. It
  * computes virtual data.
  *
@@ -35,12 +51,10 @@ namespace shadowrobot
      *
      * @param name the display name of the sensor
      * @param touch_name the actual name of the touch sensor
-     * @param temp_name the actual name of the temperature sensor
      *
      * @return
      */
-    SrVirtualTactileSensor(std::string name, std::string touch_name,
-                           std::string temp_name);
+    SrVirtualTactileSensor(std::string name, std::string touch_name);
     ~SrVirtualTactileSensor();
 
     /**
@@ -49,17 +63,11 @@ namespace shadowrobot
      * @return the pressure value
      */
     virtual double get_touch_data();
-    /**
-     * Generates a value for the sensor
-     *
-     * @return the temperature value
-     */
-    virtual double get_temp_data();
 
   private:
     ros::NodeHandle nh;
-    boost::mutex touch_mutex, temp_mutex;
-    double touch_value, temp_value;
+    boost::mutex touch_mutex;
+    double touch_value;
 
     /**
      * The names from which we get the joint position.

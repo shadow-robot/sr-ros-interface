@@ -2,11 +2,27 @@
  * @file   sr_real_tactile_sensor.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com> updated by Ravin de Souza <rsouza@isr.ist.utl.pt>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
- * 
+ *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief  This is the virtual implementation of the SrGenericTactileSensor. It
  * computes virtual data.
- * 
- * 
+ *
+ *
  */
 
 
@@ -36,12 +52,6 @@ namespace shadowrobot
      * @return the pressure value
      */
     virtual double get_touch_data();
-    /**
-     * Generates a value for the sensor
-     *
-     * @return the temperature value
-     */
-    virtual double get_temp_data();
 
   private:
     ros::NodeHandle nh;
@@ -49,10 +59,10 @@ namespace shadowrobot
     double touch_value;
 
     ros::Subscriber sub;
-    /** 
+    /**
      * Callback function called when a msg is received on the
      * gazebo bumper topic.
-     * 
+     *
      * @param msg the message containing the contact data
      */
     void callback(const gazebo_plugins::ContactsState& msg);

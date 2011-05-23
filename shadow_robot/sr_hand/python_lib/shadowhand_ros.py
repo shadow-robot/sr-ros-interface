@@ -1,4 +1,20 @@
 #!/usr/bin/env python
+#
+# Copyright 2011 Shadow Robot Company Ltd.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 import roslib; roslib.load_manifest('sr_hand')
 import time
 import os
@@ -51,10 +67,10 @@ class ShadowHand_ROS():
                            Joint("WRJ2", "smart_motor_wr2", -30, 10),
                            ]
         self.handJoints = []
-        self.armJoints = [Joint("ShoulderJRotate", "", -45, 90),
-                          Joint("ShoulderJSwing", "", 0, 90),
+        self.armJoints = [Joint("ShoulderJRotate", "", -45, 60),
+                          Joint("ShoulderJSwing", "", 0, 80),
                           Joint("ElbowJSwing", "", 0,120),
-                          Joint("ElbowJRotate", "", -90,90)
+                          Joint("ElbowJRotate", "", -80,80)
                          ]
         self.lastMsg = 0
         self.lastArmMsg = 0

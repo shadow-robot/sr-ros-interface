@@ -1,10 +1,11 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
-        xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
        xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
        xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
        xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
        xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
+
   <include filename="$(find sr_hand)/model/hand_urdf/thumb/thdistal.transmission.xacro" />
 
   <xacro:macro name="thdistal" params="parent">
@@ -17,7 +18,7 @@
 	izz="0.0" />
       </inertial>
       <visual>
-	<origin xyz="0 0 0" rpy="${M_PI} -${M_PI/2} ${M_PI}" />
+	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="thdistal_visual">
 	<mesh filename="package://sr_hand/model/meshes/TH1_z.mesh" scale="0.001 0.001 0.001" />
       </geometry>
@@ -45,7 +46,7 @@
         </controller:gazebo_ros_bumper>
       </sensor:contact>
       <material>Gazebo/Grey</material>
-  	  <selfCollide>false</selfCollide>
+      <selfCollide>false</selfCollide>
     </gazebo>
 
     <joint name="THJ1" type="revolute">

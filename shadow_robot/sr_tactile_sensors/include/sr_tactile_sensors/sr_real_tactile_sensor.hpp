@@ -3,6 +3,22 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
  *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief  This is the implementation of the SrGenericTactileSensor. It
  * fetches data from the real sensors.
  *
@@ -27,8 +43,7 @@ namespace shadowrobot
   class SrRealTactileSensor : public SrGenericTactileSensor
   {
   public:
-    SrRealTactileSensor(std::string name, std::string touch_name,
-                        std::string temp_name);
+    SrRealTactileSensor(std::string name, std::string touch_name);
     ~SrRealTactileSensor();
 
     /**
@@ -37,16 +52,10 @@ namespace shadowrobot
      * @return the pressure value ; -1000 if sensor not found
      */
     virtual double get_touch_data();
-    /**
-     * Reads the value from the sensor
-     *
-     * @return the pressure value ; -1000 if sensor not found
-     */
-    virtual double get_temp_data();
 
   private:
-    struct sensor sensor_touch, sensor_temp;
-    int res_touch, res_temp;
+    struct sensor sensor_touch;
+    int res_touch;
   };
 
   class SrRealTactileSensorManager : public SrTactileSensorManager

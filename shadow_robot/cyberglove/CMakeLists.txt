@@ -21,14 +21,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 rosbuild_gensrv()
 
-rosbuild_add_executable(cyberglove src/cyberglove_publisher.cpp src/cyberglove_node.cpp src/serial_glove.c src/xml_calibration_parser.cpp src/cyberglove_service.cpp)
+rosbuild_add_executable(cyberglove src/cyberglove_publisher.cpp src/cyberglove_node.cpp src/serial_glove.cpp src/xml_calibration_parser.cpp src/cyberglove_service.cpp)
+target_link_libraries(cyberglove cereal_port)
 
 rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/xml_calibration_parser.cpp )
-
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})

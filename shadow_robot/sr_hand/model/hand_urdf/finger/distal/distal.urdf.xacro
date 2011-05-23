@@ -11,7 +11,6 @@
   <xacro:macro name="distal" params="link_prefix joint_prefix parent">
 
     <link name="${link_prefix}distal">
-
       <inertial>
 	<mass value="0.010" />
 	<origin xyz="0 0 0.025" />
@@ -19,7 +18,7 @@
 	izz="0.0" />
       </inertial>
       <visual>
-	<origin xyz="0 0 0" rpy="0 -${M_PI/2} 0" />
+	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="distal_visual">
       <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001" />
       </geometry>
@@ -32,7 +31,6 @@
 	</geometry>
       </collision>
     </link>
-
     <gazebo reference="${link_prefix}distal">
       <sensor:contact name="${link_prefix}distal_contact_sensor">
         <geom>${link_prefix}distal_geom</geom>

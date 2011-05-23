@@ -1,14 +1,11 @@
 <launch>
 
   <!-- start gazebo with an empty plane -->
-  <param name="/use_sim_time" value="true" />
-  <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find sr_hand)/launch/gazebo/empty.world" respawn="false" output="screen">
-    <remap from="joint_states" to="gazebo/joint_states"/>
-  </node>
+  <include file="$(find sr_hand)/launch/gazebo/empty_world.launch"/>
 
   <!-- spawn the arm model -->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_muscle.urdf.xacro'" />
-  <node name="spawn_hand" pkg="gazebo_tools" type="gazebo_model" args="-p robot_description spawn" respawn="false" output="screen" />
+  <param name="robot_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_muscle.urdf"/>
+  <node name="spawn_hand" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -model arm_and_hand -x 0 -y 0 -z 0.0" respawn="false" output="screen" />
 
   <!-- Controllers for the arm -->
   <rosparam file="$(find sr_hand)/model/hand_urdf/hand_controller.yaml" command="load"/>

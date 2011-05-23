@@ -6,9 +6,20 @@
 
   </description>
   <author>Maintained by Ugo Cupcic: ugo@shadowrobot.com, contact@shadowrobot.com</author>
-  <license>GPL</license>  
+  <license>BSD,GPL</license>  
   <review status="unreviewed" notes=""/>
-  <url>http://www.shadowrobot.com</url>
-  <depend stack="ros" />
+  <url>http://ros.org/wiki/shadow_robot</url>
+  <depend stack="common" /> <!-- tinyxml -->
+  <depend stack="common_msgs" /> <!-- sensor_msgs, geometry_msgs, diagnostic_msgs -->
+  <depend stack="diagnostics" /> <!-- diagnostic_aggregator -->
+  <depend stack="diagnostics_monitors" /> <!-- robot_monitor -->
+  <depend stack="driver_common" /> <!-- dynamic_reconfigure -->
+  <depend stack="pr2_controllers" /> <!-- pr2_mechanism_controllers -->
+  <depend stack="pr2_simulator" /> <!-- pr2_gazebo_plugins -->
+  <depend stack="robot_model" /> <!-- robot_state_publisher -->
+  <depend stack="ros" /> <!-- roslib -->
+  <depend stack="ros_comm" /> <!-- std_msgs, rospy, roscpp -->
+  <depend stack="simulator_gazebo" /> <!-- gazebo_plugins, gazebo_worlds -->
+  <depend stack="visualization" /> <!-- rviz -->
 
 </stack>

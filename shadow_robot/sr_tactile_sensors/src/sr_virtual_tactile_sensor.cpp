@@ -3,6 +3,22 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 10 11:07:10 2011
  *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief  This is the virtual implementation of the SrGenericTactileSensor. It
  * computes virtual data.
  *
@@ -19,18 +35,30 @@ namespace shadowrobot
  *         TACTILE SENSOR         *
  **********************************/
   SrVirtualTactileSensor::SrVirtualTactileSensor(std::string name,
-                                                 std::string touch_name,
-                                                 std::string temp_name) :
-    SrGenericTactileSensor(name, touch_name, temp_name),
-    touch_value(0.0), temp_value(0.0)
+                                                 std::string touch_name ) :
+    SrGenericTactileSensor(name, touch_name),
+    touch_value(0.0)
   {
-    //fills the vector of joint names: we're taking J3 and J0
-    std::string tmp = boost::to_upper_copy(name);
-    tmp += "J3";
-    names_joints_linked.push_back(tmp);
-    tmp = boost::to_upper_copy(name);
-    tmp += "J0";
-    names_joints_linked.push_back(tmp);
+	if(name.find("th")!=std::string::npos )
+	{
+		//fills the vector of joint names: we're taking J2 and J1 for TH
+		std::string tmp = boost::to_upper_copy(name);
+		tmp += "J2";
+		names_joints_linked.push_back(tmp);
+		tmp = boost::to_upper_copy(name);
+		tmp += "J1";
+		names_joints_linked.push_back(tmp);
+	}
+	else
+	{
+		//fills the vector of joint names: we're taking J3 and J0
+		std::string tmp = boost::to_upper_copy(name);
+		tmp += "J3";
+		names_joints_linked.push_back(tmp);
+		tmp = boost::to_upper_copy(name);
+		tmp += "J0";
+		names_joints_linked.push_back(tmp);
+	}
 
     sub = nh.subscribe("/srh/shadowhand_data", 2, &SrVirtualTactileSensor::callback, this);
   }
@@ -73,17 +101,6 @@ namespace shadowrobot
     return return_value;
   }
 
-  double SrVirtualTactileSensor::get_temp_data()
-  {
-    double return_value;
-    temp_mutex.lock();
-    return_value = temp_value;
-    temp_mutex.unlock();
-
-    return return_value;
-  }
-
-
 /**********************************
  *     TACTILE SENSOR MANAGER     *
  **********************************/
@@ -97,14 +114,14 @@ namespace shadowrobot
       tactile_sensors.push_back(
         boost::shared_ptr<SrVirtualTactileSensor>(
           new SrVirtualTactileSensor(all_names[0][i],
-                                     all_names[1][i],
-                                     all_names[2][i]) ));
+                                     all_names[1][i]) ));
     }
   }
 
   SrVirtualTactileSensorManager::~SrVirtualTactileSensorManager()
   {}
 }
+
 /**
  * Initializes a set of virtual tactile sensors and publish.
  *

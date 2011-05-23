@@ -1,5 +1,5 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
-        xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
        xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
        xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
@@ -13,7 +13,7 @@
     <link name="thhub">
       <inertial>
 	<mass value="0.002" />
-	<origin xyz="0.02687 0 0.02687" rpy="0 0 0"/> 
+	<origin xyz="0.02687 0 0.02687" rpy="0 0 0"/>
 	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
 	izz="0.0" />
       </inertial>
@@ -45,7 +45,6 @@
           <interface:bumper name="thhub_gazebo_ros_bumper_iface" />
         </controller:gazebo_ros_bumper>
       </sensor:contact>
-
       <material>Gazebo/Grey</material>
     </gazebo>
 
@@ -62,5 +61,5 @@
     <xacro:thhub_transmission />
 
   </xacro:macro>
-  
+
 </robot>

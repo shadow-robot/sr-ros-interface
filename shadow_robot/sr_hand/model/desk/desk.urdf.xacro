@@ -1,0 +1,61 @@
+<robot name="desk" xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="desk">
+
+  <link name="desk_pillar">
+    <inertial>
+      <origin xyz="0 0 0.5"/>
+      <mass value="100.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.5"/>
+      <geometry name="desk_visual">
+        <cylinder length="1.0" radius="0.1"/>
+      </geometry>
+      <material name="Green"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.5"/>
+      <geometry name="desk_collision">
+        <cylinder length="1.0" radius="0.1"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="desk_pillar">
+    <material>Gazebo/Green</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+
+  <link name="desk_support">
+    <inertial>
+      <origin xyz="0 0 0.01"/>
+      <mass value="1000.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.01"/>
+      <geometry name="desk_s_visual">
+        <cylinder length="0.02" radius="1.0"/>
+      </geometry>
+      <material name="Green"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.01"/>
+      <geometry name="desk_s_collision">
+        <cylinder length="0.02" radius="1.0"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="desk_support">
+    <material>Gazebo/Green</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+
+  <joint name="desk_joint" type="fixed">
+    <parent link="desk_support"/>
+    <child link="desk_pillar"/>
+    <origin rpy="0 0 0" xyz="0 0 0.01"/>
+  </joint>
+
+  </xacro:macro>
+</robot>

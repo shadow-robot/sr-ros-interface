@@ -28,10 +28,68 @@
       <updateRate>1000.0</updateRate>
     </controller:gazebo_ros_controller_manager>
   </gazebo>
+  <link name="desk_pillar">
+    <inertial>
+      <origin xyz="0 0 0.5"/>
+      <mass value="100.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.5"/>
+      <geometry name="desk_visual">
+        <cylinder length="1.0" radius="0.1"/>
+      </geometry>
+      <material name="Green"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.5"/>
+      <geometry name="desk_collision">
+        <cylinder length="1.0" radius="0.1"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="desk_pillar">
+    <material>Gazebo/Green</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <link name="desk_support">
+    <inertial>
+      <origin xyz="0 0 0.01"/>
+      <mass value="1000.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.01"/>
+      <geometry name="desk_s_visual">
+        <cylinder length="0.02" radius="1.0"/>
+      </geometry>
+      <material name="Green"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.01"/>
+      <geometry name="desk_s_collision">
+        <cylinder length="0.02" radius="1.0"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="desk_support">
+    <material>Gazebo/Green</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <joint name="desk_joint" type="fixed">
+    <parent link="desk_support"/>
+    <child link="desk_pillar"/>
+    <origin rpy="0 0 0" xyz="0 0 0.01"/>
+  </joint>
+  <joint name="base_fix" type="fixed">
+    <parent link="desk_pillar"/>
+    <child link="shadowarm_base"/>
+    <origin rpy="0 0 0" xyz="0 0 1.0"/>
+  </joint>
   <link name="shadowarm_base">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="5000"/>
+      <mass value="0.4"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
@@ -76,36 +134,36 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="trunk_rotation" type="revolute">
+  <joint name="ShoulderJRotate" type="revolute">
     <parent link="shadowarm_base"/>
     <child link="shadowarm_trunk"/>
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
     <axis xyz="0 0 1"/>
-    <limit effort="10" lower="-1.57079632679" upper="0.785398163397" velocity="1.0"/>
+    <limit effort="10" lower="-0.785398163397" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="200.5"/>
   </joint>
   <transmission name="trunk_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="trunk_rotation"/>
-    <joint name="trunk_rotation"/>
+    <joint name="ShoulderJRotate"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
   <link name="shadowarm_upperarm">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.1845 -0.067 0"/>
+      <origin rpy="0 0 0" xyz="0 -0.067 -0.1845"/>
       <mass value="2"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="-1.57079632679 0 -1.57079632679" xyz="0 0.067 0"/>
+      <origin rpy="0 0 -1.57079632679" xyz="0 0.067 0"/>
       <geometry name="shadowarm_upperarm_visual">
         <mesh filename="package://sr_hand/model/meshes/arm/upper_arm.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 1.57079632679 0" xyz="0.1845 0 0"/>
+      <origin rpy="0 -3.14159265359 0" xyz="0 0 0.1845"/>
       <geometry name="shadowarm_upperarm_collision">
         <box size="0.03 0.03 0.369"/>
       </geometry>
@@ -115,36 +173,36 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="shoulder_rotation" type="revolute">
+  <joint name="ShoulderJSwing" type="revolute">
     <parent link="shadowarm_trunk"/>
     <child link="shadowarm_upperarm"/>
-    <origin rpy="0 0 0" xyz="0 -0.134 0.5405"/>
-    <axis xyz="0 1 0"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 -0.134 0.5405"/>
+    <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
   <transmission name="shoulder_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="shoulder_rotation"/>
-    <joint name="shoulder_rotation"/>
+    <joint name="ShoulderJSwing"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
   <link name="shadowarm_lowerarm">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.0655 0 -0.08"/>
+      <origin rpy="0 0 0" xyz="0.08 0 0.0655"/>
       <mass value="1.7"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 0.5 0" xyz="0.036 0 -0.03"/>
+      <origin rpy="3.14159265359 -1.07079632679 0" xyz="0.03 0 0.036"/>
       <geometry name="shadowarm_lowerarm_visual">
         <mesh filename="package://sr_hand/model/meshes/arm/elbow_flex.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 1.57079632679 0" xyz="0.0655 0 -0.08"/>
+      <origin rpy="0 0 0" xyz="0.08 0 0.0655"/>
       <geometry name="shadowarm_lowerarm_collision">
         <box size="0.03 0.03 0.131"/>
       </geometry>
@@ -154,17 +212,17 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="elbow_abduction" type="revolute">
+  <joint name="ElbowJSwing" type="revolute">
     <parent link="shadowarm_upperarm"/>
     <child link="shadowarm_lowerarm"/>
-    <origin rpy="0 0 0" xyz="0.369 0 0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.369"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="2.09439510239" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
   <transmission name="elbow_abduction_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="elbow_abduction"/>
-    <joint name="elbow_abduction"/>
+    <joint name="ElbowJSwing"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -176,14 +234,14 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 0 -1.57079632679" xyz="-0.04 0 0"/>
+      <origin rpy="1.57079632679 0 0" xyz="0 0 -0.04"/>
       <geometry name="shadowarm_handsupport_visual">
         <mesh filename="package://sr_hand/model/meshes/arm/elbow_rotate_motor.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="LightGrey"/>
     </visual>
     <collision>
-      <origin rpy="0 1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="shadowarm_handsupport_collision">
         <cylinder length="0.001" radius="0.06"/>
       </geometry>
@@ -193,17 +251,17 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-  <joint name="forearm_rotation" type="revolute">
+  <joint name="ElbowJRotate" type="revolute">
     <parent link="shadowarm_lowerarm"/>
     <child link="shadowarm_handsupport_motor"/>
-    <origin rpy="0 0 0" xyz="0.131 0 -0.08"/>
-    <axis xyz="1 0 0"/>
+    <origin rpy="0 0 0" xyz="0.08 0 0.131"/>
+    <axis xyz="0 0 -1"/>
     <limit effort="10" lower="-1.57079632679" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="10.5"/>
   </joint>
   <transmission name="forearm_rotation_transmission" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="forearm_rotation"/>
-    <joint name="forearm_rotation"/>
+    <joint name="ElbowJRotate"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -211,7 +269,7 @@
   <joint name="arm_link" type="revolute">
     <parent link="shadowarm_handsupport_motor"/>
     <child link="forearm_motor"/>
-    <origin rpy="1.57079632679 0 1.57079632679" xyz="0 0 0"/>
+    <origin rpy="0 0 3.14159265359" xyz="0 0 0"/>
     <axis xyz="0 -1 0"/>
     <limit effort="10" lower="0" upper="0" velocity="1.0"/>
     <dynamics damping="3.5"/>
@@ -223,9 +281,9 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 0 -1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="shadow_forearm_geom">
-        <mesh filename="package://sr_hand/model/meshes/forearm.mesh"/>
+        <mesh filename="package://sr_hand/model/meshes/forearm.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -248,7 +306,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="1.57079632679 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="wrist_visual">
         <mesh filename="package://sr_hand/model/meshes/wrist.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -288,7 +346,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="palm_visual">
         <mesh filename="package://sr_hand/model/meshes/palm.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -338,7 +396,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
       <geometry name="knuckle_visual">
         <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -388,7 +446,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="proximal_visual">
         <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -437,7 +495,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="middle_visual">
         <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -486,7 +544,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="distal_visual">
         <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -536,7 +594,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
       <geometry name="knuckle_visual">
         <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -586,7 +644,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="proximal_visual">
         <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -635,7 +693,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="middle_visual">
         <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -684,7 +742,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="distal_visual">
         <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -734,7 +792,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
       <geometry name="knuckle_visual">
         <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -784,7 +842,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="proximal_visual">
         <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -833,7 +891,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="middle_visual">
         <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -882,7 +940,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="distal_visual">
         <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -926,12 +984,12 @@
   </transmission>
   <link name="lfmetacarpal">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.00568 0 -0.12061"/>
+      <origin rpy="0 0 0" xyz="-0.033 0 0.02071"/>
       <mass value="0.075"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="lfmetacarpal_visual">
         <mesh filename="package://sr_hand/model/meshes/lfmetacarpal.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -961,7 +1019,7 @@
   <joint name="LFJ5" type="revolute">
     <parent link="palm"/>
     <child link="lfmetacarpal"/>
-    <origin rpy="0 0 0" xyz="-0.01671 0 0.044"/>
+    <origin rpy="0 0 0" xyz="-0.033 0 0.02071"/>
     <axis xyz="0.57 0 0.82"/>
     <limit effort="10" lower="0" upper="0.69813170079773179" velocity="1.0"/>
     <dynamics damping="50.5"/>
@@ -975,12 +1033,12 @@
   </transmission>
   <link name="lfknuckle">
     <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0.0425"/>
+      <origin rpy="0 0 0" xyz="0 0 0.06579"/>
       <mass value="0.008"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="knuckle_visual">
         <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -1010,7 +1068,7 @@
   <joint name="LFJ4" type="revolute">
     <parent link="lfmetacarpal"/>
     <child link="lfknuckle"/>
-    <origin rpy="0 0 0" xyz="-0.01671 0 0.044"/>
+    <origin rpy="0 0 0" xyz="0 0 0.06579"/>
     <axis xyz="0 1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
     <dynamics damping="50.5"/>
@@ -1029,7 +1087,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="proximal_visual">
         <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -1078,7 +1136,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="middle_visual">
         <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -1127,7 +1185,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="distal_visual">
         <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -1172,7 +1230,7 @@
   <link name="thbase">
     <inertial>
       <mass value="0.010"/>
-      <origin rpy="0 0 0" xyz="0.034 0.0085 0.02924"/>
+      <origin rpy="0 0 0" xyz="0.034 0.0085 0.029"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
@@ -1208,7 +1266,7 @@
   <joint name="THJ5" type="revolute">
     <parent link="palm"/>
     <child link="thbase"/>
-    <origin rpy="0 0.785398163397 0" xyz="0.034 -0.0085 0.02924"/>
+    <origin rpy="0 0.785398163397 0" xyz="0.034 -0.0085 0.029"/>
     <axis xyz="0 0 -1"/>
     <limit effort="10" lower="-1.047" upper="1.047" velocity="1.0"/>
     <dynamics damping="50.5"/>
@@ -1229,7 +1287,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="thproximal_visual">
-        <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.01 0.01 0.01"/>
+        <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="shadow_thproximal_material">
         <color rgba="0.2 0.2 0.2 1.0"/>
@@ -1329,7 +1387,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="thmiddle_visual">
         <mesh filename="package://sr_hand/model/meshes/TH2_z.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -1380,7 +1438,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 3.14159265359" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="thdistal_visual">
         <mesh filename="package://sr_hand/model/meshes/TH1_z.mesh" scale="0.001 0.001 0.001"/>
       </geometry>

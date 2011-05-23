@@ -1,9 +1,0 @@
-[Core]
-Name = hand_joint_sliders
-Module = hand_joint_sliders
-
-[Documentation]
-Author = Ugo Cupcic
-Version = 0.1
-Website = http://www.shadowrobot.com
-Description = ShadowHand

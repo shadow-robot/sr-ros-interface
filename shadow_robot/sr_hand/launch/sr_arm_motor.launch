@@ -189,8 +189,7 @@
 
 	<!--
 	    Diagnostic Aggregator
-                          -->
-
+	    -->
 	<node pkg="diagnostic_aggregator" type="aggregator_node" name="sr_diagnostic_aggregator"
 		machine="robot">
 		<rosparam command="load" file="$(find sr_hand)/shadowhand_analyzer.yaml"

@@ -1,3 +1,20 @@
+#!/usr/bin/env python
+#
+# Copyright 2011 Shadow Robot Company Ltd.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 from Grasp import Grasp
 
 class GraspInterpoler:
@@ -15,13 +32,13 @@ class GraspInterpoler:
 		self.grasp_to = grasp_to
 
 		# store the joints in common between the 2 grasps, with a table
-		# [ starting_value, end_value ] 
+		# [ starting_value, end_value ]
 		self.from_grasp1_to_grasp2 = {}
 
 		for joint in self.grasp_from.joints_and_positions.keys():
             #if joint in self.grasp_to.joints_and_positions.keys():
 			self.from_grasp1_to_grasp2.update({joint: [self.grasp_from.joints_and_positions.get(joint),self.grasp_to.joints_and_positions.get(joint)]})
-        
+
 	def set_percentage_grasp1_to_grasp2(self, percentage):
 		"""
 		move to a given percentage between grasp1 and grasp2
@@ -33,11 +50,11 @@ class GraspInterpoler:
 		positions_to_send = {}
 
 		for joint in self.from_grasp1_to_grasp2.iteritems():
-			new_target = percentage/100.0 * (joint[1][1] - joint[1][0]) 
+			new_target = percentage/100.0 * (joint[1][1] - joint[1][0])
 			positions_to_send.update({joint[0]:new_target})
 
 		return positions_to_send
-               
+
 	def interpolate(self, percentage):
 		position_to_send = {}
 		for name, position in self.grasp_to.joints_and_positions.items():

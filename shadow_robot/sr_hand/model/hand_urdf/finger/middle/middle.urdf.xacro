@@ -9,7 +9,7 @@
   <include filename="$(find sr_hand)/model/hand_urdf/finger/middle/middle.transmission.xacro" />
 
   <xacro:macro name="middle" params="link_prefix joint_prefix parent">
-  
+
     <link name="${link_prefix}middle">
       <inertial>
 	<origin xyz="0 0 0.045" rpy="0 0 0" />
@@ -18,7 +18,7 @@
 	izz="0.0" />
       </inertial>
       <visual>
-	<origin xyz="0 0 0" rpy="0 -${M_PI/2} 0" />
+	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="middle_visual">
       <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001" />
       </geometry>
@@ -32,7 +32,6 @@
       </collision>
     </link>
     <gazebo reference="${link_prefix}middle">
-
       <sensor:contact name="${link_prefix}middle_contact_sensor">
         <geom>${link_prefix}middle_geom</geom>
        <updateRate>100.0</updateRate>
@@ -44,10 +43,9 @@
           <interface:bumper name="${link_prefix}middle_gazebo_ros_bumper_iface" />
         </controller:gazebo_ros_bumper>
       </sensor:contact>
-
       <material>Gazebo/Grey</material>
     </gazebo>
-    
+
     <joint name="${joint_prefix}J2" type="revolute">
       <parent link="${parent}"/>
       <child link="${link_prefix}middle"/>
@@ -59,7 +57,7 @@
     </joint>
 
     <xacro:middle_transmission />
-  
+
   </xacro:macro>
-  
+
 </robot>

@@ -9,18 +9,18 @@
   <include filename="$(find sr_hand)/model/hand_urdf/thumb/thproximal.transmission.xacro" />
 
   <xacro:macro name="thproximal" params="parent">
-  
+
     <link name="thproximal">
       <inertial>
 	<mass value="0.016" />
-	<origin xyz="0 0 0" rpy="0 0 0"/> 
+	<origin xyz="0 0 0" rpy="0 0 0"/>
 	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
 	izz="0.0" />
       </inertial>
       <visual>
 	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="thproximal_visual">
-      <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.01 0.01 0.01" />
+      <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.001 0.001 0.001" />
       </geometry>
       <material name="shadow_thproximal_material">
 	  <color rgba="0.2 0.2 0.2 1.0"/>
@@ -45,10 +45,9 @@
           <interface:bumper name="thproximal_gazebo_ros_bumper_iface" />
         </controller:gazebo_ros_bumper>
       </sensor:contact>
-
       <material>Gazebo/Grey</material>
     </gazebo>
-    
+
     <joint name="THJ4" type="revolute">
       <parent link="${parent}"/>
       <child link="thproximal"/>
@@ -60,7 +59,7 @@
     </joint>
 
     <xacro:thproximal_transmission />
-  
+
   </xacro:macro>
-  
+
 </robot>

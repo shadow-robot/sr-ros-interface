@@ -3,6 +3,22 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu May 13 09:44:52 2010
  *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief This program remapps the force information contained in
  * /joint_states coming from the hand to the /cybergraspforces topic
  * used to control the cybergrasp.
@@ -25,7 +41,7 @@ using namespace ros;
 namespace shadowhand_to_cyberglove_remapper
 {
 
-const int ShadowhandToCybergloveRemapper::number_hand_joints = 20;
+const unsigned int ShadowhandToCybergloveRemapper::number_hand_joints = 20;
 
 ShadowhandToCybergloveRemapper::ShadowhandToCybergloveRemapper() :
     n_tilde("~")
@@ -91,7 +107,7 @@ void ShadowhandToCybergloveRemapper::jointstatesCallback( const sensor_msgs::Joi
     pub.sendupdate_length = number_hand_joints;
 
     std::vector<sr_robot_msgs::joint> table(number_hand_joints);
-    for( unsigned int i = 0; i < number_hand_joints; ++i )
+    for(unsigned int i = 0; i < number_hand_joints; ++i )
     {
         joint.joint_name = joints_names[i];
         joint.joint_target = vect[i];

@@ -3,10 +3,25 @@
 * @author Ugo Cupcic <ugo@shadowrobot.com>
 * @date   Thu Mar 25 15:36:41 2010
 *
-* @brief The goal of this ROS publisher is to publish relevant data
-* concerning the hand at a regular time interval.
-* Those data are (not exhaustive): positions, targets, temperatures,
-* currents, forces, error flags, ...
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+* @brief The goal of this ROS publisher is to publish raw and calibrated
+* joint positions from the cyberglove at a regular time interval. We're
+* oversampling to get a better accuracy on our data.
 *
 *
 */
@@ -18,20 +33,20 @@
 #include <string>
 #include <sstream>
 
-#include "cyberglove/serial_glove.h"
 #include "cyberglove/cyberglove_publisher.h"
 
 using namespace ros;
 using namespace xml_calibration_parser;
 
-namespace cyberglove_publisher{
+namespace cyberglove{
 
   /////////////////////////////////
   //    CONSTRUCTOR/DESTRUCTOR   //
   /////////////////////////////////
 
   CyberglovePublisher::CyberglovePublisher()
-    : n_tilde("~"), publish_rate(0.0), path_to_glove("/dev/ttyS0"), publishing(true)
+    : n_tilde("~"), sampling_rate(0.0), publish_counter_max(0), publish_counter_index(0),
+      path_to_glove("/dev/ttyS0"), publishing(true)
   {
 
     std::string path_to_calibration;
@@ -40,37 +55,68 @@ namespace cyberglove_publisher{
 
     initialize_calibration(path_to_calibration);
 
-    // set publish frequency
+    //set sampling frequency
+    double sampling_freq;
+    n_tilde.param("sampling_frequency", sampling_freq, 100.0);
+    sampling_rate = Rate(sampling_freq);
+
+    // set publish_counter: the number of data we'll average
+    // before publishing.
     double publish_freq;
     n_tilde.param("publish_frequency", publish_freq, 20.0);
-    publish_rate = Rate(publish_freq);
+    publish_counter_max = (int)(sampling_freq / publish_freq);
+
+    ROS_INFO_STREAM("Sampling at " << sampling_freq << "Hz ; Publishing at "
+                    << publish_freq << "Hz ; Publish counter: "<< publish_counter_max);
 
     // set path to glove
     n_tilde.param("path_to_glove", path_to_glove, std::string("/dev/ttyS0"));
     ROS_INFO("Opening glove on port: %s", path_to_glove.c_str());
 
-    int error = setup_glove( path_to_glove.c_str() );
-    //sleep 1s to be sure the glove had enough time to start 
-    sleep(1);
+    //initialize the connection with the cyberglove and binds the callback function
+    serial_glove = boost::shared_ptr<CybergloveSerial>(new CybergloveSerial(path_to_glove, boost::bind(&CyberglovePublisher::glove_callback, this, _1, _2)));
 
-    if( error != 0 )
-      ROS_ERROR("Couldn't initialize the glove, is the glove plugged in?");
-    else
-      {
-	//publishes calibrated JointState messages
-	std::string prefix;
-	std::string searched_param;
-	n_tilde.searchParam("cyberglove_prefix", searched_param);
-	n_tilde.param(searched_param, prefix, std::string());
-	std::string full_topic = prefix + "/calibrated/joint_states";
-	cyberglove_pub = n_tilde.advertise<sensor_msgs::JointState>(full_topic, 2);
+    int res = -1;
+    cyberglove_freq::CybergloveFreq frequency;
 
-	//publishes raw JointState messages
-	n_tilde.searchParam("cyberglove_prefix", searched_param);
-	n_tilde.param(searched_param, prefix, std::string());
-	full_topic = prefix + "/raw/joint_states";
-	cyberglove_raw_pub = n_tilde.advertise<sensor_msgs::JointState>(full_topic, 2);
-      }
+    switch( (int)sampling_freq)
+    {
+    case 100:
+      res = serial_glove->set_frequency(frequency.hundred_hz);
+      break;
+    case 45:
+      res = serial_glove->set_frequency(frequency.fourtyfive_hz);
+      break;
+    case 10:
+      res = serial_glove->set_frequency(frequency.ten_hz);
+      break;
+    case 1:
+      res = serial_glove->set_frequency(frequency.one_hz);
+      break;
+    default:
+      res = serial_glove->set_frequency(frequency.hundred_hz);
+      break;
+    }
+    //No filtering: we're oversampling the data, we want a fast poling rate
+    res = serial_glove->set_filtering(false);
+    //We want the glove to transmit the status (light on/off)
+    res = serial_glove->set_transmit_info(true);
+    //start reading the data.
+    res = serial_glove->start_stream();
+
+    //publishes calibrated JointState messages
+    std::string prefix;
+    std::string searched_param;
+    n_tilde.searchParam("cyberglove_prefix", searched_param);
+    n_tilde.param(searched_param, prefix, std::string());
+    std::string full_topic = prefix + "/calibrated/joint_states";
+    cyberglove_pub = n_tilde.advertise<sensor_msgs::JointState>(full_topic, 2);
+
+    //publishes raw JointState messages
+    n_tilde.searchParam("cyberglove_prefix", searched_param);
+    n_tilde.param(searched_param, prefix, std::string());
+    full_topic = prefix + "/raw/joint_states";
+    cyberglove_raw_pub = n_tilde.advertise<sensor_msgs::JointState>(full_topic, 2);
 
     //initialises joint names (the order is important)
     jointstate_msg.name.push_back("G_ThumbRotate");
@@ -102,7 +148,7 @@ namespace cyberglove_publisher{
   CyberglovePublisher::~CyberglovePublisher()
   {
   }
-  
+
   void CyberglovePublisher::initialize_calibration(std::string path_to_calibration)
   {
     calibration_parser = XmlCalibrationParser(path_to_calibration);
@@ -111,112 +157,92 @@ namespace cyberglove_publisher{
   bool CyberglovePublisher::isPublishing()
   {
     if (publishing)
-      {
-	return true;
-      }
+    {
+      return true;
+    }
     else
-      {
-	//check if the value was read
-	if( checkGloveState() )
-	  {
-	    ROS_INFO("The glove button was switched on, starting to publish data.");
-	    publishing = true;
-	  }
-	
-	ros::spinOnce();
-	publish_rate.sleep();
-	return false;
-      }
+    {
+      return false;
+    }
   }
 
-  void CyberglovePublisher::setPublishing(bool value){
+  void CyberglovePublisher::setPublishing(bool value)
+  {
     publishing = value;
   }
 
   /////////////////////////////////
-  //       PUBLISH METHOD        //
+  //       CALLBACK METHOD       //
   /////////////////////////////////
-  void CyberglovePublisher::publish()
+  void CyberglovePublisher::glove_callback(std::vector<float> glove_pos, bool light_on)
   {
-    //if (!publishing) return;
-    //read the state of the glove button
-    if( !checkGloveState() )
+    //if the light is off, we don't publish any data.
+    if( !light_on )
+    {
+      publishing = false;
+      ROS_DEBUG("The glove button is off, no data will be read / sent");
+      ros::spinOnce();
+      sampling_rate.sleep();
+      return;
+    }
+    publishing = true;
+
+    //appends the current position to the vector of position
+    glove_positions.push_back( glove_pos );
+
+    //if we've enough samples, publish the data:
+    if( publish_counter_index == publish_counter_max )
+    {
+      //reset the messages
+      jointstate_msg.position.clear();
+      jointstate_msg.velocity.clear();
+      jointstate_raw_msg.position.clear();
+      jointstate_raw_msg.velocity.clear();
+
+      //fill the joint_state msg with the averaged glove data
+      for(unsigned int index_joint = 0; index_joint < CybergloveSerial::glove_size; ++index_joint)
       {
-	publishing = false;
-	ROS_INFO("The glove button is off, no data will be read / sent");
-	ros::spinOnce();
-	publish_rate.sleep();
-	return;
+        //compute the average over the samples for the current joint
+        float averaged_value = 0.0f;
+        for (unsigned int index_sample = 0; index_sample < publish_counter_max; ++index_sample)
+        {
+          averaged_value += glove_positions[index_sample][index_joint];
+        }
+        averaged_value /= publish_counter_max;
+
+        jointstate_raw_msg.position.push_back(averaged_value);
+        add_jointstate(averaged_value, jointstate_msg.name[index_joint]);
       }
 
-    //read data from the glove
-    try
-      {
-	glovePositions = glove_get_values();
-      }
-    catch(int e)
-      {
-	ROS_ERROR("The glove values can't be read");
-	ros::spinOnce();
-	publish_rate.sleep();
-	return;
-      }
+      //publish the msgs
+      cyberglove_pub.publish(jointstate_msg);
+      cyberglove_raw_pub.publish(jointstate_raw_msg);
 
-    //reset the messages
-    jointstate_msg.effort.clear();
-    jointstate_msg.position.clear();
-    jointstate_msg.velocity.clear();
-    jointstate_raw_msg.effort.clear();
-    jointstate_raw_msg.position.clear();
-    jointstate_raw_msg.velocity.clear();
+      publish_counter_index = 0;
+      glove_positions.clear();
+    }
 
-    //fill the joint_state msg with the glove data
-    for(unsigned int i=0; i<GLOVE_SIZE; ++i)
-      {
-	jointstate_raw_msg.position.push_back(glovePositions[i]);
-	add_jointstate(glovePositions[i], jointstate_msg.name[i]);
-      }
-    //publish the msgs
-    cyberglove_pub.publish(jointstate_msg);
-    cyberglove_raw_pub.publish(jointstate_raw_msg);
-
+    publish_counter_index += 1;
     ros::spinOnce();
-    publish_rate.sleep();
+    sampling_rate.sleep();
   }
 
   void CyberglovePublisher::add_jointstate(float position, std::string joint_name)
   {
-    //can't read the effort from the glove
-    jointstate_msg.effort.push_back(0.0);
-
     //get the calibration value
     float calibration_value = calibration_parser.get_calibration_value(position, joint_name);
-    std::cout << calibration_value << std::endl;
     //publish the glove position
     jointstate_msg.position.push_back(calibration_value);
-    //set velocity to 0. 
+    //set velocity to 0.
     //@TODO : send the correct velocity ?
     jointstate_msg.velocity.push_back(0.0);
   }
-
-  bool CyberglovePublisher::checkGloveState()
-  {
-    int gloveButtonState = -1;
-    gloveButtonState =  read_button_value();
-    
-    //check if the value was read
-    switch( gloveButtonState)
-      {
-      case 0:
-	return false;
-      case 1:
-	return true;
-      default:
-	ROS_ERROR("The glove button state value couldn't be read.");
-	return false;
-      }
-  }
-
 }// end namespace
 
 
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
