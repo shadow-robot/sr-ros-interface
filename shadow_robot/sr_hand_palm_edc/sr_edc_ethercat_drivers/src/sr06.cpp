@@ -98,6 +98,76 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 						exit(1); \
 					}
 
+
+
+/** \brief Constructor of the SR06 driver
+ *
+ *  This is the Constructor of the driver. it creates a bunch of real time publishers to publich the joints data
+ *  initializes a few boolean values, a mutex and creates the Flashing service.
+ */
+//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
+
+SR06::SR06()
+  : SR0X(),
+    which_motors(0),
+    which_data_from_motors(0),
+    flashing(false),
+    can_message_sent(true),
+    can_packet_acked(true),
+    zero_buffer_read(0)
+{
+  int res;
+  res = pthread_mutex_init(&mutex, NULL);
+  check_for_pthread_mutex_init_error(res);
+
+  pthread_mutex_lock(&mutex);
+  //char          topic_name[16];
+  //unsigned char i;
+  counter_ = 0;
+
+  ROS_ERROR("There are %d sensors\n", ETHERCAT_OUTGOING_DATA_SIZE/2);
+  ROS_ERROR("There are %d sensors\n", nb_sensors_const);
+
+  ros::Rate tmp(100);
+  for (unsigned int i = 0 ; i < nb_sensors_const ; ++i)
+  {
+    std::stringstream ss;
+    ss << "j" << i;
+    //sprintf(topic_name, "j%d", i);
+    std::string topic_name = ss.str();
+    ROS_ERROR("Topic: %s  /  %d\n", topic_name.c_str(), nb_sensors_const);
+    realtime_pub_.push_back(boost::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::Int16> >(new realtime_tools::RealtimePublisher<std_msgs::Int16>(nodehandle_, topic_name, 100)) );
+    ros::spinOnce();
+    tmp.sleep();
+  }
+
+  ROS_ERROR("Done\n");
+
+  ROS_INFO(     "device_pub_freq_const = %d", device_pub_freq_const      );
+  ROS_INFO(        "ros_pub_freq_const = %d", ros_pub_freq_const         );
+  ROS_INFO(            "max_iter_const = %d", max_iter_const             );
+  ROS_INFO(          "nb_sensors_const = %d", nb_sensors_const           );
+  ROS_INFO("nb_publish_by_unpack_const = %d", nb_publish_by_unpack_const );
+
+  res = pthread_mutex_init(&producing, NULL);
+  check_for_pthread_mutex_init_error(res);
+
+  serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::SimpleMotorFlasher, this);
+
+  pthread_mutex_unlock(&mutex);
+}
+
+/** \brief Desctructor of the SR06 driver
+ *
+ *  This is the Destructor of the driver. it frees the FMMUs and SyncManagers which have been allocated during the construct.
+ */
+SR06::~SR06()
+{
+  delete sh_->get_fmmu_config();
+  delete sh_->get_pd_config();
+}
+
+
 /** \brief Erase the PIC18F Flash memory
  *
  *  This function fills the can_message_ struct with a CAN message
@@ -151,7 +221,6 @@ void SR06::erase_flash(void)
       ROS_ERROR("ERASE command timedout, resending it !");
     }
   } while (timedout);
-
 }
 
 /** \brief Function that reads back 8 bytes from PIC18F program memory
@@ -273,7 +342,7 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
   binary_content = NULL;
   flashing = true;
 
-  ROS_ERROR("DEBUT DU SERVICE\n");
+  ROS_ERROR("Flashing the motor\n");
 
   bfd_init();
 
@@ -618,73 +687,6 @@ bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Reque
   return true;
 }
 
-/** \brief Constructor of the SR06 driver
- *
- *  This is the Constructor of the driver. it creates a bunch of real time publishers to publich the joints data
- *  initializes a few boolean values, a mutex and creates the Flashing service.
- */
-//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
-
-SR06::SR06()
-  : SR0X(),
-    which_motors(0),
-    which_data_from_motors(0),
-    flashing(false),
-    can_message_sent(true),
-    can_packet_acked(true),
-    zero_buffer_read(0)
-{
-  int res;
-  res = pthread_mutex_init(&mutex, NULL);
-  check_for_pthread_mutex_init_error(res);
-
-  pthread_mutex_lock(&mutex);
-  //char          topic_name[16];
-  //unsigned char i;
-  counter_ = 0;
-
-  ROS_ERROR("There are %d sensors\n", ETHERCAT_OUTGOING_DATA_SIZE/2);
-  ROS_ERROR("There are %d sensors\n", nb_sensors_const);
-
-  ros::Rate tmp(100);
-  for (unsigned int i = 0 ; i < nb_sensors_const ; ++i)
-  {
-    std::stringstream ss;
-    ss << "j" << i;
-    //sprintf(topic_name, "j%d", i);
-    std::string topic_name = ss.str();
-    ROS_ERROR("Topic: %s  /  %d\n", topic_name.c_str(), nb_sensors_const);
-    realtime_pub_.push_back(boost::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::Int16> >(new realtime_tools::RealtimePublisher<std_msgs::Int16>(nodehandle_, topic_name, 100)) );
-    ros::spinOnce();
-    tmp.sleep();
-  }
-
-  ROS_ERROR("Done\n");
-
-  ROS_INFO(     "device_pub_freq_const = %d", device_pub_freq_const      );
-  ROS_INFO(        "ros_pub_freq_const = %d", ros_pub_freq_const         );
-  ROS_INFO(            "max_iter_const = %d", max_iter_const             );
-  ROS_INFO(          "nb_sensors_const = %d", nb_sensors_const           );
-  ROS_INFO("nb_publish_by_unpack_const = %d", nb_publish_by_unpack_const );
-
-  res = pthread_mutex_init(&producing, NULL);
-  check_for_pthread_mutex_init_error(res);
-
-  serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::SimpleMotorFlasher, this);
-
-  pthread_mutex_unlock(&mutex);
-}
-
-/** \brief Desctructor of the SR06 driver
- *
- *  This is the Destructor of the driver. it frees the FMMUs and SyncManagers which have been allocated during the construct.
- */
-SR06::~SR06()
-{
-  delete sh_->get_fmmu_config();
-  delete sh_->get_pd_config();
-}
-
 /** \brief Construct function, run at startup to set SyncManagers and FMMUs
  *
  *  The role of this function is to setup the SyncManagers and the FMMUs used by this EtherCAT slave.
@@ -694,7 +696,7 @@ SR06::~SR06()
  *
  *  We communicate using Shared Memory areas.
  *
- *  The FMMUs are usefull to map the logical memory used by ROS to the Physical memory of the EtherCAT slave chip (ET1200 chip).
+ *  The FMMUs are useful to map the logical memory used by ROS to the Physical memory of the EtherCAT slave chip (ET1200 chip).
  *  So that the chip, receiving the packet will know that the data at address 0x10000 is in reality to be written at physical address 0x1000 of the chip memory for example.
  *  It is the mapping between the EtherCAT bus address space and each slave's chip own memory address space.
  *
@@ -810,7 +812,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
  *  This function provides diagnostics data that can be displayed by the runtime_monitor node
  */
 void SR06::diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *) {
-stringstream name;
+  stringstream name;
   name << "EtherCAT Device #" << setw(2) << setfill('0')
        << sh_->get_ring_position() << " (Product SIX)";
   d.name = name.str();
@@ -825,6 +827,8 @@ stringstream name;
   d.addf("Serial Number", "%d", sh_->get_serial());
   d.addf("Revision", "%d", sh_->get_revision());
   d.addf("Counter", "%d", ++counter_);
+
+  ROS_ERROR_STREAM("Diag: "<<d);
   EthercatDevice::ethercatDiagnostics(d, 2);
 }
 
@@ -1008,8 +1012,8 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   if ( !(res = pthread_mutex_trylock(&mutex)) )
     return false;
 
-  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
-  ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING  *tbuffer  = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_                               );
+  ETHERCAT_CAN_BRIDGE_DATA                        *can_data = (ETHERCAT_CAN_BRIDGE_DATA                       *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE );
 
   static unsigned int i = 0;
   static unsigned int num_rxed_packets = 0;
@@ -1020,6 +1024,10 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //received empty message: the pic is not writing to its mailbox.
     ++zero_buffer_read;
     ROS_ERROR("Reception error detected : %d errors out of %d rxed packets\n", ++zero_buffer_read, num_rxed_packets);
+  }
+  else
+  {
+    ROS_ERROR("Test data %02x %02x %02x %02x %02x %02x %02x %02x ", (int)this_buffer[0], (int)this_buffer[1], (int)this_buffer[2], (int)this_buffer[3], (int)this_buffer[4], (int)this_buffer[5], (int)this_buffer[6], (int)this_buffer[7]);
   }
 /*
   for (j = 0 ; j < 20 ; ++j)
