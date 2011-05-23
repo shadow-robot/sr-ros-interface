@@ -1,3 +1,29 @@
+/**
+ * @file   sr06.h
+ * @author Yann Sionneau <yann.sionneau@gmail.com>, Hugo Elias <hugo@shadowrobot.com>,
+ *         Ugo Cupcic <ugo@shadowrobot.com>, contact <contact@shadowrobot.com>
+ * @date   Mon May 23 13:33:30 2011
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+ * @brief This is a ROS driver for Shadow Robot #6 EtherCAT Slave
+ *
+ *
+ */
+
 #ifndef SR06_H
 #define SR06_H
 
@@ -10,17 +36,9 @@
 #include <bfd.h>
 #include <boost/smart_ptr.hpp>
 
-typedef unsigned char       int8u;
-typedef   signed char       int8s;
-
-typedef unsigned short      int16u;
-typedef   signed short      int16s;
-
-typedef unsigned int        int32u;
-typedef   signed int        int32s;
-
+#include <sr_edc_ethercat_drivers/types_for_external.h>
 extern "C" {
-	#include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
+  #include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
 }
 
 class SR06 : public SR0X
@@ -33,7 +51,7 @@ public:
   int  initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_unprogrammed=true);
   void diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *);
 
-  bool SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res);
+  bool simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res);
   void packCommand(unsigned char *buffer, bool halt, bool reset);
   bool unpackState(unsigned char *this_buffer, unsigned char *prev_buffer);
   bool can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet);
@@ -45,7 +63,9 @@ protected:
   int                                                                  counter_;
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING                       data_;
   ros::NodeHandle                                                      nodehandle_;
-  std::vector< boost::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::Int16> > >   realtime_pub_;
+
+  typedef realtime_tools::RealtimePublisher<std_msgs::Int16> rt_pub_int16_t;
+  std::vector< boost::shared_ptr<rt_pub_int16_t> >   realtime_pub_;
 
 private:
 
