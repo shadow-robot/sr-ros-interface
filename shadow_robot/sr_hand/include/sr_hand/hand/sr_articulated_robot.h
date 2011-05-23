@@ -272,8 +272,9 @@ namespace shadowrobot
  * One (or more) ROS subscriber and publisher can then share the same instance
  * of a Shadowhand object to update the information contained in this object.
  */
-class SRArticulatedRobot : boost::noncopyable
-{
+  class SRArticulatedRobot : boost::noncopyable
+  {
+  public:
     /**
      * empty constructor.
      */
