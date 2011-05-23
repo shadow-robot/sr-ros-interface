@@ -48,6 +48,7 @@ using namespace std;
 #include <sr_edc_ethercat_drivers/types_for_external.h>
 extern "C" {
   #include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
+  #include "external/simplemotor-bootloader/bootloader.h"
 }
 
 #define ETHERCAT_OUTGOING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING)
@@ -62,13 +63,7 @@ const unsigned int       SR06::max_retry                  = 10;
 
 
 #define ETHERCAT_CAN_BRIDGE_DATA_SIZE sizeof(ETHERCAT_CAN_BRIDGE_DATA)
-//TODO: aren't those defined somewhere else?
-#define WRITE_FLASH_DATA_COMMAND	0x00
-#define READ_FLASH_COMMAND		0x01
-#define ERASE_FLASH_COMMAND		0x02
-#define RESET_COMMAND			0x03
-#define READ_VERSION_COMMAND		0x04
-#define WRITE_FLASH_ADDRESS_COMMAND	0x05
+
 
 PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 

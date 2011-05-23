@@ -99,3 +99,5 @@ tmp
 shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/include/external/0220_palm_edc
 ￼
 shadow_robot/sr_hand_palm_edc/build
+￼
+shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/include/external/simplemotor-bootloader
