@@ -1,8 +1,29 @@
-/*  This is a ROS driver for Shadow Robot #6 EtherCAT Slave
+/**
+ * @file   sr06.cpp
+ * @author Yann Sionneau <yann.sionneau@gmail.com>, Hugo Elias <hugo@shadowrobot.com>,
+ *         Ugo Cupcic <ugo@shadowrobot.com>, contact <contact@shadowrobot.com>
+ * @date   Mon May 23 13:33:30 2011
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+ * @brief This is a ROS driver for Shadow Robot #6 EtherCAT Slave
  *
- *  by Yann Sionneau <yann.sionneau@gmail.com>
- *  published under GPL
+ *
  */
+
 
 #include <sr_edc_ethercat_drivers/sr06.h>
 
@@ -41,7 +62,7 @@ const unsigned int       SR06::max_retry                  = 10;
 
 
 #define ETHERCAT_CAN_BRIDGE_DATA_SIZE sizeof(ETHERCAT_CAN_BRIDGE_DATA)
-//aren't those defined somewhere else?
+//TODO: aren't those defined somewhere else?
 #define WRITE_FLASH_DATA_COMMAND	0x00
 #define READ_FLASH_COMMAND		0x01
 #define ERASE_FLASH_COMMAND		0x02
@@ -89,6 +110,192 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 						ROS_ERROR("mutex error %s:%d", __FILE__, __LINE__); \
 						exit(1); \
 					}
+
+
+/** \brief Constructor of the SR06 driver
+ *
+ *  This is the Constructor of the driver. it creates a bunch of real time publishers to publish the joints data
+ *  initializes a few boolean values, a mutex and creates the Flashing service.
+ */
+//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
+
+SR06::SR06()
+  : SR0X(),
+    which_motors(0),
+    which_data_from_motors(0),
+    flashing(false),
+    can_message_sent(true),
+    can_packet_acked(true),
+    zero_buffer_read(0)
+{
+  int res;
+  res = pthread_mutex_init(&mutex, NULL);
+  check_for_pthread_mutex_init_error(res);
+
+  pthread_mutex_lock(&mutex);
+  counter_ = 0;
+
+  ROS_ERROR("There are %lu sensors\n", ETHERCAT_OUTGOING_DATA_SIZE/2);
+  ROS_ERROR("There are %d sensors\n", nb_sensors_const);
+
+  ros::Rate tmp(100);
+  for (unsigned int i = 0 ; i < nb_sensors_const ; ++i)
+  {
+    std::stringstream ss;
+    ss << "j" << i;
+    std::string topic_name = ss.str();
+    ROS_ERROR("Topic: %s  /  %d\n", topic_name.c_str(), nb_sensors_const);
+    realtime_pub_.push_back(boost::shared_ptr<rt_pub_int16_t >(new rt_pub_int16_t(nodehandle_, topic_name, 100)) );
+    ros::spinOnce();
+    tmp.sleep();
+  }
+
+  ROS_ERROR("Done\n");
+
+  ROS_INFO(     "device_pub_freq_const = %d", device_pub_freq_const      );
+  ROS_INFO(        "ros_pub_freq_const = %d", ros_pub_freq_const         );
+  ROS_INFO(            "max_iter_const = %d", max_iter_const             );
+  ROS_INFO(          "nb_sensors_const = %d", nb_sensors_const           );
+  ROS_INFO("nb_publish_by_unpack_const = %d", nb_publish_by_unpack_const );
+
+  res = pthread_mutex_init(&producing, NULL);
+  check_for_pthread_mutex_init_error(res);
+
+  serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::simple_motor_flasher, this);
+
+  pthread_mutex_unlock(&mutex);
+}
+
+/** \brief Desctructor of the SR06 driver
+ *
+ *  This is the Destructor of the driver. it frees the FMMUs and SyncManagers which have been allocated during the construct.
+ */
+SR06::~SR06()
+{
+  delete sh_->get_fmmu_config();
+  delete sh_->get_pd_config();
+}
+
+/** \brief Construct function, run at startup to set SyncManagers and FMMUs
+ *
+ *  The role of this function is to setup the SyncManagers and the FMMUs used by this EtherCAT slave.
+ *  This slave is using two Mailboxes on two different memory areas.
+ *
+ *  Here we are setting up the way of communicating between ROS and the PIC32 using the EtherCAT protocol.
+ *
+ *  We communicate using Shared Memory areas.
+ *
+ *  The FMMUs are usefull to map the logical memory used by ROS to the Physical memory of the EtherCAT slave chip (ET1200 chip).
+ *  So that the chip, receiving the packet will know that the data at address 0x10000 is in reality to be written at physical address 0x1000 of the chip memory for example.
+ *  It is the mapping between the EtherCAT bus address space and each slave's chip own memory address space.
+ *
+ *  The SyncManagers are usefull to give a safe way of accessing this Shared Memory, using a consumer / producer model. There are features like interrupts to tell the consumer
+ *  that there is something to consume or to tell the producer that the Mailbox is empty and then ready to receive a new message.
+ *
+ *  - One Mailbox contains the commands, written by ROS, read by the PIC32
+ *  - One Mailbox contains the status, written back by the PIC32, read by ROS
+ *
+ *  That's basically one Mailbox for upstream and one Mailbox for downstream.
+ *
+ * - The first Mailbox contains in fact two commands, one is the torque demand, the other is a CAN command used in CAN_DIRECT_MODE to communicate with the SimpleMotor for
+ *   test purposes, or to reflash a new firmware in bootloading mode.
+ *   This Mailbox is at logicial address 0x10000 and mapped via a FMMU to physical address 0x1000 (the first address of user memory)
+ * - The second Mailbox contains in fact two status, they are the response of the two previously described commands. One is the status containing the joints data, sensor
+ *   data, finger tips data and motor data. The other is the can command response in CAN_DIRECT_MODE. When doing a flashing in bootloading mode this is usually an acknowledgment
+ *   from the bootloader. This Mailbox is at logical address 0x10038 and mapped via a FMMU to physical address 0x1038.
+ *
+ * This function sets the two private members command_size_ and status_size_ to be the size of each Mailbox.
+ * It is important for these numbers to be accurate since they are used by the EthercatHardware class when manipulating the buffers.
+ * If you need to have several commands like in this SR06 driver, put the sum of the size, same thing for the status.
+ *
+ */
+void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
+{
+  SR0X::construct(sh, start_address);
+
+  command_base_ = start_address;
+  command_size_ = ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
+  ROS_ERROR("First FMMU (command) : start_address : 0x%08X ; size : 0x%lX ; phy addr : 0x%08X\n", start_address, ETHERCAT_INCOMING_DATA_SIZE, EC_PALM_EDC_COMMAND_PHY_BASE);
+  EC_FMMU *commandFMMU = new EC_FMMU(start_address,
+                                     ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,		// Logical Start Address
+                                     0x00,									// Logical Start Bit
+                                     0x07,									// Logical End Bit
+                                     EC_PALM_EDC_COMMAND_PHY_BASE,						// Physical Start Address
+                                     0x00,									// Physical Start Bit
+                                     false,									// Read Enable
+                                     true,									// Write Enable
+                                     true);									// Channel Enable
+  start_address += ETHERCAT_INCOMING_DATA_SIZE;
+  start_address += ETHERCAT_CAN_BRIDGE_DATA_SIZE;
+
+  status_base_ = start_address;
+
+  ROS_ERROR("Second FMMU (status) : start_address : 0x%08X ; size : 0x%lX ; phy addr : 0x%08X\n", start_address, ETHERCAT_OUTGOING_DATA_SIZE, EC_PALM_EDC_DATA_PHY_BASE);
+
+  EC_FMMU *statusFMMU = new EC_FMMU(start_address,
+                                    ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,
+                                    0x00,
+                                    0x07,
+                                    EC_PALM_EDC_DATA_PHY_BASE,
+                                    0x00,
+                                    true,
+                                    false,
+                                    true);
+
+  status_size_ = ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
+
+  EtherCAT_FMMU_Config *fmmu = new EtherCAT_FMMU_Config(2);
+
+  (*fmmu)[0] = *commandFMMU;
+  (*fmmu)[1] = *statusFMMU;
+
+  sh->set_fmmu_config(fmmu);
+
+  EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(4);
+
+  (*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE,           ETHERCAT_INCOMING_DATA_SIZE,   EC_QUEUED, EC_WRITTEN_FROM_MASTER);
+  //(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE,           ETHERCAT_INCOMING_DATA_SIZE,   EC_BUFFERED, EC_WRITTEN_FROM_MASTER);
+  (*pd)[1] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE, ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);
+  (*pd)[2] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE,              ETHERCAT_OUTGOING_DATA_SIZE,   EC_QUEUED);
+  (*pd)[3] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_IN_BASE,  ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED);
+
+
+
+  (*pd)[0].ChannelEnable = true;
+  (*pd)[0].ALEventEnable = true;
+  (*pd)[0].WriteEvent    = true;
+
+  (*pd)[1].ChannelEnable = true;
+  (*pd)[1].ALEventEnable = true;
+  (*pd)[1].WriteEvent    = true;
+
+  (*pd)[2].ChannelEnable = true;
+  (*pd)[3].ChannelEnable = true;
+
+  sh->set_pd_config(pd);
+
+  ROS_ERROR("status_size_ : %d ; command_size_ : %d\n", status_size_, command_size_);
+
+  ROS_INFO("Finished constructing the SR06 driver");
+}
+
+/**
+ *
+ */
+int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_unprogrammed)
+{
+
+  int retval = SR0X::initialize(hw, allow_unprogrammed);
+
+  ROS_ERROR("ETHERCAT_OUTGOING_DATA_SIZE = %lu bytes\n", ETHERCAT_OUTGOING_DATA_SIZE);
+  ROS_ERROR("ETHERCAT_INCOMING_DATA_SIZE = %lu bytes\n", ETHERCAT_INCOMING_DATA_SIZE);
+
+
+//  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
+
+  return retval;
+}
+
 
 /** \brief Erase the PIC18F Flash memory
  *
@@ -610,193 +817,6 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
   return true;
 }
 
-/** \brief Constructor of the SR06 driver
- *
- *  This is the Constructor of the driver. it creates a bunch of real time publishers to publich the joints data
- *  initializes a few boolean values, a mutex and creates the Flashing service.
- */
-//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
-
-SR06::SR06()
-  : SR0X(),
-    which_motors(0),
-    which_data_from_motors(0),
-    flashing(false),
-    can_message_sent(true),
-    can_packet_acked(true),
-    zero_buffer_read(0)
-{
-  int res;
-  res = pthread_mutex_init(&mutex, NULL);
-  check_for_pthread_mutex_init_error(res);
-
-  pthread_mutex_lock(&mutex);
-  //char          topic_name[16];
-  //unsigned char i;
-  counter_ = 0;
-
-  ROS_ERROR("There are %lu sensors\n", ETHERCAT_OUTGOING_DATA_SIZE/2);
-  ROS_ERROR("There are %d sensors\n", nb_sensors_const);
-
-  ros::Rate tmp(100);
-  for (unsigned int i = 0 ; i < nb_sensors_const ; ++i)
-  {
-    std::stringstream ss;
-    ss << "j" << i;
-    //sprintf(topic_name, "j%d", i);
-    std::string topic_name = ss.str();
-    ROS_ERROR("Topic: %s  /  %d\n", topic_name.c_str(), nb_sensors_const);
-    realtime_pub_.push_back(boost::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::Int16> >(new realtime_tools::RealtimePublisher<std_msgs::Int16>(nodehandle_, topic_name, 100)) );
-    ros::spinOnce();
-    tmp.sleep();
-  }
-
-  ROS_ERROR("Done\n");
-
-  ROS_INFO(     "device_pub_freq_const = %d", device_pub_freq_const      );
-  ROS_INFO(        "ros_pub_freq_const = %d", ros_pub_freq_const         );
-  ROS_INFO(            "max_iter_const = %d", max_iter_const             );
-  ROS_INFO(          "nb_sensors_const = %d", nb_sensors_const           );
-  ROS_INFO("nb_publish_by_unpack_const = %d", nb_publish_by_unpack_const );
-
-  res = pthread_mutex_init(&producing, NULL);
-  check_for_pthread_mutex_init_error(res);
-
-  serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::simple_motor_flasher, this);
-
-  pthread_mutex_unlock(&mutex);
-}
-
-/** \brief Desctructor of the SR06 driver
- *
- *  This is the Destructor of the driver. it frees the FMMUs and SyncManagers which have been allocated during the construct.
- */
-SR06::~SR06()
-{
-  delete sh_->get_fmmu_config();
-  delete sh_->get_pd_config();
-}
-
-/** \brief Construct function, run at startup to set SyncManagers and FMMUs
- *
- *  The role of this function is to setup the SyncManagers and the FMMUs used by this EtherCAT slave.
- *  This slave is using two Mailboxes on two different memory areas.
- *
- *  Here we are setting up the way of communicating between ROS and the PIC32 using the EtherCAT protocol.
- *
- *  We communicate using Shared Memory areas.
- *
- *  The FMMUs are usefull to map the logical memory used by ROS to the Physical memory of the EtherCAT slave chip (ET1200 chip).
- *  So that the chip, receiving the packet will know that the data at address 0x10000 is in reality to be written at physical address 0x1000 of the chip memory for example.
- *  It is the mapping between the EtherCAT bus address space and each slave's chip own memory address space.
- *
- *  The SyncManagers are usefull to give a safe way of accessing this Shared Memory, using a consumer / producer model. There are features like interrupts to tell the consumer
- *  that there is something to consume or to tell the producer that the Mailbox is empty and then ready to receive a new message.
- *
- *  - One Mailbox contains the commands, written by ROS, read by the PIC32
- *  - One Mailbox contains the status, written back by the PIC32, read by ROS
- *
- *  That's basically one Mailbox for upstream and one Mailbox for downstream.
- *
- * - The first Mailbox contains in fact two commands, one is the torque demand, the other is a CAN command used in CAN_DIRECT_MODE to communicate with the SimpleMotor for
- *   test purposes, or to reflash a new firmware in bootloading mode.
- *   This Mailbox is at logicial address 0x10000 and mapped via a FMMU to physical address 0x1000 (the first address of user memory)
- * - The second Mailbox contains in fact two status, they are the response of the two previously described commands. One is the status containing the joints data, sensor
- *   data, finger tips data and motor data. The other is the can command response in CAN_DIRECT_MODE. When doing a flashing in bootloading mode this is usually an acknowledgment
- *   from the bootloader. This Mailbox is at logical address 0x10038 and mapped via a FMMU to physical address 0x1038.
- *
- * This function sets the two private members command_size_ and status_size_ to be the size of each Mailbox.
- * It is important for these numbers to be accurate since they are used by the EthercatHardware class when manipulating the buffers.
- * If you need to have several commands like in this SR06 driver, put the sum of the size, same thing for the status.
- *
- */
-void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
-{
-  SR0X::construct(sh, start_address);
-
-  command_base_ = start_address;
-  command_size_ = ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
-  ROS_ERROR("First FMMU (command) : start_address : 0x%08X ; size : 0x%lX ; phy addr : 0x%08X\n", start_address, ETHERCAT_INCOMING_DATA_SIZE, EC_PALM_EDC_COMMAND_PHY_BASE);
-  EC_FMMU *commandFMMU = new EC_FMMU(start_address,
-                                     ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,		// Logical Start Address
-                                     0x00,									// Logical Start Bit
-                                     0x07,									// Logical End Bit
-                                     EC_PALM_EDC_COMMAND_PHY_BASE,						// Physical Start Address
-                                     0x00,									// Physical Start Bit
-                                     false,									// Read Enable
-                                     true,									// Write Enable
-                                     true);									// Channel Enable
-  start_address += ETHERCAT_INCOMING_DATA_SIZE;
-  start_address += ETHERCAT_CAN_BRIDGE_DATA_SIZE;
-
-  status_base_ = start_address;
-
-  ROS_ERROR("Second FMMU (status) : start_address : 0x%08X ; size : 0x%lX ; phy addr : 0x%08X\n", start_address, ETHERCAT_OUTGOING_DATA_SIZE, EC_PALM_EDC_DATA_PHY_BASE);
-
-  EC_FMMU *statusFMMU = new EC_FMMU(start_address,
-                                    ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,
-                                    0x00,
-                                    0x07,
-                                    EC_PALM_EDC_DATA_PHY_BASE,
-                                    0x00,
-                                    true,
-                                    false,
-                                    true);
-
-  status_size_ = ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
-
-  EtherCAT_FMMU_Config *fmmu = new EtherCAT_FMMU_Config(2);
-
-  (*fmmu)[0] = *commandFMMU;
-  (*fmmu)[1] = *statusFMMU;
-
-  sh->set_fmmu_config(fmmu);
-
-  EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(4);
-
-  (*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE,           ETHERCAT_INCOMING_DATA_SIZE,   EC_QUEUED, EC_WRITTEN_FROM_MASTER);
-  //(*pd)[0] = EC_SyncMan(EC_PALM_EDC_COMMAND_PHY_BASE,           ETHERCAT_INCOMING_DATA_SIZE,   EC_BUFFERED, EC_WRITTEN_FROM_MASTER);
-  (*pd)[1] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE, ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED, EC_WRITTEN_FROM_MASTER);
-  (*pd)[2] = EC_SyncMan(EC_PALM_EDC_DATA_PHY_BASE,              ETHERCAT_OUTGOING_DATA_SIZE,   EC_QUEUED);
-  (*pd)[3] = EC_SyncMan(EC_PALM_EDC_CAN_BRIDGE_MASTER_IN_BASE,  ETHERCAT_CAN_BRIDGE_DATA_SIZE, EC_QUEUED);
-
-
-
-  (*pd)[0].ChannelEnable = true;
-  (*pd)[0].ALEventEnable = true;
-  (*pd)[0].WriteEvent    = true;
-
-  (*pd)[1].ChannelEnable = true;
-  (*pd)[1].ALEventEnable = true;
-  (*pd)[1].WriteEvent    = true;
-
-  (*pd)[2].ChannelEnable = true;
-  (*pd)[3].ChannelEnable = true;
-
-  sh->set_pd_config(pd);
-
-  ROS_ERROR("status_size_ : %d ; command_size_ : %d\n", status_size_, command_size_);
-
-  ROS_INFO("Finished constructing the SR06 driver");
-}
-
-/**
- *
- */
-int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_unprogrammed)
-{
-
-  int retval = SR0X::initialize(hw, allow_unprogrammed);
-
-  ROS_ERROR("ETHERCAT_OUTGOING_DATA_SIZE = %lu bytes\n", ETHERCAT_OUTGOING_DATA_SIZE);
-  ROS_ERROR("ETHERCAT_INCOMING_DATA_SIZE = %lu bytes\n", ETHERCAT_INCOMING_DATA_SIZE);
-
-
-//  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
-
-  return retval;
-}
-
 /** \brief This function gives some diagnostics data
  *
  *  This function provides diagnostics data that can be displayed by the runtime_monitor node
@@ -844,6 +864,7 @@ void SR06::update_which_motors(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING   
   case 2: command->from_motor_data_type = MOTOR_DATA_PWM;        break;
   case 3: command->from_motor_data_type = MOTOR_DATA_FLAGS;      break;
   case 4: command->from_motor_data_type = MOTOR_DATA_CURRENT;    break;
+  default: ROS_ERROR_STREAM("Motor data type not recognized: "<<command->from_motor_data_type); break;
   }
 }
 
@@ -872,6 +893,8 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING   *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING *)buffer;
   ETHERCAT_CAN_BRIDGE_DATA	                 *message = (ETHERCAT_CAN_BRIDGE_DATA *)(buffer + ETHERCAT_INCOMING_DATA_SIZE);
+
+  //TODO: What's 20???
   signed short int motor[20] = {0};
 
   for (int i = 0 ; i < 20 ; ++i)

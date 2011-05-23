@@ -1,3 +1,29 @@
+/**
+ * @file   sr06.h
+ * @author Yann Sionneau <yann.sionneau@gmail.com>, Hugo Elias <hugo@shadowrobot.com>,
+ *         Ugo Cupcic <ugo@shadowrobot.com>, contact <contact@shadowrobot.com>
+ * @date   Mon May 23 13:33:30 2011
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+ * @brief This is a ROS driver for Shadow Robot #6 EtherCAT Slave
+ *
+ *
+ */
+
 #ifndef SR06_H
 #define SR06_H
 
@@ -37,7 +63,9 @@ protected:
   int                                                                  counter_;
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING                       data_;
   ros::NodeHandle                                                      nodehandle_;
-  std::vector< boost::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::Int16> > >   realtime_pub_;
+
+  typedef realtime_tools::RealtimePublisher<std_msgs::Int16> rt_pub_int16_t;
+  std::vector< boost::shared_ptr<rt_pub_int16_t> >   realtime_pub_;
 
 private:
 
