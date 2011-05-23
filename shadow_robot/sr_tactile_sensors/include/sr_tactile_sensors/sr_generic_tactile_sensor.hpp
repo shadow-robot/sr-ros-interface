@@ -51,7 +51,6 @@ namespace shadowrobot
      */
     void publish_current_values();
 
-  protected:
     /**
      * Needs to be implemented in the inheriting class
      *
