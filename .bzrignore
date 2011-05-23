@@ -167,3 +167,5 @@ shadow_robot/sr_tactile_sensors/bin
 shadow_robot/sr_tactile_sensors/build
 bin
 build
+￼
+shadow_robot/cyberglove/bin/test/test_calibration

@@ -1,14 +1,12 @@
 <launch>
 
   <!-- start gazebo with an empty plane -->
-  <param name="/use_sim_time" value="true" />
-  <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find sr_hand)/launch/gazebo/empty.world" respawn="false" output="screen">
-    <remap from="joint_states" to="gazebo/joint_states"/>
-  </node>
+<!--  <include file="$(find pr2_gazebo)/empty_world_paused.launch"/> -->
 
   <!-- spawn the arm model -->
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'" />
-  <node name="spawn_hand" pkg="gazebo_tools" type="gazebo_model" args="-p robot_description spawn" respawn="false" output="screen" />
+
+ <node name="spawn_shadowrobot" pkg="gazebo" type="spawn_model" args=" -unpause -urdf -param robot_description -model sr_arm_and_hand" respawn="false" output="screen" />
 
   <!-- Controllers for the arm -->
   <rosparam file="$(find sr_hand)/model/hand_urdf/hand_controller.yaml" command="load"/>
@@ -41,5 +39,4 @@
   <node name="spawn_thhub_controller" pkg="pr2_controller_manager" type="spawner" args="thhub_controller" respawn="false" output="screen" />
   <node name="spawn_thmiddle_controller" pkg="pr2_controller_manager" type="spawner" args="thmiddle_controller" respawn="false" output="screen" />
   <node name="spawn_thdistal_controller" pkg="pr2_controller_manager" type="spawner" args="thdistal_controller" respawn="false" output="screen" />
-
 </launch>

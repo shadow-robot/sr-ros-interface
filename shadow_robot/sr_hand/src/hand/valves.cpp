@@ -3,7 +3,7 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Wed Feb 9 14:56:10 2010
  *
- * @brief  This is a ROS Interface used to directly access the valves 
+ * @brief  This is a ROS Interface used to directly access the valves
  * on Shadow Robot's muscle robots.
  *
  */
@@ -59,7 +59,7 @@ namespace shadowrobot
   }
 
   void Valves::init_subs_and_pubs(int index_joint)
-  {    
+  {
     std::vector<std::string> subname(2);
     subname[0] = "Flex";
     subname[1] = "Ext";
@@ -79,7 +79,6 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index] << "_Pressure";
       std::string valve_name = ss_valve_name.str();
-      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       std::string topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
@@ -93,7 +92,6 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index] << "_Target";
       valve_name = ss_valve_name.str();
-      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
@@ -121,7 +119,6 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index] << "_Fill";
       valve_name = ss_valve_name.str();
-      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
@@ -135,7 +132,6 @@ namespace shadowrobot
       ss_valve_name << hand_joints[index_joint].joint_name << "_"
                     << subname[subname_index] << "_Empty";
       valve_name = ss_valve_name.str();
-      valves_names.push_back(valve_name);
       ROS_DEBUG("%s", valve_name.c_str());
       topic = valve_name + "/status";
       valves_publishers.push_back(n_tilde.advertise<std_msgs::Float64> (topic, 2));
@@ -146,17 +142,17 @@ namespace shadowrobot
   }
 
 
-/** 
+/**
  * callback function for the valves: send a command to a given valve.
- * 
+ *
  * we have on subscriber per valve. The subscriber index corresponds to the
  * index_valve. From this index_valve you can get the valve sensor
  * from the valves_sensors vector.
- * 
+ *
  * @param msg the msg containing a value to send to a valve controller.
  * @param index_valve the index of the valve in the valves_sensors vector.
- * 
- * @return 
+ *
+ * @return
  */
   void Valves::valve_command(const std_msgs::Float64ConstPtr& msg, int index_valve)
   {
@@ -165,7 +161,7 @@ namespace shadowrobot
   }
 
   /**
-   * Callback function for the periodic publishing: publishes the 
+   * Callback function for the periodic publishing: publishes the
    * data for each valve.
    **/
   void Valves::publish()
@@ -181,7 +177,7 @@ namespace shadowrobot
 
     ros::spinOnce();
     publish_rate.sleep();
-  
+
   }
 } //end namespace
 

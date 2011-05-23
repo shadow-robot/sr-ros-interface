@@ -21,16 +21,16 @@ class Joint():
 
 class ShadowHand_ROS():
     """
-    This is a python library used to easily access the shadow hand ROS interface. 
+    This is a python library used to easily access the shadow hand ROS interface.
     """
     def __init__(self):
         """
         Builds the library, creates the communication node in ROS and
-        initializes the hand publisher and subscriber to the default 
-        values of shadowhand_data and sendupdate 
+        initializes the hand publisher and subscriber to the default
+        values of shadowhand_data and sendupdate
         """
-        self.allJoints = [Joint("THJ1", "smart_motor_th1"), 
-                           Joint("THJ2", "smart_motor_th2", -30, 30), 
+        self.allJoints = [Joint("THJ1", "smart_motor_th1"),
+                           Joint("THJ2", "smart_motor_th2", -30, 30),
                            Joint("THJ3", "smart_motor_th3",-15, 15),
                            Joint("THJ4", "smart_motor_th4",0, 75),
                            Joint("THJ5", "smart_motor_th5",-60, 60),
@@ -45,16 +45,16 @@ class ShadowHand_ROS():
                            Joint("RFJ4", "smart_motor_rf4", -25,25),
                            Joint("LFJ0", "smart_motor_lf2", 0, 180),
                            Joint("LFJ3", "smart_motor_lf3"),
-                           Joint("LFJ4", "smart_motor_lf4", -25, 25), 
+                           Joint("LFJ4", "smart_motor_lf4", -25, 25),
                            Joint("LFJ5", "smart_motor_lf5", 0, 45),
-                           Joint("WRJ1", "smart_motor_wr1", -30, 40), 
+                           Joint("WRJ1", "smart_motor_wr1", -30, 40),
                            Joint("WRJ2", "smart_motor_wr2", -30, 10),
                            ]
         self.handJoints = []
-        self.armJoints = [Joint("trunk_rotation", "", -45, 90),
-                          Joint("shoulder_rotation", "", 0, 90),
-                          Joint("elbow_abduction", "", 0,120),
-                          Joint("forearm_rotation", "", -90,90)
+        self.armJoints = [Joint("ShoulderJRotate", "", -45, 90),
+                          Joint("ShoulderJSwing", "", 0, 90),
+                          Joint("ElbowJSwing", "", 0,120),
+                          Joint("ElbowJRotate", "", -90,90)
                          ]
         self.lastMsg = 0
         self.lastArmMsg = 0
@@ -77,7 +77,7 @@ class ShadowHand_ROS():
         self.dict_arm_tar = {}
         #rospy.init_node('python_hand_library')
         self.sendupdate_lock = threading.Lock()
-        
+
         ###
         # Grasps
         self.grasp_parser = GraspParser()
@@ -87,9 +87,9 @@ class ShadowHand_ROS():
         self.rootPath = self.rootPath[0]
         #print "path : "+self.rootPath
         self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasp/grasps.xml")
-      
+
         self.grasp_interpoler = 0
-        
+
         threading.Thread(None, rospy.spin)
 
     def create_grasp_interpoler(self, current_step, next_step):
@@ -99,12 +99,12 @@ class ShadowHand_ROS():
         """
         @param data: The ROS message received which called the callback
         If the message is the first received, initializes the dictionnaries
-        Else, it updates the lastMsg    
+        Else, it updates the lastMsg
         """
-        self.lastMsg = data;        
-        if self.isFirstMessage : 
+        self.lastMsg = data;
+        if self.isFirstMessage :
             self.init_actual_joints()
-            for joint in self.lastMsg.joints_list : 
+            for joint in self.lastMsg.joints_list :
                 self.dict_pos[joint.joint_name]=joint.joint_position
                 self.dict_tar[joint.joint_name]=joint.joint_target
             self.isFirstMessage = False
@@ -114,14 +114,14 @@ class ShadowHand_ROS():
         """
         @param data: The ROS message received which called the callback
         If the message is the first received, initializes the dictionnaries
-        Else, it updates the lastMsg    
+        Else, it updates the lastMsg
         """
-        self.lastArmMsg = data    
+        self.lastArmMsg = data
         if self.isFirstMessageArm :
-            for joint in self.lastArmMsg.joints_list : 
+            for joint in self.lastArmMsg.joints_list :
                 self.dict_arm_pos[joint.joint_name]=joint.joint_position
                 self.dict_arm_tar[joint.joint_name]=joint.joint_target
-       
+
     def init_actual_joints(self):
         """
         Initializes the library with just the fingers actually connected
@@ -144,21 +144,21 @@ class ShadowHand_ROS():
                 rospy.logerr("No hand found. Are you sure the ROS hand is running ?")
                 return False
         return True
- 
+
     def set_shadowhand_data_topic(self, topic):
         """
         @param topic: The new topic to be set as the hand publishing topic
         Set the library to listen to a new topic
         """
-        print 'Changing subscriber to ' + topic 
+        print 'Changing subscriber to ' + topic
         self.sub = rospy.Subscriber(topic, joints_data ,self.callback)
-    
+
     def set_sendupdate_topic(self, topic):
         """
         @param topic: The new topic to be set as the hand subscribing topic
         Set the library to publish to a new topic
         """
-        print 'Changing publisher to ' + topic 
+        print 'Changing publisher to ' + topic
         self.pub = rospy.Publisher(topic,sendupdate)
 
     def sendupdate_from_dict(self, dicti):
@@ -213,7 +213,7 @@ class ShadowHand_ROS():
         for joint in self.lastArmMsg.joints_list:
             if joint.joint_name == jointName:
                 return float(joint.joint_position)
-        return 'NaN'        
+        return 'NaN'
 
     def has_arm(self):
         """
@@ -225,18 +225,18 @@ class ShadowHand_ROS():
         if self.liste == 0:
             master = rosgraph.masterapi.Master('/rostopic')
             self.liste = master.getPublishedTopics('/')
-        for topic_typ in self.liste : 
-            for topic in topic_typ: 
+        for topic_typ in self.liste :
+            for topic in topic_typ:
                 if 'sr_arm/shadowhand_data' in topic :
                     self.hasarm = True
         return self.hasarm
-        
+
     def record_step_to_file(self, filename, grasp_as_xml):
         """
         @param filename: name (or path) of the file to save to
         @param grasp_as_xml: xml-formatted grasp
         Write the grasp at the end of the file, creates the file if does not exist
-        """    
+        """
         if os.path.exists(filename) :
             obj = open(filename, 'r')
             text = obj.readlines()
@@ -258,7 +258,7 @@ class ShadowHand_ROS():
         objFile=open(filename,'w')
         for key, value in self.dict_pos:
             objFile.write(key + ' ' + value + '\n')
-        objFile.close()    
+        objFile.close()
 
     def read_all_current_positions(self):
         """

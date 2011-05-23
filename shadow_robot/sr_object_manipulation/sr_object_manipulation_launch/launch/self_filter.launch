@@ -1,4 +1,5 @@
 <launch>
+
   <node pkg="robot_self_filter" type="self_filter" name="kinect_self_filter"
 	respawn="true" output="screen">
     <remap from="robot_description" to="robot_description"/>
