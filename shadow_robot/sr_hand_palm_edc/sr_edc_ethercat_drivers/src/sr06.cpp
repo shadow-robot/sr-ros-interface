@@ -24,17 +24,9 @@
 
 using namespace std;
 
-typedef unsigned char       int8u;
-typedef   signed char       int8s;
-
-typedef unsigned short      int16u;
-typedef   signed short      int16s;
-
-typedef unsigned int        int32u;
-typedef   signed int        int32s;
-
+#include <sr_edc_ethercat_drivers/types_for_external.h>
 extern "C" {
-	#include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
+  #include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
 }
 
 #define ETHERCAT_OUTGOING_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING)
@@ -49,7 +41,7 @@ const unsigned int       SR06::max_retry                  = 10;
 
 
 #define ETHERCAT_CAN_BRIDGE_DATA_SIZE sizeof(ETHERCAT_CAN_BRIDGE_DATA)
-
+//aren't those defined somewhere else?
 #define WRITE_FLASH_DATA_COMMAND	0x00
 #define READ_FLASH_COMMAND		0x01
 #define ERASE_FLASH_COMMAND		0x02
@@ -250,7 +242,7 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
  *
  *  @return This returns always true, the real return value is in the res parameter
  */
-bool SR06::SimpleMotorFlasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res)
+bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res)
 {
   int err;
   unsigned char cmd_sent;
@@ -643,7 +635,7 @@ SR06::SR06()
   //unsigned char i;
   counter_ = 0;
 
-  ROS_ERROR("There are %d sensors\n", ETHERCAT_OUTGOING_DATA_SIZE/2);
+  ROS_ERROR("There are %lu sensors\n", ETHERCAT_OUTGOING_DATA_SIZE/2);
   ROS_ERROR("There are %d sensors\n", nb_sensors_const);
 
   ros::Rate tmp(100);
@@ -670,7 +662,7 @@ SR06::SR06()
   res = pthread_mutex_init(&producing, NULL);
   check_for_pthread_mutex_init_error(res);
 
-  serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::SimpleMotorFlasher, this);
+  serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::simple_motor_flasher, this);
 
   pthread_mutex_unlock(&mutex);
 }
@@ -724,7 +716,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 
   command_base_ = start_address;
   command_size_ = ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE;
-  ROS_ERROR("First FMMU (command) : start_address : 0x%08X ; size : 0x%08X ; phy addr : 0x%08X\n", start_address, ETHERCAT_INCOMING_DATA_SIZE, EC_PALM_EDC_COMMAND_PHY_BASE);
+  ROS_ERROR("First FMMU (command) : start_address : 0x%08X ; size : 0x%lX ; phy addr : 0x%08X\n", start_address, ETHERCAT_INCOMING_DATA_SIZE, EC_PALM_EDC_COMMAND_PHY_BASE);
   EC_FMMU *commandFMMU = new EC_FMMU(start_address,
                                      ETHERCAT_INCOMING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,		// Logical Start Address
                                      0x00,									// Logical Start Bit
@@ -739,7 +731,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 
   status_base_ = start_address;
 
-  ROS_ERROR("Second FMMU (status) : start_address : 0x%08X ; size : 0x%08X ; phy addr : 0x%08X\n", start_address, ETHERCAT_OUTGOING_DATA_SIZE, EC_PALM_EDC_DATA_PHY_BASE);
+  ROS_ERROR("Second FMMU (status) : start_address : 0x%08X ; size : 0x%lX ; phy addr : 0x%08X\n", start_address, ETHERCAT_OUTGOING_DATA_SIZE, EC_PALM_EDC_DATA_PHY_BASE);
 
   EC_FMMU *statusFMMU = new EC_FMMU(start_address,
                                     ETHERCAT_OUTGOING_DATA_SIZE + ETHERCAT_CAN_BRIDGE_DATA_SIZE,
@@ -796,8 +788,8 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
   int retval = SR0X::initialize(hw, allow_unprogrammed);
 
-  ROS_ERROR("ETHERCAT_OUTGOING_DATA_SIZE = %d bytes\n", ETHERCAT_OUTGOING_DATA_SIZE);
-  ROS_ERROR("ETHERCAT_INCOMING_DATA_SIZE = %d bytes\n", ETHERCAT_INCOMING_DATA_SIZE);
+  ROS_ERROR("ETHERCAT_OUTGOING_DATA_SIZE = %lu bytes\n", ETHERCAT_OUTGOING_DATA_SIZE);
+  ROS_ERROR("ETHERCAT_INCOMING_DATA_SIZE = %lu bytes\n", ETHERCAT_INCOMING_DATA_SIZE);
 
 
 //  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
