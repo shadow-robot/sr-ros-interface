@@ -114,7 +114,7 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 
 /** \brief Constructor of the SR06 driver
  *
- *  This is the Constructor of the driver. it creates a bunch of real time publishers to publish the joints data
+ *  This is the Constructor of the driver. it creates a bunch of real time publishers to publich the joints data
  *  initializes a few boolean values, a mutex and creates the Flashing service.
  */
 //, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
@@ -162,7 +162,6 @@ SR06::SR06()
   check_for_pthread_mutex_init_error(res);
 
   serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::simple_motor_flasher, this);
-
   pthread_mutex_unlock(&mutex);
 }
 
@@ -296,7 +295,6 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   return retval;
 }
 
-
 /** \brief Erase the PIC18F Flash memory
  *
  *  This function fills the can_message_ struct with a CAN message
@@ -350,7 +348,6 @@ void SR06::erase_flash(void)
       ROS_ERROR("ERASE command timedout, resending it !");
     }
   } while (timedout);
-
 }
 
 /** \brief Function that reads back 8 bytes from PIC18F program memory
@@ -472,7 +469,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
   binary_content = NULL;
   flashing = true;
 
-  ROS_ERROR("DEBUT DU SERVICE\n");
+  ROS_ERROR("Flashing the motor\n");
 
   bfd_init();
 
@@ -822,7 +819,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
  *  This function provides diagnostics data that can be displayed by the runtime_monitor node
  */
 void SR06::diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *) {
-stringstream name;
+  stringstream name;
   name << "EtherCAT Device #" << setw(2) << setfill('0')
        << sh_->get_ring_position() << " (Product SIX)";
   d.name = name.str();
@@ -837,6 +834,8 @@ stringstream name;
   d.addf("Serial Number", "%d", sh_->get_serial());
   d.addf("Revision", "%d", sh_->get_revision());
   d.addf("Counter", "%d", ++counter_);
+
+  ROS_ERROR_STREAM("Diag: "<<d);
   EthercatDevice::ethercatDiagnostics(d, 2);
 }
 
@@ -1023,8 +1022,8 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   if ( !(res = pthread_mutex_trylock(&mutex)) )
     return false;
 
-  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *tbuffer = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_);
-  ETHERCAT_CAN_BRIDGE_DATA *can_data = (ETHERCAT_CAN_BRIDGE_DATA *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE);
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING  *tbuffer  = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING *)(this_buffer + command_size_                               );
+  ETHERCAT_CAN_BRIDGE_DATA                        *can_data = (ETHERCAT_CAN_BRIDGE_DATA                       *)(this_buffer + command_size_ + ETHERCAT_OUTGOING_DATA_SIZE );
 
   static unsigned int i = 0;
   static unsigned int num_rxed_packets = 0;
@@ -1035,6 +1034,10 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //received empty message: the pic is not writing to its mailbox.
     ++zero_buffer_read;
     ROS_ERROR("Reception error detected : %d errors out of %d rxed packets\n", ++zero_buffer_read, num_rxed_packets);
+  }
+  else
+  {
+    ROS_ERROR("Test data %02x %02x %02x %02x %02x %02x %02x %02x ", (int)this_buffer[0], (int)this_buffer[1], (int)this_buffer[2], (int)this_buffer[3], (int)this_buffer[4], (int)this_buffer[5], (int)this_buffer[6], (int)this_buffer[7]);
   }
 /*
   for (j = 0 ; j < 20 ; ++j)
