@@ -4,7 +4,7 @@
 
   <arg name="tabletop_segmentation_points_in" default="/camera/depth/points" />
 
-  <node pkg="tabletop_object_detector" name="tabletop_segmentation" type="tabletop_segmentation" respawn="true" output="screen"
+  <node pkg="tabletop_object_detector" name="tabletop_segmentation" type="tabletop_segmentation" respawn="false" output="screen"
 	machine="household_database">
     <!--topic remapping-->
     <remap from="cloud_in" to="$(arg tabletop_segmentation_points_in)" />
@@ -44,7 +44,7 @@
 
   <!--complete node -->
   <node pkg="tabletop_object_detector" name="tabletop_complete_node" type="tabletop_complete_node"
-	respawn="true" output="screen" machine="household_database"/>
+	respawn="false" output="screen" machine="household_database"/>
 
 </launch>
 

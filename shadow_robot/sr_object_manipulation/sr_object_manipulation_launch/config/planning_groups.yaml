@@ -5,28 +5,10 @@ groups:
 
   - name: right_arm
     joints:
-      trunk_rotation
-      shoulder_rotation
-      elbow_abduction
-      forearm_rotation
-      arm_link
-      WRJ2
-      WRJ1
-    links: 
-      shadowarm_base
-      shadowarm_trunk
-      shadowarm_upperarm
-      shadowarm_lowerarm
-      shadowarm_handsupport_motor 
-      forearm_motor
-      wrist
-      palm
-  - name: arms
-    joints: 
-      trunk_rotation
-      shoulder_rotation
-      elbow_abduction
-      forearm_rotation
+      ShoulderJRotate
+      ShoulderJSwing
+      ElbowJSwing
+      ElbowJRotate
       arm_link
       WRJ2
       WRJ1
@@ -35,12 +17,30 @@ groups:
       shadowarm_trunk
       shadowarm_upperarm
       shadowarm_lowerarm
-      shadowarm_handsupport_motor 
+      shadowarm_handsupport_motor
+      forearm_motor
+      wrist
+      palm
+  - name: arms
+    joints:
+      ShoulderJRotate
+      ShoulderJSwing
+      ElbowJSwing
+      ElbowJRotate
+      arm_link
+      WRJ2
+      WRJ1
+    links:
+      shadowarm_base
+      shadowarm_trunk
+      shadowarm_upperarm
+      shadowarm_lowerarm
+      shadowarm_handsupport_motor
       forearm_motor
       wrist
       palm
     planner_configs:
-      RRTkConfig2 SBLkConfig2 
+      RRTkConfig2 SBLkConfig2
 
   - name: r_end_effector
     links:

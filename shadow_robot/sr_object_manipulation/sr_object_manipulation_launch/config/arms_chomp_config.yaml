@@ -25,19 +25,19 @@ collision_links:
       thdistal
 
 joints_costs:
-      trunk_rotation: 1.0
-      shoulder_rotation: 1.0
-      elbow_abduction: 1.0
-      forearm_rotation: 1.0
+      ShoulderJRotate: 1.0
+      ShoulderJSwing: 1.0
+      ElbowJSwing: 1.0
+      ElbowJRotate: 1.0
       arm_link: 1.0
       WRJ2: 1.0
       WRJ1: 1.0
 
 joint_velocity_limits:
-      trunk_rotation: 1.0
-      shoulder_rotation: 1.0
-      elbow_abduction: 1.0
-      forearm_rotation: 1.0
+      ShoulderJRotate: 1.0
+      ShoulderJSwing: 1.0
+      ElbowJSwing: 1.0
+      ElbowJRotate: 1.0
       arm_link: 1.0
       WRJ2: 1.0
       WRJ1: 1.0

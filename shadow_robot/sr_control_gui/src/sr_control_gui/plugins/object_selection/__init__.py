@@ -6,7 +6,7 @@ import rospy
 
 from PyQt4 import QtCore, QtGui, Qt
 
-from generic_plugin import GenericPlugin
+from shadow_generic_plugin import ShadowGenericPlugin
 from config import Config
 
 from tabletop_object_detector.srv import TabletopDetection
@@ -336,7 +336,7 @@ class Model(object):
     def __init__(self):
         self.name = None
 
-class ObjectSelection(GenericPlugin):
+class ObjectSelection(ShadowGenericPlugin):
     """
     Contact the tabletop object detector to get a list of the objects on top
     of the table. Then possibility to select a detected object for picking it up.
@@ -344,7 +344,7 @@ class ObjectSelection(GenericPlugin):
     name = "Object Selection"
 
     def __init__(self):
-        GenericPlugin.__init__(self)
+        ShadowGenericPlugin.__init__(self)
 
         self.service_object_detector = None
         self.service_db_get_model_description = None
@@ -381,10 +381,7 @@ class ObjectSelection(GenericPlugin):
         self.is_activated = False
 
     def activate(self):
-        if self.is_activated:
-            return
-        self.is_activated = True
-
+        ShadowGenericPlugin.activate(self)
         if self.service_object_detector == None:
             rospy.wait_for_service('object_detection')
             self.service_object_detector = rospy.ServiceProxy('object_detection', TabletopDetection)
@@ -398,9 +395,6 @@ class ObjectSelection(GenericPlugin):
             self.service_tabletop_collision_map = rospy.ServiceProxy('/tabletop_collision_map_processing/tabletop_collision_map_processing', TabletopCollisionMapProcessing)
 
         self.object_chooser.draw()
-
-
-        GenericPlugin.activate(self)
 
     def get_object_name(self, model_id):
         """

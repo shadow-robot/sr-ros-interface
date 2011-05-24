@@ -2,7 +2,7 @@
   <include file="$(find sr_object_manipulation_launch)/machines/dataprocessing.machine"/>
 
   <node pkg="collision_map" type="collision_map_self_occ_node" name="collision_map_self_occ_node"
-	respawn="true" output="screen" machine="dataprocessing">
+	respawn="false" output="screen" machine="dataprocessing">
     <remap from="robot_description" to="robot_description"/>
 
     <!-- The default padding to be added for the body parts the robot can see
@@ -66,7 +66,7 @@
   <!-- send parameters needed for motion planning -->
   <rosparam command="load" ns="robot_description_planning" file="$(find sr_object_manipulation_launch)/config/planning_groups.yaml" />
 
-  <node machine="dataprocessing" pkg="planning_environment" type="environment_server" output="screen" name="environment_server">
+  <node machine="dataprocessing" pkg="planning_environment" type="environment_server" output="screen" name="environment_server" respawn="false">
     <remap from="collision_map" to="collision_map_occ" />
     <remap from="collision_map_update" to="collision_map_occ_update" />
 

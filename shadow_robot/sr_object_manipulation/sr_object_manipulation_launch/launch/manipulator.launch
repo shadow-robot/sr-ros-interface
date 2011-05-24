@@ -17,7 +17,7 @@
 	respawn="false">
   </node>
 
-  <node name="sr_grasp_planner" pkg="sr_grasp_planner" type="sr_grasp_planner"/>
+  <node name="sr_grasp_planner" pkg="sr_grasp_planner" type="sr_grasp_planner" respawn="false"/>
 
   <node name="object_manipulator" pkg="object_manipulator" type="object_manipulator_node"
 	respawn="false"
@@ -47,7 +47,7 @@
   </node>
 
 
-  <node pkg="trajectory_filter_server" name="trajectory_filter" type="trajectory_filter_server" output="screen">
+  <node pkg="trajectory_filter_server" name="trajectory_filter" type="trajectory_filter_server" output="screen" respawn="false">
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/joint_limits.yaml"/>
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/filters.yaml"/>
 
@@ -100,7 +100,7 @@
     <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/joint_limits.yaml"/>
   </node>
 
-  <node pkg="ompl_ros_interface" type="ompl_ros" name="ompl_planning" respawn="true" output="screen">
+  <node pkg="ompl_ros_interface" type="ompl_ros" name="ompl_planning" respawn="false" output="screen">
     <remap from="robot_description" to="robot_description" />
     <remap from="collision_map" to="collision_map_occ" />
     <remap from="collision_map_update" to="collision_map_occ_update" />
