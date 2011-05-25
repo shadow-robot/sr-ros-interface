@@ -64,7 +64,7 @@ rosbuild_link_boost(shadowhand_virtual thread)
 #    REAL ARM    #
 ##################
 
-#uncomment those lines if you build for the real hand
+##uncomment those lines if you build for the real hand
 #include_directories(/usr/realtime/include/)
 #LINK_LIBRARIES(pthread)
 #rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)

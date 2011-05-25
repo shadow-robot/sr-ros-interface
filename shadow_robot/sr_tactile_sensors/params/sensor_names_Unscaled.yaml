@@ -1,0 +1,19 @@
+
+display_names:
+  - 'ff'
+  - 'mf'
+  - 'rf'
+  - 'lf'
+  - 'th'
+sensor_touch_names:
+  - 'FF_Touch_Unscaled'
+  - 'MF_Touch_Unscaled'
+  - 'RF_Touch_Unscaled'
+  - 'LF_Touch_Unscaled'
+  - 'TH_Touch_Unscaled'
+sensor_temp_names:
+  - 'FF_Temp'
+  - 'MF_Temp'
+  - 'RF_Temp'
+  - 'LF_Temp'
+  - 'TH_Temp'

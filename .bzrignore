@@ -70,6 +70,7 @@ shadow_robot/sr_control_gui/images/glove_calibration/tmp
 shadow_robot/sr_convenient_dependencies/bin
 shadow_robot/sr_convenient_dependencies/build
 shadow_robot/sr_convenient_dependencies/src
+shadow_robot/sr_hand/CMakeLists.txt
 shadow_robot/dataglove/doc
 ￼
 shadow_robot/sr_control_gui/.pydevproject
@@ -125,3 +126,5 @@ shadow_robot/sr_hand/model/hand_urdf/shadowhand_motor_old.pdf
 sr_arm_motor_org.pdf
 sr_arm_motor.pdf
 sr_arm_motor.gv
+shadow_robot/sr_hand/CMakeLists.txt
+shadow_robot/sr_tactile_sensors/CMakeLists.txt
