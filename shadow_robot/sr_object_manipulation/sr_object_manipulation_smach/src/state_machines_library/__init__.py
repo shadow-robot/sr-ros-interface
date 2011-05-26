@@ -16,23 +16,3 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import roslib; roslib.load_manifest('sr_object_manipulation_smach')
-import rospy
-
-import smach
-import smach_ros
-
-from state_machines_library.full_object_manipulation import SrFullObjectManipulationStateMachine
-
-
-def main():
-    """
-    """
-    rospy.init_node('sr_object_manipulation_smach')
-    sm = SrFullObjectManipulationStateMachine()
-    sm.state_machine.execute()
-
-    rospy.spin()
-
-if __name__ == '__main__':
-    main()            

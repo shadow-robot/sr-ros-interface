@@ -4,14 +4,16 @@
      sr_object_manipulation_smach
 
   </description>
-  <author>Genevieve & Ugo</author>
-  <license>BSD</license>
+  <author>Ugo Cupcic / ugo@shadowrobot.com, contact@shadowrobot.com</author>
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_object_manipulation_smach</url>
   <depend package="rospy"/>
   <depend package="std_msgs"/>
   <depend package="sr_robot_msgs"/>
   <depend package="sensor_msgs"/>
+  <depend package="smach"/>
+  <depend package="smach_ros"/>
 
 </package>
 
