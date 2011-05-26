@@ -1,0 +1,18 @@
+<package>
+  <description brief="sr_object_manipulation_smach">
+
+     sr_object_manipulation_smach
+
+  </description>
+  <author>Genevieve & Ugo</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_object_manipulation_smach</url>
+  <depend package="rospy"/>
+  <depend package="std_msgs"/>
+  <depend package="sr_robot_msgs"/>
+  <depend package="sensor_msgs"/>
+
+</package>
+
+
