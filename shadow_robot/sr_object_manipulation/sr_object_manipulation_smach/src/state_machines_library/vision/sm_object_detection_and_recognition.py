@@ -20,13 +20,7 @@ import roslib; roslib.load_manifest('sr_object_manipulation_smach')
 import rospy
 import smach
 
-
-from tabletop_object_detector.srv import TabletopDetection
-from tabletop_object_detector.msg import TabletopDetectionResult
-from household_objects_database_msgs.srv import GetModelDescription
-
-
-from sr_generic_state_machine import SrGenericStateMachine
+from ..sr_generic_state_machine import SrGenericStateMachine
 
 class SrObjectDetectionAndRecognitionStateMachine(SrGenericStateMachine):
     """

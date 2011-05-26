@@ -23,7 +23,7 @@ import smach
 import smach_ros
 
 from sr_generic_state_machine import SrGenericStateMachine
-from object_detection_and_recognition import SrObjectDetectionAndRecognitionStateMachine
+from vision.object_detection_and_recognition import SrObjectDetectionAndRecognitionStateMachine
 
 
 class Starting(smach.State):
