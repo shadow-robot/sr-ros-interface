@@ -61,6 +61,6 @@ class SrFullObjectManipulationStateMachine(SrGenericStateMachine):
             self.state_machine.add('Starting', Starting(),
                                    transitions={'success':'DetectingAndRecognizingObjects'})
             self.state_machine.add('DetectingAndRecognizingObjects', self.object_detection.state_machine,
-                                   transitions={'success':'Finishing'},
-                                                remapping={'objects_data_in':'objects_data_out'} )
-            self.state_machine.add('Finishing', Finishing())
+                                   transitions={'success':'Finishing'} )
+            self.state_machine.add('Finishing', Finishing(),
+                                   remapping={'objects_data_in':'objects_data_out'})

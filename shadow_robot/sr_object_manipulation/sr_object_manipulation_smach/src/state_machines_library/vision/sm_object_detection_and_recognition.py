@@ -21,6 +21,9 @@ import rospy
 import smach
 
 from ..sr_generic_state_machine import SrGenericStateMachine
+from object_detection_and_recognition import ObjectDetection, CollisionMapProcessing, ObjectRecognition
+from object_detection_and_recognition import ObjectDetectionError, CollisionMapError, ObjectRecognitionError
+
 
 class SrObjectDetectionAndRecognitionStateMachine(SrGenericStateMachine):
     """
@@ -43,49 +46,31 @@ class SrObjectDetectionAndRecognitionStateMachine(SrGenericStateMachine):
                                        sm_output_keys=['objects_data_out'])
 
         with self.state_machine:
-            smach.StateMachine.add('DetectingTable', DetectingTable(),
-                                   transitions={'table_found':'DetectingObjects',
-                                                'no_table':'DetectingTable'},
-                                   remapping={'table_data_in':'table_data_out'})
-            
             smach.StateMachine.add('DetectingObjects', DetectingObjects(),
-                                   transitions={'objects_found':'RecognizingObjects',
-                                                'no_objects':'DetectingObjects'},
+                                   transitions={'objects_found':'ProcessingCollisionMap',
+                                                'no_objects':'DetectingObjects'})
+
+            smach.StateMachine.add('ProcessingCollisionMap', ProcessingCollisionMap(),
+                                   transitions={'success':'RecognizingObjects'},
                                    remapping={'objects_data_in':'objects_data_out'})
-            smach.StateMachine.add('RecognizingObjects', RecognizingObjects())
 
-class DetectingTable(smach.State):
-    """
-    Trying to detect the table in the point cloud.
-    """
-    
-    def __init__(self):
-        """
-        Detecting the table.
+            smach.StateMachine.add('RecognizingObjects', RecognizingObjects(),
+                                   remapping={'collision_map_in':'collision_map_out'})
 
-        The possible outcomes for this state are:
-         - table_found: detected the table, returns a bounding box
-         - no_table:    couldn't detect any table
-         - failed:      problem encountered
-        """
-        smach.State.__init__(self, outcomes=['table_found', 'no_table', 'failed'],
-                             output_keys=['table_data_out'])
-
-    def execute(self, userdata):
-        """
-        Starts the detection.
-        """
-        userdata.table_data_out = ['data']
-        return 'table_found'
 
 class DetectingObjects(smach.State):
     """
     Trying to detect the objects above the table.
     """
-    
+
     def __init__(self):
         """
         Detecting the objects on top of the table.
+
+        No inputs.
+
+        Outputs:
+          - objects_data_out contains a table of detected objects
 
         The possible outcomes for this state are:
          - object_founds: detected the objects, returns a bounding box
@@ -93,21 +78,70 @@ class DetectingObjects(smach.State):
          - failed:        problem encountered
         """
         smach.State.__init__(self, outcomes=['objects_found', 'no_objects', 'failed'],
-                             output_keys=['objects_data_out'],
-                             input_keys =['table_data_in'])
+                             output_keys=['objects_data_out'])
+
+        self.object_detection = ObjectDetection()
+        self.object_detection.activate()
 
     def execute(self, userdata):
         """
         Starts the detection.
         """
-        userdata.objects_data_out = ['data']
+        results = []
+        try:
+            results = self.object_detection.execute()
+        except ObjectDetectionError, e:
+            rospy.logerr(e.msg)
+            return 'failed'
+
+        #nothing was found
+        if results == []:
+            return 'no_objects'
+
+        userdata.objects_data_out = results
         return 'objects_found'
+
+
+class ProcessingCollisionMap(smach.State):
+    """
+    Processing the collision map.
+    """
+
+    def __init__(self):
+        """
+        Processing the collision map: adding the detected objects, etc...
+
+        The possible outcomes for this state are:
+         - success: collision map updated correctly
+         - failed:  problem encountered
+        """
+        smach.State.__init__(self, outcomes=['success', 'failed'],
+                             output_keys=['collision_map_out'],
+                             input_keys =['objects_data_in'])
+
+        self.collision_map_processor = CollisionMapProcessing()
+        self.collision_map_processor.activate()
+
+    def execute(self, userdata):
+        """
+        Starts the detection.
+        """
+        results = 0
+        try:
+            results = self.collision_map_processor.execute(userdata.objects_data_in)
+        except CollisionMapError,e:
+            rospy.logerr(e.msg)
+            return 'failed'
+
+        userdata.collision_map_out = results
+        return 'success'
+
 
 class RecognizingObjects(smach.State):
     """
     Trying to recognize the objects above the table.
     """
-    
+
     def __init__(self):
         """
         Recognizing the objects on top of the table.
@@ -118,15 +152,26 @@ class RecognizingObjects(smach.State):
         """
         smach.State.__init__(self, outcomes=['success','failed'],
                              output_keys=['objects_data_out'],
-                             input_keys =['objects_data_in'])
+                             input_keys =['collision_map_in'])
+
+        self.object_recognition = ObjectRecognition()
+        self.object_recognition.activate()
 
     def execute(self, userdata):
         """
         Starts the detection.
         """
-        userdata.objects_data_out = ['data']
+        results = 0
+
+        try:
+            results = self.object_recognition.execute(userdata.collision_map_in)
+        except ObjectRecognitionError, e:
+            rospy.logerr(e.msg)
+            return 'failed'
+
+        userdata.objects_data_out = results
         return 'success'
-        
+
 
 
 
