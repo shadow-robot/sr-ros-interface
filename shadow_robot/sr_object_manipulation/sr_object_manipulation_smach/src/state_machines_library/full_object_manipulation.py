@@ -56,7 +56,7 @@ class SrFullObjectManipulationStateMachine(SrGenericStateMachine):
         SrGenericStateMachine.__init__(self, sm_name="full_object_manipulation")
 
         self.object_detection = SrObjectDetectionAndRecognitionStateMachine()
-
+        self.introspection_server = smach_ros.IntrospectionServer("FullObjectManipulation", self.state_machine, "/FullObjectManipulation")
         with self.state_machine:
             self.state_machine.add('Starting', Starting(),
                                    transitions={'success':'DetectingAndRecognizingObjects'})
@@ -64,3 +64,5 @@ class SrFullObjectManipulationStateMachine(SrGenericStateMachine):
                                    transitions={'success':'Finishing'} )
             self.state_machine.add('Finishing', Finishing(),
                                    remapping={'objects_data_in':'objects_data_out'})
+
+        self.introspection_server.start()

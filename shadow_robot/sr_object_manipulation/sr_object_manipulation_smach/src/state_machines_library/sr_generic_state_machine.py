@@ -29,8 +29,7 @@ class SrGenericStateMachine(object):
     """
 
     state_machine = None
-    introspection_server = None
-    
+
     def __init__(self, sm_name, sm_outcomes = ['success', 'failed'], sm_output_keys = [], sm_input_keys = []):
         """
         Initializes the state machine with the given parameters.
@@ -40,8 +39,4 @@ class SrGenericStateMachine(object):
         self.state_machine = smach.StateMachine(outcomes = sm_outcomes,
                                                 output_keys = sm_output_keys,
                                                 input_keys = sm_input_keys)
-        
-        self.introspection_server = smach_ros.IntrospectionServer(sm_name,
-                                                                  self.state_machine,
-                                                                  '/'+sm_name)
-        self.introspection_server.start()
+
