@@ -23,7 +23,7 @@ import smach
 import smach_ros
 
 from sr_generic_state_machine import SrGenericStateMachine
-from vision.object_detection_and_recognition import SrObjectDetectionAndRecognitionStateMachine
+from vision.sm_object_detection_and_recognition import SrObjectDetectionAndRecognitionStateMachine
 
 
 class Starting(smach.State):
@@ -47,7 +47,7 @@ class SrFullObjectManipulationStateMachine(SrGenericStateMachine):
     object manipulation stack using Shadow Robot's hardware.
     """
     introspection_server = None
-    
+
     def __init__(self):
         """
         Initializes the object manipulation state machine using the state machines
