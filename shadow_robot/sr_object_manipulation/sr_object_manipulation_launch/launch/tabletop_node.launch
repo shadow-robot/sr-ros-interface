@@ -1,11 +1,10 @@
 <launch>
-  <include file="$(find sr_object_manipulation_launch)/machines/household_database.machine"/>
+<!--  <include file="$(find sr_object_manipulation_launch)/machines/household_database.machine"/> -->
 
 
   <arg name="tabletop_segmentation_points_in" default="/camera/depth/points" />
 
-  <node pkg="tabletop_object_detector" name="tabletop_segmentation" type="tabletop_segmentation" respawn="false" output="screen"
-	machine="household_database">
+  <node pkg="tabletop_object_detector" name="tabletop_segmentation" type="tabletop_segmentation" respawn="false" output="screen">
     <!--topic remapping-->
     <remap from="cloud_in" to="$(arg tabletop_segmentation_points_in)" />
     <remap from="segmentation_srv" to="tabletop_segmentation" />
@@ -14,17 +13,16 @@
     <!-- processing and filtering frame -->
     <!-- remove this entire block and processing and filtering will -->
     <!-- be done with default settings, in the incoming cloud frame -->
-    <param name="processing_frame" value="openni_camera" />
-    <param name="up_direction" value="-1.0" />
+    <param name="processing_frame" value="/base_link" />
+    <param name="up_direction" value="1.0" />
     <param name="z_filter_min" value="0.01" />
-    <param name="z_filter_max" value="1.0" />
+    <param name="z_filter_max" value="1.3" />
     <param name="table_z_filter_min" value="0.01" />
-    <param name="table_z_filter_max" value="0.5" />
+    <param name="table_z_filter_max" value="0.9" />
   </node>
 
   <node pkg="tabletop_object_detector" name="tabletop_object_recognition"
-	type="tabletop_object_recognition" respawn="false" output="screen"
-	machine="household_database">
+	type="tabletop_object_recognition" respawn="false" output="screen">
     <!--operational parameters-->
     <param name="perform_fit_merge" value="true" />
     <param name="fit_merge_threshold" value="0.05" />
@@ -44,7 +42,7 @@
 
   <!--complete node -->
   <node pkg="tabletop_object_detector" name="tabletop_complete_node" type="tabletop_complete_node"
-	respawn="false" output="screen" machine="household_database"/>
+	respawn="false" output="screen"/>
 
 </launch>
 
