@@ -2,7 +2,7 @@
 <!--  <include file="$(find sr_object_manipulation_launch)/machines/household_database.machine"/> -->
 
 
-  <arg name="tabletop_segmentation_points_in" default="/camera/depth/points" />
+  <arg name="tabletop_segmentation_points_in" default="/passthrough/output" />
 
   <node pkg="tabletop_object_detector" name="tabletop_segmentation" type="tabletop_segmentation" respawn="false" output="screen">
     <!--topic remapping-->

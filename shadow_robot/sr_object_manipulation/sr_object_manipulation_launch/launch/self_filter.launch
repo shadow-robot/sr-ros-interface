@@ -5,7 +5,7 @@
     <remap from="robot_description" to="robot_description"/>
 
     <!-- The topic for the input cloud -->
-    <remap from="cloud_in" to="/camera/depth/points" />
+    <remap from="cloud_in" to="/passthrough/output" />
     <!-- The topic for the output cloud -->
     <remap from="cloud_out" to="/kinect/depth/points_filtered2" />
 
