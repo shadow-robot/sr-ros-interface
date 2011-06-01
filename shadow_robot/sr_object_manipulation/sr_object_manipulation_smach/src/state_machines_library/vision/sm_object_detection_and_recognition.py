@@ -43,7 +43,10 @@ class SrObjectDetectionAndRecognitionStateMachine(SrGenericStateMachine):
          - failed:  a problem was encountered
         """
         SrGenericStateMachine.__init__(self, sm_name="object_detection",
-                                       sm_output_keys=['objects_data_out'])
+                                       sm_output_keys=['objects_data_out',
+                                                       'graspable_objects_out',
+                                                       'graspable_objects_names_out',
+                                                       'collision_support_surface_name_out'])
 
         with self.state_machine:
             smach.StateMachine.add('DetectingObjects', DetectingObjects(),
@@ -151,7 +154,10 @@ class RecognizingObjects(smach.State):
          - failed:  problem encountered
         """
         smach.State.__init__(self, outcomes=['success','failed'],
-                             output_keys=['objects_data_out'],
+                             output_keys=['objects_data_out',
+                                          'graspable_objects_out',
+                                          'graspable_objects_names_out',
+                                          'collision_support_surface_name_out'],
                              input_keys =['collision_map_in'])
 
         self.object_recognition = ObjectRecognition()
@@ -163,11 +169,21 @@ class RecognizingObjects(smach.State):
         """
         results = 0
 
+        userdata.collision_support_surface_name_out = userdata.collision_map_in.collision_support_surface_name
+        userdata.graspable_objects_out = userdata.collision_map_in.graspable_objects
+        userdata.graspable_objects_names_out = userdata.collision_map_in.collision_object_names
+
         try:
             results = self.object_recognition.execute(userdata.collision_map_in)
         except ObjectRecognitionError, e:
             rospy.logerr(e.msg)
             return 'failed'
+
+        print ""
+        print "---"
+        for obj in results:
+            print obj.model_description
+        print "---"
 
         userdata.objects_data_out = results
         return 'success'

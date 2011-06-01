@@ -24,7 +24,7 @@ import smach_ros
 
 from sr_generic_state_machine import SrGenericStateMachine
 from vision.sm_object_detection_and_recognition import SrObjectDetectionAndRecognitionStateMachine
-
+from pickup.sm_pickup_object import SrPickupObjectStateMachine
 
 class Starting(smach.State):
     def __init__(self):
@@ -41,6 +41,42 @@ class Finishing(smach.State):
     def execute(self, userdata):
         return 'success'
 
+class UserChooseObject(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['success','failed'],
+                             input_keys=['objects_data_in',
+                                         'graspable_objects_in',
+                                         'graspable_objects_names_in',
+                                         'collision_support_surface_name_in'],
+                             output_keys=['graspable_object_out',
+                                          'graspable_object_name_out',
+                                          'collision_support_surface_name_out'])
+    def execute(self, userdata):
+        print ""
+        print ""
+        print "----------------------------------"
+
+        for index,obj in enumerate(userdata.objects_data_in):
+            print "[", index,"]", obj.model_description
+
+        try:
+            chosen_index = int(raw_input("Choose the object you want to pickup: "))
+
+            print " ---> Picking up the ", userdata.objects_data_in[chosen_index].model_description
+            print "----------------------------------"
+            print ""
+            userdata.graspable_object_out = userdata.graspable_objects_in[chosen_index]
+            userdata.graspable_object_name_out = userdata.graspable_objects_names_in[chosen_index]
+            userdata.collision_support_surface_name_out = userdata.collision_support_surface_name_in
+
+            print userdata.graspable_objects_names_in[chosen_index]
+            print userdata.collision_support_surface_name_in
+        except:
+            return 'failed'
+
+        return 'success'
+
+
 class SrFullObjectManipulationStateMachine(SrGenericStateMachine):
     """
     Main class containing the complete state machine for the
@@ -56,12 +92,28 @@ class SrFullObjectManipulationStateMachine(SrGenericStateMachine):
         SrGenericStateMachine.__init__(self, sm_name="full_object_manipulation")
 
         self.object_detection = SrObjectDetectionAndRecognitionStateMachine()
+        self.pickup_object = SrPickupObjectStateMachine()
         self.introspection_server = smach_ros.IntrospectionServer("FullObjectManipulation", self.state_machine, "/FullObjectManipulation")
         with self.state_machine:
             self.state_machine.add('Starting', Starting(),
                                    transitions={'success':'DetectingAndRecognizingObjects'})
             self.state_machine.add('DetectingAndRecognizingObjects', self.object_detection.state_machine,
-                                   transitions={'success':'Finishing'} )
+                                   transitions={'success':'UserChooseObject'} )
+
+            self.state_machine.add('UserChooseObject', UserChooseObject(),
+                                   transitions={'success':'PickupObject',
+                                                'failed':'DetectingAndRecognizingObjects'},
+                                   remapping={'objects_data_in':'objects_data_out',
+                                              'graspable_objects_in':'graspable_objects_out',
+                                              'graspable_objects_names_in':'graspable_objects_names_out',
+                                              'collision_support_surface_name_in':'collision_support_surface_name_out'})
+
+            self.state_machine.add('PickupObject', self.pickup_object.state_machine,
+                                   transitions={'success':'Finishing'},
+                                   remapping={'graspable_object_in':'graspable_object_out',
+                                              'graspable_object_name_in':'graspable_object_name_out',
+                                              'collision_support_surface_name_in':'collision_support_surface_name_out'})
+
             self.state_machine.add('Finishing', Finishing(),
                                    remapping={'objects_data_in':'objects_data_out'})
 

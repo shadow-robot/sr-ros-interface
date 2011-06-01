@@ -77,6 +77,7 @@ class ObjectDetection(object):
         machine.
         """
         self.service_object_detector = None
+
     def activate(self):
         """
         Waits for the different services to appear, and initializes the connection
@@ -185,11 +186,10 @@ class ObjectRecognition(object):
 
         @return the list of detected objects updated with the model names and graspable objects
         """
-        graspable_objects = []
-        model_index = -1
         detected_objects = []
 
         for grasp_obj, grasp_obj_name in zip(collision_map_results.graspable_objects, collision_map_results.collision_object_names):
+            model_index = -1
             obj_tmp = GraspableObject(grasp_obj_name, grasp_obj)
             obj_tmp.graspable_object = grasp_obj
             obj_tmp.graspable_object_name = grasp_obj_name
