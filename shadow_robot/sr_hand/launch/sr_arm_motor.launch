@@ -162,9 +162,9 @@
 		args="0 0 0.0 0 0 0  /sr_arm/position/shadowarm_base /sr_arm/target/shadowarm_base 100" machine="robot"/>
 
 	<node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos"
-		args="0 0 0 3.14159 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100" machine="robot"/>
+		args="0 0 0 2.36 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100" machine="robot"/>
 	<node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target"
-		args="0 0 0 3.14159 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100"
+		args="0 0 0 2.36 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100"
 		machine="robot"/>
 
 	<!-- merge the arm / hand joint_states topics to publish onto /joint_states -->
