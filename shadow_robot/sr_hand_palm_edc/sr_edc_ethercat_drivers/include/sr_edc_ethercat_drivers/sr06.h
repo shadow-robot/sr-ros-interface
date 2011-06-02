@@ -57,11 +57,11 @@ public:
   bool can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet);
   void erase_flash();
   bool read_flash(unsigned int offset, unsigned char baddrl, unsigned char baddrh, unsigned char baddru);
-  void update_which_motors(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_INCOMING   *command);
+  void update_which_motors(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND   *command);
 
 protected:
   int                                                                  counter_;
-  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_OUTGOING                       data_;
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS                         data_;
   ros::NodeHandle                                                      nodehandle_;
 
   typedef realtime_tools::RealtimePublisher<std_msgs::Int16> rt_pub_int16_t;
