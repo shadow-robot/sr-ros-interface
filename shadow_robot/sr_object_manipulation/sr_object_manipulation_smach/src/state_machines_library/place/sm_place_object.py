@@ -91,7 +91,7 @@ class PlacingObject(smach.State):
                                          'collision_support_surface_name_in',
                                          'pickup_result_in',
                                          'list_of_poses_in'],
-                             output_keys=['place_results_out'])
+                             output_keys=['place_result_out'])
 
         self.place_object = PlaceObject()
         self.place_object.activate()
@@ -112,6 +112,6 @@ class PlacingObject(smach.State):
         if result == -1:
             return 'failed'
 
-        userdata.place_results_out = result
+        userdata.place_result_out = result
 
         return 'success'
