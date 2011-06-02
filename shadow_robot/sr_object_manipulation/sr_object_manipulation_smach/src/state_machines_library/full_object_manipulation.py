@@ -25,6 +25,7 @@ import smach_ros
 from sr_generic_state_machine import SrGenericStateMachine
 from vision.sm_object_detection_and_recognition import SrObjectDetectionAndRecognitionStateMachine
 from pickup.sm_pickup_object import SrPickupObjectStateMachine
+from place.sm_place_object import SrPlaceObjectStateMachine
 
 class Starting(smach.State):
     def __init__(self):
@@ -35,11 +36,26 @@ class Starting(smach.State):
 
 class Finishing(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['success','failed'],
+        smach.State.__init__(self, outcomes=['restart','success'],
                              input_keys=['objects_data_in'])
 
     def execute(self, userdata):
-        return 'success'
+        print ""
+        print ""
+        print "----------------------------------"
+
+        try:
+            result = raw_input("Do you want to restart? [y/N]")
+            if result == "y" or result == "Y":
+                print " -> RESTARTING..."
+                return 'restart'
+            else:
+                print " -> DONE"
+                return 'success'
+        except:
+            return 'success'
+
+        return 'restart'
 
 class UserChooseObject(smach.State):
     def __init__(self):
@@ -91,12 +107,16 @@ class SrFullObjectManipulationStateMachine(SrGenericStateMachine):
         """
         SrGenericStateMachine.__init__(self, sm_name="full_object_manipulation")
 
+        #initializing the other state machines
         self.object_detection = SrObjectDetectionAndRecognitionStateMachine()
         self.pickup_object = SrPickupObjectStateMachine()
+        self.place_object = SrPlaceObjectStateMachine()
+
         self.introspection_server = smach_ros.IntrospectionServer("FullObjectManipulation", self.state_machine, "/FullObjectManipulation")
+
         with self.state_machine:
             self.state_machine.add('Starting', Starting(),
-                                   transitions={'success':'DetectingAndRecognizingObjects'})
+                                   transitions={'success':'DetectingAndRecognizingObjects', 'failed':'Finishing'})
             self.state_machine.add('DetectingAndRecognizingObjects', self.object_detection.state_machine,
                                    transitions={'success':'UserChooseObject'} )
 
@@ -109,12 +129,20 @@ class SrFullObjectManipulationStateMachine(SrGenericStateMachine):
                                               'collision_support_surface_name_in':'collision_support_surface_name_out'})
 
             self.state_machine.add('PickupObject', self.pickup_object.state_machine,
-                                   transitions={'success':'Finishing'},
+                                   transitions={'success':'PlaceObject', 'failed':'Finishing'},
                                    remapping={'graspable_object_in':'graspable_object_out',
                                               'graspable_object_name_in':'graspable_object_name_out',
                                               'collision_support_surface_name_in':'collision_support_surface_name_out'})
 
+            self.state_machine.add('PlaceObject', self.place_object.state_machine,
+                                   transitions={'success': 'Finishing', 'failed':'Finishing'},
+                                   remapping={'graspable_object_in':'graspable_object_out',
+                                              'graspable_object_name_in':'graspable_object_name_out',
+                                              'collision_support_surface_name_in':'collision_support_surface_name_out',
+                                              'pickup_result_in':'pickup_result_out'})
+
             self.state_machine.add('Finishing', Finishing(),
+                                   transitions={'restart':'Starting'},
                                    remapping={'objects_data_in':'objects_data_out'})
 
         self.introspection_server.start()

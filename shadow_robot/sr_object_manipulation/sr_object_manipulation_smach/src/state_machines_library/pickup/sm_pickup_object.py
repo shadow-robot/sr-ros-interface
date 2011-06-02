@@ -35,7 +35,10 @@ class SrPickupObjectStateMachine(SrGenericStateMachine):
                                        sm_input_keys=['graspable_object_in',
                                                       'graspable_object_name_in',
                                                       'collision_support_surface_name_in'],
-                                       sm_output_keys=['pickup_result_out'])
+                                       sm_output_keys=['pickup_result_out',
+                                                       'graspable_object_out',
+                                                       'graspable_object_name_out',
+                                                       'collision_support_surface_name_out'])
         with self.state_machine:
             smach.StateMachine.add('PickingUpObject', PickingUpObject())
 
@@ -49,7 +52,10 @@ class PickingUpObject(smach.State):
                              input_keys=['graspable_object_in',
                                          'graspable_object_name_in',
                                          'collision_support_surface_name_in'],
-                             output_keys=['pickup_result_out'])
+                             output_keys=['pickup_result_out',
+                                          'graspable_object_out',
+                                          'graspable_object_name_out',
+                                          'collision_support_surface_name_out'])
         self.object_pickup = PickupObject()
         self.object_pickup.activate()
 
@@ -65,5 +71,8 @@ class PickingUpObject(smach.State):
             return 'failed'
 
         userdata.pickup_result_out = result
+        userdata.graspable_object_out = userdata.graspable_object_in
+        userdata.graspable_object_name_out = userdata.graspable_object_name_in
+        userdata.collision_support_surface_name_out = userdata.collision_support_surface_name_in
 
         return 'success'

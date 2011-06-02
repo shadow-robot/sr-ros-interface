@@ -41,7 +41,6 @@ class PickupObject(object):
         """
         self.pickup_client = None
 
-
     def activate(self):
         """
         Waits for the different services to appear, and initializes the connection
@@ -61,8 +60,6 @@ class PickupObject(object):
         """
         Pickup the object.
         """
-        print "PICKING UP: ",graspable_object_name, " from ", collision_support_surface_name
-
         pickup_goal = PickupGoal()
 
         pickup_goal.target = graspable_object
@@ -100,8 +97,6 @@ class PickupObject(object):
         rospy.loginfo("Got Pickup results")
 
         pickup_result = self.pickup_client.get_result()
-
-        print pickup_result
 
         if self.pickup_client.get_state() != GoalStatus.SUCCEEDED:
             rospy.logerr("The pickup action has failed: " + str(pickup_result.manipulation_result.value) )
