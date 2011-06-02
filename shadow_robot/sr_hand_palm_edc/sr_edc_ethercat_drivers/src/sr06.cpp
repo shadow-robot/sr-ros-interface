@@ -1075,12 +1075,9 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
  */
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
-  int res = -1;
-
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS  *status_data = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS *)(this_buffer + command_size_                             );
   ETHERCAT_CAN_BRIDGE_DATA                      *can_data    = (ETHERCAT_CAN_BRIDGE_DATA                     *)(this_buffer + command_size_ + ETHERCAT_STATUS_DATA_SIZE );
   int16u                                        *status_buffer = (int16u*)status_data;
-  static unsigned int i = 0;
   static unsigned int num_rxed_packets = 0;
 
   ++num_rxed_packets;
