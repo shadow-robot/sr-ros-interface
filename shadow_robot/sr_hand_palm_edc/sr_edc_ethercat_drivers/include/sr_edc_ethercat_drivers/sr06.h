@@ -61,7 +61,7 @@ public:
 
   void construct(EtherCAT_SlaveHandler *sh, int &start_address);
   int  initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_unprogrammed=true);
-  void diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *);
+  void multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsigned char *buffer);
 
   bool simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res);
   void packCommand(unsigned char *buffer, bool halt, bool reset);

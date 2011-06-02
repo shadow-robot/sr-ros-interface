@@ -871,9 +871,14 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
 
 /** \brief This function gives some diagnostics data
  *
- *  This function provides diagnostics data that can be displayed by the runtime_monitor node
+ *  This function provides diagnostics data that can be displayed by
+ *  the runtime_monitor node. We use the mutliDiagnostics as it publishes
+ *  the diagnostics for each motors.
  */
-void SR06::diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned char *) {
+void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsigned char *buffer)
+{
+  diagnostic_updater::DiagnosticStatusWrapper &d(diagnostic_status_);
+
   stringstream name;
   name << "EtherCAT Device #" << setw(2) << setfill('0')
        << sh_->get_ring_position() << " (Product SIX)";
@@ -890,8 +895,8 @@ void SR06::diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsigned 
   d.addf("Revision", "%d", sh_->get_revision());
   d.addf("Counter", "%d", ++counter_);
 
-  //ROS_ERROR_STREAM("Diag: "<<d);
-  EthercatDevice::ethercatDiagnostics(d, 2);
+  this->ethercatDiagnostics(d,2);
+  vec.push_back(d);
 }
 
 

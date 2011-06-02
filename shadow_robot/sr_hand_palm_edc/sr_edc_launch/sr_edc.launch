@@ -24,5 +24,10 @@ For the moment we do not do any calibration
   <!-- Default controllers -->
   <include file="$(find sr_edc_controller_configuration)/sr_edc_default_controllers.launch" />
 
+  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator">
+    <rosparam command="load"  file="$(find sr_edc_launch)/diagnostics_analyzer.yaml"/>
+  </node>
+
+
 </launch>
 
