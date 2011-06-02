@@ -183,6 +183,9 @@ SR06::SR06()
  */
 SR06::~SR06()
 {
+  for(unsigned int i = 0; i < actuators_.size(); ++i)
+    delete actuators_[i];
+
   delete sh_->get_fmmu_config();
   delete sh_->get_pd_config();
 }
@@ -311,6 +314,31 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 {
 
   int retval = SR0X::initialize(hw, allow_unprogrammed);
+
+  if(retval != 0)
+    return retval;
+
+  //initializing the actuators
+  std::map<const std::string, const int>::const_iterator iter;
+
+  for(iter = srh_mapping::joints_map.begin() ;
+      iter != srh_mapping::joints_map.end(); ++iter)
+  {
+    pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(iter->first.c_str());
+    actuators_.push_back( actuator );
+
+    if(hw)
+    {
+      if(!hw->addActuator(actuator) )
+      {
+        ROS_FATAL("An actuator of the name '%s' already exists.", actuator->name_.c_str());
+        return -1;
+      }
+    }
+  }
+
+
+
 
   ROS_ERROR("ETHERCAT_STATUS_DATA_SIZE      = %4d bytes", (int)ETHERCAT_STATUS_DATA_SIZE);
   ROS_ERROR("ETHERCAT_COMMAND_DATA_SIZE     = %4d bytes", (int)ETHERCAT_COMMAND_DATA_SIZE);
@@ -921,7 +949,7 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
   SR0X::packCommand(buffer, halt, reset);
 
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND   *command = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND *)(buffer                             );
-  ETHERCAT_CAN_BRIDGE_DATA	                      *message = (ETHERCAT_CAN_BRIDGE_DATA                      *)(buffer + ETHERCAT_COMMAND_DATA_SIZE);
+  ETHERCAT_CAN_BRIDGE_DATA	                  *message = (ETHERCAT_CAN_BRIDGE_DATA                      *)(buffer + ETHERCAT_COMMAND_DATA_SIZE);
 
 
 
@@ -935,6 +963,7 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
     command->EDC_command = EDC_COMMAND_CAN_DIRECT_MODE;
   }
 
+  //TODO change this to alternate between even and uneven motors + all the other data
   command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;			// Currently, the only data we send to motors is torque demand.
 
   update_which_motors(command);
@@ -1042,8 +1071,6 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
 bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
   int res = -1;
-  if ( !(res = pthread_mutex_trylock(&mutex)) )
-    return false;
 
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS  *status_data = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS *)(this_buffer + command_size_                             );
   ETHERCAT_CAN_BRIDGE_DATA                      *can_data    = (ETHERCAT_CAN_BRIDGE_DATA                     *)(this_buffer + command_size_ + ETHERCAT_STATUS_DATA_SIZE );
@@ -1053,100 +1080,35 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
   ++num_rxed_packets;
   if (status_data->EDC_command == EDC_COMMAND_INVALID)
-    {
-      //received empty message: the pic is not writing to its mailbox.
-      ++zero_buffer_read;
-      float percentage_packet_loss = 100.f * ((float)zero_buffer_read / (float)num_rxed_packets);
-      ROS_ERROR("Reception error detected : %d errors out of %d rxed packets (%2.3f%%)", zero_buffer_read, num_rxed_packets, percentage_packet_loss);
-    }
-  else
-    {
+  {
+    //received empty message: the pic is not writing to its mailbox.
+    ++zero_buffer_read;
+    float percentage_packet_loss = 100.f * ((float)zero_buffer_read / (float)num_rxed_packets);
+    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets (%2.3f%%)", zero_buffer_read, num_rxed_packets, percentage_packet_loss);
+    return false;
+  }
 
-      //ROS_ERROR("Time: %04x   J16: %04x", status_data->processing_time_us, status_data->LFJ5);
-      /*
-	ROS_ERROR("Test data %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x ", (int)status_data[ 0],
-	(int)status_data[ 2],
-	(int)status_data[ 3],
-	(int)status_data[ 4],
-	(int)status_data[ 5],
-	(int)status_data[ 6],
-	(int)status_data[ 7],
-	(int)status_data[ 8],
-	(int)status_data[ 9],
-	(int)status_data[10],
-	(int)status_data[11],
-	(int)status_data[12],
-	(int)status_data[13],
-	(int)status_data[14],
-	(int)status_data[15]);
-      */
-    }
-  /*
-    for (j = 0 ; j < NUM_MOTORS ; ++j)
-    {
-    ROS_ERROR("Motor[%d] : torque == %hd ; SG_L == %hu ; SG_R == %hu ; temp == %hd ; current == %hd ; flags == %hu\n", j, tbuffer->motor[j].torque, tbuffer->motor[j].SG_L, tbuffer->motor[j].SG_R, tbuffer->motor[j].temperature, tbuffer->motor[j].current, tbuffer->motor[j].flags);
-    }
-  */
-  //  ROS_ERROR("Motor[8] : torque == %hd ; SG_L == %hu ; SG_R == %hu ; temp == %hd ; current == %hd ; flags == %hu\n", tbuffer->motor[8].torque, tbuffer->motor[8].SG_L, tbuffer->motor[8].SG_R, tbuffer->motor[8].temperature, tbuffer->motor[8].current, tbuffer->motor[8].flags);
+  //ok the message was not empty
+  //@TODO: how do we get the current actuator state?
+  for(unsigned int i=0; i<actuators_.size(); ++i)
+  {
+    pr2_hardware_interface::Actuator* actuator = actuators_[i];
 
-  //  ROS_ERROR("CAN debug RXed : can_bus : %d ; message_length : %d ; message_id : 0x%04X ; message_data : 0x%02X 0x%02X 0x%02X 0x%02X\n", can_data->can_bus, can_data->message_length, can_data->message_id, can_data->message_data[0], can_data->message_data[1], can_data->message_data[2], can_data->message_data[3]);
+    pr2_hardware_interface::ActuatorState* state(&actuator->state_); // state[slave_offset]->
+
+    state->is_enabled_ = 1;
+    state->device_id_ = i;
+
+    state->position_ = status_data->LFJ5;
+  }
+
   if (flashing & !can_packet_acked)
+  {
+    if (can_data_is_ack(can_data))
     {
-      if (can_data_is_ack(can_data))
-	{
-	  can_packet_acked = true;
-	}
+      can_packet_acked = true;
     }
-
-  if (i == max_iter_const)
-    { // 10 == 100 Hz
-      i = 0;
-      unlock(&mutex);
-
-      ROS_DEBUG("Leaving UnpackState");
-      return true;
-    }
-  else if (i * nb_publish_by_unpack_const < nb_sensors_const)
-    {
-      std_msgs::Int16 *msg = (std_msgs::Int16*)this_buffer;
-
-      ROS_DEBUG_STREAM("during counter: "<<i<<"/"<<max_iter_const<< " buffer: "<<msg);
-
-      /*
-       *
-      unsigned int j;
-
-
-      for (j = 0 ; j < nb_sensors_const ; ++j)
-	{
-
-	  ROS_DEBUG_STREAM("["<<j<<"/"<<nb_sensors_const<<"]: "<< msg[j]);
-	  ROS_DEBUG_STREAM("nb publishers: "<< realtime_pub_.size());
-	  if  (realtime_pub_[j]->trylock())
-	    {
-	      ROS_DEBUG("locked");
-	      realtime_pub_[j]->msg_.data =  msg[j].data;
-	      ROS_DEBUG("msg changed");
-	      realtime_pub_[j]->unlockAndPublish();
-	      ROS_DEBUG("msg published");
-	    }
-	}
-      **/
-    }
-  /*
-
-    for (int j = 0 ; j < nb_sensors_const ; ++j)
-    {
-    //msg.data = status_buffer[j];
-    if  (realtime_pub_[j]->trylock())
-    {
-    realtime_pub_[j]->msg_.data =  status_buffer[j];
-    realtime_pub_[j]->unlockAndPublish();
-    }
-    }
-  */
-  ++i;
-  pthread_mutex_unlock(&mutex);
+  }
 
   ROS_DEBUG("Leaving UnpackState");
 
@@ -1155,7 +1117,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
 
 /* For the emacs weenies in the crowd.
-Local Variables:
+   Local Variables:
    c-basic-offset: 2
-End:
+   End:
 */

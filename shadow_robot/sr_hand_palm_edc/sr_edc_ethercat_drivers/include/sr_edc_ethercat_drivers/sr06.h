@@ -35,10 +35,22 @@
 #include <pthread.h>
 #include <bfd.h>
 #include <boost/smart_ptr.hpp>
+#include <map>
+#include <boost/assign.hpp>
 
 #include <sr_edc_ethercat_drivers/types_for_external.h>
 extern "C" {
   #include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
+}
+
+namespace srh_mapping
+{
+  static const std::map<const std::string, const int> joints_map
+    = boost::assign::map_list_of  ("srh_wrj1", 0) \
+                                  ("srh_wrj2", 0) \
+                                  ("srh_ffj3", 0) \
+                                  ("srh_ffj4", 0);
+
 }
 
 class SR06 : public SR0X
@@ -94,6 +106,8 @@ private:
   unsigned int                     zero_buffer_read;
 
   pthread_mutex_t mutex;
+
+  std::vector<pr2_hardware_interface::Actuator* > actuators_;
 };
 
 
