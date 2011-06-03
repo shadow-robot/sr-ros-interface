@@ -7,7 +7,7 @@
   <!-- FIXME: all the limits are not valid -->
   <!-- FIXME: all the limits are not valid -->
   <link name="world"/>
-  <joint name="srh_wrj2_joint" type="revolute">
+  <joint name="WRJ2_joint" type="revolute">
     <parent link="world"/>
     <child link="sr_wrist_dummy_link"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -16,7 +16,7 @@
   </joint>
   <link name="sr_wrist_dummy_link">
     </link>
-  <joint name="srh_wrj1_joint" type="revolute">
+  <joint name="WRJ1_joint" type="revolute">
     <parent link="sr_wrist_dummy_link"/>
     <child link="sr_hand_palm_link"/>
     <origin rpy="0 0 0" xyz="0 0 0.034"/>
@@ -27,7 +27,7 @@
 
     </link>
   <!-- ........................................ -->
-  <joint name="srh_ffj4_joint" type="revolute">
+  <joint name="FFJ4_joint" type="revolute">
     <parent link="sr_hand_palm_link"/>
     <child link="sr_hand_ff4_link"/>
     <origin rpy="0 0 0" xyz="0.033 0 0.095"/>
@@ -37,7 +37,7 @@
   <link name="sr_hand_ff4_link">
 
     </link>
-  <joint name="srh_ffj3_joint" type="revolute">
+  <joint name="FFJ3_joint" type="revolute">
     <parent link="sr_hand_ff4_link"/>
     <child link="sr_hand_ff3_link"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -48,24 +48,24 @@
 
     </link>
   <!-- ........................................ -->
-  <transmission name="wrj1_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
+  <transmission name="WRJ1_trans" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="WRJ1"/>
-    <joint name="srh_wrj1_joint"/>
+    <joint name="WRJ1_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
-  <transmission name="wrj2_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
+  <transmission name="WRJ2_trans" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="WRJ2"/>
-    <joint name="srh_wrj2_joint"/>
+    <joint name="WRJ2_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
-  <transmission name="ffj3_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
+  <transmission name="FFJ3_trans" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="FFJ3"/>
-    <joint name="srh_ffj3_joint"/>
+    <joint name="FFJ3_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
-  <transmission name="ffj4_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
+  <transmission name="FFJ4_trans" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="FFJ4"/>
-    <joint name="srh_ffj4_joint"/>
+    <joint name="FFJ4_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
 </robot>

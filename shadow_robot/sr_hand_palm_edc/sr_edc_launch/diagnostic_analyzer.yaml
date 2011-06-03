@@ -11,37 +11,37 @@ analyzers:
         type: GenericAnalyzer
         path: First Finger
         timeout: 5.0
-        regex: 'SRDMotor .*ffj[0-9].*'
+        regex: 'SRDMotor .*FFJ[0-9].*'
         num_items: 3
       right_finger:
         type: GenericAnalyzer
         path: Right Finger
         timeout: 5.0
-        regex: 'SRDMotor .*rfj[0-9].*'
+        regex: 'SRDMotor .*RFJ[0-9].*'
         num_items: 3
       middle_finger:
         type: GenericAnalyzer
         path: Middle Finger
         timeout: 5.0
-        regex: 'SRDMotor .*mfj[0-9].*'
+        regex: 'SRDMotor .*MFJ[0-9].*'
         num_items: 3
       little_finger:
         type: GenericAnalyzer
         path: Little Finger
         timeout: 5.0
-        regex: 'SRDMotor .*lfj[0-9].*'
+        regex: 'SRDMotor .*LFJ[0-9].*'
         num_items: 4
       thumb:
         type: GenericAnalyzer
         path: Thumb
         timeout: 5.0
-        regex: 'SRDMotor .*thj[0-9].*'
+        regex: 'SRDMotor .*THJ[0-9].*'
         num_items: 5
       wrist:
         type: GenericAnalyzer
         path: Wrist
         timeout: 5.0
-        regex: 'SRDMotor .*wrj[0-9].*'
+        regex: 'SRDMotor .*WRJ[0-9].*'
         num_items: 2
       controllers:
         type: GenericAnalyzer

@@ -1,5 +1,8 @@
 <launch>
     <!-- send pre urdf to param server -->
-    <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_edc_defs)/robots/sr_edc.urdf.xacro'" />
+<!--    <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_edc_defs)/robots/sr_edc.urdf.xacro'" /> -->
+
+  <param name="robot_description" textfile="$(find sr_edc_defs)/robots/sr_edc.urdf"/>
+
 </launch>
 

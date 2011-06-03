@@ -1,6 +1,6 @@
-# Shadow Hand Defines for Sensor Offset and Gains .. Need proper values 
+# Shadow Hand Defines for Sensor Offset and Gains .. Need proper values
 
-srh_ffj0:
+FFJ0:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -9,7 +9,7 @@ srh_ffj0:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_ffj3:
+FFJ3:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -18,7 +18,7 @@ srh_ffj3:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_ffj4:
+FFJ4:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -27,7 +27,7 @@ srh_ffj4:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_mfj0:
+MFJ0:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -36,7 +36,7 @@ srh_mfj0:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_mfj3:
+MFJ3:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -45,7 +45,7 @@ srh_mfj3:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_mfj4:
+MFJ4:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -54,7 +54,7 @@ srh_mfj4:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_rfj0:
+RFJ0:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -63,7 +63,7 @@ srh_rfj0:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_rfj3:
+RFJ3:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -71,16 +71,7 @@ srh_rfj3:
   position: {gain: 1.0, offset: 0.0}
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
-srh_rfj4:
-  force_1: {gain: 1.0, offset: 0.0}
-  force_2: {gain: 1.0, offset: 0.0}
-  force_3: {gain: 1.0, offset: 0.0}
-  temperature: {gain: 1.0, offset: 0.0}
-  position: {gain: 1.0, offset: 0.0}
-  current: {gain: 1.0, offset: 0.0}
-  voltage: {gain: 1.0, offset: 0.0}
-  min_effort: 0.15
-srh_lfj0:
+RFJ4:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -89,7 +80,7 @@ srh_lfj0:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_lfj3:
+LFJ0:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -98,7 +89,7 @@ srh_lfj3:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_lfj4:
+LFJ3:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -107,7 +98,7 @@ srh_lfj4:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_lfj5:
+LFJ4:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -116,7 +107,7 @@ srh_lfj5:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_thj1:
+LFJ5:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -125,7 +116,7 @@ srh_thj1:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_thj2:
+THJ1:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -134,7 +125,7 @@ srh_thj2:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_thj3:
+THJ2:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -143,7 +134,7 @@ srh_thj3:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_thj4:
+THJ3:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -152,7 +143,7 @@ srh_thj4:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_thj5:
+THJ4:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -161,7 +152,7 @@ srh_thj5:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_wrj1:
+THJ5:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}
@@ -170,7 +161,16 @@ srh_wrj1:
   current: {gain: 1.0, offset: 0.0}
   voltage: {gain: 1.0, offset: 0.0}
   min_effort: 0.15
-srh_wrj2:
+WRJ1:
+  force_1: {gain: 1.0, offset: 0.0}
+  force_2: {gain: 1.0, offset: 0.0}
+  force_3: {gain: 1.0, offset: 0.0}
+  temperature: {gain: 1.0, offset: 0.0}
+  position: {gain: 1.0, offset: 0.0}
+  current: {gain: 1.0, offset: 0.0}
+  voltage: {gain: 1.0, offset: 0.0}
+  min_effort: 0.15
+WRJ2:
   force_1: {gain: 1.0, offset: 0.0}
   force_2: {gain: 1.0, offset: 0.0}
   force_3: {gain: 1.0, offset: 0.0}

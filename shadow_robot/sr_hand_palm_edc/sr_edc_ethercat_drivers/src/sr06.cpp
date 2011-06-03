@@ -339,6 +339,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
     //initializing the actuators.
     pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(sensor_names[i]);
+    ROS_ERROR_STREAM("adding actuator: "<<sensor_names[i]);
     actuators.push_back( actuator );
 
     if(hw)
@@ -927,11 +928,11 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
     d.summary(d.OK, "OK");
 
     d.clear();
-    d.addf("Measured Voltage", "%d", state->motor_voltage_);
-    d.addf("Measured Current", "%d", state->last_measured_current_);
+    d.addf("Measured Voltage", "%f", state->motor_voltage_);
+    d.addf("Measured Current", "%f", state->last_measured_current_);
 
-    d.addf("Measured Effort", "%d", state->last_measured_effort_);
-
+    d.addf("Measured Effort", "%f", state->last_measured_effort_);
+    d.addf("Encoder Position", "%f", state->position_);
 
     vec.push_back(d);
   }
@@ -1189,18 +1190,21 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   //ok the message was not empty
   //@TODO: how do we get the current actuator state?
 
-/*  for(unsigned int i=0; i<actuators_.size(); ++i)
+  shadow_joints::JointsMap::iterator joint_iter;
+  for(joint_iter = sr_hand_lib->joints_map.begin(); joint_iter != sr_hand_lib->joints_map.end();
+      ++joint_iter)
   {
-    pr2_hardware_interface::Actuator* actuator = actuators_[i];
-
+    pr2_hardware_interface::Actuator* actuator = joint_iter->second->motor->actuator;
     pr2_hardware_interface::ActuatorState* state(&actuator->state_);
+
+    int i=joint_iter->second->motor->motor_id;
 
     state->is_enabled_ = 1;
     state->device_id_ = i;
 
     //get all the raw joint positions.
     //TODO: calibrated here?
-    state->position_ = status_data->sensors[LFJ5];
+    state->position_ = status_data->sensors[joint_iter->second->joint_id];
 
     //get the remaining information.
     // TODO: check if there was an error, using which_motor_data_had_errors mask
@@ -1244,7 +1248,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     }
 
   }
-*/
+
   if (flashing & !can_packet_acked)
   {
     if (can_data_is_ack(can_data))
