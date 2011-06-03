@@ -1,0 +1,15 @@
+<package>
+  <description brief="sr_robot_lib">
+
+     sr_robot_lib
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_robot_lib</url>
+  <depend package="roscpp"/>
+
+</package>
+
+
