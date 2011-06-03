@@ -9,6 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_robot_lib</url>
 
+  <depend package="pr2_hardware_interface"/>
+
   <export>
     <cpp cflags="-I${prefix}/include"/>
   </export>
