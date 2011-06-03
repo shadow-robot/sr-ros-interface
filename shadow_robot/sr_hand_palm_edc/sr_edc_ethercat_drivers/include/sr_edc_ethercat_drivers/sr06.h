@@ -38,19 +38,11 @@
 #include <map>
 #include <boost/assign.hpp>
 
+#include <sr_robot_lib/sr_hand_lib.hpp>
+
 #include <sr_edc_ethercat_drivers/types_for_external.h>
 extern "C" {
   #include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
-}
-
-namespace srh_mapping
-{
-  static const std::map<const std::string, const int> joints_map
-    = boost::assign::map_list_of  ("srh_wrj1", 0) \
-                                  ("srh_wrj2", 0) \
-                                  ("srh_ffj3", 0) \
-                                  ("srh_ffj4", 0);
-
 }
 
 class SR06 : public SR0X
@@ -114,6 +106,7 @@ private:
   /// A vector containing all the actuators
   std::vector<pr2_hardware_interface::Actuator* > actuators_;
 
+  boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
 };
 
 

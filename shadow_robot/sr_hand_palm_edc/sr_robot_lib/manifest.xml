@@ -9,6 +9,9 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_robot_lib</url>
 
+  <export>
+    <cpp cflags="-I${prefix}/include"/>
+  </export>
 </package>
 
 

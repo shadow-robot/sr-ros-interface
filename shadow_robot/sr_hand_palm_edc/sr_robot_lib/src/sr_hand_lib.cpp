@@ -28,44 +28,29 @@
 
 #include "sr_robot_lib/sr_hand_lib.hpp"
 #include <string>
+#include <boost/foreach.hpp>
 
 namespace shadow_robot
 {
-  SrHandLib::SrHandLib() :
-    SrRobotLib()
+  SrHandLib::SrHandLib(std::vector<std::string> joint_names,
+                       std::vector<int> motor_ids,
+                       std::vector<int> joint_ids,
+                       std::vector<pr2_hardware_interface::Actuator*> actuators) :
+    SrRobotLib(joint_names, motor_ids, joint_ids, actuators)
   {
-
-    //TODO: in a first time, read this from a config file
-    // will need to be read from the EEProm at some points.
-    std::vector<std::string> joint_names;
-    joint_names.push_back("ffj3");
-    joint_names.push_back("ffj4");
-    joint_names.push_back("wrj1");
-    joint_names.push_back("wrj2");
-
-    std::vector<int> motor_ids;
-    motor_ids.push_back(0);
-    motor_ids.push_back(1);
-    motor_ids.push_back(2);
-    motor_ids.push_back(3);
-
-    std::vector<int> joint_ids;
-    joint_ids.push_back(0);
-    joint_ids.push_back(1);
-    joint_ids.push_back(2);
-    joint_ids.push_back(3);
-
     initialize_map(joint_names, motor_ids, joint_ids);
   }
 
   SrHandLib::~SrHandLib()
   {
-
+    BOOST_FOREACH( shadow_joints::JointsMap::value_type &i, joints_map )
+      delete i->actuator;
   }
 
   void SrHandLib::initialize_map(std::vector<std::string> joint_names,
                                  std::vector<int> motor_ids,
-                                 std::vector<int> joint_ids)
+                                 std::vector<int> joint_ids,
+                                std::vector<pr2_hardware_interface::Actuator*> actuators)
   {
     joints_map_mutex.lock();
 
@@ -77,8 +62,11 @@ namespace shadow_robot
       joint->joint_id = joint_ids[index];
       motor->motor_id = motor_ids[index];
 
+      motor->actuator = actuators[index];
+
       //TODO: check if the joint has a motor associated or not
-      joint->motor    = motor;
+      joint->has_motor = true;
+      joint->motor     = motor;
 
       joints_map[ joint_names[index] ] = joint;
     }

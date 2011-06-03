@@ -185,9 +185,6 @@ SR06::SR06()
  */
 SR06::~SR06()
 {
-  for(unsigned int i = 0; i < actuators_.size(); ++i)
-    delete actuators_[i];
-
   delete sh_->get_fmmu_config();
   delete sh_->get_pd_config();
 }
@@ -320,14 +317,21 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   if(retval != 0)
     return retval;
 
-  //initializing the actuators
-  std::map<const std::string, const int>::const_iterator iter;
+  //initializing the hand library
+  std::vector<std::string> joint_names;
+  std::vector<int> motor_ids;
+  std::vector<int> joint_ids;
+  std::vector<pr2_hardware_interface::Actuator*> actuators;
 
-  for(iter = srh_mapping::joints_map.begin() ;
-      iter != srh_mapping::joints_map.end(); ++iter)
+  for(unsigned int i=0; i< 24; ++i)
   {
-    pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(iter->first.c_str());
-    actuators_.push_back( actuator );
+    joint_names.push_back(std::string(sensor_names[i]));
+    motor_ids.push_back(i);
+    joint_ids.push_back(i);
+
+    //initializing the actuators.
+    pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(sensor_names[i]);
+    actuators.push_back( actuator );
 
     if(hw)
     {
@@ -338,6 +342,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
       }
     }
   }
+  sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>(new shadow_robot::SrHandLib(joint_names, motor_ids, joint_ids, actuators));
 
 
 
@@ -900,12 +905,14 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
   this->ethercatDiagnostics(d,2);
   vec.push_back(d);
 
-  for(unsigned int i=0; i<actuators_.size(); ++i)
+  shadow_joints::JointsMap::iterator joint_iter;
+  for(joint_iter = sr_hand_lib->joints_map.begin(); joint_iter != sr_hand_lib->joints_map.end();
+      ++joint_iter)
   {
-    const pr2_hardware_interface::ActuatorState *state(&actuators_[i]->state_);
+    const pr2_hardware_interface::ActuatorState *state(&(joint_iter->second->motor->actuator)->state_);
 
     name.str("");
-    name << "SRDMotor ffj"<< i;
+    name << "SRDMotor "<< joint_iter->first;
     d.name = name.str();
 
     //TODO check if motor is OK
@@ -1173,7 +1180,8 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
   //ok the message was not empty
   //@TODO: how do we get the current actuator state?
-  for(unsigned int i=0; i<actuators_.size(); ++i)
+
+/*  for(unsigned int i=0; i<actuators_.size(); ++i)
   {
     pr2_hardware_interface::Actuator* actuator = actuators_[i];
 
@@ -1184,7 +1192,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
     //get all the raw joint positions.
     //TODO: calibrated here?
-    state->position_ = status_data->LFJ5;
+    state->position_ = status_data->sensors[LFJ5];
 
     //get the remaining information.
     // TODO: check if there was an error, using which_motor_data_had_errors mask
@@ -1228,7 +1236,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     }
 
   }
-
+*/
   if (flashing & !can_packet_acked)
   {
     if (can_data_is_ack(can_data))

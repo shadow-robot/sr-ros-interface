@@ -32,6 +32,8 @@
 #include <vector>
 #include <map>
 
+#include <pr2_hardware_interface/hardware_interface.h>
+
 namespace shadow_joints
 {
   struct Motor
@@ -39,6 +41,9 @@ namespace shadow_joints
     //the position of the motor in the motor array
     // coming from the hardware
     int motor_id;
+
+    //actuator
+    pr2_hardware_interface::Actuator* actuator;
 
     //Data we can read from the motor
     double encoder_position;
@@ -82,17 +87,18 @@ namespace shadow_robot
   class SrRobotLib
   {
   public:
-    SrRobotLib() {};
+    SrRobotLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
+               std::vector<int> joint_ids, std::vector<pr2_hardware_interface::Actuator*> actuators) {};
     ~SrRobotLib() {};
-
-  protected:
-    virtual void initialize_map(std::vector<std::string> joint_names,
-                                std::vector<int> motor_ids,
-                                std::vector<int> joint_ids) = 0;
 
     shadow_joints::JointsMap joints_map;
     boost::mutex joints_map_mutex;
 
+  protected:
+    virtual void initialize_map(std::vector<std::string> joint_names,
+                                std::vector<int> motor_ids,
+                                std::vector<int> joint_ids,
+                                std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
   };
 }
 
