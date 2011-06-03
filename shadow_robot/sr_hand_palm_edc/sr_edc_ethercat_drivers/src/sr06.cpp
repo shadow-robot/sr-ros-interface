@@ -323,6 +323,14 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   std::vector<int> joint_ids;
   std::vector<pr2_hardware_interface::Actuator*> actuators;
 
+  //TODO: remove this:
+  //for the time being we only use WRJ1, WRJ2, FFJ3 and FFJ4
+  std::vector<int> tmp_joints;
+  tmp_joints.push_back(FFJ3);
+  tmp_joints.push_back(FFJ4);
+  tmp_joints.push_back(WRJ1);
+  tmp_joints.push_back(WRJ2);
+
   for(unsigned int i=0; i< 24; ++i)
   {
     joint_names.push_back(std::string(sensor_names[i]));

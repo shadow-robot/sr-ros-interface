@@ -12,7 +12,7 @@
   <depend package="pr2_hardware_interface"/>
 
   <export>
-    <cpp cflags="-I${prefix}/include"/>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_hand_lib"/>
   </export>
 </package>
 

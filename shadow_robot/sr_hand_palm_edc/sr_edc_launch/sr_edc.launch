@@ -9,7 +9,7 @@
   <rosparam command="load" file="$(find sr_edc_launch)/sr_edc_sensor_gain_offset.yaml" />
 
   <!-- pr2_etherCAT -->
-  <node name="realtime_loop" machine="local" pkg="pr2_etherCAT" type="pr2_etherCAT" args="-i eth1 -x /robot_description" output="screen" /> <!-- launch-prefix="xterm -hold -e strace -f -e trace=!gettimeofday,futex"/> -->
+  <node name="realtime_loop" machine="local" pkg="pr2_etherCAT" type="pr2_etherCAT" args="-i eth1 -x /robot_description" output="screen"/> <!-- launch-prefix="xterm -hold -e strace -f -e trace=!gettimeofday,futex"/> -->
 
   <!--<node name="runtime_monitor" machine="local" pkg="runtime_monitor" type="monitor" />-->
 

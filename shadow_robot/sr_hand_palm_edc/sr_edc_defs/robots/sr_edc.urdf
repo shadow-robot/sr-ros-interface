@@ -49,22 +49,22 @@
     </link>
   <!-- ........................................ -->
   <transmission name="wrj1_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="srh_wrj1"/>
+    <actuator name="WRJ1"/>
     <joint name="srh_wrj1_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
   <transmission name="wrj2_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="srh_wrj2"/>
+    <actuator name="WRJ2"/>
     <joint name="srh_wrj2_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
   <transmission name="ffj3_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="srh_ffj3"/>
+    <actuator name="FFJ3"/>
     <joint name="srh_ffj3_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
   <transmission name="ffj4_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="srh_ffj4"/>
+    <actuator name="FFJ4"/>
     <joint name="srh_ffj4_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
