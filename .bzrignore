@@ -101,3 +101,9 @@ shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/include/external/0220_palm
 shadow_robot/sr_hand_palm_edc/build
 ￼
 shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/include/external/simplemotor-bootloader
+￼
+shadow_robot/sr_hand_palm_edc/sr_robot_lib/bin
+￼
+shadow_robot/sr_hand_palm_edc/sr_robot_lib/build
+￼
+shadow_robot/sr_hand_palm_edc/sr_robot_lib/lib

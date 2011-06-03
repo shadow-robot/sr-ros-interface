@@ -20,7 +20,6 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
  * @brief This is a generic robot library for Shadow Robot's Hardware.
- * You can find it instantiated in the sr_edc_ethercat_drivers.
  *
  *
  */
@@ -28,14 +27,73 @@
 #ifndef _SR_ROBOT_LIB_HPP_
 #define _SR_ROBOT_LIB_HPP_
 
+#include <boost/smart_ptr.hpp>
+#include <boost/thread.hpp>
+#include <vector>
+#include <map>
+
+namespace shadow_joints
+{
+  struct Motor
+  {
+    //the position of the motor in the motor array
+    // coming from the hardware
+    int motor_id;
+
+    //Data we can read from the motor
+    double encoder_position;
+    double torque;
+
+    double strain_gauge_left;
+    double strain_gauge_right;
+    double pwm;
+    double flags;
+    double current;
+    double voltage;
+    int can_msgs_received;
+    int can_msgs_transmitted;
+
+    int firmware_svn_revision;
+
+    int force_control_p;
+    int force_control_i;
+    int force_control_d;
+    int force_control_imax;
+    int force_control_deadband;
+  };
+
+  struct Joint
+  {
+    //the index of the joint in the joint array
+    // coming from the hardware
+    int joint_id;
+
+    double calibrated_position;
+
+    bool has_motor;
+    boost::shared_ptr<Motor> motor;
+  };
+
+  typedef std::map<std::string, boost::shared_ptr<Joint> > JointsMap;
+}
+
 namespace shadow_robot
 {
   class SrRobotLib
   {
-  pubic:
-    SrRobotLib();
-    ~SrRobotLib();
-  }
+  public:
+    SrRobotLib() {};
+    ~SrRobotLib() {};
+
+  protected:
+    virtual void initialize_map(std::vector<std::string> joint_names,
+                                std::vector<int> motor_ids,
+                                std::vector<int> joint_ids) = 0;
+
+    shadow_joints::JointsMap joints_map;
+    boost::mutex joints_map_mutex;
+
+  };
 }
 
 /* For the emacs weenies in the crowd.

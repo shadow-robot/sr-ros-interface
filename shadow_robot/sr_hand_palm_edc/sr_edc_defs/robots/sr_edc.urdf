@@ -58,11 +58,6 @@
     <joint name="srh_wrj2_joint"/>
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
-  <transmission name="ffj0_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="srh_ffj0"/>
-    <joint name="srh_ffj0_joint"/>
-    <mechanicalReduction>1.0</mechanicalReduction>
-  </transmission>
   <transmission name="ffj3_joint_trans" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="srh_ffj3"/>
     <joint name="srh_ffj3_joint"/>
