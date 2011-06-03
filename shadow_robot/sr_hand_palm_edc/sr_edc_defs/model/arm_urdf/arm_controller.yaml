@@ -1,0 +1,36 @@
+trunk_rotation_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: ShoulderJRotate
+  pid:
+    p: 60.5
+    i: 31.0
+    d: 8.0
+    i_clamp: 1
+
+shoulder_rotation_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: ShoulderJSwing
+  pid:
+    p: 300.0
+    i: 360.0
+    d: 400.0
+    i_clamp: 20.0
+
+elbow_abduction_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: ElbowJSwing
+  pid:
+    p: 100.0
+    i: 150.0
+    d: 150.0
+    i_clamp: 10.0
+
+forearm_rotation_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: ElbowJRotate
+  pid:
+    p: 24.0
+    i: 18.0
+    d: 15.0
+    i_clamp: 1
+
