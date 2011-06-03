@@ -38,13 +38,13 @@ namespace shadow_robot
                        std::vector<pr2_hardware_interface::Actuator*> actuators) :
     SrRobotLib(joint_names, motor_ids, joint_ids, actuators)
   {
-    initialize_map(joint_names, motor_ids, joint_ids);
+    initialize_map(joint_names, motor_ids, joint_ids, actuators);
   }
 
   SrHandLib::~SrHandLib()
   {
     BOOST_FOREACH( shadow_joints::JointsMap::value_type &i, joints_map )
-      delete i->actuator;
+      delete i.second->motor->actuator;
   }
 
   void SrHandLib::initialize_map(std::vector<std::string> joint_names,
