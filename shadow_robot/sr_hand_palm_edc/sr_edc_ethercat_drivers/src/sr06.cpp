@@ -61,6 +61,7 @@ const unsigned int       SR06::nb_sensors_const           = ETHERCAT_STATUS_DATA
 const unsigned char      SR06::nb_publish_by_unpack_const = (nb_sensors_const % max_iter_const) ? (nb_sensors_const / max_iter_const) + 1 : (nb_sensors_const / max_iter_const);
 const unsigned int       SR06::max_retry                  = 10;
 
+const int SR06::slow_motor_info_max_iter_const = 1000;
 
 #define ETHERCAT_CAN_BRIDGE_DATA_SIZE sizeof(ETHERCAT_CAN_BRIDGE_DATA)
 
@@ -118,6 +119,7 @@ SR06::SR06()
   : SR0X(),
     which_motors(0),
     which_data_from_motors(0),
+    slow_motor_info_counter(0),
     flashing(false),
     can_message_sent(true),
     can_packet_acked(true),
@@ -897,37 +899,114 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
 
   this->ethercatDiagnostics(d,2);
   vec.push_back(d);
+
+  for(unsigned int i=0; i<actuators_.size(); ++i)
+  {
+    const pr2_hardware_interface::ActuatorState *state(&actuators_[i]->state_);
+
+    name.str("");
+    name << "SRDMotor ffj"<< i;
+    d.name = name.str();
+
+    //TODO check if motor is OK
+    d.summary(d.OK, "OK");
+
+    d.clear();
+    d.addf("Measured Voltage", "%d", state->motor_voltage_);
+    d.addf("Measured Current", "%d", state->last_measured_current_);
+
+    d.addf("Measured Effort", "%d", state->last_measured_effort_);
+
+
+    vec.push_back(d);
+  }
 }
 
 
 void SR06::update_which_motors(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND   *command)
 {
-    if (0 == which_motors)
+  if (0 == which_motors)
+  {
+    which_motors = 1;
+  }
+  else
+  {
+    which_motors = 0;
+
+    which_data_from_motors++;
+
+    if (which_data_from_motors > 4)
+      which_data_from_motors = 0;
+  }
+
+  command->which_motors = which_motors;
+
+  //Asks for some less important data only from time to time.
+  if( slow_motor_info_counter >= slow_motor_info_max_iter_const)
+  {
+    which_data_from_motors = slow_motor_info_counter - slow_motor_info_max_iter_const;
+    switch( which_data_from_motors )
     {
-        which_motors = 1;
+    case 0:
+      command->from_motor_data_type = MOTOR_DATA_VOLTAGE;
+      break;
+    case 1:
+      command->from_motor_data_type = MOTOR_DATA_TEMPERATURE;
+      break;
+    case 2:
+      command->from_motor_data_type = MOTOR_DATA_CAN_NUM_RECEIVED;
+      break;
+    case 3:
+      command->from_motor_data_type = MOTOR_DATA_CAN_NUM_TRANSMITTED;
+      break;
+    case 4:
+      command->from_motor_data_type = MOTOR_DATA_SVN_REVISION;
+      break;
+    case 5:
+      command->from_motor_data_type = MOTOR_DATA_SVN_REVISION;
+      break;
+    case 6:
+      command->from_motor_data_type = MOTOR_DATA_P_I;
+      break;
+    case 7:
+      command->from_motor_data_type = MOTOR_DATA_I_IMAX;
+      break;
+    case 8:
+      command->from_motor_data_type = MOTOR_DATA_DEADBAND_SIGN;
+      slow_motor_info_counter = -1;
+      break;
+    default:
+      ROS_ERROR_STREAM("Motor data type not recognized: "<<command->from_motor_data_type);
+      slow_motor_info_counter = -1;
+      break;
     }
-    else
-    {
-        which_motors = 0;
-
-        which_data_from_motors++;
-
-        if (which_data_from_motors > 4)
-            which_data_from_motors = 0;
-    }
-
-    command->which_motors = which_motors;
-
+  }
+  else
+  {
     switch (which_data_from_motors)
     {
-        case 0: command->from_motor_data_type = MOTOR_DATA_SGL;        break;
-        case 1: command->from_motor_data_type = MOTOR_DATA_SGR;        break;
-        case 2: command->from_motor_data_type = MOTOR_DATA_PWM;        break;
-        case 3: command->from_motor_data_type = MOTOR_DATA_FLAGS;      break;
-        case 4: command->from_motor_data_type = MOTOR_DATA_CURRENT;    break;
-        default: ROS_ERROR_STREAM("Motor data type not recognized: "<<command->from_motor_data_type); break;
+    case 0:
+      command->from_motor_data_type = MOTOR_DATA_SGL;
+      break;
+    case 1:
+      command->from_motor_data_type = MOTOR_DATA_SGR;
+      break;
+    case 2:
+      command->from_motor_data_type = MOTOR_DATA_PWM;
+      break;
+    case 3:
+      command->from_motor_data_type = MOTOR_DATA_FLAGS;
+      break;
+    case 4:
+      command->from_motor_data_type = MOTOR_DATA_CURRENT;
+      break;
+    default:
+      ROS_ERROR_STREAM("Motor data type not recognized: "<<command->from_motor_data_type);
+      break;
     }
+  } //end else slow_motor_info_counter
 
+  ++ slow_motor_info_counter;
 }
 
 
@@ -968,9 +1047,11 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
     command->EDC_command = EDC_COMMAND_CAN_DIRECT_MODE;
   }
 
-  //TODO change this to alternate between even and uneven motors + all the other data
-  command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;			// Currently, the only data we send to motors is torque demand.
+  // Currently, the only data we send to motors is torque demand.
+  command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
 
+  //alternate between even and uneven motors
+  // and ask for the different informations.
   update_which_motors(command);
 
   if (flashing && !can_packet_acked && !can_message_sent)
@@ -1096,12 +1177,56 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   {
     pr2_hardware_interface::Actuator* actuator = actuators_[i];
 
-    pr2_hardware_interface::ActuatorState* state(&actuator->state_); // state[slave_offset]->
+    pr2_hardware_interface::ActuatorState* state(&actuator->state_);
 
     state->is_enabled_ = 1;
     state->device_id_ = i;
 
+    //get all the raw joint positions.
+    //TODO: calibrated here?
     state->position_ = status_data->LFJ5;
+
+    //get the remaining information.
+    // TODO: check if there was an error, using which_motor_data_had_errors mask
+    bool read_motor_info = false;
+    int index_motor = 0;
+    if(status_data->which_motors == 0)
+    {
+      //We sampled the even motor numbers
+      if( i%2 == 0)
+      {
+        read_motor_info = true;
+        index_motor = i/2;
+      }
+    }
+    else
+    {
+      //we sampled the uneven motor numbers
+      if( i%2 == 1)
+      {
+        read_motor_info = true;
+        index_motor = i/2 - 1;
+      }
+    }
+
+    //ok now we read the info and add it to the actuator state
+    if(read_motor_info)
+    {
+      switch(status_data->motor_data_type)
+      {
+      case MOTOR_DATA_VOLTAGE:
+        //TODO: Hugo: how can I get the correct voltage from the motor (as a double)
+        state->motor_voltage_ = (double)status_data->motor_data_packet[index_motor].misc;
+        break;
+      case MOTOR_DATA_CURRENT:
+        state->last_measured_current_ = (double)status_data->motor_data_packet[index_motor].misc;
+      default:
+        break;
+      }
+
+      state->last_measured_effort_ = (double)status_data->motor_data_packet[index_motor].torque;
+    }
+
   }
 
   if (flashing & !can_packet_acked)

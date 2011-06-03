@@ -1,6 +1,6 @@
 analyzers:
-  # The shadow hand has two motors per EtherCAT slave device.  
-  # The diagnostics for the devices and motors are seperate 
+  # The shadow hand has two motors per EtherCAT slave device.
+  # The diagnostics for the devices and motors are seperate
   # All devices are put in one category
   # The motors are split into multiple categories based on which finger they belong to.
   shadow_hand:

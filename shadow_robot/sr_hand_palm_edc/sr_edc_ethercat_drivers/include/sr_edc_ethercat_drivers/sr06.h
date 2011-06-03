@@ -94,6 +94,10 @@ private:
   int                              which_motors;
   int                              which_data_from_motors;
 
+  ///Some information is less important to sample than some other
+  int slow_motor_info_counter;
+  static const int slow_motor_info_max_iter_const;
+
   bool                             flashing;
   ETHERCAT_CAN_BRIDGE_DATA         can_message_;
   bool                             can_message_sent;
@@ -107,7 +111,9 @@ private:
 
   pthread_mutex_t mutex;
 
+  /// A vector containing all the actuators
   std::vector<pr2_hardware_interface::Actuator* > actuators_;
+
 };
 
 
