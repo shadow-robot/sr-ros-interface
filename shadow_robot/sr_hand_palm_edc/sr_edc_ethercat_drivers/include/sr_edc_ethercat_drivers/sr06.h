@@ -107,6 +107,15 @@ private:
   std::vector<pr2_hardware_interface::Actuator* > actuators_;
 
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
+
+  /**
+   * This vector contains a mapping between the different motor data
+   * we can ask for (defined in 0220_palm_edc_ethercat_protocol.h) and
+   * the approximate frequency at which each should be polled.
+   *
+   * If the frequency is 0, then we update this data as fast as we can.
+   */
+  std::vector<std::pair<int, int> > motor_data_update_freq;
 };
 
 

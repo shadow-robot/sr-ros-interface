@@ -1,0 +1,10 @@
+less_important_frequencies: {
+  motor_data_voltage: 1,
+  motor_data_temperature: 1,
+  motor_data_can_num_received: 1,
+  motor_data_can_num_transmitted: 1,
+  motor_data_svn_revision: 10,
+  motor_data_f_p: 1,
+  motor_data_i_d: 1,
+  motor_data_imax_deadband_sign: 1
+  }

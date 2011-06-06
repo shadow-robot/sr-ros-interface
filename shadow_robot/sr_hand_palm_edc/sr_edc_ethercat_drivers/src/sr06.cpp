@@ -132,40 +132,35 @@ SR06::SR06()
   pthread_mutex_lock(&mutex);
   counter_ = 0;
 
-  ROS_ERROR("There are %lu sensors", ETHERCAT_STATUS_DATA_SIZE/2);
-  ROS_ERROR("There are %d sensors", nb_sensors_const);
+  XmlRpc::XmlRpcValue my_list;
+  nodehandle_.getParam("less_important_frequencies", my_list);
+  ROS_ASSERT(my_list.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+  for (int32_t i = 0; i < my_list.size(); ++i)
+  {
+    ROS_ASSERT(my_list[i].getType() == XmlRpc::XmlRpcValue::TypeInt);
+    ROS_ERROR_STREAM("TOTO: " << static_cast<int>(my_list[i]));
+  }
+
+
+  ROS_INFO("There are %d sensors", nb_sensors_const);
 
 /*
   if (EC_PALM_EDC_COMMAND_PHY_BASE+ETHERCAT_COMMAND_DATA_SIZE > EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE)
-    ROS_ERROR("Not enough space for ETHERCAT_COMMAND_DATA\n");
+  ROS_ERROR("Not enough space for ETHERCAT_COMMAND_DATA\n");
   else
-    ROS_ERROR("Enough space for ETHERCAT_COMMAND_DATA\n");
+  ROS_ERROR("Enough space for ETHERCAT_COMMAND_DATA\n");
 
   if (EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE+sizeof( ETHERCAT_CAN_BRIDGE_DATA) > EC_PALM_EDC_DATA_PHY_BASE)
-    ROS_ERROR("Not enough space for EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE\n");
+  ROS_ERROR("Not enough space for EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE\n");
   else
-    ROS_ERROR("Enough space for EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE\n");
+  ROS_ERROR("Enough space for EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE\n");
 
   if (EC_PALM_EDC_DATA_PHY_BASE+ETHERCAT_STATUS_DATA_SIZE > EC_PALM_EDC_CAN_BRIDGE_MASTER_IN_BASE)
-    ROS_ERROR("Not enough space for EC_PALM_EDC_DATA_PHY_BASE\n");
+  ROS_ERROR("Not enough space for EC_PALM_EDC_DATA_PHY_BASE\n");
   else
-    ROS_ERROR("Enough space for EC_PALM_EDC_DATA_PHY_BASE\n");
+  ROS_ERROR("Enough space for EC_PALM_EDC_DATA_PHY_BASE\n");
 */
-
-  //ros::Rate tmp(1000);
-  for (unsigned int i = 0 ; i < nb_sensors_const ; ++i)
-  {
-    std::stringstream ss;
-    ss << "j" << i;
-    std::string topic_name = ss.str();
-    ROS_ERROR("Topic: %s  /  %d", topic_name.c_str(), nb_sensors_const);
-    //realtime_pub_.push_back(boost::shared_ptr<rt_pub_int16_t >(new rt_pub_int16_t(nodehandle_, topic_name, 100)) );
-    ros::spinOnce();
-    //tmp.sleep();
-  }
-
-  ROS_ERROR("Done\n");
-
   ROS_INFO(     "device_pub_freq_const = %d", device_pub_freq_const      );
   ROS_INFO(        "ros_pub_freq_const = %d", ros_pub_freq_const         );
   ROS_INFO(            "max_iter_const = %d", max_iter_const             );
