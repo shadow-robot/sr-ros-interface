@@ -1204,7 +1204,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
     //get all the raw joint positions.
     //TODO: calibrated here?
-    state->position_ = status_data->sensors[joint_iter->second->joint_id];
+    state->position_ = status_data->sensors[joint_iter->second->joint_id] / 4000.0;
 
     //get the remaining information.
     // TODO: check if there was an error, using which_motor_data_had_errors mask

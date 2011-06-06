@@ -48,5 +48,5 @@ analyzers:
         path: Devices
         timeout: 5.0
         regex: [ 'SRDMotor : [0-9]+', 'SRCAN.*', 'SRBridge.*' ]
-        num_items: 12
+        num_items: 1
 

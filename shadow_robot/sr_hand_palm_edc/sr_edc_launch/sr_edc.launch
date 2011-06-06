@@ -24,9 +24,17 @@ For the moment we do not do any calibration
   <!-- Default controllers -->
   <include file="$(find sr_edc_controller_configuration)/sr_edc_default_controllers.launch" />
 
+  <!-- diagnostic aggregator for being able to see the results in the robot_monitor -->
   <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator">
     <rosparam command="load"  file="$(find sr_edc_launch)/diagnostic_analyzer.yaml"/>
   </node>
+
+  <!-- Robot state publisher: transforming the joints angles to tf.  -->
+  <node pkg="robot_state_publisher" type="state_publisher"
+	name="srh_robot_state_publisher_pos">
+    <param name="publish_frequency" type="double" value="20.0" />
+  </node>
+
 
 
 </launch>
