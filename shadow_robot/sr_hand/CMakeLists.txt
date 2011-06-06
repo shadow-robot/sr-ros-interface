@@ -17,16 +17,21 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-rosbuild_genmsg()
+#rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
 rosbuild_add_boost_directories()
 
 
-#if you don't want to have the gazebo interface for the virtual hardware 
+#if you don't want to have the gazebo interface for the virtual hardware
 # just comment this flag
-SET( CMAKE_CXX_FLAGS "-D GAZEBO")
+IF($ENV{GAZEBO} EQUAL 1)
+  SET( CMAKE_CXX_FLAGS "-D GAZEBO")
+  MESSAGE("Compiling with Gazebo support")
+ELSE($ENV{GAZEBO} EQUAL 1)
+  MESSAGE("Compiling without Gazebo support")
+ENDIF($ENV{GAZEBO} EQUAL 1)
 
 ##################
 #  VIRTUAL ARM  #
@@ -46,14 +51,34 @@ rosbuild_link_boost(shadowhand_virtual thread)
 #    REAL HAND   #
 ##################
 
-#uncomment those lines if you build for the real hand
+##uncomment those lines if you build for the real hand
 #include_directories(/usr/realtime/include/)
 #LINK_LIBRARIES(pthread)
-#add_library(robot STATIC IMPORTED) 
+#add_library(robot STATIC IMPORTED)
 #set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
 #rosbuild_add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
 #rosbuild_link_boost(shadowhand_real thread)
 #target_link_libraries(shadowhand_real robot)
+
+##################
+#    REAL ARM    #
+##################
+
+#uncomment those lines if you build for the real hand
+#include_directories(/usr/realtime/include/)
+#LINK_LIBRARIES(pthread)
+#rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
+#rosbuild_link_boost(shadowarm_real thread)
+#target_link_libraries(shadowarm_real robot)
+
+##################
+#     VALVES     #
+##################
+#include_directories(/usr/realtime/include/)
+#LINK_LIBRARIES(pthread)
+#rosbuild_add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
+#rosbuild_link_boost(sr_valves thread)
+#target_link_libraries(sr_valves robot)
 
 #####################################
 #   dynamic parameters reconfigure  #
@@ -66,5 +91,4 @@ rosbuild_link_boost(shadowhand_virtual thread)
 ###############
 #   EXAMPLES  #
 ###############
-
 rosbuild_add_executable(examples/link_joints examples/link_joints.cpp)

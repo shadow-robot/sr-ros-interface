@@ -3,6 +3,22 @@
  * @author Ugo Cupcic <ugo@ugo-kubuntu.local>
  * @date   Wed Apr  7 15:37:06 2010
  *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief Contains the main for the real Shadow Dextrous Hand. We start the publishers / subscribers in this node.
  * They all share the same RealShadowhand object, this way the subscriber can update the hand properties,
  * while the publishers publish up to date data. The diagnostics and the other publisher are started
@@ -11,9 +27,7 @@
  *
  */
 
-#include <kdl_parser/kdl_parser.hpp>
 #include <ros/ros.h>
-#include <kdl/tree.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/smart_ptr.hpp>
@@ -26,7 +40,6 @@
 
 using namespace std;
 using namespace ros;
-using namespace KDL;
 using namespace shadowrobot;
 //using namespace shadowhand_config_server;
 
@@ -67,45 +80,12 @@ int main(int argc, char** argv)
   NodeHandle n;
 
   boost::shared_ptr<RealShadowhand> real_sh(new RealShadowhand());
-  boost::shared_ptr<SRSubscriber> shadowhand_subscriber;
+  boost::shared_ptr<SRSubscriber> shadowhand_subscriber(new SRSubscriber(real_sh));
 
 
   boost::shared_ptr<SRPublisher> shadowhand_pub( new SRPublisher(real_sh));
   boost::shared_ptr<SRDiagnosticer> shadowhand_diag( new SRDiagnosticer(real_sh, sr_hand_hardware));
 
-  // gets the location of the robot description on the parameter server
-  string full_param_name;
-  n.searchParam("robot_description",full_param_name);
-
-  string robot_desc_string;
-  n.param(full_param_name, robot_desc_string, string());
-  Tree tree;
-  if (!kdl_parser::treeFromString(robot_desc_string, tree))
-    {
-      ROS_ERROR("Failed to construct kdl tree");
-    }
-  else
-    {
-      ROS_DEBUG("kdl tree loaded!");
-    }
-  
-  //  ShadowhandConfigServer shadowhand_config_server;
-  if (tree.getNrOfSegments() == 0)
-    {
-      ROS_WARN("ShadowHand subscriber got an empty tree and cannot do inverse kinematics");
-      shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new SRSubscriber(real_sh));
-    }
-  else if (tree.getNrOfSegments() == 1)
-    {
-      ROS_WARN("ShadowHand subscriber got an empty tree and cannot do inverse kinematics");
-
-      shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new SRSubscriber(real_sh));
-    }
-  else
-    {
-      shadowhand_subscriber = boost::shared_ptr<SRSubscriber>(new  SRSubscriber(real_sh, tree));
-    }
-    
   boost::thread thrd1( boost::bind( &run_diagnotics, shadowhand_diag ));
   boost::thread thrd2( boost::bind( &run_publisher, shadowhand_pub ));
   thrd1.join();

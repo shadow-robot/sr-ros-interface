@@ -14,7 +14,7 @@
       <visual>
 	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="thproximal_visual">
-      <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.01 0.01 0.01" />
+      <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.001 0.001 0.001" />
       </geometry>
       <material name="shadow_thproximal_material">
 	  <color rgba="0.2 0.2 0.2 1.0"/>

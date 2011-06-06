@@ -3,19 +3,34 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:50:42 2010
  *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief
  *
  *
  */
 
+#include <ros/ros.h>
+
+#include "sr_hand/hand/real_shadowhand.h"
 //our robot code
 #include <robot/robot.h>
 #include <robot/hand.h>
 #include <robot/hand_protocol.h>
-
-#include <ros/ros.h>
-
-#include "sr_hand/hand/real_shadowhand.h"
 
 namespace shadowrobot
 {
@@ -57,7 +72,7 @@ void RealShadowhand::initializeMap()
     tmpData.force = 0.0;
     tmpData.flags = "";
 
-    for( unsigned int i = 0; i < NUM_HAND_JOINTS + 4; i++ )
+    for( unsigned int i = 0; i < START_OF_ARM; i++ )
     {
         std::string name = hand_joints[i].joint_name;
         tmpData.jointIndex = i;
@@ -303,7 +318,7 @@ std::vector<DiagnosticData> RealShadowhand::getDiagnostics()
     std::stringstream ss;
 
     //get the data from the hand
-    for( unsigned int index = 0; index < NUM_HAND_JOINTS + 4; ++index )
+    for( unsigned int index = 0; index < START_OF_ARM; ++index )
     {
         tmpData.joint_name = std::string(hand_joints[index].joint_name);
         tmpData.level = 0;
@@ -335,7 +350,7 @@ std::vector<DiagnosticData> RealShadowhand::getDiagnostics()
                 {
                     at_least_one_error_flag = true;
                     ss << "NFAULT ";
-                    ROS_ERROR( "[%s]: NFAULT", hand_joints[index].joint_name );
+                    ROS_WARN( "[%s]: NFAULT", hand_joints[index].joint_name );
                 }
                 if( f.temperature_cutout )
                 {

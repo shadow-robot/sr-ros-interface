@@ -1,4 +1,20 @@
-
+#!/usr/bin/env python
+#
+# Copyright 2011 Shadow Robot Company Ltd.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 import roslib; roslib.load_manifest('sr_control_gui')
 
 from PyQt4 import QtCore, QtGui, Qt
@@ -21,7 +37,7 @@ class RunCommand(Qt.QThread):
         self.ip = library.ip
         self.library = library
         self.final_status = final_status
-    
+
     def run(self):
         if self.command != "":
             if self.library.is_local:
@@ -31,7 +47,7 @@ class RunCommand(Qt.QThread):
                 self.run_local_command()
             else:
                 self.run_ssh_command()
-    
+
     def run_local_command(self):
         """
         Run a local command using subprocess
@@ -40,11 +56,11 @@ class RunCommand(Qt.QThread):
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         output = process.communicate()[0]
-        
+
         #get status commands need special treatment of their output
         if self.final_status == "get_status":
             output = output.split('\n')
-            
+
             all_name_found = True
             for name in self.library.list_of_nodes:
                 name_found = False
@@ -63,7 +79,7 @@ class RunCommand(Qt.QThread):
             else:
                 if "starting" != self.library.status:
                     self.library.status = "stopped"
-        
+
         # get status command for the robot code needs a special treatment as well
         elif self.final_status == "get_status_robot":
             output = output.split('\n')
@@ -72,8 +88,8 @@ class RunCommand(Qt.QThread):
                     self.library.status = "started"
             else:
                 if "starting" != self.library.status:
-                    self.library.status = "stopped"            
-            
+                    self.library.status = "stopped"
+
         else:
             self.library.status = self.final_status
 
@@ -88,10 +104,10 @@ class RunCommand(Qt.QThread):
         except:
             print "Error", sys.exc_info()[0]
             return
-        
-        stdin, stdout, stderr = self.library.ssh_client.exec_command("source ~/.bashrc.d/ros.sh; " + 
+
+        stdin, stdout, stderr = self.library.ssh_client.exec_command("source ~/.bashrc.d/ros.sh; " +
                                                                      self.command)
-        
+
         if self.final_status == "get_status_robot":
             output = stdout.readlines()
             if int(output[0].strip('\n')) > 0:
@@ -100,19 +116,19 @@ class RunCommand(Qt.QThread):
             else:
                 if "starting" != self.library.status:
                     self.library.status = "stopped"
-        
+
         else:
             if stderr.readlines() != []:
                 print stderr
-                error = "Couldn't run the command \"" 
+                error = "Couldn't run the command \""
                 error += self.command + "\"on the following ip: "
                 error += self.library.ip
                 for line in stderr.readlines():
                     error += "\n   " + line
                 rospy.logerr(error)
-                
+
         self.library.ssh_client.close()
-        
+
 class Library(object):
     """
     An object containing all the necessary information for a ROS node / library
@@ -138,12 +154,12 @@ class Library(object):
         self.thread_status = RunCommand(self.status_cmd, "get_status", self)
         self.thread_stop = RunCommand(self.stop_cmd, "stopped", self)
         self.set_local_ip()
-    
+
     def set_local_ip(self):
         ip = socket.gethostbyname(socket.gethostname())
         self.set_ip(ip)
         self.is_local = True
-    
+
     def set_ip(self, ip, login="", password=""):
         try:
             socket.inet_aton(ip)
@@ -154,8 +170,8 @@ class Library(object):
         try:
             self.hostname = socket.gethostbyaddr(str(ip))[0]
         except:
-            self.hostname = str(ip)  
-                      
+            self.hostname = str(ip)
+
         if self.hostname != socket.gethostbyname(socket.gethostname()):
             self.login = login
             self.password = password
@@ -171,12 +187,12 @@ class Library(object):
         self.thread_start.wait(1000)
         self.status = "starting"
         self.thread_start.start()
-        
+
     def stop(self):
         self.thread_stop.wait(1000)
         self.status = "stopping"
         self.thread_stop.start()
-    
+
     def test_login_pwd(self, login, pwd):
         try:
             self.ssh_client.connect(self.ip, username=login, password=pwd)
@@ -185,10 +201,10 @@ class Library(object):
             return False
         self.ssh_client.close()
         return True
-    
+
 class Robot(Library):
     """
-    Contains all the needed information for the Robot code. Inherits from Library object 
+    Contains all the needed information for the Robot code. Inherits from Library object
     because the two are almost the same.
     """
     def __init__(self, name="", root_path=""):
@@ -200,23 +216,23 @@ class Robot(Library):
                          start_cmd=start_cmd, stop_cmd=stop_cmd,
                          status_cmd=status_cmd, root_path=root_path)
         self.icon_library_path = root_path + '/images/icons/iconArmHand.png'
-        
+
         self.thread_status = RunCommand(self.status_cmd, "get_status_robot", self)
-   
+
 class RobotAndLibrariesBackend(object):
     """
     Contains a dict with the different Libraries (ROS nodes)/ Robot interfaces.
     """
     def __init__(self):
         self.libraries = {}
-        
+
     def add_library(self, name, list_of_nodes=[], start_cmd="", stop_cmd="", status_cmd="", root_path=""):
         lib = Library(name=name, list_of_nodes=list_of_nodes, start_cmd=start_cmd,
                       stop_cmd=stop_cmd, status_cmd=status_cmd, root_path=root_path)
         self.libraries[name] = lib
-    
+
     def add_robot(self, name, root_path=""):
         rob = Robot(name=name, root_path=root_path)
         self.libraries[name] = rob
-        
-    
+
+

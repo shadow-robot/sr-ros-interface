@@ -3,6 +3,22 @@
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Apr 22 10:26:41 2010
  *
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
  * @brief  This ROS subscriber is used to issue commands to the hand / arm, from sending a set of targets, to changing
  * the controller parameters.
  *
@@ -23,25 +39,18 @@
 
 #include <boost/smart_ptr.hpp>
 
-//kdl
-#include <kdl/tree.hpp>
-#include <kdl/treefksolverpos_recursive.hpp>
-#include <kdl/treeiksolvervel_wdls.hpp>
-#include <kdl/treeiksolverpos_nr_jl.hpp>
-
 //messages
-#include <sr_hand/joints_data.h>
-#include <sr_hand/joint.h>
-#include <sr_hand/contrlr.h>
-#include <sr_hand/sendupdate.h>
-#include <sr_hand/config.h>
-#include <sr_hand/reverseKinematics.h>
+#include <sr_robot_msgs/joints_data.h>
+#include <sr_robot_msgs/joint.h>
+#include <sr_robot_msgs/contrlr.h>
+#include <sr_robot_msgs/sendupdate.h>
+#include <sr_robot_msgs/config.h>
+#include <sr_robot_msgs/reverseKinematics.h>
 
 #include "sr_hand/hand/sr_articulated_robot.h"
 
 using namespace ros;
 using namespace shadowrobot;
-using namespace KDL;
 
 namespace shadowrobot
 {
@@ -59,13 +68,6 @@ public:
      * @param sh A Shadowhand object, where the information to be published comes from.
      */
     SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot );
-    /**
-     * Constructor initializing the ROS node, and setting the topic to which it subscribes.
-     *
-     * @param sh A Shadowhand object, where the information to be published comes from.
-     * @param tree The kinematic tree of the hand. Used to compute reverse kinematics.
-     */
-    SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot, KDL::Tree tree );
 
     /// Destructor
     ~SRSubscriber();
@@ -76,30 +78,6 @@ private:
 
     ///The shadowhand / shadowarm object (can be either an object connected to the real robot or a virtual hand).
     boost::shared_ptr<SRArticulatedRobot> sr_articulated_robot;
-
-    /// KDL tree containing the robot kinematic chains
-    const Tree sr_kinematic_tree;
-
-    ///a vector containing the end effector names
-    static const std::vector<std::string> end_effector_names;
-    ///a vector of KDL joints containing the min and max values of the joints
-    static const JntArray joints_min, joints_max;
-
-    /**
-     *    KDL kinematic solvers
-     * We need 3 solvers as the reverse position kinematics solver works
-     * recursively:
-     * - starting position
-     * - evaluation of the cartesian position with the forward solver
-     * - if different from target => use inverse velocity solver to
-     *   generate a new starting position
-     * - loop until position = target
-     */
-    TreeFkSolverPos_recursive treeFkSolverPos;
-    /// reverse velocity kinematics solver
-    TreeIkSolverVel_wdls treeIkSolverVel;
-    /// reverse position kinematics solver
-    TreeIkSolverPos_NR_JL treeSolverPos_NR_JL;
 
     ///init function
     void init();
@@ -114,7 +92,7 @@ private:
      * @param msg the sendupdate message received. The sendupdate message, contains the number of
      * sendupdate commands and a vector of joints with names and targets.
      */
-    void sendupdateCallback( const sr_hand::sendupdateConstPtr& msg );
+    void sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& msg );
     ///The subscriber to the sendupdate topic.
     Subscriber sendupdate_sub;
 
@@ -123,7 +101,7 @@ private:
      * @param msg the contrlr message received. contrlr_name + list_of_parameters in a string array
      * e.g. [p:10] sets the p value of the specified controller to 10.
      */
-    void contrlrCallback( const sr_hand::contrlrConstPtr& msg );
+    void contrlrCallback( const sr_robot_msgs::contrlrConstPtr& msg );
     ///The subscriber to the contrlr topic
     Subscriber contrlr_sub;
 
@@ -131,23 +109,9 @@ private:
      * process the config command: send new parameters to the palm.
      * @param msg the config message received
      */
-    void configCallback( const sr_hand::configConstPtr& msg );
+    void configCallback( const sr_robot_msgs::configConstPtr& msg );
     ///The subscriber to the config topic
     Subscriber config_sub;
-
-    /**
-     * process the reverse kinematics from the given message: uses the
-     * robot_description parameter (containing the urdf description of the
-     * hand) to compute the reverse kinematics.
-     *
-     * @todo Not yet implemented
-     *
-     * @param msg the reverse kinematic message
-     */
-    void reverseKinematicsCallback( const sr_hand::reverseKinematicsConstPtr& msg );
-    ///The subscriber to the reverse_kinematics topic
-    Subscriber reverse_kinematics_sub;
-
 }; // end class ShadowhandSubscriber
 
 } // end namespace

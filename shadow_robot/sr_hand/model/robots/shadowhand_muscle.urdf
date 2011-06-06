@@ -60,7 +60,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="1.57079632679 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="wrist_visual">
         <mesh filename="package://sr_hand/model/meshes/wrist.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -100,7 +100,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="palm_visual">
         <mesh filename="package://sr_hand/model/meshes/palm.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -139,7 +139,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
       <geometry name="knuckle_visual">
         <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -178,7 +178,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="proximal_visual">
         <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -216,7 +216,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="middle_visual">
         <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -254,7 +254,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="distal_visual">
         <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -293,7 +293,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
       <geometry name="knuckle_visual">
         <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -332,7 +332,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="proximal_visual">
         <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -370,7 +370,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="middle_visual">
         <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -408,7 +408,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="distal_visual">
         <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -447,7 +447,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
       <geometry name="knuckle_visual">
         <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -486,7 +486,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="proximal_visual">
         <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -524,7 +524,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="middle_visual">
         <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -562,7 +562,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="distal_visual">
         <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -595,12 +595,12 @@
   </transmission>
   <link name="lfmetacarpal">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.00568 0 -0.12061"/>
+      <origin rpy="0 0 0" xyz="-0.033 0 0.02071"/>
       <mass value="0.075"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="lfmetacarpal_visual">
         <mesh filename="package://sr_hand/model/meshes/lfmetacarpal.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -619,7 +619,7 @@
   <joint name="LFJ5" type="revolute">
     <parent link="palm"/>
     <child link="lfmetacarpal"/>
-    <origin rpy="0 0 0" xyz="-0.01671 0 0.044"/>
+    <origin rpy="0 0 0" xyz="-0.033 0 0.02071"/>
     <axis xyz="0.57 0 0.82"/>
     <limit effort="10" lower="0" upper="0.69813170079773179" velocity="1.0"/>
     <dynamics damping="50.5"/>
@@ -633,12 +633,12 @@
   </transmission>
   <link name="lfknuckle">
     <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0.0425"/>
+      <origin rpy="0 0 0" xyz="0 0 0.06579"/>
       <mass value="0.008"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 -1.57079632679" xyz="0 0 0.0005"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="knuckle_visual">
         <mesh filename="package://sr_hand/model/meshes/knuckle.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -657,7 +657,7 @@
   <joint name="LFJ4" type="revolute">
     <parent link="lfmetacarpal"/>
     <child link="lfknuckle"/>
-    <origin rpy="0 0 0" xyz="-0.01671 0 0.044"/>
+    <origin rpy="0 0 0" xyz="0 0 0.06579"/>
     <axis xyz="0 1 0"/>
     <limit effort="10" lower="-0.43633231299858238" upper="0.43633231299858238" velocity="1.0"/>
     <dynamics damping="50.5"/>
@@ -676,7 +676,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 1.57079632679" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="proximal_visual">
         <mesh filename="package://sr_hand/model/meshes/F3.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -714,7 +714,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="middle_visual">
         <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -752,7 +752,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="distal_visual">
         <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -786,7 +786,7 @@
   <link name="thbase">
     <inertial>
       <mass value="0.010"/>
-      <origin rpy="0 0 0" xyz="0.034 0.0085 0.02924"/>
+      <origin rpy="0 0 0" xyz="0.034 0.0085 0.029"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
@@ -811,7 +811,7 @@
   <joint name="THJ5" type="revolute">
     <parent link="palm"/>
     <child link="thbase"/>
-    <origin rpy="0 0.785398163397 0" xyz="0.034 -0.0085 0.02924"/>
+    <origin rpy="0 0.785398163397 0" xyz="0.034 -0.0085 0.029"/>
     <axis xyz="0 0 -1"/>
     <limit effort="10" lower="-1.047" upper="1.047" velocity="1.0"/>
     <dynamics damping="50.5"/>
@@ -832,7 +832,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="thproximal_visual">
-        <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.01 0.01 0.01"/>
+        <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="shadow_thproximal_material">
         <color rgba="0.2 0.2 0.2 1.0"/>
@@ -910,7 +910,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="thmiddle_visual">
         <mesh filename="package://sr_hand/model/meshes/TH2_z.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -950,7 +950,7 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
     <visual>
-      <origin rpy="3.14159265359 -1.57079632679 3.14159265359" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry name="thdistal_visual">
         <mesh filename="package://sr_hand/model/meshes/TH1_z.mesh" scale="0.001 0.001 0.001"/>
       </geometry>
