@@ -324,12 +324,6 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   std::vector<pr2_hardware_interface::Actuator*> actuators;
 
   //TODO: remove this:
-  //for the time being we only use WRJ1, WRJ2, FFJ3 and FFJ4
-  std::vector<int> tmp_joints;
-  tmp_joints.push_back(FFJ3);
-  tmp_joints.push_back(FFJ4);
-  tmp_joints.push_back(WRJ1);
-  tmp_joints.push_back(WRJ2);
 
   for(unsigned int i=0; i< 24; ++i)
   {
@@ -982,13 +976,13 @@ void SR06::update_which_motors(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND   *
       command->from_motor_data_type = MOTOR_DATA_SVN_REVISION;
       break;
     case 6:
-      command->from_motor_data_type = MOTOR_DATA_P_I;
+      command->from_motor_data_type = MOTOR_DATA_F_P;
       break;
     case 7:
-      command->from_motor_data_type = MOTOR_DATA_I_IMAX;
+      command->from_motor_data_type = MOTOR_DATA_I_D;
       break;
     case 8:
-      command->from_motor_data_type = MOTOR_DATA_DEADBAND_SIGN;
+      command->from_motor_data_type = MOTOR_DATA_IMAX_DEADBAND_SIGN;
       slow_motor_info_counter = -1;
       break;
     default:
