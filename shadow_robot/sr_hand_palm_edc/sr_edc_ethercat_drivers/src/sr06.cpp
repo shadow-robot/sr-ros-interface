@@ -132,7 +132,9 @@ SR06::SR06()
   pthread_mutex_lock(&mutex);
   counter_ = 0;
 
-  motor_updater = boost::shared_ptr<motor_updater::MotorUpdater>(new motor_updater::MotorUpdater());
+  std::vector<motor_updater::UpdateConfig> update_configs_vector;
+
+  motor_updater = boost::shared_ptr<motor_updater::MotorUpdater>(new motor_updater::MotorUpdater(update_configs_vector));
 
   ROS_INFO("There are %d sensors", nb_sensors_const);
 

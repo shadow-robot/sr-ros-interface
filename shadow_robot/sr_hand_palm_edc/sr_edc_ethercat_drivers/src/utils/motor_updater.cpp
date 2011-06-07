@@ -32,29 +32,33 @@
 
 namespace motor_updater
 {
-  MotorUpdater::MotorUpdater()
-    : even_motors(true), counter(0)
+  MotorUpdater::MotorUpdater(std::vector<UpdateConfig> update_configs_vector)
+    : nh_tilde("~"), even_motors(1),
+      which_data_from_motors(0)
   {
-    UpdateConfig test;
-    test.what_to_update = 0;
-    test.when_to_update = 1;
-    test.is_important = true;
+    mutex = boost::shared_ptr<boost::mutex>(new boost::mutex());
 
-    update_configs_vector.push_back(test);
+    BOOST_FOREACH(UpdateConfig config, update_configs_vector)
+    {
+      if(config.when_to_update != -1)
+      {
+        double tmp_dur = ((double)config.when_to_update)/1000.0;
+        ros::Duration duration(tmp_dur);
+        timers.push_back(nh_tilde.createTimer(duration, boost::bind(&MotorUpdater::timer_callback,
+                                                                    this, _1, config.what_to_update)));
+      }
+      else
+        important_update_configs_vector.push_back(config);
+    }
+  }
 
-/*
-  XmlRpc::XmlRpcValue my_list;
-  nodehandle_.getParam("less_important_frequencies", my_list);
-  ROS_ASSERT(my_list.getType() == XmlRpc::XmlRpcValue::TypeArray);
-
-  for (int32_t i = 0; i < my_list.size(); ++i)
+  void MotorUpdater::timer_callback(const ros::TimerEvent& event, FROM_MOTOR_DATA_TYPE data_type)
   {
-  ROS_ASSERT(my_list[i].getType() == XmlRpc::XmlRpcValue::TypeInt);
-  ROS_ERROR_STREAM("TOTO: " << static_cast<int>(my_list[i]));
-  }
-*/
+    unimportant_data_queue.push(data_type);
 
+    ROS_DEBUG_STREAM("Timer: data type = "<<data_type << " | queue size: "<<unimportant_data_queue.size());
   }
+
 
   MotorUpdater::~MotorUpdater()
   {
@@ -63,13 +67,38 @@ namespace motor_updater
 
   void MotorUpdater::build_update_motor_command(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command)
   {
-    BOOST_FOREACH(UpdateConfig config, update_configs_vector)
+    if(!mutex->try_lock())
+      return;
+
+    if(even_motors)
+      even_motors = 0;
+    else
     {
-      if(config.is_important)
-      {
-        std::cout <<"Toto" <<std::endl;
-      }
+      even_motors = 1;
+      which_data_from_motors ++;
+
+      if( which_data_from_motors >= important_update_configs_vector.size() )
+        which_data_from_motors = 0;
     }
+
+    command->which_motors = even_motors;
+
+    if(!unimportant_data_queue.empty())
+    {
+      //an unimportant data is available
+      command->from_motor_data_type = unimportant_data_queue.front();
+      unimportant_data_queue.pop();
+
+      ROS_DEBUG_STREAM("Updating unimportant data type: "<<command->from_motor_data_type << " | queue size: "<<unimportant_data_queue.size());
+    }
+    else
+    {
+      //important data to update as often as possible
+      command->from_motor_data_type = important_update_configs_vector[which_data_from_motors].what_to_update;
+      ROS_DEBUG_STREAM("Updating important data type: "<<command->from_motor_data_type << " | ["<<which_data_from_motors<<"/"<<important_update_configs_vector.size()<<"] ");
+    }
+
+    mutex->unlock();
   }
 }
 

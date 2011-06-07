@@ -30,18 +30,82 @@
 
 TEST(Utils, motor_updater_freq)
 {
-  motor_updater::MotorUpdater test = motor_updater::MotorUpdater();
+  std::vector<motor_updater::UpdateConfig> update_configs_vector;
+
+  motor_updater::UpdateConfig test;
+  test.what_to_update = MOTOR_DATA_SGL;
+  test.when_to_update = -1;
+  update_configs_vector.push_back(test);
+
+  motor_updater::UpdateConfig test2;
+  test2.what_to_update = MOTOR_DATA_SVN_REVISION;
+  test2.when_to_update = 5000;
+  update_configs_vector.push_back(test2);
+
+  motor_updater::UpdateConfig test3;
+  test3.what_to_update = MOTOR_DATA_CAN_NUM_RECEIVED;
+  test3.when_to_update = 1000;
+  update_configs_vector.push_back(test3);
+
+  motor_updater::MotorUpdater motor_updater = motor_updater::MotorUpdater(update_configs_vector);
 
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command = new ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND();
-  test.build_update_motor_command(command);
+  motor_updater.build_update_motor_command(command);
 
-  EXPECT_EQ(0,0);
+  bool svn_transmitted = false;
+  bool svn_transmitted_once = false;
+
+  int can_num_transmitted_counter = 0;
+
+  ros::Time start = ros::Time::now();
+  ros::Duration time_spent(0.0);
+
+  while(time_spent.toSec() < 7.2)
+  {
+    ros::spinOnce();
+    motor_updater.build_update_motor_command(command);
+
+    time_spent = ros::Time::now() - start;
+
+    if(abs(time_spent.toSec() - 5.0) < .01 )
+    {
+      if(command->from_motor_data_type == MOTOR_DATA_SVN_REVISION)
+      {
+        ROS_INFO_STREAM("Correct data received at time : "<<time_spent);
+        svn_transmitted = true;
+
+        if(svn_transmitted_once)
+          svn_transmitted_once = false;
+        else
+          svn_transmitted_once = true;
+      }
+    }
+
+
+    if(abs(time_spent.toSec()-((double)( (int)time_spent.toSec() ) ) ) < .01 )
+    {
+      if(command->from_motor_data_type == MOTOR_DATA_CAN_NUM_RECEIVED)
+      {
+        ROS_INFO_STREAM("Correct CAN data received at time : "<<time_spent);
+        can_num_transmitted_counter ++;
+      }
+    }
+    usleep(1000);
+  }
+
+  EXPECT_TRUE(svn_transmitted);
+  EXPECT_TRUE(svn_transmitted_once);
+
+  EXPECT_EQ(can_num_transmitted_counter, 7);
+
   delete command;
 }
 
 
 int main(int argc, char **argv)
 {
+  ros::init(argc, argv, "sr_edc_ethercat_drivers_test");
+
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

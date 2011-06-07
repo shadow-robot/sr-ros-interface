@@ -31,12 +31,6 @@ rosbuild_genmsg()
 #uncomment if you have defined services
 rosbuild_gensrv()
 
-#common commands for building c++ executables and libraries
-#target_link_libraries(${PROJECT_NAME} bfd)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
 rosbuild_add_library(sr_edc_ethercat_drivers src/sr0x.cpp src/sr06.cpp src/srbridge.cpp src/srcan.cpp src/srdmotor.cpp src/motor_trace_buffer.cpp src/utils/motor_updater.cpp headers.txt)
 target_link_libraries(sr_edc_ethercat_drivers sr_hand_lib)
 rosbuild_add_link_flags(sr_edc_ethercat_drivers -lbfd)

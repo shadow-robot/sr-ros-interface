@@ -29,7 +29,12 @@
 #ifndef _MOTOR_UPDATER_HPP_
 #define _MOTOR_UPDATER_HPP_
 
+#include <ros/ros.h>
 #include <vector>
+#include <list>
+#include <queue>
+#include <boost/thread.hpp>
+#include <boost/smart_ptr.hpp>
 
 
 #include <sr_edc_ethercat_drivers/types_for_external.h>
@@ -41,24 +46,31 @@ namespace motor_updater
 {
   struct UpdateConfig
   {
-    int what_to_update;
+    FROM_MOTOR_DATA_TYPE what_to_update;
     int when_to_update;
-    bool is_important;
   };
 
   class MotorUpdater
   {
   public:
-    MotorUpdater();
+    MotorUpdater(std::vector<UpdateConfig> update_configs_vector);
     ~MotorUpdater();
 
     void build_update_motor_command(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command);
 
-  private:
-    bool even_motors;
-    int counter;
+    void timer_callback(const ros::TimerEvent& event, FROM_MOTOR_DATA_TYPE data_type);
 
-    std::vector<UpdateConfig> update_configs_vector;
+  private:
+    ros::NodeHandle nh_tilde;
+    int even_motors;
+
+    std::vector<UpdateConfig> important_update_configs_vector;
+    int which_data_from_motors;
+
+    std::vector<ros::Timer> timers;
+    std::queue<FROM_MOTOR_DATA_TYPE, std::list<FROM_MOTOR_DATA_TYPE> > unimportant_data_queue;
+
+    boost::shared_ptr<boost::mutex> mutex;
   };
 }
 
