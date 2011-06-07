@@ -39,6 +39,7 @@
 #include <boost/assign.hpp>
 
 #include <sr_robot_lib/sr_hand_lib.hpp>
+#include "sr_edc_ethercat_drivers/utils/motor_updater.hpp"
 
 #include <sr_edc_ethercat_drivers/types_for_external.h>
 extern "C" {
@@ -116,6 +117,8 @@ private:
    * If the frequency is 0, then we update this data as fast as we can.
    */
   std::vector<std::pair<int, int> > motor_data_update_freq;
+
+  boost::shared_ptr<motor_updater::MotorUpdater> motor_updater;
 };
 
 

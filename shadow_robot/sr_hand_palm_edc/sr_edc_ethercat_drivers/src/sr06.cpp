@@ -132,16 +132,7 @@ SR06::SR06()
   pthread_mutex_lock(&mutex);
   counter_ = 0;
 
-  XmlRpc::XmlRpcValue my_list;
-  nodehandle_.getParam("less_important_frequencies", my_list);
-  ROS_ASSERT(my_list.getType() == XmlRpc::XmlRpcValue::TypeArray);
-
-  for (int32_t i = 0; i < my_list.size(); ++i)
-  {
-    ROS_ASSERT(my_list[i].getType() == XmlRpc::XmlRpcValue::TypeInt);
-    ROS_ERROR_STREAM("TOTO: " << static_cast<int>(my_list[i]));
-  }
-
+  motor_updater = boost::shared_ptr<motor_updater::MotorUpdater>(new motor_updater::MotorUpdater());
 
   ROS_INFO("There are %d sensors", nb_sensors_const);
 
