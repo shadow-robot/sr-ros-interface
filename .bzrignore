@@ -128,3 +128,5 @@ shadow_robot/sr_tactile_sensors/bin
 shadow_robot/sr_tactile_sensors/build
 bin
 build
+￼
+shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/bin/test/sr_edc_ethercat_drivers_test

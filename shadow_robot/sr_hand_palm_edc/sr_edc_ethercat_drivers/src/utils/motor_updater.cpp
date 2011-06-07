@@ -40,7 +40,7 @@ namespace motor_updater
 
     BOOST_FOREACH(UpdateConfig config, update_configs_vector)
     {
-      if(config.when_to_update != -1)
+      if(config.when_to_update != -1.0)
       {
         double tmp_dur = config.when_to_update;
         ros::Duration duration(tmp_dur);

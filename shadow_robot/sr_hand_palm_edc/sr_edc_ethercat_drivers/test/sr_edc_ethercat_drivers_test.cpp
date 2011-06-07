@@ -28,77 +28,129 @@
 #include "sr_edc_ethercat_drivers/utils/motor_updater.hpp"
 #include <gtest/gtest.h>
 
-TEST(Utils, motor_updater_freq)
+struct UpdaterResult
 {
-  std::vector<motor_updater::UpdateConfig> update_configs_vector;
+  bool svn_transmitted;
+  bool svn_transmitted_once;
+  int can_num_transmitted_counter;
+};
 
-  motor_updater::UpdateConfig test;
-  test.what_to_update = MOTOR_DATA_SGL;
-  test.when_to_update = -1;
-  update_configs_vector.push_back(test);
+class MotorUpdaterTest
+{
+public:
+  MotorUpdaterTest()
+  {}
 
-  motor_updater::UpdateConfig test2;
-  test2.what_to_update = MOTOR_DATA_SVN_REVISION;
-  test2.when_to_update = 5000;
-  update_configs_vector.push_back(test2);
+  ~MotorUpdaterTest()
+  {}
 
-  motor_updater::UpdateConfig test3;
-  test3.what_to_update = MOTOR_DATA_CAN_NUM_RECEIVED;
-  test3.when_to_update = 1000;
-  update_configs_vector.push_back(test3);
-
-  motor_updater::MotorUpdater motor_updater = motor_updater::MotorUpdater(update_configs_vector);
-
-  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command = new ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND();
-  motor_updater.build_update_motor_command(command);
-
-  bool svn_transmitted = false;
-  bool svn_transmitted_once = false;
-
-  int can_num_transmitted_counter = 0;
-
-  ros::Time start = ros::Time::now();
-  ros::Duration time_spent(0.0);
-
-  while(time_spent.toSec() < 7.2)
+  UpdaterResult check_updates(double tolerancy)
   {
-    ros::spinOnce();
+    std::vector<motor_updater::UpdateConfig> update_configs_vector;
+
+    motor_updater::UpdateConfig test;
+    test.what_to_update = MOTOR_DATA_SGL;
+    test.when_to_update = -1.0;
+    update_configs_vector.push_back(test);
+
+    motor_updater::UpdateConfig test2;
+    test2.what_to_update = MOTOR_DATA_SVN_REVISION;
+    test2.when_to_update = 5.0;
+    update_configs_vector.push_back(test2);
+
+    motor_updater::UpdateConfig test3;
+    test3.what_to_update = MOTOR_DATA_CAN_NUM_RECEIVED;
+    test3.when_to_update = 1.0;
+    update_configs_vector.push_back(test3);
+
+    motor_updater::MotorUpdater motor_updater = motor_updater::MotorUpdater(update_configs_vector);
+
+    ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command = new ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND();
     motor_updater.build_update_motor_command(command);
 
-    time_spent = ros::Time::now() - start;
+    bool svn_transmitted = false;
+    bool svn_transmitted_once = false;
 
-    if(abs(time_spent.toSec() - 5.0) < .01 )
+    int can_num_transmitted_counter = 0;
+
+    ros::Time start = ros::Time::now();
+    ros::Duration time_spent(0.0);
+
+    while(time_spent.toSec() < 7.2)
     {
-      if(command->from_motor_data_type == MOTOR_DATA_SVN_REVISION)
-      {
-        ROS_INFO_STREAM("Correct data received at time : "<<time_spent);
-        svn_transmitted = true;
+      ros::spinOnce();
+      motor_updater.build_update_motor_command(command);
 
-        if(svn_transmitted_once)
-          svn_transmitted_once = false;
-        else
-          svn_transmitted_once = true;
+      time_spent = ros::Time::now() - start;
+
+      if(abs(time_spent.toSec() - 5.0) < tolerancy )
+      {
+        if(command->from_motor_data_type == MOTOR_DATA_SVN_REVISION)
+        {
+          ROS_INFO_STREAM("Correct data received at time : "<<time_spent);
+          svn_transmitted = true;
+
+          if(svn_transmitted_once)
+            svn_transmitted_once = false;
+          else
+            svn_transmitted_once = true;
+        }
       }
+
+
+      if(abs(time_spent.toSec()-((double)( (int)time_spent.toSec() ) ) ) < tolerancy )
+      {
+        if(command->from_motor_data_type == MOTOR_DATA_CAN_NUM_RECEIVED)
+        {
+          ROS_INFO_STREAM("Correct CAN data received at time : "<<time_spent);
+          can_num_transmitted_counter ++;
+        }
+      }
+      usleep(1000);
     }
 
+    UpdaterResult updater_result;
+    updater_result.svn_transmitted = svn_transmitted;
+    updater_result.svn_transmitted_once = svn_transmitted_once;
+    updater_result.can_num_transmitted_counter = can_num_transmitted_counter;
 
-    if(abs(time_spent.toSec()-((double)( (int)time_spent.toSec() ) ) ) < .01 )
-    {
-      if(command->from_motor_data_type == MOTOR_DATA_CAN_NUM_RECEIVED)
-      {
-        ROS_INFO_STREAM("Correct CAN data received at time : "<<time_spent);
-        can_num_transmitted_counter ++;
-      }
-    }
-    usleep(1000);
+    delete command;
+
+    return updater_result;
   }
+};
 
-  EXPECT_TRUE(svn_transmitted);
-  EXPECT_TRUE(svn_transmitted_once);
+TEST(Utils, motor_updater_freq_low_tolerancy)
+{
+  MotorUpdaterTest mut = MotorUpdaterTest();
+  UpdaterResult updater_result = mut.check_updates(0.01);
 
-  EXPECT_EQ(can_num_transmitted_counter, 7);
+  EXPECT_TRUE(updater_result.svn_transmitted);
+  EXPECT_TRUE(updater_result.svn_transmitted_once);
 
-  delete command;
+  EXPECT_EQ(updater_result.can_num_transmitted_counter, 7);
+}
+
+TEST(Utils, motor_updater_freq_medium_tolerancy)
+{
+  MotorUpdaterTest mut = MotorUpdaterTest();
+  UpdaterResult updater_result = mut.check_updates(0.05);
+
+  EXPECT_TRUE(updater_result.svn_transmitted);
+  EXPECT_TRUE(updater_result.svn_transmitted_once);
+
+  EXPECT_EQ(updater_result.can_num_transmitted_counter, 7);
+}
+
+TEST(Utils, motor_updater_freq_high_tolerancy)
+{
+  MotorUpdaterTest mut = MotorUpdaterTest();
+  UpdaterResult updater_result = mut.check_updates(0.1);
+
+  EXPECT_TRUE(updater_result.svn_transmitted);
+  EXPECT_TRUE(updater_result.svn_transmitted_once);
+
+  EXPECT_EQ(updater_result.can_num_transmitted_counter, 7);
 }
 
 
