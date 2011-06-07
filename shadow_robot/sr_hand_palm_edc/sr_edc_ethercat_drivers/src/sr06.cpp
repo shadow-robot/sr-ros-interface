@@ -1153,12 +1153,72 @@ std::vector<motor_updater::UpdateConfig> SR06::read_update_rate_configs()
 {
   std::vector<motor_updater::UpdateConfig> update_rate_configs_vector;
 
-  double rate;
-  nodehandle_.getParam("motor_data_updare_rate/sgl", rate);
-  motor_updater::UpdateConfig config;
-  config.when_to_update = rate;
-  config.what_to_update = MOTOR_DATA_SGL;
+  //TODO: This should be moved somewhere else. Not sure where yet.
+  std::string base_topic = "motor_data_update_rate/";
+  typedef std::pair<std::string, FROM_MOTOR_DATA_TYPE> ConfPair;
+  std::vector<ConfPair> config;
+  ConfPair tmp;
 
+  tmp.first = base_topic + "sgl";
+  tmp.second = MOTOR_DATA_SGL;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "sgr";
+  tmp.second = MOTOR_DATA_SGR;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "pwm";
+  tmp.second = MOTOR_DATA_PWM;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "flags";
+  tmp.second = MOTOR_DATA_FLAGS;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "current";
+  tmp.second = MOTOR_DATA_CURRENT;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "voltage";
+  tmp.second = MOTOR_DATA_VOLTAGE;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "temperature";
+  tmp.second = MOTOR_DATA_TEMPERATURE;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "can_num_received";
+  tmp.second = MOTOR_DATA_CAN_NUM_RECEIVED;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "can_num_transmitted";
+  tmp.second = MOTOR_DATA_CAN_NUM_TRANSMITTED;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "svn_revision";
+  tmp.second = MOTOR_DATA_SVN_REVISION;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "f_p";
+  tmp.second = MOTOR_DATA_F_P;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "i_d";
+  tmp.second = MOTOR_DATA_I_D;
+  config.push_back(tmp);
+
+  tmp.first = base_topic + "imax_deadband_sign";
+  tmp.second = MOTOR_DATA_IMAX_DEADBAND_SIGN;
+  config.push_back(tmp);
+
+  for(unsigned int i = 0; i < config.size(); ++i)
+  {
+    double rate;
+    nodehandle_.getParam(config[i].first, rate);
+    motor_updater::UpdateConfig config_tmp;
+    config_tmp.when_to_update = rate;
+    config_tmp.what_to_update = config[i].second;
+  }
 
   return update_rate_configs_vector;
 }

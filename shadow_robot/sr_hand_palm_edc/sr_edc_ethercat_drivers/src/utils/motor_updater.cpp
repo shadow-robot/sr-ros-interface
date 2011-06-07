@@ -42,7 +42,7 @@ namespace motor_updater
     {
       if(config.when_to_update != -1)
       {
-        double tmp_dur = ((double)config.when_to_update)/1000.0;
+        double tmp_dur = config.when_to_update;
         ros::Duration duration(tmp_dur);
         timers.push_back(nh_tilde.createTimer(duration, boost::bind(&MotorUpdater::timer_callback,
                                                                     this, _1, config.what_to_update)));
