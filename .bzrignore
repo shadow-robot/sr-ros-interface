@@ -82,7 +82,6 @@ shadow_robot/sr_convenient_dependencies/build
 shadow_robot/sr_convenient_dependencies/src
 shadow_robot/dataglove/doc
 shadow_robot/sr_hand_palm_edc/sr_edc_defs/build
-shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/bin
 shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/build
 shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/lib
 shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/msg_gen

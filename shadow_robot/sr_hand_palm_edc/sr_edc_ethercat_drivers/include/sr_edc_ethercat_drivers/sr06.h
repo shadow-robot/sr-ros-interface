@@ -62,7 +62,6 @@ public:
   bool can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet);
   void erase_flash();
   bool read_flash(unsigned int offset, unsigned char baddrl, unsigned char baddrh, unsigned char baddru);
-  void update_which_motors(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND   *command);
 
 protected:
   int                                                                  counter_;
@@ -84,13 +83,6 @@ private:
   pthread_mutex_t                  producing;
   ros::ServiceServer               serviceServer;
 
-  int                              which_motors;
-  int                              which_data_from_motors;
-
-  ///Some information is less important to sample than some other
-  int slow_motor_info_counter;
-  static const int slow_motor_info_max_iter_const;
-
   bool                             flashing;
   ETHERCAT_CAN_BRIDGE_DATA         can_message_;
   bool                             can_message_sent;
@@ -102,23 +94,11 @@ private:
   ///counter for the number of empty buffer we're reading.
   unsigned int                     zero_buffer_read;
 
-  pthread_mutex_t mutex;
-
-  /// A vector containing all the actuators
-  std::vector<pr2_hardware_interface::Actuator* > actuators_;
-
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
 
-  /**
-   * This vector contains a mapping between the different motor data
-   * we can ask for (defined in 0220_palm_edc_ethercat_protocol.h) and
-   * the approximate frequency at which each should be polled.
-   *
-   * If the frequency is 0, then we update this data as fast as we can.
-   */
-  std::vector<std::pair<int, int> > motor_data_update_freq;
-
   boost::shared_ptr<motor_updater::MotorUpdater> motor_updater;
+
+  std::vector<motor_updater::UpdateConfig> read_update_rate_configs();
 };
 
 

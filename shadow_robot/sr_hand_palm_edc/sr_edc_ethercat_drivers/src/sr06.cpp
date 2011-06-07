@@ -61,8 +61,6 @@ const unsigned int       SR06::nb_sensors_const           = ETHERCAT_STATUS_DATA
 const unsigned char      SR06::nb_publish_by_unpack_const = (nb_sensors_const % max_iter_const) ? (nb_sensors_const / max_iter_const) + 1 : (nb_sensors_const / max_iter_const);
 const unsigned int       SR06::max_retry                  = 10;
 
-const int SR06::slow_motor_info_max_iter_const = 1000;
-
 #define ETHERCAT_CAN_BRIDGE_DATA_SIZE sizeof(ETHERCAT_CAN_BRIDGE_DATA)
 
 
@@ -117,24 +115,17 @@ PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 
 SR06::SR06()
   : SR0X(),
-    which_motors(0),
-    which_data_from_motors(0),
-    slow_motor_info_counter(0),
     flashing(false),
     can_message_sent(true),
     can_packet_acked(true),
     zero_buffer_read(0)
 {
   int res;
-  res = pthread_mutex_init(&mutex, NULL);
   check_for_pthread_mutex_init_error(res);
-
-  pthread_mutex_lock(&mutex);
   counter_ = 0;
 
-  std::vector<motor_updater::UpdateConfig> update_configs_vector;
-
-  motor_updater = boost::shared_ptr<motor_updater::MotorUpdater>(new motor_updater::MotorUpdater(update_configs_vector));
+  std::vector<motor_updater::UpdateConfig> update_rate_configs_vector = read_update_rate_configs();
+  motor_updater = boost::shared_ptr<motor_updater::MotorUpdater>(new motor_updater::MotorUpdater(update_rate_configs_vector));
 
   ROS_INFO("There are %d sensors", nb_sensors_const);
 
@@ -164,7 +155,6 @@ SR06::SR06()
   check_for_pthread_mutex_init_error(res);
 
   serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::simple_motor_flasher, this);
-  pthread_mutex_unlock(&mutex);
 }
 
 /** \brief Desctructor of the SR06 driver
@@ -921,92 +911,6 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
 }
 
 
-void SR06::update_which_motors(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND   *command)
-{
-  if (0 == which_motors)
-  {
-    which_motors = 1;
-  }
-  else
-  {
-    which_motors = 0;
-
-    which_data_from_motors++;
-
-    if (which_data_from_motors > 4)
-      which_data_from_motors = 0;
-  }
-
-  command->which_motors = which_motors;
-
-  //Asks for some less important data only from time to time.
-  if( slow_motor_info_counter >= slow_motor_info_max_iter_const)
-  {
-    which_data_from_motors = slow_motor_info_counter - slow_motor_info_max_iter_const;
-    switch( which_data_from_motors )
-    {
-    case 0:
-      command->from_motor_data_type = MOTOR_DATA_VOLTAGE;
-      break;
-    case 1:
-      command->from_motor_data_type = MOTOR_DATA_TEMPERATURE;
-      break;
-    case 2:
-      command->from_motor_data_type = MOTOR_DATA_CAN_NUM_RECEIVED;
-      break;
-    case 3:
-      command->from_motor_data_type = MOTOR_DATA_CAN_NUM_TRANSMITTED;
-      break;
-    case 4:
-      command->from_motor_data_type = MOTOR_DATA_SVN_REVISION;
-      break;
-    case 5:
-      command->from_motor_data_type = MOTOR_DATA_SVN_REVISION;
-      break;
-    case 6:
-      command->from_motor_data_type = MOTOR_DATA_F_P;
-      break;
-    case 7:
-      command->from_motor_data_type = MOTOR_DATA_I_D;
-      break;
-    case 8:
-      command->from_motor_data_type = MOTOR_DATA_IMAX_DEADBAND_SIGN;
-      slow_motor_info_counter = -1;
-      break;
-    default:
-      ROS_ERROR_STREAM("Motor data type not recognized: "<<command->from_motor_data_type);
-      slow_motor_info_counter = -1;
-      break;
-    }
-  }
-  else
-  {
-    switch (which_data_from_motors)
-    {
-    case 0:
-      command->from_motor_data_type = MOTOR_DATA_SGL;
-      break;
-    case 1:
-      command->from_motor_data_type = MOTOR_DATA_SGR;
-      break;
-    case 2:
-      command->from_motor_data_type = MOTOR_DATA_PWM;
-      break;
-    case 3:
-      command->from_motor_data_type = MOTOR_DATA_FLAGS;
-      break;
-    case 4:
-      command->from_motor_data_type = MOTOR_DATA_CURRENT;
-      break;
-    default:
-      ROS_ERROR_STREAM("Motor data type not recognized: "<<command->from_motor_data_type);
-      break;
-    }
-  } //end else slow_motor_info_counter
-
-  ++ slow_motor_info_counter;
-}
-
 
 /** \brief packs the commands before sending them to the EtherCAT bus
  *
@@ -1050,7 +954,7 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 
   //alternate between even and uneven motors
   // and ask for the different informations.
-  update_which_motors(command);
+  motor_updater->build_update_motor_command(command);
 
   if (flashing && !can_packet_acked && !can_message_sent)
   {
@@ -1244,7 +1148,14 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   return true;
 }
 
+std::vector<motor_updater::UpdateConfig> SR06::read_update_rate_configs()
+{
+  std::vector<motor_updater::UpdateConfig> update_rate_configs_vector;
 
+
+
+  return update_rate_configs_vector;
+}
 /* For the emacs weenies in the crowd.
    Local Variables:
    c-basic-offset: 2
