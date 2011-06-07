@@ -47,7 +47,7 @@ namespace motor_updater
   struct UpdateConfig
   {
     FROM_MOTOR_DATA_TYPE what_to_update;
-    int when_to_update;
+    double when_to_update;
   };
 
   class MotorUpdater

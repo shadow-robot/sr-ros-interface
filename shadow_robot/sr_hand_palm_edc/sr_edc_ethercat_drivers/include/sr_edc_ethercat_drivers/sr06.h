@@ -95,9 +95,14 @@ private:
   unsigned int                     zero_buffer_read;
 
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
-
   boost::shared_ptr<motor_updater::MotorUpdater> motor_updater;
 
+  /**
+   * Simply reads the config from the specified yaml file.
+   *
+   * @return A vector of UpdateConfig containing the type of data and the frequency
+   *         at which we want to poll this data
+   */
   std::vector<motor_updater::UpdateConfig> read_update_rate_configs();
 };
 

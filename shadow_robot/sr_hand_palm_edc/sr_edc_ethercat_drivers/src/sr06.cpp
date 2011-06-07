@@ -1148,10 +1148,16 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   return true;
 }
 
+
 std::vector<motor_updater::UpdateConfig> SR06::read_update_rate_configs()
 {
   std::vector<motor_updater::UpdateConfig> update_rate_configs_vector;
 
+  double rate;
+  nodehandle_.getParam("motor_data_updare_rate/sgl", rate);
+  motor_updater::UpdateConfig config;
+  config.when_to_update = rate;
+  config.what_to_update = MOTOR_DATA_SGL;
 
 
   return update_rate_configs_vector;
