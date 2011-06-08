@@ -301,8 +301,6 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   std::vector<int> joint_ids;
   std::vector<pr2_hardware_interface::Actuator*> actuators;
 
-  //TODO: remove this:
-
   for(unsigned int i=0; i< 24; ++i)
   {
     joint_names.push_back(std::string(sensor_names[i]));
@@ -1157,59 +1155,27 @@ std::vector<motor_updater::UpdateConfig> SR06::read_update_rate_configs()
   std::string base_topic = "motor_data_update_rate/";
   typedef std::pair<std::string, FROM_MOTOR_DATA_TYPE> ConfPair;
   std::vector<ConfPair> config;
-  ConfPair tmp;
 
-  tmp.first = base_topic + "sgl";
-  tmp.second = MOTOR_DATA_SGL;
-  config.push_back(tmp);
+  static const char* topics[13] = {"sgl", "sgr", "pwm", "flags", "current",
+                                   "voltage", "temperature", "can_num_received",
+                                   "can_num_transmitted", "svn_revision",
+                                   "f_p", "i_d", "imax_deadband_sign"};
 
-  tmp.first = base_topic + "sgr";
-  tmp.second = MOTOR_DATA_SGR;
-  config.push_back(tmp);
+  static const FROM_MOTOR_DATA_TYPE data_types[13] = {MOTOR_DATA_SGL, MOTOR_DATA_SGR,
+                                                      MOTOR_DATA_PWM, MOTOR_DATA_FLAGS,
+                                                      MOTOR_DATA_CURRENT, MOTOR_DATA_VOLTAGE,
+                                                      MOTOR_DATA_TEMPERATURE, MOTOR_DATA_CAN_NUM_RECEIVED,
+                                                      MOTOR_DATA_CAN_NUM_TRANSMITTED, MOTOR_DATA_SVN_REVISION,
+                                                      MOTOR_DATA_F_P, MOTOR_DATA_I_D,
+                                                      MOTOR_DATA_IMAX_DEADBAND_SIGN};
 
-  tmp.first = base_topic + "pwm";
-  tmp.second = MOTOR_DATA_PWM;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "flags";
-  tmp.second = MOTOR_DATA_FLAGS;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "current";
-  tmp.second = MOTOR_DATA_CURRENT;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "voltage";
-  tmp.second = MOTOR_DATA_VOLTAGE;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "temperature";
-  tmp.second = MOTOR_DATA_TEMPERATURE;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "can_num_received";
-  tmp.second = MOTOR_DATA_CAN_NUM_RECEIVED;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "can_num_transmitted";
-  tmp.second = MOTOR_DATA_CAN_NUM_TRANSMITTED;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "svn_revision";
-  tmp.second = MOTOR_DATA_SVN_REVISION;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "f_p";
-  tmp.second = MOTOR_DATA_F_P;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "i_d";
-  tmp.second = MOTOR_DATA_I_D;
-  config.push_back(tmp);
-
-  tmp.first = base_topic + "imax_deadband_sign";
-  tmp.second = MOTOR_DATA_IMAX_DEADBAND_SIGN;
-  config.push_back(tmp);
+  for(unsigned int i=0; i<13; ++i)
+  {
+    ConfPair tmp;
+    tmp.first = base_topic + topics[i];
+    tmp.second = data_types[i];
+    config.push_back(tmp);
+  }
 
   for(unsigned int i = 0; i < config.size(); ++i)
   {
