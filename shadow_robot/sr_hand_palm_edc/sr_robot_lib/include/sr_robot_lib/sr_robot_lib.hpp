@@ -69,9 +69,10 @@ namespace shadow_joints
 
   struct Joint
   {
-    //the index of the joint in the joint array
-    // coming from the hardware
-    int joint_id;
+    //the indexes of the joints in the joint array
+    // coming from the hardware which are used to
+    // compute the joint data.
+    std::vector<int> joint_ids;
 
     double calibrated_position;
 
@@ -88,7 +89,7 @@ namespace shadow_robot
   {
   public:
     SrRobotLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
-               std::vector<int> joint_ids, std::vector<pr2_hardware_interface::Actuator*> actuators) {};
+               std::vector<std::vector<int> > joint_ids, std::vector<pr2_hardware_interface::Actuator*> actuators) {};
     ~SrRobotLib() {};
 
     shadow_joints::JointsMap joints_map;
@@ -97,7 +98,7 @@ namespace shadow_robot
   protected:
     virtual void initialize_map(std::vector<std::string> joint_names,
                                 std::vector<int> motor_ids,
-                                std::vector<int> joint_ids,
+                                std::vector<std::vector<int> > joint_ids,
                                 std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
   };
 }

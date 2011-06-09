@@ -295,21 +295,129 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   if(retval != 0)
     return retval;
 
+  //TODO: read this from config/EEProm?
+  std::vector<std::vector<int> > joint_to_sensor;
+  std::vector<int> tmp_vect;
+
+  //FIRST FINGER
+  tmp_vect.push_back(FFJ1);
+  tmp_vect.push_back(FFJ2);      //FFJ0
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(FFJ1);            //FFJ1
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(FFJ2);            //FFJ2
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(FFJ3);            //FFJ3
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(FFJ4);            //FFJ4
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+
+  //MIDDLE FINGER
+  tmp_vect.push_back(MFJ1);
+  tmp_vect.push_back(MFJ2);      //MFJ0
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(MFJ1);            //MFJ1
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(MFJ2);            //MFJ2
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(MFJ3);            //MFJ3
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(MFJ4);            //MFJ4
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+
+  //RING FINGER
+  tmp_vect.push_back(RFJ1);
+  tmp_vect.push_back(RFJ2);      //RFJ0
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(RFJ1);            //RFJ1
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(RFJ2);            //RFJ2
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(RFJ3);            //RFJ3
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(RFJ4);            //RFJ4
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+
+  //LITTLE FINGER
+  tmp_vect.push_back(LFJ1);
+  tmp_vect.push_back(LFJ2);      //LFJ0
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(LFJ1);            //LFJ1
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(LFJ2);            //LFJ2
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(LFJ3);            //LFJ3
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(LFJ4);            //LFJ4
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(LFJ5);            //LFJ5
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+
+  //THUMB
+  tmp_vect.push_back(THJ1);            //THJ1
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(THJ2);            //THJ2
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(THJ3);            //THJ3
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(THJ4);            //THJ4
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(THJ5A);            //THJ5
+  tmp_vect.push_back(THJ5B);
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+
+  //WRIST
+  tmp_vect.push_back(WRJ1B);
+  tmp_vect.push_back(WRJ1A);            //WRJ1
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+  tmp_vect.push_back(WRJ2);            //WRJ2
+  joint_to_sensor.push_back(tmp_vect);
+  tmp_vect.clear();
+
+
   //initializing the hand library
-  std::vector<std::string> joint_names;
+  std::vector<std::string> joint_names_tmp;
   std::vector<int> motor_ids;
-  std::vector<int> joint_ids;
+  std::vector<std::vector<int> > joint_ids;
   std::vector<pr2_hardware_interface::Actuator*> actuators;
 
-  for(unsigned int i=0; i< 24; ++i)
+  for(unsigned int i=0; i< JOINTS_NUM; ++i)
   {
-    joint_names.push_back(std::string(sensor_names[i]));
+    joint_names_tmp.push_back(std::string(joint_names[i]));
     motor_ids.push_back(i);
-    joint_ids.push_back(i);
+    std::vector<int> tmp_vec = joint_to_sensor[i];
+    joint_ids.push_back(tmp_vec);
 
     //initializing the actuators.
-    pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(sensor_names[i]);
-    ROS_ERROR_STREAM("adding actuator: "<<sensor_names[i]);
+    pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(joint_names[i]);
+    ROS_ERROR_STREAM("adding actuator: "<<joint_names[i]);
     actuators.push_back( actuator );
 
     if(hw)
@@ -321,7 +429,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
       }
     }
   }
-  sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>(new shadow_robot::SrHandLib(joint_names, motor_ids, joint_ids, actuators));
+  sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>(new shadow_robot::SrHandLib(joint_names_tmp, motor_ids, joint_ids, actuators));
 
 
 
@@ -1088,7 +1196,11 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
     //get all the raw joint positions.
     //TODO: calibrated here?
-    state->position_ = status_data->sensors[joint_iter->second->joint_id] / 4000.0;
+    double tmp_position = 0.0;
+    BOOST_FOREACH(int sensor_indexes, joint_iter->second->joint_ids)
+      tmp_position += sensor_indexes;
+
+    state->position_ = tmp_position / 4000.0;;
 
     //get the remaining information.
     // TODO: check if there was an error, using which_motor_data_had_errors mask
