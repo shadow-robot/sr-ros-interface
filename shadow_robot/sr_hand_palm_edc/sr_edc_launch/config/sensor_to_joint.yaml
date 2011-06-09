@@ -1,14 +1,35 @@
 joint_to_sensor_mapping: [
   [["FFJ1", 0.5], ["FFJ2",0.5]], #FFJ0
-  [["FFJ1", 1]],                 #FFJ1
-  [["FFJ2", 1]],                 #FFJ2
-  [["FFJ3", 1]],                 #FFJ3
-  [["FFJ4", 1]],                 #FFJ4
+  [["FFJ1", 1.0]],               #FFJ1
+  [["FFJ2", 1.0]],               #FFJ2
+  [["FFJ3", 1.0]],               #FFJ3
+  [["FFJ4", 1.0]],               #FFJ4
 
   [["MFJ1", 0.5], ["MFJ2",0.5]], #MFJ0
-  [["MFJ1", 1]],                 #MFJ1
-  [["MFJ2", 1]],                 #MFJ2
-  [["MFJ3", 1]],                 #MFJ3
-  [["MFJ4", 1]],                 #MFJ4
+  [["MFJ1", 1.0]],               #MFJ1
+  [["MFJ2", 1.0]],               #MFJ2
+  [["MFJ3", 1.0]],               #MFJ3
+  [["MFJ4", 1.0]],               #MFJ4
 
+  [["RFJ1", 0.5], ["RFJ2",0.5]], #RFJ0
+  [["RFJ1", 1.0]],               #RFJ1
+  [["RFJ2", 1.0]],               #RFJ2
+  [["RFJ3", 1.0]],               #RFJ3
+  [["RFJ4", 1.0]],               #RFJ4
+
+  [["LFJ1", 0.5], ["LFJ2",0.5]], #LFJ0
+  [["LFJ1", 1.0]],               #LFJ1
+  [["LFJ2", 1.0]],               #LFJ2
+  [["LFJ3", 1.0]],               #LFJ3
+  [["LFJ4", 1.0]],               #LFJ4
+  [["LFJ5", 1.0]],               #LFJ5
+
+  [["THJ1", 1.0]],               #THJ1
+  [["THJ2", 1.0]],               #THJ2
+  [["THJ3", 1.0]],               #THJ3
+  [["THJ4", 1.0]],               #THJ4
+  [1, ["THJ5A",.5], ["THJ5B",.5]],  #THJ5: calibrate AFTER combining the sensors
+
+  [1, ["WRJ1A",.5],["WRJ1B",.5]],   #WRJ1: calibrate AFTER combining the sensors
+  [["WRJ2", 1.0]]                #WRJ2
 ]

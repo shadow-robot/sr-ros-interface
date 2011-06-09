@@ -36,13 +36,14 @@ namespace shadow_robot
   {
   public:
     SrHandLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
-              std::vector<std::vector<shadow_joints::JointToSensor> > joint_ids, std::vector<pr2_hardware_interface::Actuator*> actuators);
+              std::vector<shadow_joints::JointToSensor> joint_to_sensors,
+              std::vector<pr2_hardware_interface::Actuator*> actuators);
     ~SrHandLib();
 
   protected:
     virtual void initialize_map(std::vector<std::string> joint_names,
                                 std::vector<int> motor_ids,
-                                std::vector<std::vector<shadow_joints::JointToSensor> > joint_ids,
+                                std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                                 std::vector<pr2_hardware_interface::Actuator*> actuators);
   };
 

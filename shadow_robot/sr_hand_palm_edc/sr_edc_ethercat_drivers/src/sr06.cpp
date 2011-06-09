@@ -296,20 +296,22 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
     return retval;
 
   //TODO: read this from config/EEProm?
-  std::vector<std::vector<shadow_joints::JointToSensor> > joint_to_sensor_vect = read_joint_to_sensor_mapping();
+  std::vector<shadow_joints::JointToSensor > joint_to_sensor_vect = read_joint_to_sensor_mapping();
 
   //initializing the hand library
   std::vector<std::string> joint_names_tmp;
   std::vector<int> motor_ids;
-  std::vector<std::vector<shadow_joints::JointToSensor> > joint_ids;
+  std::vector<shadow_joints::JointToSensor > joints_to_sensors;
   std::vector<pr2_hardware_interface::Actuator*> actuators;
+
+  ROS_ASSERT(joint_to_sensor_vect.size() == JOINTS_NUM);
 
   for(unsigned int i=0; i< JOINTS_NUM; ++i)
   {
     joint_names_tmp.push_back(std::string(joint_names[i]));
     motor_ids.push_back(i);
-    std::vector<shadow_joints::JointToSensor> tmp_vec = joint_to_sensor_vect[i];
-    joint_ids.push_back(tmp_vec);
+    shadow_joints::JointToSensor tmp_jts = joint_to_sensor_vect[i];
+    joints_to_sensors.push_back(tmp_jts);
 
     //initializing the actuators.
     pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(joint_names[i]);
@@ -325,7 +327,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
       }
     }
   }
-  sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>(new shadow_robot::SrHandLib(joint_names_tmp, motor_ids, joint_ids, actuators));
+  sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>(new shadow_robot::SrHandLib(joint_names_tmp, motor_ids, joints_to_sensors, actuators));
 
 
 
@@ -1090,13 +1092,42 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     state->is_enabled_ = 1;
     state->device_id_ = i;
 
-    //get all the raw joint positions.
-    //TODO: calibrated here?
-    double tmp_position = 0.0;
-    BOOST_FOREACH(shadow_joints::JointToSensor joint_to_sensor, joint_iter->second->joint_ids)
-      tmp_position += status_data->sensors[joint_to_sensor.sensor_id]*joint_to_sensor.coeff;
+    /////////////
+    // Get the joint positions and compute the calibrate
+    // values
 
-    state->position_ = tmp_position / 4000.0;
+    if(joint_iter->second->joint_to_sensor.calibrate_after_combining_sensors)
+    {
+      //first we combine the different sensors
+      double raw_position = 0.0;
+      BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_iter->second->joint_to_sensor.joint_to_sensor_vector)
+        raw_position += static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id])*joint_to_sensor.coeff;
+
+      state->encoder_count_ = static_cast<int>(raw_position);
+
+      //and now we calibrate
+      //TODO: calibration!
+      state->position_ = static_cast<double>(raw_position)/4000.0;
+    }
+    else
+    {
+      //we calibrate the different sensors and we combine the calibrated
+      //values
+      double calibrated_position = 0.0;
+      BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_iter->second->joint_to_sensor.joint_to_sensor_vector)
+      {
+        //TODO: calibrate
+        double raw_pos = static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id]) / 4000.0;
+        //combine
+        calibrated_position += raw_pos * joint_to_sensor.coeff;
+      }
+      state->position_ = calibrated_position;
+
+    }
+
+              //
+    ////////////
+
 
     //get the remaining information.
     // TODO: check if there was an error, using which_motor_data_had_errors mask
@@ -1199,10 +1230,9 @@ std::vector<motor_updater::UpdateConfig> SR06::read_update_rate_configs()
   return update_rate_configs_vector;
 }
 
-std::vector<std::vector<shadow_joints::JointToSensor> > SR06::read_joint_to_sensor_mapping()
+std::vector<shadow_joints::JointToSensor> SR06::read_joint_to_sensor_mapping()
 {
-  std::vector<std::vector<shadow_joints::JointToSensor> > joint_to_sensor_vect;
-  std::vector<shadow_joints::JointToSensor> tmp_vect;
+  std::vector<shadow_joints::JointToSensor> joint_to_sensor_vect;
 
   std::map<std::string, int> sensors_map;
   for(unsigned int i=0; i < SENSORS_NUM; ++i)
@@ -1215,19 +1245,39 @@ std::vector<std::vector<shadow_joints::JointToSensor> > SR06::read_joint_to_sens
   ROS_ASSERT(joint_to_sensor_mapping.getType() == XmlRpc::XmlRpcValue::TypeArray);
   for (int32_t i = 0; i < joint_to_sensor_mapping.size(); ++i)
   {
+    shadow_joints::JointToSensor tmp_vect;
+
     XmlRpc::XmlRpcValue map_one_joint = joint_to_sensor_mapping[i];
+
+    //The parameter can either start by an array (sensor_name, coeff)
+    // or by an integer to specify if we calibrate before combining
+    // the different sensors
+    int param_index = 0;
+    //Check if the calibrate after combine int is set to 1
+    if(map_one_joint[param_index].getType() == XmlRpc::XmlRpcValue::TypeInt)
+    {
+      if(1 == static_cast<int>(map_one_joint[0]) )
+        tmp_vect.calibrate_after_combining_sensors = true;
+      else
+        tmp_vect.calibrate_after_combining_sensors = false;
+
+      param_index ++;
+    }
+    else //by default we calibrate before combining the sensors
+      tmp_vect.calibrate_after_combining_sensors = false;
+
     ROS_ASSERT(map_one_joint.getType() == XmlRpc::XmlRpcValue::TypeArray);
-    for (int32_t i = 0; i < map_one_joint.size(); ++i)
+    for (int32_t i = param_index; i < map_one_joint.size(); ++i)
     {
       ROS_ASSERT(map_one_joint[i].getType() == XmlRpc::XmlRpcValue::TypeArray);
-      shadow_joints::JointToSensor tmp_joint_to_sensor;
+      shadow_joints::PartialJointToSensor tmp_joint_to_sensor;
 
       ROS_ASSERT(map_one_joint[i][0].getType() == XmlRpc::XmlRpcValue::TypeString);
       tmp_joint_to_sensor.sensor_id = sensors_map[ static_cast<std::string>(map_one_joint[i][0]) ];
 
       ROS_ASSERT(map_one_joint[i][1].getType() == XmlRpc::XmlRpcValue::TypeDouble);
       tmp_joint_to_sensor.coeff = static_cast<double> (map_one_joint[i][1]);
-      tmp_vect.push_back(tmp_joint_to_sensor);
+      tmp_vect.joint_to_sensor_vector.push_back(tmp_joint_to_sensor);
     }
     joint_to_sensor_vect.push_back(tmp_vect);
   }

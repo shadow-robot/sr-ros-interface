@@ -34,11 +34,11 @@ namespace shadow_robot
 {
   SrHandLib::SrHandLib(std::vector<std::string> joint_names,
                        std::vector<int> motor_ids,
-                       std::vector<std::vector<shadow_joints::JointToSensor> > joint_ids,
+                       std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                        std::vector<pr2_hardware_interface::Actuator*> actuators) :
-    SrRobotLib(joint_names, motor_ids, joint_ids, actuators)
+    SrRobotLib(joint_names, motor_ids, joint_to_sensors, actuators)
   {
-    initialize_map(joint_names, motor_ids, joint_ids, actuators);
+    initialize_map(joint_names, motor_ids, joint_to_sensors, actuators);
   }
 
   SrHandLib::~SrHandLib()
@@ -49,7 +49,7 @@ namespace shadow_robot
 
   void SrHandLib::initialize_map(std::vector<std::string> joint_names,
                                  std::vector<int> motor_ids,
-                                 std::vector<std::vector<shadow_joints::JointToSensor> > joint_ids,
+                                 std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                                  std::vector<pr2_hardware_interface::Actuator*> actuators)
   {
     joints_map_mutex.lock();
@@ -59,7 +59,7 @@ namespace shadow_robot
       boost::shared_ptr<shadow_joints::Joint> joint = boost::shared_ptr<shadow_joints::Joint>( new shadow_joints::Joint() );
       boost::shared_ptr<shadow_joints::Motor> motor = boost::shared_ptr<shadow_joints::Motor> ( new shadow_joints::Motor() );
 
-      joint->joint_ids = joint_ids[index];
+      joint->joint_to_sensor = joint_to_sensors[index];
       motor->motor_id = motor_ids[index];
 
       motor->actuator = actuators[index];

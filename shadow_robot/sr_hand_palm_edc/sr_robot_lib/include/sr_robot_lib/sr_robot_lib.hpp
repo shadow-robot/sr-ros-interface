@@ -36,10 +36,16 @@
 
 namespace shadow_joints
 {
-  struct JointToSensor
+  struct PartialJointToSensor
   {
     int sensor_id;
     double coeff;
+  };
+
+  struct JointToSensor
+  {
+    std::vector<PartialJointToSensor> joint_to_sensor_vector;
+    bool calibrate_after_combining_sensors;
   };
 
   struct Motor
@@ -78,9 +84,7 @@ namespace shadow_joints
     //the indexes of the joints in the joint array
     // coming from the hardware which are used to
     // compute the joint data.
-    std::vector<JointToSensor> joint_ids;
-
-    double calibrated_position;
+    JointToSensor joint_to_sensor;
 
     bool has_motor;
     boost::shared_ptr<Motor> motor;
@@ -95,7 +99,7 @@ namespace shadow_robot
   {
   public:
     SrRobotLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
-               std::vector<std::vector<shadow_joints::JointToSensor> > joint_ids, std::vector<pr2_hardware_interface::Actuator*> actuators) {};
+               std::vector<shadow_joints::JointToSensor> joint_to_sensors, std::vector<pr2_hardware_interface::Actuator*> actuators) {};
     ~SrRobotLib() {};
 
     shadow_joints::JointsMap joints_map;
@@ -104,7 +108,7 @@ namespace shadow_robot
   protected:
     virtual void initialize_map(std::vector<std::string> joint_names,
                                 std::vector<int> motor_ids,
-                                std::vector<std::vector<shadow_joints::JointToSensor> > joint_ids,
+                                std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                                 std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
   };
 }

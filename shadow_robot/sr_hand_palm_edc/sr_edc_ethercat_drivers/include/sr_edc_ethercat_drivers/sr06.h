@@ -112,7 +112,7 @@ private:
    * @return a vector (size of the number of joints) containing vectors (containing
    *         the sensors which are combined to form a given joint)
    */
-  std::vector<std::vector<shadow_joints::JointToSensor > > read_joint_to_sensor_mapping();
+  std::vector<shadow_joints::JointToSensor> read_joint_to_sensor_mapping();
 };
 
 
