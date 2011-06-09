@@ -98,12 +98,21 @@ private:
   boost::shared_ptr<motor_updater::MotorUpdater> motor_updater;
 
   /**
-   * Simply reads the config from the specified yaml file.
+   * Simply reads the config from the parameter server.
    *
    * @return A vector of UpdateConfig containing the type of data and the frequency
    *         at which we want to poll this data
    */
   std::vector<motor_updater::UpdateConfig> read_update_rate_configs();
+
+  /**
+   * Reads the mapping between the sensors and the joints from the parameter server.
+   *
+   *
+   * @return a vector (size of the number of joints) containing vectors (containing
+   *         the sensors which are combined to form a given joint)
+   */
+  std::vector<std::vector<shadow_joints::JointToSensor > > read_joint_to_sensor_mapping();
 };
 
 

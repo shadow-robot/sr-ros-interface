@@ -296,123 +296,19 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
     return retval;
 
   //TODO: read this from config/EEProm?
-  std::vector<std::vector<int> > joint_to_sensor;
-  std::vector<int> tmp_vect;
-
-  //FIRST FINGER
-  tmp_vect.push_back(FFJ1);
-  tmp_vect.push_back(FFJ2);      //FFJ0
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(FFJ1);            //FFJ1
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(FFJ2);            //FFJ2
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(FFJ3);            //FFJ3
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(FFJ4);            //FFJ4
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-
-  //MIDDLE FINGER
-  tmp_vect.push_back(MFJ1);
-  tmp_vect.push_back(MFJ2);      //MFJ0
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(MFJ1);            //MFJ1
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(MFJ2);            //MFJ2
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(MFJ3);            //MFJ3
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(MFJ4);            //MFJ4
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-
-  //RING FINGER
-  tmp_vect.push_back(RFJ1);
-  tmp_vect.push_back(RFJ2);      //RFJ0
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(RFJ1);            //RFJ1
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(RFJ2);            //RFJ2
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(RFJ3);            //RFJ3
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(RFJ4);            //RFJ4
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-
-  //LITTLE FINGER
-  tmp_vect.push_back(LFJ1);
-  tmp_vect.push_back(LFJ2);      //LFJ0
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(LFJ1);            //LFJ1
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(LFJ2);            //LFJ2
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(LFJ3);            //LFJ3
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(LFJ4);            //LFJ4
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(LFJ5);            //LFJ5
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-
-  //THUMB
-  tmp_vect.push_back(THJ1);            //THJ1
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(THJ2);            //THJ2
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(THJ3);            //THJ3
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(THJ4);            //THJ4
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(THJ5A);            //THJ5
-  tmp_vect.push_back(THJ5B);
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-
-  //WRIST
-  tmp_vect.push_back(WRJ1B);
-  tmp_vect.push_back(WRJ1A);            //WRJ1
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-  tmp_vect.push_back(WRJ2);            //WRJ2
-  joint_to_sensor.push_back(tmp_vect);
-  tmp_vect.clear();
-
+  std::vector<std::vector<shadow_joints::JointToSensor> > joint_to_sensor_vect = read_joint_to_sensor_mapping();
 
   //initializing the hand library
   std::vector<std::string> joint_names_tmp;
   std::vector<int> motor_ids;
-  std::vector<std::vector<int> > joint_ids;
+  std::vector<std::vector<shadow_joints::JointToSensor> > joint_ids;
   std::vector<pr2_hardware_interface::Actuator*> actuators;
 
   for(unsigned int i=0; i< JOINTS_NUM; ++i)
   {
     joint_names_tmp.push_back(std::string(joint_names[i]));
     motor_ids.push_back(i);
-    std::vector<int> tmp_vec = joint_to_sensor[i];
+    std::vector<shadow_joints::JointToSensor> tmp_vec = joint_to_sensor_vect[i];
     joint_ids.push_back(tmp_vec);
 
     //initializing the actuators.
@@ -1197,10 +1093,10 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //get all the raw joint positions.
     //TODO: calibrated here?
     double tmp_position = 0.0;
-    BOOST_FOREACH(int sensor_indexes, joint_iter->second->joint_ids)
-      tmp_position += sensor_indexes;
+    BOOST_FOREACH(shadow_joints::JointToSensor joint_to_sensor, joint_iter->second->joint_ids)
+      tmp_position += status_data->sensors[joint_to_sensor.sensor_id]*joint_to_sensor.coeff;
 
-    state->position_ = tmp_position / 4000.0;;
+    state->position_ = tmp_position / 4000.0;
 
     //get the remaining information.
     // TODO: check if there was an error, using which_motor_data_had_errors mask
@@ -1301,6 +1197,42 @@ std::vector<motor_updater::UpdateConfig> SR06::read_update_rate_configs()
   }
 
   return update_rate_configs_vector;
+}
+
+std::vector<std::vector<shadow_joints::JointToSensor> > SR06::read_joint_to_sensor_mapping()
+{
+  std::vector<std::vector<shadow_joints::JointToSensor> > joint_to_sensor_vect;
+  std::vector<shadow_joints::JointToSensor> tmp_vect;
+
+  std::map<std::string, int> sensors_map;
+  for(unsigned int i=0; i < SENSORS_NUM; ++i)
+  {
+    sensors_map[sensor_names[i] ] = i;
+  }
+
+  XmlRpc::XmlRpcValue joint_to_sensor_mapping;
+  nodehandle_.getParam("joint_to_sensor_mapping", joint_to_sensor_mapping);
+  ROS_ASSERT(joint_to_sensor_mapping.getType() == XmlRpc::XmlRpcValue::TypeArray);
+  for (int32_t i = 0; i < joint_to_sensor_mapping.size(); ++i)
+  {
+    XmlRpc::XmlRpcValue map_one_joint = joint_to_sensor_mapping[i];
+    ROS_ASSERT(map_one_joint.getType() == XmlRpc::XmlRpcValue::TypeArray);
+    for (int32_t i = 0; i < map_one_joint.size(); ++i)
+    {
+      ROS_ASSERT(map_one_joint[i].getType() == XmlRpc::XmlRpcValue::TypeArray);
+      shadow_joints::JointToSensor tmp_joint_to_sensor;
+
+      ROS_ASSERT(map_one_joint[i][0].getType() == XmlRpc::XmlRpcValue::TypeString);
+      tmp_joint_to_sensor.sensor_id = sensors_map[ static_cast<std::string>(map_one_joint[i][0]) ];
+
+      ROS_ASSERT(map_one_joint[i][1].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+      tmp_joint_to_sensor.coeff = static_cast<double> (map_one_joint[i][1]);
+      tmp_vect.push_back(tmp_joint_to_sensor);
+    }
+    joint_to_sensor_vect.push_back(tmp_vect);
+  }
+
+  return joint_to_sensor_vect;
 }
 /* For the emacs weenies in the crowd.
    Local Variables:

@@ -1,0 +1,14 @@
+joint_to_sensor_mapping: [
+  [["FFJ1", 0.5], ["FFJ2",0.5]], #FFJ0
+  [["FFJ1", 1]],                 #FFJ1
+  [["FFJ2", 1]],                 #FFJ2
+  [["FFJ3", 1]],                 #FFJ3
+  [["FFJ4", 1]],                 #FFJ4
+
+  [["MFJ1", 0.5], ["MFJ2",0.5]], #MFJ0
+  [["MFJ1", 1]],                 #MFJ1
+  [["MFJ2", 1]],                 #MFJ2
+  [["MFJ3", 1]],                 #MFJ3
+  [["MFJ4", 1]],                 #MFJ4
+
+]

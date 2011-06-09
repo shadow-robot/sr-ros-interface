@@ -6,6 +6,8 @@
   <include file="$(find sr_edc_defs)/launch/upload_sr_edc.launch" />
 
   <rosparam command="load" file="$(find sr_edc_launch)/config/motor_data_polling.yaml" />
+  <rosparam command="load" file="$(find sr_edc_launch)/config/sensor_to_joint.yaml" />
+
 
   <!-- Should be loaded before starting/running pr2_etherCAT node -->
   <rosparam command="load" file="$(find sr_edc_launch)/sr_edc_sensor_gain_offset.yaml" />
