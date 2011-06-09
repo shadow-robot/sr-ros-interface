@@ -1103,6 +1103,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
       BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_iter->second->joint_to_sensor.joint_to_sensor_vector)
         raw_position += static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id])*joint_to_sensor.coeff;
 
+      //That's not an encoder position, just the raw value
       state->encoder_count_ = static_cast<int>(raw_position);
 
       //and now we calibrate
