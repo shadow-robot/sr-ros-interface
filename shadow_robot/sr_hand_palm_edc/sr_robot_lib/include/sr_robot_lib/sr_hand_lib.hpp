@@ -48,7 +48,6 @@ namespace shadow_robot
 
 }
 
-
 /* For the emacs weenies in the crowd.
 Local Variables:
    c-basic-offset: 2

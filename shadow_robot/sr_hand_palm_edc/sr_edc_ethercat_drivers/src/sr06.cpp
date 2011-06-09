@@ -1294,8 +1294,10 @@ std::vector<motor_updater::UpdateConfig> SR06::read_update_rate_configs()
     double rate;
     nodehandle_.getParam(config[i].first, rate);
     motor_updater::UpdateConfig config_tmp;
+
     config_tmp.when_to_update = rate;
     config_tmp.what_to_update = config[i].second;
+    update_rate_configs_vector.push_back(config_tmp);
   }
 
   return update_rate_configs_vector;
