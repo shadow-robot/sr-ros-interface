@@ -34,6 +34,8 @@
 
 #include <pr2_hardware_interface/hardware_interface.h>
 
+#include "sr_robot_lib/calibration.hpp"
+
 namespace shadow_joints
 {
   struct PartialJointToSensor
@@ -88,6 +90,8 @@ namespace shadow_joints
 
     bool has_motor;
     boost::shared_ptr<Motor> motor;
+
+    boost::shared_ptr<shadow_robot::JointCalibration> joint_calibration;
   };
 
   typedef std::map<std::string, boost::shared_ptr<Joint> > JointsMap;

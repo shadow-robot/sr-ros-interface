@@ -21,4 +21,4 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp)
+rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/calibration.cpp)
