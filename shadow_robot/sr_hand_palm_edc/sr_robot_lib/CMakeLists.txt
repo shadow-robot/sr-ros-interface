@@ -22,3 +22,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/calibration.cpp)
+
+#tests:
+rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/calibration.cpp)

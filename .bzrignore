@@ -130,3 +130,9 @@ bin
 build
 ￼
 shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/bin/test/sr_edc_ethercat_drivers_test
+￼
+shadow_robot/sr_hand/examples/siva_ros_object_rec_5fingers_tactile_experiment_bbc.cpp
+￼
+shadow_robot/sr_hand/examples/siva_ros_object_rec_5fingers_tactile_experiment_bbc.cpp
+￼
+shadow_robot/sr_hand_palm_edc/sr_robot_lib/bin/test/test_calibration

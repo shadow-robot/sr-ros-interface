@@ -28,14 +28,23 @@
 
 #include "sr_robot_lib/calibration.hpp"
 
+#include <boost/assert.hpp>
 #include <algorithm>
+
+#include <boost/foreach.hpp>
+#include <iostream>
 
 namespace shadow_robot
 {
   JointCalibration::JointCalibration(std::vector<joint_calibration::Point> calibration_table)
   {
     this->calibration_table_ = calibration_table;
-    calibration_table_size_ = calibration_table.size();
+    //calibration size - 1 because we use this number to access the last value in the vector
+    calibration_table_size_ = calibration_table.size() - 1;
+
+    //fails if we have only one calibration point as it's not possible
+    //to interpolate from one point
+    BOOST_ASSERT(calibration_table_size_ > 0);
 
     /*
      * make sure that the given calibration table is ordered by
@@ -62,36 +71,41 @@ namespace shadow_robot
      */
     joint_calibration::Point low_point, high_point;
 
-    //if we get a point before the first case, we
-    //need to extrapolate
-    if( raw_reading < calibration_table_[0].raw_value)
+    //That takes care of computing a reading that's before
+    // the calibration table as well as a reading that's in the
+    // first calibration table case.
+    low_point  = calibration_table_[0];
+    high_point = calibration_table_[1];
+
+    bool found = false;
+
+    //if we have more than 2 points in our calibration table
+    // or if the raw value isn't before the calibration table
+    if( (raw_reading > calibration_table_[0].raw_value) )
     {
-      low_point  = calibration_table_[0];
-      high_point = calibration_table_[1];
-    }
-    else
-    {
-      //if we get a point after the first case, we
-      // need to extrapolate as well
-      if( raw_reading > calibration_table_[calibration_table_size_].raw_value )
+      if( (calibration_table_size_ > 1) )
       {
-        low_point  = calibration_table_[calibration_table_size_ - 1];
-        high_point = calibration_table_[calibration_table_size_];
-      }
-      else
-      {
-        //ok those points are directly in the calibration table
-        for(unsigned int i=1; i < calibration_table_.size(); ++i)
+        for(unsigned int index_cal=1; index_cal < calibration_table_size_; ++index_cal)
         {
-          if( (raw_reading < calibration_table_[i].raw_value) &&
-              (raw_reading > calibration_table_[i-1].raw_value) )
+          if( (raw_reading >= calibration_table_[index_cal - 1].raw_value) &&
+              (raw_reading < calibration_table_[index_cal].raw_value) )
           {
-            low_point  = calibration_table_[i - 1];
-            high_point = calibration_table_[i];
+            low_point  = calibration_table_[index_cal - 1];
+            high_point = calibration_table_[index_cal];
+
+            found = true;
+            break;
           }
+        } //end for
+
+        //the point is outside of the table
+        if( !found )
+        {
+          low_point = calibration_table_[calibration_table_size_ - 1];
+          high_point = calibration_table_[calibration_table_size_];
         }
-      }
-    }
+      } // end if 2 values only in the table
+    } //end if raw_reading before table
 
     return linear_interpolate_(raw_reading, low_point, high_point);
   }
