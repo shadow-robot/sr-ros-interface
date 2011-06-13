@@ -32,12 +32,14 @@
 
 namespace shadow_robot
 {
-  SrHandLib::SrHandLib(std::vector<std::string> joint_names,
-                       std::vector<int> motor_ids,
+  SrHandLib::SrHandLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                        std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-                       std::vector<pr2_hardware_interface::Actuator*> actuators) :
-    SrRobotLib(joint_names, motor_ids, joint_to_sensors, actuators)
+                       std::vector<pr2_hardware_interface::Actuator*> actuators,
+                       shadow_joints::CalibrationMap calibration_map) :
+    SrRobotLib(joint_names, motor_ids, joint_to_sensors, actuators, calibration_map)
   {
+    this->calibration_map = calibration_map;
+
     initialize_map(joint_names, motor_ids, joint_to_sensors, actuators);
   }
 
@@ -47,10 +49,9 @@ namespace shadow_robot
       delete i.second->motor->actuator;
   }
 
-  void SrHandLib::initialize_map(std::vector<std::string> joint_names,
-                                 std::vector<int> motor_ids,
-                                 std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-                                 std::vector<pr2_hardware_interface::Actuator*> actuators)
+  void SrHandLib::initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,
+                                  std::vector<shadow_joints::JointToSensor> joint_to_sensors,
+                                  std::vector<pr2_hardware_interface::Actuator*> actuators)
   {
     joints_map_mutex.lock();
 

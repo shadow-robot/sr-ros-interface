@@ -297,6 +297,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
   //TODO: read this from config/EEProm?
   std::vector<shadow_joints::JointToSensor > joint_to_sensor_vect = read_joint_to_sensor_mapping();
+  shadow_joints::CalibrationMap calibration_map = read_joint_calibration();
 
   //initializing the hand library
   std::vector<std::string> joint_names_tmp;
@@ -327,7 +328,9 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
       }
     }
   }
-  sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>(new shadow_robot::SrHandLib(joint_names_tmp, motor_ids, joints_to_sensors, actuators));
+  sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>(new shadow_robot::SrHandLib(joint_names_tmp, motor_ids,
+                                                                                       joints_to_sensors, actuators,
+                                                                                       calibration_map));
 
 
 
@@ -1081,6 +1084,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   //@TODO: how do we get the current actuator state?
 
   shadow_joints::JointsMap::iterator joint_iter;
+  shadow_joints::CalibrationMap::iterator calibration_iter;
   for(joint_iter = sr_hand_lib->joints_map.begin(); joint_iter != sr_hand_lib->joints_map.end();
       ++joint_iter)
   {
@@ -1107,8 +1111,8 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
       state->encoder_count_ = static_cast<int>(raw_position);
 
       //and now we calibrate
-      //TODO: calibration!
-      state->position_ = static_cast<double>(raw_position)/4000.0;
+      calibration_iter = sr_hand_lib->calibration_map.find(joint_iter->first);
+      state->position_ = calibration_iter->second->compute( static_cast<double>(raw_position) );
     }
     else
     {
@@ -1285,6 +1289,22 @@ std::vector<shadow_joints::JointToSensor> SR06::read_joint_to_sensor_mapping()
 
   return joint_to_sensor_vect;
 }
+
+shadow_joints::CalibrationMap SR06::read_joint_calibration()
+{
+  shadow_joints::CalibrationMap joint_calibration;
+
+  //TODO: This should be moved somewhere else. Not sure where yet.
+  std::string base_topic = "sr_calibrations/";
+
+  ROS_ERROR("not implemented yet");
+
+  return joint_calibration;
+}
+
+
+
+
 /* For the emacs weenies in the crowd.
    Local Variables:
    c-basic-offset: 2

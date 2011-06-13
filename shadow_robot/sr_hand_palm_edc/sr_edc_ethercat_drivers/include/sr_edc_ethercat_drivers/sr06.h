@@ -113,6 +113,14 @@ private:
    *         the sensors which are combined to form a given joint)
    */
   std::vector<shadow_joints::JointToSensor> read_joint_to_sensor_mapping();
+
+  /**
+   * Reads the calibration from the parameter server.
+   *
+   *
+   * @return a calibration map
+   */
+  shadow_joints::CalibrationMap read_joint_calibration();
 };
 
 

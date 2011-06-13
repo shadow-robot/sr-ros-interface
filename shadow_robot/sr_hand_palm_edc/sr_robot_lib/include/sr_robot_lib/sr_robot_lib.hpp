@@ -90,11 +90,12 @@ namespace shadow_joints
 
     bool has_motor;
     boost::shared_ptr<Motor> motor;
-
-    boost::shared_ptr<shadow_robot::JointCalibration> joint_calibration;
   };
 
   typedef std::map<std::string, boost::shared_ptr<Joint> > JointsMap;
+
+  typedef std::map<std::string, boost::shared_ptr<shadow_robot::JointCalibration> > CalibrationMap;
+
 }
 
 namespace shadow_robot
@@ -103,17 +104,19 @@ namespace shadow_robot
   {
   public:
     SrRobotLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
-               std::vector<shadow_joints::JointToSensor> joint_to_sensors, std::vector<pr2_hardware_interface::Actuator*> actuators) {};
+               std::vector<shadow_joints::JointToSensor> joint_to_sensors,
+               std::vector<pr2_hardware_interface::Actuator*> actuators,
+               shadow_joints::CalibrationMap calibration_map) {};
     ~SrRobotLib() {};
 
     shadow_joints::JointsMap joints_map;
+    shadow_joints::CalibrationMap calibration_map;
     boost::mutex joints_map_mutex;
 
   protected:
-    virtual void initialize_map(std::vector<std::string> joint_names,
-                                std::vector<int> motor_ids,
-                                std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-                                std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
+    virtual void initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,
+                                 std::vector<shadow_joints::JointToSensor> joint_to_sensors,
+                                 std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
   };
 }
 
