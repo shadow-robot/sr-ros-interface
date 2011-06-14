@@ -111,7 +111,7 @@ namespace shadow_robot
 
     shadow_joints::JointsMap joints_map;
     shadow_joints::CalibrationMap calibration_map;
-    boost::mutex joints_map_mutex;
+    boost::shared_mutex joints_map_mutex;
 
   protected:
     virtual void initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,
