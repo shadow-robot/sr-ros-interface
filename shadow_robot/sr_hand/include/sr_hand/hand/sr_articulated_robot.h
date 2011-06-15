@@ -360,9 +360,9 @@ namespace shadowrobot
     /// A mapping between the parameter names and their values.
     ParametersMap parameters_map;
 
-    boost::mutex joints_map_mutex;
-    boost::mutex parameters_map_mutex;
-    boost::mutex controllers_map_mutex;
+    boost::shared_mutex joints_map_mutex;
+    boost::shared_mutex parameters_map_mutex;
+    boost::shared_mutex controllers_map_mutex;
 
   protected:
     ///this is the handle for the self tests.

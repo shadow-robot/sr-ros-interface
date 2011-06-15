@@ -63,9 +63,9 @@ namespace shadowrobot
 
   void VirtualShadowhand::initializeMap()
   {
-    joints_map_mutex.lock();
-    parameters_map_mutex.lock();
-    controllers_map_mutex.lock();
+    boost::unique_lock< boost::shared_mutex > lock_j(joints_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_p(parameters_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_m(controllers_map_mutex);
 
     JointData tmpData;
     JointData tmpDataZero;
@@ -349,16 +349,11 @@ namespace shadowrobot
     parameters_map["max_temp"] = PARAM_max_temperature;
     parameters_map["max_temperature"] = PARAM_max_temperature;
     parameters_map["max_current"] = PARAM_max_current;
-
-    controllers_map_mutex.unlock();
-    parameters_map_mutex.unlock();
-    joints_map_mutex.unlock();
   }
 
   short VirtualShadowhand::sendupdate( std::string joint_name, double target )
   {
-    joints_map_mutex.lock();
-
+    boost::upgrade_lock< boost::shared_mutex > lock(joints_map_mutex);
     JointsMap::iterator iter = joints_map.find(joint_name);
 #ifdef GAZEBO
     std_msgs::Float64 target_msg;
@@ -368,8 +363,6 @@ namespace shadowrobot
     if( iter == joints_map.end() )
     {
       ROS_DEBUG("Joint %s not found", joint_name.c_str());
-
-      joints_map_mutex.unlock();
       return -1;
     }
 
@@ -402,8 +395,9 @@ namespace shadowrobot
       tmpData1.position = target / 2.0;
 #endif
       tmpData1.target = target / 2.0;
-
+      boost::upgrade_to_unique_lock<boost::shared_mutex>* lock_u = new boost::upgrade_to_unique_lock<boost::shared_mutex>(lock);
       joints_map[iter->first] = tmpData1;
+      delete lock_u;
 
       ++iter;
       JointData tmpData2 = JointData(iter->second);
@@ -417,9 +411,9 @@ namespace shadowrobot
 #endif
       tmpData2.target = target / 2.0;
 
+      boost::upgrade_to_unique_lock<boost::shared_mutex>* lock_u2 = new boost::upgrade_to_unique_lock<boost::shared_mutex>(lock);
       joints_map[iter->first] = tmpData2;
-
-      joints_map_mutex.unlock();
+      delete lock_u2;
       return 0;
     }
 
@@ -441,15 +435,18 @@ namespace shadowrobot
 #endif
     tmpData.target = target;
 
+    boost::upgrade_to_unique_lock<boost::shared_mutex>* lock_u3 = new boost::upgrade_to_unique_lock<boost::shared_mutex>(lock);
     joints_map[joint_name] = tmpData;
+    delete lock_u3;
 
-    joints_map_mutex.unlock();
     return 0;
   }
 
   JointData VirtualShadowhand::getJointData( std::string joint_name )
   {
-    joints_map_mutex.lock();
+    boost::shared_lock< boost::shared_mutex > lock(joints_map_mutex, boost::try_to_lock);
+    if (!lock)
+      return JointData();
 
     JointsMap::iterator iter = joints_map.find(joint_name);
 
@@ -462,20 +459,19 @@ namespace shadowrobot
       iter->second.force = ((double)(rand() % 100) / 100.0);
 
       JointData tmp = JointData(iter->second);
-
-      joints_map_mutex.unlock();
       return tmp;
     }
 
     ROS_ERROR("Joint %s not found.", joint_name.c_str());
     JointData noData;
-    joints_map_mutex.unlock();
     return noData;
   }
 
   SRArticulatedRobot::JointsMap VirtualShadowhand::getAllJointsData()
   {
-    joints_map_mutex.lock();
+    boost::shared_lock< boost::shared_mutex > lock(joints_map_mutex, boost::try_to_lock);
+    if (!lock)
+      return SRArticulatedRobot::JointsMap();
 
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
@@ -490,46 +486,45 @@ namespace shadowrobot
     }
 
     JointsMap tmp_map = JointsMap(joints_map);
-    joints_map_mutex.unlock();
     return tmp_map;
   }
 
   short VirtualShadowhand::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
   {
-    controllers_map_mutex.lock();
+    boost::upgrade_lock<boost::shared_mutex> lock(controllers_map_mutex);
 
     ControllersMap::iterator iter = controllers_map.find(contrlr_name);
-
     //joint found
     if( iter != controllers_map.end() )
     {
+      boost::upgrade_to_unique_lock<boost::shared_mutex> lock_u(lock); 
       controllers_map[iter->first] = ctrlr_data;
     }
     else
     {
       ROS_ERROR("Controller %s not found", contrlr_name.c_str());
     }
-
-    controllers_map_mutex.unlock();
     return 0;
   }
 
   JointControllerData VirtualShadowhand::getContrl( std::string contrlr_name )
   {
-    controllers_map_mutex.lock();
+    boost::shared_lock<boost::shared_mutex> lock(controllers_map_mutex, boost::try_to_lock);
+    
+    if( !lock ) 
+      return JointControllerData();
+        
     ControllersMap::iterator iter = controllers_map.find(contrlr_name);
 
     //joint found
     if( iter != controllers_map.end() )
     {
       JointControllerData tmp = JointControllerData(iter->second);
-      controllers_map_mutex.unlock();
       return tmp;
     }
 
     ROS_ERROR("Controller %s not found", contrlr_name.c_str() );
     JointControllerData no_result;
-    controllers_map_mutex.unlock();
     return no_result;
   }
 
@@ -546,8 +541,10 @@ namespace shadowrobot
 
   std::vector<DiagnosticData> VirtualShadowhand::getDiagnostics()
   {
-    joints_map_mutex.lock();
+    boost::shared_lock< boost::shared_mutex > lock(joints_map_mutex, boost::try_to_lock);
     std::vector<DiagnosticData> returnVect;
+    if(!lock)
+      return returnVect;
 
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
@@ -561,15 +558,13 @@ namespace shadowrobot
 
       returnVect.push_back(tmpDiag);
     }
-
-    joints_map_mutex.unlock();
     return returnVect;
   }
 
 #ifdef GAZEBO
   void VirtualShadowhand::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
   {
-    joints_map_mutex.lock();
+    boost::upgrade_lock< boost::shared_mutex > lock(joints_map_mutex);
 
     //loop on all the names in the joint_states message
     for(unsigned int index = 0; index < msg->name.size(); ++index)
@@ -586,7 +581,9 @@ namespace shadowrobot
       tmpData.position = toDegrees(msg->position[index]);
       tmpData.force = msg->effort[index];
 
+      boost::upgrade_to_unique_lock<boost::shared_mutex> lock_u(lock);
       joints_map[joint_name] = tmpData;
+      lock_u.release();
     }
 
     //push the sum of J1+J2 to the J0s
@@ -610,11 +607,11 @@ namespace shadowrobot
 
         tmpData.position = position;
 
+        boost::upgrade_to_unique_lock<boost::shared_mutex> lock_u(lock);
         joints_map[joint_name] = tmpData;
+        lock_u.release();
       }
     }
-
-    joints_map_mutex.unlock();
   }
 #endif
 } //end namespace

@@ -66,8 +66,8 @@ namespace shadowrobot
 
   void RealShadowhand::initializeMap()
   {
-    joints_map_mutex.lock();
-    parameters_map_mutex.lock();
+    boost::unique_lock< boost::shared_mutex > lock_j(joints_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_m(parameters_map_mutex);
 
     JointData tmpData;
 
@@ -124,14 +124,11 @@ namespace shadowrobot
     parameters_map["max_temp"] = PARAM_max_temperature;
     parameters_map["max_temperature"] = PARAM_max_temperature;
     parameters_map["max_current"] = PARAM_max_current;
-
-    parameters_map_mutex.unlock();
-    joints_map_mutex.unlock();
   }
 
   short RealShadowhand::sendupdate( std::string joint_name, double target )
   {
-    joints_map_mutex.lock();
+    boost::unique_lock< boost::shared_mutex > lock(joints_map_mutex);
 
     //search the sensor in the hash_map
     JointsMap::iterator iter = joints_map.find(joint_name);
@@ -149,20 +146,17 @@ namespace shadowrobot
 
       //here we update the actual hand angles
       robot_update_sensor(&hand_joints[index_hand_joints].joint_target, target);
-      joints_map_mutex.unlock();
       return 0;
     }
 
     ROS_DEBUG("Joint %s not found", joint_name.c_str());
 
-    joints_map_mutex.unlock();
     return -1;
   }
 
   JointData RealShadowhand::getJointData( std::string joint_name )
   {
-    joints_map_mutex.lock();
-
+    boost::shared_lock< boost::shared_mutex > lock(joints_map_mutex);
     JointsMap::iterator iter = joints_map.find(joint_name);
 
     //joint not found
@@ -178,7 +172,6 @@ namespace shadowrobot
       noData.flags = "";
       noData.jointIndex = 0;
 
-      joints_map_mutex.unlock();
       return noData;
     }
 
@@ -199,8 +192,6 @@ namespace shadowrobot
     }
 
     joints_map[joint_name] = tmpData;
-
-    joints_map_mutex.unlock();
     return tmpData;
   }
 
@@ -218,7 +209,7 @@ namespace shadowrobot
 
   short RealShadowhand::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
   {
-    parameters_map_mutex.lock();
+    boost::unique_lock< boost::shared_mutex > lock(parameters_map_mutex);
 
     struct controller_config myConfig;
     memset(&myConfig, 0, sizeof(myConfig));
@@ -244,8 +235,6 @@ namespace shadowrobot
       //parameter found
       controller_update_param(&myConfig, (controller_param)iter->second, ctrlr_data.data[i].value.c_str());
     }
-
-    parameters_map_mutex.unlock();
 
     int result_ctrlr = controller_write_to_hardware(&myConfig);
     if( result_ctrlr )
@@ -408,12 +397,11 @@ namespace shadowrobot
     ROS_INFO("Preparing the environment to run self tests.");
 
     //lock all the mutexes to make sure we're not publishing other messages
-    joints_map_mutex.lock();
-    parameters_map_mutex.lock();
-    controllers_map_mutex.lock();
+    boost::unique_lock< boost::shared_mutex > lock_j(joints_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_p(parameters_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_c(controllers_map_mutex);
 
     //TODO: set the palm transmit rate to max?
-
     sleep(1);
 
     status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Pretest completed successfully.");
@@ -424,18 +412,21 @@ namespace shadowrobot
     ROS_INFO("Restoring the environment after the self tests.");
 
     //test finished, unlocking all the mutexes
-    joints_map_mutex.unlock();
-    parameters_map_mutex.unlock();
-    controllers_map_mutex.unlock();
+    boost::unique_lock< boost::shared_mutex > lock_j(joints_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_p(parameters_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_c(controllers_map_mutex);
 
     //TODO: reset the palm transmit rate to previous state?
-
     status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Postest completed successfully.");
   }
 
   void RealShadowhand::test_messages(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    ROS_WARN("Starting the test: Number of messages Received");
+    boost::unique_lock< boost::shared_mutex > lock_j(joints_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_p(parameters_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_c(controllers_map_mutex);
+
+    ROS_WARN("Starting the test: Number of messages Received");    
 
     std::pair<unsigned char, std::string> test_result;
     test_result.first = diagnostic_msgs::DiagnosticStatus::OK;
@@ -463,6 +454,10 @@ namespace shadowrobot
 
   std::pair<unsigned char, std::string> RealShadowhand::test_messages_routine(std::string joint_name, unsigned int repeat, ros::Rate rate)
   {
+    boost::unique_lock< boost::shared_mutex > lock_j(joints_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_p(parameters_map_mutex);
+    boost::unique_lock< boost::shared_mutex > lock_c(controllers_map_mutex);
+
     std::pair<unsigned char, std::string> test_result;
 
     //id should be motor board number

@@ -37,9 +37,9 @@
 
 namespace shadowrobot
 {
-VirtualArm::VirtualArm() :
+  VirtualArm::VirtualArm() :
     SRArticulatedRobot()
-{
+  {
 #ifdef GAZEBO
     ROS_INFO("This ROS interface is built for Gazebo.");
     //initialises the subscriber to the Gazebo joint_states messages
@@ -57,15 +57,15 @@ VirtualArm::VirtualArm() :
 
     srand(time(NULL));
     initializeMap();
-}
+  }
 
-VirtualArm::~VirtualArm()
-{
-}
+  VirtualArm::~VirtualArm()
+  {
+  }
 
-void VirtualArm::initializeMap()
-{
-    joints_map_mutex.lock();
+  void VirtualArm::initializeMap()
+  {
+    boost::unique_lock<boost::shared_mutex> lock(joints_map_mutex);
     JointData tmpData;
 
 #ifdef GAZEBO
@@ -111,9 +111,6 @@ void VirtualArm::initializeMap()
 #endif
     joints_map["ElbowJRotate"] = tmpData;
 
-    joints_map_mutex.unlock();
-
-
 #ifdef GAZEBO
     //if we're using Gazebo, we want to start with the elbow bent to 120
     //first we stop the physics
@@ -145,11 +142,13 @@ void VirtualArm::initializeMap()
     gazebo_phys_client.waitForExistence();
     gazebo_phys_client.call(empty_srv);
 #endif
-}
+  }
 
-short VirtualArm::sendupdate( std::string joint_name, double target )
-{
-    joints_map_mutex.lock();
+  short VirtualArm::sendupdate( std::string joint_name, double target )
+  {
+    ROS_ERROR("sendupdate");
+   
+    boost::unique_lock< boost::shared_mutex > lock(joints_map_mutex);
 
     JointsMap::iterator iter = joints_map.find(joint_name);
 
@@ -160,17 +159,16 @@ short VirtualArm::sendupdate( std::string joint_name, double target )
     //not found
     if( iter == joints_map.end() )
     {
-        ROS_DEBUG("Joint %s not found.", joint_name.c_str());
-        joints_map_mutex.unlock();
-        return -1;
+      ROS_DEBUG("Joint %s not found.", joint_name.c_str());
+      return -1;
     }
 
     //joint found
     JointData tmpData(iter->second);
     if( target < tmpData.min )
-        target = tmpData.min;
+      target = tmpData.min;
     if( target > tmpData.max )
-        target = tmpData.max;
+      target = tmpData.max;
 
 #ifdef GAZEBO
     //gazebo targets are in radians
@@ -184,125 +182,140 @@ short VirtualArm::sendupdate( std::string joint_name, double target )
 
     joints_map[joint_name] = tmpData;
 
-    joints_map_mutex.unlock();
     return 0;
-}
+  }
 
-JointData VirtualArm::getJointData( std::string joint_name )
-{
-    joints_map_mutex.lock();
+  JointData VirtualArm::getJointData( std::string joint_name )
+  {
+    ROS_ERROR("get joint data");
+    boost::shared_lock< boost::shared_mutex > lock(joints_map_mutex, boost::try_to_lock);
+    if( ! lock )
+      return JointData();
+
     JointsMap::iterator iter = joints_map.find(joint_name);
 
     //joint found
     if( iter != joints_map.end() )
     {
-        //return the position
-        iter->second.temperature = ((double)(rand() % 100) / 100.0);
-        iter->second.current = ((double)(rand() % 100) / 100.0);
-        iter->second.force = ((double)(rand() % 100) / 100.0);
+      //return the position
+      iter->second.temperature = ((double)(rand() % 100) / 100.0);
+      iter->second.current = ((double)(rand() % 100) / 100.0);
+      iter->second.force = ((double)(rand() % 100) / 100.0);
 
-        JointData tmpData = JointData(iter->second);
-        joints_map_mutex.unlock();
-        return tmpData;
+      JointData tmpData = JointData(iter->second);
+      return tmpData;
     }
 
     ROS_ERROR("Joint %s not found.", joint_name.c_str());
     JointData noData;
-    joints_map_mutex.unlock();
     return noData;
-}
+  }
 
-SRArticulatedRobot::JointsMap VirtualArm::getAllJointsData()
-{
-    joints_map_mutex.lock();
+  SRArticulatedRobot::JointsMap VirtualArm::getAllJointsData()
+  {
+    ROS_ERROR("get all joints data");
+   
+    boost::shared_lock< boost::shared_mutex > lock(joints_map_mutex, boost::try_to_lock);
+    if( ! lock )   
+      return SRArticulatedRobot::JointsMap();
+
     JointsMap tmpMap;
 
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
-        JointData tmpData = it->second;
-        tmpData.temperature = ((double)(rand() % 100) / 100.0);
-        tmpData.current = ((double)(rand() % 100) / 100.0);
-        tmpData.force = ((double)(rand() % 100) / 100.0);
-        tmpData.jointIndex = 0;
-        tmpData.flags = "";
+      JointData tmpData = it->second;
+      tmpData.temperature = ((double)(rand() % 100) / 100.0);
+      tmpData.current = ((double)(rand() % 100) / 100.0);
+      tmpData.force = ((double)(rand() % 100) / 100.0);
+      tmpData.jointIndex = 0;
+      tmpData.flags = "";
 
-        joints_map[it->first] = tmpData;
+      joints_map[it->first] = tmpData;
     }
 
     tmpMap = JointsMap(joints_map);
-    joints_map_mutex.unlock();
     return tmpMap;
-}
+  }
 
-short VirtualArm::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
-{
+  short VirtualArm::setContrl( std::string contrlr_name, JointControllerData ctrlr_data )
+  {
     ROS_WARN("The setContrl method is not yet implemented");
     return 0;
-}
+  }
 
-JointControllerData VirtualArm::getContrl( std::string contrlr_name )
-{
+  JointControllerData VirtualArm::getContrl( std::string contrlr_name )
+  {
     ROS_WARN("The getContrl method is not yet implemented");
     JointControllerData no_result;
     return no_result;
-}
+  }
 
-short VirtualArm::setConfig( std::vector<std::string> myConfig )
-{
+  short VirtualArm::setConfig( std::vector<std::string> myConfig )
+  {
     ROS_WARN("The set config function is not implemented in the virtual arm.");
     return 0;
-}
+  }
 
-void VirtualArm::getConfig( std::string joint_name )
-{
+  void VirtualArm::getConfig( std::string joint_name )
+  {
     ROS_WARN("The get config function is not implemented in the virtual arm.");
-}
+  }
 
-std::vector<DiagnosticData> VirtualArm::getDiagnostics()
-{
-    joints_map_mutex.lock();
+  std::vector<DiagnosticData> VirtualArm::getDiagnostics()
+  {
+    ROS_ERROR("get diagnostics");
+    boost::shared_lock< boost::shared_mutex > lock(joints_map_mutex, boost::try_to_lock);
+    if( ! lock )
+      return std::vector<DiagnosticData>();
+
     std::vector<DiagnosticData> returnVect;
 
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
     {
-        DiagnosticData tmpDiag;
-        tmpDiag.joint_name = it->first;
-        tmpDiag.level = 0;
-        tmpDiag.flags = "";
-        tmpDiag.target_sensor_num = 0;
-        tmpDiag.target = it->second.target;
-        tmpDiag.position = it-> second.position;
+      DiagnosticData tmpDiag;
+      tmpDiag.joint_name = it->first;
+      tmpDiag.level = 0;
+      tmpDiag.flags = "";
+      tmpDiag.target_sensor_num = 0;
+      tmpDiag.target = it->second.target;
+      tmpDiag.position = it-> second.position;
 
-        returnVect.push_back(tmpDiag);
+      returnVect.push_back(tmpDiag);
     }
 
-    joints_map_mutex.unlock();
     return returnVect;
-}
+  }
 
 #ifdef GAZEBO
-void VirtualArm::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
-{
-    joints_map_mutex.lock();
+  void VirtualArm::gazeboCallback(const sensor_msgs::JointStateConstPtr& msg)
+  {
+    boost::upgrade_lock< boost::shared_mutex > lock(joints_map_mutex);
     //loop on all the names in the joint_states message
     for(unsigned int index = 0; index < msg->name.size(); ++index)
     {
-        std::string joint_name = msg->name[index];
-        JointsMap::iterator iter = joints_map.find(joint_name);
+      std::string joint_name = msg->name[index];
+      JointsMap::iterator iter = joints_map.find(joint_name);
 
-        //not found => can be a joint from the arm / hand
-        if(iter == joints_map.end())
+      //not found => can be a joint from the arm / hand
+      if(iter == joints_map.end())
         continue;
 
-        //joint found
-        JointData tmpData(iter->second);
+      //joint found
+      JointData tmpData(iter->second);
 
-        tmpData.position = toDegrees(msg->position[index]);
-        tmpData.force = msg->effort[index];
-
-        joints_map[joint_name] = tmpData;
+      tmpData.position = toDegrees(msg->position[index]);
+      tmpData.force = msg->effort[index];
+      
+      boost::upgrade_to_unique_lock<boost::shared_mutex>(lock);
+      joints_map[joint_name] = tmpData;
+      lock_u.release();
     }
-    joints_map_mutex.unlock();
-}
+  }
 #endif
 } //end namespace
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
