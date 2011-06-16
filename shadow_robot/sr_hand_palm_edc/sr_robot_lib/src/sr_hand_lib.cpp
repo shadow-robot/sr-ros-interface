@@ -53,9 +53,6 @@ namespace shadow_robot
                                   std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                                   std::vector<pr2_hardware_interface::Actuator*> actuators)
   {
-    //the unique lock is scoped as well, no need to unlock
-    boost::unique_lock< boost::shared_mutex > lock(joints_map_mutex);
-
     for(unsigned int index = 0; index < joint_names.size(); ++index)
     {
       boost::shared_ptr<shadow_joints::Joint> joint = boost::shared_ptr<shadow_joints::Joint>( new shadow_joints::Joint() );
@@ -70,7 +67,7 @@ namespace shadow_robot
       joint->has_motor = true;
       joint->motor     = motor;
 
-      joints_map[ joint_names[index] ] = joint;
+      joints_map.insert( joint_names[index], joint);
     }
   }
 

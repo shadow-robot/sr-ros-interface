@@ -34,6 +34,8 @@
 
 #include <pr2_hardware_interface/hardware_interface.h>
 
+#include <sr_utilities/thread_safe_map.hpp>
+
 #include "sr_robot_lib/calibration.hpp"
 
 namespace shadow_joints
@@ -92,9 +94,9 @@ namespace shadow_joints
     boost::shared_ptr<Motor> motor;
   };
 
-  typedef std::map<std::string, boost::shared_ptr<Joint> > JointsMap;
+  typedef threadsafe::Map<boost::shared_ptr<Joint> > JointsMap;
 
-  typedef std::map<std::string, boost::shared_ptr<shadow_robot::JointCalibration> > CalibrationMap;
+  typedef threadsafe::Map<boost::shared_ptr<shadow_robot::JointCalibration> > CalibrationMap;
 
 }
 
@@ -111,7 +113,6 @@ namespace shadow_robot
 
     shadow_joints::JointsMap joints_map;
     shadow_joints::CalibrationMap calibration_map;
-    boost::shared_mutex joints_map_mutex;
 
   protected:
     virtual void initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,

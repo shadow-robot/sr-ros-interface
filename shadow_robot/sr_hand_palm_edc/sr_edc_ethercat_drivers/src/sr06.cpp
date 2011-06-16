@@ -893,14 +893,12 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
   this->ethercatDiagnostics(d,2);
   vec.push_back(d);
 
-  shadow_joints::JointsMap::iterator joint_iter;
-  for(joint_iter = sr_hand_lib->joints_map.begin(); joint_iter != sr_hand_lib->joints_map.end();
-      ++joint_iter)
+  BOOST_FOREACH(std::string joint_name, sr_hand_lib->joints_map.keys())
   {
-    const pr2_hardware_interface::ActuatorState *state(&(joint_iter->second->motor->actuator)->state_);
+    const pr2_hardware_interface::ActuatorState *state(&(sr_hand_lib->joints_map.find(joint_name)->motor->actuator)->state_);
 
     name.str("");
-    name << "SRDMotor "<< joint_iter->first;
+    name << "SRDMotor "<< joint_name;
     d.name = name.str();
 
     //TODO check if motor is OK
@@ -1083,15 +1081,16 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   //ok the message was not empty
   //@TODO: how do we get the current actuator state?
 
-  shadow_joints::JointsMap::iterator joint_iter;
-  shadow_joints::CalibrationMap::iterator calibration_iter;
-  for(joint_iter = sr_hand_lib->joints_map.begin(); joint_iter != sr_hand_lib->joints_map.end();
-      ++joint_iter)
+  boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
+  boost::shared_ptr<shadow_joints::Joint> joint_tmp;
+
+  BOOST_FOREACH(std::string joint_name, sr_hand_lib->joints_map.keys())
   {
-    pr2_hardware_interface::Actuator* actuator = joint_iter->second->motor->actuator;
+    joint_tmp = sr_hand_lib->joints_map.find(joint_name);
+    pr2_hardware_interface::Actuator* actuator = (joint_tmp->motor->actuator);
     pr2_hardware_interface::ActuatorState* state(&actuator->state_);
 
-    int i=joint_iter->second->motor->motor_id;
+    int i = joint_tmp->motor->motor_id;
 
     state->is_enabled_ = 1;
     state->device_id_ = i;
@@ -1100,26 +1099,26 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     // Get the joint positions and compute the calibrate
     // values
 
-    if(joint_iter->second->joint_to_sensor.calibrate_after_combining_sensors)
+    if(joint_tmp->joint_to_sensor.calibrate_after_combining_sensors)
     {
       //first we combine the different sensors
       double raw_position = 0.0;
-      BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_iter->second->joint_to_sensor.joint_to_sensor_vector)
+      BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_tmp->joint_to_sensor.joint_to_sensor_vector)
         raw_position += static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id])*joint_to_sensor.coeff;
 
       //That's not an encoder position, just the raw value
       state->encoder_count_ = static_cast<int>(raw_position);
 
       //and now we calibrate
-      calibration_iter = sr_hand_lib->calibration_map.find(joint_iter->first);
-      state->position_ = calibration_iter->second->compute( static_cast<double>(raw_position) );
+      calibration_tmp = sr_hand_lib->calibration_map.find(joint_name);
+      state->position_ = calibration_tmp->compute( static_cast<double>(raw_position) );
     }
     else
     {
       //we calibrate the different sensors and we combine the calibrated
       //values
       double calibrated_position = 0.0;
-      BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_iter->second->joint_to_sensor.joint_to_sensor_vector)
+      BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_tmp->joint_to_sensor.joint_to_sensor_vector)
       {
         //TODO: calibrate
         double raw_pos = static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id]) / 4000.0;
