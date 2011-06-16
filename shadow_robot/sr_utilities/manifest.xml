@@ -10,7 +10,11 @@
   <url>http://ros.org/wiki/sr_utilities</url>
   <depend package="sensor_msgs"/>
   <depend package="rospy"/>
+  <depend package="roscpp"/>
 
+  <export>
+	<cpp cflags="-I${prefix}/include"/>
+  </export>
 </package>
 
 
