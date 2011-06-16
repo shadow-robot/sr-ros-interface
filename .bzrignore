@@ -62,7 +62,6 @@ shadow_robot/sr_display/cmake_install.cmake
 shadow_robot/sr_display/src/euslisp
 shadow_robot/sr_display/srv/java
 shadow_robot/sr_display/srv/oct
-<<<<<<< TREE
 shadow_robot/sr_remappers/.cproject
 shadow_robot/sr_remappers/.project
 shadow_robot/sr_remappers/src/euslisp
@@ -128,11 +127,11 @@ shadow_robot/sr_tactile_sensors/bin
 shadow_robot/sr_tactile_sensors/build
 bin
 build
-￼
 shadow_robot/sr_hand_palm_edc/sr_edc_ethercat_drivers/bin/test/sr_edc_ethercat_drivers_test
-￼
 shadow_robot/sr_hand/examples/siva_ros_object_rec_5fingers_tactile_experiment_bbc.cpp
-￼
 shadow_robot/sr_hand/examples/siva_ros_object_rec_5fingers_tactile_experiment_bbc.cpp
-￼
 shadow_robot/sr_hand_palm_edc/sr_robot_lib/bin/test/test_calibration
+shadow_robot/cyberglove/bin/test/test_calibration
+test_serial
+shadow_robot/cyberglove/tmp
+shadow_robot/sr_utilities/bin/test/test_thread_safe_map
