@@ -40,13 +40,17 @@ namespace shadow_robot
   {
     this->calibration_map = calibration_map;
 
-    initialize_map(joint_names, motor_ids, joint_to_sensors, actuators);
+    initialize_maps(joint_names, motor_ids, joint_to_sensors, actuators);
   }
 
   SrHandLib::~SrHandLib()
   {
-    BOOST_FOREACH( shadow_joints::JointsMap::value_type &i, joints_map )
-      delete i.second->motor->actuator;
+    boost::shared_ptr<shadow_joints::Joint> joint_tmp;
+    BOOST_FOREACH( std::string joint_name, joints_map.keys() )
+    {
+      joint_tmp = joints_map.find(joint_name);
+      delete joint_tmp->motor->actuator;
+    }
   }
 
   void SrHandLib::initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,

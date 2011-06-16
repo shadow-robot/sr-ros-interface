@@ -89,7 +89,7 @@ namespace shadow_robot
     /**
      * The size of the calibration table, used for quick access
      */
-    int calibration_table_size_;
+    unsigned int calibration_table_size_;
 
     /**
      * Interpolate linearly between the 2 points, for the given raw_value
