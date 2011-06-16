@@ -29,6 +29,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <gtest/gtest.h>
+#include <string>
 
 class TestMultiThread
 {
@@ -93,6 +94,11 @@ TEST(ThreadSafeMapOneThread, initialization)
 
   value = map.find("b");
   EXPECT_EQ(value, 2);
+
+  EXPECT_EQ(map.keys().size(), 2);
+
+  EXPECT_EQ(map.keys()[0].compare("a"), 0 );
+  EXPECT_EQ(map.keys()[1].compare("b"), 0 );
 }
 
 TEST(ThreadSafeMapOneThread, update)
