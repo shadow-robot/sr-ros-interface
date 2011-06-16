@@ -12,25 +12,25 @@ analyzers:
         path: First Finger
         timeout: 5.0
         regex: 'SRDMotor .*FFJ[0-9].*'
-        num_items: 3
+        num_items: 5
       right_finger:
         type: GenericAnalyzer
         path: Right Finger
         timeout: 5.0
         regex: 'SRDMotor .*RFJ[0-9].*'
-        num_items: 3
+        num_items: 5
       middle_finger:
         type: GenericAnalyzer
         path: Middle Finger
         timeout: 5.0
         regex: 'SRDMotor .*MFJ[0-9].*'
-        num_items: 3
+        num_items: 5
       little_finger:
         type: GenericAnalyzer
         path: Little Finger
         timeout: 5.0
         regex: 'SRDMotor .*LFJ[0-9].*'
-        num_items: 4
+        num_items: 6
       thumb:
         type: GenericAnalyzer
         path: Thumb
