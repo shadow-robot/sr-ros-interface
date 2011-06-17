@@ -892,7 +892,8 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
 
   BOOST_FOREACH(std::string joint_name, sr_hand_lib->joints_map.keys())
   {
-    const pr2_hardware_interface::ActuatorState *state(&(sr_hand_lib->joints_map.find(joint_name)->motor->actuator)->state_);
+    boost::shared_ptr<shadow_joints::Motor> motor = sr_hand_lib->joints_map.find(joint_name)->motor;
+    const pr2_hardware_interface::ActuatorState *state(&(motor->actuator)->state_);
 
     name.str("");
     name << "SRDMotor "<< joint_name;
@@ -906,7 +907,13 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
     d.addf("Measured Current", "%f", state->last_measured_current_);
 
     d.addf("Measured Effort", "%f", state->last_measured_effort_);
+    d.addf("Executed Effort", "%f", state->last_executed_effort_);
+    d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
+
     d.addf("Encoder Position", "%f", state->position_);
+
+    d.addf("Strain Gauge Left", "%f", motor->strain_gauge_left);
+    d.addf("Strain Gauge Right", "%f", motor->strain_gauge_right);
 
     vec.push_back(d);
   }
@@ -1169,12 +1176,22 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     {
       switch(status_data->motor_data_type)
       {
+      case MOTOR_DATA_SGL:
+        joint_tmp->motor->strain_gauge_left =  (double)status_data->motor_data_packet[index_motor].misc;
+        break;
+      case MOTOR_DATA_SGR:
+        joint_tmp->motor->strain_gauge_right =  (double)status_data->motor_data_packet[index_motor].misc;
+        break;
       case MOTOR_DATA_VOLTAGE:
         //TODO: Hugo: how can I get the correct voltage from the motor (as a double)
         state->motor_voltage_ = (double)status_data->motor_data_packet[index_motor].misc;
         break;
       case MOTOR_DATA_CURRENT:
         state->last_measured_current_ = (double)status_data->motor_data_packet[index_motor].misc;
+        break;
+      case MOTOR_DATA_PWM:
+        state->last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor].misc;
+        break;
       default:
         break;
       }
@@ -1182,7 +1199,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
       state->last_measured_effort_ = (double)status_data->motor_data_packet[index_motor].torque;
     }
 
-  }
+  } //end BOOST_FOREACH joint names
 
   if (flashing & !can_packet_acked)
   {
