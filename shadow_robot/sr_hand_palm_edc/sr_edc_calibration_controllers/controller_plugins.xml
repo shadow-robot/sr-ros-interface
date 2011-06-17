@@ -1,0 +1,11 @@
+<library path="lib/libsr_edc_calibration_controllers">
+
+  <class name="sr_edc_calibration_controllers/SrhFakeJointCalibrationController"
+         type="controller::SrhFakeJointCalibrationController"
+         base_class_type="pr2_controller_interface::Controller" />
+
+  <class name="sr_edc_calibration_controllers/SrhPositionController"
+         type="controller::SrhPositionController"
+         base_class_type="pr2_controller_interface::Controller" />
+
+</library>
