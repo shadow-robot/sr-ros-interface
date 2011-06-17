@@ -1,110 +1,110 @@
 
 # Shadow Hand Defines
 
-cal_sh_ffj0:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_ffj0_joint
-  actuator: FFJ0
-  transmission: ffj0_joint_trans
+#cal_sh_ffj0:
+#  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+#  joint: FFJ0
+#  actuator: FFJ0
+#  transmission: ffmiddle_transmission
 cal_sh_ffj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_ffj3_joint
+  joint: FFJ3
   actuator: FFJ3
-  transmission: ffj3_joint_trans
+  transmission: ffproximal_transmission
 cal_sh_ffj4:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_ffj4_joint
+  joint: FFJ4
   actuator: FFJ4
-  transmission: ffj4_joint_trans
+  transmission: ffknuckle_transmission
 
 
-cal_sh_mfj0:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_mfj0_joint
-  actuator: MFJ0
-  transmission: mfj0_joint_trans
+#cal_sh_mfj0:
+#  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+#  joint: MFJ0
+#  actuator: MFJ0
+#  transmission: mfmiddle_transmission
 cal_sh_mfj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_mfj3_joint
+  joint: MFJ3
   actuator: MFJ3
-  transmission: mfj3_joint_trans
+  transmission: mfproximal_transmission
 cal_sh_mfj4:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_mfj4_joint
+  joint: MFJ4
   actuator: MFJ4
-  transmission: mfj4_joint_trans
+  transmission: mfknuckle_transmission
 
-cal_sh_rfj0:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_rfj0_joint
-  actuator: RFJ0
-  transmission: rfj0_joint_trans
+#cal_sh_rfj0:
+#  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+#  joint: RFJ0
+#  actuator: RFJ0
+#  transmission: rfmiddle_transmission
 cal_sh_rfj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_rfj3_joint
+  joint: RFJ3
   actuator: RFJ3
-  transmission: rfj3_joint_trans
+  transmission: rfproximal_transmission
 cal_sh_rfj4:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_rfj4_joint
+  joint: RFJ4
   actuator: RFJ4
-  transmission: rfj4_joint_trans
+  transmission: rfknuckle_transmission
 
-cal_sh_lfj0:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_lfj0_joint
-  actuator: LFJ0
-  transmission: lfj0_joint_trans
+#cal_sh_lfj0:
+#  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+#  joint: LFJ0
+#  actuator: LFJ0
+#  transmission: lfmiddle_transmission
 cal_sh_lfj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_lfj3_joint
+  joint: LFJ3
   actuator: LFJ3
-  transmission: lfj3_joint_trans
+  transmission: lfproximal_transmission
 cal_sh_lfj4:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_lfj4_joint
+  joint: LFJ4
   actuator: LFJ4
-  transmission: lfj4_joint_trans
+  transmission: lfknuckle_transmission
 cal_sh_lfj5:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_lfj5_joint
+  joint: LFJ5
   actuator: LFJ5
-  transmission: lfj5_joint_trans
+  transmission: lfmetacarpal_transmission
 
 
 cal_sh_thj1:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_thj1_joint
+  joint: THJ1
   actuator: THJ1
-  transmission: thj1_joint_trans
+  transmission: thdistal_transmission
 cal_sh_thj2:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_thj2_joint
+  joint: THJ2
   actuator: THJ2
-  transmission: thj2_joint_trans
+  transmission: thmiddle_transmission
 cal_sh_thj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_thj3_joint
+  joint: THJ3
   actuator: THJ3
-  transmission: thj3_joint_trans
+  transmission: thhub_transmission
 cal_sh_thj4:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_thj4_joint
+  joint: THJ4
   actuator: THJ4
-  transmission: thj4_joint_trans
+  transmission: thproximal_transmission
 cal_sh_thj5:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_thj5_joint
+  joint: THJ5
   actuator: THJ5
-  transmission: thj5_joint_trans
+  transmission: thbase_transmission
 
 cal_sh_wrj1:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_wrj1_joint
+  joint: WRJ1
   actuator: WRJ1
-  transmission: wrj1_joint_trans
+  transmission: palm_transmission
 cal_sh_wrj2:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-  joint: srh_wrj2_joint
+  joint: WRJ2
   actuator: WRJ2
-  transmission: wrj2_joint_trans
+  transmission: wrist_transmission
