@@ -32,11 +32,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "srh_calibration_controllers/srh_fake_joint_calibration_controller.h"
+#include "sr_edc_calibration_controllers/srh_fake_joint_calibration_controller.h"
 #include "ros/time.h"
 #include "pluginlib/class_list_macros.h"
 
-PLUGINLIB_DECLARE_CLASS(srh_calibration_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
+PLUGINLIB_DECLARE_CLASS(sr_edc_calibration_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
 
 using namespace std;
 
@@ -104,7 +104,7 @@ bool SrhFakeJointCalibrationController::init(pr2_mechanism_model::RobotState *ro
   // "Calibrated" topic
   pub_calibrated_.reset(
     new realtime_tools::RealtimePublisher<std_msgs::Empty>(node_, "calibrated", 1));
-  
+
   return true;
 }
 

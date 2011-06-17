@@ -32,11 +32,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "srh_calibration_controllers/srh_position_controller.h"
+#include "sr_edc_calibration_controllers/srh_position_controller.h"
 #include "angles/angles.h"
 #include "pluginlib/class_list_macros.h"
 
-PLUGINLIB_DECLARE_CLASS(srh_calibration_controllers, SrhPositionController, controller::SrhPositionController, pr2_controller_interface::Controller)
+PLUGINLIB_DECLARE_CLASS(sr_edc_calibration_controllers, SrhPositionController, controller::SrhPositionController, pr2_controller_interface::Controller)
 
 using namespace std;
 
@@ -103,7 +103,7 @@ bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, ros::No
 }
 
 
-void SrhPositionController::starting() 
+void SrhPositionController::starting()
 {
   command_ = joint_state_->position_;
   pid_controller_.reset();
