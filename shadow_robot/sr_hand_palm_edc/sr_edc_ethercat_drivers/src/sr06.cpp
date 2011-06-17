@@ -33,6 +33,7 @@
 #include <dll/ethercat_frame.h>
 #include <realtime_tools/realtime_publisher.h>
 
+#include <math.h>
 #include <sstream>
 #include <iomanip>
 #include <boost/foreach.hpp>
@@ -301,16 +302,16 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
   //initializing the hand library
   std::vector<std::string> joint_names_tmp;
-  std::vector<int> motor_ids;
+  std::vector<int> motor_ids = read_joint_to_motor_mapping();
   std::vector<shadow_joints::JointToSensor > joints_to_sensors;
   std::vector<pr2_hardware_interface::Actuator*> actuators;
 
+  ROS_ASSERT(motor_ids.size() == JOINTS_NUM);
   ROS_ASSERT(joint_to_sensor_vect.size() == JOINTS_NUM);
 
   for(unsigned int i=0; i< JOINTS_NUM; ++i)
   {
     joint_names_tmp.push_back(std::string(joint_names[i]));
-    motor_ids.push_back(i);
     shadow_joints::JointToSensor tmp_jts = joint_to_sensor_vect[i];
     joints_to_sensors.push_back(tmp_jts);
 
@@ -900,22 +901,43 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
     d.name = name.str();
 
     //TODO check if motor is OK
-    d.summary(d.OK, "OK");
+    if(motor->motor_ok)
+    {
+      if(motor->bad_data)
+      {
+        d.summary(d.WARN, "WARNING, bad CAN data received");
 
-    d.clear();
-    d.addf("Measured Voltage", "%f", state->motor_voltage_);
-    d.addf("Measured Current", "%f", state->last_measured_current_);
+        d.clear();
+        d.addf("Motor ID", "%d", motor->motor_id);
+      }
+      else //the data is good
+      {
+        d.summary(d.OK, "OK");
 
-    d.addf("Measured Effort", "%f", state->last_measured_effort_);
-    d.addf("Executed Effort", "%f", state->last_executed_effort_);
-    d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
+        d.clear();
+        d.addf("Motor ID", "%d", motor->motor_id);
 
-    d.addf("Encoder Position", "%f", state->position_);
+        d.addf("Measured Voltage", "%f", state->motor_voltage_);
+        d.addf("Measured Current", "%f", state->last_measured_current_);
 
-    d.addf("Strain Gauge Left", "%f", motor->strain_gauge_left);
-    d.addf("Strain Gauge Right", "%f", motor->strain_gauge_right);
+        d.addf("Measured Effort", "%f", state->last_measured_effort_);
+        d.addf("Executed Effort", "%f", state->last_executed_effort_);
+        d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
 
+        d.addf("Encoder Position", "%f", state->position_);
+
+        d.addf("Strain Gauge Left", "%f", motor->strain_gauge_left);
+        d.addf("Strain Gauge Right", "%f", motor->strain_gauge_right);
+      }
+    }
+    else
+    {
+      d.summary(d.ERROR, "ERROR");
+      d.clear();
+      d.addf("Motor ID", "%d", motor->motor_id);
+    }
     vec.push_back(d);
+
   }
 }
 
@@ -1072,6 +1094,11 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   //  int16u                                        *status_buffer = (int16u*)status_data;
   static unsigned int num_rxed_packets = 0;
 
+
+  ROS_ERROR_STREAM(" had errors: "<< status_data->which_motor_data_had_errors);
+  ROS_ERROR_STREAM(" arrived : "<< status_data->which_motor_data_arrived);
+
+
   ++num_rxed_packets;
   if (status_data->EDC_command == EDC_COMMAND_INVALID)
   {
@@ -1083,8 +1110,6 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   }
 
   //ok the message was not empty
-  //@TODO: how do we get the current actuator state?
-
   boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
   boost::shared_ptr<shadow_joints::Joint> joint_tmp;
 
@@ -1094,10 +1119,10 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     pr2_hardware_interface::Actuator* actuator = (joint_tmp->motor->actuator);
     pr2_hardware_interface::ActuatorState* state(&actuator->state_);
 
-    int i = joint_tmp->motor->motor_id;
+    int motor_index_full = joint_tmp->motor->motor_id;
 
     state->is_enabled_ = 1;
-    state->device_id_ = i;
+    state->device_id_ = motor_index_full;
 
     /////////////
     // Get the joint positions and compute the calibrate
@@ -1147,56 +1172,80 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //
     ////////////
 
-
+    //if no motor is associated to this joint, then return
+    if( !(motor_index_full == -1) )
+    {
+      ROS_ERROR_STREAM(""<<joint_name << " has no motor");
+      return true;
+    }
     //get the remaining information.
-    // TODO: check if there was an error, using which_motor_data_had_errors mask
     bool read_motor_info = false;
-    int index_motor = 0;
+    int index_motor_in_msg = 0;
     if(status_data->which_motors == 0)
     {
       //We sampled the even motor numbers
-      if( i%2 == 0)
+      if( motor_index_full%2 == 0)
       {
         read_motor_info = true;
-        index_motor = i/2;
+        index_motor_in_msg = motor_index_full/2;
       }
     }
     else
     {
       //we sampled the uneven motor numbers
-      if( i%2 == 1)
+      if( motor_index_full%2 == 1)
       {
         read_motor_info = true;
-        index_motor = i/2 - 1;
+        index_motor_in_msg = motor_index_full/2 + 1;
       }
     }
 
     //ok now we read the info and add it to the actuator state
     if(read_motor_info)
     {
-      switch(status_data->motor_data_type)
+      //check the masks to see if the CAN messages arrived to the motors
+      //the flag should be set to 1 for each motor
+      if( ( status_data->which_motor_data_arrived & sr06_math_utils::ipow(2, index_motor_in_msg - 1) )
+          != index_motor_in_msg )
       {
-      case MOTOR_DATA_SGL:
-        joint_tmp->motor->strain_gauge_left =  (double)status_data->motor_data_packet[index_motor].misc;
-        break;
-      case MOTOR_DATA_SGR:
-        joint_tmp->motor->strain_gauge_right =  (double)status_data->motor_data_packet[index_motor].misc;
-        break;
-      case MOTOR_DATA_VOLTAGE:
-        //TODO: Hugo: how can I get the correct voltage from the motor (as a double)
-        state->motor_voltage_ = (double)status_data->motor_data_packet[index_motor].misc;
-        break;
-      case MOTOR_DATA_CURRENT:
-        state->last_measured_current_ = (double)status_data->motor_data_packet[index_motor].misc;
-        break;
-      case MOTOR_DATA_PWM:
-        state->last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor].misc;
-        break;
-      default:
-        break;
+        joint_tmp->motor->motor_ok = false;
       }
 
-      state->last_measured_effort_ = (double)status_data->motor_data_packet[index_motor].torque;
+      //check the masks to see if a bad CAN message arrived
+      //the flag should be 0
+      if( ( status_data->which_motor_data_had_errors & sr06_math_utils::ipow(2, index_motor_in_msg - 1) )
+          == index_motor_in_msg )
+      {
+        joint_tmp->motor->bad_data = true;
+      }
+
+      if(joint_tmp->motor->motor_ok && !(joint_tmp->motor->bad_data) )
+      {
+        //we received the data and it was correct
+        switch(status_data->motor_data_type)
+        {
+        case MOTOR_DATA_SGL:
+          joint_tmp->motor->strain_gauge_left =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_SGR:
+          joint_tmp->motor->strain_gauge_right =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_VOLTAGE:
+          //TODO: Hugo: how can I get the correct voltage from the motor (as a double)
+          state->motor_voltage_ = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_CURRENT:
+          state->last_measured_current_ = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_PWM:
+          state->last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        default:
+          break;
+        }
+
+        state->last_measured_effort_ = (double)status_data->motor_data_packet[index_motor_in_msg].torque;
+      }
     }
 
   } //end BOOST_FOREACH joint names
@@ -1358,7 +1407,25 @@ shadow_joints::CalibrationMap SR06::read_joint_calibration()
   return joint_calibration;
 }
 
+std::vector<int> SR06::read_joint_to_motor_mapping()
+{
+  std::vector<int> motor_ids;
 
+  //TODO: This should be moved somewhere else. Not sure where yet.
+  std::string param_name = "joint_to_motor_mapping";
+
+  XmlRpc::XmlRpcValue mapping;
+  nodehandle_.getParam(param_name, mapping);
+  ROS_ASSERT(mapping.getType() == XmlRpc::XmlRpcValue::TypeArray);
+  //iterate on all the joints
+  for(int32_t i = 0; i < mapping.size(); ++i)
+  {
+    ROS_ASSERT(mapping[i].getType() == XmlRpc::XmlRpcValue::TypeInt);
+    motor_ids.push_back(static_cast<int>(mapping[i]));
+  }
+
+  return motor_ids;
+}
 
 
 /* For the emacs weenies in the crowd.

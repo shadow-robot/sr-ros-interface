@@ -63,12 +63,14 @@ namespace shadow_robot
       boost::shared_ptr<shadow_joints::Motor> motor = boost::shared_ptr<shadow_joints::Motor> ( new shadow_joints::Motor() );
 
       joint->joint_to_sensor = joint_to_sensors[index];
+
+      if(motor_ids[index] == -1) //no motor associated to this joint
+        joint->has_motor = false;
+      else
+        joint->has_motor = true;
+
       motor->motor_id = motor_ids[index];
-
       motor->actuator = actuators[index];
-
-      //TODO: check if the joint has a motor associated or not
-      joint->has_motor = true;
       joint->motor     = motor;
 
       joints_map.insert( joint_names[index], joint);

@@ -8,6 +8,7 @@
   <rosparam command="load" file="$(find sr_edc_launch)/config/motor_data_polling.yaml" />
   <rosparam command="load" file="$(find sr_edc_launch)/config/sensor_to_joint.yaml" />
   <rosparam command="load" file="$(find sr_edc_launch)/config/calibration.yaml" />
+  <rosparam command="load" file="$(find sr_edc_launch)/config/joint_to_motor_mapping.yaml" />
 
 
   <!-- Should be loaded before starting/running pr2_etherCAT node -->

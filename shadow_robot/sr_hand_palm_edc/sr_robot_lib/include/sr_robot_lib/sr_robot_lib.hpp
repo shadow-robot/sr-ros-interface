@@ -82,6 +82,17 @@ namespace shadow_joints
     int force_control_d;
     int force_control_imax;
     int force_control_deadband;
+
+    /**
+     * this boolean is set to true as long as we receive the
+     * data from the motor.
+     */
+    bool motor_ok;
+    /**
+     * this boolean is set to true if the data coming from the motor
+     * through the CAN bus are messed up.
+     */
+    bool bad_data;
   };
 
   struct Joint
