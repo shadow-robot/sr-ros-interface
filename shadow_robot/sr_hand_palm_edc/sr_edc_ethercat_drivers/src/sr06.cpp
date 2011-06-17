@@ -218,7 +218,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
     //
     // This is for data going TO the palm
     //
-    ROS_ERROR("First FMMU (command) : start_address : 0x%08X ; size : %3d bytes ; phy addr : 0x%08X", command_base_, command_size_, (int)ETHERCAT_COMMAND_DATA_ADDRESS);
+    ROS_INFO("First FMMU (command) : start_address : 0x%08X ; size : %3d bytes ; phy addr : 0x%08X", command_base_, command_size_, (int)ETHERCAT_COMMAND_DATA_ADDRESS);
     EC_FMMU *commandFMMU = new EC_FMMU( command_base_,
                                         command_size_,                                                  // Logical Start Address    (in ROS address space?)
                                         0x00,                                                           // Logical Start Bit
@@ -237,7 +237,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
     //
     // This is for data coming FROM the palm
     //
-    ROS_ERROR("Second FMMU (status) : start_address : 0x%08X ; size : %3d bytes ; phy addr : 0x%08X", status_base_, status_size_, (int)ETHERCAT_STATUS_DATA_ADDRESS);
+    ROS_INFO("Second FMMU (status) : start_address : 0x%08X ; size : %3d bytes ; phy addr : 0x%08X", status_base_, status_size_, (int)ETHERCAT_STATUS_DATA_ADDRESS);
     EC_FMMU *statusFMMU = new EC_FMMU(  status_base_,
                                         status_size_,
                                         0x00,
@@ -279,7 +279,7 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
 
     sh->set_pd_config(pd);
 
-    ROS_ERROR("status_size_ : %d ; command_size_ : %d", status_size_, command_size_);
+    ROS_INFO("status_size_ : %d ; command_size_ : %d", status_size_, command_size_);
 
     ROS_INFO("Finished constructing the SR06 driver");
 }
@@ -316,7 +316,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
     //initializing the actuators.
     pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(joint_names[i]);
-    ROS_ERROR_STREAM("adding actuator: "<<joint_names[i]);
+    ROS_INFO_STREAM("adding actuator: "<<joint_names[i]);
     actuators.push_back( actuator );
 
     if(hw)
@@ -332,12 +332,9 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
                                                                                        joints_to_sensors, actuators,
                                                                                        calibration_map));
 
-
-
-
-  ROS_ERROR("ETHERCAT_STATUS_DATA_SIZE      = %4d bytes", (int)ETHERCAT_STATUS_DATA_SIZE);
-  ROS_ERROR("ETHERCAT_COMMAND_DATA_SIZE     = %4d bytes", (int)ETHERCAT_COMMAND_DATA_SIZE);
-  ROS_ERROR("ETHERCAT_CAN_BRIDGE_DATA_SIZE  = %4d bytes", (int)ETHERCAT_CAN_BRIDGE_DATA_SIZE);
+  ROS_INFO("ETHERCAT_STATUS_DATA_SIZE      = %4d bytes", (int)ETHERCAT_STATUS_DATA_SIZE);
+  ROS_INFO("ETHERCAT_COMMAND_DATA_SIZE     = %4d bytes", (int)ETHERCAT_COMMAND_DATA_SIZE);
+  ROS_INFO("ETHERCAT_CAN_BRIDGE_DATA_SIZE  = %4d bytes", (int)ETHERCAT_CAN_BRIDGE_DATA_SIZE);
 
 
 //  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
@@ -359,7 +356,7 @@ void SR06::erase_flash(void)
   int err;
 
   do {
-    ROS_ERROR("Sending the ERASE FLASH command");
+    ROS_WARN("Sending the ERASE FLASH command");
     // First we send the erase command
     cmd_sent = 0;
     while (! cmd_sent )
@@ -430,7 +427,7 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
   {
     if ( !(err = pthread_mutex_trylock(&producing)) )
     {
-      ROS_ERROR("Sending READ data ... position : %d", pos);
+      ROS_WARN("Sending READ data ... position : %d", pos);
       can_message_.can_bus = 1;
       can_message_.message_length = 3;
       can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | READ_FLASH_COMMAND;
@@ -519,7 +516,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
   binary_content = NULL;
   flashing = true;
 
-  ROS_ERROR("Flashing the motor\n");
+  ROS_WARN("Flashing the motor\n");
 
   bfd_init();
 
@@ -537,9 +534,9 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
   }
 
 
-  ROS_ERROR("firmware %s's format is : %s.", req.firmware.c_str(), fd->xvec->name);
+  ROS_WARN("firmware %s's format is : %s.", req.firmware.c_str(), fd->xvec->name);
 
-  ROS_ERROR("Sending dummy packet");
+  ROS_INFO("Sending dummy packet");
   cmd_sent = 0;
   while ( !cmd_sent )
   {
@@ -571,7 +568,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     }
   }
 
-  ROS_ERROR("Sending magic CAN packet to put the motor in bootloading mode");
+  ROS_INFO("Sending magic CAN packet to put the motor in bootloading mode");
   cmd_sent = 0;
   while ( !cmd_sent )
   {
@@ -612,8 +609,8 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
   }
 
   if ( timedout ) {
-    ROS_ERROR("First magic CAN packet timedout");
-    ROS_ERROR("Sending another magic CAN packet to put the motor in bootloading mode");
+    ROS_WARN("First magic CAN packet timedout");
+    ROS_WARN("Sending another magic CAN packet to put the motor in bootloading mode");
     cmd_sent = 0;
     while ( !cmd_sent )
     {
@@ -715,7 +712,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
 
   pos = 0;
   unsigned int packet = 0;
-  ROS_ERROR("Sending the firmware data\n");
+  ROS_INFO("Sending the firmware data\n");
   while ( pos < ((total_size % 32) == 0 ? total_size : (total_size + 32 - (total_size % 32))) )
   {
     if ((pos % 32) == 0)
@@ -734,7 +731,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
             can_message_.message_data[2] = addru + ((pos + addrl + (addrh << 8)) >> 16);
             can_message_.message_data[1] = addrh + ((pos + addrl) >> 8); // User application start address is 0x4C0
             can_message_.message_data[0] = addrl + pos;
-            ROS_ERROR("Sending write address : 0x%02X%02X%02X", can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
+            ROS_INFO("Sending write address : 0x%02X%02X%02X", can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
             cmd_sent = 1;
             unlock(&producing);
           }
@@ -767,7 +764,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     {
       if ( !(err = pthread_mutex_trylock(&producing)) )
       {
-        ROS_ERROR("Sending data ... position == %d", pos);
+        ROS_INFO("Sending data ... position == %d", pos);
         can_message_.message_length = 8;
         can_message_.can_bus = 1;
         can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_DATA_COMMAND;
@@ -830,7 +827,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
   }
 
   free(binary_content);
-  ROS_ERROR("Sending the RESET command to PIC18F");
+  ROS_INFO("Sending the RESET command to PIC18F");
   // Then we send the RESET command to PIC18F
   cmd_sent = 0;
   while (! cmd_sent )
@@ -858,7 +855,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
 
   flashing = false;
 
-  ROS_ERROR("Flashing done");
+  ROS_INFO("Flashing done");
 
   res.value = res.SUCCESS;
   return true;
@@ -1012,34 +1009,34 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
   if (packet->message_id == 0)
     return false;
 
-  ROS_ERROR("ack sid : %04X", packet->message_id);
+  ROS_INFO("ack sid : %04X", packet->message_id);
 
   if ( (packet->message_id & 0b0000011111111111) == (0x0600 | (motor_being_flashed << 5) | 0x10 | READ_FLASH_COMMAND))
     return ( !memcmp(packet->message_data, binary_content + pos, 8) );
 
   if (packet->message_length != can_message_.message_length)
     return false;
-  ROS_ERROR("Length is OK");
+  ROS_INFO("Length is OK");
 
   for (i = 0 ; i < packet->message_length ; ++i)
   {
-    ROS_ERROR("packet sent, data[%d] : %02X ; ack, data[%d] : %02X", i, can_message_.message_data[i], i, packet->message_data[i]);
+    ROS_INFO("packet sent, data[%d] : %02X ; ack, data[%d] : %02X", i, can_message_.message_data[i], i, packet->message_data[i]);
     if (packet->message_data[i] != can_message_.message_data[i])
       return false;
   }
-  ROS_ERROR("Data is OK");
+  ROS_INFO("Data is OK");
 
   if ( !(0x0010 & packet->message_id))
     return false;
 
-  ROS_ERROR("This is an ACK");
+  ROS_INFO("This is an ACK");
 
   if ( (packet->message_id & 0b0000000111101111) != (can_message_.message_id & 0b0000000111101111) )
     return false;
 
-  ROS_ERROR("SID is OK");
+  ROS_INFO("SID is OK");
 
-  ROS_ERROR("Everything is OK, this is our ACK !");
+  ROS_INFO("Everything is OK, this is our ACK !");
   return true;
 }
 
