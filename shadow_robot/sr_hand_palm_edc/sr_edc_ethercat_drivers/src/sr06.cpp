@@ -1116,6 +1116,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     }
     else
     {
+
       //we calibrate the different sensors first and we combine the calibrated
       //values. This is used in the joint 0s for example ( J0 = cal(J1)+cal(J2) )
       double calibrated_position = 0.0;
@@ -1134,10 +1135,9 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
         calibrated_position += calibration_tmp->compute(raw_pos) * joint_to_sensor.coeff;
       }
       state->position_ = calibrated_position;
-
     }
 
-              //
+    //
     ////////////
 
 
