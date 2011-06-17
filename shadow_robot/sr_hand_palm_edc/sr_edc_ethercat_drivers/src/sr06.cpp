@@ -1101,8 +1101,12 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
     if(joint_tmp->joint_to_sensor.calibrate_after_combining_sensors)
     {
-      //first we combine the different sensors
+      //first we combine the different sensors and then we
+      // calibrate the value we obtained. This is used for
+      // some compound sensors ( THJ5 = cal(THJ5A + THJ5B))
       double raw_position = 0.0;
+      //when combining the values, we use the coefficient imported
+      // from the sensor_to_joint.yaml file (in sr_edc_launch/config)
       BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_tmp->joint_to_sensor.joint_to_sensor_vector)
         raw_position += static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id])*joint_to_sensor.coeff;
 
@@ -1111,20 +1115,26 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
       //and now we calibrate
       calibration_tmp = sr_hand_lib->calibration_map.find(joint_name);
-      //TODO: calibrate
       state->position_ = calibration_tmp->compute( static_cast<double>(raw_position) );
     }
     else
     {
-      //we calibrate the different sensors and we combine the calibrated
-      //values
+      //we calibrate the different sensors first and we combine the calibrated
+      //values. This is used in the joint 0s for example ( J0 = cal(J1)+cal(J2) )
       double calibrated_position = 0.0;
-      BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_tmp->joint_to_sensor.joint_to_sensor_vector)
+      shadow_joints::PartialJointToSensor joint_to_sensor;
+      std::string sensor_name;
+      for(unsigned int index_joint_to_sensor=0;
+          index_joint_to_sensor < joint_tmp->joint_to_sensor.joint_to_sensor_vector.size();
+          ++index_joint_to_sensor)
       {
-        //TODO: calibrate
-        double raw_pos = static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id]) / 4000.0;
-        //combine
-        calibrated_position += raw_pos * joint_to_sensor.coeff;
+        joint_to_sensor = joint_tmp->joint_to_sensor.joint_to_sensor_vector[index_joint_to_sensor];
+        sensor_name = joint_tmp->joint_to_sensor.sensor_names[index_joint_to_sensor];
+        //get the raw position
+        double raw_pos = static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id]);
+        //calibrate and then combine
+        calibration_tmp = sr_hand_lib->calibration_map.find(sensor_name);
+        calibrated_position += calibration_tmp->compute(raw_pos) * joint_to_sensor.coeff;
       }
       state->position_ = calibrated_position;
 
@@ -1278,6 +1288,7 @@ std::vector<shadow_joints::JointToSensor> SR06::read_joint_to_sensor_mapping()
       shadow_joints::PartialJointToSensor tmp_joint_to_sensor;
 
       ROS_ASSERT(map_one_joint[i][0].getType() == XmlRpc::XmlRpcValue::TypeString);
+      tmp_vect.sensor_names.push_back( static_cast<std::string>(map_one_joint[i][0]) );
       tmp_joint_to_sensor.sensor_id = sensors_map[ static_cast<std::string>(map_one_joint[i][0]) ];
 
       ROS_ASSERT(map_one_joint[i][1].getType() == XmlRpc::XmlRpcValue::TypeDouble);

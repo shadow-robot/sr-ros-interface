@@ -48,6 +48,7 @@ namespace shadow_joints
 
   struct JointToSensor
   {
+    std::vector<std::string> sensor_names;
     std::vector<PartialJointToSensor> joint_to_sensor_vector;
     bool calibrate_after_combining_sensors;
   };
