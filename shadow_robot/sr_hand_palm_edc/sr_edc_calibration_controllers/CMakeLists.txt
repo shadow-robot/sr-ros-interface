@@ -17,6 +17,6 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_library(${PROJECT_NAME}
-  src/sr_edc_fake_joint_calibration_controller.cpp
-  src/sr_edc_position_controller.cpp
+  src/srh_fake_joint_calibration_controller.cpp
+  src/srh_position_controller.cpp
 )
