@@ -1065,7 +1065,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 {
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS  *status_data = (ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS *)(this_buffer + command_size_                             );
   ETHERCAT_CAN_BRIDGE_DATA                      *can_data    = (ETHERCAT_CAN_BRIDGE_DATA                     *)(this_buffer + command_size_ + ETHERCAT_STATUS_DATA_SIZE );
-  int16u                                        *status_buffer = (int16u*)status_data;
+  //  int16u                                        *status_buffer = (int16u*)status_data;
   static unsigned int num_rxed_packets = 0;
 
   ++num_rxed_packets;
@@ -1111,6 +1111,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
       //and now we calibrate
       calibration_tmp = sr_hand_lib->calibration_map.find(joint_name);
+      //TODO: calibrate
       state->position_ = calibration_tmp->compute( static_cast<double>(raw_position) );
     }
     else
@@ -1294,9 +1295,40 @@ shadow_joints::CalibrationMap SR06::read_joint_calibration()
   shadow_joints::CalibrationMap joint_calibration;
 
   //TODO: This should be moved somewhere else. Not sure where yet.
-  std::string base_topic = "sr_calibrations/";
+  std::string param_name = "sr_calibrations";
 
-  ROS_ERROR("not implemented yet");
+  XmlRpc::XmlRpcValue calib;
+  nodehandle_.getParam(param_name, calib);
+  ROS_ASSERT(calib.getType() == XmlRpc::XmlRpcValue::TypeArray);
+  //iterate on all the joints
+  for(int32_t index_cal = 0; index_cal < calib.size(); ++index_cal)
+  {
+    //check the calibration is well formatted:
+    // first joint name, then calibration table
+    ROS_ASSERT(calib[index_cal][0].getType() == XmlRpc::XmlRpcValue::TypeString);
+    ROS_ASSERT(calib[index_cal][1].getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+    std::string joint_name = static_cast<std::string> (calib[index_cal][0]);
+    std::vector<joint_calibration::Point> calib_table_tmp;
+
+    //now iterates on the calibration table for the current joint
+    for(int32_t index_table=0; index_table < calib[index_cal][1].size(); ++index_table)
+    {
+      ROS_ASSERT(calib[index_cal][1][index_table].getType() == XmlRpc::XmlRpcValue::TypeArray);
+      //only 2 values per calibration point: raw and calibrated (doubles)
+      ROS_ASSERT(calib[index_cal][1][index_table].size() == 2);
+      ROS_ASSERT(calib[index_cal][1][index_table][0].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+      ROS_ASSERT(calib[index_cal][1][index_table][1].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+
+
+      joint_calibration::Point point_tmp;
+      point_tmp.raw_value = static_cast<double> (calib[index_cal][1][index_table][0]);
+      point_tmp.calibrated_value = static_cast<double> (calib[index_cal][1][index_table][1]);
+      calib_table_tmp.push_back(point_tmp);
+    }
+
+    joint_calibration.insert(joint_name, boost::shared_ptr<shadow_robot::JointCalibration>(new shadow_robot::JointCalibration(calib_table_tmp)) );
+  }
 
   return joint_calibration;
 }
