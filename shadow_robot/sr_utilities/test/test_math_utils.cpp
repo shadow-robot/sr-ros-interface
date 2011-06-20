@@ -31,6 +31,8 @@ TEST(Pow, base2)
   EXPECT_EQ(sr_math_utils::ipow(2, 0), 1);
   EXPECT_EQ(sr_math_utils::ipow(2, 2), 4);
   EXPECT_EQ(sr_math_utils::ipow(2, 10), 1024);
+
+  EXPECT_EQ(sr_math_utils::ipow(2, 20), 1048576);
 }
 
 TEST(Pow, base3)
@@ -38,6 +40,72 @@ TEST(Pow, base3)
   EXPECT_EQ(sr_math_utils::ipow(3, 0), 1);
   EXPECT_EQ(sr_math_utils::ipow(3, 2), 9);
   EXPECT_EQ(sr_math_utils::ipow(3, 10), 59049);
+}
+
+TEST(BitMasks, is_true__true_0)
+{
+  //bit mask = 0b01
+  int bit_mask = 1;
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_true(bit_mask, 0));
+}
+
+TEST(BitMasks, is_true__false_1)
+{
+  //bit mask = 0b01
+  int bit_mask = 1;
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_true(bit_mask, 1));
+}
+
+TEST(BitMasks, is_false__false_0)
+{
+  //bit mask = 0b01
+  int bit_mask = 1;
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_false(bit_mask, 0));
+}
+
+TEST(BitMasks, is_false__true_1)
+{
+  //bit mask = 0b01
+  int bit_mask = 1;
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_false(bit_mask, 1));
+}
+
+TEST(BitMasksGlobal, is_true__true)
+{
+  //bit mask = 0b1010101
+  int bit_mask = 85;
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_true(bit_mask, 0));
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_true(bit_mask, 2));
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_true(bit_mask, 4));
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_true(bit_mask, 6));
+}
+
+TEST(BitMasksGlobal, is_false__false)
+{
+  //bit mask = 0b1010101
+  int bit_mask = 85;
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_false(bit_mask, 0));
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_false(bit_mask, 2));
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_false(bit_mask, 4));
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_false(bit_mask, 6));
+}
+
+TEST(BitMasksGlobal, is_true__false)
+{
+  //bit mask = 0b1010101
+  int bit_mask = 85;
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_true(bit_mask, 1));
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_true(bit_mask, 3));
+  EXPECT_FALSE(sr_math_utils::is_bit_mask_index_true(bit_mask, 5));
+}
+
+TEST(BitMasksGlobal, is_false__true)
+{
+  //bit mask = 0b1010101
+  int bit_mask = 85;
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_false(bit_mask, 1));
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_false(bit_mask, 3));
+  EXPECT_TRUE(sr_math_utils::is_bit_mask_index_false(bit_mask, 5));
 }
 
 // Run all the tests that were declared with TEST()

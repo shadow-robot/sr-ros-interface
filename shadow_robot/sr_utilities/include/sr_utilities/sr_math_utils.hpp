@@ -29,7 +29,7 @@
 
 namespace sr_math_utils
 {
-  inline int ipow(int base, int exp)
+  static inline int ipow(int base, int exp)
   {
     int result = 1;
     while (exp)
@@ -41,6 +41,19 @@ namespace sr_math_utils
     }
 
     return result;
+  }
+
+  static inline bool is_bit_mask_index_true(int bit_mask, int index)
+  {
+    if ( bit_mask & (1<<index) )
+      return true;
+    else
+      return false;
+  }
+
+  static inline bool is_bit_mask_index_false(int bit_mask, int index)
+  {
+    return !(is_bit_mask_index_true(bit_mask, index));
   }
 }
 

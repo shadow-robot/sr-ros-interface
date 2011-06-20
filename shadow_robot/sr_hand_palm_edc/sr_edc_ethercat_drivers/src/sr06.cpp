@@ -1207,19 +1207,11 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     {
       //check the masks to see if the CAN messages arrived to the motors
       //the flag should be set to 1 for each motor
-      if( ( status_data->which_motor_data_arrived & sr_math_utils::ipow(2, index_motor_in_msg - 1) )
-          != index_motor_in_msg )
-      {
-        joint_tmp->motor->motor_ok = false;
-      }
+      joint_tmp->motor->motor_ok = sr_math_utils::is_bit_mask_index_true(status_data->which_motor_data_arrived, index_motor_in_msg);
 
       //check the masks to see if a bad CAN message arrived
       //the flag should be 0
-      if( ( status_data->which_motor_data_had_errors & sr_math_utils::ipow(2, index_motor_in_msg - 1) )
-          == index_motor_in_msg )
-      {
-        joint_tmp->motor->bad_data = true;
-      }
+      joint_tmp->motor->bad_data = sr_math_utils::is_bit_mask_index_true(status_data->which_motor_data_had_errors, index_motor_in_msg);
 
       if(joint_tmp->motor->motor_ok && !(joint_tmp->motor->bad_data) )
       {
