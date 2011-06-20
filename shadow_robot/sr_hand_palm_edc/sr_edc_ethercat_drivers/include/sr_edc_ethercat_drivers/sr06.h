@@ -46,23 +46,6 @@ extern "C" {
   #include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
 }
 
-namespace sr06_math_utils
-{
-  inline int ipow(int base, int exp)
-  {
-    int result = 1;
-    while (exp)
-    {
-      if (exp & 1)
-        result *= base;
-      exp >>= 1;
-      base *= base;
-    }
-
-    return result;
-  }
-}
-
 class SR06 : public SR0X
 {
 public:

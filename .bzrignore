@@ -135,3 +135,5 @@ shadow_robot/cyberglove/bin/test/test_calibration
 test_serial
 shadow_robot/cyberglove/tmp
 shadow_robot/sr_utilities/bin/test/test_thread_safe_map
+￼
+shadow_robot/sr_utilities/bin/test/test_math_utils

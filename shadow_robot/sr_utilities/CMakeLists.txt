@@ -17,3 +17,4 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_gtest(test/test_thread_safe_map test/test_thread_safe_map.cpp)
+rosbuild_add_gtest(test/test_math_utils test/test_math_utils.cpp)

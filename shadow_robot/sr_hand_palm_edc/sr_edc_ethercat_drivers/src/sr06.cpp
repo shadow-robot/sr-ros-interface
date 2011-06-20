@@ -44,6 +44,8 @@
 #include <pthread.h>
 #include <bfd.h>
 
+#include <sr_utilities/sr_math_utils.hpp>
+
 using namespace std;
 
 #include <sr_edc_ethercat_drivers/types_for_external.h>
@@ -1205,7 +1207,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     {
       //check the masks to see if the CAN messages arrived to the motors
       //the flag should be set to 1 for each motor
-      if( ( status_data->which_motor_data_arrived & sr06_math_utils::ipow(2, index_motor_in_msg - 1) )
+      if( ( status_data->which_motor_data_arrived & sr_math_utils::ipow(2, index_motor_in_msg - 1) )
           != index_motor_in_msg )
       {
         joint_tmp->motor->motor_ok = false;
@@ -1213,7 +1215,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
       //check the masks to see if a bad CAN message arrived
       //the flag should be 0
-      if( ( status_data->which_motor_data_had_errors & sr06_math_utils::ipow(2, index_motor_in_msg - 1) )
+      if( ( status_data->which_motor_data_had_errors & sr_math_utils::ipow(2, index_motor_in_msg - 1) )
           == index_motor_in_msg )
       {
         joint_tmp->motor->bad_data = true;
