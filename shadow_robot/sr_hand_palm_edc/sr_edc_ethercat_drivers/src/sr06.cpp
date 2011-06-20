@@ -895,48 +895,55 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
 
   BOOST_FOREACH(std::string joint_name, sr_hand_lib->joints_map.keys())
   {
-    boost::shared_ptr<shadow_joints::Motor> motor = sr_hand_lib->joints_map.find(joint_name)->motor;
-    const pr2_hardware_interface::ActuatorState *state(&(motor->actuator)->state_);
-
     name.str("");
     name << "SRDMotor "<< joint_name;
     d.name = name.str();
 
-    //TODO check if motor is OK
-    if(motor->motor_ok)
+    if( sr_hand_lib->joints_map.find(joint_name)->has_motor )
     {
-      if(motor->bad_data)
-      {
-        d.summary(d.WARN, "WARNING, bad CAN data received");
+      boost::shared_ptr<shadow_joints::Motor> motor = sr_hand_lib->joints_map.find(joint_name)->motor;
+      const pr2_hardware_interface::ActuatorState *state(&(motor->actuator)->state_);
 
-        d.clear();
-        d.addf("Motor ID", "%d", motor->motor_id);
+      if(motor->motor_ok)
+      {
+        if(motor->bad_data)
+        {
+          d.summary(d.WARN, "WARNING, bad CAN data received");
+
+          d.clear();
+          d.addf("Motor ID", "%d", motor->motor_id);
+        }
+        else //the data is good
+        {
+          d.summary(d.OK, "OK");
+
+          d.clear();
+          d.addf("Motor ID", "%d", motor->motor_id);
+
+          d.addf("Measured Voltage", "%f", state->motor_voltage_);
+          d.addf("Measured Current", "%f", state->last_measured_current_);
+
+          d.addf("Measured Effort", "%f", state->last_measured_effort_);
+          d.addf("Executed Effort", "%f", state->last_executed_effort_);
+          d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
+
+          d.addf("Encoder Position", "%f", state->position_);
+
+          d.addf("Strain Gauge Left", "%f", motor->strain_gauge_left);
+          d.addf("Strain Gauge Right", "%f", motor->strain_gauge_right);
+        }
       }
-      else //the data is good
+      else
       {
-        d.summary(d.OK, "OK");
-
+        d.summary(d.ERROR, "Motor error");
         d.clear();
         d.addf("Motor ID", "%d", motor->motor_id);
-
-        d.addf("Measured Voltage", "%f", state->motor_voltage_);
-        d.addf("Measured Current", "%f", state->last_measured_current_);
-
-        d.addf("Measured Effort", "%f", state->last_measured_effort_);
-        d.addf("Executed Effort", "%f", state->last_executed_effort_);
-        d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
-
-        d.addf("Encoder Position", "%f", state->position_);
-
-        d.addf("Strain Gauge Left", "%f", motor->strain_gauge_left);
-        d.addf("Strain Gauge Right", "%f", motor->strain_gauge_right);
       }
     }
     else
     {
-      d.summary(d.ERROR, "Motor error");
+      d.summary(d.OK, "No motor associated to this joint");
       d.clear();
-      d.addf("Motor ID", "%d", motor->motor_id);
     }
     vec.push_back(d);
 
