@@ -17,4 +17,11 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_gtest(test/test_thread_safe_map test/test_thread_safe_map.cpp)
+rosbuild_add_compile_flags(test/test_thread_safe_map -fprofile-arcs -ftest-coverage)
+add_library(gcov STATIC IMPORTED)
+set_property(TARGET gcov PROPERTY IMPORTED_LOCATION /usr/lib/gcc/i486-linux-gnu/4.4/libgcov.a)
+target_link_libraries(test/test_thread_safe_map gcov)
+
 rosbuild_add_gtest(test/test_math_utils test/test_math_utils.cpp)
+rosbuild_add_compile_flags(test/test_math_utils -fprofile-arcs -ftest-coverage)
+target_link_libraries(test/test_math_utils gcov)
