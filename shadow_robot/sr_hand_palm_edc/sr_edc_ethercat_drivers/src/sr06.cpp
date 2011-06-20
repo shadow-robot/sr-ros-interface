@@ -308,10 +308,10 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   std::vector<shadow_joints::JointToSensor > joints_to_sensors;
   std::vector<pr2_hardware_interface::Actuator*> actuators;
 
-  ROS_ASSERT(motor_ids.size() == JOINTS_NUM);
-  ROS_ASSERT(joint_to_sensor_vect.size() == JOINTS_NUM);
+  ROS_ASSERT(motor_ids.size() == JOINTS_NUM_0220);
+  ROS_ASSERT(joint_to_sensor_vect.size() == JOINTS_NUM_0220);
 
-  for(unsigned int i=0; i< JOINTS_NUM; ++i)
+  for(unsigned int i=0; i< JOINTS_NUM_0220; ++i)
   {
     joint_names_tmp.push_back(std::string(joint_names[i]));
     shadow_joints::JointToSensor tmp_jts = joint_to_sensor_vect[i];
@@ -934,7 +934,7 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
     }
     else
     {
-      d.summary(d.ERROR, "ERROR");
+      d.summary(d.ERROR, "Motor error");
       d.clear();
       d.addf("Motor ID", "%d", motor->motor_id);
     }
@@ -1096,18 +1096,13 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   //  int16u                                        *status_buffer = (int16u*)status_data;
   static unsigned int num_rxed_packets = 0;
 
-
-  ROS_ERROR_STREAM(" had errors: "<< status_data->which_motor_data_had_errors);
-  ROS_ERROR_STREAM(" arrived : "<< status_data->which_motor_data_arrived);
-
-
   ++num_rxed_packets;
   if (status_data->EDC_command == EDC_COMMAND_INVALID)
   {
     //received empty message: the pic is not writing to its mailbox.
     ++zero_buffer_read;
     float percentage_packet_loss = 100.f * ((float)zero_buffer_read / (float)num_rxed_packets);
-    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets (%2.3f%%)", zero_buffer_read, num_rxed_packets, percentage_packet_loss);
+    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
     return false;
   }
 
@@ -1122,7 +1117,6 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     pr2_hardware_interface::ActuatorState* state(&actuator->state_);
 
     int motor_index_full = joint_tmp->motor->motor_id;
-
     state->is_enabled_ = 1;
     state->device_id_ = motor_index_full;
 
@@ -1174,15 +1168,14 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //
     ////////////
 
-    //if no motor is associated to this joint, then return
-    if( !(motor_index_full == -1) )
-    {
-      ROS_ERROR_STREAM(""<<joint_name << " has no motor");
-      return true;
-    }
+    //if no motor is associated to this joint, then continue
+    if( (motor_index_full == -1) )
+      continue;
+
     //get the remaining information.
     bool read_motor_info = false;
     int index_motor_in_msg = 0;
+
     if(status_data->which_motors == 0)
     {
       //We sampled the even motor numbers
@@ -1307,7 +1300,7 @@ std::vector<shadow_joints::JointToSensor> SR06::read_joint_to_sensor_mapping()
   std::vector<shadow_joints::JointToSensor> joint_to_sensor_vect;
 
   std::map<std::string, int> sensors_map;
-  for(unsigned int i=0; i < SENSORS_NUM; ++i)
+  for(unsigned int i=0; i < SENSORS_NUM_0220; ++i)
   {
     sensors_map[sensor_names[i] ] = i;
   }
