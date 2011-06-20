@@ -37,3 +37,7 @@ rosbuild_add_link_flags(sr_edc_ethercat_drivers -lbfd)
 
 
 rosbuild_add_gtest(test/sr_edc_ethercat_drivers_test test/sr_edc_ethercat_drivers_test.cpp src/utils/motor_updater.cpp headers.txt)
+rosbuild_add_compile_flags(test/sr_edc_ethercat_drivers_test -g -pg -fprofile-arcs -ftest-coverage)
+add_library(gcov STATIC IMPORTED)
+set_property(TARGET gcov PROPERTY IMPORTED_LOCATION /usr/lib/gcc/i486-linux-gnu/4.4/libgcov.a)
+target_link_libraries(test/sr_edc_ethercat_drivers_test gcov)
