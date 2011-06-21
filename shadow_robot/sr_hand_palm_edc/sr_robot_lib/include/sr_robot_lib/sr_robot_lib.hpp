@@ -28,13 +28,13 @@
 #define _SR_ROBOT_LIB_HPP_
 
 #include <boost/smart_ptr.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
 #include <vector>
-#include <map>
-
-#include <pr2_hardware_interface/hardware_interface.h>
 
 #include <sr_utilities/thread_safe_map.hpp>
+
+#include <pr2_hardware_interface/hardware_interface.h>
 
 #include "sr_robot_lib/calibration.hpp"
 
@@ -100,6 +100,8 @@ namespace shadow_joints
 
   struct Joint
   {
+    std::string joint_name;
+
     //the indexes of the joints in the joint array
     // coming from the hardware which are used to
     // compute the joint data.
@@ -109,10 +111,7 @@ namespace shadow_joints
     boost::shared_ptr<Motor> motor;
   };
 
-  typedef threadsafe::Map<boost::shared_ptr<Joint> > JointsMap;
-
   typedef threadsafe::Map<boost::shared_ptr<shadow_robot::JointCalibration> > CalibrationMap;
-
 }
 
 namespace shadow_robot
@@ -126,7 +125,7 @@ namespace shadow_robot
                shadow_joints::CalibrationMap calibration_map) {};
     ~SrRobotLib() {};
 
-    shadow_joints::JointsMap joints_map;
+    boost::ptr_vector<shadow_joints::Joint> joints_vector;
     shadow_joints::CalibrationMap calibration_map;
 
   protected:

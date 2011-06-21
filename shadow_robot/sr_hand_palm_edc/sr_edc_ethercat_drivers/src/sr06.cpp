@@ -895,51 +895,51 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
   this->ethercatDiagnostics(d,2);
   vec.push_back(d);
 
-  BOOST_FOREACH(std::string joint_name, sr_hand_lib->joints_map.keys())
+  boost::ptr_vector<shadow_joints::Joint>::iterator joint = sr_hand_lib->joints_vector.begin();
+  for(;joint != sr_hand_lib->joints_vector.end(); ++joint)
   {
     name.str("");
-    name << "SRDMotor "<< joint_name;
+    name << "SRDMotor "<< joint->joint_name;
     d.name = name.str();
 
-    if( sr_hand_lib->joints_map.find(joint_name)->has_motor )
+    if( joint->has_motor )
     {
-      boost::shared_ptr<shadow_joints::Motor> motor = sr_hand_lib->joints_map.find(joint_name)->motor;
-      const pr2_hardware_interface::ActuatorState *state(&(motor->actuator)->state_);
+      const pr2_hardware_interface::ActuatorState *state(&(joint->motor->actuator)->state_);
 
-      if(motor->motor_ok)
+      if(joint->motor->motor_ok)
       {
-        if(motor->bad_data)
+        if(joint->motor->bad_data)
         {
           d.summary(d.WARN, "WARNING, bad CAN data received");
 
           d.clear();
-          d.addf("Motor ID", "%d", motor->motor_id);
+          d.addf("Motor ID", "%d", joint->motor->motor_id);
         }
         else //the data is good
         {
           d.summary(d.OK, "OK");
 
           d.clear();
-          d.addf("Motor ID", "%d", motor->motor_id);
-          d.addf("Motor ID in message", "%d", motor->msg_motor_id);
+          d.addf("Motor ID", "%d", joint->motor->motor_id);
+          d.addf("Motor ID in message", "%d", joint->motor->msg_motor_id);
 
-	  ROS_ERROR_STREAM("Reading sgl: "<<motor->strain_gauge_left);
-          d.addf("Strain Gauge Left", "%f", motor->strain_gauge_left);
-          d.addf("Strain Gauge Right", "%f", motor->strain_gauge_right);
+	  ROS_ERROR_STREAM("Reading sgl: "<<joint->motor->strain_gauge_left);
+          d.addf("Strain Gauge Left", "%f", joint->motor->strain_gauge_left);
+          d.addf("Strain Gauge Right", "%f", joint->motor->strain_gauge_right);
           d.addf("Executed Effort", "%f", state->last_executed_effort_);
-          d.addf("Motor Flags", "%d", motor->flags);
+          d.addf("Motor Flags", "%d", joint->motor->flags);
           d.addf("Measured Current", "%f", state->last_measured_current_);
           d.addf("Measured Voltage", "%f", state->motor_voltage_);
-          d.addf("Temperature", "%f", motor->temperature);
-          d.addf("Number of CAN messages received", "%d", motor->can_msgs_received);
-          d.addf("Number of CAN messages transmitted", "%d", motor->can_msgs_transmitted);
-          d.addf("Firmware svn revision", "%d", motor->firmware_svn_revision);
-          d.addf("Tests", "%d", motor->tests);
-          d.addf("Force control P", "%d", motor->force_control_p);
-          d.addf("Force control I", "%d", motor->force_control_i);
-          d.addf("Force control D", "%d", motor->force_control_d);
-          d.addf("Force control Imax", "%d", motor->force_control_imax);
-          d.addf("Force control Deadband", "%d", motor->force_control_deadband);
+          d.addf("Temperature", "%f", joint->motor->temperature);
+          d.addf("Number of CAN messages received", "%d", joint->motor->can_msgs_received);
+          d.addf("Number of CAN messages transmitted", "%d", joint->motor->can_msgs_transmitted);
+          d.addf("Firmware svn revision", "%d", joint->motor->firmware_svn_revision);
+          d.addf("Tests", "%d", joint->motor->tests);
+          d.addf("Force control P", "%d", joint->motor->force_control_p);
+          d.addf("Force control I", "%d", joint->motor->force_control_i);
+          d.addf("Force control D", "%d", joint->motor->force_control_d);
+          d.addf("Force control Imax", "%d", joint->motor->force_control_imax);
+          d.addf("Force control Deadband", "%d", joint->motor->force_control_deadband);
 
 
           d.addf("Measured Effort", "%f", state->last_measured_effort_);
@@ -951,7 +951,7 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
       {
         d.summary(d.ERROR, "Motor error");
         d.clear();
-        d.addf("Motor ID", "%d", motor->motor_id);
+        d.addf("Motor ID", "%d", joint->motor->motor_id);
       }
     }
     else
@@ -961,7 +961,7 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
     }
     vec.push_back(d);
 
-  }
+  } //end for each joints
 }
 
 
@@ -1129,14 +1129,13 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
   //ok the message was not empty
   boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
-  boost::shared_ptr<shadow_joints::Joint> joint_tmp;
 
   //read the PIC idle time
   sr_hand_lib->palm_pic_idle_time = status_data->idle_time_us;
 
-  BOOST_FOREACH(std::string joint_name, sr_hand_lib->joints_map.keys())
+  boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = sr_hand_lib->joints_vector.begin();
+  for(;joint_tmp != sr_hand_lib->joints_vector.end(); ++joint_tmp)
   {
-    joint_tmp = sr_hand_lib->joints_map.find(joint_name);
     pr2_hardware_interface::Actuator* actuator = (joint_tmp->motor->actuator);
     pr2_hardware_interface::ActuatorState* state(&actuator->state_);
 
@@ -1163,12 +1162,11 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
       state->encoder_count_ = static_cast<int>(raw_position);
 
       //and now we calibrate
-      calibration_tmp = sr_hand_lib->calibration_map.find(joint_name);
+      calibration_tmp = sr_hand_lib->calibration_map.find(joint_tmp->joint_name);
       state->position_ = calibration_tmp->compute( static_cast<double>(raw_position) );
     }
     else
     {
-
       //we calibrate the different sensors first and we combine the calibrated
       //values. This is used in the joint 0s for example ( J0 = cal(J1)+cal(J2) )
       double calibrated_position = 0.0;
@@ -1227,6 +1225,8 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //ok now we read the info and add it to the actuator state
     if(read_motor_info)
     {
+      ROS_ERROR_STREAM("Reading motor: "<<joint_tmp->joint_name << " ("<< motor_index_full << " / "<< index_motor_in_msg<<") => mask = "<<status_data->which_motor_data_arrived);
+
       //check the masks to see if the CAN messages arrived to the motors
       //the flag should be set to 1 for each motor
       joint_tmp->motor->motor_ok = sr_math_utils::is_bit_mask_index_true(status_data->which_motor_data_arrived, motor_index_full);
@@ -1243,9 +1243,6 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
         switch(status_data->motor_data_type)
         {
         case MOTOR_DATA_SGL:
-	  if(index_motor_in_msg == 1)
-	    ROS_ERROR_STREAM(" sgl: "<<status_data->motor_data_packet[index_motor_in_msg].misc);
-
           joint_tmp->motor->strain_gauge_left =  status_data->motor_data_packet[index_motor_in_msg].misc;
           break;
         case MOTOR_DATA_SGR:

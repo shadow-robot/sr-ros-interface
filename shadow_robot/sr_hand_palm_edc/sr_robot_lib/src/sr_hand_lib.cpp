@@ -30,6 +30,8 @@
 #include <string>
 #include <boost/foreach.hpp>
 
+#include <stdio.h>
+
 namespace shadow_robot
 {
   SrHandLib::SrHandLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
@@ -45,11 +47,10 @@ namespace shadow_robot
 
   SrHandLib::~SrHandLib()
   {
-    boost::shared_ptr<shadow_joints::Joint> joint_tmp;
-    BOOST_FOREACH( std::string joint_name, joints_map.keys() )
+    boost::ptr_vector<shadow_joints::Joint>::iterator joint = joints_vector.begin();
+    for(;joint != joints_vector.end(); ++joint)
     {
-      joint_tmp = joints_map.find(joint_name);
-      delete joint_tmp->motor->actuator;
+      delete joint->motor->actuator;
     }
   }
 
@@ -59,9 +60,14 @@ namespace shadow_robot
   {
     for(unsigned int index = 0; index < joint_names.size(); ++index)
     {
-      boost::shared_ptr<shadow_joints::Joint> joint = boost::shared_ptr<shadow_joints::Joint>( new shadow_joints::Joint() );
-      boost::shared_ptr<shadow_joints::Motor> motor = boost::shared_ptr<shadow_joints::Motor> ( new shadow_joints::Motor() );
+      //add the joint and the vector of joints.
+      joints_vector.push_back( new shadow_joints::Joint() );
 
+      //get the last inserted joint
+      boost::ptr_vector<shadow_joints::Joint>::reverse_iterator joint = joints_vector.rbegin();
+
+      //update the joint variables
+      joint->joint_name = joint_names[index];
       joint->joint_to_sensor = joint_to_sensors[index];
 
       if(motor_ids[index] == -1) //no motor associated to this joint
@@ -69,12 +75,11 @@ namespace shadow_robot
       else
         joint->has_motor = true;
 
-      motor->motor_id = motor_ids[index];
-      motor->actuator = actuators[index];
-      joint->motor     = motor;
+      joint->motor    = boost::shared_ptr<shadow_joints::Motor>( new shadow_joints::Motor() );
+      joint->motor->motor_id = motor_ids[index];
+      joint->motor->actuator = actuators[index];
 
-      joints_map.insert( joint_names[index], joint);
-    }
+    } //end for joints.
   }
 
 }
