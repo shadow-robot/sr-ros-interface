@@ -921,7 +921,9 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
 
           d.clear();
           d.addf("Motor ID", "%d", motor->motor_id);
+          d.addf("Motor ID in message", "%d", motor->msg_motor_id);
 
+	  ROS_ERROR_STREAM("Reading sgl: "<<motor->strain_gauge_left);
           d.addf("Strain Gauge Left", "%f", motor->strain_gauge_left);
           d.addf("Strain Gauge Right", "%f", motor->strain_gauge_right);
           d.addf("Executed Effort", "%f", state->last_executed_effort_);
@@ -1112,6 +1114,9 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   //  int16u                                        *status_buffer = (int16u*)status_data;
   static unsigned int num_rxed_packets = 0;
 
+  //check is the EDC_COMMAND is 32bit on the computer
+  ROS_ASSERT(sizeof(EDC_COMMAND) == 4);
+
   ++num_rxed_packets;
   if (status_data->EDC_command == EDC_COMMAND_INVALID)
   {
@@ -1199,27 +1204,32 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     {
       //We sampled the even motor numbers
       if( motor_index_full%2 == 0)
-      {
-        read_motor_info = true;
-        index_motor_in_msg = motor_index_full/2;
-      }
+	read_motor_info = true;
     }
     else
     {
       //we sampled the uneven motor numbers
       if( motor_index_full%2 == 1)
-      {
         read_motor_info = true;
-        index_motor_in_msg = motor_index_full/2 + 1;
-      }
     }
+
+    //the position of the motor in the message
+    // is different from the motor index:
+    // the motor indexes range from 0 to 19
+    // while the message contains information
+    // for only 10 motors.
+    index_motor_in_msg = motor_index_full/2;
+
+    //setting the position of the motor in the message,
+    // we'll print that in the diagnostics.
+    joint_tmp->motor->msg_motor_id = index_motor_in_msg;
 
     //ok now we read the info and add it to the actuator state
     if(read_motor_info)
     {
       //check the masks to see if the CAN messages arrived to the motors
       //the flag should be set to 1 for each motor
-      joint_tmp->motor->motor_ok = sr_math_utils::is_bit_mask_index_true(status_data->which_motor_data_arrived, index_motor_in_msg);
+      joint_tmp->motor->motor_ok = sr_math_utils::is_bit_mask_index_true(status_data->which_motor_data_arrived, motor_index_full);
 
       //check the masks to see if a bad CAN message arrived
       //the flag should be 0
@@ -1233,10 +1243,13 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
         switch(status_data->motor_data_type)
         {
         case MOTOR_DATA_SGL:
-          joint_tmp->motor->strain_gauge_left =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+	  if(index_motor_in_msg == 1)
+	    ROS_ERROR_STREAM(" sgl: "<<status_data->motor_data_packet[index_motor_in_msg].misc);
+
+          joint_tmp->motor->strain_gauge_left =  status_data->motor_data_packet[index_motor_in_msg].misc;
           break;
         case MOTOR_DATA_SGR:
-          joint_tmp->motor->strain_gauge_right =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          joint_tmp->motor->strain_gauge_right =  status_data->motor_data_packet[index_motor_in_msg].misc;
           break;
         case MOTOR_DATA_PWM:
           state->last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
@@ -1245,13 +1258,14 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
           joint_tmp->motor->flags = status_data->motor_data_packet[index_motor_in_msg].misc;
           break;
         case MOTOR_DATA_CURRENT:
-          state->last_measured_current_ = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          //we're receiving the current in milli amps
+          state->last_measured_current_ = ((double)status_data->motor_data_packet[index_motor_in_msg].misc)/1000.0;
           break;
         case MOTOR_DATA_VOLTAGE:
-          state->motor_voltage_ = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          state->motor_voltage_ = ((double)status_data->motor_data_packet[index_motor_in_msg].misc ) / 256.0;
           break;
         case MOTOR_DATA_TEMPERATURE:
-          joint_tmp->motor->temperature = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          joint_tmp->motor->temperature = ((double)status_data->motor_data_packet[index_motor_in_msg].misc) / 256.0;
           break;
         case MOTOR_DATA_CAN_NUM_RECEIVED:
           joint_tmp->motor->can_msgs_received = status_data->motor_data_packet[index_motor_in_msg].misc;

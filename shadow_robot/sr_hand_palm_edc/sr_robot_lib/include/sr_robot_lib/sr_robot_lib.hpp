@@ -59,12 +59,15 @@ namespace shadow_joints
     // coming from the hardware
     int motor_id;
 
+    //the position of the motor in the message array
+    int msg_motor_id;
+
     //actuator
     pr2_hardware_interface::Actuator* actuator;
 
     //Data we can read from the motor
-    double strain_gauge_left;
-    double strain_gauge_right;
+    int strain_gauge_left;
+    int strain_gauge_right;
 
     int flags;
 
