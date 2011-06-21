@@ -121,8 +121,7 @@ SR06::SR06()
     flashing(false),
     can_message_sent(true),
     can_packet_acked(true),
-    zero_buffer_read(0),
-    total_iter(0)
+    zero_buffer_read(0)
 {
   int res;
   check_for_pthread_mutex_init_error(res);
@@ -892,7 +891,9 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
   d.addf("Counter", "%d", ++counter_);
 
   d.addf("PIC idle time (in microsecs)", "%d", sr_hand_lib->palm_pic_idle_time);
-  d.addf("Min PIC idle time (in the last second)", "%d", sr_hand_lib->palm_pic_idle_time_min);
+  d.addf("Min PIC idle time (since last diagnostics)", "%d", sr_hand_lib->palm_pic_idle_time_min);
+  //reset the idle time min to a big number, to get a fresh number on next diagnostic
+  sr_hand_lib->palm_pic_idle_time_min = 1000;
 
   this->ethercatDiagnostics(d,2);
   vec.push_back(d);
@@ -1131,15 +1132,9 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
 
   //read the PIC idle time
-  if( total_iter == 1000 )
-  {
-    total_iter = 0;
-    sr_hand_lib->palm_pic_idle_time_min = 1000;
-  }
   sr_hand_lib->palm_pic_idle_time = status_data->idle_time_us;
   if( status_data->idle_time_us < sr_hand_lib->palm_pic_idle_time_min )
     sr_hand_lib->palm_pic_idle_time_min = status_data->idle_time_us;
-  ++total_iter;
 
   boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = sr_hand_lib->joints_vector.begin();
   for(;joint_tmp != sr_hand_lib->joints_vector.end(); ++joint_tmp)
@@ -1214,7 +1209,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     }
     else
     {
-      //we sampled the uneven motor numbers
+      //we sampled the odd motor numbers
       if( motor_index_full%2 == 1)
         read_motor_info = true;
     }

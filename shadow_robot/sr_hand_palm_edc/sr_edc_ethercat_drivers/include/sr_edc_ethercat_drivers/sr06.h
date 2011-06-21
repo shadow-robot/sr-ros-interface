@@ -94,8 +94,6 @@ private:
   ///counter for the number of empty buffer we're reading.
   unsigned int                     zero_buffer_read;
 
-  unsigned int                     total_iter;
-
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
   boost::shared_ptr<motor_updater::MotorUpdater> motor_updater;
 
