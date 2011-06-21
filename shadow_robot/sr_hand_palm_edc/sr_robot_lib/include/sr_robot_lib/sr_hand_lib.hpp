@@ -43,6 +43,7 @@ namespace shadow_robot
 
 
     int palm_pic_idle_time;
+    int palm_pic_idle_time_min;
 
   protected:
     virtual void initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,

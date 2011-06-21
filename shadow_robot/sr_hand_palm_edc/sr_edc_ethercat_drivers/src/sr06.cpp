@@ -121,7 +121,8 @@ SR06::SR06()
     flashing(false),
     can_message_sent(true),
     can_packet_acked(true),
-    zero_buffer_read(0)
+    zero_buffer_read(0),
+    total_iter(0)
 {
   int res;
   check_for_pthread_mutex_init_error(res);
@@ -891,6 +892,7 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
   d.addf("Counter", "%d", ++counter_);
 
   d.addf("PIC idle time (in microsecs)", "%d", sr_hand_lib->palm_pic_idle_time);
+  d.addf("Min PIC idle time (in the last second)", "%d", sr_hand_lib->palm_pic_idle_time_min);
 
   this->ethercatDiagnostics(d,2);
   vec.push_back(d);
@@ -922,8 +924,6 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.clear();
           d.addf("Motor ID", "%d", joint->motor->motor_id);
           d.addf("Motor ID in message", "%d", joint->motor->msg_motor_id);
-
-	  ROS_ERROR_STREAM("Reading sgl: "<<joint->motor->strain_gauge_left);
           d.addf("Strain Gauge Left", "%f", joint->motor->strain_gauge_left);
           d.addf("Strain Gauge Right", "%f", joint->motor->strain_gauge_right);
           d.addf("Executed Effort", "%f", state->last_executed_effort_);
@@ -1123,7 +1123,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //received empty message: the pic is not writing to its mailbox.
     ++zero_buffer_read;
     float percentage_packet_loss = 100.f * ((float)zero_buffer_read / (float)num_rxed_packets);
-    ROS_ERROR("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
+    ROS_WARN("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
     return false;
   }
 
@@ -1131,7 +1131,15 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
 
   //read the PIC idle time
+  if( total_iter == 1000 )
+  {
+    total_iter = 0;
+    sr_hand_lib->palm_pic_idle_time_min = 1000;
+  }
   sr_hand_lib->palm_pic_idle_time = status_data->idle_time_us;
+  if( status_data->idle_time_us < sr_hand_lib->palm_pic_idle_time_min )
+    sr_hand_lib->palm_pic_idle_time_min = status_data->idle_time_us;
+  ++total_iter;
 
   boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = sr_hand_lib->joints_vector.begin();
   for(;joint_tmp != sr_hand_lib->joints_vector.end(); ++joint_tmp)
@@ -1225,7 +1233,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //ok now we read the info and add it to the actuator state
     if(read_motor_info)
     {
-      ROS_ERROR_STREAM("Reading motor: "<<joint_tmp->joint_name << " ("<< motor_index_full << " / "<< index_motor_in_msg<<") => mask = "<<status_data->which_motor_data_arrived);
+      ROS_DEBUG_STREAM("Reading motor: "<<joint_tmp->joint_name << " ("<< motor_index_full << " / "<< index_motor_in_msg<<") => mask = "<<status_data->which_motor_data_arrived);
 
       //check the masks to see if the CAN messages arrived to the motors
       //the flag should be set to 1 for each motor
