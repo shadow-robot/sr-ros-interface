@@ -890,6 +890,8 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
   d.addf("Revision", "%d", sh_->get_revision());
   d.addf("Counter", "%d", ++counter_);
 
+  d.addf("PIC idle time (in microsecs)", "%d", sr_hand_lib->palm_pic_idle_time);
+
   this->ethercatDiagnostics(d,2);
   vec.push_back(d);
 
@@ -920,17 +922,27 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.clear();
           d.addf("Motor ID", "%d", motor->motor_id);
 
-          d.addf("Measured Voltage", "%f", state->motor_voltage_);
-          d.addf("Measured Current", "%f", state->last_measured_current_);
-
-          d.addf("Measured Effort", "%f", state->last_measured_effort_);
-          d.addf("Executed Effort", "%f", state->last_executed_effort_);
-          d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
-
-          d.addf("Encoder Position", "%f", state->position_);
-
           d.addf("Strain Gauge Left", "%f", motor->strain_gauge_left);
           d.addf("Strain Gauge Right", "%f", motor->strain_gauge_right);
+          d.addf("Executed Effort", "%f", state->last_executed_effort_);
+          d.addf("Motor Flags", "%d", motor->flags);
+          d.addf("Measured Current", "%f", state->last_measured_current_);
+          d.addf("Measured Voltage", "%f", state->motor_voltage_);
+          d.addf("Temperature", "%f", motor->temperature);
+          d.addf("Number of CAN messages received", "%d", motor->can_msgs_received);
+          d.addf("Number of CAN messages transmitted", "%d", motor->can_msgs_transmitted);
+          d.addf("Firmware svn revision", "%d", motor->firmware_svn_revision);
+          d.addf("Tests", "%d", motor->tests);
+          d.addf("Force control P", "%d", motor->force_control_p);
+          d.addf("Force control I", "%d", motor->force_control_i);
+          d.addf("Force control D", "%d", motor->force_control_d);
+          d.addf("Force control Imax", "%d", motor->force_control_imax);
+          d.addf("Force control Deadband", "%d", motor->force_control_deadband);
+
+
+          d.addf("Measured Effort", "%f", state->last_measured_effort_);
+          //d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
+          d.addf("Encoder Position", "%f", state->position_);
         }
       }
       else
@@ -1117,6 +1129,9 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
   boost::shared_ptr<shadow_joints::Joint> joint_tmp;
 
+  //read the PIC idle time
+  sr_hand_lib->palm_pic_idle_time = status_data->idle_time_us;
+
   BOOST_FOREACH(std::string joint_name, sr_hand_lib->joints_map.keys())
   {
     joint_tmp = sr_hand_lib->joints_map.find(joint_name);
@@ -1215,6 +1230,8 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
       if(joint_tmp->motor->motor_ok && !(joint_tmp->motor->bad_data) )
       {
+        //TODO: Hugo: how can I get the correct values from the motor???
+
         //we received the data and it was correct
         switch(status_data->motor_data_type)
         {
@@ -1224,15 +1241,41 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
         case MOTOR_DATA_SGR:
           joint_tmp->motor->strain_gauge_right =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
           break;
-        case MOTOR_DATA_VOLTAGE:
-          //TODO: Hugo: how can I get the correct voltage from the motor (as a double)
-          state->motor_voltage_ = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+        case MOTOR_DATA_PWM:
+          state->last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_FLAGS:
+          joint_tmp->motor->flags = status_data->motor_data_packet[index_motor_in_msg].misc;
           break;
         case MOTOR_DATA_CURRENT:
           state->last_measured_current_ = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
           break;
-        case MOTOR_DATA_PWM:
-          state->last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+        case MOTOR_DATA_VOLTAGE:
+          state->motor_voltage_ = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_TEMPERATURE:
+          joint_tmp->motor->temperature = (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_CAN_NUM_RECEIVED:
+          joint_tmp->motor->can_msgs_received = status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_CAN_NUM_TRANSMITTED:
+          joint_tmp->motor->can_msgs_transmitted = status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_SVN_REVISION:
+          joint_tmp->motor->firmware_svn_revision = status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_TESTS:
+          joint_tmp->motor->tests = status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_F_P:
+          joint_tmp->motor->force_control_p = status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_I_D:
+          joint_tmp->motor->force_control_i = status_data->motor_data_packet[index_motor_in_msg].misc;
+          break;
+        case MOTOR_DATA_IMAX_DEADBAND_SIGN:
+          joint_tmp->motor->force_control_imax = status_data->motor_data_packet[index_motor_in_msg].misc;
           break;
         default:
           break;

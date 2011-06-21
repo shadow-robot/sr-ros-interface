@@ -63,19 +63,19 @@ namespace shadow_joints
     pr2_hardware_interface::Actuator* actuator;
 
     //Data we can read from the motor
-    double encoder_position;
-    double torque;
-
     double strain_gauge_left;
     double strain_gauge_right;
-    double pwm;
-    double flags;
-    double current;
-    double voltage;
+
+    int flags;
+
+    double temperature;
+
     int can_msgs_received;
     int can_msgs_transmitted;
 
     int firmware_svn_revision;
+
+    int tests;
 
     int force_control_p;
     int force_control_i;
