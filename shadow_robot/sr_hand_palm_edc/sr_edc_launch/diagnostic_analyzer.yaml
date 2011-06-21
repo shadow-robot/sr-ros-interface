@@ -47,6 +47,6 @@ analyzers:
         type: GenericAnalyzer
         path: Devices
         timeout: 5.0
-        regex: [ 'SRDMotor : [0-9]+', 'SRCAN.*', 'SRBridge.*', 'EtherCAT Device #[0-9][0-9]' ]
-        num_items: 1
+        regex: [ 'SRDMotor : [0-9]+', 'SRBridge.*', 'EtherCAT Device.*Product SIX.*' ]
+        num_items: 2
 

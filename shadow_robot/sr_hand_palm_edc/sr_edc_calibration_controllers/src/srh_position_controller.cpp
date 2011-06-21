@@ -158,7 +158,6 @@ void SrhPositionController::update()
 
   double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
   joint_state_->commanded_effort_ = commanded_effort;
-  //joint_state_->commanded_effort_ = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
 
   if(loop_count_ % 10 == 0)
   {

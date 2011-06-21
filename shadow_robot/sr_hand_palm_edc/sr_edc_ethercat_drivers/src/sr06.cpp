@@ -944,7 +944,7 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
 
 
           d.addf("Measured Effort", "%f", state->last_measured_effort_);
-          //d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
+          d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
           d.addf("Encoder Position", "%f", state->position_);
         }
       }
