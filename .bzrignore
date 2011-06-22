@@ -137,3 +137,5 @@ shadow_robot/cyberglove/tmp
 shadow_robot/sr_utilities/bin/test/test_thread_safe_map
 ￼
 shadow_robot/sr_utilities/bin/test/test_math_utils
+￼
+shadow_robot/sr_hand_palm_edc/sr_external_dependencies/include/sr_external_dependencies/external

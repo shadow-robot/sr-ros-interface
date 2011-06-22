@@ -2,6 +2,7 @@
 
 START_PATH=`pwd`
 
+mkdir -p ../include/sr_external_dependencies/external
 cd "../include/sr_external_dependencies/external"
 
 function checkout_or_update {

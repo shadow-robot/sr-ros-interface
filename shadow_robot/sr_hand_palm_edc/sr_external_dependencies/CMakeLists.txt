@@ -16,9 +16,4 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-
-ADD_CUSTOM_COMMAND(
-  OUTPUT headers.txt
-  COMMAND "${PROJECT_SOURCE_DIR}/scripts/update_header.sh"
-)
-ADD_CUSTOM_TARGET(generate_headers DEPENDS headers.txt)
+EXECUTE_PROCESS(COMMAND "${PROJECT_SOURCE_DIR}/scripts/update_header.sh")
