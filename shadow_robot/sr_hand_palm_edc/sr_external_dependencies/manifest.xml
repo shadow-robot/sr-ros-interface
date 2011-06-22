@@ -1,0 +1,14 @@
+<package>
+  <description brief="sr_external_dependencies">
+
+     sr_external_dependencies package is a "dummy" package used to synchronize the includes for the protocol communication between the host and the PIC for Shadow's EtherCAT hardware. It contains a script that automatically downloads the latest h file from our pic32 svn.
+
+  </description>
+  <author>Ugo Cupcic/ ugo@shadowrobot.com</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_external_dependencies</url>
+
+</package>
+
+

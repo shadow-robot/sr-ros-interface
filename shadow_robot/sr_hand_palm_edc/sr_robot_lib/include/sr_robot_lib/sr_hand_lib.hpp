@@ -41,10 +41,6 @@ namespace shadow_robot
               shadow_joints::CalibrationMap calibration_map);
     ~SrHandLib();
 
-
-    int palm_pic_idle_time;
-    int palm_pic_idle_time_min;
-
   protected:
     virtual void initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                                  std::vector<shadow_joints::JointToSensor> joint_to_sensors,
