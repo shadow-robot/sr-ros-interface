@@ -147,7 +147,6 @@ namespace shadow_robot
     void read_additional_data(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp);
 
     pr2_hardware_interface::Actuator* actuator;
-    pr2_hardware_interface::ActuatorState* state;
     ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data;
     boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
     int motor_index_full, index_motor_in_msg;

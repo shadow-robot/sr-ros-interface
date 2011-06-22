@@ -51,11 +51,10 @@ namespace shadow_robot
     for(;joint_tmp != joints_vector.end(); ++joint_tmp)
     {
       actuator = (joint_tmp->motor->actuator);
-      state = (&actuator->state_);
 
       motor_index_full = joint_tmp->motor->motor_id;
-      state->is_enabled_ = 1;
-      state->device_id_ = motor_index_full;
+      actuator->state_.is_enabled_ = 1;
+      actuator->state_.device_id_ = motor_index_full;
 
       //calibrate the joint and update the position.
       calibrate_joint(joint_tmp);
@@ -114,11 +113,11 @@ namespace shadow_robot
         raw_position += static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id])*joint_to_sensor.coeff;
 
       //That's not an encoder position, just the raw value
-      state->encoder_count_ = static_cast<int>(raw_position);
+      actuator->state_.encoder_count_ = static_cast<int>(raw_position);
 
       //and now we calibrate
       calibration_tmp = calibration_map.find(joint_tmp->joint_name);
-      state->position_ = calibration_tmp->compute( static_cast<double>(raw_position) );
+      actuator->state_.position_ = calibration_tmp->compute( static_cast<double>(raw_position) );
     }
     else
     {
@@ -139,7 +138,7 @@ namespace shadow_robot
         calibration_tmp = calibration_map.find(sensor_name);
         calibrated_position += calibration_tmp->compute(raw_pos) * joint_to_sensor.coeff;
       }
-      state->position_ = calibrated_position;
+      actuator->state_.position_ = calibrated_position;
     }
   } //end calibrate_joint()
 
@@ -171,17 +170,17 @@ namespace shadow_robot
         joint_tmp->motor->strain_gauge_right =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_PWM:
-        state->last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_FLAGS:
         joint_tmp->motor->flags = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_CURRENT:
         //we're receiving the current in milli amps
-        state->last_measured_current_ = ((double)status_data->motor_data_packet[index_motor_in_msg].misc)/1000.0;
+        actuator->state_.last_measured_current_ = ((double)status_data->motor_data_packet[index_motor_in_msg].misc)/1000.0;
         break;
       case MOTOR_DATA_VOLTAGE:
-        state->motor_voltage_ = ((double)status_data->motor_data_packet[index_motor_in_msg].misc ) / 256.0;
+        actuator->state_.motor_voltage_ = ((double)status_data->motor_data_packet[index_motor_in_msg].misc ) / 256.0;
         break;
       case MOTOR_DATA_TEMPERATURE:
         joint_tmp->motor->temperature = ((double)status_data->motor_data_packet[index_motor_in_msg].misc) / 256.0;
@@ -211,7 +210,7 @@ namespace shadow_robot
         break;
       }
 
-      state->last_measured_effort_ = (double)status_data->motor_data_packet[index_motor_in_msg].torque;
+      actuator->state_.last_measured_effort_ = (double)status_data->motor_data_packet[index_motor_in_msg].torque;
     }
   }
 
