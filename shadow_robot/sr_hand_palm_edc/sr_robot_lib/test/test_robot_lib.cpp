@@ -59,27 +59,49 @@ TEST(SrRobotLib, Initialization)
 /**
  * Tests the update of the hand library.
  */
-TEST(SrRobotLib, Initialization)
+TEST(SrRobotLib, Update)
 {
   boost::shared_ptr< HandLibTest > lib_test = boost::shared_ptr< HandLibTest >( new HandLibTest() );
 
-  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data = new ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS();
+  /*
 
-  //filling the status data with known values
-  status_data->idle_time_us = 1;
-  //even motors
-  status_data->which_motors = 0;
+    ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data = new ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS();
 
-  //add sensors
-  status_data->sensors = [];
+    //add growing sensors values
+    for(unsigned int i=0 ; i < SENSORS_NUM_0220 + 1; ++i)
+    {
+    status_data->sensors[i] = i;
+    }
 
-  //update the library
-  lib_test->sr_hand_lib->update(status_data);
+    status_data->motor_data_type = MOTOR_DATA_SGR;
 
-  //check the data we read back are correct.
+    //even motors
+    status_data->which_motors = 0;
 
-  //cleanup
+    //all motor data arrived with no errors
+    status_data->which_motor_data_arrived = 1048575;
+    status_data->which_motor_data_had_errors = 0;
 
+    //add growing motor data packet values
+    for(unsigned int i=0 ; i < SENSORS_NUM_0220; ++i)
+    {
+    status_data->motor_data_packet[i].torque = i;
+    status_data->motor_data_packet[i].misc = 2*i;
+    }
+
+    //filling the status data with known values
+    status_data->idle_time_us = 1;
+
+    //update the library
+    lib_test->sr_hand_lib->update(status_data);
+
+    //check the data we read back are correct.
+    EXPECT_EQ(lib_test->sr_hand_lib->main_pic_idle_time, 1);
+    EXPECT_EQ(lib_test->sr_hand_lib->main_pic_idle_time_min, 1);
+
+    //cleanup
+    delete status_data;
+  */
 }
 
 /////////////////////
