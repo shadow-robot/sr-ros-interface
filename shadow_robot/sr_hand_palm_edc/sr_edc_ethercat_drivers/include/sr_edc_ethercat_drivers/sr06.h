@@ -41,10 +41,12 @@
 #include <sr_robot_lib/sr_hand_lib.hpp>
 #include "sr_edc_ethercat_drivers/utils/motor_updater.hpp"
 
-#include <sr_edc_ethercat_drivers/types_for_external.h>
-extern "C" {
-  #include "external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h"
+#include <sr_external_dependencies/types_for_external.h>
+extern "C"
+{
+  #include <sr_external_dependencies/external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h>
 }
+
 
 class SR06 : public SR0X
 {

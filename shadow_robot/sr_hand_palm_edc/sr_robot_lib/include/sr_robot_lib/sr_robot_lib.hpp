@@ -38,6 +38,13 @@
 
 #include "sr_robot_lib/calibration.hpp"
 
+#include <sr_external_dependencies/types_for_external.h>
+extern "C"
+{
+  #include <sr_external_dependencies/external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h>
+  #include <sr_external_dependencies/external/simplemotor-bootloader/bootloader.h>
+}
+
 namespace shadow_joints
 {
   struct PartialJointToSensor
@@ -122,11 +129,16 @@ namespace shadow_robot
     SrRobotLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                std::vector<pr2_hardware_interface::Actuator*> actuators,
-               shadow_joints::CalibrationMap calibration_map) {};
+               shadow_joints::CalibrationMap calibration_map);
     ~SrRobotLib() {};
+
+    void update(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data);
 
     boost::ptr_vector<shadow_joints::Joint> joints_vector;
     shadow_joints::CalibrationMap calibration_map;
+
+    int main_pic_idle_time;
+    int main_pic_idle_time_min;
 
   protected:
     virtual void initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,

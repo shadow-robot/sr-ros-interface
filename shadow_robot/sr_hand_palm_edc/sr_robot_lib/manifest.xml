@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/sr_robot_lib</url>
   <depend package="sr_utilities"/>
   <depend package="pr2_hardware_interface"/>
+  <depend package="sr_external_dependencies"/>
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_hand_lib"/>

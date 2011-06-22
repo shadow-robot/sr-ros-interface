@@ -43,9 +43,6 @@ namespace shadow_robot
     this->calibration_map = calibration_map;
 
     initialize_maps(joint_names, motor_ids, joint_to_sensors, actuators);
-
-    palm_pic_idle_time = 0;
-    palm_pic_idle_time_min = 1000;
   }
 
   SrHandLib::~SrHandLib()
