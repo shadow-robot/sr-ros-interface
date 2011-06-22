@@ -1133,8 +1133,10 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
   //We received a coherent message.
   //Update the library (positions, diagnostics values, actuators, etc...)
+  //with the received information
   sr_hand_lib->update(status_data);
 
+  //If we're flashing, check is the packet has been acked
   if (flashing & !can_packet_acked)
   {
     if (can_data_is_ack(can_data))

@@ -144,7 +144,20 @@ namespace shadow_robot
     virtual void initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                                  std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                                  std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
-  };
+
+    void calibrate_joint(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp);
+
+    void read_additional_data(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp);
+
+    pr2_hardware_interface::Actuator* actuator;
+    pr2_hardware_interface::ActuatorState* state;
+    ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data;
+    boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
+    int motor_index_full, index_motor_in_msg;
+
+
+
+  };//end class
 }
 
 /* For the emacs weenies in the crowd.
