@@ -25,3 +25,6 @@ rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/calibration.cpp src/sr_
 
 #tests:
 rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/calibration.cpp)
+
+rosbuild_add_executable(test/test_robot_lib test/test_robot_lib.cpp src/sr_robot_lib.cpp src/sr_hand_lib.cpp src/calibration.cpp)
+rosbuild_add_gtest_build_flags(test/test_robot_lib)

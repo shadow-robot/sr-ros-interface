@@ -6,10 +6,6 @@
   <include file="$(find sr_edc_defs)/launch/upload_sr_edc.launch" />
 
   <rosparam command="load" file="$(find sr_edc_launch)/config/motor_data_polling.yaml" />
-  <rosparam command="load" file="$(find sr_edc_launch)/config/sensor_to_joint.yaml" />
-  <rosparam command="load" file="$(find sr_edc_launch)/config/calibration.yaml" />
-  <rosparam command="load" file="$(find sr_edc_launch)/config/joint_to_motor_mapping.yaml" />
-
 
   <!-- Should be loaded before starting/running pr2_etherCAT node -->
   <rosparam command="load" ns="srh" file="$(find sr_edc_launch)/sr_edc_sensor_gain_offset.yaml" />
@@ -25,6 +21,8 @@
 	args="cal_sh_ffj3 cal_sh_ffj4 cal_sh_mfj3 cal_sh_mfj4 cal_sh_rfj3 cal_sh_rfj4 cal_sh_lfj3 cal_sh_lfj4 cal_sh_lfj5 cal_sh_thj1 cal_sh_thj2 cal_sh_thj3 cal_sh_thj4 cal_sh_thj5 cal_sh_wrj1 cal_sh_wrj2"/>
 <!--        args="cal_sh_ffj0 cal_sh_ffj3 cal_sh_ffj4 cal_sh_mfj0 cal_sh_mfj3 cal_sh_mfj4 cal_sh_rfj0 cal_sh_rfj3 cal_sh_rfj4 cal_sh_lfj0 cal_sh_lfj3 cal_sh_lfj4 cal_sh_lfj5 cal_sh_thj1 cal_sh_thj2 cal_sh_thj3 cal_sh_thj4 cal_sh_thj5 cal_sh_wrj1 cal_sh_wrj2"/> -->
 
+  <!-- load parameters for the robot library -->
+  <include file="$(find sr_robot_lib)/launch/sr_hand_lib.launch" />
 
   <!-- Default controllers -->
   <include file="$(find sr_edc_controller_configuration)/sr_edc_default_controllers.launch" />
