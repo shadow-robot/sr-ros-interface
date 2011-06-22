@@ -126,10 +126,7 @@ namespace shadow_robot
   class SrRobotLib
   {
   public:
-    SrRobotLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
-               std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-               std::vector<pr2_hardware_interface::Actuator*> actuators,
-               shadow_joints::CalibrationMap calibration_map);
+    SrRobotLib(pr2_hardware_interface::HardwareInterface *hw);
     ~SrRobotLib() {};
 
     void update(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data);
@@ -141,9 +138,9 @@ namespace shadow_robot
     int main_pic_idle_time_min;
 
   protected:
-    virtual void initialize_maps(std::vector<std::string> joint_names, std::vector<int> motor_ids,
-                                 std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-                                 std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
+    virtual void initialize(std::vector<std::string> joint_names, std::vector<int> motor_ids,
+                            std::vector<shadow_joints::JointToSensor> joint_to_sensors,
+                            std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
 
     void calibrate_joint(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp);
 

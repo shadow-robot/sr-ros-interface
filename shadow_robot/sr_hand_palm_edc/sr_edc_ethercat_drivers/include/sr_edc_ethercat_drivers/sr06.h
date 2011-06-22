@@ -106,33 +106,6 @@ private:
    *         at which we want to poll this data
    */
   std::vector<motor_updater::UpdateConfig> read_update_rate_configs();
-
-  /**
-   * Reads the mapping between the sensors and the joints from the parameter server.
-   *
-   *
-   * @return a vector (size of the number of joints) containing vectors (containing
-   *         the sensors which are combined to form a given joint)
-   */
-  std::vector<shadow_joints::JointToSensor> read_joint_to_sensor_mapping();
-
-  /**
-   * Reads the calibration from the parameter server.
-   *
-   *
-   * @return a calibration map
-   */
-  shadow_joints::CalibrationMap read_joint_calibration();
-
-  /**
-   * Reads the mapping associating a joint to a motor.
-   * If the motor index is -1, then no motor is associated
-   * to this joint.
-   *
-   *
-   * @return a vector of motor indexes, ordered by joint.
-   */
-  std::vector<int> read_joint_to_motor_mapping();
 };
 
 

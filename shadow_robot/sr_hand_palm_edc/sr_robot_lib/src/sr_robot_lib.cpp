@@ -32,10 +32,7 @@
 
 namespace shadow_robot
 {
-  SrRobotLib::SrRobotLib(std::vector<std::string> joint_names, std::vector<int> motor_ids,
-                         std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-                         std::vector<pr2_hardware_interface::Actuator*> actuators,
-                         shadow_joints::CalibrationMap calibration_map)
+  SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
     : main_pic_idle_time(0), main_pic_idle_time_min(1000)
   {
   }
@@ -148,6 +145,10 @@ namespace shadow_robot
 
   void SrRobotLib::read_additional_data(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp)
   {
+    ROS_DEBUG_STREAM("["<< joint_tmp->joint_name << "] : incoming mask=" << status_data->which_motor_data_arrived
+                     << " / bad data mask : " << status_data->which_motor_data_had_errors
+                     << " / motor_index: " << motor_index_full << " / "<< index_motor_in_msg);
+
     //check the masks to see if the CAN messages arrived to the motors
     //the flag should be set to 1 for each motor
     joint_tmp->motor->motor_ok = sr_math_utils::is_bit_mask_index_true(status_data->which_motor_data_arrived, motor_index_full);
