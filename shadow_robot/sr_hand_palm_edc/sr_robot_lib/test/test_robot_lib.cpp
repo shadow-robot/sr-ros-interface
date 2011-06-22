@@ -28,15 +28,32 @@
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 
+class HandLibTest
+{
+public:
+  pr2_hardware_interface::HardwareInterface *hw;
+  boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
+
+  HandLibTest()
+  {
+    hw = new pr2_hardware_interface::HardwareInterface();
+    sr_hand_lib= boost::shared_ptr<shadow_robot::SrHandLib>( new shadow_robot::SrHandLib(hw) );
+  }
+
+  ~HandLibTest()
+  {
+    delete hw;
+  }
+};
+
 /**
  * Tests the initialization of the hand library.
  */
-TEST(SrHandLib, Init)
+TEST(SrRobotLib, Initialization)
 {
-  pr2_hardware_interface::HardwareInterface *hw;
-  boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>( new shadow_robot::SrHandLib(hw) );
+  boost::shared_ptr< HandLibTest > lib_test = boost::shared_ptr< HandLibTest >( new HandLibTest() );
 
-  EXPECT_EQ(sr_hand_lib->joints_vector.size(), 28);
+  EXPECT_EQ(lib_test->sr_hand_lib->joints_vector.size(), 28);
 }
 
 /////////////////////
