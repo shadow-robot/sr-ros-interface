@@ -33,6 +33,7 @@ class HandLibTest
 public:
   pr2_hardware_interface::HardwareInterface *hw;
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
+  pr2_hardware_interface::Actuator* actuator;
 
   HandLibTest()
   {
@@ -45,14 +46,17 @@ public:
     delete hw;
   }
 
-  void check_hw_actuator(std::string name, int motor_id, int id_in_enum)
+  void check_hw_actuator(std::string name, int motor_id, int id_in_enum, double expected_pos)
   {
     pr2_hardware_interface::ActuatorState state;
-    state = (hw->getActuator(name)->state_);
+
+    actuator = hw->getActuator(name);
+    state = (actuator->state_);
 
     EXPECT_EQ(state.device_id_ , motor_id);
-    EXPECT_EQ(state.last_measured_effort_ , 4.0);//(double)motor_id / 2.0);
-    EXPECT_EQ(state.position_ , 10.0);// (double)id_in_enum);
+    EXPECT_EQ(state.last_measured_effort_ , (double)motor_id / 2.0);
+    EXPECT_EQ(state.position_ , expected_pos);
+    EXPECT_EQ(state.motor_voltage_, 10.0*(double)id_in_enum/256.0);
   }
 
 };
@@ -79,7 +83,7 @@ TEST(SrRobotLib, UpdateMotor)
   for(unsigned int i=1 ; i < SENSORS_NUM_0220 + 2; ++i)
   {
     //position = id in joint enum
-    status_data->sensors[i] = 10;
+    status_data->sensors[i] = i;
   }
 
   status_data->motor_data_type = MOTOR_DATA_SGR;
@@ -88,7 +92,7 @@ TEST(SrRobotLib, UpdateMotor)
   status_data->which_motors = 0;
 
   //all motor data arrived with no errors
-  status_data->which_motor_data_arrived = 1048575;
+  status_data->which_motor_data_arrived = 0x00055555;
   status_data->which_motor_data_had_errors = 0;
 
   //add growing motor data packet values
@@ -127,32 +131,32 @@ TEST(SrRobotLib, UpdateMotor)
  * Tests the update of the actuators
  * which are in the pr2_hardware_interface hw*
  */
-/*TEST(SrRobotLib, UpdateActuators)
+TEST(SrRobotLib, UpdateActuators)
 {
   boost::shared_ptr< HandLibTest > lib_test = boost::shared_ptr< HandLibTest >( new HandLibTest() );
 
   ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data = new ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS();
   //add growing sensors values
-  for(unsigned int i=1 ; i < SENSORS_NUM_0220 + 2; ++i)
+  for(unsigned int i=0 ; i < SENSORS_NUM_0220 + 1; ++i)
   {
     //position = id in joint enum
-    status_data->sensors[i] = 10;
+    status_data->sensors[i] = i+1;
   }
 
-  status_data->motor_data_type = MOTOR_DATA_SGR;
+  status_data->motor_data_type = MOTOR_DATA_VOLTAGE;
 
   //even motors
   status_data->which_motors = 0;
 
   //all motor data arrived with no errors
-  status_data->which_motor_data_arrived = 1048575;
+  status_data->which_motor_data_arrived = 0x00055555;
   status_data->which_motor_data_had_errors = 0;
 
   //add growing motor data packet values
   for(unsigned int i=0 ; i < 10; ++i)
   {
-    status_data->motor_data_packet[i].torque = 4;
-    status_data->motor_data_packet[i].misc = 2*i;
+    status_data->motor_data_packet[i].torque = i;
+    status_data->motor_data_packet[i].misc = 10*i;
   }
   //filling the status data with known values
   status_data->idle_time_us = 1;
@@ -160,15 +164,14 @@ TEST(SrRobotLib, UpdateMotor)
   //update the library
   lib_test->sr_hand_lib->update(status_data);
 
-  // get actuator for FFJ3 which is motor 1 in
-  // the test joint_to_motor_mapping.yaml
-  // and 3 in the joint enum
-  lib_test->check_hw_actuator("FFJ3", 1, 3);
+  lib_test->check_hw_actuator("FFJ4", 2, 1, 4.0);
+  lib_test->check_hw_actuator("MFJ3", 4, 2, 7.0);
 
   //cleanup
   delete status_data;
 }
-*/
+
+
 /////////////////////
 //     MAIN       //
 ///////////////////

@@ -134,6 +134,7 @@ namespace shadow_robot
         sensor_name = joint_tmp->joint_to_sensor.sensor_names[index_joint_to_sensor];
         //get the raw position
         double raw_pos = static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id]);
+
         //calibrate and then combine
         calibration_tmp = calibration_map.find(sensor_name);
         calibrated_position += calibration_tmp->compute(raw_pos) * joint_to_sensor.coeff;
