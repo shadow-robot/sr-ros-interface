@@ -56,6 +56,32 @@ TEST(SrRobotLib, Initialization)
   EXPECT_EQ(lib_test->sr_hand_lib->joints_vector.size(), 28);
 }
 
+/**
+ * Tests the update of the hand library.
+ */
+TEST(SrRobotLib, Initialization)
+{
+  boost::shared_ptr< HandLibTest > lib_test = boost::shared_ptr< HandLibTest >( new HandLibTest() );
+
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data = new ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS();
+
+  //filling the status data with known values
+  status_data->idle_time_us = 1;
+  //even motors
+  status_data->which_motors = 0;
+
+  //add sensors
+  status_data->sensors = [];
+
+  //update the library
+  lib_test->sr_hand_lib->update(status_data);
+
+  //check the data we read back are correct.
+
+  //cleanup
+
+}
+
 /////////////////////
 //     MAIN       //
 ///////////////////

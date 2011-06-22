@@ -1,0 +1,3 @@
+<launch>
+  <test test-name="test_sr_edc_ethercat_drivers" pkg="sr_edc_ethercat_drivers" type="sr_edc_ethercat_drivers_test" />
+</launch>
