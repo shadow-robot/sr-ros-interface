@@ -54,6 +54,15 @@ extern "C" {
   #include "external/simplemotor-bootloader/bootloader.h"
 }
 
+
+#include <boost/static_assert.hpp>
+namespace is_edc_command_32_bits
+{
+  //check is the EDC_COMMAND is 32bits on the computer
+  //if not, fails
+  BOOST_STATIC_ASSERT(sizeof(EDC_COMMAND) == 4);
+} // namespace is_edc_command_32_bits
+
 #define ETHERCAT_STATUS_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS)
 #define ETHERCAT_COMMAND_DATA_SIZE sizeof(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND)
 
@@ -1114,9 +1123,6 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   ETHERCAT_CAN_BRIDGE_DATA                      *can_data    = (ETHERCAT_CAN_BRIDGE_DATA                     *)(this_buffer + command_size_ + ETHERCAT_STATUS_DATA_SIZE );
   //  int16u                                        *status_buffer = (int16u*)status_data;
   static unsigned int num_rxed_packets = 0;
-
-  //check is the EDC_COMMAND is 32bit on the computer
-  ROS_ASSERT(sizeof(EDC_COMMAND) == 4);
 
   ++num_rxed_packets;
   if (status_data->EDC_command == EDC_COMMAND_INVALID)
