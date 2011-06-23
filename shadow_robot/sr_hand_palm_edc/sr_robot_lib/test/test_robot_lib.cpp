@@ -384,10 +384,22 @@ TEST(SrRobotLib, CalibrationTHJ5)
  */
 TEST(SrRobotLib, HumanizeFlags)
 {
-//  pr2_hardware_interface::HardwareInterface *hw;
-//  boost::shared_ptr<TestHandLib> sr_hand_lib = boost::shared_ptr<TestHandLib>( new TestHandLib(hw) );
+  pr2_hardware_interface::HardwareInterface *hw;
+  boost::shared_ptr<TestHandLib> sr_hand_lib = boost::shared_ptr<TestHandLib>( new TestHandLib(hw) );
 
-  EXPECT_TRUE(true);
+  std::vector<std::pair<std::string, bool> > flags;
+  //all flags set
+  flags = sr_hand_lib->humanize_flags(0xFFFF);
+
+  EXPECT_EQ(flags.size(), 16);
+
+  for(unsigned int i=0; i < 16; ++i)
+    EXPECT_EQ(flags[i].first.compare(error_flag_names[i]) , 0);
+
+  //The last three flags are serious
+  EXPECT_TRUE(flags[13].second);
+  EXPECT_TRUE(flags[14].second);
+  EXPECT_TRUE(flags[15].second);
 }
 
 /////////////////////

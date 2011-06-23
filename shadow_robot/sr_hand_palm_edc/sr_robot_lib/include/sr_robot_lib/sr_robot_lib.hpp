@@ -76,7 +76,14 @@ namespace shadow_joints
     int strain_gauge_left;
     int strain_gauge_right;
 
-    std::vector<std::string> flags;
+    /**
+     * a vector containing human readable flags:
+     *  each flag is a pair containing the flag name
+     *  and a boolean which is true if the flag is
+     *  really serious, false if it's just a warning
+     *  flag.
+     */
+    std::vector<std::pair<std::string, bool> > flags;
 
     double temperature;
 
@@ -194,7 +201,7 @@ namespace shadow_robot
      *
      * @return human readable flags.
      */
-    std::vector<std::string> humanize_flags(int flag);
+    std::vector<std::pair<std::string, bool> > humanize_flags(int flag);
 
     /// The current actuator.
     pr2_hardware_interface::Actuator* actuator;

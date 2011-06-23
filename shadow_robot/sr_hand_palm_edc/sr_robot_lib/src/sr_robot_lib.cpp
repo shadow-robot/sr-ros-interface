@@ -230,9 +230,26 @@ namespace shadow_robot
     }
   }
 
-  std::vector<std::string> SrRobotLib::humanize_flags(int flag)
+  std::vector<std::pair<std::string, bool> > SrRobotLib::humanize_flags(int flag)
   {
-    std::vector<std::string> flags;
+    std::vector<std::pair<std::string, bool> > flags;
+
+    //16 is the number of flags
+    for(unsigned int i = 0; i < 16; ++i)
+    {
+      std::pair<std::string, bool> new_flag;
+      //if the flag is set add the name
+      if( sr_math_utils::is_bit_mask_index_true(flag, i) )
+      {
+        if( sr_math_utils::is_bit_mask_index_true(SERIOUS_ERROR_FLAGS, i) )
+          new_flag.second = true;
+        else
+          new_flag.second = false;
+
+        new_flag.first = error_flag_names[i];
+        flags.push_back( new_flag );
+      }
+    }
 
     return flags;
   }
@@ -240,7 +257,7 @@ namespace shadow_robot
 } //end namespace
 
 /* For the emacs weenies in the crowd.
-Local Variables:
+   Local Variables:
    c-basic-offset: 2
-End:
+   End:
 */

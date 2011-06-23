@@ -901,9 +901,26 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Strain Gauge Right", "%d", joint->motor->strain_gauge_right);
           d.addf("Executed Effort", "%f", state->last_executed_effort_);
 
+          //if some flags are set
           std::stringstream ss;
-          BOOST_FOREACH(std::string flag, joint->motor->flags)
-            ss << flag << " | ";
+          if( joint->motor->flags.size() > 0 )
+          {
+            int flags_seriousness = d.OK;
+            std::pair<std::string, bool> flag;
+            BOOST_FOREACH(flag, joint->motor->flags)
+            {
+              //Serious error flag
+              if(flag.second)
+                flags_seriousness = d.ERROR;
+
+              if( flags_seriousness != d.ERROR )
+                flags_seriousness = d.WARN;
+              ss << flag.first << " | ";
+            }
+            d.summary(flags_seriousness, ss.str() );
+          }
+          else
+            ss << " None";
           d.addf("Motor Flags", "%s", ss.str() );
 
           d.addf("Measured Current", "%f", state->last_measured_current_);
