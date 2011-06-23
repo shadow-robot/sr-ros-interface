@@ -917,11 +917,11 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
                 flags_seriousness = d.WARN;
               ss << flag.first << " | ";
             }
-            d.summary(flags_seriousness, ss.str() );
+            d.summary(flags_seriousness, ss.str().c_str() );
           }
           else
             ss << " None";
-          d.addf("Motor Flags", "%s", ss.str() );
+          d.addf("Motor Flags", "%s", ss.str().c_str() );
 
           d.addf("Measured Current", "%f", state->last_measured_current_);
           d.addf("Measured Voltage", "%f", state->motor_voltage_);
