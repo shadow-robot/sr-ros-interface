@@ -900,7 +900,12 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Strain Gauge Left", "%d", joint->motor->strain_gauge_left);
           d.addf("Strain Gauge Right", "%d", joint->motor->strain_gauge_right);
           d.addf("Executed Effort", "%f", state->last_executed_effort_);
-          d.addf("Motor Flags", "%d", joint->motor->flags);
+
+          std::stringstream ss;
+          BOOST_FOREACH(std::string flag, joint->motor->flags)
+            ss << flag << " | ";
+          d.addf("Motor Flags", "%s", ss.str() );
+
           d.addf("Measured Current", "%f", state->last_measured_current_);
           d.addf("Measured Voltage", "%f", state->motor_voltage_);
           d.addf("Temperature", "%f", joint->motor->temperature);

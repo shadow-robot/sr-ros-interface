@@ -30,6 +30,8 @@
 
 #include <sr_utilities/sr_math_utils.hpp>
 
+#include <ros/ros.h>
+
 namespace shadow_robot
 {
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
@@ -144,9 +146,23 @@ namespace shadow_robot
 
   void SrRobotLib::read_additional_data(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp)
   {
-    ROS_DEBUG_STREAM("["<< joint_tmp->joint_name << "] : incoming mask=" << status_data->which_motor_data_arrived
-                     << " / bad data mask : " << status_data->which_motor_data_had_errors
-                     << " / motor_index: " << motor_index_full << " / "<< index_motor_in_msg);
+    /*
+      if (motor_index_full & 1)
+      {
+      if (status_data->which_motor_data_arrived == 8)
+      {
+      ROS_ERROR_STREAM ("[*] " << status_data->motor_data_type);
+      }
+      else
+      {
+      ROS_ERROR_STREAM ("[ ] " << status_data->motor_data_type);
+      }
+      ROS_ERROR_STREAM("["<< joint_tmp->joint_name << "] : incoming mask=" << status_data->which_motor_data_arrived
+      << " / bad data mask : " << status_data->which_motor_data_had_errors
+      << " / motor_index: " << motor_index_full << " / "<< index_motor_in_msg);
+      }
+    */
+
 
     //check the masks to see if the CAN messages arrived to the motors
     //the flag should be set to 1 for each motor
@@ -173,7 +189,7 @@ namespace shadow_robot
         actuator->state_.last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_FLAGS:
-        joint_tmp->motor->flags = status_data->motor_data_packet[index_motor_in_msg].misc;
+        joint_tmp->motor->flags = humanize_flags(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_CURRENT:
         //we're receiving the current in milli amps
@@ -214,7 +230,14 @@ namespace shadow_robot
     }
   }
 
-}
+  std::vector<std::string> SrRobotLib::humanize_flags(int flag)
+  {
+    std::vector<std::string> flags;
+
+    return flags;
+  }
+
+} //end namespace
 
 /* For the emacs weenies in the crowd.
 Local Variables:

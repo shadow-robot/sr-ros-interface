@@ -76,7 +76,7 @@ namespace shadow_joints
     int strain_gauge_left;
     int strain_gauge_right;
 
-    int flags;
+    std::vector<std::string> flags;
 
     double temperature;
 
@@ -185,6 +185,16 @@ namespace shadow_robot
      * @param joint_tmp The joint we want to read teh data for.
      */
     void read_additional_data(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp);
+
+    /**
+     * Transforms the incoming flag as a human
+     * readable vector of strings.
+     *
+     * @param flag incoming flag.
+     *
+     * @return human readable flags.
+     */
+    std::vector<std::string> humanize_flags(int flag);
 
     /// The current actuator.
     pr2_hardware_interface::Actuator* actuator;

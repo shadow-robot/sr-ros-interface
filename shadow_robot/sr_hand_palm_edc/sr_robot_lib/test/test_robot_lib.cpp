@@ -190,6 +190,8 @@ public:
   using shadow_robot::SrHandLib::status_data;
 
   using shadow_robot::SrHandLib::actuator;
+
+  using shadow_robot::SrHandLib::humanize_flags;
 };
 
 
@@ -376,6 +378,17 @@ TEST(SrRobotLib, CalibrationTHJ5)
   delete hw;
 }
 
+/**
+ * Testing the humanization of the flags.
+ *
+ */
+TEST(SrRobotLib, HumanizeFlags)
+{
+//  pr2_hardware_interface::HardwareInterface *hw;
+//  boost::shared_ptr<TestHandLib> sr_hand_lib = boost::shared_ptr<TestHandLib>( new TestHandLib(hw) );
+
+  EXPECT_TRUE(true);
+}
 
 /////////////////////
 //     MAIN       //
