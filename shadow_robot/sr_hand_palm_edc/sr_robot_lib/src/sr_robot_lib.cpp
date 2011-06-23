@@ -35,7 +35,7 @@
 namespace shadow_robot
 {
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
-    : main_pic_idle_time(0), main_pic_idle_time_min(1000)
+    : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(0)
   {
   }
 
@@ -105,24 +105,47 @@ namespace shadow_robot
 
 
     ///////
-    // Now we send the commands to the motor
-    // Currently, the only data we send to motors is torque demand.
-    //command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
-    //TODO: change back to torque
-    command->to_motor_data_type   = MOTOR_DEMAND_PWM;
+    // Now we chose the command to send to the motor
+    // by default we send a torque demand (we're running
+    // the force control on the motors), but if we have a waiting
+    // configuration, then we send the configuration.
 
-    //loop on either even or odd motors
-    int motor_index = 0;
-    for(unsigned int i = 0; i < 10; ++i)
+    if( reconfig_queue.size() == 0)
     {
-      if( command->which_motors )
-        motor_index = 2*i;
-      else
-        motor_index = 2*i + 1;
+      //no config to send
+      //command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
+      //TODO: change back to torque
+      command->to_motor_data_type   = MOTOR_DEMAND_PWM;
 
-      command->motor_data[i] = joints_vector[motor_index].motor->actuator->command_.effort_;
-    }
+      //loop on either even or odd motors
+      int motor_index = 0;
+      for(unsigned int i = 0; i < 10; ++i)
+      {
+        if( command->which_motors )
+          motor_index = 2*i;
+        else
+          motor_index = 2*i + 1;
 
+        command->motor_data[i] = joints_vector[motor_index].motor->actuator->command_.effort_;
+      }
+    } //endif reconfig_queue.size() == 0
+    else
+    {
+      //we have a waiting config:
+      // we need to send all the config, finishing by the
+      // CRC. We'll remove the config from the queue only
+      // when the whole config has been sent
+
+      //this is the last thing to send:
+      // send the value, then remove the
+      // config from the queue and reset the
+      // index to 0.
+      if( config_index == MOTOR_CONFIG_CRC )
+      {
+
+      }
+
+    } //endelse reconfig_queue.size()
   }
 
 

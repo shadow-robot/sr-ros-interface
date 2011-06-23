@@ -226,6 +226,13 @@ namespace shadow_robot
      */
     boost::shared_ptr<motor_updater::MotorUpdater> motor_updater_;
 
+    /**
+     * This queue contains the force PID config waiting to be pushed to the motor.
+     */
+    std::queue<std::vector<crc_unions::union16>, std::list<std::vector<crc_unions::union16> > > reconfig_queue;
+    ///this index is used to iterate over the config we're sending.
+    int config_index;
+
     /// The current actuator.
     pr2_hardware_interface::Actuator* actuator;
     /// The latest etherCAT message received.
