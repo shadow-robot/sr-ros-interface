@@ -21,7 +21,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/calibration.cpp src/sr_robot_lib.cpp)
+rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/calibration.cpp src/sr_robot_lib.cpp src/motor_updater.cpp)
 
 #tests:
 rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/calibration.cpp)
@@ -30,3 +30,12 @@ rosbuild_add_executable(test/test_robot_lib test/test_robot_lib.cpp src/sr_robot
 rosbuild_add_compile_flags(test/test_robot_lib -g)
 rosbuild_add_gtest_build_flags(test/test_robot_lib)
 rosbuild_add_rostest(launch/sr_hand_lib.test)
+
+rosbuild_add_executable(test/motor_updater_test test/motor_updater_test.cpp src/motor_updater.cpp)
+rosbuild_add_gtest_build_flags(test/motor_updater_test)
+rosbuild_add_compile_flags(test/sr_edc_ethercat_drivers_test -g -pg -fprofile-arcs -ftest-coverage)
+add_library(gcov STATIC IMPORTED)
+set_property(TARGET gcov PROPERTY IMPORTED_LOCATION /usr/lib/gcc/i486-linux-gnu/4.4/libgcov.a)
+target_link_libraries(test/sr_edc_ethercat_drivers_test gcov)
+
+rosbuild_add_rostest(test/motor_updater.test)

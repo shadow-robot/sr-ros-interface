@@ -39,7 +39,6 @@
 #include <boost/assign.hpp>
 
 #include <sr_robot_lib/sr_hand_lib.hpp>
-#include "sr_edc_ethercat_drivers/utils/motor_updater.hpp"
 
 #include <sr_external_dependencies/types_for_external.h>
 extern "C"
@@ -97,15 +96,6 @@ private:
   unsigned int                     zero_buffer_read;
 
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
-  boost::shared_ptr<motor_updater::MotorUpdater> motor_updater;
-
-  /**
-   * Simply reads the config from the parameter server.
-   *
-   * @return A vector of UpdateConfig containing the type of data and the frequency
-   *         at which we want to poll this data
-   */
-  std::vector<motor_updater::UpdateConfig> read_update_rate_configs();
 };
 
 

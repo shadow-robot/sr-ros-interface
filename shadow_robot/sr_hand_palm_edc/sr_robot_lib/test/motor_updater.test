@@ -1,0 +1,3 @@
+<launch>
+  <test test-name="test_robot_updater" pkg="sr_robot_lib" type="motor_updater_test"/>
+</launch>

@@ -26,7 +26,7 @@
  *
  */
 
-#include "sr_edc_ethercat_drivers/utils/motor_updater.hpp"
+#include "sr_robot_lib/motor_updater.hpp"
 #include <boost/foreach.hpp>
 #include <iostream>
 

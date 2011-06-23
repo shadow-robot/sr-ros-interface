@@ -37,6 +37,7 @@
 #include <pr2_hardware_interface/hardware_interface.h>
 
 #include "sr_robot_lib/calibration.hpp"
+#include "sr_robot_lib/motor_updater.hpp"
 
 #include <sr_external_dependencies/types_for_external.h>
 extern "C"
@@ -156,6 +157,7 @@ namespace shadow_robot
      */
     void update(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data);
 
+    void build_motor_command(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command);
 
     /// The vector containing all the robot joints.
     boost::ptr_vector<shadow_joints::Joint> joints_vector;
@@ -217,6 +219,12 @@ namespace shadow_robot
 
     std::vector<crc_unions::union16> generate_force_control_config(int sg_refs, int f, int p, int i, int d, int imax, int deadband_sign);
 
+    /**
+     * The motor updater is used to create a correct command to send to the motor.
+     * It's build_update_motor_command() is called each time the SR06::packCommand()
+     * is called.
+     */
+    boost::shared_ptr<motor_updater::MotorUpdater> motor_updater_;
 
     /// The current actuator.
     pr2_hardware_interface::Actuator* actuator;

@@ -77,6 +77,13 @@ namespace shadow_robot
      */
     std::vector<int> read_joint_to_motor_mapping();
 
+    /**
+     * Simply reads the config from the parameter server.
+     *
+     * @return A vector of UpdateConfig containing the type of data and the frequency
+     *         at which we want to poll this data
+     */
+    std::vector<motor_updater::UpdateConfig> read_update_rate_configs();
   };
 
 }

@@ -37,6 +37,10 @@ namespace shadow_robot
   SrHandLib::SrHandLib(pr2_hardware_interface::HardwareInterface *hw) :
     SrRobotLib(hw)
   {
+    //read the motor polling frequency from the parameter server
+    std::vector<motor_updater::UpdateConfig> update_rate_configs_vector = read_update_rate_configs();
+    motor_updater_ = boost::shared_ptr<motor_updater::MotorUpdater>(new motor_updater::MotorUpdater(update_rate_configs_vector));
+
     //TODO: read this from config/EEProm?
     std::vector<shadow_joints::JointToSensor > joint_to_sensor_vect = read_joint_to_sensor_mapping();
 
@@ -232,6 +236,48 @@ namespace shadow_robot
   } //end read_joint_to_motor_mapping
 
 
+  std::vector<motor_updater::UpdateConfig> SrHandLib::read_update_rate_configs()
+  {
+    std::vector<motor_updater::UpdateConfig> update_rate_configs_vector;
+    std::string base_topic = "motor_data_update_rate/";
+    typedef std::pair<std::string, FROM_MOTOR_DATA_TYPE> ConfPair;
+    std::vector<ConfPair> config;
+
+    static const int nb_motor_data = 13;
+    static const char* topics[nb_motor_data] = {"sgl", "sgr", "pwm", "flags", "current",
+                                                "voltage", "temperature", "can_num_received",
+                                                "can_num_transmitted", "svn_revision",
+                                                "f_p", "i_d", "imax_deadband_sign"};
+
+    static const FROM_MOTOR_DATA_TYPE data_types[nb_motor_data] = {MOTOR_DATA_SGL, MOTOR_DATA_SGR,
+                                                                   MOTOR_DATA_PWM, MOTOR_DATA_FLAGS,
+                                                                   MOTOR_DATA_CURRENT, MOTOR_DATA_VOLTAGE,
+                                                                   MOTOR_DATA_TEMPERATURE, MOTOR_DATA_CAN_NUM_RECEIVED,
+                                                                   MOTOR_DATA_CAN_NUM_TRANSMITTED, MOTOR_DATA_SVN_REVISION,
+                                                                   MOTOR_DATA_F_P, MOTOR_DATA_I_D,
+                                                                   MOTOR_DATA_IMAX_DEADBAND_SIGN};
+
+    for(unsigned int i=0; i<nb_motor_data; ++i)
+    {
+      ConfPair tmp;
+      tmp.first = base_topic + topics[i];
+      tmp.second = data_types[i];
+      config.push_back(tmp);
+    }
+
+    for(unsigned int i = 0; i < config.size(); ++i)
+    {
+      double rate;
+      nodehandle_.getParam(config[i].first, rate);
+      motor_updater::UpdateConfig config_tmp;
+
+      config_tmp.when_to_update = rate;
+      config_tmp.what_to_update = config[i].second;
+      update_rate_configs_vector.push_back(config_tmp);
+    }
+
+    return update_rate_configs_vector;
+  }
 }
 
 /* For the emacs weenies in the crowd.

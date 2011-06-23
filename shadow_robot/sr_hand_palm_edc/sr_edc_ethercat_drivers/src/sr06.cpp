@@ -133,9 +133,6 @@ SR06::SR06()
   check_for_pthread_mutex_init_error(res);
   counter_ = 0;
 
-  std::vector<motor_updater::UpdateConfig> update_rate_configs_vector = read_update_rate_configs();
-  motor_updater = boost::shared_ptr<motor_updater::MotorUpdater>(new motor_updater::MotorUpdater(update_rate_configs_vector));
-
   ROS_INFO("There are %d sensors", nb_sensors_const);
 
 /*
@@ -997,27 +994,7 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 
   //alternate between even and uneven motors
   // and ask for the different informations.
-  motor_updater->build_update_motor_command(command);
-
-
-  ///////
-  // Now we send the commands to the motor
-  // Currently, the only data we send to motors is torque demand.
-  //command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
-  //TODO: change back to torque
-  command->to_motor_data_type   = MOTOR_DEMAND_PWM;
-
-  //loop on either even or odd motors
-  int motor_index = 0;
-  for(unsigned int i = 0; i < 10; ++i)
-  {
-    if( command->which_motors )
-      motor_index = 2*i;
-    else
-      motor_index = 2*i + 1;
-
-    command->motor_data[i] = sr_hand_lib->joints_vector[motor_index].motor->actuator->command_.effort_;
-  }
+  sr_hand_lib->build_motor_command(command);
 
   if (flashing && !can_packet_acked && !can_message_sent)
   {
@@ -1154,53 +1131,6 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
   return true;
 }
-
-
-std::vector<motor_updater::UpdateConfig> SR06::read_update_rate_configs()
-{
-  std::vector<motor_updater::UpdateConfig> update_rate_configs_vector;
-
-  //TODO: This should be moved somewhere else. Not sure where yet.
-  std::string base_topic = "motor_data_update_rate/";
-  typedef std::pair<std::string, FROM_MOTOR_DATA_TYPE> ConfPair;
-  std::vector<ConfPair> config;
-
-  static const int nb_motor_data = 13;
-  static const char* topics[nb_motor_data] = {"sgl", "sgr", "pwm", "flags", "current",
-                                              "voltage", "temperature", "can_num_received",
-                                              "can_num_transmitted", "svn_revision",
-                                              "f_p", "i_d", "imax_deadband_sign"};
-
-  static const FROM_MOTOR_DATA_TYPE data_types[nb_motor_data] = {MOTOR_DATA_SGL, MOTOR_DATA_SGR,
-                                                                 MOTOR_DATA_PWM, MOTOR_DATA_FLAGS,
-                                                                 MOTOR_DATA_CURRENT, MOTOR_DATA_VOLTAGE,
-                                                                 MOTOR_DATA_TEMPERATURE, MOTOR_DATA_CAN_NUM_RECEIVED,
-                                                                 MOTOR_DATA_CAN_NUM_TRANSMITTED, MOTOR_DATA_SVN_REVISION,
-                                                                 MOTOR_DATA_F_P, MOTOR_DATA_I_D,
-                                                                 MOTOR_DATA_IMAX_DEADBAND_SIGN};
-
-  for(unsigned int i=0; i<nb_motor_data; ++i)
-  {
-    ConfPair tmp;
-    tmp.first = base_topic + topics[i];
-    tmp.second = data_types[i];
-    config.push_back(tmp);
-  }
-
-  for(unsigned int i = 0; i < config.size(); ++i)
-  {
-    double rate;
-    nodehandle_.getParam(config[i].first, rate);
-    motor_updater::UpdateConfig config_tmp;
-
-    config_tmp.when_to_update = rate;
-    config_tmp.what_to_update = config[i].second;
-    update_rate_configs_vector.push_back(config_tmp);
-  }
-
-  return update_rate_configs_vector;
-}
-
 
 /* For the emacs weenies in the crowd.
    Local Variables:
