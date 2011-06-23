@@ -129,30 +129,74 @@ namespace shadow_robot
     SrRobotLib(pr2_hardware_interface::HardwareInterface *hw);
     ~SrRobotLib() {};
 
+    /**
+     * This function is called each time a new etherCAT message
+     * is received in the sr06.cpp driver. It updates the joints_vector,
+     * updating the different values, computing the calibrated joint
+     * positions, etc...
+     *
+     * @param status_data the received etherCAT message
+     */
     void update(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data);
 
+    /// The vector containing all the robot joints.
     boost::ptr_vector<shadow_joints::Joint> joints_vector;
+    /// The map used to calibrate each joint.
     shadow_joints::CalibrationMap calibration_map;
 
+    /**
+     * Contains the idle time of the PIC communicating
+     * via etherCAT with the host.
+     */
     int main_pic_idle_time;
+
+    /**
+     * Contains the minimum idle time of the PIC communicating
+     * via etherCAT with the host, this minimum is reset each
+     * time a diagnostic is being published.
+     */
     int main_pic_idle_time_min;
 
   protected:
+    /**
+     * Initializes the joints_vector.
+     *
+     * @param joint_names A vector containing all the joints.
+     * @param motor_ids A vector containing the corresponding motor indexes (-1 if no motor is associated).
+     * @param joint_to_sensors The mapping between the joints and the sensors (e.g. FFJ0 = FFJ1+FFJ2)
+     * @param actuators The actuators.
+     */
     virtual void initialize(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                             std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                             std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
 
+    /**
+     * Compute the calibrated position for the given joint. This method is called
+     * from the update method, each time a new message is received.
+     *
+     * @param joint_tmp The joint we want to calibrate.
+     */
     void calibrate_joint(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp);
 
+    /**
+     * Read additional data from the latest message and stores it into the
+     * joints_vector.
+     *
+     * @param joint_tmp The joint we want to read teh data for.
+     */
     void read_additional_data(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp);
 
+    /// The current actuator.
     pr2_hardware_interface::Actuator* actuator;
+    /// The latest etherCAT message received.
     ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data;
+    /// A temporary calibration for a given joint.
     boost::shared_ptr<shadow_robot::JointCalibration> calibration_tmp;
-    int motor_index_full, index_motor_in_msg;
 
-
-
+    ///The index of the motor in all the 20 motors
+    int motor_index_full;
+    ///The index of the motor in the current message (from 0 to 9)
+    int index_motor_in_msg;
   };//end class
 }
 

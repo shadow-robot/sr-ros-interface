@@ -95,7 +95,6 @@ namespace shadow_robot
         read_additional_data(joint_tmp);
 
     } //end BOOST_FOREACH joint names
-
   } //end update()
 
 
