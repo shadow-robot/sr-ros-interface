@@ -37,7 +37,7 @@ rosbuild_add_rostest(launch/sr_hand_lib.test)
 
 rosbuild_add_executable(test/motor_updater_test test/motor_updater_test.cpp src/motor_updater.cpp)
 rosbuild_add_gtest_build_flags(test/motor_updater_test)
-rosbuild_add_compile_flags(test/sr_edc_ethercat_drivers_test -g -pg -fprofile-arcs -ftest-coverage)
-target_link_libraries(test/sr_edc_ethercat_drivers_test gcov)
+rosbuild_add_compile_flags(test/motor_updater_test -g -pg -fprofile-arcs -ftest-coverage)
+target_link_libraries(test/motor_updater_test gcov)
 
 rosbuild_add_rostest(test/motor_updater.test)
