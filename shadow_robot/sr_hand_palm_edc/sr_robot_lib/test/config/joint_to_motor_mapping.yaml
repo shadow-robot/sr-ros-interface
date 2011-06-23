@@ -31,7 +31,7 @@ joint_to_motor_mapping: [
         14,     #THJ2
         15,     #THJ3
         16,     #THJ4
-        17,     #THJ4
+        17,     #THJ5
 
         18,     #WRJ1
         19,     #WRJ2

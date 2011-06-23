@@ -171,6 +171,211 @@ TEST(SrRobotLib, UpdateActuators)
   delete status_data;
 }
 
+/**
+ * For the next tests we want to have access to the calibrate_joint
+ * method which is protected in our code.
+ * The method is found at:
+ * http://code.google.com/p/googletest/wiki/V1_6_FAQ#How_do_I_test_private_class_members_without_writing_FRIEND_TEST(
+ */
+class TestHandLib
+  : public shadow_robot::SrHandLib
+{
+public:
+  TestHandLib(pr2_hardware_interface::HardwareInterface* hw)
+    : SrHandLib(hw)
+  {}
+
+  using shadow_robot::SrHandLib::calibrate_joint;
+
+  using shadow_robot::SrHandLib::status_data;
+
+  using shadow_robot::SrHandLib::actuator;
+};
+
+
+/**
+ * Testing the calibration procedure for
+ * a joint having one motor only (FFJ3)
+ *
+ */
+TEST(SrRobotLib, CalibrationOneMotor)
+{
+
+  pr2_hardware_interface::HardwareInterface *hw;
+  boost::shared_ptr<TestHandLib> sr_hand_lib = boost::shared_ptr<TestHandLib>( new TestHandLib(hw) );
+
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS status_data;
+
+  //set all the sensors to 0
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+    status_data.sensors[i] = 0;
+
+  sr_hand_lib->status_data = &status_data;
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+    EXPECT_EQ(sr_hand_lib->status_data->sensors[i], 0);
+
+  //let's find FFJ3 in the vector
+  boost::ptr_vector<shadow_joints::Joint>::iterator ffj3 = sr_hand_lib->joints_vector.begin();
+  std::string name_tmp = ffj3->joint_name;
+  bool ffj3_found = false;
+  int index_ffj3 = 0;
+
+  for(; ffj3 != sr_hand_lib->joints_vector.end(); ++ffj3)
+  {
+    name_tmp = ffj3->joint_name;
+
+    if( name_tmp.compare("FFJ3") == 0)
+    {
+      ffj3_found = true;
+      break;
+    }
+
+    ++index_ffj3;
+  }
+
+  EXPECT_TRUE(ffj3_found);
+  EXPECT_EQ(index_ffj3, 3);
+
+  sr_hand_lib->actuator = (ffj3->motor->actuator);
+
+  sr_hand_lib->calibrate_joint(ffj3);
+  //all the sensors at 0 -> should be 0
+  EXPECT_EQ( ffj3->motor->actuator->state_.position_ , 0.0);
+
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+  sr_hand_lib->status_data->sensors[i] = 1;
+
+  //now ffj3 position should be 1
+  sr_hand_lib->calibrate_joint(ffj3);
+  //all the sensors at 1 -> should be 1
+  EXPECT_EQ( ffj3->motor->actuator->state_.position_ , 1.0);
+
+  delete hw;
+}
+
+
+/**
+ * Testing the calibration procedure for
+ * a joint having calibrating the sensors first
+ * and then combining them (FFJ0)
+ *
+ */
+TEST(SrRobotLib, CalibrationFFJ0)
+{
+
+  pr2_hardware_interface::HardwareInterface *hw;
+  boost::shared_ptr<TestHandLib> sr_hand_lib = boost::shared_ptr<TestHandLib>( new TestHandLib(hw) );
+
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS status_data;
+
+  //set all the sensors to 0
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+    status_data.sensors[i] = 0;
+
+  sr_hand_lib->status_data = &status_data;
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+    EXPECT_EQ(sr_hand_lib->status_data->sensors[i], 0);
+
+  //let's find FFJ0 in the vector
+  boost::ptr_vector<shadow_joints::Joint>::iterator ffj0 = sr_hand_lib->joints_vector.begin();
+  std::string name_tmp = ffj0->joint_name;
+  bool ffj0_found = false;
+  int index_ffj0 = 0;
+
+  for(; ffj0 != sr_hand_lib->joints_vector.end(); ++ffj0)
+  {
+    name_tmp = ffj0->joint_name;
+
+    if( name_tmp.compare("FFJ0") == 0)
+    {
+      ffj0_found = true;
+      break;
+    }
+
+    ++index_ffj0;
+  }
+
+  EXPECT_TRUE(ffj0_found);
+  EXPECT_EQ(index_ffj0, 0);
+
+  sr_hand_lib->actuator = (ffj0->motor->actuator);
+
+  sr_hand_lib->calibrate_joint(ffj0);
+  //all the sensors at 0 -> should be 0
+  EXPECT_EQ( ffj0->motor->actuator->state_.position_ , 0.0);
+
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+    sr_hand_lib->status_data->sensors[i] = 1;
+
+  //now ffj0 position should be 1
+  sr_hand_lib->calibrate_joint(ffj0);
+  //all the sensors at 1 -> should be 2
+  EXPECT_EQ( ffj0->motor->actuator->state_.position_ , 2.0);
+
+  delete hw;
+}
+
+/**
+ * Testing the calibration procedure for
+ * a compound joint combining the sensors
+ * and then calibrating the total (THJ5)
+ *
+ */
+TEST(SrRobotLib, CalibrationTHJ5)
+{
+
+  pr2_hardware_interface::HardwareInterface *hw;
+  boost::shared_ptr<TestHandLib> sr_hand_lib = boost::shared_ptr<TestHandLib>( new TestHandLib(hw) );
+
+  ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS status_data;
+
+  //set all the sensors to 0
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+    status_data.sensors[i] = 0;
+
+  sr_hand_lib->status_data = &status_data;
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+    EXPECT_EQ(sr_hand_lib->status_data->sensors[i], 0);
+
+  //let's find THJ5 in the vector
+  boost::ptr_vector<shadow_joints::Joint>::iterator thj5 = sr_hand_lib->joints_vector.begin();
+  std::string name_tmp = thj5->joint_name;
+  bool thj5_found = false;
+  int index_thj5 = 0;
+
+  for(; thj5 != sr_hand_lib->joints_vector.end(); ++thj5)
+  {
+    name_tmp = thj5->joint_name;
+
+    if( name_tmp.compare("THJ5") == 0)
+    {
+      thj5_found = true;
+      break;
+    }
+
+    ++index_thj5;
+  }
+
+  EXPECT_TRUE(thj5_found);
+  EXPECT_EQ(index_thj5, 25);
+
+  sr_hand_lib->actuator = (thj5->motor->actuator);
+
+  sr_hand_lib->calibrate_joint(thj5);
+  //all the sensors at 0 -> should be 0
+  EXPECT_EQ( thj5->motor->actuator->state_.position_ , 0.0);
+
+  for(unsigned int i = 0; i < SENSORS_NUM_0220 + 1; ++i)
+    sr_hand_lib->status_data->sensors[i] = 1;
+
+  //now thj5 position should be 1
+  sr_hand_lib->calibrate_joint(thj5);
+  //all the sensors at 1 -> should be 1 (THJ5 = .5 THJ5A + .5 THJ5B)
+  EXPECT_EQ( thj5->motor->actuator->state_.position_ , 1.0);
+
+  delete hw;
+}
+
 
 /////////////////////
 //     MAIN       //
