@@ -897,8 +897,8 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.clear();
           d.addf("Motor ID", "%d", joint->motor->motor_id);
           d.addf("Motor ID in message", "%d", joint->motor->msg_motor_id);
-          d.addf("Strain Gauge Left", "%f", joint->motor->strain_gauge_left);
-          d.addf("Strain Gauge Right", "%f", joint->motor->strain_gauge_right);
+          d.addf("Strain Gauge Left", "%d", joint->motor->strain_gauge_left);
+          d.addf("Strain Gauge Right", "%d", joint->motor->strain_gauge_right);
           d.addf("Executed Effort", "%f", state->last_executed_effort_);
           d.addf("Motor Flags", "%d", joint->motor->flags);
           d.addf("Measured Current", "%f", state->last_measured_current_);
