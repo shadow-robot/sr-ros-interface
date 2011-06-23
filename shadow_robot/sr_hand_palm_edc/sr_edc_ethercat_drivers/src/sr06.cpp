@@ -995,12 +995,29 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
     command->EDC_command = EDC_COMMAND_CAN_DIRECT_MODE;
   }
 
-  // Currently, the only data we send to motors is torque demand.
-  command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
-
   //alternate between even and uneven motors
   // and ask for the different informations.
   motor_updater->build_update_motor_command(command);
+
+
+  ///////
+  // Now we send the commands to the motor
+  // Currently, the only data we send to motors is torque demand.
+  //command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
+  //TODO: change back to torque
+  command->to_motor_data_type   = MOTOR_DEMAND_PWM;
+
+  //loop on either even or odd motors
+  int motor_index = 0;
+  for(unsigned int i = 0; i < 10; ++i)
+  {
+    if( command->which_motors )
+      motor_index = 2*i;
+    else
+      motor_index = 2*i + 1;
+
+    command->motor_data[i] = sr_hand_lib->joints_vector[motor_index].motor->actuator->command_.effort_;
+  }
 
   if (flashing && !can_packet_acked && !can_message_sent)
   {

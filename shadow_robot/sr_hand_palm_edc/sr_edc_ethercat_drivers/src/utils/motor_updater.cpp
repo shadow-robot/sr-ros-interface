@@ -70,6 +70,8 @@ namespace motor_updater
     if(!mutex->try_lock())
       return;
 
+    ///////
+    // First we ask for the next data we want to receive
     if(even_motors)
       even_motors = 0;
     else
@@ -99,6 +101,7 @@ namespace motor_updater
     }
 
     mutex->unlock();
+
   }
 }
 
