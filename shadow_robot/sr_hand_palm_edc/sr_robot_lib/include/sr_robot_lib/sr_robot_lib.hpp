@@ -134,15 +134,6 @@ namespace shadow_joints
      * motor.
      */
     ros::ServiceServer force_pid_service;
-
-    bool force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response)
-    {
-      ROS_INFO_STREAM("Received new force PID parameters.");
-
-      ROS_WARN("Not implemented yet.");
-      response.configured = true;
-      return true;
-    }
   };
 
   struct Joint

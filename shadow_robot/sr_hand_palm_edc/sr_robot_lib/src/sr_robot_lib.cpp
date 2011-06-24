@@ -367,8 +367,9 @@ namespace shadow_robot
 
     value.word = crc_result;
     full_config.at(MOTOR_CONFIG_CRC) = value;
-  }
 
+    return full_config;
+  }
 } //end namespace
 
 /* For the emacs weenies in the crowd.

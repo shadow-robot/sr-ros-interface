@@ -115,11 +115,23 @@ namespace shadow_robot
       joint->motor->actuator = actuators[index];
 
       std::stringstream ss;
-      ss << "ForcePID_" << joint_names[index];
-      joint->motor->force_pid_service = nh_tilde.advertiseService(ss.str().c_str(), &shadow_joints::Motor::force_pid_callback, joint->motor);
+      ss << "change_force_PID_" << joint_names[index];
+      //initialize the force pid service
+      joint->motor->force_pid_service = nh_tilde.advertiseService( ss.str().c_str(), &SrHandLib::force_pid_callback, this);
 
     } //end for joints.
   }
+
+
+  bool SrHandLib::force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response)
+  {
+    ROS_INFO_STREAM("Received new force PID parameters for motor ");
+
+    ROS_WARN("Not implemented yet.");
+    response.configured = true;
+    return true;
+  }
+
 
   std::vector<shadow_joints::JointToSensor> SrHandLib::read_joint_to_sensor_mapping()
   {

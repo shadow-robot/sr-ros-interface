@@ -42,6 +42,11 @@ namespace shadow_robot
     SrHandLib(pr2_hardware_interface::HardwareInterface *hw);
     ~SrHandLib();
 
+
+    bool force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response);
+
+
+
   protected:
     virtual void initialize(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                             std::vector<shadow_joints::JointToSensor> joint_to_sensors,
