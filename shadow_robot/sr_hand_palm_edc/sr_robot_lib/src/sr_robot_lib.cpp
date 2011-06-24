@@ -395,6 +395,11 @@ namespace shadow_robot
       INSERT_CRC_CALCULATION_HERE;
     }
 
+    //never send a CRC of 0, send 1 if the
+    // computed CRC is 0 (0 is a code for
+    // ignoring the config)
+    if( crc_result == 0 )
+      crc_result = 1;
     value.word = crc_result;
     full_config.at(MOTOR_CONFIG_CRC) = value;
 
