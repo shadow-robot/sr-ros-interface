@@ -114,6 +114,10 @@ namespace shadow_robot
       joint->motor->motor_id = motor_ids[index];
       joint->motor->actuator = actuators[index];
 
+      std::stringstream ss;
+      ss << "ForcePID_" << joint_names[index];
+      joint->motor->force_pid_service = nh_tilde.advertiseService(ss.str().c_str(), &shadow_joints::Motor::force_pid_callback, joint->motor);
+
     } //end for joints.
   }
 

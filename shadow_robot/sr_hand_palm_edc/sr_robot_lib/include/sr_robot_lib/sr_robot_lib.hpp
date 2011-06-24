@@ -36,6 +36,8 @@
 
 #include <pr2_hardware_interface/hardware_interface.h>
 
+#include <sr_robot_msgs/ForceController.h>
+
 #include "sr_robot_lib/calibration.hpp"
 #include "sr_robot_lib/motor_updater.hpp"
 
@@ -71,8 +73,13 @@ namespace shadow_joints
     bool calibrate_after_combining_sensors;
   };
 
-  struct Motor
+  class Motor
   {
+  public:
+    Motor(){};
+
+    ~Motor(){};
+
     //the position of the motor in the motor array
     // coming from the hardware
     int motor_id;
@@ -121,6 +128,21 @@ namespace shadow_joints
      * through the CAN bus are messed up.
      */
     bool bad_data;
+
+    /**
+     * A service used to set the force PID settings on the
+     * motor.
+     */
+    ros::ServiceServer force_pid_service;
+
+    bool force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response)
+    {
+      ROS_INFO_STREAM("Received new force PID parameters.");
+
+      ROS_WARN("Not implemented yet.");
+      response.configured = true;
+      return true;
+    }
   };
 
   struct Joint
@@ -248,6 +270,9 @@ namespace shadow_robot
     int8u crc_byte;
     int16u crc_result;
     int8u crc_i;
+
+    /// a ROS nodehandle to be able to advertise the Force PID service
+    ros::NodeHandle nh_tilde;
   };//end class
 }
 
