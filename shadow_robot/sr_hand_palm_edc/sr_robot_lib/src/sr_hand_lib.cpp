@@ -129,7 +129,8 @@ namespace shadow_robot
   {
     ROS_INFO_STREAM("Received new force PID parameters for motor " << motor_index);
 
-    generate_force_control_config(request.sgleftref, request.sgrightref, request.f, request.p, request.i,
+    generate_force_control_config(motor_index, request.sgleftref, request.sgrightref,
+                                  request.f, request.p, request.i,
                                   request.d, request.imax, request.deadband, request.sign);
 
     ROS_WARN("Not implemented yet.");

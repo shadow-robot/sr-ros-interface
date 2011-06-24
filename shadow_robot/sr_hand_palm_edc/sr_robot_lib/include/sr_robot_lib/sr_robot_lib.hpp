@@ -231,7 +231,9 @@ namespace shadow_robot
      */
     std::vector<std::pair<std::string, bool> > humanize_flags(int flag);
 
-    void generate_force_control_config(int sg_left, int sg_right, int f, int p, int i, int d, int imax, int deadband, int sign);
+    void generate_force_control_config(int motor_index, int sg_left, int sg_right,
+                                       int f, int p, int i, int d, int imax,
+                                       int deadband, int sign);
 
     /**
      * The motor updater is used to create a correct command to send to the motor.
@@ -241,9 +243,15 @@ namespace shadow_robot
     boost::shared_ptr<motor_updater::MotorUpdater> motor_updater_;
 
     /**
+     * The ForceConfig type consists of an int representing the motor index for this config
+     * followed by a vector of config: the index in the vector of config corresponds to the
+     * type of the data, and the value at this index corresponds to the value we want to set.
+     */
+    typedef std::pair<int, std::vector<crc_unions::union16> > ForceConfig;
+    /**
      * This queue contains the force PID config waiting to be pushed to the motor.
      */
-    std::queue<std::vector<crc_unions::union16>, std::list<std::vector<crc_unions::union16> > > reconfig_queue;
+    std::queue<ForceConfig, std::list<ForceConfig> > reconfig_queue;
     ///this index is used to iterate over the config we're sending.
     int config_index;
 

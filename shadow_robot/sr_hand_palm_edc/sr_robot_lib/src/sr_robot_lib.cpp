@@ -129,7 +129,7 @@ namespace shadow_robot
 
         command->motor_data[i] = joints_vector[motor_index].motor->actuator->command_.effort_;
       }
-    } //endif reconfig_queue.size() == 0
+    } //endif reconfig_queue.empty()
     else
     {
       //we have a waiting config:
@@ -146,27 +146,39 @@ namespace shadow_robot
       // in the config array.
       command->to_motor_data_type   = (TO_MOTOR_DATA_TYPE)config_index;
 
-      //loop on either even or odd motors
-      int motor_index = 0;
-      for(unsigned int i = 0; i < 10; ++i)
-      {
-        // if( command->which_motors )
-        //   motor_index = 2*i;
-        // else
-          motor_index = 2*i + 1;
+      //convert the motor index to the index of the motor in the message
+      int motor_index = reconfig_queue.front().first;
+      motor_index %2 == 0 ? motor_index /= 2 : motor_index = (motor_index / 2) - 1;
 
-        command->motor_data[i] = reconfig_queue.front()[config_index].word;
-      }
+      command->motor_data[motor_index] = reconfig_queue.front().second[config_index].word;
 
-      //OK the CRC was sent which means that the whole
-      // config has been transmitted. Pop the element.
+      ++config_index;
+
+      //OK we now need to send the correct CRC to the motor
+      // we updated, and CRC=0 to all the other motors in its
+      // group (odd/even) to tell them to ignore the new
+      // configuration.
+      // Once the config has been transmitted, pop the element
+      // and reset the config_index to the beginning of the
+      // config values
       if( config_index == MOTOR_CONFIG_CRC )
       {
+        //loop on all the motors and send a CRC of 0
+        // except for the motor we're reconfiguring
+        for( unsigned int i = 0 ; i < 10 ; ++i )
+        {
+          if( i == motor_index )
+            command->motor_data[motor_index] = reconfig_queue.front().second[config_index].word;
+          else
+            command->motor_data[motor_index] = 0;
+        }
+
+        //reset the config_index and remove the configuration
+        // we just sent from the configurations queue
         reconfig_queue.pop();
         config_index = MOTOR_CONFIG_FIRST_VALUE;
       }
 
-      ++config_index;
     } //endelse reconfig_queue.size()
   }
 
@@ -337,7 +349,9 @@ namespace shadow_robot
     return flags;
   }
 
-  void SrRobotLib::generate_force_control_config(int sg_left, int sg_right, int f, int p, int i, int d, int imax, int deadband, int sign)
+  void SrRobotLib::generate_force_control_config(int motor_index, int sg_left, int sg_right,
+                                                 int f, int p, int i, int d, int imax,
+                                                 int deadband, int sign)
   {
     //the vector is of the size of the TO_MOTOR_DATA_TYPE enum.
     //the value of the element at a given index is the value
@@ -384,8 +398,11 @@ namespace shadow_robot
     value.word = crc_result;
     full_config.at(MOTOR_CONFIG_CRC) = value;
 
+    ForceConfig config;
+    config.first = motor_index;
+    config.second = full_config;
     //push the new config to the configuration queue
-    reconfig_queue.push(full_config);
+    reconfig_queue.push(config);
   }
 } //end namespace
 
