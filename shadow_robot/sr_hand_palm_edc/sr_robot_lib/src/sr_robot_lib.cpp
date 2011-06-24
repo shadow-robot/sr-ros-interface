@@ -37,6 +37,8 @@ namespace shadow_robot
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
     : main_pic_idle_time(0), main_pic_idle_time_min(1000)
   {
+    debug_publishers.push_back(node_handle.advertise<std_msgs::Int16>("sr_debug_1",100));
+    debug_publishers.push_back(node_handle.advertise<std_msgs::Int16>("sr_debug_2",100));
   }
 
 
@@ -180,9 +182,21 @@ namespace shadow_robot
       switch(status_data->motor_data_type)
       {
       case MOTOR_DATA_SGL:
+	if(motor_index_full == 9)
+        {
+          msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
+          debug_publishers[0].publish(msg_debug);
+        }
+
         joint_tmp->motor->strain_gauge_left =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_SGR:
+	if(motor_index_full == 9)
+        {
+          msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
+          debug_publishers[1].publish(msg_debug);
+        }
+
         joint_tmp->motor->strain_gauge_right =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_PWM:
@@ -252,52 +266,6 @@ namespace shadow_robot
     }
 
     return flags;
-  }
-
-  std::vector<crc_unions::union16> SrRobotLib::generate_force_control_config(int sg_refs, int f, int p, int i, int d, int imax, int deadband_sign)
-  {
-    //the vector is of the size of the TO_MOTOR_DATA_TYPE enum.
-    //the value of the element at a given index is the value
-    //for the given MOTOR_CONFIG.
-    std::vector<crc_unions::union16> full_config(MOTOR_CONFIG_CRC);
-    crc_unions::union16 value;
-
-    //TODO: get each strain gauge amplifier and combine them here
-    value.word = sg_refs;
-    full_config.at(MOTOR_CONFIG_SG_REFS) = value;
-
-    value.word = f;
-    full_config.at(MOTOR_CONFIG_F) = value;
-
-    value.word = p;
-    full_config.at(MOTOR_CONFIG_P) = value;
-
-    value.word = i;
-    full_config.at(MOTOR_CONFIG_I) = value;
-
-    value.word = d;
-    full_config.at(MOTOR_CONFIG_D) = value;
-
-    value.word = imax;
-    full_config.at(MOTOR_CONFIG_IMAX) = value;
-
-    value.word = deadband_sign;
-    full_config.at(MOTOR_CONFIG_DEADBAND_SIGN) = value;
-
-
-    //compute crc
-    crc_result = 0;
-    for(unsigned int i = MOTOR_CONFIG_FIRST_VALUE; i < MOTOR_CONFIG_LAST_VALUE; ++i)
-    {
-      crc_byte = full_config.at(i).byte[0];
-      INSERT_CRC_CALCULATION_HERE;
-
-      crc_byte = full_config.at(i).byte[1];
-      INSERT_CRC_CALCULATION_HERE;
-    }
-
-    value.word = crc_result;
-    full_config.at(MOTOR_CONFIG_CRC) = value;
   }
 
 } //end namespace

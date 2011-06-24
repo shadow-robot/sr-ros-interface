@@ -32,6 +32,9 @@
 #include <boost/thread.hpp>
 #include <vector>
 
+//used to publish debug values
+#include <std_msgs/Int16.h>
+
 #include <sr_utilities/thread_safe_map.hpp>
 
 #include <pr2_hardware_interface/hardware_interface.h>
@@ -44,16 +47,6 @@ extern "C"
   #include <sr_external_dependencies/external/0220_palm_edc/0220_palm_edc_ethercat_protocol.h>
   #include <sr_external_dependencies/external/simplemotor-bootloader/bootloader.h>
 }
-
-namespace crc_unions
-{
-  typedef union
-  {
-    int16u word;
-    int8u byte[2];
-  } union16;
-}
-
 
 namespace shadow_joints
 {
@@ -156,7 +149,6 @@ namespace shadow_robot
      */
     void update(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data);
 
-
     /// The vector containing all the robot joints.
     boost::ptr_vector<shadow_joints::Joint> joints_vector;
     /// The map used to calibrate each joint.
@@ -214,10 +206,6 @@ namespace shadow_robot
      */
     std::vector<std::pair<std::string, bool> > humanize_flags(int flag);
 
-
-    std::vector<crc_unions::union16> generate_force_control_config(int sg_refs, int f, int p, int i, int d, int imax, int deadband_sign);
-
-
     /// The current actuator.
     pr2_hardware_interface::Actuator* actuator;
     /// The latest etherCAT message received.
@@ -230,9 +218,10 @@ namespace shadow_robot
     ///The index of the motor in the current message (from 0 to 9)
     int index_motor_in_msg;
 
-    int8u crc_byte;
-    int16u crc_result;
-    int8u crc_i;
+    ///This publisher is useful for debugging
+    std::vector<ros::Publisher> debug_publishers;
+    ros::NodeHandle node_handle;
+    std_msgs::Int16 msg_debug;
   };//end class
 }
 
