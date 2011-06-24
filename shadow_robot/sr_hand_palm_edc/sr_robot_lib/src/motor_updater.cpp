@@ -52,17 +52,15 @@ namespace motor_updater
     }
   }
 
+  MotorUpdater::~MotorUpdater()
+  {
+  }
+
   void MotorUpdater::timer_callback(const ros::TimerEvent& event, FROM_MOTOR_DATA_TYPE data_type)
   {
     unimportant_data_queue.push(data_type);
 
     ROS_DEBUG_STREAM("Timer: data type = "<<data_type << " | queue size: "<<unimportant_data_queue.size());
-  }
-
-
-  MotorUpdater::~MotorUpdater()
-  {
-
   }
 
   void MotorUpdater::build_update_motor_command(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command)
