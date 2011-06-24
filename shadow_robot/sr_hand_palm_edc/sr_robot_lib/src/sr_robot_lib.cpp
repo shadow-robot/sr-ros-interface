@@ -37,6 +37,8 @@ namespace shadow_robot
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
     : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(MOTOR_CONFIG_FIRST_VALUE), nh_tilde("~")
   {
+    debug_publishers.push_back(node_handle.advertise<std_msgs::Int16>("sr_debug_1",100));
+    debug_publishers.push_back(node_handle.advertise<std_msgs::Int16>("sr_debug_2",100));
   }
 
 
@@ -249,9 +251,21 @@ namespace shadow_robot
       switch(status_data->motor_data_type)
       {
       case MOTOR_DATA_SGL:
+	if(motor_index_full == 9)
+        {
+          msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
+          debug_publishers[0].publish(msg_debug);
+        }
+
         joint_tmp->motor->strain_gauge_left =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_SGR:
+	if(motor_index_full == 9)
+        {
+          msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
+          debug_publishers[1].publish(msg_debug);
+        }
+
         joint_tmp->motor->strain_gauge_right =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_PWM:
