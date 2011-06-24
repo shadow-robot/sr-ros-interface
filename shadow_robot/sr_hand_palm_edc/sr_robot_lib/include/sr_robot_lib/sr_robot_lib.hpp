@@ -231,7 +231,7 @@ namespace shadow_robot
      */
     std::vector<std::pair<std::string, bool> > humanize_flags(int flag);
 
-    std::vector<crc_unions::union16> generate_force_control_config(int sg_refs, int f, int p, int i, int d, int imax, int deadband_sign);
+    void generate_force_control_config(int sg_left, int sg_right, int f, int p, int i, int d, int imax, int deadband, int sign);
 
     /**
      * The motor updater is used to create a correct command to send to the motor.
@@ -259,17 +259,12 @@ namespace shadow_robot
     ///The index of the motor in the current message (from 0 to 9)
     int index_motor_in_msg;
 
-    ///This publisher is useful for debugging
-    std::vector<ros::Publisher> debug_publishers;
-    ros::NodeHandle node_handle;
-    std_msgs::Int16 msg_debug;
-
     int8u crc_byte;
     int16u crc_result;
     int8u crc_i;
 
     /// a ROS nodehandle to be able to advertise the Force PID service
-    ros::NodeHandle nh_tilde
+    ros::NodeHandle nh_tilde;
 
     ///This publishers are useful for debugging
     std::vector<ros::Publisher> debug_publishers;

@@ -337,16 +337,17 @@ namespace shadow_robot
     return flags;
   }
 
-  std::vector<crc_unions::union16> SrRobotLib::generate_force_control_config(int sg_refs, int f, int p, int i, int d, int imax, int deadband_sign)
+  void SrRobotLib::generate_force_control_config(int sg_left, int sg_right, int f, int p, int i, int d, int imax, int deadband, int sign)
   {
     //the vector is of the size of the TO_MOTOR_DATA_TYPE enum.
     //the value of the element at a given index is the value
     //for the given MOTOR_CONFIG.
-    std::vector<crc_unions::union16> full_config(MOTOR_CONFIG_CRC);
+    std::vector<crc_unions::union16> full_config(MOTOR_CONFIG_CRC + 1);
     crc_unions::union16 value;
 
     //TODO: get each strain gauge amplifier and combine them here
-    value.word = sg_refs;
+    value.byte[0] = sg_left;
+    value.byte[1] = sg_right;
     full_config.at(MOTOR_CONFIG_SG_REFS) = value;
 
     value.word = f;
@@ -364,7 +365,8 @@ namespace shadow_robot
     value.word = imax;
     full_config.at(MOTOR_CONFIG_IMAX) = value;
 
-    value.word = deadband_sign;
+    value.byte[0] = deadband;
+    value.byte[1] = sign;
     full_config.at(MOTOR_CONFIG_DEADBAND_SIGN) = value;
 
 
@@ -382,7 +384,8 @@ namespace shadow_robot
     value.word = crc_result;
     full_config.at(MOTOR_CONFIG_CRC) = value;
 
-    return full_config;
+    //push the new config to the configuration queue
+    reconfig_queue.push(full_config);
   }
 } //end namespace
 
