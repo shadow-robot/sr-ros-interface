@@ -132,8 +132,6 @@ namespace shadow_robot
     generate_force_control_config(motor_index, request.sgleftref, request.sgrightref,
                                   request.f, request.p, request.i,
                                   request.d, request.imax, request.deadband, request.sign);
-
-    ROS_WARN("Not implemented yet.");
     response.configured = true;
     return true;
   }
