@@ -35,7 +35,7 @@
 namespace shadow_robot
 {
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
-    : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(0)
+    : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(MOTOR_CONFIG_FIRST_VALUE)
   {
   }
 
@@ -103,14 +103,13 @@ namespace shadow_robot
   {
     motor_updater_->build_update_motor_command(command);
 
-
     ///////
     // Now we chose the command to send to the motor
     // by default we send a torque demand (we're running
     // the force control on the motors), but if we have a waiting
     // configuration, then we send the configuration.
 
-    if( reconfig_queue.size() == 0)
+    if( reconfig_queue.empty() )
     {
       //no config to send
       //command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
@@ -139,12 +138,33 @@ namespace shadow_robot
       //this is the last thing to send:
       // send the value, then remove the
       // config from the queue and reset the
-      // index to 0.
-      if( config_index == MOTOR_CONFIG_CRC )
-      {
+      // index to MOTOR_CONFIG_FIRST_VALUE.
 
+      // the motor data type correspond to the index
+      // in the config array.
+      command->to_motor_data_type   = (TO_MOTOR_DATA_TYPE)config_index;
+
+      //loop on either even or odd motors
+      int motor_index = 0;
+      for(unsigned int i = 0; i < 10; ++i)
+      {
+        if( command->which_motors )
+          motor_index = 2*i;
+        else
+          motor_index = 2*i + 1;
+
+        command->motor_data[i] = reconfig_queue.front()[config_index].word;
       }
 
+      ++config_index;
+
+      //OK the CRC was sent which means that the whole
+      // config has been transmitted. Pop the element.
+      if( config_index == MOTOR_CONFIG_CRC )
+      {
+        reconfig_queue.pop();
+        config_index = MOTOR_CONFIG_FIRST_VALUE;
+      }
     } //endelse reconfig_queue.size()
   }
 
