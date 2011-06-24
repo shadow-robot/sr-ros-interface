@@ -43,7 +43,7 @@ namespace shadow_robot
     ~SrHandLib();
 
 
-    bool force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response);
+    bool force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response, int motor_index);
 
 
 

@@ -117,15 +117,15 @@ namespace shadow_robot
       std::stringstream ss;
       ss << "change_force_PID_" << joint_names[index];
       //initialize the force pid service
-      joint->motor->force_pid_service = nh_tilde.advertiseService( ss.str().c_str(), &SrHandLib::force_pid_callback, this);
-
+      joint->motor->force_pid_service = nh_tilde.advertiseService<sr_robot_msgs::ForceController::Request,sr_robot_msgs::ForceController::Response>( ss.str().c_str(),
+                                                                                                                                                     boost::bind( &SrHandLib::force_pid_callback, this, _1, _2, joint->motor->motor_id) );
     } //end for joints.
   }
 
 
-  bool SrHandLib::force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response)
+  bool SrHandLib::force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response, int motor_index)
   {
-    ROS_INFO_STREAM("Received new force PID parameters for motor ");
+    ROS_INFO_STREAM("Received new force PID parameters for motor " << motor_index);
 
     generate_force_control_config(request.sgleftref, request.sgrightref, request.f, request.p, request.i,
                                   request.d, request.imax, request.deadband, request.sign);
