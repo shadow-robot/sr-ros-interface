@@ -150,15 +150,13 @@ namespace shadow_robot
       int motor_index = 0;
       for(unsigned int i = 0; i < 10; ++i)
       {
-        if( command->which_motors )
-          motor_index = 2*i;
-        else
+        // if( command->which_motors )
+        //   motor_index = 2*i;
+        // else
           motor_index = 2*i + 1;
 
         command->motor_data[i] = reconfig_queue.front()[config_index].word;
       }
-
-      ++config_index;
 
       //OK the CRC was sent which means that the whole
       // config has been transmitted. Pop the element.
@@ -167,6 +165,8 @@ namespace shadow_robot
         reconfig_queue.pop();
         config_index = MOTOR_CONFIG_FIRST_VALUE;
       }
+
+      ++config_index;
     } //endelse reconfig_queue.size()
   }
 
@@ -372,7 +372,7 @@ namespace shadow_robot
 
     //compute crc
     crc_result = 0;
-    for(unsigned int i = MOTOR_CONFIG_FIRST_VALUE; i < MOTOR_CONFIG_LAST_VALUE; ++i)
+    for(unsigned int i = MOTOR_CONFIG_FIRST_VALUE; i <= MOTOR_CONFIG_LAST_VALUE; ++i)
     {
       crc_byte = full_config.at(i).byte[0];
       INSERT_CRC_CALCULATION_HERE;

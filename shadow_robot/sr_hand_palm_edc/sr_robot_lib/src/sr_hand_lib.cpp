@@ -123,7 +123,9 @@ namespace shadow_robot
   }
 
 
-  bool SrHandLib::force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response, int motor_index)
+  bool SrHandLib::force_pid_callback(sr_robot_msgs::ForceController::Request& request,
+                                     sr_robot_msgs::ForceController::Response& response,
+                                     int motor_index)
   {
     ROS_INFO_STREAM("Received new force PID parameters for motor " << motor_index);
 

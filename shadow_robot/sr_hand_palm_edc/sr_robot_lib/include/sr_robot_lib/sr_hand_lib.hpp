@@ -42,8 +42,20 @@ namespace shadow_robot
     SrHandLib(pr2_hardware_interface::HardwareInterface *hw);
     ~SrHandLib();
 
-
-    bool force_pid_callback(sr_robot_msgs::ForceController::Request& request, sr_robot_msgs::ForceController::Response& response, int motor_index);
+    /**
+     * The service callback for setting the Force PID values. There's only one callback
+     * function, but it can called for any motors. We know which motor called the service
+     * thanks to the motor_index.
+     *
+     * @param request The request contains the new parameters for the controllers.
+     * @param response True if succeeded.
+     * @param motor_index The index of the motor for which the service has been called.
+     *
+     * @return true if succeeded.
+     */
+    bool force_pid_callback(sr_robot_msgs::ForceController::Request& request,
+                            sr_robot_msgs::ForceController::Response& response,
+                            int motor_index);
 
 
 
