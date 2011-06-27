@@ -30,4 +30,6 @@ checkout_or_update 0220_palm_edc svn://Pericles/Pic32/trunk/nodes/0220_palm_edc
 checkout_or_update simplemotor-bootloader svn://pericles/EDC/simplemotor-bootloader/
 
 cd ${START_PATH}
-
+cd "../compiled_firmware"
+checkout_or_update compiled_firmware svn://pericles/EDC/simplemotor/released_firmware/
+cd ${START_PATH}

@@ -143,3 +143,5 @@ shadow_robot/sr_hand_palm_edc/sr_external_dependencies/include/sr_external_depen
 shadow_robot/sr_hand_palm_edc/sr_robot_lib/bin/test/test_robot_lib
 ￼
 shadow_robot/sr_hand_palm_edc/sr_robot_lib/bin/test/motor_updater_test
+￼
+shadow_robot/sr_hand_palm_edc/sr_external_dependencies/compiled_firmware/released_firmware
