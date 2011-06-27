@@ -305,7 +305,7 @@ namespace shadow_robot
       case MOTOR_DATA_SVN_REVISION:
         joint_tmp->motor->firmware_svn_revision = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
-      case MOTOR_DATA_TESTS:
+      case MOTOR_DATA_CAN_ERROR_COUNTERS:
         joint_tmp->motor->tests = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_F_P:
