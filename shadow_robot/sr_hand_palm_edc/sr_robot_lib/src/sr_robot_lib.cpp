@@ -120,15 +120,8 @@ namespace shadow_robot
 
       //loop on either even or odd motors
       int motor_index = 0;
-      for(unsigned int i = 0; i < 10; ++i)
-      {
-        if( command->which_motors )
-          motor_index = 2*i;
-        else
-          motor_index = 2*i + 1;
-
+      for(unsigned int i = 0; i < NUM_MOTORS; ++i)
         command->motor_data[i] = joints_vector[motor_index].motor->actuator->command_.effort_;
-      }
     } //endif reconfig_queue.empty()
     else
     {
@@ -137,47 +130,40 @@ namespace shadow_robot
       // CRC. We'll remove the config from the queue only
       // when the whole config has been sent
 
-      //this is the last thing to send:
-      // send the value, then remove the
-      // config from the queue and reset the
-      // index to MOTOR_CONFIG_FIRST_VALUE.
-
       // the motor data type correspond to the index
       // in the config array.
       command->to_motor_data_type   = static_cast<TO_MOTOR_DATA_TYPE>(config_index);
 
       //convert the motor index to the index of the motor in the message
       int motor_index = reconfig_queue.front().first;
-      motor_index %2 == 0 ? motor_index /= 2 : motor_index = (motor_index / 2) - 1;
 
+      //set the data we want to send to the given motor
       command->motor_data[motor_index] = reconfig_queue.front().second[config_index].word;
 
-      ++config_index;
-
-      //OK we now need to send the correct CRC to the motor
-      // we updated, and CRC=0 to all the other motors in its
+      //We're now sending the CRC. We need to send the correct CRC to
+      // the motor we updated, and CRC=0 to all the other motors in its
       // group (odd/even) to tell them to ignore the new
       // configuration.
       // Once the config has been transmitted, pop the element
       // and reset the config_index to the beginning of the
       // config values
-      if( config_index == MOTOR_CONFIG_CRC )
+      if( config_index == static_cast<int>(MOTOR_CONFIG_CRC) )
       {
-        //loop on all the motors and send a CRC of 0
+	//loop on all the motors and send a CRC of 0
         // except for the motor we're reconfiguring
-        for( unsigned int i = 0 ; i < 10 ; ++i )
+        for( unsigned int i = 0 ; i < NUM_MOTORS ; ++i )
         {
-          if( i == motor_index )
-            command->motor_data[motor_index] = reconfig_queue.front().second[config_index].word;
-          else
-            command->motor_data[motor_index] = 0;
+          if( i != motor_index )
+            command->motor_data[i] = 0;
         }
 
         //reset the config_index and remove the configuration
         // we just sent from the configurations queue
         reconfig_queue.pop();
         config_index = MOTOR_CONFIG_FIRST_VALUE;
+
       }
+      ++config_index;
 
     } //endelse reconfig_queue.size()
   }
@@ -255,6 +241,8 @@ namespace shadow_robot
     //the flag should be 0
     joint_tmp->motor->bad_data = sr_math_utils::is_bit_mask_index_true(status_data->which_motor_data_had_errors, index_motor_in_msg);
 
+    crc_unions::union16 tmp_value;
+
     if(joint_tmp->motor->motor_ok && !(joint_tmp->motor->bad_data) )
     {
       //TODO: Hugo: how can I get the correct values from the motor???
@@ -303,7 +291,11 @@ namespace shadow_robot
         joint_tmp->motor->can_msgs_transmitted = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_SVN_REVISION:
-        joint_tmp->motor->firmware_svn_revision = status_data->motor_data_packet[index_motor_in_msg].misc;
+        joint_tmp->motor->server_firmware_svn_revision = status_data->motor_data_packet[index_motor_in_msg].torque;
+        //the bit 15 tells us if the firmware version on the motor is a modified version of the svn.
+        joint_tmp->motor->firmware_modified = ( (status_data->motor_data_packet[index_motor_in_msg].misc & 0x8000) != 0 );
+        // the other 14 bits are the svn revision currently programmed on the pic
+        joint_tmp->motor->pic_firmware_svn_revision = ( status_data->motor_data_packet[index_motor_in_msg].misc & 0x7FFF );
         break;
       case MOTOR_DATA_CAN_ERROR_COUNTERS:
         joint_tmp->motor->tests = status_data->motor_data_packet[index_motor_in_msg].misc;
@@ -319,7 +311,6 @@ namespace shadow_robot
       case MOTOR_DATA_IMAX_DEADBAND_SIGN:
         joint_tmp->motor->force_control_imax = status_data->motor_data_packet[index_motor_in_msg].torque;
 
-        crc_unions::union16 tmp_value;
         tmp_value.word = status_data->motor_data_packet[index_motor_in_msg].misc;
         joint_tmp->motor->force_control_deadband = static_cast<int>(tmp_value.byte[0]);
         //how do I read the sign?
@@ -353,7 +344,6 @@ namespace shadow_robot
         flags.push_back( new_flag );
       }
     }
-
     return flags;
   }
 

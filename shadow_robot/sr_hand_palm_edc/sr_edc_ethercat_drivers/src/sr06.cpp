@@ -925,8 +925,6 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Temperature", "%f", joint->motor->temperature);
           d.addf("Number of CAN messages received", "%d", joint->motor->can_msgs_received);
           d.addf("Number of CAN messages transmitted", "%d", joint->motor->can_msgs_transmitted);
-          d.addf("Firmware svn revision", "%d", joint->motor->firmware_svn_revision);
-          d.addf("Tests", "%d", joint->motor->tests);
 
           d.addf("Force control F", "%d", joint->motor->force_control_f);
           d.addf("Force control P", "%d", joint->motor->force_control_p);
@@ -943,6 +941,15 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Measured Effort", "%f", state->last_measured_effort_);
           d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
           d.addf("Encoder Position", "%f", state->position_);
+
+          if(joint->motor->firmware_modified )
+            d.addf("Firmware svn revision (server / pic / modified)", "%d / %d / True", joint->motor->server_firmware_svn_revision,
+                   joint->motor->pic_firmware_svn_revision );
+          else
+            d.addf("Firmware svn revision (server / pic / modified)", "%d / %d / False", joint->motor->server_firmware_svn_revision,
+                   joint->motor->pic_firmware_svn_revision );
+
+          d.addf("Tests", "%d", joint->motor->tests);
         }
       }
       else

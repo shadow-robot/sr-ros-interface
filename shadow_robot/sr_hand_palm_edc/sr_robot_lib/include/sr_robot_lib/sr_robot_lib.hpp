@@ -81,7 +81,8 @@ namespace shadow_joints
     Motor() :
       motor_id(0), msg_motor_id(0), actuator(NULL), strain_gauge_left(0),
       strain_gauge_right(0), temperature(0.), can_msgs_received(0),
-      can_msgs_transmitted(0), firmware_svn_revision(0), tests(0),
+      can_msgs_transmitted(0), pic_firmware_svn_revision(0),
+      server_firmware_svn_revision(0), firmware_modified(0), tests(0),
       force_control_f(0), force_control_p(0), force_control_i(0),
       force_control_d(0), force_control_imax(0), force_control_deadband(0),
       force_control_sign(0), motor_ok(false), bad_data(false)
@@ -117,7 +118,9 @@ namespace shadow_joints
     int can_msgs_received;
     int can_msgs_transmitted;
 
-    int firmware_svn_revision;
+    int pic_firmware_svn_revision;
+    int server_firmware_svn_revision;
+    bool firmware_modified;
 
     int tests;
 
