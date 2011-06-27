@@ -144,7 +144,7 @@ namespace shadow_robot
 
       // the motor data type correspond to the index
       // in the config array.
-      command->to_motor_data_type   = (TO_MOTOR_DATA_TYPE)config_index;
+      command->to_motor_data_type   = static_cast<TO_MOTOR_DATA_TYPE>(config_index);
 
       //convert the motor index to the index of the motor in the message
       int motor_index = reconfig_queue.front().first;
@@ -281,20 +281,20 @@ namespace shadow_robot
         joint_tmp->motor->strain_gauge_right =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_PWM:
-        actuator->state_.last_executed_effort_ =  (double)status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.last_executed_effort_ =  static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_FLAGS:
         joint_tmp->motor->flags = humanize_flags(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_CURRENT:
         //we're receiving the current in milli amps
-        actuator->state_.last_measured_current_ = ((double)status_data->motor_data_packet[index_motor_in_msg].misc)/1000.0;
+        actuator->state_.last_measured_current_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc)/1000.0;
         break;
       case MOTOR_DATA_VOLTAGE:
-        actuator->state_.motor_voltage_ = ((double)status_data->motor_data_packet[index_motor_in_msg].misc ) / 256.0;
+        actuator->state_.motor_voltage_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc ) / 256.0;
         break;
       case MOTOR_DATA_TEMPERATURE:
-        joint_tmp->motor->temperature = ((double)status_data->motor_data_packet[index_motor_in_msg].misc) / 256.0;
+        joint_tmp->motor->temperature = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc) / 256.0;
         break;
       case MOTOR_DATA_CAN_NUM_RECEIVED:
         joint_tmp->motor->can_msgs_received = status_data->motor_data_packet[index_motor_in_msg].misc;
@@ -318,15 +318,18 @@ namespace shadow_robot
         break;
       case MOTOR_DATA_IMAX_DEADBAND_SIGN:
         joint_tmp->motor->force_control_imax = status_data->motor_data_packet[index_motor_in_msg].torque;
-        joint_tmp->motor->force_control_deadband = status_data->motor_data_packet[index_motor_in_msg].misc;
+
+        crc_unions::union16 tmp_value;
+        tmp_value.word = status_data->motor_data_packet[index_motor_in_msg].misc;
+        joint_tmp->motor->force_control_deadband = static_cast<int>(tmp_value.byte[0]);
         //how do I read the sign?
-        joint_tmp->motor->force_control_sign = status_data->motor_data_packet[index_motor_in_msg].misc;
+        joint_tmp->motor->force_control_sign = static_cast<int>(tmp_value.byte[1]);
         break;
       default:
         break;
       }
 
-      actuator->state_.last_measured_effort_ = (double)status_data->motor_data_packet[index_motor_in_msg].torque;
+      actuator->state_.last_measured_effort_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].torque);
     }
   }
 

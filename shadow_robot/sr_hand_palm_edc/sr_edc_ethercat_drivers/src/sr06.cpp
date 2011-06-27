@@ -934,7 +934,11 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Force control D", "%d", joint->motor->force_control_d);
           d.addf("Force control Imax", "%d", joint->motor->force_control_imax);
           d.addf("Force control Deadband", "%d", joint->motor->force_control_deadband);
-          d.addf("Force control Sign", "%d", joint->motor->force_control_sign);
+
+          if( joint->motor->force_control_sign == 0 )
+            d.addf("Force control Sign", "+");
+          else
+            d.addf("Force control Sign", "-");
 
           d.addf("Measured Effort", "%f", state->last_measured_effort_);
           d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
