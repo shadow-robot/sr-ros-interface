@@ -927,12 +927,14 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Number of CAN messages transmitted", "%d", joint->motor->can_msgs_transmitted);
           d.addf("Firmware svn revision", "%d", joint->motor->firmware_svn_revision);
           d.addf("Tests", "%d", joint->motor->tests);
+
+          d.addf("Force control F", "%d", joint->motor->force_control_f);
           d.addf("Force control P", "%d", joint->motor->force_control_p);
           d.addf("Force control I", "%d", joint->motor->force_control_i);
           d.addf("Force control D", "%d", joint->motor->force_control_d);
           d.addf("Force control Imax", "%d", joint->motor->force_control_imax);
           d.addf("Force control Deadband", "%d", joint->motor->force_control_deadband);
-
+          d.addf("Force control Sign", "%d", joint->motor->force_control_sign);
 
           d.addf("Measured Effort", "%f", state->last_measured_effort_);
           d.addf("Commanded Effort", "%f", state->last_commanded_effort_);

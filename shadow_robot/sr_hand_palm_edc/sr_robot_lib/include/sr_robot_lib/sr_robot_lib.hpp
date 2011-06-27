@@ -78,7 +78,14 @@ namespace shadow_joints
   class Motor
   {
   public:
-    Motor(){};
+    Motor() :
+      motor_id(0), msg_motor_id(0), actuator(NULL), strain_gauge_left(0),
+      strain_gauge_right(0), temperature(0.), can_msgs_received(0),
+      can_msgs_transmitted(0), firmware_svn_revision(0), tests(0),
+      force_control_f(0), force_control_p(0), force_control_i(0),
+      force_control_d(0), force_control_imax(0), force_control_deadband(0),
+      force_control_sign(0), motor_ok(false), bad_data(false)
+    {};
 
     ~Motor(){};
 
@@ -114,11 +121,13 @@ namespace shadow_joints
 
     int tests;
 
+    int force_control_f;
     int force_control_p;
     int force_control_i;
     int force_control_d;
     int force_control_imax;
     int force_control_deadband;
+    int force_control_sign;
 
     /**
      * this boolean is set to true as long as we receive the

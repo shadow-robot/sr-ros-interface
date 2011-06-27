@@ -309,13 +309,18 @@ namespace shadow_robot
         joint_tmp->motor->tests = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_F_P:
+        joint_tmp->motor->force_control_f = status_data->motor_data_packet[index_motor_in_msg].torque;
         joint_tmp->motor->force_control_p = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_I_D:
-        joint_tmp->motor->force_control_i = status_data->motor_data_packet[index_motor_in_msg].misc;
+        joint_tmp->motor->force_control_i = status_data->motor_data_packet[index_motor_in_msg].torque;
+        joint_tmp->motor->force_control_d = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_IMAX_DEADBAND_SIGN:
-        joint_tmp->motor->force_control_imax = status_data->motor_data_packet[index_motor_in_msg].misc;
+        joint_tmp->motor->force_control_imax = status_data->motor_data_packet[index_motor_in_msg].torque;
+        joint_tmp->motor->force_control_deadband = status_data->motor_data_packet[index_motor_in_msg].misc;
+        //how do I read the sign?
+        joint_tmp->motor->force_control_sign = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       default:
         break;
