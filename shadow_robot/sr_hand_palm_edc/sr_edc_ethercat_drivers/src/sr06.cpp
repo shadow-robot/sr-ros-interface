@@ -129,7 +129,7 @@ SR06::SR06()
     can_packet_acked(true),
     zero_buffer_read(0)
 {
-  int res;
+  int res = 0;
   check_for_pthread_mutex_init_error(res);
   counter_ = 0;
 
@@ -224,9 +224,10 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
     //
     // This is for data going TO the palm
     //
-    ROS_INFO("First FMMU (command) : start_address : 0x%08X ; size : %3d bytes ; phy addr : 0x%08X", command_base_, command_size_, (int)ETHERCAT_COMMAND_DATA_ADDRESS);
-    EC_FMMU *commandFMMU = new EC_FMMU( command_base_,
-                                        command_size_,                                                  // Logical Start Address    (in ROS address space?)
+    ROS_INFO("First FMMU (command) : start_address : 0x%08X ; size : %3d bytes ; phy addr : 0x%08X", command_base_, command_size_,
+	     static_cast<int>(ETHERCAT_COMMAND_DATA_ADDRESS) );
+    EC_FMMU *commandFMMU = new EC_FMMU( command_base_,                                                  // Logical Start Address    (in ROS address space?)
+                                        command_size_,
                                         0x00,                                                           // Logical Start Bit
                                         0x07,                                                           // Logical End Bit
                                         ETHERCAT_COMMAND_DATA_ADDRESS,                                  // Physical Start Address   (in ET1200 address space?)
@@ -243,7 +244,8 @@ void SR06::construct(EtherCAT_SlaveHandler *sh, int &start_address)
     //
     // This is for data coming FROM the palm
     //
-    ROS_INFO("Second FMMU (status) : start_address : 0x%08X ; size : %3d bytes ; phy addr : 0x%08X", status_base_, status_size_, (int)ETHERCAT_STATUS_DATA_ADDRESS);
+    ROS_INFO("Second FMMU (status) : start_address : 0x%08X ; size : %3d bytes ; phy addr : 0x%08X", status_base_, status_size_,
+	     static_cast<int>(ETHERCAT_STATUS_DATA_ADDRESS) );
     EC_FMMU *statusFMMU = new EC_FMMU(  status_base_,
                                         status_size_,
                                         0x00,
@@ -304,9 +306,9 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
 
   sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>( new shadow_robot::SrHandLib(hw) );
 
-  ROS_INFO("ETHERCAT_STATUS_DATA_SIZE      = %4d bytes", (int)ETHERCAT_STATUS_DATA_SIZE);
-  ROS_INFO("ETHERCAT_COMMAND_DATA_SIZE     = %4d bytes", (int)ETHERCAT_COMMAND_DATA_SIZE);
-  ROS_INFO("ETHERCAT_CAN_BRIDGE_DATA_SIZE  = %4d bytes", (int)ETHERCAT_CAN_BRIDGE_DATA_SIZE);
+  ROS_INFO("ETHERCAT_STATUS_DATA_SIZE      = %4d bytes", static_cast<int>(ETHERCAT_STATUS_DATA_SIZE) );
+  ROS_INFO("ETHERCAT_COMMAND_DATA_SIZE     = %4d bytes", static_cast<int>(ETHERCAT_COMMAND_DATA_SIZE) );
+  ROS_INFO("ETHERCAT_CAN_BRIDGE_DATA_SIZE  = %4d bytes", static_cast<int>(ETHERCAT_CAN_BRIDGE_DATA_SIZE) );
 
 
 //  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
@@ -548,7 +550,8 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     {
       can_message_.message_length = 8;
       can_message_.can_bus = 1;
-      can_message_.message_id = 0x0400 | (req.motor_id << 5) | 0b1010;
+      can_message_.message_id = 0x0600 | (req.motor_id << 5) | 0b1010;
+
       can_message_.message_data[0] = 0x55;
       can_message_.message_data[1] = 0xAA;
       can_message_.message_data[2] = 0x55;
@@ -1013,10 +1016,14 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
   {
     if ( !(res = pthread_mutex_trylock(&producing)) )
     {
-      ROS_DEBUG("We send a CAN message for flashing !");
+      ROS_DEBUG_STREAM("Ethercat Command data size: "<< ETHERCAT_COMMAND_DATA_SIZE);
+      ROS_DEBUG_STREAM("Ethercat bridge data size: "<< ETHERCAT_CAN_BRIDGE_DATA_SIZE);
+
+      ROS_INFO("We send a CAN message for flashing !");
       memcpy(message, &can_message_, sizeof(can_message_));
       can_message_sent = true;
-      ROS_DEBUG("Sending : SID : 0x%04X ; bus : 0x%02X ; length : 0x%02X ; data : 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X", 	message->message_id,
+      ROS_DEBUG("Sending : SID : 0x%04X ; bus : 0x%02X ; length : 0x%02X ; data : 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X",
+		message->message_id,
                 message->can_bus,
                 message->message_length,
                 message->message_data[0],
@@ -1032,7 +1039,7 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
     }
     else
     {
-      ROS_DEBUG("Mutex is locked, we don't send any CAN message !");
+      ROS_ERROR("Mutex is locked, we don't send any CAN message !");
       check_for_trylock_error(res);
     }
   }
@@ -1060,7 +1067,7 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
   if (packet->message_id == 0)
     return false;
 
-  ROS_INFO("ack sid : %04X", packet->message_id);
+  ROS_DEBUG("ack sid : %04X", packet->message_id);
 
   if ( (packet->message_id & 0b0000011111111111) == (0x0600 | (motor_being_flashed << 5) | 0x10 | READ_FLASH_COMMAND))
     return ( !memcmp(packet->message_data, binary_content + pos, 8) );
@@ -1083,7 +1090,10 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
   ROS_INFO("This is an ACK");
 
   if ( (packet->message_id & 0b0000000111101111) != (can_message_.message_id & 0b0000000111101111) )
+    {
+      ROS_ERROR_STREAM("Bad packet id: " << packet->message_id);
     return false;
+    }
 
   ROS_INFO("SID is OK");
 
@@ -1122,7 +1132,9 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //received empty message: the pic is not writing to its mailbox.
     ++zero_buffer_read;
     float percentage_packet_loss = 100.f * ((float)zero_buffer_read / (float)num_rxed_packets);
-    ROS_WARN("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
+
+    //TODO: use ROS_WARN again
+    ROS_DEBUG("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
     return false;
   }
 
