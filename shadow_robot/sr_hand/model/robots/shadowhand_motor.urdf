@@ -240,9 +240,10 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
-  <transmission name="ffmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="FFJ2"/>
-    <joint name="FFJ2"/>
+  <transmission name="ffmiddle_transmission" type="sr_mechanism_model/J0Transmission">
+    <actuator name="FFJ0"/>
+    <joint1 name="FFJ1"/>
+    <joint2 name="FFJ2"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -278,13 +279,6 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
-  <transmission name="ffdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="FFJ1"/>
-    <joint name="FFJ1"/>
-    <mechanicalReduction>1</mechanicalReduction>
-    <motorTorqueConstant>1</motorTorqueConstant>
-    <pulsesPerRevolution>90000</pulsesPerRevolution>
-  </transmission>
   <link name="mfknuckle">
     <inertial>
       <!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
@@ -394,9 +388,10 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
-  <transmission name="mfmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="MFJ2"/>
-    <joint name="MFJ2"/>
+  <transmission name="mfmiddle_transmission" type="sr_mechanism_model/J0Transmission">
+    <actuator name="MFJ0"/>
+    <joint1 name="MFJ1"/>
+    <joint2 name="MFJ2"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -432,13 +427,6 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
-  <transmission name="mfdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="MFJ1"/>
-    <joint name="MFJ1"/>
-    <mechanicalReduction>1</mechanicalReduction>
-    <motorTorqueConstant>1</motorTorqueConstant>
-    <pulsesPerRevolution>90000</pulsesPerRevolution>
-  </transmission>
   <link name="rfknuckle">
     <inertial>
       <!--<origin xyz="0.011 0 0.099" rpy="0 0 0" />-->
@@ -548,9 +536,10 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
-  <transmission name="rfmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="RFJ2"/>
-    <joint name="RFJ2"/>
+  <transmission name="rfmiddle_transmission" type="sr_mechanism_model/J0Transmission">
+    <actuator name="RFJ0"/>
+    <joint1 name="RFJ1"/>
+    <joint2 name="RFJ2"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -586,13 +575,6 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
-  <transmission name="rfdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="RFJ1"/>
-    <joint name="RFJ1"/>
-    <mechanicalReduction>1</mechanicalReduction>
-    <motorTorqueConstant>1</motorTorqueConstant>
-    <pulsesPerRevolution>90000</pulsesPerRevolution>
-  </transmission>
   <link name="lfmetacarpal">
     <inertial>
       <origin rpy="0 0 0" xyz="-0.033 0 0.02071"/>
@@ -738,9 +720,10 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
-  <transmission name="lfmiddle_transmission" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="LFJ2"/>
-    <joint name="LFJ2"/>
+  <transmission name="lfmiddle_transmission" type="sr_mechanism_model/J0Transmission">
+    <actuator name="LFJ0"/>
+    <joint1 name="LFJ1"/>
+    <joint2 name="LFJ2"/>
     <mechanicalReduction>1</mechanicalReduction>
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
@@ -776,13 +759,6 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
-  <transmission name="lfdistal_transmission" type="pr2_mechanism_model/SimpleTransmission">
-    <actuator name="LFJ1"/>
-    <joint name="LFJ1"/>
-    <mechanicalReduction>1</mechanicalReduction>
-    <motorTorqueConstant>1</motorTorqueConstant>
-    <pulsesPerRevolution>90000</pulsesPerRevolution>
-  </transmission>
   <link name="thbase">
     <inertial>
       <mass value="0.010"/>

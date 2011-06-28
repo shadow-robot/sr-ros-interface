@@ -1,0 +1,3 @@
+<library path="lib/libsr_mechanism_model">
+  <class name="sr_mechanism_model/J0Transmission" type="sr_mechanism_model::J0Transmission" base_class_type="pr2_mechanism_model::Transmission" />
+</library>

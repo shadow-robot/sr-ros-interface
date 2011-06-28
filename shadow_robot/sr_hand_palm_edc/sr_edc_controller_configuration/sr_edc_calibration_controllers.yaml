@@ -1,11 +1,11 @@
 
 # Shadow Hand Defines
 
-#cal_sh_ffj0:
-#  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-#  joint: FFJ0
-#  actuator: FFJ0
-#  transmission: ffmiddle_transmission
+cal_sh_ffj0:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: FFJ2
+  actuator: FFJ0
+  transmission: ffmiddle_transmission
 cal_sh_ffj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
   joint: FFJ3
@@ -18,11 +18,11 @@ cal_sh_ffj4:
   transmission: ffknuckle_transmission
 
 
-#cal_sh_mfj0:
-#  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-#  joint: MFJ0
-#  actuator: MFJ0
-#  transmission: mfmiddle_transmission
+cal_sh_mfj0:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: MFJ2
+  actuator: MFJ0
+  transmission: mfmiddle_transmission
 cal_sh_mfj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
   joint: MFJ3
@@ -34,11 +34,11 @@ cal_sh_mfj4:
   actuator: MFJ4
   transmission: mfknuckle_transmission
 
-#cal_sh_rfj0:
-#  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-#  joint: RFJ0
-#  actuator: RFJ0
-#  transmission: rfmiddle_transmission
+cal_sh_rfj0:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: RFJ2
+  actuator: RFJ0
+  transmission: rfmiddle_transmission
 cal_sh_rfj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
   joint: RFJ3
@@ -50,11 +50,11 @@ cal_sh_rfj4:
   actuator: RFJ4
   transmission: rfknuckle_transmission
 
-#cal_sh_lfj0:
-#  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
-#  joint: LFJ0
-#  actuator: LFJ0
-#  transmission: lfmiddle_transmission
+cal_sh_lfj0:
+  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  joint: LFJ2
+  actuator: LFJ0
+  transmission: lfmiddle_transmission
 cal_sh_lfj3:
   type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
   joint: LFJ3

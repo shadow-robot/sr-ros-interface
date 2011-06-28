@@ -1,0 +1,20 @@
+<package>
+  <description brief="sr_mechanism_model">
+
+     sr_mechanism_model
+
+  </description>
+  <author>hugo</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_mechanism_model</url>
+  <depend package="roscpp"/>
+  <depend package="pr2_mechanism_model"/>
+  <depend package="pluginlib"/>
+
+  <export>
+    <sr_mechanism_model plugin="${prefix}/transmission_plugin.xml" />
+  </export>
+</package>
+
+
