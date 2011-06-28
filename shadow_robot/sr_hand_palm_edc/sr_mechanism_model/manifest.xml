@@ -10,10 +10,10 @@
   <url>http://ros.org/wiki/sr_mechanism_model</url>
   <depend package="roscpp"/>
   <depend package="pr2_mechanism_model"/>
-  <depend package="pluginlib"/>
 
   <export>
-    <sr_mechanism_model plugin="${prefix}/transmission_plugin.xml" />
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_mechanism_model -Wl,-rpath,${prefix}/lib"/>
+    <pr2_mechanism_model plugin="${prefix}/transmission_plugin.xml" />
   </export>
 </package>
 

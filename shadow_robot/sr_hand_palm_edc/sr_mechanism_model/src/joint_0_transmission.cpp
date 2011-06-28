@@ -26,7 +26,7 @@
  *
  */
 
-#include "pr2_mechanism_model/joint_0_transmission.hpp"
+#include "sr_mechanism_model/joint_0_transmission.hpp"
 
 #include <math.h>
 #include <pluginlib/class_list_macros.h>
@@ -112,26 +112,41 @@ namespace sr_mechanism_model
       }
     }
     joint_names_.push_back(joint_name);
+
+    return true;
   }
 
   void J0Transmission::propagatePosition(
     std::vector<Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
     assert(as.size() == 1);
-    assert(js.size() == 1);
+    assert(js.size() == 2);
+
+
+    //ROS_ERROR_STREAM( "READING pos " << as[0]->state_.position_ );// = js[0]->position_ + js[1]->position_;
+
     js[0]->position_ = (as[0]->state_.position_ / mechanical_reduction_) + js[0]->reference_position_;
+    js[1]->position_ = (as[0]->state_.position_ / mechanical_reduction_) + js[1]->reference_position_;
+
     js[0]->velocity_ = as[0]->state_.velocity_ / mechanical_reduction_;
+    js[1]->velocity_ = as[0]->state_.velocity_ / mechanical_reduction_;
+
     js[0]->measured_effort_ = as[0]->state_.last_measured_effort_ * mechanical_reduction_;
+    js[1]->measured_effort_ = as[0]->state_.last_measured_effort_ * mechanical_reduction_;
   }
 
   void J0Transmission::propagatePositionBackwards(
     std::vector<pr2_mechanism_model::JointState*>& js, std::vector<Actuator*>& as)
   {
+    ROS_ERROR("propagate pos backward");
+
     assert(as.size() == 1);
-    assert(js.size() == 1);
-    as[0]->state_.position_ = (js[0]->position_ - js[0]->reference_position_) * mechanical_reduction_;
-    as[0]->state_.velocity_ = js[0]->velocity_ * mechanical_reduction_;
-    as[0]->state_.last_measured_effort_ = js[0]->measured_effort_ / mechanical_reduction_;
+    assert(js.size() == 2);
+/*
+  as[0]->state_.position_ = (js[0]->position_ - js[0]->reference_position_) * mechanical_reduction_;
+  as[0]->state_.velocity_ = js[0]->velocity_ * mechanical_reduction_;
+*/
+    as[0]->state_.last_measured_effort_ = (js[0]->measured_effort_ + js[1]->measured_effort_) / mechanical_reduction_;
 
     // Update the timing (making sure it's initialized).
     if (! simulated_actuator_timestamp_initialized_)
@@ -162,17 +177,20 @@ namespace sr_mechanism_model
     std::vector<pr2_mechanism_model::JointState*>& js, std::vector<Actuator*>& as)
   {
     assert(as.size() == 1);
-    assert(js.size() == 1);
+    assert(js.size() == 2);
     as[0]->command_.enable_ = true;
-    as[0]->command_.effort_ = js[0]->commanded_effort_ / mechanical_reduction_;
+    as[0]->command_.effort_ = (js[0]->commanded_effort_ + js[1]->commanded_effort_) / mechanical_reduction_;
   }
 
   void J0Transmission::propagateEffortBackwards(
     std::vector<Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
+    ROS_ERROR("propagate effort backward");
+
     assert(as.size() == 1);
-    assert(js.size() == 1);
+    assert(js.size() == 2);
     js[0]->commanded_effort_ = as[0]->command_.effort_ * mechanical_reduction_;
+    js[1]->commanded_effort_ = as[0]->command_.effort_ * mechanical_reduction_;
   }
 
 } //end namespace sr_mechanism_model
