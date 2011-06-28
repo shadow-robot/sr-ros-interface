@@ -879,7 +879,7 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
 
     if( joint->has_motor )
     {
-      const pr2_hardware_interface::ActuatorState *state(&(joint->motor->actuator)->state_);
+      const sr_actuator::SrActuatorState *state(&(joint->motor->actuator)->state_);
 
       if(joint->motor->motor_ok)
       {
@@ -897,17 +897,17 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.clear();
           d.addf("Motor ID", "%d", joint->motor->motor_id);
           d.addf("Motor ID in message", "%d", joint->motor->msg_motor_id);
-          d.addf("Strain Gauge Left", "%d", joint->motor->strain_gauge_left);
-          d.addf("Strain Gauge Right", "%d", joint->motor->strain_gauge_right);
+          d.addf("Strain Gauge Left", "%d", state->strain_gauge_left_);
+          d.addf("Strain Gauge Right", "%d", state->strain_gauge_right_);
           d.addf("Executed Effort", "%f", state->last_executed_effort_);
 
           //if some flags are set
           std::stringstream ss;
-          if( joint->motor->flags.size() > 0 )
+          if( state->flags_.size() > 0 )
           {
             int flags_seriousness = d.OK;
             std::pair<std::string, bool> flag;
-            BOOST_FOREACH(flag, joint->motor->flags)
+            BOOST_FOREACH(flag, state->flags_)
             {
               //Serious error flag
               if(flag.second)
@@ -925,18 +925,18 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
 
           d.addf("Measured Current", "%f", state->last_measured_current_);
           d.addf("Measured Voltage", "%f", state->motor_voltage_);
-          d.addf("Temperature", "%f", joint->motor->temperature);
-          d.addf("Number of CAN messages received", "%d", joint->motor->can_msgs_received);
-          d.addf("Number of CAN messages transmitted", "%d", joint->motor->can_msgs_transmitted);
+          d.addf("Temperature", "%f", state->temperature_);
+          d.addf("Number of CAN messages received", "%d", state->can_msgs_received_);
+          d.addf("Number of CAN messages transmitted", "%d", state->can_msgs_transmitted_);
 
-          d.addf("Force control F", "%d", joint->motor->force_control_f);
-          d.addf("Force control P", "%d", joint->motor->force_control_p);
-          d.addf("Force control I", "%d", joint->motor->force_control_i);
-          d.addf("Force control D", "%d", joint->motor->force_control_d);
-          d.addf("Force control Imax", "%d", joint->motor->force_control_imax);
-          d.addf("Force control Deadband", "%d", joint->motor->force_control_deadband);
+          d.addf("Force control F", "%d", state->force_control_f_);
+          d.addf("Force control P", "%d", state->force_control_p_);
+          d.addf("Force control I", "%d", state->force_control_i_);
+          d.addf("Force control D", "%d", state->force_control_d_);
+          d.addf("Force control Imax", "%d", state->force_control_imax_);
+          d.addf("Force control Deadband", "%d", state->force_control_deadband_);
 
-          if( joint->motor->force_control_sign == 0 )
+          if( state->force_control_sign_ == 0 )
             d.addf("Force control Sign", "+");
           else
             d.addf("Force control Sign", "-");
@@ -945,14 +945,14 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Commanded Effort", "%f", state->last_commanded_effort_);
           d.addf("Encoder Position", "%f", state->position_);
 
-          if(joint->motor->firmware_modified )
-            d.addf("Firmware svn revision (server / pic / modified)", "%d / %d / True", joint->motor->server_firmware_svn_revision,
-                   joint->motor->pic_firmware_svn_revision );
+          if(state->firmware_modified_ )
+            d.addf("Firmware svn revision (server / pic / modified)", "%d / %d / True", state->server_firmware_svn_revision_,
+                   state->pic_firmware_svn_revision_ );
           else
-            d.addf("Firmware svn revision (server / pic / modified)", "%d / %d / False", joint->motor->server_firmware_svn_revision,
-                   joint->motor->pic_firmware_svn_revision );
+            d.addf("Firmware svn revision (server / pic / modified)", "%d / %d / False", state->server_firmware_svn_revision_,
+                   state->pic_firmware_svn_revision_ );
 
-          d.addf("Tests", "%d", joint->motor->tests);
+          d.addf("Tests", "%d", state->tests_);
         }
       }
       else

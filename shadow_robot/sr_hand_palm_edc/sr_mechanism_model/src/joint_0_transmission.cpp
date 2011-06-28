@@ -33,6 +33,8 @@
 #include "pr2_mechanism_model/robot.h"
 #include "pr2_mechanism_model/simple_transmission.h"
 
+#include <sr_robot_lib/sr_actuator.hpp>
+
 using namespace pr2_hardware_interface;
 
 PLUGINLIB_DECLARE_CLASS(sr_mechanism_model, J0Transmission,
@@ -117,16 +119,22 @@ namespace sr_mechanism_model
   }
 
   void J0Transmission::propagatePosition(
-    std::vector<Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
+    std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
     assert(as.size() == 1);
     assert(js.size() == 2);
 
 
-    //ROS_ERROR_STREAM( "READING pos " << as[0]->state_.position_ );// = js[0]->position_ + js[1]->position_;
+    //TODO: why do we get 4 values instead of 2?
+    if(  static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_.size() > 2 )
+    {
+      ROS_DEBUG_STREAM( "READING pos " << as[0]->state_.position_
+                        << " J1 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0]
+                        << " J2 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1] );
 
-    js[0]->position_ = (as[0]->state_.position_ / mechanical_reduction_) + js[0]->reference_position_;
-    js[1]->position_ = (as[0]->state_.position_ / mechanical_reduction_) + js[1]->reference_position_;
+      js[0]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0];
+      js[1]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1];
+    }
 
     js[0]->velocity_ = as[0]->state_.velocity_ / mechanical_reduction_;
     js[1]->velocity_ = as[0]->state_.velocity_ / mechanical_reduction_;
@@ -136,7 +144,7 @@ namespace sr_mechanism_model
   }
 
   void J0Transmission::propagatePositionBackwards(
-    std::vector<pr2_mechanism_model::JointState*>& js, std::vector<Actuator*>& as)
+    std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
   {
     ROS_ERROR("propagate pos backward");
 
@@ -174,7 +182,7 @@ namespace sr_mechanism_model
   }
 
   void J0Transmission::propagateEffort(
-    std::vector<pr2_mechanism_model::JointState*>& js, std::vector<Actuator*>& as)
+    std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
   {
     assert(as.size() == 1);
     assert(js.size() == 2);
@@ -183,7 +191,7 @@ namespace sr_mechanism_model
   }
 
   void J0Transmission::propagateEffortBackwards(
-    std::vector<Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
+    std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
     ROS_ERROR("propagate effort backward");
 

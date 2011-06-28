@@ -48,7 +48,7 @@ namespace shadow_robot
     std::vector<std::string> joint_names_tmp;
     std::vector<int> motor_ids = read_joint_to_motor_mapping();
     std::vector<shadow_joints::JointToSensor > joints_to_sensors;
-    std::vector<pr2_hardware_interface::Actuator*> actuators;
+    std::vector<sr_actuator::SrActuator*> actuators;
 
     ROS_ASSERT(motor_ids.size() == JOINTS_NUM_0220);
     ROS_ASSERT(joint_to_sensor_vect.size() == JOINTS_NUM_0220);
@@ -60,7 +60,7 @@ namespace shadow_robot
       joints_to_sensors.push_back(tmp_jts);
 
       //initializing the actuators.
-      pr2_hardware_interface::Actuator* actuator = new pr2_hardware_interface::Actuator(joint_names[i]);
+      sr_actuator::SrActuator* actuator = new sr_actuator::SrActuator(joint_names[i]);
       ROS_INFO_STREAM("adding actuator: "<<joint_names[i]);
       actuators.push_back( actuator );
 
@@ -91,7 +91,7 @@ namespace shadow_robot
   void SrHandLib::initialize(std::vector<std::string> joint_names,
                              std::vector<int> motor_ids,
                              std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-                             std::vector<pr2_hardware_interface::Actuator*> actuators)
+                             std::vector<sr_actuator::SrActuator*> actuators)
   {
     for(unsigned int index = 0; index < joint_names.size(); ++index)
     {

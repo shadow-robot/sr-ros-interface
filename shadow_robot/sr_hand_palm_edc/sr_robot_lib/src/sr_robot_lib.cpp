@@ -171,6 +171,9 @@ namespace shadow_robot
 
   void SrRobotLib::calibrate_joint(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp)
   {
+    actuator->state_.raw_sensor_values_.clear();
+    actuator->state_.calibrated_sensor_values_.clear();
+
     if(joint_tmp->joint_to_sensor.calibrate_after_combining_sensors)
     {
       //first we combine the different sensors and then we
@@ -182,8 +185,7 @@ namespace shadow_robot
       BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_tmp->joint_to_sensor.joint_to_sensor_vector)
         raw_position += static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id])*joint_to_sensor.coeff;
 
-      //That's not an encoder position, just the raw value
-      actuator->state_.encoder_count_ = static_cast<int>(raw_position);
+      actuator->state_.raw_sensor_values_.push_back( static_cast<int>(raw_position) );
 
       //and now we calibrate
       calibration_tmp = calibration_map.find(joint_tmp->joint_name);
@@ -208,10 +210,17 @@ namespace shadow_robot
 
         //get the raw position
         double raw_pos = static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id]);
+        //push the new raw values
+        actuator->state_.calibrated_sensor_values_.push_back( static_cast<int>(raw_pos) );
 
         //calibrate and then combine
         calibration_tmp = calibration_map.find(sensor_name);
-        calibrated_position += calibration_tmp->compute(raw_pos) * joint_to_sensor.coeff;
+        double tmp_cal_value = calibration_tmp->compute(raw_pos);
+
+        //push the new calibrated values.
+        actuator->state_.calibrated_sensor_values_.push_back( tmp_cal_value );
+
+        calibrated_position += tmp_cal_value * joint_to_sensor.coeff;
 
         ROS_DEBUG_STREAM("      -> "<< sensor_name<< " raw = " << raw_pos
                          << " calibrated = " << calibrated_position);
@@ -266,7 +275,7 @@ namespace shadow_robot
           debug_publishers[0].publish(msg_debug);
         }
 
-        joint_tmp->motor->strain_gauge_left =  status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.strain_gauge_left_ =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_SGR:
 	if(motor_index_full == 9)
@@ -275,13 +284,13 @@ namespace shadow_robot
           debug_publishers[1].publish(msg_debug);
         }
 
-        joint_tmp->motor->strain_gauge_right =  status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.strain_gauge_right_ =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_PWM:
         actuator->state_.last_executed_effort_ =  static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_FLAGS:
-        joint_tmp->motor->flags = humanize_flags(status_data->motor_data_packet[index_motor_in_msg].misc);
+        actuator->state_.flags_ = humanize_flags(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_CURRENT:
         //we're receiving the current in milli amps
@@ -291,39 +300,39 @@ namespace shadow_robot
         actuator->state_.motor_voltage_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc ) / 256.0;
         break;
       case MOTOR_DATA_TEMPERATURE:
-        joint_tmp->motor->temperature = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc) / 256.0;
+        actuator->state_.temperature_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc) / 256.0;
         break;
       case MOTOR_DATA_CAN_NUM_RECEIVED:
-        joint_tmp->motor->can_msgs_received = status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.can_msgs_received_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_CAN_NUM_TRANSMITTED:
-        joint_tmp->motor->can_msgs_transmitted = status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.can_msgs_transmitted_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_SVN_REVISION:
-        joint_tmp->motor->server_firmware_svn_revision = status_data->motor_data_packet[index_motor_in_msg].torque;
+        actuator->state_.server_firmware_svn_revision_ = status_data->motor_data_packet[index_motor_in_msg].torque;
         //the bit 15 tells us if the firmware version on the motor is a modified version of the svn.
-        joint_tmp->motor->firmware_modified = ( (status_data->motor_data_packet[index_motor_in_msg].misc & 0x8000) != 0 );
+        actuator->state_.firmware_modified_ = ( (status_data->motor_data_packet[index_motor_in_msg].misc & 0x8000) != 0 );
         // the other 14 bits are the svn revision currently programmed on the pic
-        joint_tmp->motor->pic_firmware_svn_revision = ( status_data->motor_data_packet[index_motor_in_msg].misc & 0x7FFF );
+        actuator->state_.pic_firmware_svn_revision_ = ( status_data->motor_data_packet[index_motor_in_msg].misc & 0x7FFF );
         break;
       case MOTOR_DATA_CAN_ERROR_COUNTERS:
-        joint_tmp->motor->tests = status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.tests_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_F_P:
-        joint_tmp->motor->force_control_f = status_data->motor_data_packet[index_motor_in_msg].torque;
-        joint_tmp->motor->force_control_p = status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.force_control_f_ = status_data->motor_data_packet[index_motor_in_msg].torque;
+        actuator->state_.force_control_p_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_I_D:
-        joint_tmp->motor->force_control_i = status_data->motor_data_packet[index_motor_in_msg].torque;
-        joint_tmp->motor->force_control_d = status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.force_control_i_ = status_data->motor_data_packet[index_motor_in_msg].torque;
+        actuator->state_.force_control_d_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_IMAX_DEADBAND_SIGN:
-        joint_tmp->motor->force_control_imax = status_data->motor_data_packet[index_motor_in_msg].torque;
+        actuator->state_.force_control_imax_ = status_data->motor_data_packet[index_motor_in_msg].torque;
 
         tmp_value.word = status_data->motor_data_packet[index_motor_in_msg].misc;
-        joint_tmp->motor->force_control_deadband = static_cast<int>(tmp_value.byte[0]);
+        actuator->state_.force_control_deadband_ = static_cast<int>(tmp_value.byte[0]);
         //how do I read the sign?
-        joint_tmp->motor->force_control_sign = static_cast<int>(tmp_value.byte[1]);
+        actuator->state_.force_control_sign_ = static_cast<int>(tmp_value.byte[1]);
         break;
       default:
         break;

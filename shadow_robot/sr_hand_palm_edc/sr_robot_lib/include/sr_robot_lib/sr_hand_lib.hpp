@@ -62,7 +62,7 @@ namespace shadow_robot
   protected:
     virtual void initialize(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                             std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-                            std::vector<pr2_hardware_interface::Actuator*> actuators);
+                            std::vector<sr_actuator::SrActuator*> actuators);
 
   private:
     ros::NodeHandle nodehandle_;

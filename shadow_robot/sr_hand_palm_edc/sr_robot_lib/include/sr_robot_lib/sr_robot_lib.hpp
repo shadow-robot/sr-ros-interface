@@ -37,7 +37,7 @@
 
 #include <sr_utilities/thread_safe_map.hpp>
 
-#include <pr2_hardware_interface/hardware_interface.h>
+#include <sr_robot_lib/sr_actuator.hpp>
 
 #include <sr_robot_msgs/ForceController.h>
 
@@ -79,13 +79,8 @@ namespace shadow_joints
   {
   public:
     Motor() :
-      motor_id(0), msg_motor_id(0), actuator(NULL), strain_gauge_left(0),
-      strain_gauge_right(0), temperature(0.), can_msgs_received(0),
-      can_msgs_transmitted(0), pic_firmware_svn_revision(0),
-      server_firmware_svn_revision(0), firmware_modified(0), tests(0),
-      force_control_f(0), force_control_p(0), force_control_i(0),
-      force_control_d(0), force_control_imax(0), force_control_deadband(0),
-      force_control_sign(0), motor_ok(false), bad_data(false)
+      motor_id(0), msg_motor_id(0), actuator(NULL), motor_ok(false),
+      bad_data(false)
     {};
 
     ~Motor(){};
@@ -98,39 +93,7 @@ namespace shadow_joints
     int msg_motor_id;
 
     //actuator
-    pr2_hardware_interface::Actuator* actuator;
-
-    //Data we can read from the motor
-    int strain_gauge_left;
-    int strain_gauge_right;
-
-    /**
-     * a vector containing human readable flags:
-     *  each flag is a pair containing the flag name
-     *  and a boolean which is true if the flag is
-     *  really serious, false if it's just a warning
-     *  flag.
-     */
-    std::vector<std::pair<std::string, bool> > flags;
-
-    double temperature;
-
-    int can_msgs_received;
-    int can_msgs_transmitted;
-
-    int pic_firmware_svn_revision;
-    int server_firmware_svn_revision;
-    bool firmware_modified;
-
-    int tests;
-
-    int force_control_f;
-    int force_control_p;
-    int force_control_i;
-    int force_control_d;
-    int force_control_imax;
-    int force_control_deadband;
-    int force_control_sign;
+    sr_actuator::SrActuator* actuator;
 
     /**
      * this boolean is set to true as long as we receive the
@@ -215,7 +178,7 @@ namespace shadow_robot
      */
     virtual void initialize(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                             std::vector<shadow_joints::JointToSensor> joint_to_sensors,
-                            std::vector<pr2_hardware_interface::Actuator*> actuators) = 0;
+                            std::vector<sr_actuator::SrActuator*> actuators) = 0;
 
     /**
      * Compute the calibrated position for the given joint. This method is called
@@ -268,7 +231,7 @@ namespace shadow_robot
     int config_index;
 
     /// The current actuator.
-    pr2_hardware_interface::Actuator* actuator;
+    sr_actuator::SrActuator* actuator;
     /// The latest etherCAT message received.
     ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data;
     /// A temporary calibration for a given joint.
