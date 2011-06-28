@@ -135,13 +135,12 @@ shadow_robot/cyberglove/bin/test/test_calibration
 test_serial
 shadow_robot/cyberglove/tmp
 shadow_robot/sr_utilities/bin/test/test_thread_safe_map
-￼
 shadow_robot/sr_utilities/bin/test/test_math_utils
-￼
 shadow_robot/sr_hand_palm_edc/sr_external_dependencies/include/sr_external_dependencies/external
-￼
 shadow_robot/sr_hand_palm_edc/sr_robot_lib/bin/test/test_robot_lib
-￼
 shadow_robot/sr_hand_palm_edc/sr_robot_lib/bin/test/motor_updater_test
-￼
+shadow_robot/doc/index.html
+shadow_robot/doc/licenses.html
+shadow_robot/doc/sr_edc_ethercat_drivers
+shadow_robot/doc/styles.css
 shadow_robot/sr_hand_palm_edc/sr_external_dependencies/compiled_firmware/released_firmware
