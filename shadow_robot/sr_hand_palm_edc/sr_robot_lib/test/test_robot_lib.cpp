@@ -33,7 +33,7 @@ class HandLibTest
 public:
   pr2_hardware_interface::HardwareInterface *hw;
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
-  pr2_hardware_interface::Actuator* actuator;
+  sr_actuator::SrActuator* actuator;
 
   HandLibTest()
   {
@@ -48,9 +48,9 @@ public:
 
   void check_hw_actuator(std::string name, int motor_id, int id_in_enum, double expected_pos)
   {
-    pr2_hardware_interface::ActuatorState state;
+    sr_actuator::SrActuatorState state;
 
-    actuator = hw->getActuator(name);
+    actuator = static_cast<sr_actuator::SrActuator*>(hw->getActuator(name));
     state = (actuator->state_);
 
     EXPECT_EQ(state.device_id_ , motor_id);

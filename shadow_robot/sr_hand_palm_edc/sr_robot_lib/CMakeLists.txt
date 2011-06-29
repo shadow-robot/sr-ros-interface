@@ -27,17 +27,25 @@ rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/calibration.cpp src/sr_
 #     TESTS
 rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/calibration.cpp)
 
-add_library(gcov STATIC IMPORTED)
-set_property(TARGET gcov PROPERTY IMPORTED_LOCATION /usr/lib/gcc/i486-linux-gnu/4.4/libgcov.a)
+SET(jenkins $ENV{JENKINS})
+
+IF(DEFINED jenkins)
+  add_library(gcov STATIC IMPORTED)
+  set_property(TARGET gcov PROPERTY IMPORTED_LOCATION /usr/lib/gcc/i486-linux-gnu/4.4/libgcov.a)
+ENDIF(DEFINED jenkins)
 
 rosbuild_add_executable(test/test_robot_lib test/test_robot_lib.cpp src/sr_robot_lib.cpp src/sr_hand_lib.cpp src/calibration.cpp src/motor_updater.cpp)
-rosbuild_add_compile_flags(test/test_robot_lib -g -pg -fprofile-arcs -ftest-coverage)
+IF(DEFINED jenkins)
+  rosbuild_add_compile_flags(test/test_robot_lib -g -pg -fprofile-arcs -ftest-coverage)
+  target_link_libraries(test/test_robot_lib gcov)
+ENDIF(DEFINED jenkins)
 rosbuild_add_gtest_build_flags(test/test_robot_lib)
-target_link_libraries(test/test_robot_lib gcov)
 rosbuild_add_rostest(launch/sr_hand_lib.test)
 
 rosbuild_add_executable(test/motor_updater_test test/motor_updater_test.cpp src/motor_updater.cpp)
 rosbuild_add_gtest_build_flags(test/motor_updater_test)
-rosbuild_add_compile_flags(test/motor_updater_test -g -pg -fprofile-arcs -ftest-coverage)
-target_link_libraries(test/motor_updater_test gcov)
+IF(DEFINED jenkins)
+  rosbuild_add_compile_flags(test/motor_updater_test -g -pg -fprofile-arcs -ftest-coverage)
+  target_link_libraries(test/motor_updater_test gcov)
+ENDIF(DEFINED jenkins)
 rosbuild_add_rostest(test/motor_updater.test)
