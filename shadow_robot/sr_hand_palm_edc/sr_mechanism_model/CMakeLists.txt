@@ -16,4 +16,4 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-rosbuild_add_library( sr_mechanism_model src/joint_0_transmission.cpp )
+rosbuild_add_library( sr_mechanism_model src/joint_0_transmission.cpp src/simple_transmission.cpp)

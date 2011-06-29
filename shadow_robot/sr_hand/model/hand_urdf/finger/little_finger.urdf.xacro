@@ -5,12 +5,12 @@
   <include filename="$(find sr_hand)/model/hand_urdf/finger/middle/middle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/distal/distal.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/lfmetacarpal/lfmetacarpal.urdf.xacro" />
-  
+
   <xacro:macro name="little_finger" params="link_prefix joint_prefix parent">
-  
+
     <xacro:lfmetacarpal parent="${parent}" >
     </xacro:lfmetacarpal>
-    
+
     <link name="lfknuckle">
       <inertial>
 	<origin xyz="0 0 0.06579" rpy="0 0 0" />
@@ -35,7 +35,7 @@
     <gazebo reference="lfknuckle">
       <material>PR2/Grey2</material>
     </gazebo>
-    
+
     <joint name="LFJ4" type="revolute">
       <parent link="lfmetacarpal"/>
       <child link="lfknuckle"/>
@@ -46,23 +46,23 @@
       <dynamics damping="50.5"/>
     </joint>
 
-    <transmission type="pr2_mechanism_model/SimpleTransmission" name="lfknuckle_transmission">
+    <transmission type="sr_mechanism_model/SimpleTransmission" name="lfknuckle_transmission">
       <actuator name="LFJ4" />
       <joint name="LFJ4" />
       <mechanicalReduction>1</mechanicalReduction>
       <motorTorqueConstant>1</motorTorqueConstant>
       <pulsesPerRevolution>90000</pulsesPerRevolution>
     </transmission>
-    
+
     <xacro:proximal link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${link_prefix}knuckle" >
     </xacro:proximal>
-    
+
     <xacro:middle link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${link_prefix}proximal" >
     </xacro:middle>
-    
+
     <xacro:distal link_prefix="${link_prefix}" joint_prefix="${joint_prefix}" parent="${link_prefix}middle" >
     </xacro:distal>
-    
+
   </xacro:macro>
-  
+
 </robot>

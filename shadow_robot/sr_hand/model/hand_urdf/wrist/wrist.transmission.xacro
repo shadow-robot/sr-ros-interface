@@ -5,15 +5,15 @@
        xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:macro name="shadowhand_wrist_transmission">
-  
-    <transmission type="pr2_mechanism_model/SimpleTransmission" name="wrist_transmission">
+
+    <transmission type="sr_mechanism_model/SimpleTransmission" name="wrist_transmission">
       <actuator name="WRJ2" />
       <joint name="WRJ2" />
       <mechanicalReduction>1</mechanicalReduction>
       <motorTorqueConstant>1</motorTorqueConstant>
       <pulsesPerRevolution>90000</pulsesPerRevolution>
     </transmission>
-    
+
   </xacro:macro>
 
 </robot>
