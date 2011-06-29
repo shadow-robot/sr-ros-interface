@@ -183,9 +183,11 @@ namespace shadow_robot
       //when combining the values, we use the coefficient imported
       // from the sensor_to_joint.yaml file (in sr_edc_launch/config)
       BOOST_FOREACH(shadow_joints::PartialJointToSensor joint_to_sensor, joint_tmp->joint_to_sensor.joint_to_sensor_vector)
-        raw_position += static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id])*joint_to_sensor.coeff;
-
-      actuator->state_.raw_sensor_values_.push_back( static_cast<int>(raw_position) );
+      {
+        int tmp_raw = status_data->sensors[joint_to_sensor.sensor_id];
+        actuator->state_.raw_sensor_values_.push_back( tmp_raw );
+        raw_position += static_cast<double>(tmp_raw)*joint_to_sensor.coeff;
+      }
 
       //and now we calibrate
       calibration_tmp = calibration_map.find(joint_tmp->joint_name);
@@ -209,13 +211,13 @@ namespace shadow_robot
         sensor_name = joint_tmp->joint_to_sensor.sensor_names[index_joint_to_sensor];
 
         //get the raw position
-        double raw_pos = static_cast<double>(status_data->sensors[joint_to_sensor.sensor_id]);
+        int raw_pos = status_data->sensors[joint_to_sensor.sensor_id];
         //push the new raw values
-        actuator->state_.calibrated_sensor_values_.push_back( static_cast<int>(raw_pos) );
+        actuator->state_.raw_sensor_values_.push_back( raw_pos );
 
         //calibrate and then combine
         calibration_tmp = calibration_map.find(sensor_name);
-        double tmp_cal_value = calibration_tmp->compute(raw_pos);
+        double tmp_cal_value = calibration_tmp->compute( static_cast<double>( raw_pos) );
 
         //push the new calibrated values.
         actuator->state_.calibrated_sensor_values_.push_back( tmp_cal_value );

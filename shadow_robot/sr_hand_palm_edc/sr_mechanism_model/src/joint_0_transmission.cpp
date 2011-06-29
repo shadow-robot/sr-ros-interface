@@ -124,22 +124,26 @@ namespace sr_mechanism_model
     assert(as.size() == 1);
     assert(js.size() == 2);
 
-    //TODO: why do we get 4 values instead of 2?
-    if(  static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_.size() > 2 )
+    //the size is either 0 (when the joint hasn't been updated yet), either 2
+    // (joint 0 is composed of the 2 calibrated values: joint 1 and joint 2)
+    int size = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_.size();
+    if( size != 0)
     {
+      assert( size == 2 );
+
       ROS_DEBUG_STREAM( "READING pos " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_
                         << " J1 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0]
                         << " J2 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1] );
 
       js[0]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0];
       js[1]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1];
+
+      js[0]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
+      js[1]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
+
+      js[0]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
+      js[1]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
     }
-
-    js[0]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
-    js[1]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
-
-    js[0]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
-    js[1]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
   }
 
   void J0Transmission::propagatePositionBackwards(
