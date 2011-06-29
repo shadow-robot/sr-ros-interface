@@ -127,10 +127,16 @@ namespace shadow_robot
       //TODO: change back to torque
       command->to_motor_data_type   = MOTOR_DEMAND_PWM;
 
-      //loop on either even or odd motors
-      int motor_index = 0;
-      for(unsigned int i = 0; i < NUM_MOTORS; ++i)
-        command->motor_data[i] = joints_vector[motor_index].motor->actuator->command_.effort_;
+      //loop on all the joints and update their motor: we're sending commands to all the motors.
+      boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = joints_vector.begin();
+      for(;joint_tmp != joints_vector.end(); ++joint_tmp)
+      {
+        if(joint_tmp->has_motor)
+        {
+          command->motor_data[joint_tmp->motor->motor_id] = joint_tmp->motor->actuator->command_.effort_;
+          joint_tmp->motor->actuator->state_.last_commanded_effort_ = joint_tmp->motor->actuator->command_.effort_;
+        }
+      }
     } //endif reconfig_queue.empty()
     else
     {
