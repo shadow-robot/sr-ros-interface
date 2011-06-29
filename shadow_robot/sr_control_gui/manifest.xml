@@ -8,6 +8,7 @@
   <url>http://www.shadowrobot.com</url>
   <depend package="rospy"/>
   <depend package="sr_hand"/>
+  <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="cyberglove"/>
   <rosdep name="python-scipy"/>

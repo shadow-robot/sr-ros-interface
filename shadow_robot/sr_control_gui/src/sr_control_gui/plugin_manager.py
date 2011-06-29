@@ -154,7 +154,7 @@ class PluginManager(object):
                 plugin_tmp.description = description
                 plugin_tmp.category = category
             except:
-                print "[", plugin_name, "]: not imported."
+                print "[", plugin_name, "]: not imported: ", sys.exc_info()[0]
 
         else:
             print "[",plugin_name ,"]", "The Module name was not defined in the config file. Aborting."

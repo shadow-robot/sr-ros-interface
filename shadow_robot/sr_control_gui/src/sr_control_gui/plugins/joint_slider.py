@@ -22,6 +22,7 @@ import rospy
 from PyQt4 import QtCore, QtGui, Qt
 
 from shadow_generic_plugin import ShadowGenericPlugin
+from generic_plugin import GenericPlugin
 
 import math
 
@@ -93,8 +94,11 @@ class ExtendedSlider(QtGui.QWidget):
         self.plugin_parent.sendupdate(joint_dict)
 
     def update(self):
-        self.current_value = round(self.plugin_parent.parent.parent.libraries["sr_library"].valueof(self.name),1)
-        self.position.setText("Pos: " + str(self.current_value))
+        try:
+            self.current_value = round(self.plugin_parent.parent.parent.libraries["sr_library"].valueof(self.name),1)
+            self.position.setText("Pos: " + str(self.current_value))
+        except:
+            pass
 
     def checkbox_click(self, value):
         self.is_selected = value
@@ -158,6 +162,45 @@ class JointSlider(ShadowGenericPlugin):
 
     def activate(self):
         ShadowGenericPlugin.activate(self)
+        for slider in self.sliders:
+            slider.timer.start(200)
+
+
+
+class LightJointSlider(GenericPlugin):
+    """
+    A generic class used to easily create new joint slider plugins, for the user
+    to move the joints using sliders.
+    """
+    name = "Joint Slider"
+
+    def __init__(self, joints_list):
+        GenericPlugin.__init__(self)
+
+        self.layout = QtGui.QHBoxLayout()
+        self.layout.setAlignment(QtCore.Qt.AlignCenter)
+        self.frame = QtGui.QFrame()
+
+        #Add the sliders
+        self.sliders = []
+        for joint in joints_list:
+            slider = ExtendedSlider(joint, self)
+            self.layout.addWidget(slider)
+            self.sliders.append(slider)
+
+        #Add a slider to control all the selected sliders
+        selected_joints = Joint("Move Selected Joints", -100, 100)
+        self.super_slider = ExtendedSuperSlider(selected_joints, self)
+        self.layout.addWidget(self.super_slider)
+
+        self.frame.setLayout(self.layout)
+        self.window.setWidget(self.frame)
+
+    def sendupdate(self, dict):
+        rospy.logerr("Virtual method, please implement.")
+
+    def activate(self):
+        GenericPlugin.activate(self)
         for slider in self.sliders:
             slider.timer.start(200)
 
