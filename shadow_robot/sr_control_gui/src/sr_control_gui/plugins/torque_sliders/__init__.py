@@ -33,31 +33,31 @@ class TorqueJointSlider(LightJointSlider):
     name = "Torque Sliders"
 
     def __init__(self):
-        joints_tmp = [ ["FFJ0", "/sh_ffj0_position_controller/command"] ,
-                       ["FFJ3", "/sh_ffj3_position_controller/command"] ,
-                       ["FFJ4", "/sh_ffj4_position_controller/command"] ,
+        joints_tmp = [ ["FFJ0", "/sh_ffj0_effort_controller/command"] ,
+                       ["FFJ3", "/sh_ffj3_effort_controller/command"] ,
+                       ["FFJ4", "/sh_ffj4_effort_controller/command"] ,
 
-                       ["MFJ0", "/sh_mfj0_position_controller/command"] ,
-                       ["MFJ3", "/sh_mfj3_position_controller/command"] ,
-                       ["MFJ4", "/sh_mfj4_position_controller/command"] ,
+                       ["MFJ0", "/sh_mfj0_effort_controller/command"] ,
+                       ["MFJ3", "/sh_mfj3_effort_controller/command"] ,
+                       ["MFJ4", "/sh_mfj4_effort_controller/command"] ,
 
-                       ["RFJ0", "/sh_rfj0_position_controller/command"] ,
-                       ["RFJ3", "/sh_rfj3_position_controller/command"] ,
-                       ["RFJ4", "/sh_rfj4_position_controller/command"] ,
+                       ["RFJ0", "/sh_rfj0_effort_controller/command"] ,
+                       ["RFJ3", "/sh_rfj3_effort_controller/command"] ,
+                       ["RFJ4", "/sh_rfj4_effort_controller/command"] ,
 
-                       ["LFJ0", "/sh_lfj0_position_controller/command"] ,
-                       ["LFJ3", "/sh_lfj3_position_controller/command"] ,
-                       ["LFJ4", "/sh_lfj4_position_controller/command"] ,
-                       ["LFJ5", "/sh_lfj5_position_controller/command"] ,
+                       ["LFJ0", "/sh_lfj0_effort_controller/command"] ,
+                       ["LFJ3", "/sh_lfj3_effort_controller/command"] ,
+                       ["LFJ4", "/sh_lfj4_effort_controller/command"] ,
+                       ["LFJ5", "/sh_lfj5_effort_controller/command"] ,
 
-                       ["THJ1", "/sh_thj1_position_controller/command"] ,
-                       ["THJ2", "/sh_thj2_position_controller/command"] ,
-                       ["THJ3", "/sh_thj3_position_controller/command"] ,
-                       ["THJ4", "/sh_thj4_position_controller/command"] ,
-                       ["THJ5", "/sh_thj5_position_controller/command"] ,
+                       ["THJ1", "/sh_thj1_effort_controller/command"] ,
+                       ["THJ2", "/sh_thj2_effort_controller/command"] ,
+                       ["THJ3", "/sh_thj3_effort_controller/command"] ,
+                       ["THJ4", "/sh_thj4_effort_controller/command"] ,
+                       ["THJ5", "/sh_thj5_effort_controller/command"] ,
 
-                       ["WRJ1", "/sh_wrj1_position_controller/command"] ,
-                       ["WRJ2", "/sh_wrj2_position_controller/command"]   ]
+                       ["WRJ1", "/sh_wrj1_effort_controller/command"] ,
+                       ["WRJ2", "/sh_wrj2_effort_controller/command"]   ]
 
         joints_list = []
         self.publishers = {}
