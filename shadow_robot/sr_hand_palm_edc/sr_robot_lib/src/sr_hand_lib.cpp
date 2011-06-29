@@ -34,6 +34,21 @@
 
 namespace shadow_robot
 {
+  const int SrHandLib::nb_motor_data = 13;
+  const char* SrHandLib::human_readable_motor_data_types[nb_motor_data] = {"sgl", "sgr", "pwm", "flags", "current",
+                                                                           "voltage", "temperature", "can_num_received",
+                                                                           "can_num_transmitted", "svn_revision",
+                                                                           "f_p", "i_d", "imax_deadband_sign"};
+
+  const FROM_MOTOR_DATA_TYPE SrHandLib::motor_data_types[nb_motor_data] = {MOTOR_DATA_SGL, MOTOR_DATA_SGR,
+                                                                           MOTOR_DATA_PWM, MOTOR_DATA_FLAGS,
+                                                                           MOTOR_DATA_CURRENT, MOTOR_DATA_VOLTAGE,
+                                                                           MOTOR_DATA_TEMPERATURE, MOTOR_DATA_CAN_NUM_RECEIVED,
+                                                                           MOTOR_DATA_CAN_NUM_TRANSMITTED, MOTOR_DATA_SVN_REVISION,
+                                                                           MOTOR_DATA_F_P, MOTOR_DATA_I_D,
+                                                                           MOTOR_DATA_IMAX_DEADBAND_SIGN};
+
+
   SrHandLib::SrHandLib(pr2_hardware_interface::HardwareInterface *hw) :
     SrRobotLib(hw)
   {
@@ -72,6 +87,8 @@ namespace shadow_robot
         }
       }
     }
+
+    debug_service = nh_tilde.advertiseService( "set_debug_publishers", &SrHandLib::set_debug_data_to_publish, this);
 
     initialize(joint_names_tmp, motor_ids, joint_to_sensor_vect, actuators);
 
@@ -259,29 +276,15 @@ namespace shadow_robot
   std::vector<motor_updater::UpdateConfig> SrHandLib::read_update_rate_configs()
   {
     std::vector<motor_updater::UpdateConfig> update_rate_configs_vector;
-    std::string base_topic = "motor_data_update_rate/";
+    std::string base_param = "motor_data_update_rate/";
     typedef std::pair<std::string, FROM_MOTOR_DATA_TYPE> ConfPair;
     std::vector<ConfPair> config;
 
-    static const int nb_motor_data = 13;
-    static const char* topics[nb_motor_data] = {"sgl", "sgr", "pwm", "flags", "current",
-                                                "voltage", "temperature", "can_num_received",
-                                                "can_num_transmitted", "svn_revision",
-                                                "f_p", "i_d", "imax_deadband_sign"};
-
-    static const FROM_MOTOR_DATA_TYPE data_types[nb_motor_data] = {MOTOR_DATA_SGL, MOTOR_DATA_SGR,
-                                                                   MOTOR_DATA_PWM, MOTOR_DATA_FLAGS,
-                                                                   MOTOR_DATA_CURRENT, MOTOR_DATA_VOLTAGE,
-                                                                   MOTOR_DATA_TEMPERATURE, MOTOR_DATA_CAN_NUM_RECEIVED,
-                                                                   MOTOR_DATA_CAN_NUM_TRANSMITTED, MOTOR_DATA_SVN_REVISION,
-                                                                   MOTOR_DATA_F_P, MOTOR_DATA_I_D,
-                                                                   MOTOR_DATA_IMAX_DEADBAND_SIGN};
-
-    for(unsigned int i=0; i<nb_motor_data; ++i)
+    for(int i=0; i<nb_motor_data; ++i)
     {
       ConfPair tmp;
-      tmp.first = base_topic + topics[i];
-      tmp.second = data_types[i];
+      tmp.first = base_param + human_readable_motor_data_types[i];
+      tmp.second = motor_data_types[i];
       config.push_back(tmp);
     }
 
@@ -298,6 +301,47 @@ namespace shadow_robot
 
     return update_rate_configs_vector;
   }
+
+  bool SrHandLib::set_debug_data_to_publish(sr_robot_msgs::SetDebugData::Request& request,
+                                            sr_robot_msgs::SetDebugData::Response& response)
+  {
+    //check if the publisher_index is correct
+    if( request.publisher_index < nb_debug_publishers_const )
+    {
+      if( request.motor_index > NUM_MOTORS )
+      {
+        response.success = false;
+        return false;
+      }
+      if( (request.motor_data_type < MOTOR_DATA_SGL) ||
+          (request.motor_data_type > MOTOR_DATA_IMAX_DEADBAND_SIGN) )
+      {
+        response.success = false;
+        return false;
+      }
+
+      if(!debug_mutex.timed_lock(boost::posix_time::microseconds(debug_mutex_lock_wait_time)))
+      {
+        response.success = false;
+        return false;
+      }
+
+      debug_motor_indexes_and_data[request.publisher_index] = boost::shared_ptr<std::pair<int, int> >(new std::pair<int, int>());
+
+      debug_motor_indexes_and_data[request.publisher_index]->first = request.motor_index;
+      debug_motor_indexes_and_data[request.publisher_index]->second = request.motor_data_type;
+      debug_mutex.unlock();
+    }
+    else
+    {
+      response.success = false;
+      return false;
+    }
+
+    response.success = true;
+    return true;
+  }
+
 }
 
 /* For the emacs weenies in the crowd.

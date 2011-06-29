@@ -57,6 +57,17 @@ namespace shadow_robot
                             sr_robot_msgs::ForceController::Response& response,
                             int motor_index);
 
+    /**
+     * This is a service callback: we set the debug data we want to publish
+     * at full speed in the debug topics.
+     *
+     * @param request Contains the motor index and the MOTOR_DATA type
+     * @param response True if succeedded.
+     *
+     * @return true if succeeded.
+     */
+    bool set_debug_data_to_publish(sr_robot_msgs::SetDebugData::Request& request,
+                                   sr_robot_msgs::SetDebugData::Response& response);
 
 
   protected:
@@ -101,6 +112,13 @@ namespace shadow_robot
      *         at which we want to poll this data
      */
     std::vector<motor_updater::UpdateConfig> read_update_rate_configs();
+
+    static const int nb_motor_data;
+    static const char* human_readable_motor_data_types[];
+    static const FROM_MOTOR_DATA_TYPE motor_data_types[];
+
+    /// a service server for reconfiguring the debug data we want to publish
+    ros::ServiceServer debug_service;
   };
 
 }

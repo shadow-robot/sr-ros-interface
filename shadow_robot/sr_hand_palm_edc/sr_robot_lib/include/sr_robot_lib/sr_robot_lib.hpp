@@ -40,6 +40,7 @@
 #include <sr_robot_lib/sr_actuator.hpp>
 
 #include <sr_robot_msgs/ForceController.h>
+#include <sr_robot_msgs/SetDebugData.h>
 
 #include "sr_robot_lib/calibration.hpp"
 #include "sr_robot_lib/motor_updater.hpp"
@@ -249,8 +250,19 @@ namespace shadow_robot
     /// a ROS nodehandle to be able to advertise the Force PID service
     ros::NodeHandle nh_tilde;
 
-    ///This publishers are useful for debugging
+    ///These publishers are useful for debugging
+    static const int nb_debug_publishers_const;
     std::vector<ros::Publisher> debug_publishers;
+    /**
+     * A vector containing pairs:
+     *  - associate a motor index
+     *  - to a MOTOR_DATA
+     *
+     * This vector has the same size as the debug_publishers vector.
+     */
+    std::vector<boost::shared_ptr<std::pair<int, int> > > debug_motor_indexes_and_data;
+    static const int debug_mutex_lock_wait_time;
+    boost::shared_mutex debug_mutex;
     ros::NodeHandle node_handle;
     std_msgs::Int16 msg_debug;
   };//end class

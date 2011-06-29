@@ -34,11 +34,20 @@
 
 namespace shadow_robot
 {
+  //max of 20 publishers for debug
+  const int SrRobotLib::nb_debug_publishers_const = 20;
+  const int SrRobotLib::debug_mutex_lock_wait_time = 100;
+
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
     : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(MOTOR_CONFIG_FIRST_VALUE), nh_tilde("~")
   {
-    debug_publishers.push_back(node_handle.advertise<std_msgs::Int16>("sr_debug_1",100));
-    debug_publishers.push_back(node_handle.advertise<std_msgs::Int16>("sr_debug_2",100));
+    debug_motor_indexes_and_data.resize(nb_debug_publishers_const);
+    for( int i = 0; i < nb_debug_publishers_const ; ++i )
+    {
+      std::stringstream ss;
+      ss << "srh/debug_" << i;
+      debug_publishers.push_back(node_handle.advertise<std_msgs::Int16>(ss.str().c_str(),100));
+    }
   }
 
 
@@ -151,7 +160,7 @@ namespace shadow_robot
       {
 	//loop on all the motors and send a CRC of 0
         // except for the motor we're reconfiguring
-        for( unsigned int i = 0 ; i < NUM_MOTORS ; ++i )
+        for( int i = 0 ; i < NUM_MOTORS ; ++i )
         {
           if( i != motor_index )
             command->motor_data[i] = 0;
@@ -235,24 +244,6 @@ namespace shadow_robot
 
   void SrRobotLib::read_additional_data(boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp)
   {
-    /*
-      if (motor_index_full & 1)
-      {
-      if (status_data->which_motor_data_arrived == 8)
-      {
-      ROS_ERROR_STREAM ("[*] " << status_data->motor_data_type);
-      }
-      else
-      {
-      ROS_ERROR_STREAM ("[ ] " << status_data->motor_data_type);
-      }
-      ROS_ERROR_STREAM("["<< joint_tmp->joint_name << "] : incoming mask=" << status_data->which_motor_data_arrived
-      << " / bad data mask : " << status_data->which_motor_data_had_errors
-      << " / motor_index: " << motor_index_full << " / "<< index_motor_in_msg);
-      }
-    */
-
-
     //check the masks to see if the CAN messages arrived to the motors
     //the flag should be set to 1 for each motor
     joint_tmp->motor->motor_ok = sr_math_utils::is_bit_mask_index_true(status_data->which_motor_data_arrived, motor_index_full);
@@ -265,27 +256,42 @@ namespace shadow_robot
 
     if(joint_tmp->motor->motor_ok && !(joint_tmp->motor->bad_data) )
     {
-      //TODO: Hugo: how can I get the correct values from the motor???
+      int publisher_index = 0;
+      //publish the debug values for the given motors.
+      // NB: debug_motor_indexes_and_data is smaller
+      //     than debug_publishers.
+      boost::shared_ptr<std::pair<int,int> > debug_pair;
+
+      if( debug_mutex.try_lock() )
+      {
+        BOOST_FOREACH(debug_pair, debug_motor_indexes_and_data)
+        {
+          if( debug_pair != NULL )
+          {
+            //check if we want to publish some data for the current motor
+            if( debug_pair->first == joint_tmp->motor->motor_id )
+            {
+              //check if it's the correct data
+              if( debug_pair->second == status_data->motor_data_type )
+              {
+                msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
+                debug_publishers[publisher_index].publish(msg_debug);
+              }
+            }
+          }
+          publisher_index ++;
+        }
+
+        debug_mutex.unlock();
+      } //end try_lock
 
       //we received the data and it was correct
       switch(status_data->motor_data_type)
       {
       case MOTOR_DATA_SGL:
-	if(motor_index_full == 9)
-        {
-          msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
-          debug_publishers[0].publish(msg_debug);
-        }
-
         actuator->state_.strain_gauge_left_ =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_SGR:
-	if(motor_index_full == 9)
-        {
-          msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
-          debug_publishers[1].publish(msg_debug);
-        }
-
         actuator->state_.strain_gauge_right_ =  status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_PWM:
