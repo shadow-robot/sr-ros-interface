@@ -1,0 +1,9 @@
+[Core]
+Name = torque_sliders
+Module = TorqueJointSlider
+
+[Documentation]
+Author = Ugo Cupcic
+Version = 0.1
+Website = http://www.shadowrobot.com
+Description = Torque Sliders.

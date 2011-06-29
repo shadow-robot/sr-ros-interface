@@ -129,7 +129,8 @@ class MainWidget(QtGui.QWidget):
             dependencies = action_and_plugin[1].depends()
             activate_plugin = True
             if dependencies == None:
-                activate_plugin = False
+                activate_plugin = True
+                no_plugin_available = False
             else:
                 for dependency in dependencies:
                     if self.parent.libraries[dependency].status != "started":
