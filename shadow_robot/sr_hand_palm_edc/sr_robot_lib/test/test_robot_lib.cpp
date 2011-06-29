@@ -121,7 +121,7 @@ TEST(SrRobotLib, UpdateMotor)
       if(joint_tmp->motor->motor_id % 2 == 0)
       {
         EXPECT_EQ(joint_tmp->motor->actuator->state_.last_measured_effort_ , 4.0);//(double)joint_tmp->motor->motor_id/2.0);
-        EXPECT_EQ(joint_tmp->motor->strain_gauge_right, joint_tmp->motor->motor_id);
+        EXPECT_EQ(joint_tmp->motor->actuator->state_.strain_gauge_right_, joint_tmp->motor->motor_id);
       }
     }
   }
