@@ -39,6 +39,9 @@ class GenericGLWidget(QGLWidget):
         self.setMinimumSize(500, 500)
         self.paint_method = paint_method
 
+        self.refresh_timer = QtCore.QTimer()
+        QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.paintGL)
+
     def paintGL(self):
         '''
         Virtual drawing routine: needs to be overloaded
@@ -88,9 +91,10 @@ class OpenGLGenericPlugin(GenericPlugin):
 
     def activate(self):
         GenericPlugin.activate(self)
-
+        self.open_gl_widget.refresh_timer.start( 1000/Config.open_gl_generic_plugin_config.refresh_frequency )
 
     def on_close(self):
+        self.open_gl_widget.refresh_timer.stop()
         GenericPlugin.on_close(self)
 
     def depends(self):

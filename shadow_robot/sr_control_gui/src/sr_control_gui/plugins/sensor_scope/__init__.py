@@ -41,9 +41,8 @@ class SensorScope(OpenGLGenericPlugin):
 
     def paint_method(self):
         '''
-        Drawing routine
+        Drawing routine: this function is called periodically.
         '''
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 

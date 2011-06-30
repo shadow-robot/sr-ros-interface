@@ -16,12 +16,15 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 """
-File containing all the configuration parameters. 
+File containing all the configuration parameters.
 """
+
+class OpenGLGenericPluginConfig(object):
+    refresh_frequency = 20
 
 class GenericPluginConfig(object):
     dependencies = []
-    
+
 class GenericRosNodeConfig(object):
     name = ""
     list_of_nodes = []
@@ -80,10 +83,10 @@ class RobotCodeConfig(object):
     start_cmd = "sudo /etc/init.d/robot start"
     stop_cmd = "sudo /etc/init.d/robot stop"
     status_cmd = "ls /proc/robot/ | wc -l"
-    
-    
+
+
 class Config(object):
-    
+
     #ROS nodes config
     library_refresh_rate = 0.5
     library_timeout = 10
@@ -91,16 +94,18 @@ class Config(object):
     library_shadow_arm_hand = ShadowArmHandConfig()
     library_cyberglove = CybergloveConfig()
     library_cyberglove_remapper = CybergloveRemapperConfig()
-    
+
     #Robot code config
     robot_code = RobotCodeConfig()
-    
+
     #Plugins config
     generic_plugin_config = GenericPluginConfig()
     shadowhand_plugin_config = ShadowHandPluginConfig()
     cyberglove_generic_plugin_config = CybergloveGenericPluginConfig()
     shadow_arm_plugin_config = ShadowArmPluginConfig()
-    
+
     #Other GUI config
     main_widget_refresh_rate = 0.5
 
+    #Open GL plugins
+    open_gl_generic_plugin_config = OpenGLGenericPluginConfig()
