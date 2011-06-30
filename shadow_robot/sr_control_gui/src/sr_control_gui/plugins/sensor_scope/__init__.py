@@ -93,6 +93,8 @@ class SensorScope(OpenGLGenericPlugin):
         tmp_dataset2.change_color(200,20,20)
         self.datasets.append(tmp_dataset2)
 
+        self.open_gl_widget.center_at_the_end()
+
 
     def msg_callback(self, msg, index):
         """

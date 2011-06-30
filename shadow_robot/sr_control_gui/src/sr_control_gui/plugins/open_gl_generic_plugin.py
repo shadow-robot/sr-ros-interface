@@ -34,7 +34,7 @@ class GenericGLWidget(QtGui.QGraphicsView):
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
-    number_of_points = 1000
+    number_of_points = 2000
     def __init__(self, parent, paint_method):
         QtGui.QGraphicsView.__init__(self,parent)
         self.scene=QtGui.QGraphicsScene()
@@ -43,6 +43,8 @@ class GenericGLWidget(QtGui.QGraphicsView):
 
         self.setMinimumSize(500, 500)
         self.paint_method = paint_method
+
+        self.center_at_the_end()
 
         self.refresh_timer = QtCore.QTimer()
         QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
@@ -55,26 +57,13 @@ class GenericGLWidget(QtGui.QGraphicsView):
 
         self.update()
 
-    def resizeGL(self, w, h):
-        '''
-        Resize the GL window
-        '''
-        glViewport(0, 0, w, h)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(40.0, 1.0, 1.0, 30.0)
+    def center_at_the_end(self):
+        #center on the further item on the right
+        if( len(self.scene.items()) > 0):
+            self.centerOn(self.scene.items()[0])
 
-    def initializeGL(self):
-        '''
-        Initialize GL
-        '''
-        # set viewing projection
-        glClearColor(0.0, 0.0, 0.0, 1.0)
-        glClearDepth(1.0)
-
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(40.0, 1.0, 1.0, 30.0)
+    def resizeEvent(self, event):
+        self.center_at_the_end()
 
 
 class OpenGLGenericPlugin(GenericPlugin):
