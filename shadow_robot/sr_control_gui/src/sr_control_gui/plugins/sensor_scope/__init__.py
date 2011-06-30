@@ -35,7 +35,7 @@ from std_msgs.msg import Int16
 
 
 class DataSet(object):
-    colors = [QtCore.Qt.green, QtCore.Qt.blue, QtCore.Qt.red]
+    default_color = QtCore.Qt.black
 
     def __init__(self, parent, index = 0):
         self.parent = parent
@@ -44,7 +44,7 @@ class DataSet(object):
 
         self.points = []
         self.lines = []
-        self.pen = QtGui.QPen(self.colors[0], 1,
+        self.pen = QtGui.QPen(self.default_color, 1,
                               QtCore.Qt.SolidLine, QtCore.Qt.RoundCap,
                               QtCore.Qt.RoundJoin)
         self.init_dataset()
@@ -59,8 +59,8 @@ class DataSet(object):
             tmp = [0]* self.parent.number_of_points
             self.points = deque(tmp)
 
-    def change_color(self, color):
-        self.pen = QtGui.QPen(color, 1,
+    def change_color(self, r,g,b):
+        self.pen = QtGui.QPen(Qt.QColor.fromRgb(r,g,b), 1,
                               QtCore.Qt.SolidLine, QtCore.Qt.RoundCap,
                               QtCore.Qt.RoundJoin)
         for line in self.lines:
@@ -85,12 +85,12 @@ class SensorScope(OpenGLGenericPlugin):
 
         self.subscribers.append( rospy.Subscriber("/test_1", Int16, self.msg_callback, 0) )
         tmp_dataset1 = DataSet(self.open_gl_widget, index = -1)
-        tmp_dataset1.change_color(tmp_dataset1.colors[1])
+        tmp_dataset1.change_color(125,125,125)
         self.datasets.append(tmp_dataset1)
 
         self.subscribers.append( rospy.Subscriber("/test_2", Int16, self.msg_callback, 1) )
         tmp_dataset2 = DataSet(self.open_gl_widget, index = 1)
-        tmp_dataset2.change_color(tmp_dataset2.colors[2])
+        tmp_dataset2.change_color(200,20,20)
         self.datasets.append(tmp_dataset2)
 
 
