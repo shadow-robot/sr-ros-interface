@@ -29,30 +29,48 @@ from PyQt4.QtOpenGL import *
 from generic_plugin import GenericPlugin
 from config import *
 
-class GenericGLWidget(QGLWidget):
+class GenericGLWidget(QtGui.QGraphicsView):
     """
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
+    number_of_points = 500
+
     def __init__(self, parent, paint_method):
-        QGLWidget.__init__(self, parent)
+        QtGui.QGraphicsView.__init__(self,parent)
+        self.scene=QtGui.QGraphicsScene()
+        self.setScene(self.scene)
+        self.setViewport(QGLWidget())
+
+        self.points = []
+        self.populate()
+
         self.setMinimumSize(500, 500)
         self.paint_method = paint_method
 
         self.refresh_timer = QtCore.QTimer()
-        QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.paintGL)
+        QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
 
-    def paintGL(self):
+    def populate(self):
+        for index_points in range(0, self.number_of_points):
+            tmp_point = QtGui.QGraphicsTextItem("+")
+            tmp_point.setZValue(0)
+            tmp_point.setPos(0, 0)
+            self.scene.addItem(tmp_point)
+            self.points.append(tmp_point)
+
+    def animate(self):
         '''
         Virtual drawing routine: needs to be overloaded
         '''
         self.paint_method()
 
+        self.update()
+
     def resizeGL(self, w, h):
         '''
         Resize the GL window
         '''
-
         glViewport(0, 0, w, h)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
@@ -62,7 +80,6 @@ class GenericGLWidget(QGLWidget):
         '''
         Initialize GL
         '''
-
         # set viewing projection
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glClearDepth(1.0)

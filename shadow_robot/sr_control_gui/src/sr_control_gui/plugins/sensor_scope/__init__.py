@@ -23,12 +23,14 @@ import rospy
 from open_gl_generic_plugin import OpenGLGenericPlugin
 from config import Config
 import math
+
+from PyQt4 import QtCore, QtGui, Qt
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 
-from std_msgs.msg import Float64
+from std_msgs.msg import Int16
 
 class SensorScope(OpenGLGenericPlugin):
     """
@@ -38,49 +40,55 @@ class SensorScope(OpenGLGenericPlugin):
 
     def __init__(self):
         OpenGLGenericPlugin.__init__(self, self.paint_method)
+        self.subscribers = []
+
+        #1000 points are displayed
+        self.points_size = 500
+        self.points = [[0,0]]* self.points_size
+        self.index_points = 0
+
+    def activate(self):
+        OpenGLGenericPlugin.activate(self)
+
+        self.subscribers.append( rospy.Subscriber("/test", Int16, self.msg_callback, 0) )
+
+    def msg_callback(self, msg, index):
+        """
+        Received a message on the topic. Adding the new point to
+        the queue.
+        """
+        #received message from subscriber at index.
+        self.points[self.index_points] = [self.index_points, msg.data]
+
+        self.index_points += 1
+        if self.index_points > self.points_size - 1:
+            self.index_points = 0
+
 
     def paint_method(self):
         '''
         Drawing routine: this function is called periodically.
         '''
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glLoadIdentity()
+        #animations = []
+        for data_point, graph_point in zip(self.points, self.open_gl_widget.points):
+            graph_point.setPos(data_point[0], data_point[1])
+            #animation=QtGui.QGraphicsItemAnimation()
+            #duration of the animation
+            #timeline=QtCore.QTimeLine(1000/Config.open_gl_generic_plugin_config.refresh_frequency)
+            # 5 steps
+            #timeline.setFrameRange(0,5)
+            #I want that, at time t, the item be at point x,y
+            #print " setting pos: ", data_point
+            #animation.setPosAt(0,QtCore.QPointF(data_point[0], data_point[1]))
 
-        # Draw the spiral in 'immediate mode'
-        # WARNING: You should not be doing the spiral calculation inside the loop
-        # even if you are using glBegin/glEnd, sin/cos are fairly expensive functions
-        # I've left it here as is to make the code simpler.
-        radius = 1.0
-        x = radius*math.sin(0)
-        y = radius*math.cos(0)
-        glColor(0.0, 1.0, 0.0)
-        glBegin(GL_LINE_STRIP)
-        for deg in xrange(1000):
-            glVertex(x, y, 0.0)
-            rad = math.radians(deg)
-            radius -= 0.001
-            x = radius*math.sin(rad)
-            y = radius*math.cos(rad)
-        glEnd()
+            #It should animate this specific item
+            #animation.setItem(graph_point)
+            # And the whole animation is this long, and has
+            # this many steps as I set in timeline.
+            #animation.setTimeLine(timeline)
+            #animations.append(animation)
 
-        glEnableClientState(GL_VERTEX_ARRAY)
-
-        spiral_array = []
-
-        # Second Spiral using "array immediate mode" (i.e. Vertex Arrays)
-        radius = 0.8
-        x = radius*math.sin(0)
-        y = radius*math.cos(0)
-        glColor(1.0, 0.0, 0.0)
-        for deg in xrange(820):
-            spiral_array.append([x, y])
-            rad = math.radians(deg)
-            radius -= 0.001
-            x = radius*math.sin(rad)
-            y = radius*math.cos(rad)
-
-        glVertexPointerf(spiral_array)
-        glDrawArrays(GL_LINE_STRIP, 0, len(spiral_array))
+        #[ animation.timeLine().start() for animation in animations ]
 
 
 if __name__ == "__main__":
