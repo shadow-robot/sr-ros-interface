@@ -30,7 +30,42 @@ from OpenGL.GLU import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 
+from collections import deque
 from std_msgs.msg import Int16
+
+
+class DataSet(object):
+    colors = [QtCore.Qt.green, QtCore.Qt.blue, QtCore.Qt.red]
+
+    def __init__(self, parent, index = 0):
+        self.parent = parent
+
+        self.index = index
+
+        self.points = []
+        self.lines = []
+        self.pen = QtGui.QPen(self.colors[0], 1,
+                              QtCore.Qt.SolidLine, QtCore.Qt.RoundCap,
+                              QtCore.Qt.RoundJoin)
+        self.init_dataset()
+
+    def init_dataset(self):
+        for index_points in range(0, self.parent.number_of_points):
+            tmp_line = QtGui.QGraphicsLineItem(index_points,self.index*100,index_points + 1,self.index*100)
+            tmp_line.setPen(self.pen)
+            self.parent.scene.addItem(tmp_line)
+            self.lines.append(tmp_line)
+
+            tmp = [0]* self.parent.number_of_points
+            self.points = deque(tmp)
+
+    def change_color(self, color):
+        self.pen = QtGui.QPen(color, 1,
+                              QtCore.Qt.SolidLine, QtCore.Qt.RoundCap,
+                              QtCore.Qt.RoundJoin)
+        for line in self.lines:
+            line.setPen(self.pen)
+
 
 class SensorScope(OpenGLGenericPlugin):
     """
@@ -41,55 +76,48 @@ class SensorScope(OpenGLGenericPlugin):
     def __init__(self):
         OpenGLGenericPlugin.__init__(self, self.paint_method)
         self.subscribers = []
+        self.datasets = []
+        self.points_size = self.open_gl_widget.number_of_points
 
-        #1000 points are displayed
-        self.points_size = 500
-        self.points = [[0,0]]* self.points_size
-        self.index_points = 0
 
     def activate(self):
         OpenGLGenericPlugin.activate(self)
 
-        self.subscribers.append( rospy.Subscriber("/test", Int16, self.msg_callback, 0) )
+        self.subscribers.append( rospy.Subscriber("/test_1", Int16, self.msg_callback, 0) )
+        tmp_dataset1 = DataSet(self.open_gl_widget, index = -1)
+        tmp_dataset1.change_color(tmp_dataset1.colors[1])
+        self.datasets.append(tmp_dataset1)
+
+        self.subscribers.append( rospy.Subscriber("/test_2", Int16, self.msg_callback, 1) )
+        tmp_dataset2 = DataSet(self.open_gl_widget, index = 1)
+        tmp_dataset2.change_color(tmp_dataset2.colors[2])
+        self.datasets.append(tmp_dataset2)
+
 
     def msg_callback(self, msg, index):
         """
         Received a message on the topic. Adding the new point to
         the queue.
         """
-        #received message from subscriber at index.
-        self.points[self.index_points] = [self.index_points, msg.data]
+        #received message from subscriber at index: update the last
+        # point and pop the first point
+        #print index, " ", msg.data
 
-        self.index_points += 1
-        if self.index_points > self.points_size - 1:
-            self.index_points = 0
-
+        for data_set_id,data_set in enumerate(self.datasets):
+            if data_set_id == index:
+                data_set.points.append(msg.data)
+            else:
+                data_set.points.append(data_set.points[-1])
+            data_set.points.popleft()
 
     def paint_method(self):
         '''
         Drawing routine: this function is called periodically.
         '''
-        #animations = []
-        for data_point, graph_point in zip(self.points, self.open_gl_widget.points):
-            graph_point.setPos(data_point[0], data_point[1])
-            #animation=QtGui.QGraphicsItemAnimation()
-            #duration of the animation
-            #timeline=QtCore.QTimeLine(1000/Config.open_gl_generic_plugin_config.refresh_frequency)
-            # 5 steps
-            #timeline.setFrameRange(0,5)
-            #I want that, at time t, the item be at point x,y
-            #print " setting pos: ", data_point
-            #animation.setPosAt(0,QtCore.QPointF(data_point[0], data_point[1]))
-
-            #It should animate this specific item
-            #animation.setItem(graph_point)
-            # And the whole animation is this long, and has
-            # this many steps as I set in timeline.
-            #animation.setTimeLine(timeline)
-            #animations.append(animation)
-
-        #[ animation.timeLine().start() for animation in animations ]
-
+        for data_set_id,data_set in enumerate(self.datasets):
+            for index in range(0, self.points_size - 1):
+                data_set.lines[index].setLine(index, data_set.points[index],
+                                              index + 1, data_set.points[index + 1])
 
 if __name__ == "__main__":
     a = SensorScope()

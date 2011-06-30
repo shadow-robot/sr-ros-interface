@@ -34,30 +34,18 @@ class GenericGLWidget(QtGui.QGraphicsView):
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
-    number_of_points = 500
-
+    number_of_points = 1000
     def __init__(self, parent, paint_method):
         QtGui.QGraphicsView.__init__(self,parent)
         self.scene=QtGui.QGraphicsScene()
         self.setScene(self.scene)
         self.setViewport(QGLWidget())
 
-        self.points = []
-        self.populate()
-
         self.setMinimumSize(500, 500)
         self.paint_method = paint_method
 
         self.refresh_timer = QtCore.QTimer()
         QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
-
-    def populate(self):
-        for index_points in range(0, self.number_of_points):
-            tmp_point = QtGui.QGraphicsTextItem("+")
-            tmp_point.setZValue(0)
-            tmp_point.setPos(0, 0)
-            self.scene.addItem(tmp_point)
-            self.points.append(tmp_point)
 
     def animate(self):
         '''
