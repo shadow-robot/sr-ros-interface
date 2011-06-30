@@ -1,0 +1,9 @@
+[Core]
+Name = sensor_scope
+Module = SensorScope
+
+[Documentation]
+Author = Ugo Cupcic
+Version = 0.1
+Website = http://www.shadowrobot.com
+Description = A real time plotting utility. Useful for debugging.
