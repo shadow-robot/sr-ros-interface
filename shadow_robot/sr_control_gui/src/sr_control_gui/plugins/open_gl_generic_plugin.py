@@ -35,6 +35,7 @@ class GenericGLWidget(QtGui.QGraphicsView):
     the OpenGLGenericPlugin frame.
     """
     number_of_points = 2000
+
     def __init__(self, parent, paint_method):
         QtGui.QGraphicsView.__init__(self,parent)
         self.scene=QtGui.QGraphicsScene()
@@ -65,7 +66,6 @@ class GenericGLWidget(QtGui.QGraphicsView):
     def resizeEvent(self, event):
         self.center_at_the_end()
 
-
 class OpenGLGenericPlugin(GenericPlugin):
     """
     A generic plugin implement an openGL widget.
@@ -78,8 +78,14 @@ class OpenGLGenericPlugin(GenericPlugin):
         self.layout = QtGui.QHBoxLayout()
         self.frame = QtGui.QFrame()
 
+        self.control_frame = QtGui.QFrame()
+
+        self.layout.addWidget(self.control_frame)
+
         self.open_gl_widget = GenericGLWidget(self.frame, paint_method)
         self.layout.addWidget(self.open_gl_widget)
+
+
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
 

@@ -79,19 +79,30 @@ class SensorScope(OpenGLGenericPlugin):
         self.datasets = []
         self.points_size = self.open_gl_widget.number_of_points
 
+        self.control_layout = QtGui.QVBoxLayout()
+
+        self.play_btn = QtGui.QPushButton()
+        self.play_btn.setText(" pause") #setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/play.png'))
+        self.play_btn.setFixedWidth(30)
+        self.control_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
+        self.control_layout.addWidget(self.play_btn)
+
+        self.control_frame.setLayout(self.control_layout)
+
+        self.paused = False
+
 
     def activate(self):
         OpenGLGenericPlugin.activate(self)
 
-        self.subscribers.append( rospy.Subscriber("/test_1", Int16, self.msg_callback, 0) )
-        tmp_dataset1 = DataSet(self.open_gl_widget, index = -1)
-        tmp_dataset1.change_color(125,125,125)
-        self.datasets.append(tmp_dataset1)
+        self.add_subscriber("/test_1", Int16)
+        self.add_subscriber("/test_2", Int16)
 
-        self.subscribers.append( rospy.Subscriber("/test_2", Int16, self.msg_callback, 1) )
-        tmp_dataset2 = DataSet(self.open_gl_widget, index = 1)
-        tmp_dataset2.change_color(200,20,20)
-        self.datasets.append(tmp_dataset2)
+    def add_subscriber( self, topic, msg_type ):
+        self.subscribers.append( rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) )
+        tmp_dataset = DataSet(self.open_gl_widget, index = -1)
+        tmp_dataset.change_color(10*(len(self.datasets)%25),100*(len(self.datasets)%2),70*(len(self.datasets)%3))
+        self.datasets.append(tmp_dataset)
 
         self.open_gl_widget.center_at_the_end()
 
@@ -116,10 +127,17 @@ class SensorScope(OpenGLGenericPlugin):
         '''
         Drawing routine: this function is called periodically.
         '''
+        if self.paused:
+            return
         for data_set_id,data_set in enumerate(self.datasets):
             for index in range(0, self.points_size - 1):
-                data_set.lines[index].setLine(index, data_set.points[index],
-                                              index + 1, data_set.points[index + 1])
+                # invert the data because the frame is pointing downwards.
+                data_set.lines[index].setLine(index, - data_set.points[index],
+                                              index + 1, - data_set.points[index + 1])
+
+    def button_play_clicked(self):
+        #lock mutex here
+        self.paused = not self.paused
 
 if __name__ == "__main__":
     a = SensorScope()
