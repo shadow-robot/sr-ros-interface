@@ -82,7 +82,6 @@ class SensorScope(OpenGLGenericPlugin):
         self.control_layout = QtGui.QVBoxLayout()
 
         self.play_btn = QtGui.QPushButton()
-        self.play_btn.setText(" pause") #setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/play.png'))
         self.play_btn.setFixedWidth(30)
         self.control_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
         self.control_layout.addWidget(self.play_btn)
@@ -94,6 +93,7 @@ class SensorScope(OpenGLGenericPlugin):
 
     def activate(self):
         OpenGLGenericPlugin.activate(self)
+        self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
 
         self.add_subscriber("/test_1", Int16)
         self.add_subscriber("/test_2", Int16)
@@ -115,7 +115,6 @@ class SensorScope(OpenGLGenericPlugin):
         #received message from subscriber at index: update the last
         # point and pop the first point
         #print index, " ", msg.data
-
         for data_set_id,data_set in enumerate(self.datasets):
             if data_set_id == index:
                 data_set.points.append(msg.data)
@@ -137,7 +136,9 @@ class SensorScope(OpenGLGenericPlugin):
 
     def button_play_clicked(self):
         #lock mutex here
-        self.paused = not self.paused
-
-if __name__ == "__main__":
-    a = SensorScope()
+        if not self.paused:
+            self.paused = True
+            self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/play.png'))
+        else:
+            self.paused = False
+            self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
