@@ -23,12 +23,13 @@ import roslib.names
 import roslib.scriptutil
 import roslib.message
 import rosgraph.masterapi
+from std_msgs.msg import Int16
 
 class RosTopicChecker(object):
     def __init__(self):
         pass
 
-    def get_topics(self, topic = None, publishers_only=True):
+    def get_topics(self, topic = None, publishers_only=True, topic_filter = Int16):
         master = rosgraph.masterapi.Master('/rostopic')
         try:
             state = master.getSystemState()
@@ -42,11 +43,81 @@ class RosTopicChecker(object):
             
         except socket.error:
             raise ROSTopicIOException("Unable to communicate with master!")
+        
+        subs, pubs = self.filter_topics(topic_filter, subs, pubs)
 
         if publishers_only:
             return pubs
         else:
             return subs, pubs
+        
+    def filter_topics(self, topic_filter, subs, pubs):
+        filtered_sub = []
+        filtered_pub = []
+        
+        for sub in subs:
+            tmp = self._get_topic_type(sub[0])
+            if tmp[0] == "std_msgs/Int16":
+                filtered_sub.append(sub)
+
+        for pub in pubs:
+            tmp = self._get_topic_type(pub[0])
+            if tmp[0] == "std_msgs/Int16":
+                filtered_pub.append(pub)
+        return filtered_sub, filtered_pub
+
+    def _master_get_topic_types(self, master):
+        try:
+            val = master.getTopicTypes()
+        except xmlrpclib.Fault:
+            print >> sys.stderr, "WARNING: rostopic is being used against an older version of ROS/roscore"
+            val = master.getPublishedTopics('/')
+        return val
+        
+    def _get_topic_type(self, topic):
+        """
+        subroutine for getting the topic type
+        @return: topic type, real topic name and fn to evaluate the message instance
+        if the topic points to a field within a topic, e.g. /rosout/msg
+        @rtype: str, str, fn
+        """
+        try:
+            val = self._master_get_topic_types(rosgraph.masterapi.Master('/rostopic'))
+        except socket.error:
+            raise ROSTopicIOException("Unable to communicate with master!")
+
+        # exact match first, followed by prefix match
+        matches = [(t, t_type) for t, t_type in val if t == topic]
+        if not matches:
+            matches = [(t, t_type) for t, t_type in val if topic.startswith(t+'/')]
+        if matches:
+            #TODO logic for multiple matches if we are prefix matching
+            t, t_type = matches[0]
+            if t_type == roslib.names.ANYTYPE:
+                return None, None, None
+            return t_type, t, self.msgevalgen(topic[len(t):])
+        else:
+            return None, None, None
+
+    def msgevalgen(self, pattern):
+        """
+        Generates a function that returns the relevant field (aka 'subtopic') of a Message object
+        @param pattern: subtopic, e.g. /x. Must have a leading '/' if specified.
+        @type  pattern: str
+        @return: function that converts a message into the desired value
+        @rtype: fn(rospy.Message) -> value
+        """
+        if not pattern or pattern == '/':
+            return None
+        def msgeval(msg):
+            # I will probably replace this with some less beautiful but more efficient
+            try:
+                return eval('msg'+'.'.join(pattern.split('/')))
+            except AttributeError, e:
+                sys.stdout.write("no field named [%s]"%pattern+"\n")
+                return None
+            return msgeval
+
 
 if __name__ == "__main__":
     test = RosTopicChecker()
