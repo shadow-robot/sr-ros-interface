@@ -91,17 +91,11 @@ class SubscribeTopicFrame(QtGui.QFrame):
 
     def onChanged(self, index):
         text = self.topic_box.currentText()
+        #unsubscribe the current topic
+        self.parent.remove_subscriber(self.subscriber_index)
 
-        print text
-
-        if text == "None":
-            # the selected item is None: unsubscribe from the current
-            # topic
-            self.parent.remove_subscriber(self.subscriber_index)
-            self.parent.add_subscriber("/wait", Int16)
-        else:
-            self.parent.remove_subscriber(self.subscriber_index)
-            self.parent.add_subscriber(str(text), Int16)
+        if text != "None":
+            self.parent.add_subscriber(str(text), Int16, self.subscriber_index)
         
 
 class SensorScope(OpenGLGenericPlugin):
@@ -143,15 +137,17 @@ class SensorScope(OpenGLGenericPlugin):
         self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
 
         for i in range (0,4):
-            self.add_subscriber("/wait", Int16)
+            self.add_subscriber("/wait", Int16, i)
+            self.subscribers[i].unregister()
 
     def remove_subscriber(self, index):
-        print "removing: ", index, " / ", len(self.subscribers)
-        self.subscribers.remove(self.subscribers[index])
+        self.subscribers[index].unregister()
 
-    def add_subscriber( self, topic, msg_type ):
-        print "adding subscriber: ", topic
-        self.subscribers.append( rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) )
+    def add_subscriber( self, topic, msg_type, index ):
+        if index >= len(self.subscribers):
+            self.subscribers.append( rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) )
+        else:
+            self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) 
         tmp_dataset = DataSet(self.open_gl_widget, index = -1)
         tmp_dataset.change_color(10*(len(self.datasets)%25),100*(len(self.datasets)%2),70*(len(self.datasets)%3))
         self.datasets.append(tmp_dataset)
