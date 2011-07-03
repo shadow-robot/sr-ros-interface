@@ -34,7 +34,7 @@ class GenericGLWidget(QtGui.QGraphicsView):
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
-    number_of_points = 2000
+    number_of_points = 500
 
     def __init__(self, parent, paint_method):
         QtGui.QGraphicsView.__init__(self,parent)

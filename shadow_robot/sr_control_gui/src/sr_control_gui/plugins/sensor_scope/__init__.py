@@ -21,6 +21,7 @@ import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
 from open_gl_generic_plugin import OpenGLGenericPlugin
+from utils.rostopic import RosTopicChecker
 from config import Config
 import math
 
@@ -34,6 +35,7 @@ from collections import deque
 from std_msgs.msg import Int16
 
 
+
 class DataSet(object):
     default_color = QtCore.Qt.black
 
@@ -44,8 +46,8 @@ class DataSet(object):
 
         self.points = []
         self.lines = []
-        self.pen = QtGui.QPen(self.default_color, 1,
-                              QtCore.Qt.SolidLine, QtCore.Qt.RoundCap,
+        self.pen = QtGui.QPen(self.default_color, 1, 
+                              QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, 
                               QtCore.Qt.RoundJoin)
         self.init_dataset()
 
@@ -60,12 +62,47 @@ class DataSet(object):
             self.points = deque(tmp)
 
     def change_color(self, r,g,b):
-        self.pen = QtGui.QPen(Qt.QColor.fromRgb(r,g,b), 1,
-                              QtCore.Qt.SolidLine, QtCore.Qt.RoundCap,
+        self.pen = QtGui.QPen(Qt.QColor.fromRgb(r,g,b), 1, 
+                              QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, 
                               QtCore.Qt.RoundJoin)
         for line in self.lines:
             line.setPen(self.pen)
 
+class SubscribeTopicFrame(QtGui.QFrame):
+    """
+    """
+    
+    def __init__(self, parent, subscriber_index):
+        """
+        """
+        self.parent = parent
+        self.subscriber_index = subscriber_index
+        QtGui.QFrame.__init__(self)
+        self.layout = QtGui.QHBoxLayout()
+        
+        self.topic_box = QtGui.QComboBox(self)
+
+        self.topic_box.addItem("None")
+        for pub in parent.all_pubs:
+            self.topic_box.addItem(pub[0])
+        self.connect(self.topic_box, QtCore.SIGNAL('activated(int)'), self.onChanged)
+        self.layout.addWidget(self.topic_box)
+        self.setLayout(self.layout)
+
+    def onChanged(self, index):
+        text = self.topic_box.currentText()
+
+        print text
+
+        if text == "None":
+            # the selected item is None: unsubscribe from the current
+            # topic
+            self.parent.remove_subscriber(self.subscriber_index)
+            self.parent.add_subscriber("/wait", Int16)
+        else:
+            self.parent.remove_subscriber(self.subscriber_index)
+            self.parent.add_subscriber(str(text), Int16)
+        
 
 class SensorScope(OpenGLGenericPlugin):
     """
@@ -78,6 +115,10 @@ class SensorScope(OpenGLGenericPlugin):
         self.subscribers = []
         self.datasets = []
         self.points_size = self.open_gl_widget.number_of_points
+        
+        self.all_pubs = None
+        self.topic_checker = RosTopicChecker()
+        self.refresh_topics()
 
         self.control_layout = QtGui.QVBoxLayout()
 
@@ -85,6 +126,12 @@ class SensorScope(OpenGLGenericPlugin):
         self.play_btn.setFixedWidth(30)
         self.control_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
         self.control_layout.addWidget(self.play_btn)
+
+        self.subscribe_topic_frames = []
+        for i in range (0,4):
+            tmp_stf = SubscribeTopicFrame(self, i)
+            self.control_layout.addWidget( tmp_stf )
+            self.subscribe_topic_frames.append( tmp_stf )
 
         self.control_frame.setLayout(self.control_layout)
 
@@ -95,10 +142,15 @@ class SensorScope(OpenGLGenericPlugin):
         OpenGLGenericPlugin.activate(self)
         self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
 
-        self.add_subscriber("/test_1", Int16)
-        self.add_subscriber("/test_2", Int16)
+        for i in range (0,4):
+            self.add_subscriber("/wait", Int16)
+
+    def remove_subscriber(self, index):
+        print "removing: ", index, " / ", len(self.subscribers)
+        self.subscribers.remove(self.subscribers[index])
 
     def add_subscriber( self, topic, msg_type ):
+        print "adding subscriber: ", topic
         self.subscribers.append( rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) )
         tmp_dataset = DataSet(self.open_gl_widget, index = -1)
         tmp_dataset.change_color(10*(len(self.datasets)%25),100*(len(self.datasets)%2),70*(len(self.datasets)%3))
@@ -142,3 +194,6 @@ class SensorScope(OpenGLGenericPlugin):
         else:
             self.paused = False
             self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
+
+    def refresh_topics(self):
+        self.all_pubs = self.topic_checker.get_topics()
