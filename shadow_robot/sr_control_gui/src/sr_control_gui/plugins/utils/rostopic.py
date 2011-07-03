@@ -23,13 +23,12 @@ import roslib.names
 import roslib.scriptutil
 import roslib.message
 import rosgraph.masterapi
-from std_msgs.msg import Int16
 
 class RosTopicChecker(object):
     def __init__(self):
         pass
 
-    def get_topics(self, topic = None, publishers_only=True, topic_filter = Int16):
+    def get_topics(self, topic = None, publishers_only=True, topic_filter = "std_msgs/Int16"):
         master = rosgraph.masterapi.Master('/rostopic')
         try:
             state = master.getSystemState()
@@ -57,12 +56,12 @@ class RosTopicChecker(object):
         
         for sub in subs:
             tmp = self._get_topic_type(sub[0])
-            if tmp[0] == "std_msgs/Int16":
+            if tmp[0] == topic_filter:
                 filtered_sub.append(sub)
 
         for pub in pubs:
             tmp = self._get_topic_type(pub[0])
-            if tmp[0] == "std_msgs/Int16":
+            if tmp[0] == topic_filter:
                 filtered_pub.append(pub)
         return filtered_sub, filtered_pub
 
