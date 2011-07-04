@@ -147,7 +147,7 @@ class SensorScope(OpenGLGenericPlugin):
         if index >= len(self.subscribers):
             self.subscribers.append( rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) )
         else:
-            self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) 
+            self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, index) 
         tmp_dataset = DataSet(self.open_gl_widget, index = -1)
         tmp_dataset.change_color(10*(len(self.datasets)%25),100*(len(self.datasets)%2),70*(len(self.datasets)%3))
         self.datasets.append(tmp_dataset)
