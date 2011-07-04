@@ -42,6 +42,8 @@ class DataSet(object):
     def __init__(self, parent, index = 0):
         self.parent = parent
 
+        self.enabled = False
+
         self.index = index
 
         self.points = []
@@ -95,7 +97,10 @@ class SubscribeTopicFrame(QtGui.QFrame):
         self.parent.remove_subscriber(self.subscriber_index)
 
         if text != "None":
+            self.parent.datasets[self.subscriber_index].enabled = True
             self.parent.add_subscriber(str(text), Int16, self.subscriber_index)
+        else:
+            self.parent.datasets[self.subscriber_index].enabled = False
         
 
 class SensorScope(OpenGLGenericPlugin):
@@ -164,10 +169,15 @@ class SensorScope(OpenGLGenericPlugin):
         # point and pop the first point
         #print index, " ", msg.data
         for data_set_id,data_set in enumerate(self.datasets):
-            if data_set_id == index:
-                data_set.points.append(msg.data)
+            if data_set.enabled:
+                if data_set_id == index:
+                    data_set.points.append(msg.data)
+                else:
+                    data_set.points.append(data_set.points[-1])
             else:
-                data_set.points.append(data_set.points[-1])
+                # if the data set is not enabled (i.e. subscribing to None),
+                # we only draw a line on 0
+                data_set.points.append(0)
             data_set.points.popleft()
 
     def paint_method(self):
