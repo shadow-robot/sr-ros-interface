@@ -108,7 +108,7 @@ class SensorScope(OpenGLGenericPlugin):
         OpenGLGenericPlugin.__init__(self, self.paint_method)
         self.subscribers = []
         self.datasets = []
-        self.points_size = self.open_gl_widget.number_of_points
+        self.points_size = self.open_gl_widget.number_of_points_to_display
         
         self.all_pubs = None
         self.topic_checker = RosTopicChecker()
