@@ -185,21 +185,27 @@ class SensorScope(OpenGLGenericPlugin):
             return
 
         display_points = []
+        colors = []
 
         #print ""
         for data_set_id,data_set in enumerate(self.datasets):
-            glColor(data_set_id / 4.0,0.0,0.0)
+            tmp_color = [data_set_id / 4.0, 1.0 - (data_set_id/4.0),0.0]
             for index in range(0, self.points_size):
                 #print "(",index, ",",data_set.points[index],")",
-                
+                colors.append(tmp_color)
                 display_points.append([index, data_set.points[index]])
         #print ""
 
         glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_COLOR_ARRAY)
+        glColorPointerf(colors)
         glVertexPointerf(display_points)
         glClear(GL_COLOR_BUFFER_BIT)
         #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
         glDrawArrays(GL_POINTS, 0, len(display_points))
+
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_COLOR_ARRAY)
         glFlush()
 
     def button_play_clicked(self):
