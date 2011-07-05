@@ -23,6 +23,7 @@ from PyQt4 import QtCore, QtGui, Qt
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 
@@ -34,12 +35,12 @@ class GenericGLWidget(QGLWidget):
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
-    number_of_points = 20
+    number_of_points = 1000
 
     def __init__(self, parent, paint_method):
         QGLWidget.__init__(self, parent)
-
-        self.setMinimumSize(500, 500)
+        
+        self.setMinimumSize(400, 400)
         self.paint_method = paint_method
 
         self.center_at_the_end()
@@ -66,7 +67,9 @@ class GenericGLWidget(QGLWidget):
         '''
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluOrtho2D(0.0, w, 0.0, h)
+
+        gluOrtho2D(-50.0, 1000.0, -50.0, 1000.0)
+        #gluOrtho2D(0.0, w, 0.0, h)
 
     
     def initializeGL(self):
@@ -80,7 +83,8 @@ class GenericGLWidget(QGLWidget):
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluOrtho2D(0.0, 500.0, 0.0, 500.0)
+
+        gluOrtho2D(-50.0, 1000.0, -50.0, 1000.0)
 
 class OpenGLGenericPlugin(GenericPlugin):
     """

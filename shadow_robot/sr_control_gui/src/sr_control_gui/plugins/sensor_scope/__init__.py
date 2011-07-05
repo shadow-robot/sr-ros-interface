@@ -28,6 +28,7 @@ import math
 from PyQt4 import QtCore, QtGui, Qt
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 
@@ -121,7 +122,8 @@ class SensorScope(OpenGLGenericPlugin):
         self.control_layout.addWidget(self.play_btn)
 
         self.subscribe_topic_frames = []
-        for i in range (0,4):
+        
+        for i in range(0,4):
             tmp_stf = SubscribeTopicFrame(self, i)
             self.control_layout.addWidget( tmp_stf )
             self.subscribe_topic_frames.append( tmp_stf )
@@ -135,7 +137,7 @@ class SensorScope(OpenGLGenericPlugin):
         OpenGLGenericPlugin.activate(self)
         self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
 
-        for i in range (0,4):
+        for i in range(0, 4):
             self.add_subscriber("/wait", Int16, i)
             self.subscribers[i].unregister()
 
@@ -150,10 +152,6 @@ class SensorScope(OpenGLGenericPlugin):
             self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, index) 
         tmp_dataset = DataSet(self.open_gl_widget, index = -1)
         tmp_dataset.change_color(10*(len(self.datasets)%25),100*(len(self.datasets)%2),70*(len(self.datasets)%3))
-
-        if index == 1:
-            tmp_dataset.change_color(0.0, 0.0, 1.0)
-
         self.datasets.append(tmp_dataset)
         
         self.open_gl_widget.center_at_the_end()
@@ -186,22 +184,23 @@ class SensorScope(OpenGLGenericPlugin):
         if self.paused:
             return
 
-        glEnableClientState(GL_VERTEX_ARRAY)
-
         display_points = []
 
+        #print ""
         for data_set_id,data_set in enumerate(self.datasets):
-            glColor(1.0,0.0,0.0)
+            glColor(data_set_id / 4.0,0.0,0.0)
             for index in range(0, self.points_size):
-                #if (data_set_id == 0):
-                    #print "(",index, ",",data_set.points[index],")",
-                # invert the data because the frame is pointing downwards.
+                #print "(",index, ",",data_set.points[index],")",
+                
                 display_points.append([index, data_set.points[index]])
+        #print ""
 
+        glEnableClientState(GL_VERTEX_ARRAY)
         glVertexPointerf(display_points)
-        glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
+        glClear(GL_COLOR_BUFFER_BIT)
+        #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
+        glDrawArrays(GL_POINTS, 0, len(display_points))
         glFlush()
-
 
     def button_play_clicked(self):
         #lock mutex here
