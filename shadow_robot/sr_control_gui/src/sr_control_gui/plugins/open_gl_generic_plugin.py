@@ -29,24 +29,20 @@ from PyQt4.QtOpenGL import *
 from generic_plugin import GenericPlugin
 from config import *
 
-class GenericGLWidget(QtGui.QGraphicsView):
+class GenericGLWidget(QGLWidget):
     """
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
-    number_of_points = 500
+    number_of_points = 20
 
     def __init__(self, parent, paint_method):
-        QtGui.QGraphicsView.__init__(self,parent)
-        self.scene=QtGui.QGraphicsScene()
-        self.setScene(self.scene)
-        self.setViewport(QGLWidget())
+        QGLWidget.__init__(self, parent)
 
         self.setMinimumSize(500, 500)
         self.paint_method = paint_method
 
         self.center_at_the_end()
-
         self.refresh_timer = QtCore.QTimer()
         QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
 
@@ -55,16 +51,36 @@ class GenericGLWidget(QtGui.QGraphicsView):
         Virtual drawing routine: needs to be overloaded
         '''
         self.paint_method()
-
         self.update()
 
     def center_at_the_end(self):
         #center on the further item on the right
-        if( len(self.scene.items()) > 0):
-            self.centerOn(self.scene.items()[0])
+        pass
 
     def resizeEvent(self, event):
         self.center_at_the_end()
+
+    def resizeGL(self, w, h):
+        '''
+        Resize the GL window 
+        '''
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluOrtho2D(0.0, w, 0.0, h)
+
+    
+    def initializeGL(self):
+        '''
+        Initialize GL
+        '''
+        
+        # set viewing projection
+        glClearColor(0.0, 0.0, 0.0, 1.0)
+        glClearDepth(1.0)
+
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluOrtho2D(0.0, 500.0, 0.0, 500.0)
 
 class OpenGLGenericPlugin(GenericPlugin):
     """
@@ -84,7 +100,6 @@ class OpenGLGenericPlugin(GenericPlugin):
 
         self.open_gl_widget = GenericGLWidget(self.frame, paint_method)
         self.layout.addWidget(self.open_gl_widget)
-
 
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)

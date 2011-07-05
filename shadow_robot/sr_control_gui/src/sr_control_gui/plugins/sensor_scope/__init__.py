@@ -47,28 +47,22 @@ class DataSet(object):
         self.index = index
 
         self.points = []
-        self.lines = []
-        self.pen = QtGui.QPen(self.default_color, 1, 
-                              QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, 
-                              QtCore.Qt.RoundJoin)
         self.init_dataset()
+        #self.color = glColor(1.0, 0.0, 0.0)
 
     def init_dataset(self):
         for index_points in range(0, self.parent.number_of_points):
-            tmp_line = QtGui.QGraphicsLineItem(index_points,self.index*100,index_points + 1,self.index*100)
-            tmp_line.setPen(self.pen)
-            self.parent.scene.addItem(tmp_line)
-            self.lines.append(tmp_line)
-
             tmp = [0]* self.parent.number_of_points
             self.points = deque(tmp)
 
     def change_color(self, r,g,b):
-        self.pen = QtGui.QPen(Qt.QColor.fromRgb(r,g,b), 1, 
-                              QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, 
-                              QtCore.Qt.RoundJoin)
-        for line in self.lines:
-            line.setPen(self.pen)
+        pass
+        #self.color = glColor(r, g, b)
+
+    def get_color(self):
+        pass
+        #return self.color 
+
 
 class SubscribeTopicFrame(QtGui.QFrame):
     """
@@ -145,6 +139,7 @@ class SensorScope(OpenGLGenericPlugin):
             self.add_subscriber("/wait", Int16, i)
             self.subscribers[i].unregister()
 
+
     def remove_subscriber(self, index):
         self.subscribers[index].unregister()
 
@@ -155,8 +150,12 @@ class SensorScope(OpenGLGenericPlugin):
             self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, index) 
         tmp_dataset = DataSet(self.open_gl_widget, index = -1)
         tmp_dataset.change_color(10*(len(self.datasets)%25),100*(len(self.datasets)%2),70*(len(self.datasets)%3))
-        self.datasets.append(tmp_dataset)
 
+        if index == 1:
+            tmp_dataset.change_color(0.0, 0.0, 1.0)
+
+        self.datasets.append(tmp_dataset)
+        
         self.open_gl_widget.center_at_the_end()
 
 
@@ -186,11 +185,23 @@ class SensorScope(OpenGLGenericPlugin):
         '''
         if self.paused:
             return
+
+        glEnableClientState(GL_VERTEX_ARRAY)
+
+        display_points = []
+
         for data_set_id,data_set in enumerate(self.datasets):
-            for index in range(0, self.points_size - 1):
+            glColor(1.0,0.0,0.0)
+            for index in range(0, self.points_size):
+                #if (data_set_id == 0):
+                    #print "(",index, ",",data_set.points[index],")",
                 # invert the data because the frame is pointing downwards.
-                data_set.lines[index].setLine(index, - data_set.points[index],
-                                              index + 1, - data_set.points[index + 1])
+                display_points.append([index, data_set.points[index]])
+
+        glVertexPointerf(display_points)
+        glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
+        glFlush()
+
 
     def button_play_clicked(self):
         #lock mutex here
