@@ -40,12 +40,11 @@ from std_msgs.msg import Int16
 class DataSet(object):
     default_color = QtCore.Qt.black
 
-    def __init__(self, parent, index = 0):
+    def __init__(self, parent):
         self.parent = parent
+        self.subscriber = None
 
         self.enabled = False
-
-        self.index = index
 
         self.points = []
         self.init_dataset()
@@ -55,8 +54,8 @@ class DataSet(object):
         self.change_color(Qt.QColor(255,0,0))
 
     def init_dataset(self):
-        for index_points in range(0, self.parent.number_of_points):
-            tmp = [0]* self.parent.number_of_points
+        for index_points in range(0, self.parent.data_points_size):
+            tmp = [0]* self.parent.data_points_size
             self.points = deque(tmp)
 
     def change_color(self, col):
@@ -88,6 +87,10 @@ class SubscribeTopicFrame(QtGui.QFrame):
         """
         self.parent = parent
         self.subscriber_index = subscriber_index
+
+        #contains a data set to store the data
+        self.data_set = DataSet(self.parent)
+
         QtGui.QFrame.__init__(self)
         self.layout = QtGui.QHBoxLayout()
 
@@ -114,7 +117,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
         self.layout.addWidget(self.add_subscribe_topic_btn)
 
         #add a button to remove the current subscribe topic frame
-        if len(self.parent.subscribers) > 0:
+        if len(self.parent.subscribe_topic_frames) > 0:
             self.remove_topic_btn = QtGui.QPushButton()
             self.remove_topic_btn.setText('-')
             self.remove_topic_btn.setFixedWidth(30)
@@ -126,26 +129,27 @@ class SubscribeTopicFrame(QtGui.QFrame):
     def onChanged(self, index):
         text = self.topic_box.currentText()
         #unsubscribe the current topic
-        self.parent.remove_subscriber(self.subscriber_index)
+        if self.data_set.subscriber != None:
+            self.data_set.subscriber.unregister()
 
         if text != "None":
-            self.parent.datasets[self.subscriber_index].enabled = True
-            self.parent.add_subscriber(str(text), Int16, self.subscriber_index)
+            self.data_set.enabled = True
+            self.data_set.subscriber = rospy.Subscriber(str(text), Int16, self.parent.msg_callback, self.subscriber_index)
         else:
-            self.parent.datasets[self.subscriber_index].enabled = False
+            self.data_set.enabled = False
 
     def change_color_clicked(self):
         col = QtGui.QColorDialog.getColor()
         if col.isValid():
-            self.parent.datasets[self.subscriber_index].change_color(col)
+            self.data_set.change_color(col)
 
     def add_subscribe_topic_clicked(self):
         self.parent.add_topic_subscriber()
         Qt.QTimer.singleShot(0, self.adjustSize)
 
     def remove_topic_clicked(self):
-        self.parent.subscribers[self.subscriber_index].unregister()
-        self.parent.subscribers.remove(self.parent.subscribers[self.subscriber_index])
+        self.data_set.subscriber.unregister()
+        self.parent.subscriber = None
         self.parent.subscribe_topic_frames.remove(self)
         Qt.QTimer.singleShot(0, self.adjustSize)
         del self
@@ -158,10 +162,7 @@ class SensorScope(OpenGLGenericPlugin):
 
     def __init__(self):
         OpenGLGenericPlugin.__init__(self, self.paint_method)
-        self.subscribers = []
-        self.datasets = []
         self.data_points_size = self.open_gl_widget.number_of_points
-
         self.all_pubs = None
         self.topic_checker = RosTopicChecker()
         self.refresh_topics()
@@ -192,21 +193,6 @@ class SensorScope(OpenGLGenericPlugin):
         self.control_layout.addWidget( tmp_stf )
         self.subscribe_topic_frames.append( tmp_stf )
 
-        self.add_subscriber("/wait", Int16, index)
-        self.subscribers[index].unregister()
-
-    def remove_subscriber(self, index):
-        self.subscribers[index].unregister()
-
-    def add_subscriber( self, topic, msg_type, index ):
-        if index >= len(self.subscribers):
-            self.subscribers.append( rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) )
-        else:
-            self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, index)
-        tmp_dataset = DataSet(self.open_gl_widget, index = -1)
-        self.datasets.append(tmp_dataset)
-
-
     def msg_callback(self, msg, index):
         """
         Received a message on the topic. Adding the new point to
@@ -215,17 +201,17 @@ class SensorScope(OpenGLGenericPlugin):
         #received message from subscriber at index: update the last
         # point and pop the first point
         #print index, " ", msg.data
-        for data_set_id,data_set in enumerate(self.datasets):
-            if data_set.enabled:
-                if data_set_id == index:
-                    data_set.points.append(msg.data)
+        for sub_frame in self.subscribe_topic_frames:
+            if sub_frame.data_set.enabled:
+                if sub_frame.subscriber_index == index:
+                    sub_frame.data_set.points.append(msg.data)
                 else:
-                    data_set.points.append(data_set.points[-1])
-            else:
+                    sub_frame.data_set.points.append(sub_frame.data_set.points[-1])
+            #else:
                 # if the data set is not enabled (i.e. subscribing to None),
                 # we only draw a line on 0
-                data_set.points.append(0)
-            data_set.points.popleft()
+            #    sub_frame.data_set.points.append(0)
+                sub_frame.data_set.points.popleft()
 
     def paint_method(self):
         '''
@@ -237,20 +223,20 @@ class SensorScope(OpenGLGenericPlugin):
         display_points = []
         colors = []
 
-        for data_set_id,data_set in enumerate(self.datasets):
+        for sub_frame in self.subscribe_topic_frames:
             #we want to keep the last point of the raw data in the middle of
             # the screen
-            offset = self.open_gl_widget.height/2 - data_set.points[-1]
+            offset = self.open_gl_widget.height/2 - sub_frame.data_set.points[-1]
 
             for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
                 # add the raw data
-                colors.append(data_set.get_raw_color())
+                colors.append(sub_frame.data_set.get_raw_color())
                 data_index = self.display_to_data_index(display_index)
-                display_points.append([display_index, data_set.points[data_index] + offset])
+                display_points.append([display_index, sub_frame.data_set.points[data_index] + offset])
 
                 #also add the scaled data
-                colors.append(data_set.get_scaled_color())
-                display_points.append([display_index, self.scale_data(data_set.points[data_index])] )
+                colors.append(sub_frame.data_set.get_scaled_color())
+                display_points.append([display_index, self.scale_data(sub_frame.data_set.points[data_index])] )
 
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
