@@ -148,9 +148,20 @@ class SubscribeTopicFrame(QtGui.QFrame):
         Qt.QTimer.singleShot(0, self.adjustSize)
 
     def remove_topic_clicked(self):
-        self.data_set.subscriber.unregister()
-        self.parent.subscriber = None
+        if self.data_set.subscriber != None:
+            self.data_set.subscriber.unregister()
+            self.parent.subscriber = None
         self.parent.subscribe_topic_frames.remove(self)
+
+        self.topic_box.setParent(None)
+        self.change_color_btn.setParent(None)
+        self.add_subscribe_topic_btn.setParent(None)
+        self.remove_topic_btn.setParent(None)
+
+        #refresh the indexes
+        for i,sub_frame in enumerate(self.parent.subscribe_topic_frames):
+            sub_frame.subscriber_index = i
+
         Qt.QTimer.singleShot(0, self.adjustSize)
         del self
 

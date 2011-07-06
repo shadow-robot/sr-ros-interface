@@ -43,15 +43,17 @@ def talker():
     msg1 = Int16()
     msg2 = Int16()
 
+    step_nb = 0
+
     while not rospy.is_shutdown():
         target1 = math.cos( math.radians(angle1) )
-        angle1 += 1
+        angle1 += .01
         if angle1 > 90:
             angle1 = -90
         msg1.data = target1 * 20000
         pub1.publish( msg1 )
 
-        if angle1 % 5 == 0:
+        if step_nb ==  5:
             target2 = math.sin( math.radians(angle2) )
             angle2 += 1
             if angle2 > 180:
@@ -59,7 +61,9 @@ def talker():
 
             msg2.data = target2*30000
             pub2.publish( msg2 )
+            step_nb = 0
 
+        step_nb += 1
         time.sleep(.005)
 
 

@@ -45,7 +45,6 @@ class GenericGLWidget(QGLWidget):
         self.setMinimumSize(400, 400)
         self.paint_method = paint_method
 
-        self.center_at_the_end()
         self.refresh_timer = QtCore.QTimer()
         QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
 
@@ -53,12 +52,11 @@ class GenericGLWidget(QGLWidget):
         '''
         Virtual drawing routine: needs to be overloaded
         '''
-        self.paint_method()
-        self.update()
-
-    def center_at_the_end(self):
-        #center on the further item on the right
-        pass
+        try:
+            self.paint_method()
+            self.update()
+        except:
+            pass
 
     def resizeEvent(self, event):
         w = event.size().width()
@@ -72,7 +70,6 @@ class GenericGLWidget(QGLWidget):
         gluOrtho2D(0.0, w, 0.0, h)
 
         self.number_of_points_to_display = w
-        print "number of points to display: ",self.number_of_points_to_display
 
     def initializeGL(self):
         '''
@@ -100,7 +97,7 @@ class OpenGLGenericPlugin(GenericPlugin):
         self.frame = QtGui.QFrame()
 
         self.control_frame = QtGui.QFrame()
-        self.control_frame.setFixedWidth(200)
+        self.control_frame.setFixedWidth(250)
 
         self.layout.addWidget(self.control_frame)
 
