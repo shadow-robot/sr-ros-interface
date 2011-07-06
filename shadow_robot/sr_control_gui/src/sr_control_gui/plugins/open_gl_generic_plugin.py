@@ -97,7 +97,7 @@ class OpenGLGenericPlugin(GenericPlugin):
         self.frame = QtGui.QFrame()
 
         self.control_frame = QtGui.QFrame()
-        self.control_frame.setFixedWidth(250)
+        self.control_frame.setFixedWidth(300)
 
         self.layout.addWidget(self.control_frame)
 

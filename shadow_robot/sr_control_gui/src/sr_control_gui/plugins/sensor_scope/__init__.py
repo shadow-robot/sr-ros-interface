@@ -128,6 +128,12 @@ class SubscribeTopicFrame(QtGui.QFrame):
             self.connect(self.remove_topic_btn, QtCore.SIGNAL('clicked()'),self.remove_topic_clicked)
             self.layout.addWidget(self.remove_topic_btn)
 
+        self.display_last_value = QtGui.QLabel()
+        self.layout.addWidget(self.display_last_value)
+
+        #set a color by default
+        self.change_color_clicked(const_color = Qt.QColor(255,0,0))
+
         self.setLayout(self.layout)
 
     def refresh_topics(self):
@@ -148,10 +154,28 @@ class SubscribeTopicFrame(QtGui.QFrame):
         else:
             self.data_set.enabled = False
 
-    def change_color_clicked(self):
-        col = QtGui.QColorDialog.getColor()
+    def update_display_last_value(self, value):
+        txt = ""
+        txt += str(value)
+        txt += " / "
+        txt += str(hex( value ))
+        self.display_last_value.setText(txt)
+
+
+    def change_color_clicked(self, const_color = None):
+        if const_color == None:
+            col = QtGui.QColorDialog.getColor()
+
+        else:
+            col = const_color
+
         if col.isValid():
             self.data_set.change_color(col)
+
+            html_color = "QLabel { color : "
+            html_color += col.name()
+            html_color += "; }"
+            self.display_last_value.setStyleSheet(html_color)
 
     def add_subscribe_topic_clicked(self):
         self.parent.add_topic_subscriber()
@@ -262,6 +286,9 @@ class SensorScope(OpenGLGenericPlugin):
         colors = []
 
         for sub_frame in self.subscribe_topic_frames:
+            #update the value in the label
+            sub_frame.update_display_last_value(sub_frame.data_set.points[-1])
+
             #we want to keep the last point of the raw data in the middle of
             # the screen
             offset = self.open_gl_widget.height/2 - sub_frame.data_set.points[-1]
