@@ -49,27 +49,27 @@ class DataSet(object):
 
         self.points = []
         self.init_dataset()
-        self.scaled_color = [1.0, 0.0, 0.0]
-        self.raw_color = [0.0, 1.0, 0.0]
+        self.scaled_color = []
+        self.raw_color = []
+
+        self.change_color(Qt.QColor(255,0,0))
 
     def init_dataset(self):
         for index_points in range(0, self.parent.number_of_points):
             tmp = [0]* self.parent.number_of_points
             self.points = deque(tmp)
 
-    def change_color(self, r,g,b):
+    def change_color(self, col):
+        r = col.redF()
+        g = col.greenF()
+        b = col.blueF()
+
         self.scaled_color = [r, g, b]
 
-        r += 0.1
-        g += 0.1
-        b += 0.1
-
-        if r > 1.0:
-            r = 1.0
-        if g > 1.0:
-            g = 1.0
-        if b > 1.0:
-            b = 1.0
+        #create a darker version of the raw color
+        r *= 0.5
+        g *= 0.5
+        b *= 0.5
         self.raw_color = [r,g,b]
 
     def get_raw_color(self):
@@ -91,13 +91,36 @@ class SubscribeTopicFrame(QtGui.QFrame):
         QtGui.QFrame.__init__(self)
         self.layout = QtGui.QHBoxLayout()
 
+        #add a combo box to select the topic
         self.topic_box = QtGui.QComboBox(self)
-
         self.topic_box.addItem("None")
         for pub in parent.all_pubs:
             self.topic_box.addItem(pub[0])
         self.connect(self.topic_box, QtCore.SIGNAL('activated(int)'), self.onChanged)
         self.layout.addWidget(self.topic_box)
+
+        #add a button to change the color
+        self.change_color_btn = QtGui.QPushButton()
+        self.change_color_btn.setIcon(QtGui.QIcon(self.parent.parent.parent.rootPath + '/images/icons/color_wheel.png'))
+        self.change_color_btn.setFixedWidth(30)
+        self.connect(self.change_color_btn, QtCore.SIGNAL('clicked()'), self.change_color_clicked)
+        self.layout.addWidget(self.change_color_btn)
+
+        #add a button to add a subscribe topic frame
+        self.add_subscribe_topic_btn = QtGui.QPushButton()
+        self.add_subscribe_topic_btn.setText('+')
+        self.add_subscribe_topic_btn.setFixedWidth(30)
+        self.connect(self.add_subscribe_topic_btn, QtCore.SIGNAL('clicked()'),self.add_subscribe_topic_clicked)
+        self.layout.addWidget(self.add_subscribe_topic_btn)
+
+        #add a button to remove the current subscribe topic frame
+        if len(self.parent.subscribers) > 0:
+            self.remove_topic_btn = QtGui.QPushButton()
+            self.remove_topic_btn.setText('-')
+            self.remove_topic_btn.setFixedWidth(30)
+            self.connect(self.remove_topic_btn, QtCore.SIGNAL('clicked()'),self.remove_topic_clicked)
+            self.layout.addWidget(self.remove_topic_btn)
+
         self.setLayout(self.layout)
 
     def onChanged(self, index):
@@ -111,6 +134,21 @@ class SubscribeTopicFrame(QtGui.QFrame):
         else:
             self.parent.datasets[self.subscriber_index].enabled = False
 
+    def change_color_clicked(self):
+        col = QtGui.QColorDialog.getColor()
+        if col.isValid():
+            self.parent.datasets[self.subscriber_index].change_color(col)
+
+    def add_subscribe_topic_clicked(self):
+        self.parent.add_topic_subscriber()
+        Qt.QTimer.singleShot(0, self.adjustSize)
+
+    def remove_topic_clicked(self):
+        self.parent.subscribers[self.subscriber_index].unregister()
+        self.parent.subscribers.remove(self.parent.subscribers[self.subscriber_index])
+        self.parent.subscribe_topic_frames.remove(self)
+        Qt.QTimer.singleShot(0, self.adjustSize)
+        del self
 
 class SensorScope(OpenGLGenericPlugin):
     """
@@ -137,13 +175,6 @@ class SensorScope(OpenGLGenericPlugin):
 
         self.subscribe_topic_frames = []
 
-        for i in range(0,4):
-            tmp_stf = SubscribeTopicFrame(self, i)
-            self.control_layout.addWidget( tmp_stf )
-            self.subscribe_topic_frames.append( tmp_stf )
-
-        self.control_frame.setLayout(self.control_layout)
-
         self.paused = False
 
 
@@ -151,10 +182,18 @@ class SensorScope(OpenGLGenericPlugin):
         OpenGLGenericPlugin.activate(self)
         self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
 
-        for i in range(0, 4):
-            self.add_subscriber("/wait", Int16, i)
-            self.subscribers[i].unregister()
+        self.add_topic_subscriber()
 
+        self.control_frame.setLayout(self.control_layout)
+
+    def add_topic_subscriber(self):
+        index = len(self.subscribe_topic_frames)
+        tmp_stf = SubscribeTopicFrame(self, index)
+        self.control_layout.addWidget( tmp_stf )
+        self.subscribe_topic_frames.append( tmp_stf )
+
+        self.add_subscriber("/wait", Int16, index)
+        self.subscribers[index].unregister()
 
     def remove_subscriber(self, index):
         self.subscribers[index].unregister()
@@ -166,8 +205,6 @@ class SensorScope(OpenGLGenericPlugin):
             self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, index)
         tmp_dataset = DataSet(self.open_gl_widget, index = -1)
         self.datasets.append(tmp_dataset)
-
-        self.open_gl_widget.center_at_the_end()
 
 
     def msg_callback(self, msg, index):
@@ -200,7 +237,6 @@ class SensorScope(OpenGLGenericPlugin):
         display_points = []
         colors = []
 
-        #print ""
         for data_set_id,data_set in enumerate(self.datasets):
             #we want to keep the last point of the raw data in the middle of
             # the screen
@@ -216,15 +252,15 @@ class SensorScope(OpenGLGenericPlugin):
                 colors.append(data_set.get_scaled_color())
                 display_points.append([display_index, self.scale_data(data_set.points[data_index])] )
 
-
-        #print ""
-
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
         glColorPointerf(colors)
         glVertexPointerf(display_points)
         glClear(GL_COLOR_BUFFER_BIT)
         #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
+        glPointSize(1.5)
+        #glEnable(GL_POINT_SMOOTH)
+        #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
 
         glDisableClientState(GL_VERTEX_ARRAY)

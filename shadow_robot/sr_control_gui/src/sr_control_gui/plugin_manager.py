@@ -144,17 +144,17 @@ class PluginManager(object):
         plugin_tmp = None
         if class_name != None:
             #import the module
-            try:
-                exec "from %s import %s" % (plugin_name, class_name)
-                class_tmp_str = class_name + "()"
-                plugin_tmp = eval(class_tmp_str)
+            #try:
+            exec "from %s import %s" % (plugin_name, class_name)
+            class_tmp_str = class_name + "()"
+            plugin_tmp = eval(class_tmp_str)
 
-                plugin_tmp.plugin_name = plugin_name
-                plugin_tmp.class_name = class_name
-                plugin_tmp.description = description
-                plugin_tmp.category = category
-            except:
-                print "[", plugin_name, "]: not imported: ", sys.exc_info()[0]
+            plugin_tmp.plugin_name = plugin_name
+            plugin_tmp.class_name = class_name
+            plugin_tmp.description = description
+            plugin_tmp.category = category
+            #except:
+            #    print "[", plugin_name, "]: not imported: ", sys.exc_info()[0]
 
         else:
             print "[",plugin_name ,"]", "The Module name was not defined in the config file. Aborting."

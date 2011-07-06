@@ -57,7 +57,7 @@ def talker():
             if angle2 > 180:
                 angle2 = 0
 
-            msg2.data = target2*150
+            msg2.data = target2*30000
             pub2.publish( msg2 )
 
         time.sleep(.005)
