@@ -96,6 +96,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
 
         #add a combo box to select the topic
         self.topic_box = QtGui.QComboBox(self)
+        self.topic_box.setToolTip("Choose which topic you want to plot.")
         self.topic_box.addItem("None")
         for pub in parent.all_pubs:
             self.topic_box.addItem(pub[0])
@@ -105,6 +106,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
         #add a button to change the color
         self.change_color_btn = QtGui.QPushButton()
         self.change_color_btn.setIcon(QtGui.QIcon(self.parent.parent.parent.rootPath + '/images/icons/color_wheel.png'))
+        self.change_color_btn.setToolTip("Change the color for this topic")
         self.change_color_btn.setFixedWidth(30)
         self.connect(self.change_color_btn, QtCore.SIGNAL('clicked()'), self.change_color_clicked)
         self.layout.addWidget(self.change_color_btn)
@@ -112,6 +114,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
         #add a button to add a subscribe topic frame
         self.add_subscribe_topic_btn = QtGui.QPushButton()
         self.add_subscribe_topic_btn.setText('+')
+        self.add_subscribe_topic_btn.setToolTip("Add a new topic to plot.")
         self.add_subscribe_topic_btn.setFixedWidth(30)
         self.connect(self.add_subscribe_topic_btn, QtCore.SIGNAL('clicked()'),self.add_subscribe_topic_clicked)
         self.layout.addWidget(self.add_subscribe_topic_btn)
@@ -120,6 +123,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
         if len(self.parent.subscribe_topic_frames) > 0:
             self.remove_topic_btn = QtGui.QPushButton()
             self.remove_topic_btn.setText('-')
+            self.remove_topic_btn.setToolTip("Remove this topic.")
             self.remove_topic_btn.setFixedWidth(30)
             self.connect(self.remove_topic_btn, QtCore.SIGNAL('clicked()'),self.remove_topic_clicked)
             self.layout.addWidget(self.remove_topic_btn)
@@ -191,12 +195,14 @@ class SensorScope(OpenGLGenericPlugin):
         # add a button to play/pause the display
         self.play_btn = QtGui.QPushButton()
         self.play_btn.setFixedWidth(30)
+        self.play_btn.setToolTip("Play/Pause the plots")
         self.btn_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
         self.btn_frame_layout.addWidget(self.play_btn)
 
         #add a button to refresh the topics
         self.refresh_btn = QtGui.QPushButton()
         self.refresh_btn.setFixedWidth(30)
+        self.refresh_btn.setToolTip("Refresh the list of topics")
         self.btn_frame.connect(self.refresh_btn, QtCore.SIGNAL('clicked()'), self.button_refresh_clicked)
         self.btn_frame_layout.addWidget(self.refresh_btn)
 
