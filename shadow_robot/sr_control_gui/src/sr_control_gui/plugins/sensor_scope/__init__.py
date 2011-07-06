@@ -191,6 +191,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
         self.change_color_btn.setParent(None)
         self.add_subscribe_topic_btn.setParent(None)
         self.remove_topic_btn.setParent(None)
+        self.display_last_value.setParent(None)
 
         #refresh the indexes
         for i,sub_frame in enumerate(self.parent.subscribe_topic_frames):
