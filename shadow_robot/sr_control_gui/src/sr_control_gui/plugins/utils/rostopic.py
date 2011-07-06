@@ -34,26 +34,27 @@ class RosTopicChecker(object):
             state = master.getSystemState()
 
             pubs, subs, _ = state
+
             if topic:
                 # filter based on topic
-                topic_ns = roslib.names.make_global_ns(topic)        
+                topic_ns = roslib.names.make_global_ns(topic)
                 subs = (x for x in subs if x[0] == topic or x[0].startswith(topic_ns))
                 pubs = (x for x in pubs if x[0] == topic or x[0].startswith(topic_ns))
-            
+
         except socket.error:
             raise ROSTopicIOException("Unable to communicate with master!")
-        
+
         subs, pubs = self.filter_topics(topic_filter, subs, pubs)
 
         if publishers_only:
             return pubs
         else:
             return subs, pubs
-        
+
     def filter_topics(self, topic_filter, subs, pubs):
         filtered_sub = []
         filtered_pub = []
-        
+
         for sub in subs:
             tmp = self._get_topic_type(sub[0])
             if tmp[0] == topic_filter:
@@ -72,7 +73,7 @@ class RosTopicChecker(object):
             print >> sys.stderr, "WARNING: rostopic is being used against an older version of ROS/roscore"
             val = master.getPublishedTopics('/')
         return val
-        
+
     def _get_topic_type(self, topic):
         """
         subroutine for getting the topic type

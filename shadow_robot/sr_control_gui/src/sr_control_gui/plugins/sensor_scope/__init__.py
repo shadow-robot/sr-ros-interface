@@ -126,6 +126,12 @@ class SubscribeTopicFrame(QtGui.QFrame):
 
         self.setLayout(self.layout)
 
+    def refresh_topics(self):
+        self.topic_box.clear()
+        self.topic_box.addItem("None")
+        for pub in self.parent.all_pubs:
+            self.topic_box.addItem(pub[0])
+
     def onChanged(self, index):
         text = self.topic_box.currentText()
         #unsubscribe the current topic
@@ -180,11 +186,25 @@ class SensorScope(OpenGLGenericPlugin):
 
         self.control_layout = QtGui.QVBoxLayout()
 
+        self.btn_frame = QtGui.QFrame()
+        self.btn_frame_layout = QtGui.QHBoxLayout()
+        # add a button to play/pause the display
         self.play_btn = QtGui.QPushButton()
         self.play_btn.setFixedWidth(30)
-        self.control_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
-        self.control_layout.addWidget(self.play_btn)
+        self.btn_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
+        self.btn_frame_layout.addWidget(self.play_btn)
 
+        #add a button to refresh the topics
+        self.refresh_btn = QtGui.QPushButton()
+        self.refresh_btn.setFixedWidth(30)
+        self.btn_frame.connect(self.refresh_btn, QtCore.SIGNAL('clicked()'), self.button_refresh_clicked)
+        self.btn_frame_layout.addWidget(self.refresh_btn)
+
+        self.btn_frame.setFixedWidth(80)
+        self.btn_frame.setFixedHeight(50)
+        self.btn_frame.setLayout(self.btn_frame_layout)
+
+        self.control_layout.addWidget(self.btn_frame)
         self.subscribe_topic_frames = []
 
         self.paused = False
@@ -193,6 +213,7 @@ class SensorScope(OpenGLGenericPlugin):
     def activate(self):
         OpenGLGenericPlugin.activate(self)
         self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
+        self.refresh_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/refresh.png'))
 
         self.add_topic_subscriber()
 
@@ -272,6 +293,11 @@ class SensorScope(OpenGLGenericPlugin):
         else:
             self.paused = False
             self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
+
+    def button_refresh_clicked(self):
+        self.refresh_topics()
+        for sub_frame in self.subscribe_topic_frames:
+            sub_frame.refresh_topics()
 
     def refresh_topics(self):
         self.all_pubs = self.topic_checker.get_topics()
