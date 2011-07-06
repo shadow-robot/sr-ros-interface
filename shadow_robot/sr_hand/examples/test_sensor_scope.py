@@ -48,7 +48,7 @@ def talker():
         angle1 += 1
         if angle1 > 90:
             angle1 = -90
-        msg1.data = target1 * 100
+        msg1.data = target1 * 20000
         pub1.publish( msg1 )
 
         if angle1 % 5 == 0:

@@ -35,11 +35,13 @@ class GenericGLWidget(QGLWidget):
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
-    number_of_points = 1000
+    number_of_points = 2000
+    number_of_points_to_display = 500
+    height = 400
 
     def __init__(self, parent, paint_method):
         QGLWidget.__init__(self, parent)
-        
+
         self.setMinimumSize(400, 400)
         self.paint_method = paint_method
 
@@ -59,32 +61,31 @@ class GenericGLWidget(QGLWidget):
         pass
 
     def resizeEvent(self, event):
-        self.center_at_the_end()
+        w = event.size().width()
+        h = event.size().height()
 
-    def resizeGL(self, w, h):
-        '''
-        Resize the GL window 
-        '''
+        self.height = h
+
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
+        glViewport(0, 0, w, h)
+        gluOrtho2D(0.0, w, 0.0, h)
 
-        gluOrtho2D(-50.0, 1000.0, -50.0, 1000.0)
-        #gluOrtho2D(0.0, w, 0.0, h)
+        self.number_of_points_to_display = w
+        print "number of points to display: ",self.number_of_points_to_display
 
-    
     def initializeGL(self):
         '''
         Initialize GL
         '''
-        
         # set viewing projection
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glClearDepth(1.0)
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-
-        gluOrtho2D(-50.0, 1000.0, -50.0, 1000.0)
+        glViewport(0, 0, 400, 400)
+        gluOrtho2D(0.0, 400.0, 0.0, 400.0)
 
 class OpenGLGenericPlugin(GenericPlugin):
     """
@@ -99,6 +100,7 @@ class OpenGLGenericPlugin(GenericPlugin):
         self.frame = QtGui.QFrame()
 
         self.control_frame = QtGui.QFrame()
+        self.control_frame.setFixedWidth(200)
 
         self.layout.addWidget(self.control_frame)
 

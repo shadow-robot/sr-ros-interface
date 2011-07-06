@@ -49,7 +49,8 @@ class DataSet(object):
 
         self.points = []
         self.init_dataset()
-        #self.color = glColor(1.0, 0.0, 0.0)
+        self.scaled_color = [1.0, 0.0, 0.0]
+        self.raw_color = [0.0, 1.0, 0.0]
 
     def init_dataset(self):
         for index_points in range(0, self.parent.number_of_points):
@@ -57,18 +58,31 @@ class DataSet(object):
             self.points = deque(tmp)
 
     def change_color(self, r,g,b):
-        pass
-        #self.color = glColor(r, g, b)
+        self.scaled_color = [r, g, b]
 
-    def get_color(self):
-        pass
-        #return self.color 
+        r += 0.1
+        g += 0.1
+        b += 0.1
+
+        if r > 1.0:
+            r = 1.0
+        if g > 1.0:
+            g = 1.0
+        if b > 1.0:
+            b = 1.0
+        self.raw_color = [r,g,b]
+
+    def get_raw_color(self):
+        return self.raw_color
+
+    def get_scaled_color(self):
+        return self.scaled_color
 
 
 class SubscribeTopicFrame(QtGui.QFrame):
     """
     """
-    
+
     def __init__(self, parent, subscriber_index):
         """
         """
@@ -76,7 +90,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
         self.subscriber_index = subscriber_index
         QtGui.QFrame.__init__(self)
         self.layout = QtGui.QHBoxLayout()
-        
+
         self.topic_box = QtGui.QComboBox(self)
 
         self.topic_box.addItem("None")
@@ -96,7 +110,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
             self.parent.add_subscriber(str(text), Int16, self.subscriber_index)
         else:
             self.parent.datasets[self.subscriber_index].enabled = False
-        
+
 
 class SensorScope(OpenGLGenericPlugin):
     """
@@ -108,8 +122,8 @@ class SensorScope(OpenGLGenericPlugin):
         OpenGLGenericPlugin.__init__(self, self.paint_method)
         self.subscribers = []
         self.datasets = []
-        self.points_size = self.open_gl_widget.number_of_points_to_display
-        
+        self.data_points_size = self.open_gl_widget.number_of_points
+
         self.all_pubs = None
         self.topic_checker = RosTopicChecker()
         self.refresh_topics()
@@ -122,7 +136,7 @@ class SensorScope(OpenGLGenericPlugin):
         self.control_layout.addWidget(self.play_btn)
 
         self.subscribe_topic_frames = []
-        
+
         for i in range(0,4):
             tmp_stf = SubscribeTopicFrame(self, i)
             self.control_layout.addWidget( tmp_stf )
@@ -149,11 +163,10 @@ class SensorScope(OpenGLGenericPlugin):
         if index >= len(self.subscribers):
             self.subscribers.append( rospy.Subscriber(topic, msg_type, self.msg_callback, len(self.subscribers)) )
         else:
-            self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, index) 
+            self.subscribers[index] = rospy.Subscriber(topic, msg_type, self.msg_callback, index)
         tmp_dataset = DataSet(self.open_gl_widget, index = -1)
-        tmp_dataset.change_color(10*(len(self.datasets)%25),100*(len(self.datasets)%2),70*(len(self.datasets)%3))
         self.datasets.append(tmp_dataset)
-        
+
         self.open_gl_widget.center_at_the_end()
 
 
@@ -189,11 +202,21 @@ class SensorScope(OpenGLGenericPlugin):
 
         #print ""
         for data_set_id,data_set in enumerate(self.datasets):
-            tmp_color = [data_set_id / 4.0, 1.0 - (data_set_id/4.0),0.0]
-            for index in range(0, self.points_size):
-                #print "(",index, ",",data_set.points[index],")",
-                colors.append(tmp_color)
-                display_points.append([index, data_set.points[index]])
+            #we want to keep the last point of the raw data in the middle of
+            # the screen
+            offset = self.open_gl_widget.height/2 - data_set.points[-1]
+
+            for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
+                # add the raw data
+                colors.append(data_set.get_raw_color())
+                data_index = self.display_to_data_index(display_index)
+                display_points.append([display_index, data_set.points[data_index] + offset])
+
+                #also add the scaled data
+                colors.append(data_set.get_scaled_color())
+                display_points.append([display_index, self.scale_data(data_set.points[data_index])] )
+
+
         #print ""
 
         glEnableClientState(GL_VERTEX_ARRAY)
@@ -219,3 +242,11 @@ class SensorScope(OpenGLGenericPlugin):
 
     def refresh_topics(self):
         self.all_pubs = self.topic_checker.get_topics()
+
+    def display_to_data_index(self, display_index):
+        data_index = self.data_points_size - self.open_gl_widget.number_of_points_to_display + display_index
+        return data_index
+
+    def scale_data(self, data, data_max = 65536):
+        scaled_data = (data * self.open_gl_widget.height) / data_max
+        return scaled_data
