@@ -49,7 +49,7 @@ class GenericGLWidget(QGLWidget):
 
         self.refresh_timer = QtCore.QTimer()
 
-        self.line_x = self.width
+        self.line_x = 10
         self.line = [[self.line_x, 0],
                      [self.line_x, self.height]]
         self.line_color = [1.0,1.0,1.0]
@@ -63,6 +63,7 @@ class GenericGLWidget(QGLWidget):
         try:
             self.paint_method()
 
+            #draw the vertical line
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_COLOR_ARRAY)
             glColorPointerf(self.line_color)

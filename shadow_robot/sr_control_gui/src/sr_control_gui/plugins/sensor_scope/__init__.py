@@ -214,6 +214,9 @@ class SensorScope(OpenGLGenericPlugin):
         self.topic_checker = RosTopicChecker()
         self.refresh_topics()
 
+        # this is used to go back in time
+        self.display_frame = 0
+
         self.mutex = threading.Lock()
 
         self.control_layout = QtGui.QVBoxLayout()
