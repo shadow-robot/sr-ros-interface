@@ -39,15 +39,20 @@ class GenericGLWidget(QGLWidget):
     height = 400
     width = 400
 
-    def __init__(self, parent, paint_method, plugin_parent):
+    def __init__(self, parent, paint_method, right_click_method, plugin_parent):
         QGLWidget.__init__(self, parent)
         self.number_of_points = Config.open_gl_generic_plugin_config.number_of_points
+
+        self.last_right_click_x = 0
 
         self.parent = plugin_parent
         self.setMinimumSize(400, 400)
         self.paint_method = paint_method
 
+        self.right_click_method = right_click_method
+
         self.refresh_timer = QtCore.QTimer()
+
 
         self.line_x = 10
         self.line = [[self.line_x, 0],
@@ -76,14 +81,23 @@ class GenericGLWidget(QGLWidget):
         except:
             pass
 
+    def mousePressEvent(self, event):
+        self.last_right_click_x = event.pos().x()
+
     def mouseMoveEvent(self, event):
         """
         Draw a vertical line when the mouse is dragged on the
         opengl widget.
         """
-        self.line_x = event.pos().x()
-        self.line = [[self.line_x, 0],
-                     [self.line_x, self.height]]
+        button = event.buttons()
+
+        if button & QtCore.Qt.LeftButton:
+            #left click drags the line
+            self.line_x = event.pos().x()
+            self.line = [[self.line_x, 0],
+                         [self.line_x, self.height]]
+        else:
+            self.right_click_method(event.pos().x())
 
     def resizeEvent(self, event):
         w = event.size().width()
@@ -119,7 +133,7 @@ class OpenGLGenericPlugin(GenericPlugin):
     """
     name = "OpenGL Generic Plugin"
 
-    def __init__(self, paint_method):
+    def __init__(self, paint_method, right_click_method):
         GenericPlugin.__init__(self)
 
         self.splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
@@ -131,7 +145,7 @@ class OpenGLGenericPlugin(GenericPlugin):
         #the visualization frame
         self.layout = QtGui.QVBoxLayout()
         self.frame = QtGui.QFrame()
-        self.open_gl_widget = GenericGLWidget(self.frame, paint_method, self)
+        self.open_gl_widget = GenericGLWidget(self.frame, paint_method, right_click_method, self)
         self.layout.addWidget(self.open_gl_widget)
 
         self.frame.setLayout(self.layout)

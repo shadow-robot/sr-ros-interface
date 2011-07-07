@@ -210,7 +210,7 @@ class SensorScope(OpenGLGenericPlugin):
     name = "Sensor Scope"
 
     def __init__(self):
-        OpenGLGenericPlugin.__init__(self, self.paint_method)
+        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method)
         self.data_points_size = self.open_gl_widget.number_of_points
         self.all_pubs = None
         self.topic_checker = RosTopicChecker()
@@ -259,7 +259,7 @@ class SensorScope(OpenGLGenericPlugin):
 
     def resized(self):
         #we divide by 100 because we want to scroll 100 points per 100 points
-        self.time_slider.setMaximum((self.data_points_size - self.open_gl_widget.number_of_points_to_display) - 1)
+        self.time_slider.setMaximum((self.data_points_size - self.open_gl_widget.number_of_points_to_display)/100 - 1)
 
     def activate(self):
         OpenGLGenericPlugin.activate(self)
@@ -294,12 +294,22 @@ class SensorScope(OpenGLGenericPlugin):
                     sub_frame.data_set.points.append(msg.data)
                 else:
                     sub_frame.data_set.points.append(None)
-            #else:
-                # if the data set is not enabled (i.e. subscribing to None),
-                # we only draw a line on 0
-            #    sub_frame.data_set.points.append(0)
                 sub_frame.data_set.points.popleft()
         self.mutex.release()
+
+    def right_click_method(self, x):
+        #right click for time traveling
+        # only if paused
+        if self.paused:
+            self.display_frame += (x - self.open_gl_widget.last_right_click_x)
+            if self.display_frame < 0:
+                self.display_frame = 0
+            if self.display_frame >= self.data_points_size:
+                self.display_frame = self.data_points_size - 1
+
+            self.open_gl_widget.last_right_click_x = x
+
+            self.paint_method(self.display_frame)
 
     def paint_method(self, display_frame = 0):
         '''
@@ -368,7 +378,7 @@ class SensorScope(OpenGLGenericPlugin):
         self.open_gl_widget.update()
 
     def time_changed(self, value):
-        self.display_frame = value
+        self.display_frame = value*100
         self.paint_method(value)
 
     def button_play_clicked(self):
