@@ -337,7 +337,7 @@ class SensorScope(OpenGLGenericPlugin):
         glVertexPointerf(display_points)
         glClear(GL_COLOR_BUFFER_BIT)
         #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
-        glPointSize(1.5)
+        #glPointSize(1.5)
         #glEnable(GL_POINT_SMOOTH)
         #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
