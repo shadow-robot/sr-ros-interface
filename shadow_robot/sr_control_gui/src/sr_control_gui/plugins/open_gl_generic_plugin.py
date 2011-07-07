@@ -40,29 +40,45 @@ class GenericGLWidget(QGLWidget):
 
     def __init__(self, parent, paint_method, plugin_parent):
         QGLWidget.__init__(self, parent)
-        self.parent = plugin_parent
         self.number_of_points = Config.open_gl_generic_plugin_config.number_of_points
 
+        self.parent = plugin_parent
         self.setMinimumSize(400, 400)
         self.paint_method = paint_method
 
-        self.update()
         self.refresh_timer = QtCore.QTimer()
-        self.refresh_timer.setSingleShot(True)
-        QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
+        self.line = []
+        self.line_color = [1.0,1.0,1.0]
 
-    def animate_one_shot(self):
-        self.refresh_timer.start()
+        QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
 
     def animate(self):
         '''
         Virtual drawing routine: needs to be overloaded
         '''
         try:
-            self.update()
             self.paint_method()
+
+            glEnableClientState(GL_VERTEX_ARRAY)
+            glEnableClientState(GL_COLOR_ARRAY)
+            glColorPointerf(self.line_color)
+            glVertexPointerf(self.line)
+            glDrawArrays(GL_LINES, 0, len(self.line))
+            glDisableClientState(GL_VERTEX_ARRAY)
+            glDisableClientState(GL_COLOR_ARRAY)
+            glFlush()
+            self.update()
         except:
             pass
+
+    def mouseMoveEvent(self, event):
+        """
+        Draw a vertical line when the mouse is dragged on the
+        opengl widget.
+        """
+        self.line = [[event.pos().x(), 0],
+                     [event.pos().x(), self.height]]
+
 
     def resizeEvent(self, event):
         w = event.size().width()
@@ -119,8 +135,10 @@ class OpenGLGenericPlugin(GenericPlugin):
 
     def activate(self):
         GenericPlugin.activate(self)
+        self.open_gl_widget.refresh_timer.start( 1000/Config.open_gl_generic_plugin_config.refresh_frequency )
 
     def on_close(self):
+        self.open_gl_widget.refresh_timer.stop()
         GenericPlugin.on_close(self)
 
     def depends(self):

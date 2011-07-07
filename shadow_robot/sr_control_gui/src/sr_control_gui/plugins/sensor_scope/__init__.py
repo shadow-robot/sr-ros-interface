@@ -151,7 +151,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
 
         if text != "None":
             self.data_set.enabled = True
-            self.data_set.subscriber = rospy.Subscriber(str(text), Int16, self.parent.msg_callback, self.subscriber_index, queue_size = 50000)
+            self.data_set.subscriber = rospy.Subscriber(str(text), Int16, self.parent.msg_callback, self.subscriber_index)
         else:
             self.data_set.enabled = False
 
@@ -211,11 +211,10 @@ class SensorScope(OpenGLGenericPlugin):
         OpenGLGenericPlugin.__init__(self, self.paint_method)
         self.data_points_size = self.open_gl_widget.number_of_points
         self.all_pubs = None
-
-        self.counter = 0
-
         self.topic_checker = RosTopicChecker()
         self.refresh_topics()
+
+        self.mutex = threading.Lock()
 
         self.control_layout = QtGui.QVBoxLayout()
 
@@ -283,6 +282,7 @@ class SensorScope(OpenGLGenericPlugin):
         if self.paused:
             return
 
+        self.mutex.acquire()
         for sub_frame in self.subscribe_topic_frames:
             if sub_frame.data_set.enabled:
                 if sub_frame.subscriber_index == index:
@@ -294,15 +294,7 @@ class SensorScope(OpenGLGenericPlugin):
                 # we only draw a line on 0
             #    sub_frame.data_set.points.append(0)
                 sub_frame.data_set.points.popleft()
-
-        #paint every 50 frames
-        if self.counter == 50:
-            self.counter = 0
-            try:
-                self.open_gl_widget.animate_one_shot()
-            except:
-                " failed to refresh "
-        self.counter += 1
+        self.mutex.release()
 
     def paint_method(self, display_frame = 0):
         '''
@@ -319,6 +311,7 @@ class SensorScope(OpenGLGenericPlugin):
         display_points = []
         colors = []
 
+        self.mutex.acquire()
         for sub_frame in self.subscribe_topic_frames:
             #update the value in the label
             sub_frame.update_display_last_value(sub_frame.data_set.points[-1])
@@ -347,10 +340,12 @@ class SensorScope(OpenGLGenericPlugin):
         #glEnable(GL_POINT_SMOOTH)
         #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
+
+        self.mutex.release()
+
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_COLOR_ARRAY)
         glFlush()
-
         self.open_gl_widget.update()
 
     def time_changed(self, value):
