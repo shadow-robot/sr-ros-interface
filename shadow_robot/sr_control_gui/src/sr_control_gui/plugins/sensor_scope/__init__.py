@@ -130,6 +130,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
             self.layout.addWidget(self.remove_topic_btn)
 
         self.display_last_value = QtGui.QLabel()
+        self.display_last_value.setFixedWidth(110)
         self.layout.addWidget(self.display_last_value)
 
         #set a color by default
@@ -159,7 +160,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
         txt = ""
         txt += str(value)
         txt += " / "
-        txt += str(hex( value ))
+        txt += "0x%0.4X" % value
         self.display_last_value.setText(txt)
 
 
