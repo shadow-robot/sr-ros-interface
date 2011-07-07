@@ -313,8 +313,6 @@ class SensorScope(OpenGLGenericPlugin):
         self.mutex.acquire()
         for sub_frame in self.subscribe_topic_frames:
             last_displayed_index = self.data_points_size - display_frame -1
-            #update the value in the label
-            sub_frame.update_display_last_value(sub_frame.data_set.points[last_displayed_index])
 
             #we want to keep the last point of the raw data in the middle of
             # the screen
@@ -341,7 +339,7 @@ class SensorScope(OpenGLGenericPlugin):
         #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
 
-        #self.compute_line_intersect(display_frame)
+        self.compute_line_intersect(display_frame)
 
         self.mutex.release()
 
@@ -382,12 +380,11 @@ class SensorScope(OpenGLGenericPlugin):
         scaled_data = (data * self.open_gl_widget.height) / data_max
         return scaled_data
 
-    #def compute_line_intersect(self, display_frame):
-    #    pass
-    #    for sub_frame in self.subscribe_topic_frames:
-    #        if sub_frame.data_set.enabled:
-    #            for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
-    #                data_index = self.display_to_data_index(display_index, display_frame)
-
-
-
+    def compute_line_intersect(self, display_frame):
+        for sub_frame in self.subscribe_topic_frames:
+            if sub_frame.data_set.enabled:
+                for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
+                    if display_index == self.open_gl_widget.line_x:
+                        data_index = self.display_to_data_index(display_index, display_frame)
+                        #update the value in the label
+                        sub_frame.update_display_last_value(sub_frame.data_set.points[data_index])
