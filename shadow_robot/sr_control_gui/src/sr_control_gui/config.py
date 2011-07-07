@@ -20,7 +20,7 @@ File containing all the configuration parameters.
 """
 
 class OpenGLGenericPluginConfig(object):
-    refresh_frequency = 60
+    number_of_points = 50000
 
 class GenericPluginConfig(object):
     dependencies = []

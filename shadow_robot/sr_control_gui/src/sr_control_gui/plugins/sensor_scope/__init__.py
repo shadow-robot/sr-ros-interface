@@ -32,6 +32,8 @@ from OpenGL.GLUT import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 
+import threading
+
 from collections import deque
 from std_msgs.msg import Int16
 
@@ -149,7 +151,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
 
         if text != "None":
             self.data_set.enabled = True
-            self.data_set.subscriber = rospy.Subscriber(str(text), Int16, self.parent.msg_callback, self.subscriber_index)
+            self.data_set.subscriber = rospy.Subscriber(str(text), Int16, self.parent.msg_callback, self.subscriber_index, queue_size = 50000)
         else:
             self.data_set.enabled = False
 
@@ -209,6 +211,9 @@ class SensorScope(OpenGLGenericPlugin):
         OpenGLGenericPlugin.__init__(self, self.paint_method)
         self.data_points_size = self.open_gl_widget.number_of_points
         self.all_pubs = None
+
+        self.counter = 0
+
         self.topic_checker = RosTopicChecker()
         self.refresh_topics()
 
@@ -249,7 +254,8 @@ class SensorScope(OpenGLGenericPlugin):
         self.paused = False
 
     def resized(self):
-        self.time_slider.setMaximum(self.data_points_size - self.open_gl_widget.number_of_points_to_display - 1)
+        #we divide by 100 because we want to scroll 100 points per 100 points
+        self.time_slider.setMaximum((self.data_points_size - self.open_gl_widget.number_of_points_to_display)/100 - 1)
 
     def activate(self):
         OpenGLGenericPlugin.activate(self)
@@ -288,6 +294,15 @@ class SensorScope(OpenGLGenericPlugin):
                 # we only draw a line on 0
             #    sub_frame.data_set.points.append(0)
                 sub_frame.data_set.points.popleft()
+
+        #paint every 50 frames
+        if self.counter == 50:
+            self.counter = 0
+            try:
+                self.open_gl_widget.animate_one_shot()
+            except:
+                " failed to refresh "
+        self.counter += 1
 
     def paint_method(self, display_frame = 0):
         '''
@@ -332,10 +347,10 @@ class SensorScope(OpenGLGenericPlugin):
         #glEnable(GL_POINT_SMOOTH)
         #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
-
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_COLOR_ARRAY)
         glFlush()
+
         self.open_gl_widget.update()
 
     def time_changed(self, value):
@@ -361,7 +376,8 @@ class SensorScope(OpenGLGenericPlugin):
         self.all_pubs = self.topic_checker.get_topics()
 
     def display_to_data_index(self, display_index, display_frame):
-        data_index = self.data_points_size - self.open_gl_widget.number_of_points_to_display + display_index - display_frame
+        # we multiply display_frame by a 100 because we're scrolling 100 points per 100 points
+        data_index = self.data_points_size - self.open_gl_widget.number_of_points_to_display + display_index - (display_frame*100)
         return data_index
 
     def scale_data(self, data, data_max = 65536):

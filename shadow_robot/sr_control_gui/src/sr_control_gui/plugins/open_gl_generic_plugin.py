@@ -35,25 +35,31 @@ class GenericGLWidget(QGLWidget):
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
-    number_of_points = 500000
     number_of_points_to_display = 500
     height = 400
 
     def __init__(self, parent, paint_method, plugin_parent):
         QGLWidget.__init__(self, parent)
-
         self.parent = plugin_parent
+        self.number_of_points = Config.open_gl_generic_plugin_config.number_of_points
+
         self.setMinimumSize(400, 400)
         self.paint_method = paint_method
 
+        self.update()
         self.refresh_timer = QtCore.QTimer()
+        self.refresh_timer.setSingleShot(True)
         QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
+
+    def animate_one_shot(self):
+        self.refresh_timer.start()
 
     def animate(self):
         '''
         Virtual drawing routine: needs to be overloaded
         '''
         try:
+            self.update()
             self.paint_method()
         except:
             pass
@@ -113,10 +119,8 @@ class OpenGLGenericPlugin(GenericPlugin):
 
     def activate(self):
         GenericPlugin.activate(self)
-        self.open_gl_widget.refresh_timer.start( 1000/Config.open_gl_generic_plugin_config.refresh_frequency )
 
     def on_close(self):
-        self.open_gl_widget.refresh_timer.stop()
         GenericPlugin.on_close(self)
 
     def depends(self):
