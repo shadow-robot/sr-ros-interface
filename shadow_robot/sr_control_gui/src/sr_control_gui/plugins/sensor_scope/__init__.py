@@ -54,9 +54,8 @@ class DataSet(object):
         self.change_color(Qt.QColor(255,0,0))
 
     def init_dataset(self):
-        for index_points in range(0, self.parent.data_points_size):
-            tmp = [0]* self.parent.data_points_size
-            self.points = deque(tmp)
+        tmp = [0]* self.parent.data_points_size
+        self.points = deque(tmp)
 
     def change_color(self, col):
         r = col.redF()

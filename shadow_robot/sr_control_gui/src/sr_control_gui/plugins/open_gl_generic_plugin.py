@@ -35,7 +35,7 @@ class GenericGLWidget(QGLWidget):
     A generic openGL frame which is embedded in
     the OpenGLGenericPlugin frame.
     """
-    number_of_points = 2000
+    number_of_points = 500000
     number_of_points_to_display = 500
     height = 400
 
