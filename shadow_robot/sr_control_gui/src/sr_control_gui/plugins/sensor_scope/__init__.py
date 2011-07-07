@@ -383,8 +383,7 @@ class SensorScope(OpenGLGenericPlugin):
     def compute_line_intersect(self, display_frame):
         for sub_frame in self.subscribe_topic_frames:
             if sub_frame.data_set.enabled:
-                for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
-                    if display_index == self.open_gl_widget.line_x:
-                        data_index = self.display_to_data_index(display_index, display_frame)
-                        #update the value in the label
-                        sub_frame.update_display_last_value(sub_frame.data_set.points[data_index])
+                data_index = self.display_to_data_index(self.open_gl_widget.line_x, display_frame)
+                #update the value in the label
+                sub_frame.update_display_last_value(sub_frame.data_set.points[data_index])
+
