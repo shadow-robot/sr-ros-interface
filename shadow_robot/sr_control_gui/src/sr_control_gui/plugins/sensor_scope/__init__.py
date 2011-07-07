@@ -237,8 +237,19 @@ class SensorScope(OpenGLGenericPlugin):
         self.control_layout.addWidget(self.btn_frame)
         self.subscribe_topic_frames = []
 
+        self.time_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.time_slider.setMinimum(0)
+        self.time_slider.setMaximum(self.data_points_size - self.open_gl_widget.number_of_points_to_display)
+        self.time_slider.setInvertedControls(True)
+        self.time_slider.setInvertedAppearance(True)
+        self.time_slider.setEnabled(False)
+        self.frame.connect(self.time_slider, QtCore.SIGNAL('valueChanged(int)'), self.time_changed)
+        self.layout.addWidget(self.time_slider)
+
         self.paused = False
 
+    def resized(self):
+        self.time_slider.setMaximum(self.data_points_size - self.open_gl_widget.number_of_points_to_display - 1)
 
     def activate(self):
         OpenGLGenericPlugin.activate(self)
@@ -263,6 +274,9 @@ class SensorScope(OpenGLGenericPlugin):
         #received message from subscriber at index: update the last
         # point and pop the first point
         #print index, " ", msg.data
+        if self.paused:
+            return
+
         for sub_frame in self.subscribe_topic_frames:
             if sub_frame.data_set.enabled:
                 if sub_frame.subscriber_index == index:
@@ -275,12 +289,17 @@ class SensorScope(OpenGLGenericPlugin):
             #    sub_frame.data_set.points.append(0)
                 sub_frame.data_set.points.popleft()
 
-    def paint_method(self):
+    def paint_method(self, display_frame = 0):
         '''
         Drawing routine: this function is called periodically.
+
+        @display_frame: the frame to display: we have more points than we display.
+                        By default, we display the latest values, but by playing
+                        with the time_slider we can then go back in time.
         '''
         if self.paused:
-            return
+            if display_frame == 0:
+                return
 
         display_points = []
         colors = []
@@ -296,7 +315,7 @@ class SensorScope(OpenGLGenericPlugin):
             for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
                 # add the raw data
                 colors.append(sub_frame.data_set.get_raw_color())
-                data_index = self.display_to_data_index(display_index)
+                data_index = self.display_to_data_index(display_index, display_frame)
                 display_points.append([display_index, sub_frame.data_set.points[data_index] + offset])
 
                 #also add the scaled data
@@ -317,15 +336,21 @@ class SensorScope(OpenGLGenericPlugin):
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_COLOR_ARRAY)
         glFlush()
+        self.open_gl_widget.update()
+
+    def time_changed(self, value):
+        self.paint_method(value)
 
     def button_play_clicked(self):
         #lock mutex here
         if not self.paused:
             self.paused = True
             self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/play.png'))
+            self.time_slider.setEnabled(True)
         else:
             self.paused = False
             self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
+            self.time_slider.setEnabled(False)
 
     def button_refresh_clicked(self):
         self.refresh_topics()
@@ -335,8 +360,8 @@ class SensorScope(OpenGLGenericPlugin):
     def refresh_topics(self):
         self.all_pubs = self.topic_checker.get_topics()
 
-    def display_to_data_index(self, display_index):
-        data_index = self.data_points_size - self.open_gl_widget.number_of_points_to_display + display_index
+    def display_to_data_index(self, display_index, display_frame):
+        data_index = self.data_points_size - self.open_gl_widget.number_of_points_to_display + display_index - display_frame
         return data_index
 
     def scale_data(self, data, data_max = 65536):

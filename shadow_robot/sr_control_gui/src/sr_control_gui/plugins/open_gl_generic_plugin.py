@@ -39,9 +39,10 @@ class GenericGLWidget(QGLWidget):
     number_of_points_to_display = 500
     height = 400
 
-    def __init__(self, parent, paint_method):
+    def __init__(self, parent, paint_method, plugin_parent):
         QGLWidget.__init__(self, parent)
 
+        self.parent = plugin_parent
         self.setMinimumSize(400, 400)
         self.paint_method = paint_method
 
@@ -54,7 +55,6 @@ class GenericGLWidget(QGLWidget):
         '''
         try:
             self.paint_method()
-            self.update()
         except:
             pass
 
@@ -70,6 +70,7 @@ class GenericGLWidget(QGLWidget):
         gluOrtho2D(0.0, w, 0.0, h)
 
         self.number_of_points_to_display = w
+        self.parent.resized()
 
     def initializeGL(self):
         '''
@@ -93,19 +94,22 @@ class OpenGLGenericPlugin(GenericPlugin):
     def __init__(self, paint_method):
         GenericPlugin.__init__(self)
 
-        self.layout = QtGui.QHBoxLayout()
-        self.frame = QtGui.QFrame()
+        self.splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
 
+        #a control frame, will contain the buttons / dropdown etc...
         self.control_frame = QtGui.QFrame()
-        self.control_frame.setFixedWidth(300)
+        self.splitter.addWidget(self.control_frame)
 
-        self.layout.addWidget(self.control_frame)
-
-        self.open_gl_widget = GenericGLWidget(self.frame, paint_method)
+        #the visualization frame
+        self.layout = QtGui.QVBoxLayout()
+        self.frame = QtGui.QFrame()
+        self.open_gl_widget = GenericGLWidget(self.frame, paint_method, self)
         self.layout.addWidget(self.open_gl_widget)
 
         self.frame.setLayout(self.layout)
-        self.window.setWidget(self.frame)
+        self.splitter.addWidget(self.frame)
+
+        self.window.setWidget(self.splitter)
 
     def activate(self):
         GenericPlugin.activate(self)
@@ -117,3 +121,6 @@ class OpenGLGenericPlugin(GenericPlugin):
 
     def depends(self):
         return None
+
+    def resized(self):
+        pass
