@@ -56,7 +56,7 @@ class DataSet(object):
         self.change_color(Qt.QColor(255,0,0))
 
     def init_dataset(self):
-        tmp = [0]* self.parent.data_points_size
+        tmp = [None]* self.parent.data_points_size
         self.points = deque(tmp)
 
     def change_color(self, col):
@@ -157,11 +157,12 @@ class SubscribeTopicFrame(QtGui.QFrame):
             self.data_set.enabled = False
 
     def update_display_last_value(self, value):
-        txt = ""
-        txt += str(value)
-        txt += " / "
-        txt += "0x%0.4X" % value
-        self.display_last_value.setText(txt)
+        if value != None:
+            txt = ""
+            txt += str(value)
+            txt += " / "
+            txt += "0x%0.4X" % value
+            self.display_last_value.setText(txt)
 
 
     def change_color_clicked(self, const_color = None):
@@ -292,7 +293,7 @@ class SensorScope(OpenGLGenericPlugin):
                 if sub_frame.subscriber_index == index:
                     sub_frame.data_set.points.append(msg.data)
                 else:
-                    sub_frame.data_set.points.append(sub_frame.data_set.points[-1])
+                    sub_frame.data_set.points.append(None)
             #else:
                 # if the data set is not enabled (i.e. subscribing to None),
                 # we only draw a line on 0
@@ -320,17 +321,20 @@ class SensorScope(OpenGLGenericPlugin):
 
             #we want to keep the last point of the raw data in the middle of
             # the screen
-            offset = self.open_gl_widget.height/2 - sub_frame.data_set.points[last_displayed_index]
+            if sub_frame.data_set.points[last_displayed_index] != None:
+                offset = self.open_gl_widget.height/2 - sub_frame.data_set.points[last_displayed_index]
+            else:
+                offset = 0
 
             for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
-                # add the raw data
-                colors.append(sub_frame.data_set.get_raw_color())
                 data_index = self.display_to_data_index(display_index, display_frame)
-                display_points.append([display_index, sub_frame.data_set.points[data_index] + offset])
-
-                #also add the scaled data
-                colors.append(sub_frame.data_set.get_scaled_color())
-                display_points.append([display_index, self.scale_data(sub_frame.data_set.points[data_index])] )
+                if sub_frame.data_set.points[data_index] != None:
+                    # add the raw data
+                    colors.append(sub_frame.data_set.get_raw_color())
+                    display_points.append([display_index, sub_frame.data_set.points[data_index] + offset])
+                    #also add the scaled data
+                    colors.append(sub_frame.data_set.get_scaled_color())
+                    display_points.append([display_index, self.scale_data(sub_frame.data_set.points[data_index])] )
 
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
@@ -338,7 +342,7 @@ class SensorScope(OpenGLGenericPlugin):
         glVertexPointerf(display_points)
         glClear(GL_COLOR_BUFFER_BIT)
         #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
-        #glPointSize(1.5)
+        #glPointSize(1)
         #glEnable(GL_POINT_SMOOTH)
         #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
