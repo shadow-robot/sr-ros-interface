@@ -254,7 +254,7 @@ class SensorScope(OpenGLGenericPlugin):
 
     def resized(self):
         #we divide by 100 because we want to scroll 100 points per 100 points
-        self.time_slider.setMaximum((self.data_points_size - self.open_gl_widget.number_of_points_to_display)/100 - 1)
+        self.time_slider.setMaximum((self.data_points_size - self.open_gl_widget.number_of_points_to_display) - 1)
 
     def activate(self):
         OpenGLGenericPlugin.activate(self)
@@ -305,20 +305,20 @@ class SensorScope(OpenGLGenericPlugin):
                         with the time_slider we can then go back in time.
         '''
         if self.paused:
-            if display_frame == 0:
-                return
+            display_frame = self.display_frame
 
         display_points = []
         colors = []
 
         self.mutex.acquire()
         for sub_frame in self.subscribe_topic_frames:
+            last_displayed_index = self.data_points_size - display_frame -1
             #update the value in the label
-            sub_frame.update_display_last_value(sub_frame.data_set.points[-1])
+            sub_frame.update_display_last_value(sub_frame.data_set.points[last_displayed_index])
 
             #we want to keep the last point of the raw data in the middle of
             # the screen
-            offset = self.open_gl_widget.height/2 - sub_frame.data_set.points[-1]
+            offset = self.open_gl_widget.height/2 - sub_frame.data_set.points[last_displayed_index]
 
             for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
                 # add the raw data
@@ -341,6 +341,8 @@ class SensorScope(OpenGLGenericPlugin):
         #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
 
+        #self.compute_line_intersect(display_frame)
+
         self.mutex.release()
 
         glDisableClientState(GL_VERTEX_ARRAY)
@@ -349,6 +351,7 @@ class SensorScope(OpenGLGenericPlugin):
         self.open_gl_widget.update()
 
     def time_changed(self, value):
+        self.display_frame = value
         self.paint_method(value)
 
     def button_play_clicked(self):
@@ -372,9 +375,19 @@ class SensorScope(OpenGLGenericPlugin):
 
     def display_to_data_index(self, display_index, display_frame):
         # we multiply display_frame by a 100 because we're scrolling 100 points per 100 points
-        data_index = self.data_points_size - self.open_gl_widget.number_of_points_to_display + display_index - (display_frame*100)
+        data_index = self.data_points_size - self.open_gl_widget.number_of_points_to_display + display_index - (display_frame)
         return data_index
 
     def scale_data(self, data, data_max = 65536):
         scaled_data = (data * self.open_gl_widget.height) / data_max
         return scaled_data
+
+    #def compute_line_intersect(self, display_frame):
+    #    pass
+    #    for sub_frame in self.subscribe_topic_frames:
+    #        if sub_frame.data_set.enabled:
+    #            for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
+    #                data_index = self.display_to_data_index(display_index, display_frame)
+
+
+

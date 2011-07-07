@@ -37,6 +37,7 @@ class GenericGLWidget(QGLWidget):
     """
     number_of_points_to_display = 500
     height = 400
+    width = 400
 
     def __init__(self, parent, paint_method, plugin_parent):
         QGLWidget.__init__(self, parent)
@@ -47,7 +48,10 @@ class GenericGLWidget(QGLWidget):
         self.paint_method = paint_method
 
         self.refresh_timer = QtCore.QTimer()
-        self.line = []
+
+        self.line_x = self.width
+        self.line = [[self.line_x, 0],
+                     [self.line_x, self.height]]
         self.line_color = [1.0,1.0,1.0]
 
         QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
@@ -76,14 +80,15 @@ class GenericGLWidget(QGLWidget):
         Draw a vertical line when the mouse is dragged on the
         opengl widget.
         """
-        self.line = [[event.pos().x(), 0],
-                     [event.pos().x(), self.height]]
-
+        self.line_x = event.pos().x()
+        self.line = [[self.line_x, 0],
+                     [self.line_x, self.height]]
 
     def resizeEvent(self, event):
         w = event.size().width()
         h = event.size().height()
 
+        self.width = w
         self.height = h
 
         glMatrixMode(GL_PROJECTION)
