@@ -317,12 +317,23 @@ class SensorScope(OpenGLGenericPlugin):
 
         self.mutex.acquire()
         for sub_frame in self.subscribe_topic_frames:
-            last_displayed_index = self.data_points_size - display_frame -1
+            #we want to keep the average of the last 50 points of
+            #  the raw data in the middle of the screen
+            #first we remove the data containing None from the 50 last points
+            last_50_points = []
+            index = (self.data_points_size - display_frame -1)
+            iteration = 0
+            while len(last_50_points) < 50:
+                if sub_frame.data_set.points[index] != None:
+                    last_50_points.append(sub_frame.data_set.points[index])
+                index -= 1
+                iteration += 1
+                #searched the last 200 points
+                if iteration == 200:
+                    break
 
-            #we want to keep the last point of the raw data in the middle of
-            # the screen
-            if sub_frame.data_set.points[last_displayed_index] != None:
-                offset = self.open_gl_widget.height/2 - sub_frame.data_set.points[last_displayed_index]
+            if len(last_50_points) != 0:
+                offset = self.open_gl_widget.height/2 - int(float(sum(last_50_points))/len(last_50_points))
             else:
                 offset = 0
 
@@ -342,7 +353,7 @@ class SensorScope(OpenGLGenericPlugin):
         glVertexPointerf(display_points)
         glClear(GL_COLOR_BUFFER_BIT)
         #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
-        #glPointSize(1)
+        #glPointSize(10)
         #glEnable(GL_POINT_SMOOTH)
         #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
