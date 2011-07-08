@@ -22,6 +22,15 @@ File containing all the configuration parameters.
 class OpenGLGenericPluginConfig(object):
     refresh_frequency = 60
     number_of_points = 500000
+    colors = [["red", [1.0,0,0]],
+              ["green", [0,1.0,0]],
+              ["blue", [0,0,1.0]],
+              ["light_blue", [0.51,0.75,1.]],
+              ["orange", [1.,0.66,0]],
+              ["yellow", [1.,0.92,0.06]],
+              ["purple", [0.85,0.13,0.82]],
+              ["pink", [1.,0.51,0.80]]
+              ]
 
 class GenericPluginConfig(object):
     dependencies = []

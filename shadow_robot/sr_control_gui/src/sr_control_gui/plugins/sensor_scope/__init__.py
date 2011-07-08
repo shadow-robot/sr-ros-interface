@@ -53,16 +53,16 @@ class DataSet(object):
         self.scaled_color = []
         self.raw_color = []
 
-        self.change_color(Qt.QColor(255,0,0))
+        self.change_color([255,0,0])
 
     def init_dataset(self):
         tmp = [None]* self.parent.data_points_size
         self.points = deque(tmp)
 
-    def change_color(self, col):
-        r = col.redF()
-        g = col.greenF()
-        b = col.blueF()
+    def change_color(self, rgb):
+        r = rgb[0]
+        g = rgb[1]
+        b = rgb[2]
 
         self.scaled_color = [r, g, b]
 
@@ -104,13 +104,22 @@ class SubscribeTopicFrame(QtGui.QFrame):
         self.connect(self.topic_box, QtCore.SIGNAL('activated(int)'), self.onChanged)
         self.layout.addWidget(self.topic_box)
 
-        #add a button to change the color
-        self.change_color_btn = QtGui.QPushButton()
-        self.change_color_btn.setIcon(QtGui.QIcon(self.parent.parent.parent.rootPath + '/images/icons/color_wheel.png'))
-        self.change_color_btn.setToolTip("Change the color for this topic")
-        self.change_color_btn.setFixedWidth(30)
-        self.connect(self.change_color_btn, QtCore.SIGNAL('clicked()'), self.change_color_clicked)
-        self.layout.addWidget(self.change_color_btn)
+        #add a combobox to easily change the color
+        self.change_color_combobox = QtGui.QComboBox(self)
+        self.change_color_combobox.setToolTip("Change the color for this topic")
+        self.change_color_combobox.setFixedWidth(45)
+
+        for color in Config.open_gl_generic_plugin_config.colors:
+            #the colors are stored as an icon + a color value
+            icon = QtGui.QIcon(self.parent.parent.parent.rootPath + '/images/icons/colors/'+color[0] +'.png')
+            self.change_color_combobox.addItem( icon, "" )
+
+        #add the color picker at the end of the list for the user to pick a custom color
+        icon = QtGui.QIcon(self.parent.parent.parent.rootPath + '/images/icons/color_wheel.png')
+        self.change_color_combobox.addItem( icon, "" )
+
+        self.connect(self.change_color_combobox, QtCore.SIGNAL('activated(int)'), self.change_color_clicked)
+        self.layout.addWidget(self.change_color_combobox)
 
         #add a button to add a subscribe topic frame
         self.add_subscribe_topic_btn = QtGui.QPushButton()
@@ -134,7 +143,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
         self.layout.addWidget(self.display_last_value)
 
         #set a color by default
-        self.change_color_clicked(const_color = Qt.QColor(255,0,0))
+        self.change_color_clicked(index = 0, const_color = [255,0,0])
 
         self.setLayout(self.layout)
 
@@ -165,20 +174,22 @@ class SubscribeTopicFrame(QtGui.QFrame):
             self.display_last_value.setText(txt)
 
 
-    def change_color_clicked(self, const_color = None):
-        if const_color == None:
-            col = QtGui.QColorDialog.getColor()
-
+    def change_color_clicked(self, index, const_color = None):
+        # the last item is the color picker
+        if index == self.change_color_combobox.count() - 1:
+            col_tmp = QtGui.QColorDialog.getColor()
+            if not col_tmp.isValid():
+                return
+            col = [col_tmp.redF(), col_tmp.greenF(), col_tmp.blueF()]
         else:
-            col = const_color
+            #the user choosed a color from the dropdown
+            if const_color == None:
+                col = Config.open_gl_generic_plugin_config.colors[index][1]
+            else:
+                col = const_color
 
-        if col.isValid():
-            self.data_set.change_color(col)
+        self.data_set.change_color(col)
 
-            html_color = "QLabel { color : "
-            html_color += col.name()
-            html_color += "; }"
-            self.display_last_value.setStyleSheet(html_color)
 
     def add_subscribe_topic_clicked(self):
         self.parent.add_topic_subscriber()
