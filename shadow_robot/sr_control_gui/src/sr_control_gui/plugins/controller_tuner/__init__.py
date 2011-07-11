@@ -132,7 +132,7 @@ class JointPidSetter(QtGui.QFrame):
 
     def set_pid(self):
         for param in self.parameters.items():
-            param[1][0] = param[1][1].text().toInt()
+            param[1][0] = param[1][1].text().toInt()[0]
         try:
             self.pid_service(self.parameters["sgleftref"][0], self.parameters["sgrightref"][0],
                              self.parameters["f"][0], self.parameters["p"][0], self.parameters["i"][0],

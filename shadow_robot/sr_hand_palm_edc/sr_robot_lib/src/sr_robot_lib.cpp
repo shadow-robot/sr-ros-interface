@@ -188,7 +188,8 @@ namespace shadow_robot
         config_index = MOTOR_CONFIG_FIRST_VALUE;
 
       }
-      ++config_index;
+      else
+	++config_index;
 
     } //endelse reconfig_queue.size()
   }
@@ -406,7 +407,10 @@ namespace shadow_robot
     std::vector<crc_unions::union16> full_config(MOTOR_CONFIG_CRC + 1);
     crc_unions::union16 value;
 
-    //TODO: get each strain gauge amplifier and combine them here
+    //TODO: read max pwm
+    value.word = 0x00FF;
+    full_config.at(MOTOR_CONFIG_MAX_PWM) = value;
+
     value.byte[0] = sg_left;
     value.byte[1] = sg_right;
     full_config.at(MOTOR_CONFIG_SG_REFS) = value;
