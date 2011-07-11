@@ -21,6 +21,7 @@ import rospy
 
 from generic_plugin import GenericPlugin
 from sr_robot_msgs.srv import ForceController
+from functools import partial
 
 from PyQt4 import QtCore, QtGui, Qt
 
@@ -79,6 +80,26 @@ class JointPidSetter(QtGui.QFrame):
 
             parameter[1] = text_edit
             self.layout_.addWidget(text_edit)
+            plus_minus_frame = QtGui.QFrame()
+            plus_minus_layout = QtGui.QVBoxLayout()
+
+            plus_btn = QtGui.QPushButton()
+            plus_btn.setText("+")
+            plus_btn.setFixedWidth(25)
+            plus_btn.setFixedHeight(25)
+            plus_btn.clicked.connect(partial(self.plus, parameter_name))
+            plus_minus_layout.addWidget(plus_btn)
+
+            minus_btn = QtGui.QPushButton()
+            minus_btn.setText("-")
+            minus_btn.setFixedWidth(25)
+            minus_btn.setFixedHeight(25)
+            minus_btn.clicked.connect(partial(self.minus, parameter_name))
+            plus_minus_layout.addWidget(minus_btn)
+
+            plus_minus_frame.setLayout(plus_minus_layout)
+
+            self.layout_.addWidget(plus_minus_frame)
 
         btn = QtGui.QPushButton()
         btn.setText("SET")
@@ -88,6 +109,26 @@ class JointPidSetter(QtGui.QFrame):
         self.layout_.addWidget(btn)
 
         self.setLayout(self.layout_)
+
+    def plus(self, param_name):
+        param = self.parameters[param_name]
+
+        value = param[1].text().toInt()[0]
+        value += 1
+        if value > param[2][1]:
+            value = param[2][1]
+
+        param[1].setText( str( value ) )
+
+    def minus(self, param_name):
+        param = self.parameters[param_name]
+
+        value = param[1].text().toInt()[0]
+        value -= 1
+        if value < param[2][0]:
+            value = param[2][0]
+        param[1].setText( str( value ) )
+
 
     def set_pid(self):
         for param in self.parameters.items():
