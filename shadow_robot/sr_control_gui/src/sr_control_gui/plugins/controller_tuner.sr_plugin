@@ -1,0 +1,9 @@
+[Core]
+Name = controller_tuner
+Module = ControllerTuner
+
+[Documentation]
+Author = Ugo Cupcic
+Version = 0.1
+Website = http://www.shadowrobot.com
+Description = Tuning the Force controller on the etherCAT hand.
