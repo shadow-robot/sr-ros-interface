@@ -46,30 +46,38 @@ class JointPidSetter(QtGui.QFrame):
         self.layout_.addWidget( label )
 
         self.ordered_params = ["sgleftref",
-                              "sgrightref",
-                              "f",
-                              "p",
-                              "i",
-                              "d",
-                              "imax",
-                              "deadband",
-                              "sign" ]
+                               "sgrightref",
+                               "f",
+                               "p",
+                               "i",
+                               "d",
+                               "imax",
+                               "deadband",
+                               "sign" ]
 
         self.parameters = {}
         for param in self.ordered_params:
-            self.parameters[param] = [0]
+            #a parameter contains:
+            #   - the value
+            #   - a QLineEdit to be able to modify the value
+            #   - an array containing the min/max
+            self.parameters[param] = [0,0,[0,100]]
 
         for parameter_name in self.ordered_params:
             parameter = self.parameters[parameter_name]
             label = QtGui.QLabel(parameter_name)
             self.layout_.addWidget( label )
 
-            text_edit = QtGui.QTextEdit()
+            text_edit = QtGui.QLineEdit()
             text_edit.setFixedHeight(30)
             text_edit.setFixedWidth(50)
             text_edit.setText( str(parameter[0]) )
 
-            parameter.append(text_edit)
+            validator = QtGui.QIntValidator(parameter[2][0], parameter[2][1], self)
+            text_edit.setValidator(validator)
+
+
+            parameter[1] = text_edit
             self.layout_.addWidget(text_edit)
 
         btn = QtGui.QPushButton()
@@ -83,7 +91,7 @@ class JointPidSetter(QtGui.QFrame):
 
     def set_pid(self):
         for param in self.parameters.items():
-            param[1][0] = int( param[1][1].toPlainText() )
+            param[1][0] = param[1][1].text().toInt()
         try:
             self.pid_service(self.parameters["sgleftref"][0], self.parameters["sgrightref"][0],
                              self.parameters["f"][0], self.parameters["p"][0], self.parameters["i"][0],
