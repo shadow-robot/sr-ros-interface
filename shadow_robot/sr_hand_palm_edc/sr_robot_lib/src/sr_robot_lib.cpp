@@ -130,8 +130,6 @@ namespace shadow_robot
     {
       //no config to send
       command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
-      //TODO: change back to torque
-      //command->to_motor_data_type   = MOTOR_DEMAND_PWM;
 
       //loop on all the joints and update their motor: we're sending commands to all the motors.
       boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = joints_vector.begin();
@@ -141,6 +139,36 @@ namespace shadow_robot
         {
 	  //ROS_ERROR_STREAM(" LFJ3 "<< joint_tmp->motor->actuator->command_.effort_);
           command->motor_data[joint_tmp->motor->motor_id] = joint_tmp->motor->actuator->command_.effort_;
+
+
+          //publish the debug values for the given motors.
+          // NB: debug_motor_indexes_and_data is smaller
+          //     than debug_publishers.
+          int publisher_index = 0;
+          boost::shared_ptr<std::pair<int,int> > debug_pair;
+          if( debug_mutex.try_lock() )
+          {
+            BOOST_FOREACH(debug_pair, debug_motor_indexes_and_data)
+            {
+              if( debug_pair != NULL )
+              {
+                //check if we want to publish some data for the current motor
+                if( debug_pair->first == joint_tmp->motor->motor_id )
+                {
+                  //check if it's the correct data
+                  if( debug_pair->second == -1 )
+                  {
+                    msg_debug.data =  joint_tmp->motor->actuator->command_.effort_;
+                    debug_publishers[publisher_index].publish(msg_debug);
+                  }
+                }
+              }
+              publisher_index ++;
+            }
+
+            debug_mutex.unlock();
+          } //end try_lock
+
 	  /*if(joint_tmp->motor->motor_id == 6)
 	    command->motor_data[joint_tmp->motor->motor_id] = 100;
 	  */
@@ -288,6 +316,10 @@ namespace shadow_robot
             //check if we want to publish some data for the current motor
             if( debug_pair->first == joint_tmp->motor->motor_id )
             {
+              //if < 0, then we're not asking for a FROM_MOTOR_DATA_TYPE
+              if( debug_pair->second < 0 )
+                continue;
+
               //check if it's the correct data
               if( debug_pair->second == status_data->motor_data_type )
               {
@@ -395,10 +427,10 @@ namespace shadow_robot
                                                  int deadband, int sign)
   {
     ROS_INFO_STREAM("Setting new pid values for motor" << motor_index << ": sg_left="
-		    << sg_left << " sg_right=" << sg_right << " f=" << f << " p=" 
-		    << p << " i=" << i << " d="<< d << " imax=" << imax 
+		    << sg_left << " sg_right=" << sg_right << " f=" << f << " p="
+		    << p << " i=" << i << " d="<< d << " imax=" << imax
 		    << " deadband="<< deadband << " sign=" << sign);
-		
+
 
 
     //the vector is of the size of the TO_MOTOR_DATA_TYPE enum.
