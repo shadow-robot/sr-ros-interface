@@ -42,7 +42,7 @@ class JointPidSetter(QtGui.QFrame):
 
         self.layout_ = QtGui.QHBoxLayout()
 
-        label = QtGui.QLabel(joint_name)
+        label = QtGui.QLabel("<font color=red>"+joint_name+"</font>")
         self.layout_.addWidget( label )
 
         self.ordered_params = ["sgleftref",
@@ -100,6 +100,9 @@ class FingerPIDSetter(QtGui.QFrame):
 
     def __init__(self, finger_name, joint_names):
         QtGui.QFrame.__init__(self)
+
+        self.setFrameShape(QtGui.QFrame.Box)
+
         self.finger_name = finger_name
         self.joint_names = joint_names
 
@@ -127,7 +130,7 @@ class ControllerTuner(GenericPlugin):
         self.frame = QtGui.QFrame()
         self.layout = QtGui.QVBoxLayout()
 
-        self.joints = {"LF": ["LFJ0", "LFJ3"]}
+        self.joints = {"LF": ["LFJ0", "LFJ3", "LFJ4", "LFJ5"]}
         self.finger_pid_setters = []
 
         for finger in self.joints.items():
