@@ -63,7 +63,7 @@ class TorqueJointSlider(LightJointSlider):
         self.publishers = {}
 
         for j in joints_tmp:
-            joints_list.append( Joint(j[0], -10, 10) )
+            joints_list.append( Joint(j[0], -200, 200) )
             self.publishers[j[0]] = rospy.Publisher(j[1], Float64)
 
         LightJointSlider.__init__(self, joints_list)

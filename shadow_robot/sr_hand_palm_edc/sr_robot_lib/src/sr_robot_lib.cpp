@@ -129,9 +129,9 @@ namespace shadow_robot
     if( reconfig_queue.empty() )
     {
       //no config to send
-      //command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
+      command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
       //TODO: change back to torque
-      command->to_motor_data_type   = MOTOR_DEMAND_PWM;
+      //command->to_motor_data_type   = MOTOR_DEMAND_PWM;
 
       //loop on all the joints and update their motor: we're sending commands to all the motors.
       boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = joints_vector.begin();
@@ -139,7 +139,11 @@ namespace shadow_robot
       {
         if(joint_tmp->has_motor)
         {
+	  //ROS_ERROR_STREAM(" LFJ3 "<< joint_tmp->motor->actuator->command_.effort_);
           command->motor_data[joint_tmp->motor->motor_id] = joint_tmp->motor->actuator->command_.effort_;
+	  /*if(joint_tmp->motor->motor_id == 6)
+	    command->motor_data[joint_tmp->motor->motor_id] = 100;
+	  */
           joint_tmp->motor->actuator->state_.last_commanded_effort_ = joint_tmp->motor->actuator->command_.effort_;
         }
       }
@@ -389,6 +393,13 @@ namespace shadow_robot
                                                  int f, int p, int i, int d, int imax,
                                                  int deadband, int sign)
   {
+    ROS_INFO_STREAM("Setting new pid values for motor" << motor_index << ": sg_left="
+		    << sg_left << " sg_right=" << sg_right << " f=" << f << " p=" 
+		    << p << " i=" << i << " d="<< d << " imax=" << imax 
+		    << " deadband="<< deadband << " sign=" << sign);
+		
+
+
     //the vector is of the size of the TO_MOTOR_DATA_TYPE enum.
     //the value of the element at a given index is the value
     //for the given MOTOR_CONFIG.

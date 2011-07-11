@@ -65,8 +65,8 @@ class JointPidSetter(QtGui.QFrame):
             self.layout_.addWidget( label )
 
             text_edit = QtGui.QTextEdit()
-            text_edit.setFixedHeight(25)
-            text_edit.setFixedWidth(40)
+            text_edit.setFixedHeight(30)
+            text_edit.setFixedWidth(50)
             text_edit.setText( str(parameter[0]) )
 
             parameter.append(text_edit)
