@@ -310,6 +310,8 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   ROS_INFO("ETHERCAT_COMMAND_DATA_SIZE     = %4d bytes", static_cast<int>(ETHERCAT_COMMAND_DATA_SIZE) );
   ROS_INFO("ETHERCAT_CAN_BRIDGE_DATA_SIZE  = %4d bytes", static_cast<int>(ETHERCAT_CAN_BRIDGE_DATA_SIZE) );
 
+  // Tactile sensor real time publisher
+  tactile_publisher = boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray> >( new realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray>(nodehandle_ , "tactile", 4));
 
 //  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
 
@@ -1142,6 +1144,28 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   //Update the library (positions, diagnostics values, actuators, etc...)
   //with the received information
   sr_hand_lib->update(status_data);
+
+  //Now publish the tactile sensor data:
+  if(tactile_publisher->trylock())
+  {
+    tactile_publisher->msg_.header.stamp = ros::Time::now();
+
+    std::vector<sr_robot_msgs::Tactile> tactiles(5);
+    for(unsigned int id_tact = 0; id_tact < sr_hand_lib->nb_tactiles; ++id_tact)
+    {
+      sr_robot_msgs::Tactile tmp_tact;
+      for( unsigned int id_tact_data = 0; id_tact_data < 8; ++id_tact_data)
+      {
+        std_msgs::Int16 data;
+        data.data = static_cast<int>( sr_hand_lib->tactiles_vector[id_tact].data[id_tact_data] );
+        tmp_tact.data.push_back( data );
+      }
+      tactiles[id_tact] = tmp_tact;
+    }
+
+    tactile_publisher->msg_.data = tactiles;
+    tactile_publisher->unlockAndPublish();
+  }
 
   //If we're flashing, check is the packet has been acked
   if (flashing & !can_packet_acked)

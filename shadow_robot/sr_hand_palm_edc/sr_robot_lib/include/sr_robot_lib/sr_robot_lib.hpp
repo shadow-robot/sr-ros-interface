@@ -142,7 +142,7 @@ namespace shadow_robot
      * This function is called each time a new etherCAT message
      * is received in the sr06.cpp driver. It updates the joints_vector,
      * updating the different values, computing the calibrated joint
-     * positions, etc...
+     * positions, etc... It also updates the tactile sensors values.
      *
      * @param status_data the received etherCAT message
      */
@@ -154,6 +154,11 @@ namespace shadow_robot
     boost::ptr_vector<shadow_joints::Joint> joints_vector;
     /// The map used to calibrate each joint.
     shadow_joints::CalibrationMap calibration_map;
+
+    /// The vector containing all the tactile sensor information.
+    boost::ptr_vector<TACTILE_SENSOR_OUT> tactiles_vector;
+    /// Number of tactile sensors (TODO: should probably be defined in the protocol)
+    static const unsigned int nb_tactiles;
 
     /**
      * Contains the idle time of the PIC communicating
@@ -265,6 +270,7 @@ namespace shadow_robot
     boost::shared_mutex debug_mutex;
     ros::NodeHandle node_handle;
     std_msgs::Int16 msg_debug;
+
   };//end class
 }
 

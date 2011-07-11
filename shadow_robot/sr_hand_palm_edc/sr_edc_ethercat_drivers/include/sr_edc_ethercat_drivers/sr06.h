@@ -40,6 +40,9 @@
 
 #include <sr_robot_lib/sr_hand_lib.hpp>
 
+#include <sr_robot_msgs/TactileArray.h>
+#include <sr_robot_msgs/Tactile.h>
+
 #include <sr_external_dependencies/types_for_external.h>
 extern "C"
 {
@@ -96,6 +99,8 @@ private:
   unsigned int                     zero_buffer_read;
 
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
+
+  boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray> > tactile_publisher;
 };
 
 

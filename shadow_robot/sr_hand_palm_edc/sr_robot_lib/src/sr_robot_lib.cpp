@@ -60,6 +60,7 @@ namespace shadow_robot
     if( status_data->idle_time_us < main_pic_idle_time_min )
       main_pic_idle_time_min = status_data->idle_time_us;
 
+    //First we read the joints informations
     boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = joints_vector.begin();
     for(;joint_tmp != joints_vector.end(); ++joint_tmp)
     {
@@ -106,8 +107,13 @@ namespace shadow_robot
       //ok now we read the info and add it to the actuator state
       if(read_motor_info)
         read_additional_data(joint_tmp);
+    } //end for joint
 
-    } //end BOOST_FOREACH joint names
+    //then we read the tactile sensors information
+    for( unsigned int id_tactile = 0; id_tactile < nb_tactiles; ++id_tactile)
+    {
+      tactiles_vector[id_tactile] = status_data->tactile[id_tactile];
+    }
   } //end update()
 
   void SrRobotLib::build_motor_command(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command)

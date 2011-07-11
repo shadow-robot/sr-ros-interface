@@ -48,6 +48,7 @@ namespace shadow_robot
                                                                            MOTOR_DATA_F_P, MOTOR_DATA_I_D,
                                                                            MOTOR_DATA_IMAX_DEADBAND_SIGN};
 
+  const unsigned int SrRobotLib::nb_tactiles = 5;
 
   SrHandLib::SrHandLib(pr2_hardware_interface::HardwareInterface *hw) :
     SrRobotLib(hw)
@@ -87,13 +88,19 @@ namespace shadow_robot
         }
       }
     }
-
-    debug_service = nh_tilde.advertiseService( "set_debug_publishers", &SrHandLib::set_debug_data_to_publish, this);
-
     initialize(joint_names_tmp, motor_ids, joint_to_sensor_vect, actuators);
 
     //initialize the calibration map
     this->calibration_map = read_joint_calibration();
+
+    //initialize the vector of tactiles
+    for(unsigned int i=0; i < nb_tactiles; ++i)
+    {
+      tactiles_vector.push_back( new TACTILE_SENSOR_OUT() );
+    }
+
+    //advertise the debug service, used to set which data we want to publish on the debug topics
+    debug_service = nh_tilde.advertiseService( "set_debug_publishers", &SrHandLib::set_debug_data_to_publish, this);
   }
 
   SrHandLib::~SrHandLib()
