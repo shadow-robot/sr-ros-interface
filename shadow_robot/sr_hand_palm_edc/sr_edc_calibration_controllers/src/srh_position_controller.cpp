@@ -35,6 +35,7 @@
 #include "sr_edc_calibration_controllers/srh_position_controller.h"
 #include "angles/angles.h"
 #include "pluginlib/class_list_macros.h"
+#include <math.h>
 
 PLUGINLIB_DECLARE_CLASS(sr_edc_calibration_controllers, SrhPositionController, controller::SrhPositionController, pr2_controller_interface::Controller)
 
@@ -160,6 +161,8 @@ void SrhPositionController::update()
   error = joint_state_->position_ - command_;
 
   double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
+
+
   joint_state_->commanded_effort_ = commanded_effort;
 
   if(loop_count_ % 10 == 0)

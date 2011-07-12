@@ -56,6 +56,7 @@ class MainWidget(QtGui.QWidget):
         rospy.loginfo(str(nb_plugins_found) + " plugins found")
 
         self.plugins = self.manager.getPluginsOfCategory(["Default"])
+        self.plugins += self.manager.getPluginsOfCategory(["etherCAT_hand"])
 
         self.plugin_actions = []
 
@@ -63,11 +64,14 @@ class MainWidget(QtGui.QWidget):
         cyberglove_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconGlove.png'))
         hand_menu = QtGui.QMenu("Shadow Hand")
         hand_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconHand.png'))
+        etherCAT_hand_menu = QtGui.QMenu("EtherCAT Hand")
+        etherCAT_hand_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconHand.png'))
         arm_menu = QtGui.QMenu("Shadow Arm")
         arm_menu.setIcon(QtGui.QIcon(self.parent.rootPath + '/images/icons/iconArm.png'))
 
         categories = [[cyberglove_menu, "cyberglove", 0],
                       [hand_menu, "shadowhand", 0],
+                      [etherCAT_hand_menu, "etherCAT_hand", 0],
                       [arm_menu, "shadowarm", 0],
                       [QtGui.QMenu("Other"), "", 0]]
 
@@ -81,7 +85,7 @@ class MainWidget(QtGui.QWidget):
             self.connect(action, QtCore.SIGNAL('triggered()'), plugin.activate)
 
             for category in categories:
-                if category[1] in plugin.description.lower():
+                if category[1] in plugin.description.lower() or category[1] in plugin.category:
                     category[0].addAction(action)
                     category[2] = category[2] + 1
                     break

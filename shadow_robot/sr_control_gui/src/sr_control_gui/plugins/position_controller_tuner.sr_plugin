@@ -1,6 +1,7 @@
 [Core]
 Name = position_controller_tuner
 Module = PositionControllerTuner
+Category = etherCAT_hand
 
 [Documentation]
 Author = Ugo Cupcic

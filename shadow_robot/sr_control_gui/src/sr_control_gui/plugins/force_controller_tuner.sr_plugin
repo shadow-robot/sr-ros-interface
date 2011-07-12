@@ -1,6 +1,7 @@
 [Core]
 Name = force_controller_tuner
 Module = ForceControllerTuner
+Category = etherCAT_hand
 
 [Documentation]
 Author = Ugo Cupcic

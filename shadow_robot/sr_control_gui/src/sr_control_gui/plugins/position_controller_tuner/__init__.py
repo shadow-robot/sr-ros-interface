@@ -49,7 +49,7 @@ class BaseMovement(object):
         pass
 
 class SinusoidMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 1.57):
+    def __init__(self, joint_name, amplitude = 1.0):
         BaseMovement.__init__(self,joint_name)
         self.amplitude = amplitude
 
@@ -58,7 +58,7 @@ class SinusoidMovement(BaseMovement):
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 1.57, nb_steps = 50):
+    def __init__(self, joint_name, amplitude = 1.0, nb_steps = 50):
         BaseMovement.__init__(self,joint_name)
         self.amplitude = amplitude
         self.nb_steps  = nb_steps
@@ -127,7 +127,7 @@ class JointPidSetter(QtGui.QFrame):
             #   - the value
             #   - a QLineEdit to be able to modify the value
             #   - an array containing the min/max
-            self.parameters[param] = [0,0,[0,1023]]
+            self.parameters[param] = [0,0,[-10230,10230]]
 
         for parameter_name in self.ordered_params:
             parameter = self.parameters[parameter_name]
