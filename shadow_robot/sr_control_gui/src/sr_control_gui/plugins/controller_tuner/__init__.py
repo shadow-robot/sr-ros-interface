@@ -22,8 +22,24 @@ import rospy
 from generic_plugin import GenericPlugin
 from sr_robot_msgs.srv import ForceController
 from functools import partial
+import threading, time
 
 from PyQt4 import QtCore, QtGui, Qt
+
+class FullMovement(threading.Thread):
+    def __init__(self, joint_name):
+        threading.Thread.__init__(self)
+        self.moving = False
+        self.joint_name = joint_name
+        self.movements = []
+
+    def run(self):
+        while(True):
+            if self.moving == False:
+                return
+            else:
+                print self.joint_name
+                time.sleep(.1)
 
 class AdvancedDialog(QtGui.QDialog):
     """
@@ -51,7 +67,6 @@ class AdvancedDialog(QtGui.QDialog):
 
             validator = QtGui.QIntValidator(parameter[2][0], parameter[2][1], self)
             text_edit.setValidator(validator)
-
 
             parameter[1] = text_edit
             self.layout_.addWidget(text_edit)
@@ -212,14 +227,15 @@ class JointPidSetter(QtGui.QFrame):
         btn_advanced.setToolTip("Set advanced parameters for this joint force controller.")
         self.connect(btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
         self.layout_.addWidget(btn_advanced)
-        
+
         self.moving = False
-        self.movements = []
-        btn_move = QtGui.QPushButton()
-        btn_move.setText("Move")
-        btn_move.setToolTip("Move the joint through a continuous movement, press again to stop.")
-        self.connect(btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
-        self.layout_.addWidget(btn_move)
+        self.full_movement = None
+
+        self.btn_move = QtGui.QPushButton()
+        self.btn_move.setText("Move")
+        self.btn_move.setToolTip("Move the joint through a continuous movement, press again to stop.")
+        self.connect(self.btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
+        self.layout_.addWidget(self.btn_move)
 
         self.setLayout(self.layout_)
 
@@ -244,9 +260,17 @@ class JointPidSetter(QtGui.QFrame):
 
     def move_clicked(self):
         if self.moving:
+            self.full_movement.moving = False
             self.moving = False
+            self.full_movement.join()
+            self.full_movement = None
+            self.btn_move.setDown(False)
         else:
             self.moving = True
+            self.full_movement = FullMovement(self.joint_name)
+            self.full_movement.moving = True
+            self.full_movement.start()
+            self.btn_move.setDown(True)
 
     def set_pid(self):
         for param in self.important_parameters.items():
