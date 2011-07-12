@@ -46,7 +46,8 @@ class JointPidSetter(QtGui.QFrame):
         label = QtGui.QLabel("<font color=red>"+joint_name+"</font>")
         self.layout_.addWidget( label )
 
-        self.ordered_params = ["sgleftref",
+        self.ordered_params = ["max_pwm",
+                               "sgleftref",
                                "sgrightref",
                                "f",
                                "p",
@@ -134,7 +135,8 @@ class JointPidSetter(QtGui.QFrame):
         for param in self.parameters.items():
             param[1][0] = param[1][1].text().toInt()[0]
         try:
-            self.pid_service(self.parameters["sgleftref"][0], self.parameters["sgrightref"][0],
+            self.pid_service(self.parameters["max_pwm"][0], self.parameters["sgleftref"][0],
+                             self.parameters["sgrightref"][0],
                              self.parameters["f"][0], self.parameters["p"][0], self.parameters["i"][0],
                              self.parameters["d"][0], self.parameters["imax"][0],
                              self.parameters["deadband"][0], self.parameters["sign"][0] )

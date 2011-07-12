@@ -1,3 +1,4 @@
+int16 maxpwm       # the maximum pwm the motor can apply
 int16 sgleftref    # the left strain gauge amp reference
 int16 sgrightref   # the right strain gauge amp reference
 int16 f            # the feed forward gain value for the force controller

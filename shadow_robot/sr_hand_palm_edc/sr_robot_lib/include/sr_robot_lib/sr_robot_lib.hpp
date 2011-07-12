@@ -212,7 +212,7 @@ namespace shadow_robot
      */
     std::vector<std::pair<std::string, bool> > humanize_flags(int flag);
 
-    void generate_force_control_config(int motor_index, int sg_left, int sg_right,
+    void generate_force_control_config(int motor_index, int max_pwm, int sg_left, int sg_right,
                                        int f, int p, int i, int d, int imax,
                                        int deadband, int sign);
 

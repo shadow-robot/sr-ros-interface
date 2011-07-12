@@ -140,7 +140,6 @@ namespace shadow_robot
 	  //ROS_ERROR_STREAM(" LFJ3 "<< joint_tmp->motor->actuator->command_.effort_);
           command->motor_data[joint_tmp->motor->motor_id] = joint_tmp->motor->actuator->command_.effort_;
 
-
           //publish the debug values for the given motors.
           // NB: debug_motor_indexes_and_data is smaller
           //     than debug_publishers.
@@ -422,16 +421,14 @@ namespace shadow_robot
     return flags;
   }
 
-  void SrRobotLib::generate_force_control_config(int motor_index, int sg_left, int sg_right,
+  void SrRobotLib::generate_force_control_config(int motor_index, int max_pwm, int sg_left, int sg_right,
                                                  int f, int p, int i, int d, int imax,
                                                  int deadband, int sign)
   {
-    ROS_INFO_STREAM("Setting new pid values for motor" << motor_index << ": sg_left="
-		    << sg_left << " sg_right=" << sg_right << " f=" << f << " p="
+    ROS_INFO_STREAM("Setting new pid values for motor" << motor_index << ": max_pwm="<< max_pwm
+		    <<"sg_left=" << sg_left << " sg_right=" << sg_right << " f=" << f << " p="
 		    << p << " i=" << i << " d="<< d << " imax=" << imax
 		    << " deadband="<< deadband << " sign=" << sign);
-
-
 
     //the vector is of the size of the TO_MOTOR_DATA_TYPE enum.
     //the value of the element at a given index is the value
@@ -439,8 +436,7 @@ namespace shadow_robot
     std::vector<crc_unions::union16> full_config(MOTOR_CONFIG_CRC + 1);
     crc_unions::union16 value;
 
-    //TODO: read max pwm
-    value.word = 0x00FF;
+    value.word = max_pwm;
     full_config.at(MOTOR_CONFIG_MAX_PWM) = value;
 
     value.byte[0] = sg_left;
