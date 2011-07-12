@@ -320,13 +320,15 @@ namespace shadow_robot
         response.success = false;
         return false;
       }
-      if( (request.motor_data_type < MOTOR_DATA_SGL) ||
-          (request.motor_data_type > MOTOR_DATA_IMAX_DEADBAND_SIGN) )
+      if( request.motor_data_type > 0 )
       {
-        response.success = false;
-        return false;
+        if( (request.motor_data_type < MOTOR_DATA_SGL) ||
+            (request.motor_data_type > MOTOR_DATA_IMAX_DEADBAND_SIGN) )
+        {
+          response.success = false;
+          return false;
+        }
       }
-
       if(!debug_mutex.timed_lock(boost::posix_time::microseconds(debug_mutex_lock_wait_time)))
       {
         response.success = false;

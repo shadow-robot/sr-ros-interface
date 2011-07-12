@@ -152,7 +152,7 @@ class JointPidSetter(QtGui.QFrame):
             #   - the value
             #   - a QLineEdit to be able to modify the value
             #   - an array containing the min/max
-            self.important_parameters[param] = [0,0,[0,100]]
+            self.important_parameters[param] = [0,0,[-1023,1023]]
 
         self.advanced_parameters = {}
         for param in self.ordered_params["advanced"]:
@@ -160,7 +160,7 @@ class JointPidSetter(QtGui.QFrame):
             #   - the value
             #   - a QLineEdit to be able to modify the value
             #   - an array containing the min/max
-            self.advanced_parameters[param] = [0,0,[0,100]]
+            self.advanced_parameters[param] = [0,0,[-1023,1023]]
 
         self.advanced_parameters["max_pwm"][0] = 100
 
@@ -204,16 +204,22 @@ class JointPidSetter(QtGui.QFrame):
         btn = QtGui.QPushButton()
         btn.setText("SET")
         btn.setToolTip("Sends the current PID parameters to the joint.")
-
         self.connect(btn, QtCore.SIGNAL('clicked()'),self.set_pid)
         self.layout_.addWidget(btn)
 
         btn_advanced = QtGui.QPushButton()
         btn_advanced.setText("Advanced")
         btn_advanced.setToolTip("Set advanced parameters for this joint force controller.")
-
         self.connect(btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
         self.layout_.addWidget(btn_advanced)
+        
+        self.moving = False
+        self.movements = []
+        btn_move = QtGui.QPushButton()
+        btn_move.setText("Move")
+        btn_move.setToolTip("Move the joint through a continuous movement, press again to stop.")
+        self.connect(btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
+        self.layout_.addWidget(btn_move)
 
         self.setLayout(self.layout_)
 
@@ -236,18 +242,23 @@ class JointPidSetter(QtGui.QFrame):
             value = param[2][0]
         param[1].setText( str( value ) )
 
+    def move_clicked(self):
+        if self.moving:
+            self.moving = False
+        else:
+            self.moving = True
 
     def set_pid(self):
         for param in self.important_parameters.items():
             param[1][0] = param[1][1].text().toInt()[0]
-        try:
-            self.pid_service(self.advanced_parameters["max_pwm"][0], self.advanced_parameters["sgleftref"][0],
-                             self.advanced_parameters["sgrightref"][0], self.important_parameters["f"][0],
-                             self.important_parameters["p"][0], self.important_parameters["i"][0],
-                             self.important_parameters["d"][0], self.important_parameters["imax"][0],
-                             self.advanced_parameters["deadband"][0], self.advanced_parameters["sign"][0] )
-        except:
-            print "Failed to set pid."
+        #try:
+        self.pid_service(self.advanced_parameters["max_pwm"][0], self.advanced_parameters["sgleftref"][0],
+                         self.advanced_parameters["sgrightref"][0], self.important_parameters["f"][0],
+                         self.important_parameters["p"][0], self.important_parameters["i"][0],
+                         self.important_parameters["d"][0], self.important_parameters["imax"][0],
+                         self.advanced_parameters["deadband"][0], self.advanced_parameters["sign"][0] )
+        #except:
+        #    print "Failed to set pid."
 
     def advanced_options(self):
         adv_dial = AdvancedDialog(self, self.joint_name, self.advanced_parameters,

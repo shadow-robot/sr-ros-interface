@@ -8,7 +8,7 @@ motor_data_update_rate: {
   temperature: 1.,
   can_num_received: 1.,
   can_num_transmitted: 1.,
-  svn_revision: 1..,
+  svn_revision: 1.,
   f_p: 1.,
   i_d: 1.,
   imax_deadband_sign: 1.

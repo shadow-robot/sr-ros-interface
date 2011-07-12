@@ -125,7 +125,6 @@ namespace shadow_robot
     // by default we send a torque demand (we're running
     // the force control on the motors), but if we have a waiting
     // configuration, then we send the configuration.
-
     if( reconfig_queue.empty() )
     {
       //no config to send
@@ -172,8 +171,8 @@ namespace shadow_robot
 	    command->motor_data[joint_tmp->motor->motor_id] = 100;
 	  */
           joint_tmp->motor->actuator->state_.last_commanded_effort_ = joint_tmp->motor->actuator->command_.effort_;
-        }
-      }
+        } //end if has_motor
+      } // end for each joint
     } //endif reconfig_queue.empty()
     else
     {
@@ -316,15 +315,15 @@ namespace shadow_robot
             if( debug_pair->first == joint_tmp->motor->motor_id )
             {
               //if < 0, then we're not asking for a FROM_MOTOR_DATA_TYPE
-              if( debug_pair->second < 0 )
-                continue;
-
-              //check if it's the correct data
-              if( debug_pair->second == status_data->motor_data_type )
-              {
-                msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
-                debug_publishers[publisher_index].publish(msg_debug);
-              }
+              if( debug_pair->second > 0 )
+	      {
+		//check if it's the correct data
+		if( debug_pair->second == status_data->motor_data_type )
+                {
+                  msg_debug.data = status_data->motor_data_packet[index_motor_in_msg].misc;
+                  debug_publishers[publisher_index].publish(msg_debug);
+                }
+	      }
             }
           }
           publisher_index ++;
@@ -334,6 +333,7 @@ namespace shadow_robot
       } //end try_lock
 
       //we received the data and it was correct
+      bool read_torque = true;
       switch(status_data->motor_data_type)
       {
       case MOTOR_DATA_SGL:
@@ -365,6 +365,7 @@ namespace shadow_robot
         actuator->state_.can_msgs_transmitted_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_SVN_REVISION:
+	read_torque = false;
         actuator->state_.server_firmware_svn_revision_ = status_data->motor_data_packet[index_motor_in_msg].torque;
         //the bit 15 tells us if the firmware version on the motor is a modified version of the svn.
         actuator->state_.firmware_modified_ = ( (status_data->motor_data_packet[index_motor_in_msg].misc & 0x8000) != 0 );
@@ -375,14 +376,17 @@ namespace shadow_robot
         actuator->state_.tests_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_F_P:
+	read_torque = false;
         actuator->state_.force_control_f_ = status_data->motor_data_packet[index_motor_in_msg].torque;
         actuator->state_.force_control_p_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_I_D:
+	read_torque = false;
         actuator->state_.force_control_i_ = status_data->motor_data_packet[index_motor_in_msg].torque;
         actuator->state_.force_control_d_ = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_IMAX_DEADBAND_SIGN:
+	read_torque = false;
         actuator->state_.force_control_imax_ = status_data->motor_data_packet[index_motor_in_msg].torque;
 
         tmp_value.word = status_data->motor_data_packet[index_motor_in_msg].misc;
@@ -394,7 +398,8 @@ namespace shadow_robot
         break;
       }
 
-      actuator->state_.last_measured_effort_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].torque);
+      if( read_torque )
+	actuator->state_.last_measured_effort_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].torque);
     }
   }
 

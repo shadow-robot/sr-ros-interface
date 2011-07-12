@@ -993,7 +993,6 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
  */
 void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 {
-
   int res;
 
   SR0X::packCommand(buffer, halt, reset);
