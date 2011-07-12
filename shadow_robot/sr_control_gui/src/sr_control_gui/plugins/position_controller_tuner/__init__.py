@@ -20,6 +20,7 @@ import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
 from generic_plugin import GenericPlugin
+from control_toolbox.srv import SetPidGains
 from sr_robot_msgs.srv import ForceController
 from functools import partial
 import threading, time, math
@@ -36,7 +37,7 @@ class BaseMovement(object):
         self.msg_to_send.data = 0.0
         self.sleep_time = 0.0001
 
-        topic = "/sh_"+ joint_name.lower() +"_effort_controller/command"
+        topic = "/sh_"+ joint_name.lower() +"_position_controller/command"
         self.publisher = rospy.Publisher(topic, Float64)
 
     def publish(self, mvt_percentage):
@@ -48,16 +49,16 @@ class BaseMovement(object):
         pass
 
 class SinusoidMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 400):
+    def __init__(self, joint_name, amplitude = 1.57):
         BaseMovement.__init__(self,joint_name)
         self.amplitude = amplitude
 
     def update(self, mvt_percentage):
-        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.)
+        value = self.amplitude / 2.0 * math.sin(2.0*3.14159 * mvt_percentage/100.) + self.amplitude / 2.0
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 400, nb_steps = 50):
+    def __init__(self, joint_name, amplitude = 1.57, nb_steps = 50):
         BaseMovement.__init__(self,joint_name)
         self.amplitude = amplitude
         self.nb_steps  = nb_steps
@@ -84,7 +85,7 @@ class FullMovement(threading.Thread):
         self.joint_name = joint_name
         self.iterations = 10000
         self.movements = [StepMovement(joint_name), SinusoidMovement(joint_name),
-                          StepMovement(joint_name, amplitude=600, nb_steps = 10)]
+                          StepMovement(joint_name, nb_steps = 10)]
 
     def run(self):
         while(True):
@@ -94,96 +95,6 @@ class FullMovement(threading.Thread):
                         return
                     else:
                         movement.publish(mvt_percentage/(self.iterations/100.))
-
-
-class AdvancedDialog(QtGui.QDialog):
-    """
-    Set the more advanced force PID parameters. We use a QDialog
-    to keep the main GUI simple.
-    """
-    def __init__(self, parent, joint_name, parameters, ordered_params):
-        QtGui.QDialog.__init__(self,parent)
-        self.layout = QtGui.QVBoxLayout()
-
-        self.ordered_params = ordered_params
-        self.parameters = parameters
-
-        frame = QtGui.QFrame()
-        self.layout_ = QtGui.QHBoxLayout()
-        for parameter_name in ordered_params:
-            parameter = self.parameters[parameter_name]
-            label = QtGui.QLabel(parameter_name)
-            self.layout_.addWidget( label )
-
-            text_edit = QtGui.QLineEdit()
-            text_edit.setFixedHeight(30)
-            text_edit.setFixedWidth(50)
-            text_edit.setText( str(parameter[0]) )
-
-            validator = QtGui.QIntValidator(parameter[2][0], parameter[2][1], self)
-            text_edit.setValidator(validator)
-
-            parameter[1] = text_edit
-            self.layout_.addWidget(text_edit)
-            plus_minus_frame = QtGui.QFrame()
-            plus_minus_layout = QtGui.QVBoxLayout()
-
-            plus_btn = QtGui.QPushButton()
-            plus_btn.setText("+")
-            plus_btn.setFixedWidth(25)
-            plus_btn.setFixedHeight(25)
-            plus_btn.clicked.connect(partial(self.plus, parameter_name))
-            plus_minus_layout.addWidget(plus_btn)
-
-            minus_btn = QtGui.QPushButton()
-            minus_btn.setText("-")
-            minus_btn.setFixedWidth(25)
-            minus_btn.setFixedHeight(25)
-            minus_btn.clicked.connect(partial(self.minus, parameter_name))
-            plus_minus_layout.addWidget(minus_btn)
-
-            plus_minus_frame.setLayout(plus_minus_layout)
-
-            self.layout_.addWidget(plus_minus_frame)
-        frame.setLayout(self.layout_)
-
-        self.layout.addWidget(frame)
-
-        self.btn_box = QtGui.QDialogButtonBox(self)
-        self.btn_box.setOrientation(QtCore.Qt.Horizontal)
-        self.btn_box.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.layout.addWidget(self.btn_box)
-        self.setLayout(self.layout)
-        self.setWindowTitle("Advanced options: "+joint_name)
-
-        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("accepted()"), self.accept)
-        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("rejected()"), self.reject)
-        QtCore.QMetaObject.connectSlotsByName(self)
-
-    def plus(self, param_name):
-        param = self.parameters[param_name]
-
-        value = param[1].text().toInt()[0]
-        value += 1
-        if value > param[2][1]:
-            value = param[2][1]
-
-        param[1].setText( str( value ) )
-
-    def minus(self, param_name):
-        param = self.parameters[param_name]
-
-        value = param[1].text().toInt()[0]
-        value -= 1
-        if value < param[2][0]:
-            value = param[2][0]
-        param[1].setText( str( value ) )
-
-    def getValues(self):
-        for param in self.parameters.items():
-            param[1][0] = param[1][1].text().toInt()[0]
-
-        return self.parameters
 
 class JointPidSetter(QtGui.QFrame):
     """
@@ -196,46 +107,30 @@ class JointPidSetter(QtGui.QFrame):
         QtGui.QFrame.__init__(self)
         self.joint_name = joint_name
 
-        #/realtime_loop/change_force_PID_FFJ0
-        service_name =  "/realtime_loop/change_force_PID_"+joint_name
-        self.pid_service = rospy.ServiceProxy(service_name, ForceController)
+        #/sh_ffj0_position_controller/set_gains
+        service_name = "/sh_"+ joint_name.lower()+"_position_controller/set_gains"
+        self.pid_service = rospy.ServiceProxy(service_name, SetPidGains)
 
         self.layout_ = QtGui.QHBoxLayout()
 
         label = QtGui.QLabel("<font color=red>"+joint_name+"</font>")
         self.layout_.addWidget( label )
 
-        self.ordered_params = {"important":["f",
-                                            "p",
-                                            "i",
-                                            "d",
-                                            "imax"],
-                               "advanced":["max_pwm",
-                                           "sgleftref",
-                                           "sgrightref",
-                                           "deadband",
-                                           "sign"]}
+        self.ordered_params = ["p",
+                               "i",
+                               "d",
+                               "iclamp"]
 
-        self.important_parameters = {}
-        for param in self.ordered_params["important"]:
+        self.parameters = {}
+        for param in self.ordered_params:
             #a parameter contains:
             #   - the value
             #   - a QLineEdit to be able to modify the value
             #   - an array containing the min/max
-            self.important_parameters[param] = [0,0,[-1023,1023]]
+            self.parameters[param] = [0,0,[0,1023]]
 
-        self.advanced_parameters = {}
-        for param in self.ordered_params["advanced"]:
-            #a parameter contains:
-            #   - the value
-            #   - a QLineEdit to be able to modify the value
-            #   - an array containing the min/max
-            self.advanced_parameters[param] = [0,0,[-1023,1023]]
-
-        self.advanced_parameters["max_pwm"][0] = 100
-
-        for parameter_name in self.ordered_params["important"]:
-            parameter = self.important_parameters[parameter_name]
+        for parameter_name in self.ordered_params:
+            parameter = self.parameters[parameter_name]
             label = QtGui.QLabel(parameter_name)
             self.layout_.addWidget( label )
 
@@ -277,12 +172,6 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(btn, QtCore.SIGNAL('clicked()'),self.set_pid)
         self.layout_.addWidget(btn)
 
-        btn_advanced = QtGui.QPushButton()
-        btn_advanced.setText("Advanced")
-        btn_advanced.setToolTip("Set advanced parameters for this joint force controller.")
-        self.connect(btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
-        self.layout_.addWidget(btn_advanced)
-
         self.moving = False
         self.full_movement = None
 
@@ -295,7 +184,7 @@ class JointPidSetter(QtGui.QFrame):
         self.setLayout(self.layout_)
 
     def plus(self, param_name):
-        param = self.important_parameters[param_name]
+        param = self.parameters[param_name]
 
         value = param[1].text().toInt()[0]
         value += 1
@@ -305,7 +194,7 @@ class JointPidSetter(QtGui.QFrame):
         param[1].setText( str( value ) )
 
     def minus(self, param_name):
-        param = self.important_parameters[param_name]
+        param = self.parameters[param_name]
 
         value = param[1].text().toInt()[0]
         value -= 1
@@ -328,24 +217,13 @@ class JointPidSetter(QtGui.QFrame):
             self.btn_move.setDown(True)
 
     def set_pid(self):
-        for param in self.important_parameters.items():
+        for param in self.parameters.items():
             param[1][0] = param[1][1].text().toInt()[0]
         #try:
-        self.pid_service(self.advanced_parameters["max_pwm"][0], self.advanced_parameters["sgleftref"][0],
-                         self.advanced_parameters["sgrightref"][0], self.important_parameters["f"][0],
-                         self.important_parameters["p"][0], self.important_parameters["i"][0],
-                         self.important_parameters["d"][0], self.important_parameters["imax"][0],
-                         self.advanced_parameters["deadband"][0], self.advanced_parameters["sign"][0] )
+        self.pid_service( self.parameters["p"][0], self.parameters["i"][0],
+                          self.parameters["d"][0], self.parameters["iclamp"][0] )
         #except:
         #    print "Failed to set pid."
-
-    def advanced_options(self):
-        adv_dial = AdvancedDialog(self, self.joint_name, self.advanced_parameters,
-                                  self.ordered_params["advanced"])
-        if adv_dial.exec_():
-            modified_adv_param = adv_dial.getValues()
-            for param in modified_adv_param.items():
-                self.advanced_parameters[param[0]] = param[1]
 
     def on_close(self):
         if self.full_movement != None:
