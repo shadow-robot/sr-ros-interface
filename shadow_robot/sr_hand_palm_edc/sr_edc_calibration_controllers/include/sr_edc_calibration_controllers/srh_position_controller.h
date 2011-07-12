@@ -125,6 +125,8 @@ private:
 
   ros::Subscriber sub_command_;
   void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+
+  control_toolbox::PidGainsSetter pid_gains_setter;
 };
 
 } // namespace
