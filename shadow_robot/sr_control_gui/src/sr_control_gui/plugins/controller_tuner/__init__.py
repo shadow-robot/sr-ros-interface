@@ -25,6 +25,91 @@ from functools import partial
 
 from PyQt4 import QtCore, QtGui, Qt
 
+class AdvancedDialog(QtGui.QDialog):
+    def __init__(self, parent, joint_name, parameters, ordered_params):
+        QtGui.QDialog.__init__(self,parent)
+        self.layout = QtGui.QVBoxLayout()
+
+        self.ordered_params = ordered_params
+        self.parameters = parameters
+
+        frame = QtGui.QFrame()
+        self.layout_ = QtGui.QHBoxLayout()
+        for parameter_name in ordered_params:
+            parameter = self.parameters[parameter_name]
+            label = QtGui.QLabel(parameter_name)
+            self.layout_.addWidget( label )
+
+            text_edit = QtGui.QLineEdit()
+            text_edit.setFixedHeight(30)
+            text_edit.setFixedWidth(50)
+            text_edit.setText( str(parameter[0]) )
+
+            validator = QtGui.QIntValidator(parameter[2][0], parameter[2][1], self)
+            text_edit.setValidator(validator)
+
+
+            parameter[1] = text_edit
+            self.layout_.addWidget(text_edit)
+            plus_minus_frame = QtGui.QFrame()
+            plus_minus_layout = QtGui.QVBoxLayout()
+
+            plus_btn = QtGui.QPushButton()
+            plus_btn.setText("+")
+            plus_btn.setFixedWidth(25)
+            plus_btn.setFixedHeight(25)
+            plus_btn.clicked.connect(partial(self.plus, parameter_name))
+            plus_minus_layout.addWidget(plus_btn)
+
+            minus_btn = QtGui.QPushButton()
+            minus_btn.setText("-")
+            minus_btn.setFixedWidth(25)
+            minus_btn.setFixedHeight(25)
+            minus_btn.clicked.connect(partial(self.minus, parameter_name))
+            plus_minus_layout.addWidget(minus_btn)
+
+            plus_minus_frame.setLayout(plus_minus_layout)
+
+            self.layout_.addWidget(plus_minus_frame)
+        frame.setLayout(self.layout_)
+
+        self.layout.addWidget(frame)
+
+        self.btn_box = QtGui.QDialogButtonBox(self)
+        self.btn_box.setOrientation(QtCore.Qt.Horizontal)
+        self.btn_box.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.layout.addWidget(self.btn_box)
+        self.setLayout(self.layout)
+        self.setWindowTitle("Advanced options: "+joint_name)
+
+        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("accepted()"), self.accept)
+        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("rejected()"), self.reject)
+        QtCore.QMetaObject.connectSlotsByName(self)
+
+    def plus(self, param_name):
+        param = self.parameters[param_name]
+
+        value = param[1].text().toInt()[0]
+        value += 1
+        if value > param[2][1]:
+            value = param[2][1]
+
+        param[1].setText( str( value ) )
+
+    def minus(self, param_name):
+        param = self.parameters[param_name]
+
+        value = param[1].text().toInt()[0]
+        value -= 1
+        if value < param[2][0]:
+            value = param[2][0]
+        param[1].setText( str( value ) )
+
+    def getValues(self):
+        for param in self.parameters.items():
+            param[1][0] = param[1][1].text().toInt()[0]
+
+        return self.parameters
 
 class JointPidSetter(QtGui.QFrame):
     """
@@ -46,27 +131,37 @@ class JointPidSetter(QtGui.QFrame):
         label = QtGui.QLabel("<font color=red>"+joint_name+"</font>")
         self.layout_.addWidget( label )
 
-        self.ordered_params = ["max_pwm",
-                               "sgleftref",
-                               "sgrightref",
-                               "f",
-                               "p",
-                               "i",
-                               "d",
-                               "imax",
-                               "deadband",
-                               "sign" ]
+        self.ordered_params = {"important":["f",
+                                            "p",
+                                            "i",
+                                            "d",
+                                            "imax"],
+                               "advanced":["max_pwm",
+                                           "sgleftref",
+                                           "sgrightref",
+                                           "deadband",
+                                           "sign"]}
 
-        self.parameters = {}
-        for param in self.ordered_params:
+        self.important_parameters = {}
+        for param in self.ordered_params["important"]:
             #a parameter contains:
             #   - the value
             #   - a QLineEdit to be able to modify the value
             #   - an array containing the min/max
-            self.parameters[param] = [0,0,[0,100]]
+            self.important_parameters[param] = [0,0,[0,100]]
 
-        for parameter_name in self.ordered_params:
-            parameter = self.parameters[parameter_name]
+        self.advanced_parameters = {}
+        for param in self.ordered_params["advanced"]:
+            #a parameter contains:
+            #   - the value
+            #   - a QLineEdit to be able to modify the value
+            #   - an array containing the min/max
+            self.advanced_parameters[param] = [0,0,[0,100]]
+
+        self.advanced_parameters["max_pwm"][0] = 100
+
+        for parameter_name in self.ordered_params["important"]:
+            parameter = self.important_parameters[parameter_name]
             label = QtGui.QLabel(parameter_name)
             self.layout_.addWidget( label )
 
@@ -109,10 +204,17 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(btn, QtCore.SIGNAL('clicked()'),self.set_pid)
         self.layout_.addWidget(btn)
 
+        btn_advanced = QtGui.QPushButton()
+        btn_advanced.setText("Advanced")
+        btn_advanced.setToolTip("Set advanced parameters for this joint force controller.")
+
+        self.connect(btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
+        self.layout_.addWidget(btn_advanced)
+
         self.setLayout(self.layout_)
 
     def plus(self, param_name):
-        param = self.parameters[param_name]
+        param = self.important_parameters[param_name]
 
         value = param[1].text().toInt()[0]
         value += 1
@@ -122,7 +224,7 @@ class JointPidSetter(QtGui.QFrame):
         param[1].setText( str( value ) )
 
     def minus(self, param_name):
-        param = self.parameters[param_name]
+        param = self.important_parameters[param_name]
 
         value = param[1].text().toInt()[0]
         value -= 1
@@ -132,17 +234,24 @@ class JointPidSetter(QtGui.QFrame):
 
 
     def set_pid(self):
-        for param in self.parameters.items():
+        for param in self.important_parameters.items():
             param[1][0] = param[1][1].text().toInt()[0]
         try:
-            self.pid_service(self.parameters["max_pwm"][0], self.parameters["sgleftref"][0],
-                             self.parameters["sgrightref"][0],
-                             self.parameters["f"][0], self.parameters["p"][0], self.parameters["i"][0],
-                             self.parameters["d"][0], self.parameters["imax"][0],
-                             self.parameters["deadband"][0], self.parameters["sign"][0] )
+            self.pid_service(self.advanced_parameters["max_pwm"][0], self.advanced_parameters["sgleftref"][0],
+                             self.advanced_parameters["sgrightref"][0], self.important_parameters["f"][0],
+                             self.important_parameters["p"][0], self.important_parameters["i"][0],
+                             self.important_parameters["d"][0], self.important_parameters["imax"][0],
+                             self.advanced_parameters["deadband"][0], self.advanced_parameters["sign"][0] )
         except:
             print "Failed to set pid."
 
+    def advanced_options(self):
+        adv_dial = AdvancedDialog(self, self.joint_name, self.advanced_parameters,
+                                  self.ordered_params["advanced"])
+        if adv_dial.exec_():
+            modified_adv_param = adv_dial.getValues()
+            for param in modified_adv_param.items():
+                self.advanced_parameters[param[0]] = param[1]
 
 class FingerPIDSetter(QtGui.QFrame):
     """
