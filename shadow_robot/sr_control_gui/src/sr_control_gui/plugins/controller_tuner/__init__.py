@@ -34,7 +34,7 @@ class BaseMovement(object):
 
         self.msg_to_send = Float64()
         self.msg_to_send.data = 0.0
-        self.sleep_time = 0.01
+        self.sleep_time = 0.001
 
         topic = "/sh_"+ joint_name.lower() +"_effort_controller/command"
         self.publisher = rospy.Publisher(topic, Float64)
@@ -57,17 +57,23 @@ class SinusoidMovement(BaseMovement):
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):
-    def __init__(self, joint_name):
-        BaseMovement.__init__(self,joint_name, amplitude = 400, nb_steps = 50)
+    def __init__(self, joint_name, amplitude = 400, nb_steps = 50):
+        BaseMovement.__init__(self,joint_name)
         self.amplitude = amplitude
         self.nb_steps  = nb_steps
 
         self.steps = []
-        for i in range(0, nb_steps):
-            self.steps.append(self.amplitude / nb_steps)
+        for i in range(0, int(nb_steps/2)):
+            self.steps.append(2.*float(i)*float(self.amplitude / nb_steps))
+        reversed_steps = self.steps[:]
+        reversed_steps.reverse()
+        self.steps += reversed_steps
 
     def update(self, mvt_percentage):
-        value = self.steps[ int(nb_steps * mvt_percentage / 100.) ]
+        index = int(self.nb_steps * mvt_percentage / 100.)
+        if index >= len(self.steps):
+            index = len(self.steps) - 1
+        value = self.steps[ index ]
         self.msg_to_send.data = value
 
 
@@ -76,17 +82,18 @@ class FullMovement(threading.Thread):
         threading.Thread.__init__(self)
         self.moving = False
         self.joint_name = joint_name
+        self.iterations = 5000
         self.movements = [StepMovement(joint_name), SinusoidMovement(joint_name),
-                          StepMovement(joint_name, amplitude=600, nb_steps = 5)]
+                          StepMovement(joint_name, amplitude=600, nb_steps = 10)]
 
     def run(self):
         while(True):
             for movement in self.movements:
-                for mvt_percentage in range(0,1000):
+                for mvt_percentage in range(0, self.iterations):
                     if self.moving == False:
                         return
                     else:
-                        movement.publish(mvt_percentage/10.)
+                        movement.publish(mvt_percentage/(self.iterations/100.))
 
 
 class AdvancedDialog(QtGui.QDialog):
