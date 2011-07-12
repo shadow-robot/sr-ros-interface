@@ -126,14 +126,14 @@ class MainWindow(QtGui.QMainWindow):
         ####
         # MAIN WIDGET
         ##
-        my_mdi_area = MainWidget(self)
-        self.setCentralWidget(my_mdi_area)
+        self.my_mdi_area = MainWidget(self)
+        self.setCentralWidget(self.my_mdi_area)
 
         ####
         # STATUSBAR
         ##
         self.statusBar().showMessage('Ready', 2000)
-        self.connect(my_mdi_area, QtCore.SIGNAL("messageToStatusbar(QString)"),
+        self.connect(self.my_mdi_area, QtCore.SIGNAL("messageToStatusbar(QString)"),
                      self.statusBar(), QtCore.SLOT("showMessage(QString)"))
 
     def launch_rxgraph(self):
@@ -142,3 +142,5 @@ class MainWindow(QtGui.QMainWindow):
     def launch_robot_monitor(self):
         subprocess.Popen("rosrun robot_monitor robot_monitor".split())
 
+    def closeEvent(self, event):
+        self.my_mdi_area.on_close()

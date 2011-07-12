@@ -22,24 +22,72 @@ import rospy
 from generic_plugin import GenericPlugin
 from sr_robot_msgs.srv import ForceController
 from functools import partial
-import threading, time
+import threading, time, math
+
+from std_msgs.msg import Float64
 
 from PyQt4 import QtCore, QtGui, Qt
+
+class BaseMovement(object):
+    def __init__(self, joint_name):
+        self.joint_name = joint_name
+
+        self.msg_to_send = Float64()
+        self.msg_to_send.data = 0.0
+        self.sleep_time = 0.01
+
+        topic = "/sh_"+ joint_name.lower() +"_effort_controller/command"
+        self.publisher = rospy.Publisher(topic, Float64)
+
+    def publish(self, mvt_percentage):
+        self.update(mvt_percentage)
+        self.publisher.publish(self.msg_to_send)
+        time.sleep(self.sleep_time)
+
+    def update(self, mvt_percentage):
+        pass
+
+class SinusoidMovement(BaseMovement):
+    def __init__(self, joint_name, amplitude = 400):
+        BaseMovement.__init__(self,joint_name)
+        self.amplitude = amplitude
+
+    def update(self, mvt_percentage):
+        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.)
+        self.msg_to_send.data = value
+
+class StepMovement(BaseMovement):
+    def __init__(self, joint_name):
+        BaseMovement.__init__(self,joint_name, amplitude = 400, nb_steps = 50)
+        self.amplitude = amplitude
+        self.nb_steps  = nb_steps
+
+        self.steps = []
+        for i in range(0, nb_steps):
+            self.steps.append(self.amplitude / nb_steps)
+
+    def update(self, mvt_percentage):
+        value = self.steps[ int(nb_steps * mvt_percentage / 100.) ]
+        self.msg_to_send.data = value
+
 
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):
         threading.Thread.__init__(self)
         self.moving = False
         self.joint_name = joint_name
-        self.movements = []
+        self.movements = [StepMovement(joint_name), SinusoidMovement(joint_name),
+                          StepMovement(joint_name, amplitude=600, nb_steps = 5)]
 
     def run(self):
         while(True):
-            if self.moving == False:
-                return
-            else:
-                print self.joint_name
-                time.sleep(.1)
+            for movement in self.movements:
+                for mvt_percentage in range(0,1000):
+                    if self.moving == False:
+                        return
+                    else:
+                        movement.publish(mvt_percentage/10.)
+
 
 class AdvancedDialog(QtGui.QDialog):
     """
@@ -292,6 +340,13 @@ class JointPidSetter(QtGui.QFrame):
             for param in modified_adv_param.items():
                 self.advanced_parameters[param[0]] = param[1]
 
+    def on_close(self):
+        if self.full_movement != None:
+            self.full_movement.moving = False
+            self.moving = False
+            self.full_movement.join()
+
+
 class FingerPIDSetter(QtGui.QFrame):
     """
     set the PID settings for the finger.
@@ -315,6 +370,10 @@ class FingerPIDSetter(QtGui.QFrame):
             self.layout_.addWidget( j_pid_setter )
 
         self.setLayout(self.layout_)
+
+    def on_close(self):
+        for j_pid_setter in self.joint_pid_setter:
+            j_pid_setter.on_close()
 
 
 class ControllerTuner(GenericPlugin):
@@ -355,6 +414,8 @@ class ControllerTuner(GenericPlugin):
 
     def on_close(self):
         GenericPlugin.on_close(self)
+        for f_pid_setter in self.finger_pid_setters:
+            f_pid_setter.on_close()
 
 
 

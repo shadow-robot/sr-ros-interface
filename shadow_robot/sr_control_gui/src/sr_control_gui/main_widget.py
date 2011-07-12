@@ -145,6 +145,11 @@ class MainWidget(QtGui.QWidget):
             self.parent.statusBar().showMessage('No Plugins Available. Start the Libraries you need...', 2000)
             self.parent.robot_and_libraries_dock.show()
 
-
+    def on_close(self):
+        for plugin in self.plugins:
+            try:
+                plugin.on_close()
+            except:
+                pass
 
 
