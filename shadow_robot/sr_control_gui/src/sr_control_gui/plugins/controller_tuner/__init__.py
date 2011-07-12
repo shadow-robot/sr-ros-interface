@@ -26,6 +26,10 @@ from functools import partial
 from PyQt4 import QtCore, QtGui, Qt
 
 class AdvancedDialog(QtGui.QDialog):
+    """
+    Set the more advanced force PID parameters. We use a QDialog
+    to keep the main GUI simple.
+    """
     def __init__(self, parent, joint_name, parameters, ordered_params):
         QtGui.QDialog.__init__(self,parent)
         self.layout = QtGui.QVBoxLayout()
@@ -181,15 +185,15 @@ class JointPidSetter(QtGui.QFrame):
 
             plus_btn = QtGui.QPushButton()
             plus_btn.setText("+")
-            plus_btn.setFixedWidth(25)
-            plus_btn.setFixedHeight(25)
+            plus_btn.setFixedWidth(20)
+            plus_btn.setFixedHeight(20)
             plus_btn.clicked.connect(partial(self.plus, parameter_name))
             plus_minus_layout.addWidget(plus_btn)
 
             minus_btn = QtGui.QPushButton()
             minus_btn.setText("-")
-            minus_btn.setFixedWidth(25)
-            minus_btn.setFixedHeight(25)
+            minus_btn.setFixedWidth(20)
+            minus_btn.setFixedHeight(20)
             minus_btn.clicked.connect(partial(self.minus, parameter_name))
             plus_minus_layout.addWidget(minus_btn)
 
@@ -290,14 +294,21 @@ class ControllerTuner(GenericPlugin):
         self.frame = QtGui.QFrame()
         self.layout = QtGui.QVBoxLayout()
 
-        self.joints = {"LF": ["LFJ0", "LFJ3", "LFJ4", "LFJ5"]}
+        self.joints = {"FF": ["FFJ0", "FFJ3", "FFJ4"],
+                       "MF": ["MFJ0", "MFJ3", "MFJ4"],
+                       "RF": ["RFJ0", "RFJ3", "RFJ4"],
+                       "LF": ["LFJ0", "LFJ3", "LFJ4", "LFJ5"],
+                       "TH": ["THJ1", "THJ2", "THJ3", "THJ4", "THJ5"]}
         self.finger_pid_setters = []
 
         for finger in self.joints.items():
             self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1]) )
 
+        self.qtab_widget = QtGui.QTabWidget()
         for f_pid_setter in self.finger_pid_setters:
-            self.layout.addWidget( f_pid_setter )
+            self.qtab_widget.addTab(f_pid_setter, f_pid_setter.finger_name)
+
+        self.layout.addWidget( self.qtab_widget )
 
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
