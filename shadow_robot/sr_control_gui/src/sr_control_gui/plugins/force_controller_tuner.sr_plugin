@@ -1,6 +1,6 @@
 [Core]
-Name = controller_tuner
-Module = ControllerTuner
+Name = force_controller_tuner
+Module = ForceControllerTuner
 
 [Documentation]
 Author = Ugo Cupcic

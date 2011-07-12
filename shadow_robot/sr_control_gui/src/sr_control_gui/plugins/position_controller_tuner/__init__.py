@@ -383,7 +383,7 @@ class FingerPIDSetter(QtGui.QFrame):
             j_pid_setter.on_close()
 
 
-class ControllerTuner(GenericPlugin):
+class PositionControllerTuner(GenericPlugin):
     """
     A plugin to easily tune the force controller on the etherCAT hand.
     """
