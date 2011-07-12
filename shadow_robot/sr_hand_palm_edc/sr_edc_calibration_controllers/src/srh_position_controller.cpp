@@ -90,8 +90,12 @@ bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, ros::No
   }
 
   control_toolbox::Pid pid;
+  control_toolbox::PidGainsSetter pid_gains_setter;
   if (!pid.init(ros::NodeHandle(node_, "pid")))
     return false;
+
+  pid_gains_setter.add(&pid);
+  pid_gains_setter.advertise(node_);
 
   controller_state_publisher_.reset(
     new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
