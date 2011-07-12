@@ -34,7 +34,7 @@ class BaseMovement(object):
 
         self.msg_to_send = Float64()
         self.msg_to_send.data = 0.0
-        self.sleep_time = 0.001
+        self.sleep_time = 0.0001
 
         topic = "/sh_"+ joint_name.lower() +"_effort_controller/command"
         self.publisher = rospy.Publisher(topic, Float64)
@@ -82,7 +82,7 @@ class FullMovement(threading.Thread):
         threading.Thread.__init__(self)
         self.moving = False
         self.joint_name = joint_name
-        self.iterations = 5000
+        self.iterations = 10000
         self.movements = [StepMovement(joint_name), SinusoidMovement(joint_name),
                           StepMovement(joint_name, amplitude=600, nb_steps = 10)]
 
