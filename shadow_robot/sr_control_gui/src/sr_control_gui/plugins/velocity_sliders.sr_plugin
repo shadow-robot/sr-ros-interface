@@ -1,0 +1,10 @@
+[Core]
+Name = velocity_sliders
+Module = VelocityJointSlider
+Category = etherCAT_hand
+
+[Documentation]
+Author = Ugo Cupcic
+Version = 0.1
+Website = http://www.shadowrobot.com
+Description = Velocity Sliders.
