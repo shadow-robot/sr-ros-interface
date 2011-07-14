@@ -78,6 +78,9 @@ class DataSet(object):
     def get_scaled_color(self):
         return self.scaled_color
 
+    def close(self):
+        self.subscriber.unregister()
+        self.subscriber = None
 
 class SubscribeTopicFrame(QtGui.QFrame):
     """
@@ -214,6 +217,9 @@ class SubscribeTopicFrame(QtGui.QFrame):
         Qt.QTimer.singleShot(0, self.adjustSize)
         del self
 
+    def close(self):
+        self.data_set.close()
+        
 class SensorScope(OpenGLGenericPlugin):
     """
     Plots some chosen debug values.
@@ -427,3 +433,8 @@ class SensorScope(OpenGLGenericPlugin):
                 #update the value in the label
                 sub_frame.update_display_last_value(sub_frame.data_set.points[data_index])
 
+    def close(self):
+        OpenGLGenericPlugin.on_close(self)
+
+        for sub_frame in self.subscribe_topic_frames:
+            sub_frame.close()
