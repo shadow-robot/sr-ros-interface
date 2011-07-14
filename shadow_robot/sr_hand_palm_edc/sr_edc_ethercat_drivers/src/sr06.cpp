@@ -313,6 +313,9 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   // Tactile sensor real time publisher
   tactile_publisher = boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray> >( new realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray>(nodehandle_ , "tactile", 4));
 
+  // Debug real time publisher: publishes the raw ethercat data
+  debug_publisher = boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::EthercatDebug> >( new realtime_tools::RealtimePublisher<sr_robot_msgs::EthercatDebug>(nodehandle_ , "debug_etherCAT_data", 4));
+
 //  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
 
   return retval;
@@ -1134,10 +1137,41 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     ++zero_buffer_read;
     float percentage_packet_loss = 100.f * ((float)zero_buffer_read / (float)num_rxed_packets);
 
-    //TODO: use ROS_WARN again
     ROS_WARN("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
     return false;
   }
+
+  // publishes the debug information (a slightly formatted version of the incoming ethercat packet):
+  if(debug_publisher->trylock())
+  {
+    debug_publisher->msg_.header.stamp = ros::Time::now();
+
+    debug_publisher->msg_.sensors.clear();
+    for(unsigned int i=0; i<SENSORS_NUM_0220 + 1; ++i)
+      debug_publisher->msg_.sensors.push_back( status_data->sensors[i] );
+
+    debug_publisher->msg_.motor_data_type.data = static_cast<int>(status_data->motor_data_type);
+    debug_publisher->msg_.which_motors = status_data->which_motors;
+    debug_publisher->msg_.which_motor_data_arrived = status_data->which_motor_data_arrived;
+    debug_publisher->msg_.which_motor_data_had_errors = status_data->which_motor_data_had_errors;
+
+    debug_publisher->msg_.motor_data_packet_torque.clear();
+    debug_publisher->msg_.motor_data_packet_misc.clear();
+    for(unsigned int i=0; i < 10; ++i)
+    {
+      debug_publisher->msg_.motor_data_packet_torque.push_back( status_data->motor_data_packet[i].torque );
+      debug_publisher->msg_.motor_data_packet_misc.push_back( status_data->motor_data_packet[i].misc );
+    }
+
+    debug_publisher->msg_.tactile.clear();
+    for(unsigned int i=0; i < 5; ++i)
+      debug_publisher->msg_.tactile.push_back( *(status_data->tactile[i].data) );
+
+    debug_publisher->msg_.idle_time_us = status_data->idle_time_us;
+
+    debug_publisher->unlockAndPublish();
+  }
+
 
   //We received a coherent message.
   //Update the library (positions, diagnostics values, actuators, etc...)

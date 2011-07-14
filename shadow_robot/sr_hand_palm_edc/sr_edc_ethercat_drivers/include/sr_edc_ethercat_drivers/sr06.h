@@ -42,6 +42,7 @@
 
 #include <sr_robot_msgs/TactileArray.h>
 #include <sr_robot_msgs/Tactile.h>
+#include <sr_robot_msgs/EthercatDebug.h>
 
 #include <sr_external_dependencies/types_for_external.h>
 extern "C"
@@ -100,7 +101,11 @@ private:
 
   boost::shared_ptr<shadow_robot::SrHandLib> sr_hand_lib;
 
+  // Tactile sensor real time publisher
   boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray> > tactile_publisher;
+
+  /// Debug real time publisher: publishes the raw ethercat data
+  boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::EthercatDebug> > debug_publisher;
 };
 
 
