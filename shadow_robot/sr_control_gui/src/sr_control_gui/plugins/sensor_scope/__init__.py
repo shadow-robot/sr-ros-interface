@@ -227,7 +227,7 @@ class SensorScope(OpenGLGenericPlugin):
     name = "Sensor Scope"
 
     def __init__(self):
-        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method)
+        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method, self.left_click_method)
         self.data_points_size = self.open_gl_widget.number_of_points
         self.all_pubs = None
         self.topic_checker = RosTopicChecker()
@@ -235,6 +235,12 @@ class SensorScope(OpenGLGenericPlugin):
 
         # this is used to go back in time
         self.display_frame = 0
+
+        #this is a line used to display the data intersecting it
+        self.line_x = 10
+        self.line = [[self.line_x, 0],
+                     [self.line_x, self.open_gl_widget.height]]
+        self.line_color = [1.0,1.0,1.0]
 
         self.mutex = threading.Lock()
 
@@ -328,6 +334,15 @@ class SensorScope(OpenGLGenericPlugin):
 
             self.paint_method(self.display_frame)
 
+
+    def left_click_method(self, x):
+        """
+        Moves the white line.
+        """
+        self.line_x = x
+        self.line = [[self.line_x, 0],
+                     [self.line_x, self.open_gl_widget.height]]
+        
     def paint_method(self, display_frame = 0):
         '''
         Drawing routine: this function is called periodically.
@@ -385,8 +400,12 @@ class SensorScope(OpenGLGenericPlugin):
         #glEnable(GL_BLEND)
         glDrawArrays(GL_POINTS, 0, len(display_points))
 
-        self.compute_line_intersect(display_frame)
+        #draw the vertical line
+        glColorPointerf(self.line_color)
+        glVertexPointerf(self.line)
+        glDrawArrays(GL_LINES, 0, len(self.line))
 
+        self.compute_line_intersect(display_frame)
         self.mutex.release()
 
         glDisableClientState(GL_VERTEX_ARRAY)

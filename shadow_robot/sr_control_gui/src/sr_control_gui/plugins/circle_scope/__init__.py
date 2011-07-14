@@ -288,10 +288,10 @@ class CircleScope(OpenGLGenericPlugin):
     Plots some chosen debug values.
     """
     name = "Circle Scope"
-    number_of_points_to_display = 100
+    number_of_points_to_display = 50
 
     def __init__(self):
-        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method)
+        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_clicked, self.left_clicked)
         self.data_points_size = self.open_gl_widget.number_of_points
         self.all_pubs = []
         self.topic_checker = RosTopicChecker()
@@ -327,20 +327,7 @@ class CircleScope(OpenGLGenericPlugin):
         self.control_layout.addWidget(self.btn_frame)
         self.subscribe_topic_frames = []
 
-        self.time_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
-        self.time_slider.setMinimum(0)
-        self.time_slider.setMaximum(self.data_points_size - self.number_of_points_to_display)
-        self.time_slider.setInvertedControls(True)
-        self.time_slider.setInvertedAppearance(True)
-        self.time_slider.setEnabled(False)
-        self.frame.connect(self.time_slider, QtCore.SIGNAL('valueChanged(int)'), self.time_changed)
-        self.layout.addWidget(self.time_slider)
-
         self.paused = False
-
-    def resized(self):
-        #we divide by 100 because we want to scroll 100 points per 100 points
-        self.time_slider.setMaximum((self.data_points_size - self.number_of_points_to_display)/100 - 1)
 
     def activate(self):
         OpenGLGenericPlugin.activate(self)
@@ -356,27 +343,11 @@ class CircleScope(OpenGLGenericPlugin):
         self.control_layout.addWidget( tmp_stf )
         self.subscribe_topic_frames.append( tmp_stf )
 
-    def right_click_method(self, x):
-        #right click for time traveling
-        # only if paused
-        if self.paused:
-            self.display_frame += (x - self.open_gl_widget.last_right_click_x)
-            if self.display_frame < 0:
-                self.display_frame = 0
-            if self.display_frame >= self.data_points_size:
-                self.display_frame = self.data_points_size - 1
-
-            self.open_gl_widget.last_right_click_x = x
-
-            self.paint_method(self.display_frame)
-
     def paint_method(self, display_frame = 0):
         '''
         Drawing routine: this function is called periodically.
 
         @display_frame: the frame to display: we have more points than we display.
-                        By default, we display the latest values, but by playing
-                        with the time_slider we can then go back in time.
         '''
         if self.paused:
             display_frame = self.display_frame
@@ -412,20 +383,14 @@ class CircleScope(OpenGLGenericPlugin):
         glFlush()
         self.open_gl_widget.update()
 
-    def time_changed(self, value):
-        self.display_frame = value*100
-        self.paint_method(value)
-
     def button_play_clicked(self):
         #lock mutex here
         if not self.paused:
             self.paused = True
             self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/play.png'))
-            self.time_slider.setEnabled(True)
         else:
             self.paused = False
             self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
-            self.time_slider.setEnabled(False)
 
     def button_refresh_clicked(self):
         self.refresh_topics()
@@ -451,6 +416,12 @@ class CircleScope(OpenGLGenericPlugin):
         scaled_data = (data * self.open_gl_widget.height) / data_max
         return scaled_data
 
+    def right_clicked(self, x):
+        pass
+
+    def left_clicked(self, x):
+        pass
+    
     def on_close(self):
         for sub_frame in self.subscribe_topic_frames:  
             sub_frame.close()
