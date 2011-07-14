@@ -111,7 +111,7 @@ class GenericGLWidget(QGLWidget):
         #print w, "*", h
         glViewport(0, 0, w, h)
         gluOrtho2D(0.0, w, 0.0, h)
-                
+        glClear(GL_COLOR_BUFFER_BIT)                
         self.number_of_points_to_display = w
         self.parent.resized()
 
@@ -122,6 +122,7 @@ class GenericGLWidget(QGLWidget):
         # set viewing projection
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glClearDepth(1.0)
+        glClear(GL_COLOR_BUFFER_BIT)
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()

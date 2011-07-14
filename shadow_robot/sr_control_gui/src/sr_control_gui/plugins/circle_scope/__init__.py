@@ -288,7 +288,7 @@ class CircleScope(OpenGLGenericPlugin):
     Plots some chosen debug values.
     """
     name = "Circle Scope"
-    number_of_points_to_display = 1000
+    number_of_points_to_display = 100
 
     def __init__(self):
         OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method)
@@ -403,7 +403,7 @@ class CircleScope(OpenGLGenericPlugin):
         #glEnable(GL_BLEND)
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
-        glClear(GL_COLOR_BUFFER_BIT)
+        #glClear(GL_COLOR_BUFFER_BIT)
         glColorPointerf(colors)
         glVertexPointerf(display_points)
         glDrawArrays(GL_POINTS, 0, len(display_points))
@@ -440,6 +440,7 @@ class CircleScope(OpenGLGenericPlugin):
             if "position" in topic:
                 print topic
                 self.all_pubs.append(sub)
+        self.all_pubs.sort()
 
     def display_to_data_index(self, display_index, display_frame):
         # we multiply display_frame by a 100 because we're scrolling 100 points per 100 points
