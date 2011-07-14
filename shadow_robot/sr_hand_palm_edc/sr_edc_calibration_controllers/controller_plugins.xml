@@ -8,4 +8,8 @@
          type="controller::SrhPositionController"
          base_class_type="pr2_controller_interface::Controller" />
 
+  <class name="sr_edc_calibration_controllers/SrhJointVelocityController"
+         type="controller::SrhJointVelocityController"
+         base_class_type="pr2_controller_interface::Controller" />
+
 </library>

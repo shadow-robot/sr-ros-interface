@@ -93,7 +93,8 @@ bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, ro
     return false;
   }
 
-  if (!pid_controller_.init(ros::NodeHandle(node_, "pid")))
+  control_toolbox::Pid pid;
+  if (!pid.init(ros::NodeHandle(node_, "pid")))
     return false;
 
   controller_state_publisher_.reset(
@@ -102,7 +103,7 @@ bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, ro
 
   sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhJointVelocityController::setCommandCB, this);
 
-  return true;
+  return init(robot, joint_name, pid);
 }
 
 

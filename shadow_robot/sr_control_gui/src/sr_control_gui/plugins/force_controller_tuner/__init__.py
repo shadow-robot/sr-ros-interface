@@ -222,7 +222,7 @@ class JointPidSetter(QtGui.QFrame):
             #   - the value
             #   - a QLineEdit to be able to modify the value
             #   - an array containing the min/max
-            self.important_parameters[param] = [0,0,[-1023,1023]]
+            self.important_parameters[param] = [0,0,[0,65535]]
 
         self.advanced_parameters = {}
         for param in self.ordered_params["advanced"]:
@@ -230,7 +230,7 @@ class JointPidSetter(QtGui.QFrame):
             #   - the value
             #   - a QLineEdit to be able to modify the value
             #   - an array containing the min/max
-            self.advanced_parameters[param] = [0,0,[-1023,1023]]
+            self.advanced_parameters[param] = [0,0,[0,65535]]
 
         self.advanced_parameters["max_pwm"][0] = 100
 

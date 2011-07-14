@@ -1,6 +1,6 @@
 # Shadow Hand Defines .. Need Fixing as PID values are not correct
 
-sh_ffj0_position_controller:
+sh_ffj0_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: FFJ2
   pid:
@@ -8,7 +8,7 @@ sh_ffj0_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_ffj3_position_controller:
+sh_ffj3_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: FFJ3
   pid:
@@ -16,7 +16,7 @@ sh_ffj3_position_controller:
     i: -0.5
     d: 0.0
     i_clamp: 1.0
-sh_ffj4_position_controller:
+sh_ffj4_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: FFJ4
   pid:
@@ -26,7 +26,7 @@ sh_ffj4_position_controller:
     i_clamp: 1.0
 
 
-sh_mfj0_position_controller:
+sh_mfj0_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: MFJ2
   pid:
@@ -34,7 +34,7 @@ sh_mfj0_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_mfj3_position_controller:
+sh_mfj3_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: MFJ3
   pid:
@@ -42,7 +42,7 @@ sh_mfj3_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_mfj4_position_controller:
+sh_mfj4_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: MFJ4
   pid:
@@ -53,7 +53,7 @@ sh_mfj4_position_controller:
 
 
 
-sh_rfj0_position_controller:
+sh_rfj0_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: RFJ2
   pid:
@@ -61,7 +61,7 @@ sh_rfj0_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_rfj3_position_controller:
+sh_rfj3_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: RFJ3
   pid:
@@ -69,7 +69,7 @@ sh_rfj3_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_rfj4_position_controller:
+sh_rfj4_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: RFJ4
   pid:
@@ -80,7 +80,7 @@ sh_rfj4_position_controller:
 
 
 
-sh_lfj0_position_controller:
+sh_lfj0_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: LFJ2
   pid:
@@ -88,7 +88,7 @@ sh_lfj0_position_controller:
     i: -0.5
     d: 0.0
     i_clamp: 1.0
-sh_lfj3_position_controller:
+sh_lfj3_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: LFJ3
   pid:
@@ -96,7 +96,7 @@ sh_lfj3_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_lfj4_position_controller:
+sh_lfj4_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: LFJ4
   pid:
@@ -104,7 +104,7 @@ sh_lfj4_position_controller:
     i: -0.5
     d: 0.0
     i_clamp: 1.0
-sh_lfj5_position_controller:
+sh_lfj5_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: LFJ5
   pid:
@@ -115,7 +115,7 @@ sh_lfj5_position_controller:
 
 
 
-sh_thj1_position_controller:
+sh_thj1_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: THJ1
   pid:
@@ -123,7 +123,7 @@ sh_thj1_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_thj2_position_controller:
+sh_thj2_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: THJ2
   pid:
@@ -131,7 +131,7 @@ sh_thj2_position_controller:
     i: -0.5
     d: 0.0
     i_clamp: 1.0
-sh_thj3_position_controller:
+sh_thj3_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: THJ3
   pid:
@@ -139,7 +139,7 @@ sh_thj3_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_thj4_position_controller:
+sh_thj4_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: THJ4
   pid:
@@ -147,7 +147,7 @@ sh_thj4_position_controller:
     i: 0.5
     d: 0.0
     i_clamp: 1.0
-sh_thj5_position_controller:
+sh_thj5_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: THJ5
   pid:
@@ -158,7 +158,7 @@ sh_thj5_position_controller:
 
 
 
-sh_wrj1_position_controller:
+sh_wrj1_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: WRJ1
   pid:
@@ -166,7 +166,7 @@ sh_wrj1_position_controller:
     i: 1.0
     d: 0.0
     i_clamp: 1.0
-sh_wrj2_position_controller:
+sh_wrj2_velocity_controller:
   type: sr_edc_calibration_controllers/SrhJointVelocityController
   joint: WRJ2
   pid:

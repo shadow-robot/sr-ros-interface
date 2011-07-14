@@ -31,6 +31,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
 #include <vector>
+#include <deque>
 
 //used to publish debug values
 #include <std_msgs/Int16.h>
@@ -122,6 +123,10 @@ namespace shadow_joints
     // coming from the hardware which are used to
     // compute the joint data.
     JointToSensor joint_to_sensor;
+
+    //A FIFO queue containing a given number of last positions and their timestamps.
+    // useful for computing the speed and filtering.
+    std::deque<std::pair<double, double> > last_positions;
 
     bool has_motor;
     boost::shared_ptr<Motor> motor;
@@ -270,6 +275,10 @@ namespace shadow_robot
     boost::shared_mutex debug_mutex;
     ros::NodeHandle node_handle;
     std_msgs::Int16 msg_debug;
+
+    ///the maximum number of position to keep per joint
+    static const int number_of_positions_to_keep;
+    static const int number_of_positions_for_filter;
 
   };//end class
 }

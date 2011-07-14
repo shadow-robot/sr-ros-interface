@@ -108,9 +108,10 @@ class GenericGLWidget(QGLWidget):
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
+        #print w, "*", h
         glViewport(0, 0, w, h)
         gluOrtho2D(0.0, w, 0.0, h)
-
+                
         self.number_of_points_to_display = w
         self.parent.resized()
 

@@ -49,12 +49,12 @@ class BaseMovement(object):
         pass
 
 class SinusoidMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 0.01):
+    def __init__(self, joint_name, amplitude = 1.):
         BaseMovement.__init__(self,joint_name)
         self.amplitude = amplitude
 
     def update(self, mvt_percentage):
-        value = self.amplitude / 2.0 * math.sin(2.0*3.14159 * mvt_percentage/100.) + self.amplitude / 2.0 + .7
+        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.) 
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):

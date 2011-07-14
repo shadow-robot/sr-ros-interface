@@ -28,6 +28,8 @@
 #include <string>
 #include <boost/foreach.hpp>
 
+#include <sys/time.h>
+
 #include <sr_utilities/sr_math_utils.hpp>
 
 #include <ros/ros.h>
@@ -37,6 +39,8 @@ namespace shadow_robot
   //max of 20 publishers for debug
   const int SrRobotLib::nb_debug_publishers_const = 20;
   const int SrRobotLib::debug_mutex_lock_wait_time = 100;
+  const int SrRobotLib::number_of_positions_to_keep = 20;
+  const int SrRobotLib::number_of_positions_for_filter = 10;
 
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
     : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(MOTOR_CONFIG_FIRST_VALUE), nh_tilde("~")
@@ -60,6 +64,17 @@ namespace shadow_robot
     if( status_data->idle_time_us < main_pic_idle_time_min )
       main_pic_idle_time_min = status_data->idle_time_us;
 
+    //get the current timestamp
+    struct timeval tv;
+    double timestamp = 0.0;
+    if (gettimeofday(&tv, NULL))
+    {
+      ROS_WARN("SrRobotLib: Failed to get system time, timestamp in state will be zero");
+    }
+    else
+    {
+      timestamp = double(tv.tv_sec) + double(tv.tv_usec) / 1.0e+6;
+    }
     //First we read the joints informations
     boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = joints_vector.begin();
     for(;joint_tmp != joints_vector.end(); ++joint_tmp)
@@ -72,6 +87,35 @@ namespace shadow_robot
 
       //calibrate the joint and update the position.
       calibrate_joint(joint_tmp);
+
+      //add the last position to the queue
+      std::pair<double, double> pos_and_time;
+      joint_tmp->motor->actuator->state_.timestamp_ = timestamp;
+      pos_and_time.first = joint_tmp->motor->actuator->state_.position_;
+      pos_and_time.second = timestamp;
+      joint_tmp->last_positions.push_back( pos_and_time );
+
+      //If we have more than N values, filter the position:
+      //    compute the average of the last N values
+      int queue_size = joint_tmp->last_positions.size();
+      if(queue_size > number_of_positions_for_filter)
+      {
+        double average = 0.0;
+        //compute the average of the last N values
+        for(int i=queue_size - 1; i > queue_size - number_of_positions_for_filter; --i)
+          average += joint_tmp->last_positions[i].first;
+        average /= number_of_positions_for_filter;
+
+        //reset the position to the filtered value
+        joint_tmp->motor->actuator->state_.position_ = average;
+
+        //update the position queue with the filtered value
+        pos_and_time.first = average;
+      }
+      //compute the velocity
+      joint_tmp->motor->actuator->state_.velocity_ = (joint_tmp->last_positions.front().first - joint_tmp->last_positions.back().first) / (joint_tmp->last_positions.front().second - joint_tmp->last_positions.back().second);
+      if(joint_tmp->last_positions.size() > number_of_positions_to_keep)
+        joint_tmp->last_positions.pop_front();
 
       //if no motor is associated to this joint, then continue
       if( (motor_index_full == -1) )

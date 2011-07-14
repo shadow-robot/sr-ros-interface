@@ -1135,7 +1135,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     float percentage_packet_loss = 100.f * ((float)zero_buffer_read / (float)num_rxed_packets);
 
     //TODO: use ROS_WARN again
-    ROS_DEBUG("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
+    ROS_WARN("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
     return false;
   }
 

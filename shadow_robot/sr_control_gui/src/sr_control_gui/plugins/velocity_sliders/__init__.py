@@ -63,7 +63,7 @@ class VelocityJointSlider(LightJointSlider):
         self.publishers = {}
 
         for j in joints_tmp:
-            joints_list.append( Joint(j[0], 0, 150) )
+            joints_list.append( Joint(j[0], -500, 500) )
             self.publishers[j[0]] = rospy.Publisher(j[1], Float64)
 
         LightJointSlider.__init__(self, joints_list)
@@ -73,4 +73,4 @@ class VelocityJointSlider(LightJointSlider):
 
     def sendupdate(self, dict):
         for item in dict.items():
-            self.publishers[item[0]].publish(Float64(item[1]/100.))
+            self.publishers[item[0]].publish(Float64(item[1]/1000.))
