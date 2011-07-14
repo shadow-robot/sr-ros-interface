@@ -77,7 +77,7 @@ class GenericGLWidget(QGLWidget):
 
         if button & QtCore.Qt.LeftButton:
             self.left_click_method( event.pos().x() )
-        else:
+        elif button & QtCore.Qt.RightButton:
             self.right_click_method(event.pos().x())
 
     def resizeEvent(self, event):
@@ -89,7 +89,6 @@ class GenericGLWidget(QGLWidget):
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        #print w, "*", h
         glViewport(0, 0, w, h)
         gluOrtho2D(0.0, w, 0.0, h)
         glClear(GL_COLOR_BUFFER_BIT)                

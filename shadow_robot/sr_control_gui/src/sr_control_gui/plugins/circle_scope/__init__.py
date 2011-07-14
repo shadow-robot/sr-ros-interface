@@ -60,9 +60,9 @@ class DataSet(object):
         self.change_color([255,0,0])
 
     def init_dataset(self):
-        tmp1 = [0]* self.parent.data_points_size
+        tmp1 = [None]* self.parent.data_points_size
         self.points_1 = deque(tmp1)
-        tmp2 = [0]* self.parent.data_points_size
+        tmp2 = [None]* self.parent.data_points_size
         self.points_2 = deque(tmp2)
 
     def change_color(self, rgb):
@@ -95,7 +95,7 @@ class DataSet(object):
         if self.parent.paused:
             return
         #self.mutex_1.acquire()
-        self.points_1.append( int(msg.data * 5000) )
+        self.points_1.append( msg.data )
         self.points_1.popleft()
         #self.mutex_1.release()
 
@@ -110,7 +110,7 @@ class DataSet(object):
         if self.parent.paused:
             return
         #self.mutex_2.acquire()
-        self.points_2.append( int(msg.data * 5000) )
+        self.points_2.append( msg.data )
         self.points_2.popleft()
         #self.mutex_2.release()
 
@@ -355,26 +355,26 @@ class CircleScope(OpenGLGenericPlugin):
         display_points = []
         colors = []
 
-        for sub_frame in self.subscribe_topic_frames:  
-            #sub_frame.data_set.mutex_1.acquire()
-            #sub_frame.data_set.mutex_2.acquire()
+        #we want to center the data on the screen
+        offset_x = self.open_gl_widget.width / 2
+        offset_y = self.open_gl_widget.height / 2
+
+        #this is a guestimate of the max received value
+        # from which we'll compute the scaling factor
+        max_x = 0.2
+        max_y = 0.2
+        scaling_factor_x = offset_x / max_x
+        scaling_factor_y = offset_y / max_y
+        for sub_frame in self.subscribe_topic_frames:
             for display_index in range(0, self.number_of_points_to_display):
                 data_index = self.display_to_data_index(display_index, display_frame)
-                #if sub_frame.data_set.points_1[data_index] != None:
-                #    if sub_frame.data_set.points_2[data_index] != None:
-                # add the raw data
-                colors.append(sub_frame.data_set.get_scaled_color())
-                #print "point [",data_index,"]: ", sub_frame.data_set.points_2[data_index] , " ",  sub_frame.data_set.points_1[data_index]," ",
-                display_points.append([sub_frame.data_set.points_2[data_index] + 300, sub_frame.data_set.points_1[data_index] + 300])
-            #sub_frame.data_set.mutex_1.release()
-            #sub_frame.data_set.mutex_2.release()
-        #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
-        #glPointSize(10)
-        #glEnable(GL_POINT_SMOOTH)
-        #glEnable(GL_BLEND)
+                if sub_frame.data_set.points_1[data_index] != None:
+                    if sub_frame.data_set.points_2[data_index] != None:
+                        colors.append(sub_frame.data_set.get_scaled_color())
+                        display_points.append([sub_frame.data_set.points_2[data_index] * scaling_factor_x  + offset_x, sub_frame.data_set.points_1[data_index] * scaling_factor_y + offset_y])
+
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
-        #glClear(GL_COLOR_BUFFER_BIT)
         glColorPointerf(colors)
         glVertexPointerf(display_points)
         glDrawArrays(GL_POINTS, 0, len(display_points))
@@ -403,7 +403,6 @@ class CircleScope(OpenGLGenericPlugin):
         for sub in tmp:
             topic = sub[0]
             if "position" in topic:
-                print topic
                 self.all_pubs.append(sub)
         self.all_pubs.sort()
 
