@@ -115,6 +115,8 @@ class Diamond(GenericPlugin):
         self.fingers = ["FF","MF","RF","LF"]
         self.layout = QtGui.QHBoxLayout()
         self.frame = QtGui.QFrame()
+        self.red_icon = None
+        self.green_icon = None
         self.buttons = {}
         self.movements = {}
         self.moving = {}
@@ -124,7 +126,6 @@ class Diamond(GenericPlugin):
             tmp_btn = QtGui.QPushButton(finger)
             self.buttons[finger] = tmp_btn
             tmp_btn.clicked.connect(partial(self.clicked, finger))
-
             self.layout.addWidget( tmp_btn )
         self.frame.setLayout( self.layout )
         self.window.setWidget( self.frame )
@@ -137,14 +138,20 @@ class Diamond(GenericPlugin):
             self.moving[finger_name] = False
             self.movements[finger_name].join()
             self.movements[finger_name] = None
+            self.buttons[finger_name].setIcon(self.green_icon)
         else:
             self.moving[finger_name] = True
             self.movements[finger_name] = Movement(finger_name)
             self.movements[finger_name].moving = True
             self.movements[finger_name].start()
+            self.buttons[finger_name].setIcon(self.red_icon)
 
     def activate(self):
         GenericPlugin.activate(self)
+        self.green_icon = QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/colors/green.png')
+        self.red_icon = QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/colors/red.png')
+        for btn in self.buttons.values():
+            btn.setIcon(self.green_icon)
 
     def on_close(self):
         for movement in self.movements.values():

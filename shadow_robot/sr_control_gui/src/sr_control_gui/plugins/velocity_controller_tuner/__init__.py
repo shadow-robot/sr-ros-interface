@@ -104,10 +104,11 @@ class JointPidSetter(QtGui.QFrame):
     Set the force PID settings for a given joint.
     """
 
-    def __init__(self, joint_name):
+    def __init__(self, joint_name, parent):
         """
         """
         QtGui.QFrame.__init__(self)
+        self.parent = parent
         self.joint_name = joint_name
 
         #/sh_ffj0_velocity_controller/set_gains
@@ -211,22 +212,27 @@ class JointPidSetter(QtGui.QFrame):
             self.moving = False
             self.full_movement.join()
             self.full_movement = None
-            self.btn_move.setDown(False)
+            self.btn_move.setIcon(self.green_icon)
         else:
             self.moving = True
             self.full_movement = FullMovement(self.joint_name)
             self.full_movement.moving = True
             self.full_movement.start()
-            self.btn_move.setDown(True)
+            self.btn_move.setIcon(self.red_icon)
 
     def set_pid(self):
         for param in self.parameters.items():
             param[1][0] = param[1][1].text().toInt()[0]
-        #try:
-        self.pid_service( self.parameters["p"][0], self.parameters["i"][0],
-                          self.parameters["d"][0], self.parameters["iclamp"][0] )
-        #except:
-        #    print "Failed to set pid."
+        try:
+            self.pid_service( self.parameters["p"][0], self.parameters["i"][0],
+                              self.parameters["d"][0], self.parameters["iclamp"][0] )
+        except:
+            print "Failed to set pid."
+
+    def activate(self):
+        self.green_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/green.png')
+        self.red_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/red.png')
+        self.btn_move.setIcon(self.green_icon)
 
     def on_close(self):
         if self.full_movement != None:
@@ -240,9 +246,9 @@ class FingerPIDSetter(QtGui.QFrame):
     set the PID settings for the finger.
     """
 
-    def __init__(self, finger_name, joint_names):
+    def __init__(self, finger_name, joint_names, parent):
         QtGui.QFrame.__init__(self)
-
+        self.parent = parent
         self.setFrameShape(QtGui.QFrame.Box)
 
         self.finger_name = finger_name
@@ -252,12 +258,16 @@ class FingerPIDSetter(QtGui.QFrame):
 
         self.joint_pid_setter = []
         for joint_name in self.joint_names:
-            self.joint_pid_setter.append( JointPidSetter(joint_name) )
+            self.joint_pid_setter.append( JointPidSetter(joint_name, self) )
 
         for j_pid_setter in self.joint_pid_setter:
             self.layout_.addWidget( j_pid_setter )
 
         self.setLayout(self.layout_)
+
+    def activate(self):
+        for jps in self.joint_pid_setter:
+            jps.activate()
 
     def on_close(self):
         for j_pid_setter in self.joint_pid_setter:
@@ -284,7 +294,7 @@ class VelocityControllerTuner(GenericPlugin):
         self.finger_pid_setters = []
 
         for finger in self.joints.items():
-            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1]) )
+            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1], self) )
 
         self.qtab_widget = QtGui.QTabWidget()
         for f_pid_setter in self.finger_pid_setters:
@@ -297,6 +307,9 @@ class VelocityControllerTuner(GenericPlugin):
 
     def activate(self):
         GenericPlugin.activate(self)
+
+        for fps in self.finger_pid_setters:
+            fps.activate()
 
         self.set_icon(self.parent.parent.rootPath + '/images/icons/iconHand.png')
 
