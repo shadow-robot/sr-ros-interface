@@ -33,7 +33,7 @@ from OpenGL.GLUT import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 
-import threading
+import time, threading
 
 from collections import deque
 from sr_robot_msgs.msg import EthercatDebug
@@ -232,21 +232,23 @@ class DataToDisplayWidget(QtGui.QFrame):
             self.label_value.setText(txt)
 
 
-class DataSet(object):
+class DataSet(threading.Thread):
     default_color = QtCore.Qt.black
 
     def __init__(self, parent):
+        threading.Thread.__init__(self)
         self.parent = parent
-        self.subscriber = rospy.Subscriber("/debug_etherCAT_data", EthercatDebug, self.msg_callback)
-
+        self.subscriber = None
         self.enabled = False
 
         self.points = []
         self.init_dataset()
         self.scaled_color = []
         self.raw_color = []
-
         self.change_color([255,0,0])
+
+    def run(self):
+        self.subscriber = rospy.Subscriber("/debug_etherCAT_data", EthercatDebug, self.msg_callback)
 
     def msg_callback(self, msg):
         """
@@ -259,7 +261,7 @@ class DataSet(object):
         if self.parent.paused:
             return
 
-        #self.mutex.acquire()
+        self.parent.mutex.acquire()
         new_data = { "sensors": msg.sensors,
                      "motor_data_type": msg.motor_data_type,
                      "which_motors": msg.which_motors,
@@ -271,7 +273,7 @@ class DataSet(object):
                      "idle_time_us": msg.idle_time_us }
         self.points.append(new_data)
         self.points.popleft()
-        #self.mutex.release()
+        self.parent.mutex.release()
 
     def init_dataset(self):
         tmp = [None]* self.parent.data_points_size
@@ -359,9 +361,10 @@ class SensorScope(OpenGLGenericPlugin):
         self.time_slider.setMaximum((self.data_points_size - self.open_gl_widget.number_of_points_to_display)/100 - 1)
 
     def activate(self):
+        self.data_set = DataSet(self)
+        self.data_set.start()
         OpenGLGenericPlugin.activate(self)
         self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
-        self.data_set = DataSet(self)
         self.control_frame.setLayout(self.control_layout)
 
     def right_click_method(self, x):
@@ -402,93 +405,107 @@ class SensorScope(OpenGLGenericPlugin):
         display_points = []
         colors = []
 
-        #self.mutex.acquire()
+        self.mutex.acquire()
+        try:
+            #we want to keep the average of the last 50 points of
+            #  the raw data in the middle of the screen
+            #first we remove the data containing None from the 50 last points
+            for data_to_display in self.data_to_display:
+                if data_to_display == "None":
+                    continue
+                data_tmp = data_to_display.items()[0]
+                data_name = data_tmp[0]
+                data_param = data_tmp[1]
 
-        #we want to keep the average of the last 50 points of
-        #  the raw data in the middle of the screen
-        #first we remove the data containing None from the 50 last points
-        for data_to_display in self.data_to_display:
-            if data_to_display == "None":
-                continue
-            data_tmp = data_to_display.items()[0]
-            data_name = data_tmp[0]
-            data_param = data_tmp[1]
-
-            last_50_points = []
-            index = (self.data_points_size - display_frame -1)
-            iteration = 0
-            while len(last_50_points) < 50:
-                if self.data_set.points[index] != None:
-                    #print data_index, " ", self.data_set.points[index].sensors[24]
-                    if 'id' in data_param.keys():
-                        value = self.data_set.points[index][data_name][data_param['id']]
-                    else:
-                        if data_name == "motor_data_type":
-                            value = self.data_set.points[index][data_name].data
+                last_50_points = []
+                index = (self.data_points_size - display_frame -1)
+                iteration = 0
+                while len(last_50_points) < 50:
+                    if self.data_set.points[index] != None:
+                        #print data_index, " ", self.data_set.points[index].sensors[24]
+                        if 'id' in data_param.keys():
+                            value = self.data_set.points[index][data_name][data_param['id']]
                         else:
-                            value = self.data_set.points[index][data_name]
-                    last_50_points.append( value )
-                index -= 1
-                iteration += 1
-                #searched the last 200 points
-                if iteration == 200:
-                    break
+                            if data_name == "motor_data_type":
+                                value = self.data_set.points[index][data_name].data
+                            else:
+                                value = self.data_set.points[index][data_name]
+                        last_50_points.append( value )
+                    index -= 1
+                    iteration += 1
+                    #searched the last 200 points
+                    if iteration == 200:
+                        break
 
-            if len(last_50_points) != 0:
-                offset = self.open_gl_widget.height/2 - int(float(sum(last_50_points))/len(last_50_points))
-            else:
-                offset = 0
-            data_to_display[data_name]["offset"] = offset
+                if len(last_50_points) != 0:
+                    offset = self.open_gl_widget.height/2 - int(float(sum(last_50_points))/len(last_50_points))
+                else:
+                    offset = 0
+                data_to_display[data_name]["offset"] = offset
 
-        for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
-            data_index = self.display_to_data_index(display_index, display_frame)
-            if self.data_set.points[data_index] != None:
-                #print " DATA TO DISPLAY", self.data_to_display
-                for data_tmp in self.data_to_display:
-                    if data_tmp == "None":
-                        continue
-                    data_tmp = data_tmp.items()[0]
-                    #print "    -> ",data_to_display.items(), " ", self.data_to_display
-                    data_name = data_tmp[0]
-                    data_param = data_tmp[1]
-                    #print data_param
-                    #print data_index, " ", self.data_set.points[index].sensors[24]
-                    if 'id' in data_param.keys():
-                        value = self.data_set.points[index][data_name][data_param['id']]
-                    else:
-                        if data_name == "motor_data_type":
-                            value = self.data_set.points[index][data_name].data
+            #print "-----"
+            #print "which motor: ",
+            #for point in  self.data_set.points:
+            #    print point["which_motors"]," ",
+
+            #print ""
+            #print "data_index: ",
+            for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
+                data_index = self.display_to_data_index(display_index, display_frame)
+                #print data_index, " ",
+                if self.data_set.points[data_index] != None:
+                    #print " DATA TO DISPLAY", self.data_to_display
+                    for data_tmp in self.data_to_display:
+                        if data_tmp == "None":
+                            continue
+                        data_tmp = data_tmp.items()[0]
+                        #print "    -> ",data_to_display.items(), " ", self.data_to_display
+                        data_name = data_tmp[0]
+                        data_param = data_tmp[1]
+                        #print data_param
+                        #print data_index, " ", self.data_set.points[index].sensors[24]
+                        if 'id' in data_param.keys():
+                            value = self.data_set.points[index][data_name][data_param['id']]
                         else:
-                            value = self.data_set.points[index][data_name]
-                    # add the raw data
-                    colors.append(data_param['raw_color'])
-                    display_points.append([display_index, value + data_param['offset'] ])
-                    #also add the scaled data
-                    colors.append(data_param['scaled_color'])
-                    display_points.append([display_index, self.scale_data(value, data_param['max'])] )
+                            if data_name == "motor_data_type":
+                                value = self.data_set.points[index][data_name].data
+                            else:
+                                value = self.data_set.points[index][data_name]
+                        # add the raw data
+                        colors.append(data_param['raw_color'])
+                        display_points.append([display_index, value + data_param['offset'] ])
+                        #also add the scaled data
+                        colors.append(data_param['scaled_color'])
+                        display_points.append([display_index, self.scale_data(value, data_param['max'])] )
 
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glEnableClientState(GL_COLOR_ARRAY)
-        glColorPointerf(colors)
-        glVertexPointerf(display_points)
-        glClear(GL_COLOR_BUFFER_BIT)
-        #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
-        #glPointSize(10)
-        #glEnable(GL_POINT_SMOOTH)
-        #glEnable(GL_BLEND)
-        glDrawArrays(GL_POINTS, 0, len(display_points))
+            glEnableClientState(GL_VERTEX_ARRAY)
+            glEnableClientState(GL_COLOR_ARRAY)
+            glColorPointerf(colors)
+            glVertexPointerf(display_points)
+            glClear(GL_COLOR_BUFFER_BIT)
+            #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
+            #glPointSize(10)
+            #glEnable(GL_POINT_SMOOTH)
+            #glEnable(GL_BLEND)
+            glDrawArrays(GL_POINTS, 0, len(display_points))
 
-        #draw the vertical line
-        glColorPointerf(self.line_color)
-        glVertexPointerf(self.line)
-        glDrawArrays(GL_LINES, 0, len(self.line))
+            #draw the vertical line
+            glColorPointerf(self.line_color)
+            glVertexPointerf(self.line)
+            glDrawArrays(GL_LINES, 0, len(self.line))
 
-        self.compute_line_intersect(display_frame)
-        #self.mutex.release()
+            self.compute_line_intersect(display_frame)
+            self.mutex.release()
+            #print " -> painting: RELEASED"
 
-        glDisableClientState(GL_VERTEX_ARRAY)
-        glDisableClientState(GL_COLOR_ARRAY)
-        glFlush()
+            glDisableClientState(GL_VERTEX_ARRAY)
+            glDisableClientState(GL_COLOR_ARRAY)
+            glFlush()
+
+        except:
+            self.mutex.release()
+            print "ERROR"
+            pass
         self.open_gl_widget.update()
 
     def add_data_to_display_widget(self):
@@ -519,7 +536,6 @@ class SensorScope(OpenGLGenericPlugin):
 
     def scale_data(self, data, data_max = 65536):
         scaled_data = (data * self.open_gl_widget.height) / data_max
-        print scaled_data
         return scaled_data
 
     def compute_line_intersect(self, display_frame):
@@ -543,5 +559,6 @@ class SensorScope(OpenGLGenericPlugin):
 
     def close(self):
         OpenGLGenericPlugin.on_close(self)
-
         self.data_set.close()
+        self.data_set.joint()
+

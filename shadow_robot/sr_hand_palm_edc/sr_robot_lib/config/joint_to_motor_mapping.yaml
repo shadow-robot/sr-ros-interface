@@ -5,8 +5,8 @@ joint_to_motor_mapping: [
         0,      #FFJ0
         -1,     #FFJ1
         -1,     #FFJ2
-        1,      #FFJ3
-        2,      #FFJ4
+        10,      #FFJ3
+        11,      #FFJ4
 
         3,      #MFJ0
         -1,     #MFJ1
@@ -14,17 +14,17 @@ joint_to_motor_mapping: [
         4,      #MFJ3
         5,      #MFJ4
 
-        6,      #RFJ0
+        9,      #RFJ0
         -1,     #RFJ1
         -1,     #RFJ2
         7,      #RFJ3
         8,      #RFJ4
 
-        9,      #LFJ0
+        2,      #LFJ0
         -1,     #LFJ1
         -1,     #LFJ2
-        10,     #LFJ3
-        11,     #LFJ4
+        6,     #LFJ3
+        1,     #LFJ4
         12,     #LFJ4
 
         13,     #THJ1
