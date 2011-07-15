@@ -62,14 +62,23 @@ class DataToDisplayChooser(QtGui.QDialog):
                             "motor_data_packet_torque",
                             "motor_data_packet_misc",
                             "tactile", "idle_time_us" ]
+
+        self.no_index = ["None","motor_data_type","which_motors",
+                         "which_motor_data_arrived",
+                         "which_motor_data_had_errors", "idle_time_us"]
+
         self.data_combo_box = QtGui.QComboBox(self)
         for d_t in self.data_types:
             self.data_combo_box.addItem(d_t)
+
+        self.connect(self.data_combo_box, QtCore.SIGNAL('activated(int)'), self.data_changed)
+
         self.layout.addWidget(self.data_combo_box)
 
         label = QtGui.QLabel("Index: ")
         self.layout.addWidget(label)
         self.id_field = QtGui.QLineEdit(self)
+        self.id_field.setText("0")
         validator = QtGui.QIntValidator(0, 36, self)
         self.id_field.setValidator(validator)
         self.layout.addWidget( self.id_field )
@@ -77,6 +86,7 @@ class DataToDisplayChooser(QtGui.QDialog):
         label = QtGui.QLabel("Max: ")
         self.layout.addWidget(label)
         self.max_field = QtGui.QLineEdit(self)
+        self.max_field.setText("4000")
         validator = QtGui.QIntValidator(0,65535, self)
         self.max_field.setValidator(validator)
         self.layout.addWidget( self.max_field )
@@ -147,6 +157,14 @@ class DataToDisplayChooser(QtGui.QDialog):
         b *= 0.5
         self.raw_color = [r,g,b]
 
+    def data_changed(self, index):
+        name = str( self.data_combo_box.currentText() )
+        if name in self.no_index:
+            self.id_field.setEnabled(False)
+        else:
+            self.id_field.setEnabled(True)
+
+
     def getValues(self):
         name = str( self.data_combo_box.currentText() )
         #print name
@@ -159,6 +177,12 @@ class DataToDisplayChooser(QtGui.QDialog):
 
         if name == "None":
             return [None, {"None":None}]
+
+        if name in self.no_index:
+            return [ self.current_icon,
+                     {name:{ "offset":0, "max": maximum,
+                             "raw_color": self.raw_color,
+                             "scaled_color": self.scaled_color}}]
 
         return [ self.current_icon,
                  {name:{"id": index,
@@ -191,9 +215,13 @@ class DataToDisplayWidget(QtGui.QFrame):
                 self.btn_choose_data.setText("None")
                 self.parent.data_to_display[self.index] = "None"
             else:
-                self.btn_choose_data.setText(data[1].keys()[0] + "["+str(data[1].values()[0]["id"])+"]")
+                if "id" in data[1].values()[0].keys():
+                    self.btn_choose_data.setText(data[1].keys()[0] + "["+str(data[1].values()[0]["id"])+"]")
+                else:
+                    self.btn_choose_data.setText(data[1].keys()[0])
                 self.btn_choose_data.setIcon(data[0])
                 self.parent.data_to_display[self.index] = data[1]
+
 
     def set_value(self, value):
         if value != None:
