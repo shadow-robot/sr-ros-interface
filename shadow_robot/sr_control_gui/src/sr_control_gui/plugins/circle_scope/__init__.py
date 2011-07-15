@@ -36,6 +36,7 @@ import threading
 
 from collections import deque
 from std_msgs.msg import Float64
+from sensor_msgs.msg import JointState
 
 
 
@@ -48,6 +49,11 @@ class DataSet(object):
         self.subscriber_2 = None
 
         self.enabled = False
+
+        self.index_1 = None
+        self.index_2 = None
+        self.joint_1 = None
+        self.joint_2 = None
 
         self.mutex_1 = threading.Lock()
         self.mutex_2 = threading.Lock()
@@ -98,6 +104,48 @@ class DataSet(object):
         self.points_1.append( msg.data )
         self.points_1.popleft()
         #self.mutex_1.release()
+
+    def callback_joint_states_1(self, msg):
+        """
+        Received a message on the first topic. Adding the new point to
+        the queue.
+        """
+        #received message from subscriber at index: update the last
+        # point and pop the first point
+        #print index, " ", msg.data
+        if self.parent.paused:
+            return
+
+        if self.index_1 == None:
+            for index,name in enumerate(msg.name):
+                if name == self.joint_1:
+                    self.index_1 = index
+                    break
+
+        self.points_1.append( msg.position[self.index_1] )
+        self.points_1.popleft()
+
+    def callback_joint_states_2(self, msg):
+        """
+        Received a message on the first topic. Adding the new point to
+        the queue.
+        """
+        #received message from subscriber at index: update the last
+        # point and pop the first point
+        #print index, " ", msg.data
+        if self.parent.paused:
+            return
+
+        if self.index_2 == None:
+            for index,name in enumerate(msg.name):
+                print name
+                if name == self.joint_2:
+                    self.index_2 = index
+                    break
+
+        self.points_2.append( msg.position[self.index_2] )
+        self.points_2.popleft()
+
 
     def callback_2(self, msg):
         """
@@ -214,7 +262,11 @@ class SubscribeTopicFrame(QtGui.QFrame):
 
         if text != "None":
             self.data_set.enabled = True
-            self.data_set.subscriber_1 = rospy.Subscriber(str(text), Float64, self.data_set.callback_1)
+            if "joint_states" in text:
+                self.data_set.joint_1 = text.split("/")[2]
+                self.data_set.subscriber_1 = rospy.Subscriber("/joint_states", JointState, self.data_set.callback_joint_states_1)
+            else:
+                self.data_set.subscriber_1 = rospy.Subscriber(str(text), Float64, self.data_set.callback_1)
         else:
             self.data_set.enabled = False
 
@@ -226,7 +278,12 @@ class SubscribeTopicFrame(QtGui.QFrame):
 
         if text != "None":
             self.data_set.enabled = True
-            self.data_set.subscriber_2 = rospy.Subscriber(str(text), Float64, self.data_set.callback_2)
+
+            if "joint_states" in text:
+                self.data_set.joint_2 = text.split("/")[2]
+                self.data_set.subscriber_2 = rospy.Subscriber("/joint_states", JointState, self.data_set.callback_joint_states_2)
+            else:
+                self.data_set.subscriber_2 = rospy.Subscriber(str(text), Float64, self.data_set.callback_2)
         else:
             self.data_set.enabled = False
 
@@ -279,7 +336,7 @@ class SubscribeTopicFrame(QtGui.QFrame):
 
         Qt.QTimer.singleShot(0, self.adjustSize)
         del self
-    
+
     def close(self):
         self.data_set.close()
 
@@ -401,10 +458,15 @@ class CircleScope(OpenGLGenericPlugin):
         self.all_pubs = []
         tmp = self.topic_checker.get_topics(publishers_only = True, topic_filter="std_msgs/Float64")
         for sub in tmp:
+            print sub
             topic = sub[0]
             if "position" in topic:
                 self.all_pubs.append(sub)
         self.all_pubs.sort()
+
+        joints =['WRJ2', 'WRJ1', 'FFJ4', 'FFJ3', 'FFJ1', 'FFJ2', 'MFJ4', 'MFJ3', 'MFJ1', 'MFJ2', 'RFJ4', 'RFJ3', 'RFJ1', 'RFJ2', 'LFJ5', 'LFJ4', 'LFJ3', 'LFJ1', 'LFJ2', 'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1']
+        for joint in joints:
+            self.all_pubs.append(["/joint_states/"+joint])
 
     def display_to_data_index(self, display_index, display_frame):
         # we multiply display_frame by a 100 because we're scrolling 100 points per 100 points
@@ -420,9 +482,9 @@ class CircleScope(OpenGLGenericPlugin):
 
     def left_clicked(self, x):
         pass
-    
+
     def on_close(self):
-        for sub_frame in self.subscribe_topic_frames:  
+        for sub_frame in self.subscribe_topic_frames:
             sub_frame.close()
         OpenGLGenericPlugin.on_close(self)
 
