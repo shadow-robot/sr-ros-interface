@@ -372,6 +372,7 @@ class SensorScope(OpenGLGenericPlugin):
     Plots some chosen debug values.
     """
     name = "Sensor Scope"
+    mouse_wheel_zoom = 1.0
 
     def __init__(self):
         OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method, self.left_click_method,
@@ -458,7 +459,16 @@ class SensorScope(OpenGLGenericPlugin):
 
     def mouse_wheel_method(self, delta, x, y):
         #delta is a multiple of 120
-        pass
+        self.mouse_wheel_zoom += (delta / 1000.)
+        self.mouse_wheel_zoom = max(self.mouse_wheel_zoom, 0.1)
+
+        self.open_gl_widget.setToolTip("zoom is set to : "+str(self.mouse_wheel_zoom))
+
+        for data_tmp in self.data_to_display:
+            if data_tmp is "None":
+                continue
+
+            data_tmp.values()[0]["max"] /= self.mouse_wheel_zoom
 
     def paint_method(self, display_frame = 0):
         '''

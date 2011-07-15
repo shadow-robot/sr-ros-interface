@@ -119,7 +119,7 @@ class OpenGLGenericPlugin(GenericPlugin):
     """
     name = "OpenGL Generic Plugin"
 
-    def __init__(self, paint_method, right_click_method, left_click_method, mouse_wheel_method,):
+    def __init__(self, paint_method, right_click_method, left_click_method, mouse_wheel_method):
         GenericPlugin.__init__(self)
 
         self.splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
