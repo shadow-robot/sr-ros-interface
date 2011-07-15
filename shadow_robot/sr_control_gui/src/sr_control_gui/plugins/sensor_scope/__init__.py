@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 #
 # Copyright 2011 Shadow Robot Company Ltd.
@@ -35,8 +36,172 @@ from PyQt4.QtOpenGL import *
 import threading
 
 from collections import deque
-from std_msgs.msg import Int16
+from sr_robot_msgs.msg import EthercatDebug
 
+class DataToDisplayChooser(QtGui.QDialog):
+    """
+    A popup where the user can choose which data he wants to be displayed.
+
+    return a dictionary containing this kind of data:
+         {"sensors":{"id":24, "offset": 0, "max":4000,
+         "raw_color":[0.5, 0.0, 0.0],
+         "scaled_color":[1.0,0.0,0]}}
+    """
+
+    def __init__(self, parent):
+        """
+        """
+        QtGui.QDialog.__init__(self,parent)
+        self.parent = parent
+        self.layout = QtGui.QHBoxLayout()
+
+        self.data_types = [ "None",
+                            "sensors", "motor_data_type",
+                            "which_motors", "which_motor_data_arrived",
+                            "which_motor_data_had_errors",
+                            "motor_data_packet_torque",
+                            "motor_data_packet_misc",
+                            "tactile", "idle_time_us" ]
+        self.data_combo_box = QtGui.QComboBox(self)
+        for d_t in self.data_types:
+            self.data_combo_box.addItem(d_t)
+        self.layout.addWidget(self.data_combo_box)
+
+        label = QtGui.QLabel("Index: ")
+        self.layout.addWidget(label)
+        self.id_field = QtGui.QLineEdit(self)
+        validator = QtGui.QIntValidator(0, 36, self)
+        self.id_field.setValidator(validator)
+        self.layout.addWidget( self.id_field )
+
+        label = QtGui.QLabel("Max: ")
+        self.layout.addWidget(label)
+        self.max_field = QtGui.QLineEdit(self)
+        validator = QtGui.QIntValidator(0,65535, self)
+        self.max_field.setValidator(validator)
+        self.layout.addWidget( self.max_field )
+
+        self.raw_color = [122, 0, 0]
+        self.scaled_color = [255, 0, 0]
+
+        #add a combobox to easily change the color
+        self.change_color_combobox = QtGui.QComboBox(self)
+        self.change_color_combobox.setToolTip("Change the color for this topic")
+        self.change_color_combobox.setFixedWidth(45)
+
+        self.icons = []
+        for color in Config.open_gl_generic_plugin_config.colors:
+            #the colors are stored as an icon + a color value
+            icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/'+color[0] +'.png')
+            self.icons.append(icon)
+            self.change_color_combobox.addItem( icon, "" )
+
+        #add the color picker at the end of the list for the user to pick a custom color
+        icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/color_wheel.png')
+        self.icons.append(icon)
+        self.change_color_combobox.addItem( icon, "" )
+
+        self.current_icon = self.icons[0]
+
+        self.connect(self.change_color_combobox, QtCore.SIGNAL('activated(int)'), self.change_color_clicked)
+        self.layout.addWidget(self.change_color_combobox)
+
+        self.btn_box = QtGui.QDialogButtonBox(self)
+        self.btn_box.setOrientation(QtCore.Qt.Horizontal)
+        self.btn_box.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.layout.addWidget(self.btn_box)
+        self.setLayout(self.layout)
+        self.setWindowTitle("Data To Display")
+
+        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("accepted()"), self.accept)
+        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("rejected()"), self.reject)
+        QtCore.QMetaObject.connectSlotsByName(self)
+
+    def change_color_clicked(self, index, const_color = None):
+        # the last item is the color picker
+        if index == self.change_color_combobox.count() - 1:
+            col_tmp = QtGui.QColorDialog.getColor()
+            if not col_tmp.isValid():
+                return
+            col = [col_tmp.redF(), col_tmp.greenF(), col_tmp.blueF()]
+        else:
+            #the user choosed a color from the dropdown
+            if const_color == None:
+                col = Config.open_gl_generic_plugin_config.colors[index][1]
+            else:
+                col = const_color
+
+        self.current_icon = self.icons[index]
+        self.change_color(col)
+
+    def change_color(self, rgb):
+        r = rgb[0]
+        g = rgb[1]
+        b = rgb[2]
+
+        self.scaled_color = [r, g, b]
+
+        #create a darker version of the raw color
+        r *= 0.5
+        g *= 0.5
+        b *= 0.5
+        self.raw_color = [r,g,b]
+
+    def getValues(self):
+        name = str( self.data_combo_box.currentText() )
+        #print name
+        index = self.id_field.text().toInt()[0]
+        #print index
+        maximum = self.max_field.text().toInt()[0]
+        #print max
+        #print self.raw_color
+        #print self.scaled_color
+
+        if name == "None":
+            return [None, {"None":None}]
+
+        return [ self.current_icon,
+                 {name:{"id": index,
+                        "offset":0, "max": maximum,
+                        "raw_color": self.raw_color,
+                        "scaled_color": self.scaled_color}}]
+
+class DataToDisplayWidget(QtGui.QFrame):
+    def __init__(self, parent, index):
+        self.parent = parent
+        self.index = index
+        QtGui.QFrame.__init__(self)
+        self.layout = QtGui.QHBoxLayout()
+
+        self.btn_choose_data = QtGui.QPushButton()
+        self.btn_choose_data.setText("Data")
+        self.connect(self.btn_choose_data, QtCore.SIGNAL('clicked()'), self.choose_data)
+        self.layout.addWidget(self.btn_choose_data)
+
+        self.label_value = QtGui.QLabel()
+        self.layout.addWidget(self.label_value)
+
+        self.setLayout(self.layout)
+
+    def choose_data(self):
+        data_chooser = DataToDisplayChooser(self)
+        if data_chooser.exec_():
+            data = data_chooser.getValues()
+            if data[1].keys()[0] == "None":
+                self.btn_choose_data.setText("None")
+                self.parent.data_to_display[self.index] = "None"
+            else:
+                self.btn_choose_data.setText(data[1].keys()[0] + "["+str(data[1].values()[0]["id"])+"]")
+                self.btn_choose_data.setIcon(data[0])
+                self.parent.data_to_display[self.index] = data[1]
+
+    def set_value(self, value):
+        if value != None:
+            txt = ""
+            txt += str(value)
+            txt += " / "
+            txt += "0x%0.4X" % value
+            self.label_value.setText(txt)
 
 
 class DataSet(object):
@@ -44,7 +209,7 @@ class DataSet(object):
 
     def __init__(self, parent):
         self.parent = parent
-        self.subscriber = None
+        self.subscriber = rospy.Subscriber("/debug_etherCAT_data", EthercatDebug, self.msg_callback)
 
         self.enabled = False
 
@@ -54,6 +219,31 @@ class DataSet(object):
         self.raw_color = []
 
         self.change_color([255,0,0])
+
+    def msg_callback(self, msg):
+        """
+        Received a message on the topic. Adding the new point to
+        the queue.
+        """
+        #received message from subscriber at index: update the last
+        # point and pop the first point
+        #print index, " ", msg.data
+        if self.parent.paused:
+            return
+
+        #self.mutex.acquire()
+        new_data = { "sensors": msg.sensors,
+                     "motor_data_type": msg.motor_data_type,
+                     "which_motors": msg.which_motors,
+                     "which_motor_data_arrived": msg.which_motor_data_arrived,
+                     "which_motor_data_had_errors": msg.which_motor_data_had_errors,
+                     "motor_data_packet_torque": msg.motor_data_packet_torque,
+                     "motor_data_packet_misc": msg.motor_data_packet_misc,
+                     "tactile": msg.tactile,
+                     "idle_time_us": msg.idle_time_us }
+        self.points.append(new_data)
+        self.points.popleft()
+        #self.mutex.release()
 
     def init_dataset(self):
         tmp = [None]* self.parent.data_points_size
@@ -82,144 +272,6 @@ class DataSet(object):
         self.subscriber.unregister()
         self.subscriber = None
 
-class SubscribeTopicFrame(QtGui.QFrame):
-    """
-    """
-
-    def __init__(self, parent, subscriber_index):
-        """
-        """
-        self.parent = parent
-        self.subscriber_index = subscriber_index
-
-        #contains a data set to store the data
-        self.data_set = DataSet(self.parent)
-
-        QtGui.QFrame.__init__(self)
-        self.layout = QtGui.QHBoxLayout()
-
-        #add a combo box to select the topic
-        self.topic_box = QtGui.QComboBox(self)
-        self.topic_box.setToolTip("Choose which topic you want to plot.")
-        self.topic_box.addItem("None")
-        for pub in parent.all_pubs:
-            self.topic_box.addItem(pub[0])
-        self.connect(self.topic_box, QtCore.SIGNAL('activated(int)'), self.onChanged)
-        self.layout.addWidget(self.topic_box)
-
-        #add a combobox to easily change the color
-        self.change_color_combobox = QtGui.QComboBox(self)
-        self.change_color_combobox.setToolTip("Change the color for this topic")
-        self.change_color_combobox.setFixedWidth(45)
-
-        for color in Config.open_gl_generic_plugin_config.colors:
-            #the colors are stored as an icon + a color value
-            icon = QtGui.QIcon(self.parent.parent.parent.rootPath + '/images/icons/colors/'+color[0] +'.png')
-            self.change_color_combobox.addItem( icon, "" )
-
-        #add the color picker at the end of the list for the user to pick a custom color
-        icon = QtGui.QIcon(self.parent.parent.parent.rootPath + '/images/icons/color_wheel.png')
-        self.change_color_combobox.addItem( icon, "" )
-
-        self.connect(self.change_color_combobox, QtCore.SIGNAL('activated(int)'), self.change_color_clicked)
-        self.layout.addWidget(self.change_color_combobox)
-
-        #add a button to add a subscribe topic frame
-        self.add_subscribe_topic_btn = QtGui.QPushButton()
-        self.add_subscribe_topic_btn.setText('+')
-        self.add_subscribe_topic_btn.setToolTip("Add a new topic to plot.")
-        self.add_subscribe_topic_btn.setFixedWidth(30)
-        self.connect(self.add_subscribe_topic_btn, QtCore.SIGNAL('clicked()'),self.add_subscribe_topic_clicked)
-        self.layout.addWidget(self.add_subscribe_topic_btn)
-
-        #add a button to remove the current subscribe topic frame
-        if len(self.parent.subscribe_topic_frames) > 0:
-            self.remove_topic_btn = QtGui.QPushButton()
-            self.remove_topic_btn.setText('-')
-            self.remove_topic_btn.setToolTip("Remove this topic.")
-            self.remove_topic_btn.setFixedWidth(30)
-            self.connect(self.remove_topic_btn, QtCore.SIGNAL('clicked()'),self.remove_topic_clicked)
-            self.layout.addWidget(self.remove_topic_btn)
-
-        self.display_last_value = QtGui.QLabel()
-        self.display_last_value.setFixedWidth(110)
-        self.layout.addWidget(self.display_last_value)
-
-        #set a color by default
-        self.change_color_clicked(index = 0, const_color = [255,0,0])
-
-        self.setLayout(self.layout)
-
-    def refresh_topics(self):
-        self.topic_box.clear()
-        self.topic_box.addItem("None")
-        for pub in self.parent.all_pubs:
-            self.topic_box.addItem(pub[0])
-
-    def onChanged(self, index):
-        text = self.topic_box.currentText()
-        #unsubscribe the current topic
-        if self.data_set.subscriber != None:
-            self.data_set.subscriber.unregister()
-
-        if text != "None":
-            self.data_set.enabled = True
-            self.data_set.subscriber = rospy.Subscriber(str(text), Int16, self.parent.msg_callback, self.subscriber_index)
-        else:
-            self.data_set.enabled = False
-
-    def update_display_last_value(self, value):
-        if value != None:
-            txt = ""
-            txt += str(value)
-            txt += " / "
-            txt += "0x%0.4X" % value
-            self.display_last_value.setText(txt)
-
-
-    def change_color_clicked(self, index, const_color = None):
-        # the last item is the color picker
-        if index == self.change_color_combobox.count() - 1:
-            col_tmp = QtGui.QColorDialog.getColor()
-            if not col_tmp.isValid():
-                return
-            col = [col_tmp.redF(), col_tmp.greenF(), col_tmp.blueF()]
-        else:
-            #the user choosed a color from the dropdown
-            if const_color == None:
-                col = Config.open_gl_generic_plugin_config.colors[index][1]
-            else:
-                col = const_color
-
-        self.data_set.change_color(col)
-
-
-    def add_subscribe_topic_clicked(self):
-        self.parent.add_topic_subscriber()
-        Qt.QTimer.singleShot(0, self.adjustSize)
-
-    def remove_topic_clicked(self):
-        if self.data_set.subscriber != None:
-            self.data_set.subscriber.unregister()
-            self.parent.subscriber = None
-        self.parent.subscribe_topic_frames.remove(self)
-
-        self.topic_box.setParent(None)
-        self.change_color_btn.setParent(None)
-        self.add_subscribe_topic_btn.setParent(None)
-        self.remove_topic_btn.setParent(None)
-        self.display_last_value.setParent(None)
-
-        #refresh the indexes
-        for i,sub_frame in enumerate(self.parent.subscribe_topic_frames):
-            sub_frame.subscriber_index = i
-
-        Qt.QTimer.singleShot(0, self.adjustSize)
-        del self
-
-    def close(self):
-        self.data_set.close()
-        
 class SensorScope(OpenGLGenericPlugin):
     """
     Plots some chosen debug values.
@@ -229,12 +281,13 @@ class SensorScope(OpenGLGenericPlugin):
     def __init__(self):
         OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method, self.left_click_method)
         self.data_points_size = self.open_gl_widget.number_of_points
-        self.all_pubs = None
-        self.topic_checker = RosTopicChecker()
-        self.refresh_topics()
 
         # this is used to go back in time
         self.display_frame = 0
+
+        self.data_to_display = ["None"]
+
+        self.control_layout = QtGui.QVBoxLayout()
 
         #this is a line used to display the data intersecting it
         self.line_x = 10
@@ -243,8 +296,6 @@ class SensorScope(OpenGLGenericPlugin):
         self.line_color = [1.0,1.0,1.0]
 
         self.mutex = threading.Lock()
-
-        self.control_layout = QtGui.QVBoxLayout()
 
         self.btn_frame = QtGui.QFrame()
         self.btn_frame_layout = QtGui.QHBoxLayout()
@@ -255,19 +306,14 @@ class SensorScope(OpenGLGenericPlugin):
         self.btn_frame.connect(self.play_btn, QtCore.SIGNAL('clicked()'), self.button_play_clicked)
         self.btn_frame_layout.addWidget(self.play_btn)
 
-        #add a button to refresh the topics
-        self.refresh_btn = QtGui.QPushButton()
-        self.refresh_btn.setFixedWidth(30)
-        self.refresh_btn.setToolTip("Refresh the list of topics")
-        self.btn_frame.connect(self.refresh_btn, QtCore.SIGNAL('clicked()'), self.button_refresh_clicked)
-        self.btn_frame_layout.addWidget(self.refresh_btn)
-
         self.btn_frame.setFixedWidth(80)
         self.btn_frame.setFixedHeight(50)
         self.btn_frame.setLayout(self.btn_frame_layout)
 
         self.control_layout.addWidget(self.btn_frame)
-        self.subscribe_topic_frames = []
+
+        self.data_to_display_widgets = []
+        self.add_data_to_display_widget()
 
         self.time_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.time_slider.setMinimum(0)
@@ -287,38 +333,8 @@ class SensorScope(OpenGLGenericPlugin):
     def activate(self):
         OpenGLGenericPlugin.activate(self)
         self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
-        self.refresh_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/refresh.png'))
-
-        self.add_topic_subscriber()
-
+        self.data_set = DataSet(self)
         self.control_frame.setLayout(self.control_layout)
-
-    def add_topic_subscriber(self):
-        index = len(self.subscribe_topic_frames)
-        tmp_stf = SubscribeTopicFrame(self, index)
-        self.control_layout.addWidget( tmp_stf )
-        self.subscribe_topic_frames.append( tmp_stf )
-
-    def msg_callback(self, msg, index):
-        """
-        Received a message on the topic. Adding the new point to
-        the queue.
-        """
-        #received message from subscriber at index: update the last
-        # point and pop the first point
-        #print index, " ", msg.data
-        if self.paused:
-            return
-
-        self.mutex.acquire()
-        for sub_frame in self.subscribe_topic_frames:
-            if sub_frame.data_set.enabled:
-                if sub_frame.subscriber_index == index:
-                    sub_frame.data_set.points.append(msg.data)
-                else:
-                    sub_frame.data_set.points.append(None)
-                sub_frame.data_set.points.popleft()
-        self.mutex.release()
 
     def right_click_method(self, x):
         #right click for time traveling
@@ -342,7 +358,7 @@ class SensorScope(OpenGLGenericPlugin):
         self.line_x = x
         self.line = [[self.line_x, 0],
                      [self.line_x, self.open_gl_widget.height]]
-        
+
     def paint_method(self, display_frame = 0):
         '''
         Drawing routine: this function is called periodically.
@@ -354,20 +370,33 @@ class SensorScope(OpenGLGenericPlugin):
         if self.paused:
             display_frame = self.display_frame
 
+        #print "paint"
         display_points = []
         colors = []
 
-        self.mutex.acquire()
-        for sub_frame in self.subscribe_topic_frames:
-            #we want to keep the average of the last 50 points of
-            #  the raw data in the middle of the screen
-            #first we remove the data containing None from the 50 last points
+        #self.mutex.acquire()
+
+        #we want to keep the average of the last 50 points of
+        #  the raw data in the middle of the screen
+        #first we remove the data containing None from the 50 last points
+        for data_to_display in self.data_to_display:
+            if data_to_display == "None":
+                continue
+            data_tmp = data_to_display.items()[0]
+            data_name = data_tmp[0]
+            data_param = data_tmp[1]
+
             last_50_points = []
             index = (self.data_points_size - display_frame -1)
             iteration = 0
             while len(last_50_points) < 50:
-                if sub_frame.data_set.points[index] != None:
-                    last_50_points.append(sub_frame.data_set.points[index])
+                if self.data_set.points[index] != None:
+                    #print data_index, " ", self.data_set.points[index].sensors[24]
+                    if 'id' in data_param.keys():
+                        value = self.data_set.points[index][data_name][data_param['id']]
+                    else:
+                        value = self.data_set.points[index][data_name]
+                    last_50_points.append( value )
                 index -= 1
                 iteration += 1
                 #searched the last 200 points
@@ -378,16 +407,31 @@ class SensorScope(OpenGLGenericPlugin):
                 offset = self.open_gl_widget.height/2 - int(float(sum(last_50_points))/len(last_50_points))
             else:
                 offset = 0
+            data_to_display[data_name]["offset"] = offset
 
-            for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
-                data_index = self.display_to_data_index(display_index, display_frame)
-                if sub_frame.data_set.points[data_index] != None:
+        for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
+            data_index = self.display_to_data_index(display_index, display_frame)
+            if self.data_set.points[data_index] != None:
+                #print " DATA TO DISPLAY", self.data_to_display
+                for data_tmp in self.data_to_display:
+                    if data_tmp == "None":
+                        continue
+                    data_tmp = data_tmp.items()[0]
+                    #print "    -> ",data_to_display.items(), " ", self.data_to_display
+                    data_name = data_tmp[0]
+                    data_param = data_tmp[1]
+                    #print data_param
+                    #print data_index, " ", self.data_set.points[index].sensors[24]
+                    if 'id' in data_param.keys():
+                        value = self.data_set.points[index][data_name][data_param['id']]
+                    else:
+                        value = self.data_set.points[index][data_name]
                     # add the raw data
-                    colors.append(sub_frame.data_set.get_raw_color())
-                    display_points.append([display_index, sub_frame.data_set.points[data_index] + offset])
+                    colors.append(data_param['raw_color'])
+                    display_points.append([display_index, value + data_param['offset'] ])
                     #also add the scaled data
-                    colors.append(sub_frame.data_set.get_scaled_color())
-                    display_points.append([display_index, self.scale_data(sub_frame.data_set.points[data_index])] )
+                    colors.append(data_param['scaled_color'])
+                    display_points.append([display_index, self.scale_data(value, data_param['max'])] )
 
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
@@ -406,12 +450,18 @@ class SensorScope(OpenGLGenericPlugin):
         glDrawArrays(GL_LINES, 0, len(self.line))
 
         self.compute_line_intersect(display_frame)
-        self.mutex.release()
+        #self.mutex.release()
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_COLOR_ARRAY)
         glFlush()
         self.open_gl_widget.update()
+
+    def add_data_to_display_widget(self):
+        index = len(self.data_to_display_widgets)
+        tmp_widget = DataToDisplayWidget(self, index)
+        self.control_layout.addWidget( tmp_widget )
+        self.data_to_display_widgets.append( tmp_widget )
 
     def time_changed(self, value):
         self.display_frame = value*100
@@ -428,14 +478,6 @@ class SensorScope(OpenGLGenericPlugin):
             self.play_btn.setIcon(QtGui.QIcon(self.parent.parent.rootPath + '/images/icons/pause.png'))
             self.time_slider.setEnabled(False)
 
-    def button_refresh_clicked(self):
-        self.refresh_topics()
-        for sub_frame in self.subscribe_topic_frames:
-            sub_frame.refresh_topics()
-
-    def refresh_topics(self):
-        self.all_pubs = self.topic_checker.get_topics()
-
     def display_to_data_index(self, display_index, display_frame):
         # we multiply display_frame by a 100 because we're scrolling 100 points per 100 points
         data_index = self.data_points_size - self.open_gl_widget.number_of_points_to_display + display_index - (display_frame)
@@ -446,14 +488,22 @@ class SensorScope(OpenGLGenericPlugin):
         return scaled_data
 
     def compute_line_intersect(self, display_frame):
-        for sub_frame in self.subscribe_topic_frames:
-            if sub_frame.data_set.enabled:
-                data_index = self.display_to_data_index(self.open_gl_widget.line_x, display_frame)
-                #update the value in the label
-                sub_frame.update_display_last_value(sub_frame.data_set.points[data_index])
+        data_index = self.display_to_data_index(self.line_x, display_frame)
+        #update the value in the label
+        for widget,data_to_display in zip(self.data_to_display_widgets,self.data_to_display):
+            if data_to_display == "None":
+                continue
+            data_tmp = data_to_display.items()[0]
+            data_name = data_tmp[0]
+            data_param = data_tmp[1]
+            if self.data_set.points[data_index] != None:
+                if 'id' in data_param.keys():
+                    value = self.data_set.points[data_index][data_name][data_param['id']]
+                else:
+                    value = self.data_set.points[data_index][data_name]
+            widget.set_value(value)
 
     def close(self):
         OpenGLGenericPlugin.on_close(self)
 
-        for sub_frame in self.subscribe_topic_frames:
-            sub_frame.close()
+        self.data_set.close()

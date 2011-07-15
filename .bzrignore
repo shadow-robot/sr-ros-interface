@@ -144,3 +144,5 @@ shadow_robot/doc/licenses.html
 shadow_robot/doc/sr_edc_ethercat_drivers
 shadow_robot/doc/styles.css
 shadow_robot/sr_hand_palm_edc/sr_external_dependencies/compiled_firmware/released_firmware
+￼
+shadow_robot/sr_control_gui/src/sr_control_gui/plugins/sensor_scope/tmp.py
