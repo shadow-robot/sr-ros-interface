@@ -55,10 +55,11 @@ class DataToDisplayChooser(QtGui.QDialog):
          "scaled_color":[1.0,0.0,0]}}
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, current_data, index):
         """
         """
         QtGui.QDialog.__init__(self,parent)
+
         self.parent = parent
         self.layout = QtGui.QHBoxLayout()
 
@@ -86,6 +87,14 @@ class DataToDisplayChooser(QtGui.QDialog):
         self.layout.addWidget(label)
         self.id_field = QtGui.QLineEdit(self)
         self.id_field.setText("0")
+
+        if current_data is "None":
+            self.id_field.setEnabled(False)
+        elif current_data.keys()[0] in self.no_index:
+            self.id_field.setEnabled(False)
+        else:
+            self.id_field.setText(str( current_data.values()[0]["id"] ))
+
         validator = QtGui.QIntValidator(0, 36, self)
         self.id_field.setValidator(validator)
         self.layout.addWidget( self.id_field )
@@ -94,6 +103,14 @@ class DataToDisplayChooser(QtGui.QDialog):
         self.layout.addWidget(label)
         self.max_field = QtGui.QLineEdit(self)
         self.max_field.setText("4000")
+
+        if current_data is "None":
+            self.max_field.setEnabled(False)
+        elif current_data.keys()[0] in self.no_index:
+            self.max_field.setEnabled(False)
+        else:
+            self.max_field.setText(str(current_data.values()[0]["max"]))
+
         validator = QtGui.QIntValidator(0,65535, self)
         self.max_field.setValidator(validator)
         self.layout.addWidget( self.max_field )
@@ -118,9 +135,15 @@ class DataToDisplayChooser(QtGui.QDialog):
         self.icons.append(icon)
         self.change_color_combobox.addItem( icon, "" )
 
-        self.current_icon = self.icons[0]
-
+        if index > len(self.icons) - 2:
+            index = len(self.icons) - 2
+        self.current_icon = self.icons[ index ]
         self.connect(self.change_color_combobox, QtCore.SIGNAL('activated(int)'), self.change_color_clicked)
+
+        #this changes the color, but we can't see it on the combobox
+        self.change_color_combobox.emit(QtCore.SIGNAL("activated(int)"),
+                                        index)
+
         self.layout.addWidget(self.change_color_combobox)
 
         self.btn_box = QtGui.QDialogButtonBox(self)
@@ -165,11 +188,15 @@ class DataToDisplayChooser(QtGui.QDialog):
         self.raw_color = [r,g,b]
 
     def data_changed(self, index):
-        name = str( self.data_combo_box.currentText() )
+        name = self.data_types[index]
+        print " ", name
         if name in self.no_index:
             self.id_field.setEnabled(False)
         else:
             self.id_field.setEnabled(True)
+        self.max_field.setEnabled(True)
+        if name is "None":
+            self.max_field.setEnabled(False)
 
 
     def getValues(self):
@@ -177,7 +204,7 @@ class DataToDisplayChooser(QtGui.QDialog):
         index = self.id_field.text().toInt()[0]
         maximum = self.max_field.text().toInt()[0]
 
-        if name == "None":
+        if name is "None":
             return [None, {"None":None}]
 
         if name in self.no_index:
@@ -227,10 +254,10 @@ class DataToDisplayWidget(QtGui.QFrame):
         self.setLayout(self.layout)
 
     def choose_data(self):
-        data_chooser = DataToDisplayChooser(self)
+        data_chooser = DataToDisplayChooser(self, self.parent.data_to_display[self.index], self.index)
         if data_chooser.exec_():
             data = data_chooser.getValues()
-            if data[1].keys()[0] == "None":
+            if data[1].keys()[0] is "None":
                 self.btn_choose_data.setText("None")
                 self.parent.data_to_display[self.index] = "None"
             else:
@@ -436,7 +463,8 @@ class SensorScope(OpenGLGenericPlugin):
                         By default, we display the latest values, but by playing
                         with the time_slider we can then go back in time.
         '''
-        #start_time = time.time()
+        times = []
+        times.append(["start_time",time.time()])
 
         if self.paused:
             display_frame = self.display_frame
@@ -450,7 +478,7 @@ class SensorScope(OpenGLGenericPlugin):
             #  the raw data in the middle of the screen
             #first we remove the data containing None from the 50 last points
             for data_to_display in self.data_to_display:
-                if data_to_display == "None":
+                if data_to_display is "None":
                     continue
                 data_tmp = data_to_display.items()[0]
                 data_name = data_tmp[0]
@@ -465,7 +493,7 @@ class SensorScope(OpenGLGenericPlugin):
                         if 'id' in data_param.keys():
                             value = self.data_set.points[index][data_name][data_param['id']]
                         else:
-                            if data_name == "motor_data_type":
+                            if data_name is "motor_data_type":
                                 value = self.data_set.points[index][data_name].data
                             else:
                                 value = self.data_set.points[index][data_name]
@@ -482,14 +510,14 @@ class SensorScope(OpenGLGenericPlugin):
                     offset = 0
                 data_to_display[data_name]["offset"] = offset
 
-            #last_50_time = time.time()
+            times.append(["last 50",time.time()])
 
 
             for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
                 data_index = self.display_to_data_index(display_index, display_frame)
                 if self.data_set.points[data_index] != None:
                     for data_tmp in self.data_to_display:
-                        if data_tmp == "None":
+                        if data_tmp is "None":
                             continue
                         data_tmp = data_tmp.items()[0]
                         data_name = data_tmp[0]
@@ -498,7 +526,7 @@ class SensorScope(OpenGLGenericPlugin):
                         if 'id' in data_param.keys():
                             value = self.data_set.points[data_index][data_name][data_param['id']]
                         else:
-                            if data_name == "motor_data_type":
+                            if data_name is "motor_data_type":
                                 value = self.data_set.points[data_index][data_name].data
                             else:
                                 value = self.data_set.points[data_index][data_name]
@@ -509,42 +537,56 @@ class SensorScope(OpenGLGenericPlugin):
                         colors.append(data_param['scaled_color'])
                         display_points.append([display_index, self.scale_data(value, data_param['max'])] )
 
-            #compute_time = time.time()
+            times.append(["compute",time.time()])
 
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_COLOR_ARRAY)
-            glColorPointerf(colors)
-            glVertexPointerf(display_points)
             glClear(GL_COLOR_BUFFER_BIT)
             #glDrawArrays(GL_LINE_STRIP, 0, len(display_points))
             #glPointSize(10)
             #glEnable(GL_POINT_SMOOTH)
             #glEnable(GL_BLEND)
+
+            times.append(["open gl init",time.time()])
+
+            glColorPointerf(colors)
+            glVertexPointerf(display_points)
             glDrawArrays(GL_POINTS, 0, len(display_points))
+
+            times.append(["open gl points",time.time()])
 
             #draw the vertical line
             glColorPointerf(self.line_color)
             glVertexPointerf(self.line)
             glDrawArrays(GL_LINES, 0, len(self.line))
 
-            #open_gl_time = time.time()
+            times.append(["open gl draw line",time.time()])
+
+
             self.compute_line_intersect(display_frame)
             self.mutex.release()
-            #line_time = time.time()
+
+            times.append(["compute line intersect ",time.time()])
 
             glDisableClientState(GL_VERTEX_ARRAY)
             glDisableClientState(GL_COLOR_ARRAY)
             glFlush()
-            #end_time = time.time()
 
-            #print " last50: ", last_50_time - start_time,
-            #print " compute: ", compute_time - last_50_time,
-            #print " opengl: ", open_gl_time - compute_time,
-            #print " line: ", line_time - open_gl_time,
-            #print " total: ", end_time - start_time
+            times.append(["open gl flush",time.time()])
+
+            if False:
+                print "------"
+                time_max = ["",0.0]
+                for i in range(1,len(times)):
+                    print times[i][0], "->",round(times[i][1] - times[i-1][1] , 3),"/",
+                    if ( times[i][1] - times[i-1][1] ) > time_max[1]:
+                        time_max = [ times[i][0], times[i][1] - times[i-1][1] ]
+                print ""
+                print "    -> TOTAL time: ", round(times[-1][1] - times[0][1] , 3), " max: ", time_max[0], "->",round( time_max[1], 3 )
 
         except:
-            self.mutex.release()
+            if self.mutex.locked():
+                self.mutex.release()
             print "ERROR"
             pass
         self.open_gl_widget.update()
@@ -584,7 +626,7 @@ class SensorScope(OpenGLGenericPlugin):
         data_index = self.display_to_data_index(self.line_x, display_frame)
         #update the value in the label
         for widget,data_to_display in zip(self.data_to_display_widgets,self.data_to_display):
-            if data_to_display == "None":
+            if data_to_display is "None":
                 continue
             data_tmp = data_to_display.items()[0]
             data_name = data_tmp[0]
@@ -594,7 +636,7 @@ class SensorScope(OpenGLGenericPlugin):
                 if 'id' in data_param.keys():
                     value = self.data_set.points[data_index][data_name][data_param['id']]
                 else:
-                    if data_name == "motor_data_type":
+                    if data_name is "motor_data_type":
                         value = self.data_set.points[data_index][data_name].data
                     else:
                         value = self.data_set.points[data_index][data_name]
