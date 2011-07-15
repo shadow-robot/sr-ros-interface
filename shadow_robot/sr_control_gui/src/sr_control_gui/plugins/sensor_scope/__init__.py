@@ -426,7 +426,7 @@ class SensorScope(OpenGLGenericPlugin):
                         if data_name == "motor_data_type":
                             value = self.data_set.points[index][data_name].data
                         else:
-                            value = self.data_set.points[index][data_name].data
+                            value = self.data_set.points[index][data_name]
                     last_50_points.append( value )
                 index -= 1
                 iteration += 1
@@ -459,7 +459,7 @@ class SensorScope(OpenGLGenericPlugin):
                         if data_name == "motor_data_type":
                             value = self.data_set.points[index][data_name].data
                         else:
-                            value = self.data_set.points[index][data_name].data
+                            value = self.data_set.points[index][data_name]
                     # add the raw data
                     colors.append(data_param['raw_color'])
                     display_points.append([display_index, value + data_param['offset'] ])
@@ -519,6 +519,7 @@ class SensorScope(OpenGLGenericPlugin):
 
     def scale_data(self, data, data_max = 65536):
         scaled_data = (data * self.open_gl_widget.height) / data_max
+        print scaled_data
         return scaled_data
 
     def compute_line_intersect(self, display_frame):
@@ -537,7 +538,7 @@ class SensorScope(OpenGLGenericPlugin):
                     if data_name == "motor_data_type":
                         value = self.data_set.points[data_index][data_name].data
                     else:
-                        value = self.data_set.points[data_index][data_name].data
+                        value = self.data_set.points[data_index][data_name]
             widget.set_value(value)
 
     def close(self):
