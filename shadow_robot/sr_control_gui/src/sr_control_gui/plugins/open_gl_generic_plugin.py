@@ -52,17 +52,18 @@ class GenericGLWidget(QGLWidget):
         self.right_click_method = right_click_method
         self.left_click_method = left_click_method
 
-        self.refresh_timer = QtCore.QTimer()
-        QtCore.QObject.connect(self.refresh_timer, QtCore.SIGNAL("timeout()"), self.animate)
+        self.stopped = False
 
     def animate(self):
         '''
         Virtual drawing routine: needs to be overloaded
         '''
-        try:
-            self.paint_method()
-        except:
-            pass
+        #try:
+        self.paint_method()
+        if not self.stopped:
+            Qt.QTimer.singleShot(0, self.animate)
+        #except:
+        #    pass
 
     def mousePressEvent(self, event):
         self.last_right_click_x = event.pos().x()
@@ -136,10 +137,11 @@ class OpenGLGenericPlugin(GenericPlugin):
 
     def activate(self):
         GenericPlugin.activate(self)
-        self.open_gl_widget.refresh_timer.start( 1000/Config.open_gl_generic_plugin_config.refresh_frequency )
+        Qt.QTimer.singleShot(0, self.open_gl_widget.animate)
+
 
     def on_close(self):
-        self.open_gl_widget.refresh_timer.stop()
+        self.open_gl_widget.stopped = True
         GenericPlugin.on_close(self)
 
     def depends(self):

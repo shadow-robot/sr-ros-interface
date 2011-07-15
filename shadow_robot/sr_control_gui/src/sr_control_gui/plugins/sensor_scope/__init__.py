@@ -38,6 +38,13 @@ import time, threading
 from collections import deque
 from sr_robot_msgs.msg import EthercatDebug
 
+try:
+    import psyco
+    psyco.full()
+except:
+    print "psyco not found, not optimized"
+
+
 class DataToDisplayChooser(QtGui.QDialog):
     """
     A popup where the user can choose which data he wants to be displayed.
@@ -429,6 +436,8 @@ class SensorScope(OpenGLGenericPlugin):
                         By default, we display the latest values, but by playing
                         with the time_slider we can then go back in time.
         '''
+        #start_time = time.time()
+
         if self.paused:
             display_frame = self.display_frame
 
@@ -473,6 +482,9 @@ class SensorScope(OpenGLGenericPlugin):
                     offset = 0
                 data_to_display[data_name]["offset"] = offset
 
+            #last_50_time = time.time()
+
+
             for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
                 data_index = self.display_to_data_index(display_index, display_frame)
                 if self.data_set.points[data_index] != None:
@@ -497,6 +509,8 @@ class SensorScope(OpenGLGenericPlugin):
                         colors.append(data_param['scaled_color'])
                         display_points.append([display_index, self.scale_data(value, data_param['max'])] )
 
+            #compute_time = time.time()
+
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_COLOR_ARRAY)
             glColorPointerf(colors)
@@ -513,15 +527,25 @@ class SensorScope(OpenGLGenericPlugin):
             glVertexPointerf(self.line)
             glDrawArrays(GL_LINES, 0, len(self.line))
 
+            #open_gl_time = time.time()
             self.compute_line_intersect(display_frame)
             self.mutex.release()
+            #line_time = time.time()
 
             glDisableClientState(GL_VERTEX_ARRAY)
             glDisableClientState(GL_COLOR_ARRAY)
             glFlush()
+            #end_time = time.time()
+
+            #print " last50: ", last_50_time - start_time,
+            #print " compute: ", compute_time - last_50_time,
+            #print " opengl: ", open_gl_time - compute_time,
+            #print " line: ", line_time - open_gl_time,
+            #print " total: ", end_time - start_time
 
         except:
             self.mutex.release()
+            print "ERROR"
             pass
         self.open_gl_widget.update()
 
