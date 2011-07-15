@@ -167,13 +167,8 @@ class DataToDisplayChooser(QtGui.QDialog):
 
     def getValues(self):
         name = str( self.data_combo_box.currentText() )
-        #print name
         index = self.id_field.text().toInt()[0]
-        #print index
         maximum = self.max_field.text().toInt()[0]
-        #print max
-        #print self.raw_color
-        #print self.scaled_color
 
         if name == "None":
             return [None, {"None":None}]
@@ -239,7 +234,6 @@ class DataToDisplayWidget(QtGui.QFrame):
                 self.btn_choose_data.setIcon(data[0])
                 self.parent.data_to_display[self.index] = data[1]
 
-
     def add_subscribe_topic_clicked(self):
         self.parent.add_data_to_display_widget()
         Qt.QTimer.singleShot(0, self.parent.btn_frame.adjustSize)
@@ -295,7 +289,6 @@ class DataSet(threading.Thread):
         """
         #received message from subscriber at index: update the last
         # point and pop the first point
-        #print index, " ", msg.data
         if self.parent.paused:
             return
 
@@ -439,7 +432,6 @@ class SensorScope(OpenGLGenericPlugin):
         if self.paused:
             display_frame = self.display_frame
 
-        #print "paint"
         display_points = []
         colors = []
 
@@ -460,7 +452,7 @@ class SensorScope(OpenGLGenericPlugin):
                 iteration = 0
                 while len(last_50_points) < 50:
                     if self.data_set.points[index] != None:
-                        #print data_index, " ", self.data_set.points[index].sensors[24]
+                        value = 0
                         if 'id' in data_param.keys():
                             value = self.data_set.points[index][data_name][data_param['id']]
                         else:
@@ -481,34 +473,23 @@ class SensorScope(OpenGLGenericPlugin):
                     offset = 0
                 data_to_display[data_name]["offset"] = offset
 
-            #print "-----"
-            #print "which motor: ",
-            #for point in  self.data_set.points:
-            #    print point["which_motors"]," ",
-
-            #print ""
-            #print "data_index: ",
             for display_index in range(0, self.open_gl_widget.number_of_points_to_display):
                 data_index = self.display_to_data_index(display_index, display_frame)
-                #print data_index, " ",
                 if self.data_set.points[data_index] != None:
-                    #print " DATA TO DISPLAY", self.data_to_display
                     for data_tmp in self.data_to_display:
                         if data_tmp == "None":
                             continue
                         data_tmp = data_tmp.items()[0]
-                        #print "    -> ",data_to_display.items(), " ", self.data_to_display
                         data_name = data_tmp[0]
                         data_param = data_tmp[1]
-                        #print data_param
-                        #print data_index, " ", self.data_set.points[index].sensors[24]
+                        value = 0
                         if 'id' in data_param.keys():
-                            value = self.data_set.points[index][data_name][data_param['id']]
+                            value = self.data_set.points[data_index][data_name][data_param['id']]
                         else:
                             if data_name == "motor_data_type":
-                                value = self.data_set.points[index][data_name].data
+                                value = self.data_set.points[data_index][data_name].data
                             else:
-                                value = self.data_set.points[index][data_name]
+                                value = self.data_set.points[data_index][data_name]
                         # add the raw data
                         colors.append(data_param['raw_color'])
                         display_points.append([display_index, value + data_param['offset'] ])
@@ -534,7 +515,6 @@ class SensorScope(OpenGLGenericPlugin):
 
             self.compute_line_intersect(display_frame)
             self.mutex.release()
-            #print " -> painting: RELEASED"
 
             glDisableClientState(GL_VERTEX_ARRAY)
             glDisableClientState(GL_COLOR_ARRAY)
@@ -542,7 +522,6 @@ class SensorScope(OpenGLGenericPlugin):
 
         except:
             self.mutex.release()
-            print "ERROR"
             pass
         self.open_gl_widget.update()
 
@@ -587,6 +566,7 @@ class SensorScope(OpenGLGenericPlugin):
             data_name = data_tmp[0]
             data_param = data_tmp[1]
             if self.data_set.points[data_index] != None:
+                value = 0
                 if 'id' in data_param.keys():
                     value = self.data_set.points[data_index][data_name][data_param['id']]
                 else:
