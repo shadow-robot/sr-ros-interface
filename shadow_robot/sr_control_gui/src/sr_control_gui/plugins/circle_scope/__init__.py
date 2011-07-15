@@ -348,7 +348,8 @@ class CircleScope(OpenGLGenericPlugin):
     number_of_points_to_display = 50
 
     def __init__(self):
-        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_clicked, self.left_clicked)
+        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_clicked, self.left_clicked,
+                                     self.mouse_wheel_method)
         self.data_points_size = self.open_gl_widget.number_of_points
         self.all_pubs = []
         self.topic_checker = RosTopicChecker()
@@ -481,6 +482,10 @@ class CircleScope(OpenGLGenericPlugin):
         pass
 
     def left_clicked(self, x):
+        pass
+
+    def mouse_wheel_method(self, delta, x, y):
+        #delta is a multiple of 120
         pass
 
     def on_close(self):

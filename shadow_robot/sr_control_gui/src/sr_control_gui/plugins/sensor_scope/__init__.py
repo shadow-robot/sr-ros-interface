@@ -374,7 +374,8 @@ class SensorScope(OpenGLGenericPlugin):
     name = "Sensor Scope"
 
     def __init__(self):
-        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method, self.left_click_method)
+        OpenGLGenericPlugin.__init__(self, self.paint_method, self.right_click_method, self.left_click_method,
+                                     self.mouse_wheel_method)
         self.data_points_size = self.open_gl_widget.number_of_points
 
         # this is used to go back in time
@@ -454,6 +455,10 @@ class SensorScope(OpenGLGenericPlugin):
         self.line_x = x
         self.line = [[self.line_x, 0],
                      [self.line_x, self.open_gl_widget.height]]
+
+    def mouse_wheel_method(self, delta, x, y):
+        #delta is a multiple of 120
+        pass
 
     def paint_method(self, display_frame = 0):
         '''

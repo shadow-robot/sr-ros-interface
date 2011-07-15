@@ -39,7 +39,7 @@ class GenericGLWidget(QGLWidget):
     height = 400
     width = 400
 
-    def __init__(self, parent, paint_method, right_click_method, left_click_method, plugin_parent):
+    def __init__(self, parent, paint_method, right_click_method, left_click_method, mouse_wheel_method, plugin_parent):
         QGLWidget.__init__(self, parent)
         self.number_of_points = Config.open_gl_generic_plugin_config.number_of_points
 
@@ -51,6 +51,7 @@ class GenericGLWidget(QGLWidget):
 
         self.right_click_method = right_click_method
         self.left_click_method = left_click_method
+        self.mouse_wheel_method = mouse_wheel_method
 
         self.stopped = False
 
@@ -79,6 +80,9 @@ class GenericGLWidget(QGLWidget):
             self.left_click_method( event.pos().x() )
         elif button & QtCore.Qt.RightButton:
             self.right_click_method(event.pos().x())
+
+    def wheelEvent(self, event):
+        self.mouse_wheel_method( event.delta(), event.x(), event.y())
 
     def resizeEvent(self, event):
         w = event.size().width()
@@ -115,7 +119,7 @@ class OpenGLGenericPlugin(GenericPlugin):
     """
     name = "OpenGL Generic Plugin"
 
-    def __init__(self, paint_method, right_click_method, left_click_method):
+    def __init__(self, paint_method, right_click_method, left_click_method, mouse_wheel_method,):
         GenericPlugin.__init__(self)
 
         self.splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
@@ -127,7 +131,7 @@ class OpenGLGenericPlugin(GenericPlugin):
         #the visualization frame
         self.layout = QtGui.QVBoxLayout()
         self.frame = QtGui.QFrame()
-        self.open_gl_widget = GenericGLWidget(self.frame, paint_method, right_click_method, left_click_method, self)
+        self.open_gl_widget = GenericGLWidget(self.frame, paint_method, right_click_method, left_click_method, mouse_wheel_method, self)
         self.layout.addWidget(self.open_gl_widget)
 
         self.frame.setLayout(self.layout)
