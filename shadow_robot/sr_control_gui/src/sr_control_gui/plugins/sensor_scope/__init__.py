@@ -205,6 +205,23 @@ class DataToDisplayWidget(QtGui.QFrame):
         self.label_value = QtGui.QLabel()
         self.layout.addWidget(self.label_value)
 
+        #add a button to add a subscribe topic frame
+        self.add_subscribe_topic_btn = QtGui.QPushButton()
+        self.add_subscribe_topic_btn.setText('+')
+        self.add_subscribe_topic_btn.setToolTip("Add a new topic to plot.")
+        self.add_subscribe_topic_btn.setFixedWidth(30)
+        self.connect(self.add_subscribe_topic_btn, QtCore.SIGNAL('clicked()'),self.add_subscribe_topic_clicked)
+        self.layout.addWidget(self.add_subscribe_topic_btn)
+
+        #add a button to remove the current subscribe topic frame
+        if len(self.parent.data_to_display_widgets) > 0:
+            self.remove_topic_btn = QtGui.QPushButton()
+            self.remove_topic_btn.setText('-')
+            self.remove_topic_btn.setToolTip("Remove this topic.")
+            self.remove_topic_btn.setFixedWidth(30)
+            self.connect(self.remove_topic_btn, QtCore.SIGNAL('clicked()'),self.remove_topic_clicked)
+            self.layout.addWidget(self.remove_topic_btn)
+
         self.setLayout(self.layout)
 
     def choose_data(self):
@@ -222,6 +239,27 @@ class DataToDisplayWidget(QtGui.QFrame):
                 self.btn_choose_data.setIcon(data[0])
                 self.parent.data_to_display[self.index] = data[1]
 
+
+    def add_subscribe_topic_clicked(self):
+        self.parent.add_data_to_display_widget()
+        Qt.QTimer.singleShot(0, self.parent.btn_frame.adjustSize)
+
+    def remove_topic_clicked(self):
+        self.parent.data_to_display.pop(self.index)
+        self.parent.data_to_display_widgets.remove(self)
+        self.setParent(None)
+
+        self.btn_choose_data.setParent(None)
+        self.label_value.setParent(None)
+        self.add_subscribe_topic_btn.setParent(None)
+        self.remove_topic_btn.setParent(None)
+
+        #refresh the indexes
+        for i,widget in enumerate(self.parent.data_to_display_widgets):
+            widget.subscriber_index = i
+
+        Qt.QTimer.singleShot(0, self.parent.btn_frame.adjustSize)
+        del self
 
     def set_value(self, value):
         if value != None:
@@ -510,6 +548,7 @@ class SensorScope(OpenGLGenericPlugin):
 
     def add_data_to_display_widget(self):
         index = len(self.data_to_display_widgets)
+        self.data_to_display.append("None")
         tmp_widget = DataToDisplayWidget(self, index)
         self.control_layout.addWidget( tmp_widget )
         self.data_to_display_widgets.append( tmp_widget )
