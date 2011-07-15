@@ -91,8 +91,8 @@ class DataToDisplayChooser(QtGui.QDialog):
         self.max_field.setValidator(validator)
         self.layout.addWidget( self.max_field )
 
-        self.raw_color = [122, 0, 0]
-        self.scaled_color = [255, 0, 0]
+        self.raw_color = [0.5, 0, 0]
+        self.scaled_color = [1.0, 0, 0]
 
         #add a combobox to easily change the color
         self.change_color_combobox = QtGui.QComboBox(self)
@@ -423,7 +423,10 @@ class SensorScope(OpenGLGenericPlugin):
                     if 'id' in data_param.keys():
                         value = self.data_set.points[index][data_name][data_param['id']]
                     else:
-                        value = self.data_set.points[index][data_name]
+                        if data_name == "motor_data_type":
+                            value = self.data_set.points[index][data_name].data
+                        else:
+                            value = self.data_set.points[index][data_name].data
                     last_50_points.append( value )
                 index -= 1
                 iteration += 1
@@ -453,7 +456,10 @@ class SensorScope(OpenGLGenericPlugin):
                     if 'id' in data_param.keys():
                         value = self.data_set.points[index][data_name][data_param['id']]
                     else:
-                        value = self.data_set.points[index][data_name]
+                        if data_name == "motor_data_type":
+                            value = self.data_set.points[index][data_name].data
+                        else:
+                            value = self.data_set.points[index][data_name].data
                     # add the raw data
                     colors.append(data_param['raw_color'])
                     display_points.append([display_index, value + data_param['offset'] ])
@@ -528,7 +534,10 @@ class SensorScope(OpenGLGenericPlugin):
                 if 'id' in data_param.keys():
                     value = self.data_set.points[data_index][data_name][data_param['id']]
                 else:
-                    value = self.data_set.points[data_index][data_name]
+                    if data_name == "motor_data_type":
+                        value = self.data_set.points[data_index][data_name].data
+                    else:
+                        value = self.data_set.points[data_index][data_name].data
             widget.set_value(value)
 
     def close(self):
