@@ -42,7 +42,7 @@ class Robot_Tree_Config_Automatic(object):
 	@return: nothing
 	"""
 	for chromosome in self.genome:
-            self.robot_lib.set_pid(joint_name, chromosome)
+            self.robot_lib.set_pid(self.joint_name, chromosome)
 	    self.fit_vect=self.movement_communication_with_sub_()
 
 	return self.fit_vect
@@ -55,9 +55,11 @@ class Robot_Tree_Config_Automatic(object):
         compute_the_movement=Global_Movement(self.joint_name,self.instance_callback, self.robot_lib)
         compute_the_movement.run_movement_on_robot()
         compute_the_movement.communication_with_subscriber_OFF()
-        fitness_vector_partial=self.fitness_global.complete_fitness_vector(self.fitness_score)
-        self.fitness_score=fitness_vector_partial
-        compute_the_movement.communication_with_subscriber_ON()
+        if not self.robot_lib.stopped:
+            fitness_vector_partial=self.fitness_global.complete_fitness_vector(self.fitness_score)
+            self.fitness_score=fitness_vector_partial
+            compute_the_movement.communication_with_subscriber_ON()
+
         return self.fitness_score
 
     def get_fitness_vector(self):

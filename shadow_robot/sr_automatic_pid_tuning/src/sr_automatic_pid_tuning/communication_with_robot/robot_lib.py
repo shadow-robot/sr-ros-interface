@@ -26,8 +26,9 @@ from sr_robot_msgs.msg import joint,sendupdate,contrlr,joints_data
 
 class Robot_Lib(object):
     def __init__(self):
-
-	return
+        #not pretty: used to stop the whole system: there's an existing
+        # instance of the Robot Library in each class we want to stop.
+        self.stopped = False
 
     def init_publisher(self):
 	"""
@@ -50,7 +51,7 @@ class Robot_Lib(object):
 	"""
         pass
 
-    def set_pid(self, p, i, d, imax, shift, deadband, offset):
+    def set_pid(self, joint_name, chromosome):
         pass
 
 

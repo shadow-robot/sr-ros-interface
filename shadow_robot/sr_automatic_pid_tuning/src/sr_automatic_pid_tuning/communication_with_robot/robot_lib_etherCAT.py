@@ -26,8 +26,7 @@ from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib
 
 class Robot_Lib_EtherCAT(Robot_Lib):
     def __init__(self):
-
-	return
+        Robot_Lib.__init__(self)
 
     def init_publisher(self):
 	"""
@@ -50,7 +49,7 @@ class Robot_Lib_EtherCAT(Robot_Lib):
 	"""
         pass
 
-    def set_pid(self, p, i, d, imax, shift, deadband, offset):
+    def set_pid(self, joint_name, chromosome):
         pass
 
 

@@ -28,8 +28,8 @@ from sr_robot_msgs.msg import joint,sendupdate,contrlr,joints_data
 
 class Robot_Lib_CAN(Robot_Lib):
     def __init__(self):
+        Robot_Lib.__init__(self)
         self.push_to_robot_tree = None
-	return
 
     def init_publisher(self):
 	"""

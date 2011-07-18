@@ -61,7 +61,7 @@ class Genetic_Algorithm(object):
         self.percentageOfMutation=percentageOfMutation
         self.joint_name=jointName
         ##Sub SIG
-        fichier_path=Path_Config_Dict.path_record_data['PID_SIG_SUB_path']+self.joint_name+".txt"
+        fichier_path=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['PID_SIG_SUB_path']+self.joint_name+".txt"
         fichier=open(fichier_path,"r")
 	line=fichier.readline()
 	fichier.close()
@@ -115,44 +115,50 @@ class Genetic_Algorithm(object):
         first_genome_is_the_best=False
 
         while k<generation_max and pass_to_kill==False:
-            if self.stopped == False:
-                if k==0:                            #First genome
-                    self.genome_GA=self.first_genome
-                    #self.fitness_vect0=self.send_the_genome_in_robot_tree_(self.genome_GA)
-                    self.fitness_vect0=self.push_the_genome_on_robot_tree(self.genome_GA)
-                    ##Rxplot use
-                    rxplot_vect=self.rxplot_use_(self.fitness_vect0)
-                    #test of convergence [first genome]
-                    pass_to_kill=self.other_convergence_(self.fitness_vect0)
-                    #recording other data
-                    record_actual_data0=Record_Actual_Data(self.fitness_vect0,self.first_genome,self.joint_name,self.clock_time,self.populationSize)
-                    record_actual_data0.record_all_data()
-                    ##
-                    if pass_to_kill==False:
-                        self.best_parents0=self.selection_(self.genome_GA,self.fitness_vect0)
-                        self.genome_next=self.genome.get_offspring(self.best_parents0)
-                    else:
-                        first_genome_is_the_best=True
+            if rospy.is_shutdown():
+                self.robot_lib.stopped = True
 
-                    k+=1
-                else:                               #Offsprings
-                    self.genome_GA=self.genome_next
-                    print("new offspring",self.genome_next)
-                    #self.fitness_vect_next=self.send_the_genome_in_robot_tree_(self.genome_GA)
-                    self.fitness_vect_next=self.push_the_genome_on_robot_tree(self.genome_GA)
-                    ##Rxplot use
-                    rxplot_vect=self.rxplot_use_(self.fitness_vect_next)
-                    #test of convergences
-                    pass_to_kill=self.other_convergence_(self.fitness_vect_next)
-                    ##recording other data
-                    record_actual_data0=Record_Actual_Data(self.fitness_vect_next,self.genome_next,self.joint_name,self.clock_time,self.populationSize)
-                    record_actual_data0.record_all_data()
+            if self.robot_lib.stopped:
+                break
 
-                    if pass_to_kill==False:
-                        self.best_parents_next=self.selection_(self.genome_GA,self.fitness_vect_next)
-                        self.genome_next=self.genome.get_offspring(self.best_parents_next)
+            if k==0:                            #First genome
+                self.genome_GA=self.first_genome
+                #self.fitness_vect0=self.send_the_genome_in_robot_tree_(self.genome_GA)
+                self.fitness_vect0=self.push_the_genome_on_robot_tree(self.genome_GA)
+                ##Rxplot use
+                rxplot_vect=self.rxplot_use_(self.fitness_vect0)
+                #test of convergence [first genome]
+                pass_to_kill=self.other_convergence_(self.fitness_vect0)
+                #recording other data
+                record_actual_data0=Record_Actual_Data(self.fitness_vect0,self.first_genome,self.joint_name,self.clock_time,self.populationSize)
+                record_actual_data0.record_all_data()
+                ##
+                if pass_to_kill==False:
+		  self.best_parents0=self.selection_(self.genome_GA,self.fitness_vect0)
+		  self.genome_next=self.genome.get_offspring(self.best_parents0)
+		else:
+		  first_genome_is_the_best=True
 
-                    k+=1
+                k+=1
+            else:                               #Offsprings
+                self.genome_GA=self.genome_next
+                print("new offspring",self.genome_next)
+                #self.fitness_vect_next=self.send_the_genome_in_robot_tree_(self.genome_GA)
+                self.fitness_vect_next=self.push_the_genome_on_robot_tree(self.genome_GA)
+                ##Rxplot use
+                rxplot_vect=self.rxplot_use_(self.fitness_vect_next)
+                #test of convergences
+                pass_to_kill=self.other_convergence_(self.fitness_vect_next)
+                ##recording other data
+                record_actual_data0=Record_Actual_Data(self.fitness_vect_next,self.genome_next,self.joint_name,self.clock_time,self.populationSize)
+		record_actual_data0.record_all_data()
+
+                if pass_to_kill==False:
+		    self.best_parents_next=self.selection_(self.genome_GA,self.fitness_vect_next)
+		    self.genome_next=self.genome.get_offspring(self.best_parents_next)
+
+
+                k+=1
 
         ##Basic convergence // Maximum number of generations
         if first_genome_is_the_best==True:
@@ -160,7 +166,7 @@ class Genetic_Algorithm(object):
 	else:
 	    basic_convergence_end=Record_Last_Data(self.fitness_vect_next,self.genome_GA,self.joint_name,self.clock_time)
 	basic_convergence_end.record_data_in_file()
-        self.stop_system_()
+        self.stop_system()
 
         return
 
@@ -212,14 +218,15 @@ class Genetic_Algorithm(object):
 	return
 
 
-    def stop_system_(self):
+    def stop_system(self):
         """
         Killing the sub // stop the record //cleaning pickle file (Joint_Name: "PID_SIG")
         @return: nothing
         """
+        self.robot_lib.stopped = True
 
-	print("THE END")
-	os.kill(self.PID,signal.SIGSTOP)
+	#print("THE END")
+	#os.kill(self.PID,signal.SIGSTOP)
 
         return
 

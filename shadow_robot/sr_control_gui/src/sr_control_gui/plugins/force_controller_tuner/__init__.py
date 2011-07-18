@@ -148,10 +148,9 @@ class RunGA(threading.Thread):
         self.parameters = parameters
 
 	self.robot_lib=Robot_Lib_EtherCAT()
-	self.callback=Callback_EtherCAT(joint_name)
+	self.callback = Callback_EtherCAT(joint_name)
 	##mettre ici le roslib
-	self.robot_lib.init_subscriber(callback.callback)
-
+	self.robot_lib.init_subscriber(self.callback)
 
 	self.GA=Genetic_Algorithm(parameters["population size"],
                                   parameters["number of generations"],
@@ -166,6 +165,8 @@ class RunGA(threading.Thread):
         while(self.tuning):
             print self.joint_name, " tuning"
             time.sleep(.1)
+
+        self.callback.unregister()
 
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):

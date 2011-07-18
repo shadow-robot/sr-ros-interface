@@ -52,6 +52,9 @@ class Partial_Movements(object):
         print(self.movement_name)
 
         for itr in range (0,self.number_steps):
+            if self.robot_library.stopped:
+                return
+
 	    new_target=self.compute_data(itr)
 	    self.robot_library.data_sendupdate(self.joint_name,new_target)
 	    self.rate.sleep()
