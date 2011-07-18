@@ -26,8 +26,8 @@ import numpy as np
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.partial_movements import Partial_Movements
 
 class Partial_Movement_Sinus(Partial_Movements):
-    def __init__(self,joint_name):
-        Partial_Movements.__init__(self,joint_name)
+    def __init__(self,joint_name, robot_lib):
+        Partial_Movements.__init__(self,joint_name, robot_lib)
         self.sin_amplitude = 20
         self.sin_phase = 25
         self.number_steps=374

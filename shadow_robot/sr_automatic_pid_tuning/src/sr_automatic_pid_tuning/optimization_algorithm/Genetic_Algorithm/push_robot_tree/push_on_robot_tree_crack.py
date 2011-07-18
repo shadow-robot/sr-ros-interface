@@ -30,11 +30,11 @@ from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.config.han
 from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib
 
 class Push_On_Robot_Tree_Crack(Push_On_Robot_Tree):
-    def __init__(self,joint_name):
+    def __init__(self,joint_name, robot_lib):
         Push_On_Robot_Tree.__init__(self)
         self.joint_name=joint_name
         self.path_node_config=Hand_Config_Dict.path_node_config[self.joint_name]
-        self.robot_lib=Robot_Lib()
+        self.robot_lib = robot_lib
         return
 
 
@@ -64,8 +64,7 @@ class Push_On_Robot_Tree_Crack(Push_On_Robot_Tree):
         new_param=temp_file_param_saved.read()
         temp_file_param_saved.close()
 
-        add="0X408"
-        self.robot_lib.robot_tree_pushing(path_node_config,new_param,add)
+        self.robot_tree_pushing(,new_param,add)
         #fichier=open(path_node_config,"w")
         #fichier.write("0X408 %s" %new_param)
         #fichier.close()
@@ -90,7 +89,7 @@ class Push_On_Robot_Tree_Crack(Push_On_Robot_Tree):
         temp_file_param_saved.close()
 
         add="0X409"
-        self.robot_lib.robot_tree_pushing(path_node_config,new_param,add)
+        self.robot_tree_pushing(path_node_config,new_param,add)
         #fichier=open(path_node_config,"w")
         #fichier.write("0X409 %s" %new_param)
         #fichier.close()
@@ -112,12 +111,18 @@ class Push_On_Robot_Tree_Crack(Push_On_Robot_Tree):
         new_param=temp_file_param_saved.read()
         temp_file_param_saved.close()
         add="0X40a"
-        self.robot_lib.robot_tree_pushing(path_node_config,new_param,add)
+        self.robot_tree_pushing(path_node_config,new_param,add)
 
         #fichier=open(path_node_config,"w")
         #fichier.write("0X40a %s" %new_param)
         #fichier.close()
 
-
-        return
+    def robot_tree_pushing(self,path_configuration_file,hexa_value,add):
+	"""
+	Sending values on the Robot Tree (cracked version)
+	@return nothing
+	"""
+	fichier=open(path_configuration_file,"w")
+        fichier.write(add+" "+hexa_value)
+        fichier.close()
 

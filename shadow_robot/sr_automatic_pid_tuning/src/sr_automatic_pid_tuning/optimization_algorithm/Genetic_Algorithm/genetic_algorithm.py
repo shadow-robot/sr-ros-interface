@@ -41,8 +41,13 @@ import signal
 
 class Genetic_Algorithm(object):
 
-    def __init__(self,populationSize,numberOfGenerations,numberOfGenesAffectedByMutation,percentageOfMutation,jointName,init_genome_type,instance_callback):
-
+    def __init__(self,populationSize, numberOfGenerations,
+                 numberOfGenesAffectedByMutation, percentageOfMutation,
+                 jointName, init_genome_type, instance_callback,
+                 robot_lib  ):
+        """
+        """
+        self.robot_lib = robot_lib
 	self.instance_callback=instance_callback
             ##population size must be pair
         if populationSize%2!=0:
@@ -165,7 +170,7 @@ class Genetic_Algorithm(object):
 	@return: fitness vector
 	"""
 	self.matrix=genome
-	robot_tree_config=Robot_Tree_Config_Automatic(self.matrix,self.joint_name, self.instance_callback)
+	robot_tree_config=Robot_Tree_Config_Automatic(self.matrix,self.joint_name, self.instance_callback, self.robot_lib)
 	self.fit_vect=robot_tree_config.get_fitness_vector()
 
 	return self.fit_vect

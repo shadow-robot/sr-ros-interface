@@ -26,7 +26,7 @@ from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib
 
 class Partial_Movements(object):
 
-    def __init__(self,joint_name):
+    def __init__(self,joint_name, robot_lib):
 
         #Parameters
         self.rate=19.9
@@ -40,7 +40,7 @@ class Partial_Movements(object):
         self.joint_name=joint_name
         self.movement_name="name_of_movement"
         ##
-        self.robot_library= Robot_Lib()
+        self.robot_library= robot_lib
         self.robot_library.init_publisher()
         return
 

@@ -42,8 +42,33 @@ class AutomaticTuningDialog(QtGui.QDialog):
 
         frame = QtGui.QFrame()
 
+        self.ordered_parameters = [["population size", "int", 2, 30 ], ["number of generations", "int", 5, 100],["percentage of mutation", "float", 0.0, 1.0] ]
+        self.parameters = {"population size":10, "number of generations":7,"percentage of mutation":0.25}
 
         self.layout_ = QtGui.QHBoxLayout()
+
+        self.text_edits = []
+        for param in self.ordered_parameters:
+            label = QtGui.QLabel(param[0])
+            self.layout_.addWidget(label)
+
+            text_edit = QtGui.QLineEdit()
+            text_edit.setFixedHeight(30)
+            text_edit.setFixedWidth(50)
+
+            text_edit.setText( str(self.parameters[ param[0] ]) )
+
+            if param[1] == "int":
+                validator = QtGui.QIntValidator(param[2], param[3], self)
+            elif param[1] == "float":
+                print param, " -> float"
+                validator = QtGui.QDoubleValidator(param[2], param[3], 2, self)
+            text_edit.setValidator(validator)
+
+            self.text_edits.append(text_edit)
+            self.layout_.addWidget(text_edit)
+
+        frame.setLayout(self.layout_)
         self.layout.addWidget(frame)
 
         self.btn_box = QtGui.QDialogButtonBox(self)
@@ -51,12 +76,19 @@ class AutomaticTuningDialog(QtGui.QDialog):
         self.btn_box.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.layout.addWidget(self.btn_box)
         self.setLayout(self.layout)
-        self.setWindowTitle("Advanced options: "+joint_name)
+        self.setWindowTitle("Automatic PID tuning: "+joint_name)
 
         QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("accepted()"), self.accept)
         QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("rejected()"), self.reject)
         QtCore.QMetaObject.connectSlotsByName(self)
 
+    def getValues(self):
+        for param,text_edit in zip(self.ordered_parameters, self.text_edits):
+            if param[1] == "int":
+                self.parameters[ param[0] ] = text_edit.text().toInt()[0]
+            elif param[1] == "float":
+                self.parameters[ param[0] ] = text_edit.text().toDouble()[0]
+        return self.parameters
 
 class BaseMovement(object):
     def __init__(self, joint_name):
@@ -106,6 +138,26 @@ class StepMovement(BaseMovement):
         value = self.steps[ index ]
         self.msg_to_send.data = value
 
+
+class RunGA(threading.Thread):
+    def __init__(self, joint_name, parameters):
+        threading.Thread.__init__(self)
+        self.joint_name = joint_name
+        self.tuning = True
+        self.parameters = parameters
+
+	self.GA=Genetic_Algorithm(parameters["population size"],
+                                  parameters["number of generations"],
+                                  4, # number of genes affected by mutation
+                                  parameters["percentage of mutation"],self.joint_name,
+                                  "random",
+                                  self.callback)
+	self.GA.give_life_to_the_system()
+
+    def run(self):
+        while(self.tuning):
+            print self.joint_name, " tuning"
+            time.sleep(.1)
 
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):
@@ -314,11 +366,14 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
         self.layout_.addWidget(btn_advanced)
 
-        btn_automatic_pid = QtGui.QPushButton()
-        btn_automatic_pid.setText( "Automatic" )
-        btn_automatic_pid.setToolTip("Finishes the PID tuning automatically using a genetic algorithm.")
-        self.connect(btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
-        self.layout_.addWidget(btn_automatic_pid)
+        self.btn_automatic_pid = QtGui.QPushButton()
+        self.btn_automatic_pid.setText( "Automatic" )
+        self.btn_automatic_pid.setToolTip("Finishes the PID tuning automatically using a genetic algorithm.")
+        self.connect(self.btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
+        self.layout_.addWidget(self.btn_automatic_pid)
+
+        self.tuning = False
+        self.GA_thread = None
 
         self.moving = False
         self.full_movement = None
@@ -365,8 +420,37 @@ class JointPidSetter(QtGui.QFrame):
             self.btn_move.setIcon(self.red_icon)
 
     def automatic_tuning(self):
+        if self.tuning:
+            self.btn_automatic_pid.setIcon(self.green_icon)
+            self.GA_thread.tuning = False
+            self.GA_thread.join()
+            self.GA_thread = None
 
-        print "Automatic PID Tuning"
+            self.btn_automatic_pid.setIcon(self.green_icon)
+            self.tuning = False
+            self.btn_move.setEnabled(True)
+
+        else:
+            if self.moving:
+                self.full_movement.moving = False
+                self.moving = False
+                self.full_movement.join()
+                self.full_movement = None
+                self.btn_move.setIcon(self.green_icon)
+                self.btn_move.setEnabled(False)
+
+            aut_tuning_dialog = AutomaticTuningDialog( self, self.joint_name )
+            if aut_tuning_dialog.exec_():
+                pid_settings = aut_tuning_dialog.getValues()
+
+                self.GA_thread = RunGA(self.joint_name, pid_settings)
+                self.GA_thread.start()
+
+                self.tuning = True
+                self.btn_automatic_pid.setIcon(self.red_icon)
+
+
+
 
     def set_pid(self):
         for param in self.important_parameters.items():
@@ -392,6 +476,7 @@ class JointPidSetter(QtGui.QFrame):
         self.green_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/green.png')
         self.red_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/red.png')
         self.btn_move.setIcon(self.green_icon)
+        self.btn_automatic_pid.setIcon(self.green_icon)
 
     def on_close(self):
         if self.full_movement != None:

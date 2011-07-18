@@ -25,8 +25,8 @@ import numpy as np
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.partial_movements import Partial_Movements
 
 class Partial_Movement_Slope(Partial_Movements):
-    def __init__(self,joint_name):
-        Partial_Movements.__init__(self,joint_name)
+    def __init__(self,joint_name, robot_lib):
+        Partial_Movements.__init__(self,joint_name, robot_lib)
         self.number_steps=230
         self.movement_name="Slope"
         self.ps=[]

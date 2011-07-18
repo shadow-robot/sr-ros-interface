@@ -26,8 +26,8 @@ from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.p
 
 
 class Partial_Movement_Small_Steps(Partial_Movements):
-    def __init__(self,joint_name):
-        Partial_Movements.__init__(self,joint_name)
+    def __init__(self,joint_name, robot_lib):
+        Partial_Movements.__init__(self,joint_name, robot_lib)
         self.number_steps=95
         self.movement_name="Little Steps"
         self.Target_inc=5

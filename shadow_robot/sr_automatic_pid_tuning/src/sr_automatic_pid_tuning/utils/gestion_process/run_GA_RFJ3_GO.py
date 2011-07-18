@@ -28,7 +28,7 @@ import sys
 
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.genetic_algorithm import Genetic_Algorithm
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.callback_sub import Callback_Sub
-from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib
+from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib_CAN
 
 def init_node():
     ##Begining of process ~ init node
@@ -47,13 +47,13 @@ def get_PID_sig():
 def main():
     while not rospy.is_shutdown():
 	get_PID_sig() #Break//Continue//purpose
-	robot_lib=Robot_Lib()
+	robot_lib=Robot_Lib_CAN()
 	init_node()
 	callback0=Callback_Sub("RFJ3")
 	##mettre ici le roslib
 	robot_lib.init_subscriber(callback0.callback)
 	#callback0.subscriber()
-	GA_rfj3=Genetic_Algorithm(2,2,4,0.25,"RFJ3", "random",callback0)
+	GA_rfj3=Genetic_Algorithm(2,2,4,0.25,"RFJ3", "random",callback0, Robot_Lib)
 	GA_rfj3.give_life_to_the_system()
 
 if __name__=="__main__":

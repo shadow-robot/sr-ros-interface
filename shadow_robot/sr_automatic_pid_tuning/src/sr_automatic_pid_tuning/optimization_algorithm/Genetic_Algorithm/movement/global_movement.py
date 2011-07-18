@@ -35,11 +35,10 @@ import signal
 
 
 class Global_Movement(object):
-    def __init__(self,joint_name,instance_callback):
+    def __init__(self,joint_name,instance_callback, robot_lib):
         self.joint_name=joint_name
         self.inst_callback=instance_callback
-        return
-
+        self.robot_lib = robot_lib
 
     def run_movement_on_robot(self):
         """
@@ -47,7 +46,10 @@ class Global_Movement(object):
         @return: nothing
         """
         #self.publisher_initialization_()
-        movement=[Partial_Movement_Sinus(self.joint_name),Partial_Movement_Big_Steps(self.joint_name),Partial_Movement_Small_Steps(self.joint_name),Partial_Movement_Slope(self.joint_name)]
+        movement=[Partial_Movement_Sinus(self.joint_name, self.robot_lib),
+                  Partial_Movement_Big_Steps(self.joint_name, self.robot_lib),
+                  Partial_Movement_Small_Steps(self.joint_name, self.robot_lib),
+                  Partial_Movement_Slope(self.joint_name, self.robot_lib)]
 
         for mvts in movement:
             mvts.publish_the_movement()

@@ -20,15 +20,16 @@
 ##Date:14 Juillet 2011
 
 
-from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.push_robot_tree.push_on_robot_tree_crack import Push_On_Robot_Tree_Crack
+from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.global_movement import Global_Movement
 from sr_automatic_pid_tuning.fitness_function.fitness_function_GA import Fitness_Function_GA
 
 class Robot_Tree_Config_Automatic(object):
-    def __init__(self,genome,joint_name,instance_callback):
+    def __init__(self,genome,joint_name,instance_callback, robot_lib):
 	self.genome=genome
 	self.joint_name=joint_name
-	self.push_pid=Push_On_Robot_Tree_Crack(joint_name)
+        self.robot_lib = robot_lib
+
 	self.fitness_global=Fitness_Function_GA(joint_name)
 	self.instance_callback=instance_callback
 	self.fitness_score=[]
@@ -41,7 +42,7 @@ class Robot_Tree_Config_Automatic(object):
 	@return: nothing
 	"""
 	for chromosome in self.genome:
-	    self.push_pid.pushing_values(chromosome)
+            self.robot_lib.set_pid(joint_name, chromosome)
 	    self.fit_vect=self.movement_communication_with_sub_()
 
 	return self.fit_vect
@@ -51,7 +52,7 @@ class Robot_Tree_Config_Automatic(object):
         Fellow the movement// com with sub// score //com with sub
         @return: the fitness vector in construction
         """
-        compute_the_movement=Global_Movement(self.joint_name,self.instance_callback)
+        compute_the_movement=Global_Movement(self.joint_name,self.instance_callback, self.robot_lib)
         compute_the_movement.run_movement_on_robot()
         compute_the_movement.communication_with_subscriber_OFF()
         fitness_vector_partial=self.fitness_global.complete_fitness_vector(self.fitness_score)
