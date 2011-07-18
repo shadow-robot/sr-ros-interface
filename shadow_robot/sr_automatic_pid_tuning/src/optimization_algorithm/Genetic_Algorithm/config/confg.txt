@@ -1,0 +1,37 @@
+##Values for oscillations detection
+
+eps=1    		##distance max allowed btw y[i] and y[i-1] or y[i+1]
+cst_yi=2 		##error min btw y[i] and x[i], that will make you think it may be an oscillation and not some noise
+cst_moy=1		##up to you to consider at what level a pos y[i] can be consider as a noise 
+cst_yk=1		##regarding the first point that you have, at what diff of position do you consider another point can be interesting.
+j=1				## precision to look for the other point for the slope
+
+				##weight for the mean
+wa=1.7				#weight for the M.S.E			
+wb=1.2				#weight for the number of oscillations
+wc=1				#// 	//  the overshoot	
+wd=1				#//	//  the rise time
+we=0.99				# //	// the response time
+
+
+P_min=2 			#ranges of genes
+P_max=10
+I_min=2
+I_max=15
+D_min=-10
+D_max=2
+#DB_min=0
+#DB_max=2
+DB=1 				#bruit capteur (voir si pt etre modf) si 256 qd la val actu est ˆ 1¡ autour de la target le bruit n'a plus d'effet
+#Shft_min=4
+#Shft_max=5
+Shift=5
+#Offset_min=0
+#Offset_max=0
+Offset=0
+
+Imax_min=0
+Imax_max=20
+				#Ranges value for mutation
+syring_val_min=-7
+syring_val_max=7
