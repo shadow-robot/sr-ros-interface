@@ -35,9 +35,9 @@ class Record_Actual_Data(object):
         self.offspring=offspring
 
         ###########paths
-        self.display_fitness_use_path=Path_Config_Dict.path_record_data['display_fit_use_path']+self.joint_name+"_"+self.clock_time+".txt"
-        self.offline_use_generations_path=Path_Config_Dict.path_record_data['generations_used_offline_path']+self.joint_name+"_"+self.clock_time+".txt"
-        self.current_best_chromosome_path=Path_Config_Dict.path_record_data['best_chromosome_path']+self.joint_name+"_"+self.clock_time+".txt"
+        self.display_fitness_use_path=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['display_fit_use_path']+self.joint_name+"_"+self.clock_time+".txt"
+        self.offline_use_generations_path=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['generations_used_offline_path']+self.joint_name+"_"+self.clock_time+".txt"
+        self.current_best_chromosome_path=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['best_chromosome_path']+self.joint_name+"_"+self.clock_time+".txt"
         return
 
 

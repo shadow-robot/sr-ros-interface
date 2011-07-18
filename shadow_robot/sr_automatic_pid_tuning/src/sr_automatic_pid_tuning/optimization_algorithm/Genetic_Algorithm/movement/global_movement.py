@@ -75,7 +75,7 @@ class Global_Movement(object):
         Clean all_mvts_for_fitness_JOINTNAME//Continue the Sub
         @return: nothing
         """
-	file_path1=Path_Config_Dict.path_record_data['path_used_by_fitness']+self.joint_name+".txt"
+	file_path1=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['path_used_by_fitness']+self.joint_name+".txt"
 	fichier_saved1=open(file_path1,"w")
 	fichier_saved1.write("")
 	fichier_saved1.close()

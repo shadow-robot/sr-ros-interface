@@ -17,29 +17,40 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #By: Emilie JEAN-BAPTISTE
-##Date:7 Juin 2011
-
+##Date:14 Juillet 2011
 
 import roslib; roslib.load_manifest('sr_automatic_pid_tuning')
 import rospy
 
-from get_data import Get_Data
-from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.config.path_config_dict import Path_Config_Dict
+from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib
+
+class Robot_Lib_EtherCAT(Robot_Lib):
+    def __init__(self):
+
+	return
+
+    def init_publisher(self):
+	"""
+	Initialization of the Publisher on ROS
+	@return nothing
+	"""
+        pass
+
+    def init_subscriber(self,callback):
+	"""
+	Initialization of the Subscriber on ROS
+	@return nothing
+	"""
+        pass
+
+    def data_sendupdate(self,joint_name,new_target):
+	"""
+	Senduptade on ROS
+	@return nothing
+	"""
+        pass
+
+    def set_pid(self, p, i, d, imax, shift, deadband, offset):
+        pass
 
 
-class Get_Data_From_File_GA(Get_Data):
-    def __init__(self,joint_name):
-	self.joint_name=joint_name
-        Get_Data.__init__(self)
-        Get_Data.get_vectors(self)
-	filename=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['path_used_by_fitness']+self.joint_name+".txt"
-	nb_measures=0
-        mean_square_error=0
-
-        for line in open(filename):
-            line = line.strip('\n')
-            splitted = line.split(' ')
-            self.time.append(float(splitted[0]))
-            self.output.append(float(splitted[1]))
-            self.input.append(float(splitted[2]))
-        return

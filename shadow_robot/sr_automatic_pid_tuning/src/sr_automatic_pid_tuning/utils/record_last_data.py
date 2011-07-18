@@ -37,7 +37,7 @@ class Record_Last_Data(object):
         best_chromosome_raw=self.last_fitness_vector.index(self.best_fitness_score)
         self.best_chromosome=self.offspring[best_chromosome_raw]
         ##path record
-        self.last_result_path=Path_Config_Dict.path_record_data['last_data_path']+joint_name+"_"+clock_time+".txt"
+        self.last_result_path=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['last_data_path']+joint_name+"_"+clock_time+".txt"
         return
 
     def record_data_in_file(self):

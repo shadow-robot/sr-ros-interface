@@ -53,7 +53,7 @@ def main():
 	##mettre ici le roslib
 	robot_lib.init_subscriber(callback0.callback)
 	#callback0.subscriber()
-	GA_rfj3=Genetic_Algorithm(2,2,4,0.25,"RFJ3", "random",callback0, Robot_Lib)
+	GA_rfj3=Genetic_Algorithm(2,2,4,0.25,"RFJ3", "random",callback0, robot_lib)
 	GA_rfj3.give_life_to_the_system()
 
 if __name__=="__main__":

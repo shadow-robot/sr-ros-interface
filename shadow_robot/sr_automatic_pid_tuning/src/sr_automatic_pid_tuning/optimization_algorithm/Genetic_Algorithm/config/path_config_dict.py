@@ -19,16 +19,33 @@
 #By: Emilie JEAN-BAPTISTE
 ##Date:12 Juillet 2011
 
+import os
+
+class PathInstantiater(object):
+    def __init__(self, path_root, path_record_data):
+        self.ensure_dir(path_root)
+        for path in path_record_data.values():
+            directory = "/".join(path.split("/")[:-1])
+
+            self.ensure_dir(path_root+directory)
+
+
+    def ensure_dir(self, f):
+        try:
+            os.makedirs(f)
+        except:
+            pass
 
 
 class Path_Config_Dict(object):
-    path_record_data={"path_used_by_fitness":"../../utils/saved_data_box/movements_fitness_use/all_mvts_for_fitness_",
-		      "generations_used_offline_path":"../../utils/saved_data_box/Generations_",
-		      "best_chromosome_path":"../../utils/saved_data_box/debug_current_best_chomosome_",
-		      "display_fit_use_path":"../../utils/saved_data_box/display_fit_use_",
-		      "last_data_path":"../../utils/saved_data_box/Last_Result_",
-		      "PID_SIG_SUB_path":"../../utils/saved_data_box/trash_intrinsic_use/Sig_PID_sub_",
-		      "boolean_break_path":"../../utils/saved_data_box/trash_intrinsic_use/boolean_break_",
-		      "complete_movement_path":"../../utils/saved_data_box/complete_mvt_",
-		      
-		      }
+    path_root = "/tmp"
+    path_record_data={"path_used_by_fitness":"/saved_data_box/movements_fitness_use/all_mvts_for_fitness_",
+		      "generations_used_offline_path":"/saved_data_box/Generations_",
+		      "best_chromosome_path":"/saved_data_box/debug_current_best_chomosome_",
+		      "display_fit_use_path":"/saved_data_box/display_fit_use_",
+		      "last_data_path":"/saved_data_box/Last_Result_",
+		      "PID_SIG_SUB_path":"/saved_data_box/trash_intrinsic_use/Sig_PID_sub_",
+		      "boolean_break_path":"/saved_data_box/trash_intrinsic_use/boolean_break_",
+		      "complete_movement_path":"/saved_data_box/complete_mvt_" }
+
+    __path_instantiater__ = PathInstantiater(path_root, path_record_data)

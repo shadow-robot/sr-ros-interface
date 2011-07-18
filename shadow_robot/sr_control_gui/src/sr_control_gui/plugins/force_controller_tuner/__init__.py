@@ -26,8 +26,9 @@ import threading, time, math
 
 from std_msgs.msg import Float64
 
+from sr_automatic_pid_tuning.communication_with_robot.robot_lib_etherCAT import Robot_Lib_EtherCAT
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.genetic_algorithm import Genetic_Algorithm
-from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.callback_sub import Callback_Sub
+from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.callback_etherCAT import Callback_EtherCAT
 
 from PyQt4 import QtCore, QtGui, Qt
 
@@ -146,12 +147,19 @@ class RunGA(threading.Thread):
         self.tuning = True
         self.parameters = parameters
 
+	self.robot_lib=Robot_Lib_EtherCAT()
+	self.callback=Callback_EtherCAT(joint_name)
+	##mettre ici le roslib
+	self.robot_lib.init_subscriber(callback.callback)
+
+
 	self.GA=Genetic_Algorithm(parameters["population size"],
                                   parameters["number of generations"],
                                   4, # number of genes affected by mutation
                                   parameters["percentage of mutation"],self.joint_name,
                                   "random",
-                                  self.callback)
+                                  self.callback,
+                                  self.robot_lib)
 	self.GA.give_life_to_the_system()
 
     def run(self):

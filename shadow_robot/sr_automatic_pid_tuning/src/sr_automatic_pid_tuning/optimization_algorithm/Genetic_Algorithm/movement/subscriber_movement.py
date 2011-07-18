@@ -41,12 +41,12 @@ class Subscriber_Movement(object):
         ######
         ####
         ##Paths for data
-        self.path_PID_sub=Path_Config_Dict.path_record_data['PID_SIG_SUB_path']+self.joint_name+".txt"
-        self.path_break=Path_Config_Dict.path_record_data['boolean_break_path']+self.joint_name+".txt"
-        self.path_used_by_fitness_function=Path_Config_Dict.path_record_data['path_used_by_fitness']+self.joint_name+".txt"
+        self.path_PID_sub=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['PID_SIG_SUB_path']+self.joint_name+".txt"
+        self.path_break=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['boolean_break_path']+self.joint_name+".txt"
+        self.path_used_by_fitness_function=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['path_used_by_fitness']+self.joint_name+".txt"
         #complete_mvt
         clock_time=strftime("%a_%d_%b_%Y_[%H-%M-%S]")
-        self.path_complete_mvt=Path_Config_Dict.path_record_data['complete_movement_path']+self.joint_name+"_"+clock_time+".txt"
+        self.path_complete_mvt=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['complete_movement_path']+self.joint_name+"_"+clock_time+".txt"
         #Node name
         self.node_name="Subscriber_GA_"+self.joint_name
         #Topic name
