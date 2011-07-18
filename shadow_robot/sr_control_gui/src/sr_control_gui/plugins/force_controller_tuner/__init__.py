@@ -26,7 +26,37 @@ import threading, time, math
 
 from std_msgs.msg import Float64
 
+from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.genetic_algorithm import Genetic_Algorithm
+from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.callback_sub import Callback_Sub
+
 from PyQt4 import QtCore, QtGui, Qt
+
+
+class AutomaticTuningDialog(QtGui.QDialog):
+    """
+    Set the parameters for the automatic pid tuner.
+    """
+    def __init__(self, parent, joint_name):
+        QtGui.QDialog.__init__(self,parent)
+        self.layout = QtGui.QVBoxLayout()
+
+        frame = QtGui.QFrame()
+
+
+        self.layout_ = QtGui.QHBoxLayout()
+        self.layout.addWidget(frame)
+
+        self.btn_box = QtGui.QDialogButtonBox(self)
+        self.btn_box.setOrientation(QtCore.Qt.Horizontal)
+        self.btn_box.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.layout.addWidget(self.btn_box)
+        self.setLayout(self.layout)
+        self.setWindowTitle("Advanced options: "+joint_name)
+
+        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("accepted()"), self.accept)
+        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("rejected()"), self.reject)
+        QtCore.QMetaObject.connectSlotsByName(self)
+
 
 class BaseMovement(object):
     def __init__(self, joint_name):
@@ -335,6 +365,7 @@ class JointPidSetter(QtGui.QFrame):
             self.btn_move.setIcon(self.red_icon)
 
     def automatic_tuning(self):
+
         print "Automatic PID Tuning"
 
     def set_pid(self):

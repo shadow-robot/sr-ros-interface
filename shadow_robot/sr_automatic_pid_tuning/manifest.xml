@@ -9,8 +9,12 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_automatic_pid_tuning</url>
   <depend package="rospy"/>
-  <depend package="sr_hand"/>
+  <depend package="sr_robot_msgs"/>
   <depend package="std_msgs"/>
+
+  <export>
+	<python path="${prefix}/src/"/>
+  </export>
 
 </package>
 

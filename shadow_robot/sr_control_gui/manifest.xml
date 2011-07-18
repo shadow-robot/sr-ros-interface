@@ -12,6 +12,7 @@
   <depend package="sensor_msgs"/>
   <depend package="cyberglove"/>
   <depend package="control_toolbox"/>
+  <depend package="sr_automatic_pid_tuning"/>
   <rosdep name="python-scipy"/>
   <rosdep name="paramiko"/>
   <rosdep name="pyqt4"/>
