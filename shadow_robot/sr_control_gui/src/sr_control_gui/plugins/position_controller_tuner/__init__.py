@@ -54,7 +54,7 @@ class SinusoidMovement(BaseMovement):
         self.amplitude = amplitude
 
     def update(self, mvt_percentage):
-        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.) 
+        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.)
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):
@@ -84,7 +84,7 @@ class FullMovement(threading.Thread):
         self.moving = False
         self.joint_name = joint_name
         self.iterations = 10000
-        self.movements = [StepMovement(joint_name), 
+        self.movements = [StepMovement(joint_name),
                           SinusoidMovement(joint_name),
                           SinusoidMovement(joint_name),
                           StepMovement(joint_name, nb_steps = 10)]
@@ -187,7 +187,26 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(self.btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
         self.layout_.addWidget(self.btn_move)
 
+
+        btn_automatic_pid = QtGui.QPushButton()
+        btn_automatic_pid.setText( "Automatic" )
+        btn_automatic_pid.setToolTip("Finishes the PID tuning automatically using a genetic algorithm.")
+        self.connect(btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
+        self.layout_.addWidget(btn_automatic_pid)
+
+        btn_friction_compensation = QtGui.QPushButton()
+        btn_friction_compensation.setText( "Friction" )
+        btn_friction_compensation.setToolTip("Computes the friction compensation.")
+        self.connect(btn_friction_compensation, QtCore.SIGNAL('clicked()'),self.friction_compensation)
+        self.layout_.addWidget(btn_friction_compensation)
+
         self.setLayout(self.layout_)
+
+    def automatic_tuning(self):
+        print "Automatic PID Tuning"
+
+    def friction_compensation(self):
+        print "Friction Compensation"
 
     def plus(self, param_name):
         param = self.parameters[param_name]
@@ -281,7 +300,7 @@ class PositionControllerTuner(GenericPlugin):
     """
     A plugin to easily tune the force controller on the etherCAT hand.
     """
-    name = "Controller Tuner"
+    name = "Position Controller Tuner"
 
     def __init__(self):
         GenericPlugin.__init__(self)

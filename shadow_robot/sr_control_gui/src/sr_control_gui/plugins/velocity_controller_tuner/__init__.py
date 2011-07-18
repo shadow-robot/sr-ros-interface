@@ -54,7 +54,7 @@ class SinusoidMovement(BaseMovement):
         self.amplitude = amplitude
 
     def update(self, mvt_percentage):
-        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.) 
+        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.)
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):
@@ -185,7 +185,16 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(self.btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
         self.layout_.addWidget(self.btn_move)
 
+        btn_automatic_pid = QtGui.QPushButton()
+        btn_automatic_pid.setText( "Automatic" )
+        btn_automatic_pid.setToolTip("Finishes the PID tuning automatically using a genetic algorithm.")
+        self.connect(btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
+        self.layout_.addWidget(btn_automatic_pid)
+
         self.setLayout(self.layout_)
+
+    def automatic_tuning(self):
+        print "Automatic PID Tuning"
 
     def plus(self, param_name):
         param = self.parameters[param_name]
@@ -278,7 +287,7 @@ class VelocityControllerTuner(GenericPlugin):
     """
     A plugin to easily tune the force controller on the etherCAT hand.
     """
-    name = "Controller Tuner"
+    name = "Velocity Controller Tuner"
 
     def __init__(self):
         GenericPlugin.__init__(self)

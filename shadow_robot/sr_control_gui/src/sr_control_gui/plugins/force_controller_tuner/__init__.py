@@ -284,6 +284,12 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
         self.layout_.addWidget(btn_advanced)
 
+        btn_automatic_pid = QtGui.QPushButton()
+        btn_automatic_pid.setText( "Automatic" )
+        btn_automatic_pid.setToolTip("Finishes the PID tuning automatically using a genetic algorithm.")
+        self.connect(btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
+        self.layout_.addWidget(btn_automatic_pid)
+
         self.moving = False
         self.full_movement = None
 
@@ -327,6 +333,9 @@ class JointPidSetter(QtGui.QFrame):
             self.full_movement.moving = True
             self.full_movement.start()
             self.btn_move.setIcon(self.red_icon)
+
+    def automatic_tuning(self):
+        print "Automatic PID Tuning"
 
     def set_pid(self):
         for param in self.important_parameters.items():
@@ -397,7 +406,7 @@ class ForceControllerTuner(GenericPlugin):
     """
     A plugin to easily tune the force controller on the etherCAT hand.
     """
-    name = "Controller Tuner"
+    name = "Force Controller Tuner"
 
     def __init__(self):
         GenericPlugin.__init__(self)
