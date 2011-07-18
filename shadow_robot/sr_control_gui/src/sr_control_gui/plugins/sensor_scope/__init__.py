@@ -52,7 +52,8 @@ class DataToDisplayChooser(QtGui.QDialog):
     return a dictionary containing this kind of data:
          {"sensors":{"id":24, "offset": 0, "max":4000,
          "raw_color":[0.5, 0.0, 0.0],
-         "scaled_color":[1.0,0.0,0]}}
+         "scaled_color":[1.0,0.0,0],
+         "color_index": 1 }}
     """
 
     def __init__(self, parent, current_data, index):
@@ -75,11 +76,18 @@ class DataToDisplayChooser(QtGui.QDialog):
                          "which_motor_data_arrived",
                          "which_motor_data_had_errors", "idle_time_us"]
 
+        self.color_index = index
+        try:
+            self.color_index = current_data.values()[0]["color_index"]
+        except:
+            pass
+
         self.data_combo_box = QtGui.QComboBox(self)
         for d_t in self.data_types:
             self.data_combo_box.addItem(d_t)
 
         self.connect(self.data_combo_box, QtCore.SIGNAL('activated(int)'), self.data_changed)
+
 
         self.layout.addWidget(self.data_combo_box)
 
@@ -121,6 +129,7 @@ class DataToDisplayChooser(QtGui.QDialog):
         #add a combobox to easily change the color
         self.change_color_combobox = QtGui.QComboBox(self)
         self.change_color_combobox.setToolTip("Change the color for this topic")
+        self.change_color_combobox.setCurrentIndex( index )
         self.change_color_combobox.setFixedWidth(45)
 
         self.icons = []
@@ -142,7 +151,17 @@ class DataToDisplayChooser(QtGui.QDialog):
 
         #this changes the color, but we can't see it on the combobox
         self.change_color_combobox.emit(QtCore.SIGNAL("activated(int)"),
-                                        index)
+                                        self.color_index)
+        self.change_color_combobox.setCurrentIndex( self.color_index )
+
+        #this changes the selected data
+        data_index = 0
+        if current_data != "None":
+            data_index = self.data_types.index( current_data.keys()[0] )
+        self.data_combo_box.emit( QtCore.SIGNAL("activated(int)"),
+                                  data_index )
+        self.data_combo_box.setCurrentIndex( data_index )
+
 
         self.layout.addWidget(self.change_color_combobox)
 
@@ -159,6 +178,7 @@ class DataToDisplayChooser(QtGui.QDialog):
 
     def change_color_clicked(self, index, const_color = None):
         # the last item is the color picker
+        self.color_index = index
         if index == self.change_color_combobox.count() - 1:
             col_tmp = QtGui.QColorDialog.getColor()
             if not col_tmp.isValid():
@@ -189,7 +209,6 @@ class DataToDisplayChooser(QtGui.QDialog):
 
     def data_changed(self, index):
         name = self.data_types[index]
-        print " ", name
         if name in self.no_index:
             self.id_field.setEnabled(False)
         else:
@@ -211,13 +230,15 @@ class DataToDisplayChooser(QtGui.QDialog):
             return [ self.current_icon,
                      {name:{ "offset":0, "max": maximum,
                              "raw_color": self.raw_color,
-                             "scaled_color": self.scaled_color}}]
+                             "scaled_color": self.scaled_color,
+                             "color_index": self.color_index}}]
 
         return [ self.current_icon,
                  {name:{"id": index,
                         "offset":0, "max": maximum,
                         "raw_color": self.raw_color,
-                        "scaled_color": self.scaled_color}}]
+                        "scaled_color": self.scaled_color,
+                        "color_index": self.color_index}}]
 
 class DataToDisplayWidget(QtGui.QFrame):
     def __init__(self, parent, index):
@@ -311,6 +332,7 @@ class DataSet(threading.Thread):
         self.init_dataset()
         self.scaled_color = []
         self.raw_color = []
+        self.color_index = 0
         self.change_color([255,0,0])
 
     def run(self):
