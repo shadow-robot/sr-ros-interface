@@ -34,14 +34,10 @@ class U_Map_Data_Acquisition(object):
     # Final values for U_map computation
     self.position = []
     self.pid_out = []
-
-    # Hexadecimal values from the hand
-    self.position_hex = []
-    self.pid_out_hex = []
-
+    
     # Float values
-    self.float_position = []
-    self.float_pid_out = []
+    self.position_uniq = []
+    self.pid_out_uniq = []
 
     # data filtered with a first order filtered
     self.position_filtered_1o = []
@@ -76,21 +72,15 @@ class U_Map_Data_Acquisition(object):
           # Convert from hexadecimal to float for position and integers for pid output
           # Filter the data with a first order filter
           # Sort data per increasing position
-          # Delete repeated positions so that they appear only once with the average PID value
-  def data_treatment(self, position_hex, pid_out_hex):
+          # Delete repeated positions so that they appear only once with the average PID value  
+  def data_treatment(self, position_float, pid_out_float):
       # Delete tuples (positions, pid_out) recorded several times
-    [position_uniq, pid_out_uniq] = self.utilitarian.delete_repeated_tuples(position_hex, pid_out_hex)
+    [self.position_uniq, self.pid_out_uniq] = self.utilitarian.delete_repeated_tuples(position_float, pid_out_float)
 
-      # Convert from hex to dec
-      # position
-    self.float_position = self.utilitarian.position_conversion_to_float(position_uniq)
-
-        # pid_out
-    self.float_pid_out = self.utilitarian.pid_out_conversion_to_float(pid_out_uniq)
-
+     
       # Filter the data with a first order filter
-    self.position_filtered_1o = self.filter_1o.filter_fun(self.float_position, 0.05)
-    self.pid_out_filtered_1o = self.filter_1o.filter_fun(self.float_pid_out, 0.5)
+    self.position_filtered_1o = self.filter_1o.filter_fun(self.position_uniq, 0.05)
+    self.pid_out_filtered_1o = self.filter_1o.filter_fun(self.pid_out_uniq, 0.5)
 
     # Display the filtered data in columns
           #print "\n", "Filtered data:"
