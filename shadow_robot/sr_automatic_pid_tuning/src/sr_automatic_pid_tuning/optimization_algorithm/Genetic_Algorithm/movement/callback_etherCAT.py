@@ -51,7 +51,6 @@ class Callback_EtherCAT (Subscriber_Movement):
 	Recording all mov data
 	@return nothing
 	"""
-        print "pos"
         self.pause=self.break_callback(self.pause)
         if self.pause==True:
             self.time=0
@@ -63,7 +62,7 @@ class Callback_EtherCAT (Subscriber_Movement):
             if self.index_joint == None:
                 for index,name in enumerate(msg.name):
                     print name, " ", self.joint_name
-                    if name is self.joint_name:
+                    if name in self.joint_name:
                         self.index_joint = index
                         break
             if self.index_joint is None:
@@ -92,7 +91,6 @@ class Callback_EtherCAT (Subscriber_Movement):
 	Recording all mov data
 	@return nothing
 	"""
-        print "target"
         self.pause=self.break_callback(self.pause)
         if self.pause==True:
             self.time=0

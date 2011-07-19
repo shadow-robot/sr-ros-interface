@@ -494,6 +494,11 @@ class JointPidSetter(QtGui.QFrame):
             self.moving = False
             self.full_movement.join()
 
+        if self.GA_thread != None:
+            self.GA_thread.tuning = False
+            self.GA_thread.robot_lib.stopped = True
+            self.GA_thread.join()
+            self.GA_thread = None
 
 class FingerPIDSetter(QtGui.QFrame):
     """
