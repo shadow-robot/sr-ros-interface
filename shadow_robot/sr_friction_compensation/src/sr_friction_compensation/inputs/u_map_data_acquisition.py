@@ -5,11 +5,14 @@
 # name: U_Map_Data_Acquisition
 # purpose: Collect data from the hand for U_map computation
 ####################################################################################################
-import sys, string
-sys.path.append('../')
-from utils.utilitarian import Utilitarian
-from filters.u_map_filter_1o import U_Map_Filter_1o
-from filters.u_map_filter_single_pos import U_Map_Filter_Single_Pos
+import roslib; roslib.load_manifest('sr_friction_compensation')
+import rospy
+
+import string
+
+from sr_friction_compensation.utils.utilitarian import Utilitarian
+from sr_friction_compensation.filters.u_map_filter_1o import U_Map_Filter_1o
+from sr_friction_compensation.filters.u_map_filter_single_pos import U_Map_Filter_Single_Pos
 
 
 class U_Map_Data_Acquisition(object):
