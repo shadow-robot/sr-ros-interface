@@ -8,19 +8,18 @@ import roslib; roslib.load_manifest('sr_friction_compensation')
 import rospy
 
 from sr_friction_compensation.utils.utilitarian import Utilitarian
-from sr_friction_compensation.lib.python_robot_lib import Python_Robot_Lib
 
 class U_Map_Output(object):
   
 ### Constructor 
 #    
-    def __init__(self, joint_name, hand_number):
+    def __init__(self, joint_name, hand_number, lib):
         self.joint_name = joint_name
 	self.utilitarian = Utilitarian()
-	self.lib = Python_Robot_Lib()
+	self.lib = lib
 	self.hand_number = hand_number
 	
-        [self.min_joint_angle, self.max_joint_angle, self.node_id, motor,min_osc_angle, max_osc_angle] = self.utilitarian.joint_characteristics(self.joint_name, self.hand_number)
+        [self.min_joint_angle, self.max_joint_angle,min_osc_angle, max_osc_angle] = self.utilitarian.joint_characteristics(self.joint_name, self.hand_number)
       
 ### U_map computation
 #

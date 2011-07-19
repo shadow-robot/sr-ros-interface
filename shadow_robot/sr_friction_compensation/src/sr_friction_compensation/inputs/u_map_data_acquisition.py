@@ -20,8 +20,9 @@ class U_Map_Data_Acquisition(object):
 ### Constructor:
 #
 
-  def __init__(self, joint_name, direction):
+  def __init__(self, joint_name, hand_nb, direction):
     self.stopped = True
+    self.hand_nb = hand_nb
     self.joint_name = joint_name
     self.direction = direction
 
