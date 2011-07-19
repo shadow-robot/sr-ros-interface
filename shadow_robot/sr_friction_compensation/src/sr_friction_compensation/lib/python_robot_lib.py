@@ -76,7 +76,7 @@ class Python_Robot_Lib(object):
 ### Sendupdate in python
 #
     def sendupdate(self, joint_name, hand_nb, value):
-        [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)        
+        [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         command = 'sendupdate ' + position_sensor + ' ' + value
         answer = self.utilitarian.run_command(command)
 
@@ -90,7 +90,7 @@ class Python_Robot_Lib(object):
 ### Send the U_map table to the firmware
 #
     def send_u_map_to_firmware(self, u_map_position, u_map_pid_out, direction, joint_name, hand_nb):
-        [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)        
+        [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         # send the u_map table
         date = time.localtime()
         output_file =  "/tmp/" + str(date.tm_year)+ '_' + str(date.tm_mon)+ '_' +str(date.tm_mday)+ '_' +str(date.tm_hour)+ '_' +str(date.tm_min)+ '_' +str(date.tm_sec)+'/'+ joint_name + "_" + direction +"_friction_compensation.txt"
@@ -101,11 +101,11 @@ class Python_Robot_Lib(object):
         command = "sendcal "+ output_file
         #answer = self.utilitarian.run_command(command)
 
-        
-    def get_joint_ids(self, joint_name, hand_nb):    
+
+    def get_joint_ids(self, joint_name, hand_nb):
         # First finger
         if (joint_name == "FFJ1"):
-            motor = 'ff0';      
+            motor = 'ff0';
             node_id = 'node ' + hand_nb + '12' + '0310'
         elif (joint_name == "FFJ2" ):
             motor = 'ff0';
@@ -190,10 +190,10 @@ class Python_Robot_Lib(object):
         else:
           print "The joint is wrong it should be in the following format 'FFJ4'"
           return
-        position_sensor = self.joint_name + "_Pos"
-        target = self.joint_name +"_Target"
-        motor_debug = "smart_motor_debug_" + self.motor
-        smart_motor = "smart_motor_" + self.motor +".0"
+        position_sensor = joint_name + "_Pos"
+        target = joint_name +"_Target"
+        motor_debug = "smart_motor_debug_" + motor
+        smart_motor = "smart_motor_" + motor +".0"
 
         return [node_id, position_sensor, target, motor_debug, smart_motor]
 

@@ -79,7 +79,7 @@ class FrictionCompensation(object):
 ### main execution
 #
 if __name__ == "__main__":
-   self.lib = Python_Robot_Lib()
-   FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0, self.lib)
+   lib = Python_Robot_Lib()
+   FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0, lib = lib)
 
    FC.run()
