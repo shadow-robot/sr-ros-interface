@@ -13,6 +13,8 @@
   <depend package="cyberglove"/>
   <depend package="control_toolbox"/>
   <depend package="sr_automatic_pid_tuning"/>
+  <depend package="sr_friction_compensation"/>
+
   <rosdep name="python-scipy"/>
   <rosdep name="paramiko"/>
   <rosdep name="pyqt4"/>

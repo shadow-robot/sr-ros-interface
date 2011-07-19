@@ -23,7 +23,7 @@ import roslib; roslib.load_manifest('sr_automatic_pid_tuning')
 import rospy
 
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.subscriber_movement import Subscriber_Movement
-from std_msgs import Float64
+from std_msgs.msg import Float64
 import time
 
 class Callback_EtherCAT (Subscriber_Movement):

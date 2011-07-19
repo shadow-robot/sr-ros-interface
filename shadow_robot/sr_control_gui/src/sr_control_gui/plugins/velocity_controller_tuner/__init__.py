@@ -25,6 +25,8 @@ from sr_robot_msgs.srv import ForceController
 from functools import partial
 import threading, time, math
 
+from sr_friction_compensation.u_map_computation_main import FrictionCompensation
+
 from std_msgs.msg import Float64
 
 from PyQt4 import QtCore, QtGui, Qt
@@ -99,6 +101,19 @@ class FullMovement(threading.Thread):
                     else:
                         movement.publish(mvt_percentage/(self.iterations/100.))
 
+
+
+class RunFriction(threading.Thread):
+    def __init__(self, joint_name):
+        threading.Thread.__init__(self)
+        self.joint_name = joint_name
+        self.stopped = False
+        self.FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0)
+
+    def run(self):
+        self.FC.run()
+
+
 class JointPidSetter(QtGui.QFrame):
     """
     Set the force PID settings for a given joint.
@@ -108,6 +123,10 @@ class JointPidSetter(QtGui.QFrame):
         """
         """
         QtGui.QFrame.__init__(self)
+
+        self.friction = False
+        self.friction_thread = None
+
         self.parent = parent
         self.joint_name = joint_name
 
@@ -191,7 +210,41 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
         self.layout_.addWidget(btn_automatic_pid)
 
+        self.btn_friction_compensation = QtGui.QPushButton()
+        self.btn_friction_compensation.setText( "Friction" )
+        self.btn_friction_compensation.setToolTip("Computes the Friction Compensation umap")
+        self.connect(self.btn_friction_compensation, QtCore.SIGNAL('clicked()'),self.friction_compensation)
+        self.layout_.addWidget(self.btn_friction_compensation)
+
         self.setLayout(self.layout_)
+
+    def friction_compensation(self):
+        if self.friction:
+            self.btn_friction_compensation.setIcon(self.green_icon)
+            self.friction_thread.tuning = False
+            self.friction_thread.FC.stop()
+            self.friction_thread.join()
+            self.friction_thread = None
+
+            self.btn_friction_compensation.setIcon(self.green_icon)
+            self.friction = False
+            self.btn_move.setEnabled(True)
+
+        else:
+            if self.moving:
+                self.full_movement.moving = False
+                self.moving = False
+                self.full_movement.join()
+                self.full_movement = None
+                self.btn_move.setIcon(self.green_icon)
+                self.btn_move.setEnabled(False)
+
+            self.friction_thread = RunFriction(self.joint_name)
+            self.friction_thread.start()
+
+            self.friction = True
+            self.btn_friction_compensation.setIcon(self.red_icon)
+
 
     def automatic_tuning(self):
         print "Automatic PID Tuning"
@@ -242,6 +295,8 @@ class JointPidSetter(QtGui.QFrame):
         self.green_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/green.png')
         self.red_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/red.png')
         self.btn_move.setIcon(self.green_icon)
+        self.btn_friction_compensation.setIcon(self.green_icon)
+
 
     def on_close(self):
         if self.full_movement != None:

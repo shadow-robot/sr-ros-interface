@@ -12,6 +12,10 @@
   <depend package="std_msgs"/>
   <depend package="sr_robot_msgs"/>
 
+  <export>
+	<python path="${prefix}/src/"/>
+  </export>
+
 </package>
 
 
