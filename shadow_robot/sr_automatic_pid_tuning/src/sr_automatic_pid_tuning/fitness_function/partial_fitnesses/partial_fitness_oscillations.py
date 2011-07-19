@@ -48,6 +48,9 @@ class Partial_Fitness_Oscillations(Partial_Fitnesses):
         Computation of the number of significative oscillations on each target
         @return all results in a vector
         """
+        print "time: ", t
+        print "x: ", x
+        print "y: ", y
 
         #use of configuration file
         eps=self.eps
