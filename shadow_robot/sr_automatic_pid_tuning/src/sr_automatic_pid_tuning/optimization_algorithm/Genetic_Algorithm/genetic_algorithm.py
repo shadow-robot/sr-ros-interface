@@ -85,6 +85,8 @@ class Genetic_Algorithm(object):
 	self.pass_to_kill=False
 	self.limit_first_convergence=0.8
 
+        self.fitness_vect0     = None
+        self.fitness_vect_next = None
 
         return
 
@@ -126,6 +128,9 @@ class Genetic_Algorithm(object):
                 #self.fitness_vect0=self.send_the_genome_in_robot_tree_(self.genome_GA)
                 self.fitness_vect0=self.push_the_genome_on_robot_tree(self.genome_GA)
                 ##Rxplot use
+                if self.fitness_vect0 == None:
+                    continue
+
                 rxplot_vect=self.rxplot_use_(self.fitness_vect0)
                 #test of convergence [first genome]
                 pass_to_kill=self.other_convergence_(self.fitness_vect0)
@@ -145,6 +150,9 @@ class Genetic_Algorithm(object):
                 print("new offspring",self.genome_next)
                 #self.fitness_vect_next=self.send_the_genome_in_robot_tree_(self.genome_GA)
                 self.fitness_vect_next=self.push_the_genome_on_robot_tree(self.genome_GA)
+                if self.fitness_vect_next == None:
+                    continue
+
                 ##Rxplot use
                 rxplot_vect=self.rxplot_use_(self.fitness_vect_next)
                 #test of convergences
@@ -161,11 +169,15 @@ class Genetic_Algorithm(object):
                 k+=1
 
         ##Basic convergence // Maximum number of generations
+        basic_convergence_end = None
         if first_genome_is_the_best==True:
-	    basic_convergence_end=Record_Last_Data(self.fitness_vect0,self.first_genome,self.joint_name,self.clock_time)
+            if self.fitness_vect0 != None:
+                basic_convergence_end=Record_Last_Data(self.fitness_vect0,self.first_genome,self.joint_name,self.clock_time)
 	else:
-	    basic_convergence_end=Record_Last_Data(self.fitness_vect_next,self.genome_GA,self.joint_name,self.clock_time)
-	basic_convergence_end.record_data_in_file()
+            if self.fitness_vect_next != None:
+                basic_convergence_end=Record_Last_Data(self.fitness_vect_next,self.genome_GA,self.joint_name,self.clock_time)
+        if basic_convergence_end != None:
+            basic_convergence_end.record_data_in_file()
         self.stop_system()
 
         return
@@ -189,22 +201,23 @@ class Genetic_Algorithm(object):
         """
         ##First convergence //really high score
         first_convergence=False
-        if max(fitness_vector)>=self.limit_first_convergence:
-	    print("STOP://FIRST CONVERGENCE//")
-            first_convergence=True
-            self.kill=True
+        if fitness_vector != None:
+            if max(fitness_vector)>=self.limit_first_convergence:
+                print("STOP://FIRST CONVERGENCE//")
+                first_convergence=True
+                self.kill=True
 
 
-        else:
-            ##FALSE==> continue the breeding//CONTINUE THE GA!
-            self.kill=self.pass_to_kill
+            else:
+                ##FALSE==> continue the breeding//CONTINUE THE GA!
+                self.kill=self.pass_to_kill
 
-	##Second convergence //plateau
-	if first_convergence==False:
-	    second_type_convergence=Second_Type_Convergence(fitness_vector,self.populationSize,self.mean_fit_in_list)
-	    self.kill=second_type_convergence.second_type_record_data()
+            ##Second convergence //plateau
+            if first_convergence==False:
+                second_type_convergence=Second_Type_Convergence(fitness_vector,self.populationSize,self.mean_fit_in_list)
+                self.kill=second_type_convergence.second_type_record_data()
 
-        return self.kill
+            return self.kill
 
 
     def rxplot_use_(self,fitness_vect):
@@ -212,9 +225,10 @@ class Genetic_Algorithm(object):
 	Simple computation for rxplot use // instanciation and sending data
 	@return: nothing
 	"""
-	fit_mean=sum(fitness_vect)/len(fitness_vect)
-	self.rxplot_vect.append(fit_mean)
-	self.show_rxplot.send_data_on_rxplot(self.rxplot_vect)
+        if fitness_vect != None:
+            fit_mean=sum(fitness_vect)/len(fitness_vect)
+            self.rxplot_vect.append(fit_mean)
+            self.show_rxplot.send_data_on_rxplot(self.rxplot_vect)
 	return
 
 

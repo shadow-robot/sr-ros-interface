@@ -52,6 +52,8 @@ class Global_Movement(object):
                   Partial_Movement_Slope(self.joint_name, self.robot_lib)]
 
         for mvts in movement:
+            if self.robot_lib.stopped:
+                return
             mvts.publish_the_movement()
 
 

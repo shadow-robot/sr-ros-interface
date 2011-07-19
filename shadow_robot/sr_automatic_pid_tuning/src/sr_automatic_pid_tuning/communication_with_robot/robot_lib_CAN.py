@@ -45,8 +45,7 @@ class Robot_Lib_CAN(Robot_Lib):
 	Initialization of the Subscriber on ROS
 	@return nothing
 	"""
-	rospy.Subscriber("srh/shadowhand_data", joints_data, callback)
-	return
+	self.subscriber_ = rospy.Subscriber("srh/shadowhand_data", joints_data, callback)
 
     def data_sendupdate(self,joint_name,new_target):
 	"""

@@ -37,8 +37,6 @@ class Callback_EtherCAT (Subscriber_Movement):
 	Subscriber_Movement.__init__(self,joint_name)
 	self.pause=False
 	self.joint_name=joint_name
-	return
-
 
     def callback(self,joint_data):
 	"""
@@ -75,6 +73,6 @@ class Callback_EtherCAT (Subscriber_Movement):
 	init//calling callback
 	@return: nothing
 	"""
-	rospy.Subscriber(self.topic_name, joints_data, self.callback)
+	self.subscriber_ = rospy.Subscriber(self.topic_name, joints_data, self.callback)
 
 	return

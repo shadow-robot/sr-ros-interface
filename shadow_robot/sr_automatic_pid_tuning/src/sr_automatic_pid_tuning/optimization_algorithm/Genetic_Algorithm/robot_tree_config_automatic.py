@@ -42,6 +42,9 @@ class Robot_Tree_Config_Automatic(object):
 	@return: nothing
 	"""
 	for chromosome in self.genome:
+            if self.robot_lib.stopped:
+                return
+
             self.robot_lib.set_pid(self.joint_name, chromosome)
 	    self.fit_vect=self.movement_communication_with_sub_()
 

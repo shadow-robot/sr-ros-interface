@@ -33,7 +33,7 @@ from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.config.pat
 
 class Subscriber_Movement(object):
     def __init__(self,joint_name):
-
+        self.subscriber_ = None
 	#############
         self.joint_name=joint_name
         #############

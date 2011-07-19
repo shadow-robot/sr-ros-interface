@@ -159,14 +159,13 @@ class RunGA(threading.Thread):
                                   "random",
                                   self.callback,
                                   self.robot_lib)
+    def run(self):
 	self.GA.give_life_to_the_system()
 
-    def run(self):
-        while(self.tuning):
-            print self.joint_name, " tuning"
-            time.sleep(.1)
-
-        self.callback.unregister()
+        if self.callback.subscriber_ != None:
+            self.callback.subscriber_.unregister()
+        if self.robot_lib.subscriber_ != None:
+            self.robot_lib.subscriber_.unregister()
 
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):
@@ -432,6 +431,7 @@ class JointPidSetter(QtGui.QFrame):
         if self.tuning:
             self.btn_automatic_pid.setIcon(self.green_icon)
             self.GA_thread.tuning = False
+            self.GA_thread.robot_lib.stopped = True
             self.GA_thread.join()
             self.GA_thread = None
 

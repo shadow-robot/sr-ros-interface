@@ -29,6 +29,7 @@ class Robot_Lib(object):
         #not pretty: used to stop the whole system: there's an existing
         # instance of the Robot Library in each class we want to stop.
         self.stopped = False
+        self.subscriber_ = None
 
     def init_publisher(self):
 	"""
