@@ -24,6 +24,7 @@ import rospy
 
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.subscriber_movement import Subscriber_Movement
 from std_msgs.msg import Float64
+
 import time
 
 class Callback_EtherCAT (Subscriber_Movement):
@@ -101,5 +102,5 @@ class Callback_EtherCAT (Subscriber_Movement):
 	init//calling callback
 	@return: nothing
 	"""
-	self.subscriber_pos_    = rospy.Subscriber(self.topic_name, joints_data, self.callback_pos_)
-        self.subscriber_target_ = rospy.Subscriber(self.topic_name, joints_data, self.callback_target_)
+	self.subscriber_pos_    = rospy.Subscriber(self.topic_name, Float64, self.callback_pos_)
+        self.subscriber_target_ = rospy.Subscriber(self.topic_name, Float64, self.callback_target_)

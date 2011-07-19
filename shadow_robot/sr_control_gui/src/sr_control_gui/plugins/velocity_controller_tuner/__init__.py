@@ -25,7 +25,7 @@ from sr_robot_msgs.srv import ForceController
 from functools import partial
 import threading, time, math
 
-from sr_friction_compensation.u_map_computation_main import FrictionCompensation
+#from sr_friction_compensation.u_map_computation_main import FrictionCompensation
 
 from std_msgs.msg import Float64
 
@@ -108,7 +108,7 @@ class RunFriction(threading.Thread):
         threading.Thread.__init__(self)
         self.joint_name = joint_name
         self.stopped = False
-        self.FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0)
+        #self.FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0)
 
     def run(self):
         self.FC.run()
