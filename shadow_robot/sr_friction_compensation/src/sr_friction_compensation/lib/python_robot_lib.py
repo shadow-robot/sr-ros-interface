@@ -71,7 +71,15 @@ class Python_Robot_Lib(object):
         # here data location is the name of the text file
         # Put data into lists
         [position_hex, pid_out_hex] = self.utilitarian.text_file_to_vectors(data_location)
-        return [position_hex, pid_out_hex]
+        # Convert from hex to dec
+        # position
+        float_position = self.utilitarian.position_conversion_to_float(position_hex)
+
+        # pid_out
+        float_pid_out = self.utilitarian.pid_out_conversion_to_float(pid_out_hex)
+
+        return [float_position, float_position]
+        
 
 ### Sendupdate in python
 #

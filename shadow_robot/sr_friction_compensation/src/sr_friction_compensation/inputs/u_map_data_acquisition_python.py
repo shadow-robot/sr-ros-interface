@@ -164,14 +164,13 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
 
         print "data loc: ", data_location
 
-        # get measured data
-        [self.position_hex, self.pid_out_hex] = self.lib.get_data( data_location)
+        # get measured data        
+        [self.position_float, self.pid_out_float] = self.lib.get_data( data_location)
 
-        print "ok got data"
+        print "ok got data"                
 
-
-        # run data_treatment
-        [self.position, self.pid_out] = self.data_treatment(self.position_hex, self.pid_out_hex)
+        # run data_treatment        
+        [self.position, self.pid_out] = self.data_treatment(self.position_float, self.pid_out_float)
 
         print "ran treatment: ", self.position, " ", self.pid_out
 
