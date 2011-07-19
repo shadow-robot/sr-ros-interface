@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import subprocess
+import subprocess, string
 class Utilitarian(object):
   
 ### Constructor
@@ -287,3 +287,117 @@ class Utilitarian(object):
 	for i in range(len(pid)):
 	  u_map_pid = u_map_pid + [pid[i]/256.0]	  
       	return u_map_pid
+
+
+    ### Read the measured data from the text files and save them into vectors
+    #
+    # Input:
+    # Text file name
+    # Actions:
+    # Read the measured data from the text file and save them into vectors
+    # Text file contains 3 columns:
+    # line number
+    # position values
+    # pid_out values
+    def text_file_to_vectors(self, text_file_name):
+        # Copy the data from text files into lists
+        #
+        file_open=open(text_file_name, 'r')
+        frictions_data=file_open.readlines()
+
+        # The number of lines in the text file
+        line_number = len(frictions_data)
+
+        # Temporary lists declaration
+        measured_position_hexa=[]
+        measured_pid_out_hexa=[]
+
+        # Copy list into the lists
+        for i in range(line_number):
+            # split each line (data in files are seperated by spaces)
+            words = string.split(frictions_data[i], ' ')
+            # make sure that each line contains 3 elements
+            if len(words) >= 3:
+                # Copy data into lists
+                measured_position_hexa = measured_position_hexa + [words[1]]
+                measured_pid_out_hexa = measured_pid_out_hexa + [words[2]]
+
+        return [measured_position_hexa, measured_pid_out_hexa]
+
+
+### Write the U_map values in a text file
+#
+      # needs the direction to set the right table name
+    def write_u_map_in_text_file(self, u_map_position, u_map_pid_out, output_file, node_id, direction):
+      # Text file name    
+          fout = open(output_file, 'w')
+          
+          
+      # Node id      
+          fout.write(node_id)
+          fout.write('\n')
+          fout.write('\n')
+          
+          if (direction == "forward"):
+            # POSITIVE DIRECTION TABLE          
+                fout.write('#FRICTION_MAP_POSITIVE_DIRECTION')
+                fout.write('\n')
+                fout.write('tbl 5')
+                fout.write('\n')
+          else:
+            # NEGATIVE DIRECTION TABLE      
+                fout.write('#FRICTION_MAP_NEGATIVE_DIRECTION')
+                fout.write('\n')
+                fout.write('tbl 6')
+                fout.write('\n')
+              
+          for j in range(len(u_map_position)):        
+              fout.write(str(u_map_position[j]))
+              fout.write(' @ ')
+              fout.write(str(u_map_pid_out[j]))
+              fout.write('\n')
+          fout.write('\n')
+          
+          
+
+
+
+
+### Write forward AND backward U_map values in ONE text file
+#
+      # Normally this function is unused but can be useful for debuging    
+    def write_forward_and_backward_u_map_in_one_text_file(self, u_map_position_forward, u_map_pid_out_forward, u_map_position_backward, u_map_pid_out_backward, output_file, node_id):
+
+      # Text file name
+          fout = open(output_file, 'w')
+          
+      # Node id      
+          fout.write(node_id)
+          fout.write('\n')
+          fout.write('\n')
+      
+      # POSITIVE DIRECTION TABLE          
+          fout.write('#FRICTION_MAP_POSITIVE_DIRECTION')
+          fout.write('\n')
+          fout.write('tbl 5')
+          fout.write('\n')
+          
+          for j in range(len(u_map_position_forward)):        
+              fout.write(str(u_map_position_forward[j]))
+              fout.write(' @ ')
+              fout.write(str(u_map_pid_out_forward[j]))
+              fout.write('\n')
+          fout.write('\n')
+          
+          
+      # NEGATIVE DIRECTION TABLE      
+          fout.write('#FRICTION_MAP_NEGATIVE_DIRECTION')
+          fout.write('\n')
+          fout.write('tbl 6')
+          fout.write('\n')
+          
+          for j in range(len(u_map_position_backward)):
+              fout.write(str(u_map_position_backward[j]))
+              fout.write(' @ ')
+              fout.write(str(u_map_pid_out_backward[j]))
+              fout.write('\n')

@@ -146,3 +146,5 @@ shadow_robot/doc/styles.css
 shadow_robot/sr_hand_palm_edc/sr_external_dependencies/compiled_firmware/released_firmware
 ￼
 shadow_robot/sr_control_gui/src/sr_control_gui/plugins/sensor_scope/tmp.py
+shadow_robot/sr_friction_compensation/src/sr_friction_compensation/ffj4_pos_pid_backward_unique.txt
+shadow_robot/sr_friction_compensation/src/sr_friction_compensation/test.txt
