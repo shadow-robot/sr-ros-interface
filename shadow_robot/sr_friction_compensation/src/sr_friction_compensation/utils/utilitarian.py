@@ -115,18 +115,15 @@ class Utilitarian(object):
 	return [position_sorted, pid_out_sorted]
 
 
-### Return some joint characteristics
+### Return some mechanical joint characteristics
 #
       # Inputs: joint name and hand number
 		# Caution: the parameter hand_nb must be a string
       # Outputs:
 	    # min_angle
 	    # max_angle
-	    # node_id
 	    # min_osc_angle: position where oscillations appear (with velocity loop)
-	    # max_osc_angle: position where oscillations appear (with velocity loop)
-      # Those joint characteristics are used to generate the U_map text file
-
+	    # max_osc_angle: position where oscillations appear (with velocity loop)      
     def joint_characteristics(self, joint_name, hand_nb):
 
       # First finger

@@ -50,7 +50,7 @@ class FrictionCompensation(object):
 
 
 	 # Output computation
-         [u_map_position_float, u_map_pid_out_float, final_u_map_position, final_u_map_pid_out] = output_file.u_map_computation(position, pid_out, self.n)
+         [u_map_position_float, u_map_pid_out_float] = output_file.u_map_computation(position, pid_out, self.n)
 
 	 # Set results in different variables according to the direction
          if direction == 'forward':
@@ -69,7 +69,7 @@ class FrictionCompensation(object):
             final_u_map_pid_out_backward = final_u_map_pid_out
 
          # Send U_map table
-         output_file.send_umap(final_u_map_position, final_u_map_pid_out)
+         output_file.send_umap(u_map_position, u_map_pid_out)
 
    def stop(self):
       self.stopped = True

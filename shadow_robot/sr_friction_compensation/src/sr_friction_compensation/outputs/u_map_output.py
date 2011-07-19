@@ -100,13 +100,9 @@ class U_Map_Output(object):
 	      print "\n","U_map:"	
 	      for i in range(point_nb):	    
 		print i, "\t", u_map_position[i], "\t", u_map_pid[i]
-	
-           # Conversion to the U_map format
-              final_u_map_position = self.utilitarian.set_pos_to_u_map_format(u_map_position)
-              final_u_map_pid = self.utilitarian.set_pid_to_u_map_format(u_map_pid)      
-
-	  # return the final values
-	      return [u_map_position, u_map_pid ,final_u_map_position, final_u_map_pid]
+	           
+	  # return the u_map values
+	      return [u_map_position, u_map_pid]
 	      
 ### Write to file, then sendcal
 #

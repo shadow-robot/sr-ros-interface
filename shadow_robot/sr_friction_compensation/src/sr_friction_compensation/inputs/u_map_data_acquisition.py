@@ -35,7 +35,7 @@ class U_Map_Data_Acquisition(object):
     self.position = []
     self.pid_out = []
     
-    # Float values
+    # data without repeated tuples (position, pid_out)
     self.position_uniq = []
     self.pid_out_uniq = []
 
@@ -69,11 +69,11 @@ class U_Map_Data_Acquisition(object):
           # pid_out
       # Actions:
           # Delete repeated tuples (position,pid_out)
-          # Convert from hexadecimal to float for position and integers for pid output
           # Filter the data with a first order filter
           # Sort data per increasing position
           # Delete repeated positions so that they appear only once with the average PID value  
   def data_treatment(self, position_float, pid_out_float):
+      
       # Delete tuples (positions, pid_out) recorded several times
     [self.position_uniq, self.pid_out_uniq] = self.utilitarian.delete_repeated_tuples(position_float, pid_out_float)
 
