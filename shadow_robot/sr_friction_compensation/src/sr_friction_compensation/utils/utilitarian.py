@@ -131,93 +131,93 @@ class Utilitarian(object):
 
       # First finger
 	if (joint_name == "FFJ1"):
-            motor = 'ff0';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '12' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif (joint_name == "FFJ2" ):
-            motor = 'ff0';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '12' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif (joint_name == "FFJ3"):
-            motor = 'ff3';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '13'+'0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif (joint_name == "FFJ4"):
-            motor = 'ff4';      min_osc_angle = -15;     max_osc_angle = 15;
-	    min_angle = -25;    max_angle = 25;     node_id = 'node ' + hand_nb + '11' + '0310'
+            min_osc_angle = -15;     max_osc_angle = 15;
+	    min_angle = -25;    max_angle = 25;
 
       # Medium finger
 
 	elif ( joint_name == 'MFJ1'):
-            motor = 'mf0';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '02' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'MFJ2'):
-            motor = 'mf0';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '02' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'MFJ3'):
-            motor = 'mf3';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '16' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'MFJ4'):
-            motor = 'mf4';      min_osc_angle = -15;     max_osc_angle = 15;
-	    min_angle = -25;    max_angle = 25;     node_id = 'node ' + hand_nb + '01' + '0310'
+            min_osc_angle = -15;     max_osc_angle = 15;
+	    min_angle = -25;    max_angle = 25;
 
       # Right Finger:
 	elif ( joint_name == 'RFJ1'):
-            motor = 'rf0';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '04' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'RFJ2'):
-            motor = 'rf0';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '04' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'RFJ3'):
-            motor = 'rf3';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '05' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'RFJ4'):
-            motor = 'rf4';      min_osc_angle = -15;     max_osc_angle = 15;
-	    min_angle = -25;    max_angle = 25;     node_id = 'node ' + hand_nb + '03' + '0310'
+            min_osc_angle = -15;     max_osc_angle = 15;
+	    min_angle = -25;    max_angle = 25;
 
       # Little finger
 	elif ( joint_name == 'LFJ1'):
-            motor = 'lf0';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '09' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'LFJ2'):
-	    motor = 'lf0';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '09' + '0310'
+	    min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'LFJ3'):
-            motor = 'lf3';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '08' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'LFJ4'):
-            motor = 'lf4';      min_osc_angle = -15;     max_osc_angle = 15;
-	    min_angle = -25;    max_angle = 25;     node_id = 'node ' + hand_nb + '10' + '0310'
+            min_osc_angle = -15;     max_osc_angle = 15;
+	    min_angle = -25;    max_angle = 25;
 	elif ( joint_name == 'LFJ5'):
-            motor = 'lf5';      min_osc_angle = 10;      max_osc_angle = 35;
-	    min_angle = 0;      max_angle = 45;     node_id = 'node ' + hand_nb + '06' + '0310'
+            min_osc_angle = 10;      max_osc_angle = 35;
+	    min_angle = 0;      max_angle = 45;
 
       # Thumb
 	elif ( joint_name == 'THJ1'):
-            motor = 'th1';      min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '14' + '0310'
+            min_osc_angle = 5;       max_osc_angle = 85;
+	    min_angle = 0;      max_angle = 90;
 	elif ( joint_name == 'THJ2'):
-            motor = 'th2';      min_osc_angle = -20;     max_osc_angle = 20;
-	    min_angle = -30;    max_angle = 30;     node_id = 'node ' + hand_nb + '15' + '0310'
+            min_osc_angle = -20;     max_osc_angle = 20;
+	    min_angle = -30;    max_angle = 30;
 	elif ( joint_name == 'THJ3'):
-            motor = 'th3';      min_osc_angle = -10;     max_osc_angle = 10;
-	    min_angle = -15;    max_angle = 15;     node_id = 'node ' + hand_nb + '07' + '0310'
+            min_osc_angle = -10;     max_osc_angle = 10;
+	    min_angle = -15;    max_angle = 15;
 	elif ( joint_name == 'THJ4'):
-            motor = 'th4';      min_osc_angle = 6;       max_osc_angle = 69;
-	    min_angle = 0;      max_angle = 75;     node_id = 'node ' + hand_nb + '19' + '0310'
+            min_osc_angle = 6;       max_osc_angle = 69;
+	    min_angle = 0;      max_angle = 75;
 	elif ( joint_name == 'THJ5'):
-            motor = 'th5';      min_osc_angle = -50;     max_osc_angle = 50;
-	    min_angle = -60;    max_angle = 60;     node_id = 'node ' + hand_nb + '20' + '0310'
+            min_osc_angle = -50;     max_osc_angle = 50;
+	    min_angle = -60;    max_angle = 60;
 
       # Wrist
 	elif ( joint_name == 'WRJ1'):
-            motor = 'wr1';      min_osc_angle = -40;     max_osc_angle = 30;
-	    min_angle = -45;    max_angle = 35;     node_id = 'node ' + hand_nb + '18' + '0310'
+            min_osc_angle = -40;     max_osc_angle = 30;
+	    min_angle = -45;    max_angle = 35;
 	elif ( joint_name == 'WRJ2'):
-            motor = 'wr2';      min_osc_angle = -20;     max_osc_angle = 0;
-	    min_angle = -30;    max_angle = 10;     node_id = 'node ' + hand_nb + '17' + '0310'
+            min_osc_angle = -20;     max_osc_angle = 0;
+	    min_angle = -30;    max_angle = 10;
 	else:
 	  print "The joint is wrong it should be in the following format 'FFJ4'"
 	  return
 
-	return [min_angle, max_angle, node_id, motor, min_osc_angle, max_osc_angle]
+	return [min_angle, max_angle, min_osc_angle, max_osc_angle]
 
 ### To run a command with a subprocess
 #

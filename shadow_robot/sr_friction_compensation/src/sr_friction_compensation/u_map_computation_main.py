@@ -8,14 +8,14 @@
 from  inputs.u_map_data_acquisition_python import U_Map_Data_Acquisition_Python
 from  outputs.u_map_output_file import U_Map_Output_File
 from  utils.utilitarian import Utilitarian
-
+from  lib.python_robot_lib import Python_Robot_Lib
 
 
 ### Run the friction compensation process
 #
 class FrictionCompensation(object):
 
-   def __init__(self,joint_name, n, P, I, D, shift, hand_number = '48'):
+   def __init__(self,joint_name, n, P, I, D, shift, lib, hand_number = '48'):
         self.joint_name = joint_name
         self.n = n
         self.hand_number = hand_number
@@ -23,6 +23,7 @@ class FrictionCompensation(object):
         self.I = I
         self.D = D
         self.shift = shift
+        self.lib = lib
         self.stopped = False
         self.data_acquisition_python = None
 
@@ -40,8 +41,8 @@ class FrictionCompensation(object):
          print "2"
 
          # Class instanciations
-         self.data_acquisition_python = U_Map_Data_Acquisition_Python(self.joint_name, direction, imax_regulation = False)
-         output_file = U_Map_Output_File(self.joint_name, self.hand_number, direction)
+         self.data_acquisition_python = U_Map_Data_Acquisition_Python(self.joint_name, self.hand_number, direction, self.lib, imax_regulation = False)
+         output_file = U_Map_Output_File(self.joint_name, self.hand_number, self.lib, direction)
 
 	 # Data acquisition
          [ position, pid_out ] = self.data_acquisition_python.run_data_acquisition(self.P, self.I, self.D, self.shift)
@@ -78,6 +79,7 @@ class FrictionCompensation(object):
 ### main execution
 #
 if __name__ == "__main__":
-   FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0)
+   self.lib = Python_Robot_Lib()
+   FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0, self.lib)
 
    FC.run()

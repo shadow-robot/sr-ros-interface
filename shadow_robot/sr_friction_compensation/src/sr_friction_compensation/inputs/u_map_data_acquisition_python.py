@@ -6,37 +6,31 @@ import rospy
 
 import time, string
 from sr_friction_compensation.inputs.u_map_data_acquisition import U_Map_Data_Acquisition
-from sr_friction_compensation.lib.python_robot_lib import Python_Robot_Lib
 
 class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
     ### Constructor
     #
-    def __init__(self, joint_name, direction, imax_regulation):
-        U_Map_Data_Acquisition.__init__(self, joint_name, direction)
+    def __init__(self, joint_name, hand_nb, direction, lib, imax_regulation):
+        U_Map_Data_Acquisition.__init__(self, joint_name, hand_nb, direction)
 
         self.imax_regulation = imax_regulation
-        self.lib = Python_Robot_Lib()
+        self.lib = lib
         self.position_dead_band = 0.5
         self.initial_imax = []
         self.imax_inc = []
         self.imax_dec = []
         self.imax_time =[]
         self.imax_min_delta_p = []
-        self.imax_max_delta_p = []
-        # CAUTION: node_id is wrong as no hand number is given (it is useless here)
-        [self.min_angle, self.max_angle, self.node_id, self.motor, self.min_osc_angle, self.max_osc_angle] = self.utilitarian.joint_characteristics(self.joint_name, 'hand_nb')
-        self.position_sensor = self.joint_name + "_Pos"
-        self.target = self.joint_name +"_Target"
-        self.motor_debug = "smart_motor_debug_" + self.motor
-        self.smart_motor = "smart_motor_" + self.motor +".0"
-
+        self.imax_max_delta_p = []        
+        [self.min_angle, self.max_angle, self.min_osc_angle, self.max_osc_angle] = self.utilitarian.joint_characteristics(self.joint_name, self.hand_nb)
+        
     ### Run measurements in Python
     #
     def measurement_process(self, P, I, D, shift):
         ## Measurements preparation
         #
         # Configure the motor
-        self.lib.set_PID(P, I, D, Shift, self.smart_motor)
+        self.lib.set_PID(P, I, D, Shift, self.joint_name, self.hand_nb)
 
         # Set motion parameter
         self.set_motion_parameters()
@@ -63,19 +57,19 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
     def drive_to_initial_position(self, position_dead_band):
         if imax_regulation:
             # Set the imax value high enough to move faster
-            self.lib.set_imax(3000, self.smart_motor)
+            self.lib.set_imax(3000, self.joint_name, self.hand_nb)
 
-        cur_pos = self.lib.get_current_value(self.position_sensor)
+        cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
         # Move until it reaches the initial position
         while (abs(cur_pos-self.initial_position)> position_dead_band):
-            self.lib.sendupdate(self.position_sensor, self.initial_range_end)
-            cur_pos = self.lib.get_current_value(self.position_sensor)
+            self.lib.sendupdate(self.joint_name, self.hand_nb, self.initial_range_end)
+            cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
             time.sleep(0.5)
 
         if imax_regulation:
           # Set the imax and max temperature to 0, to make sure that the joint stops
-          self.lib.set_imax(0, self.smart_motor)
-          self.lib.set_max_temperature(0, self.smart_motor)
+          self.lib.set_imax(0, self.joint_name, self.hand_nb)
+          self.lib.set_max_temperature(0, self.joint_name, self.hand_nb)
 
     ### Carry out Imax regulation
     #
@@ -85,37 +79,37 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
             # Set imax and maximum temperature values to enable motion
             self.set_imax_regulation_parameters()
             imax = self.initial_imax
-            self.lib.set_imax(imax, self.smart_motor)
-            self.lib.set_max_temperature(15000, self.smart_motor)
+            self.lib.set_imax(imax, self.joint_name, self.hand_nb)
+            self.lib.set_max_temperature(15000, self.joint_name, self.hand_nb)
 
         # Check if the joint has reached the final position
-        cur_pos = self.lib.get_current_value(self.position_sensor)
+        cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
         while abs(cur_pos - self.final_position) > position_dead_band:
             if self.stopped:
                 break
 
             # send the target position (repeated at each step maybe not always useful)
-            self.lib.sendupdate(self, self.position_sensor, self.final_range_end)
+            self.lib.sendupdate(self, self.joint_name, self.hand_nb, self.final_range_end)
             time.sleep(self.imax_time)
 
             # Regulate the I_max value according to the motion speed
             prev_pos = cur_pos
-            cur_pos = self.lib.get_current_value(self.position_sensor)
+            cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
 
             if self.imax_regulation:
                 # if the joint is too slow it increases the imax value (otherwise sometimes the joint is stuck)
                 if abs(cur_pos-prev_pos) < self.imax_min_delta_p:
                     imax += self.imax_inc
-                    self.lib.set_imax(imax, self.smart_motor)
+                    self.lib.set_imax(imax, self.joint_name, self.hand_nb)
 
                 # if the joint is too fast, it decreases the imax value
                 elif abs(cur_pos-prev_pos) > self.imax_max_delta_p:
                     imax -= self.imax_dec
-                    self.lib.set_imax(imax, self.smart_motor)
+                    self.lib.set_imax(imax, self.joint_name, self.hand_nb)
 
         # Set the imax and max temperature to 0, to make sure that the joint stops
-        self.lib.set_imax(0, self.smart_motor)
-        self.lib.set_max_temperature(0, self.smart_motor)
+        self.lib.set_imax(0, self.joint_name, self.hand_nb)
+        self.lib.set_max_temperature(0, self.joint_name, self.hand_nb)
 
 
     ### set imax regulation parameters
