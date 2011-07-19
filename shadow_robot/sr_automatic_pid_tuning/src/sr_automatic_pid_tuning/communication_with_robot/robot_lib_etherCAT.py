@@ -29,6 +29,9 @@ from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib
 class Robot_Lib_EtherCAT(Robot_Lib):
     def __init__(self):
         Robot_Lib.__init__(self)
+        self.publisher = None
+        self.msg_to_send = Float64()
+
 
     def init_publisher(self):
 	"""
@@ -42,14 +45,19 @@ class Robot_Lib_EtherCAT(Robot_Lib):
 	Initialization of the Subscriber on ROS
 	@return nothing
 	"""
-	self.subscriber_ = rospy.Subscriber("srh/shadowhand_data", Float64, callback)
+	callback.subscriber()
 
     def data_sendupdate(self,joint_name,new_target):
 	"""
 	Senduptade on ROS
 	@return nothing
 	"""
-        print "sendupdate: ",joint_name, new_target
+        if self.publisher == None:
+            topic = "/sh_"+ joint_name.lower() +"_effort_controller/command"
+            self.publisher = rospy.Publisher(topic, Float64)
+
+        self.msg_to_send.data = new_target
+        self.publisher.publish(self.msg_to_send)
 
     def set_pid(self, joint_name, chromosome):
         print "Should set the pid for ",joint_name, " : ", chromosome

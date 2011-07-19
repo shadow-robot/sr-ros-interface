@@ -23,42 +23,70 @@ import roslib; roslib.load_manifest('sr_automatic_pid_tuning')
 import rospy
 
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.subscriber_movement import Subscriber_Movement
-
-from sr_robot_msgs.msg import joints_data, joint, sendupdate
-import signal
-import os
+from std_msgs import Float64
 import time
-from time import gmtime, strftime
-
-
 
 class Callback_EtherCAT (Subscriber_Movement):
-    def __init__(self,joint_name):
+    def __init__(self,joint_name, controller_type = "force"):
 	Subscriber_Movement.__init__(self,joint_name)
 	self.pause=False
 	self.joint_name=joint_name
 
-    def callback(self,joint_data):
+        possible_controllers = {"force":0, "velocity":1, "position":2}
+        self.current_controller = possible_controllers[controller_type]
+
+        self.last_pos = 0
+        self.last_target = 0
+        self.pos_received = False
+        self.target_received = False
+
+    def callback_pos_(self, msg):
 	"""
 	Recording all mov data
 	@return nothing
 	"""
 	message=[]
 
+        self.pause=self.break_callback(self.pause)
+        if self.pause==True:
+            self.time=0
+            time.sleep(1)
 
-	for joint in joint_data.joints_list:
-	    if joint.joint_name==self.joint_name:
-		rospy.logdebug(rospy.get_name()+"[%s] : Pos = %f | Target = %f", joint.joint_name, joint.joint_position, joint.joint_target)
-		self.pause=self.break_callback(self.pause)
-		if self.pause==True:
-		    self.time=0
-		    time.sleep(1)
+        else:
+            if self.target_received:
+                self.record_in_file(self.time,self.time_1,msg.data, self.last_target)
+                self.time+=1
+                self.time_1+=1
 
-		else:
-		    self.record_in_file(self.time,self.time_1,0,0)#pos, #target)
-		    self.time+=1
-		    self.time_1+=1
-	return
+                self.pos_received = False
+                self.target_received = False
+            else:
+                self.last_pos = msg.data
+                self.pos_received = True
+
+    def callback_target_(self, msg):
+	"""
+	Recording all mov data
+	@return nothing
+	"""
+	message=[]
+
+        self.pause=self.break_callback(self.pause)
+        if self.pause==True:
+            self.time=0
+            time.sleep(1)
+
+        else:
+            if self.pos_received:
+                self.record_in_file(self.time,self.time_1, self.last_pos, msg.data)
+                self.time+=1
+                self.time_1+=1
+
+                self.pos_received = False
+                self.target_received = False
+            else:
+                self.last_target = msg.data
+                self.target_received = True
 
     def break_callback(self,pause):
 	"""
@@ -73,6 +101,5 @@ class Callback_EtherCAT (Subscriber_Movement):
 	init//calling callback
 	@return: nothing
 	"""
-	self.subscriber_ = rospy.Subscriber(self.topic_name, joints_data, self.callback)
-
-	return
+	self.subscriber_pos_    = rospy.Subscriber(self.topic_name, joints_data, self.callback_pos_)
+        self.subscriber_target_ = rospy.Subscriber(self.topic_name, joints_data, self.callback_target_)

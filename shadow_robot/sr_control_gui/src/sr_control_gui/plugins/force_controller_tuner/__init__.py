@@ -148,7 +148,7 @@ class RunGA(threading.Thread):
         self.parameters = parameters
 
 	self.robot_lib=Robot_Lib_EtherCAT()
-	self.callback = Callback_EtherCAT(joint_name)
+	self.callback = Callback_EtherCAT(joint_name, "force")
 	##mettre ici le roslib
 	self.robot_lib.init_subscriber(self.callback)
 
@@ -162,10 +162,11 @@ class RunGA(threading.Thread):
     def run(self):
 	self.GA.give_life_to_the_system()
 
-        if self.callback.subscriber_ != None:
-            self.callback.subscriber_.unregister()
-        if self.robot_lib.subscriber_ != None:
-            self.robot_lib.subscriber_.unregister()
+        if self.callback.subscriber_pos_ != None:
+            self.callback.subscriber_pos_.unregister()
+
+        if self.callback.subscriber_target_ != None:
+            self.callback.subscriber_target_.unregister()
 
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):
