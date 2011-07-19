@@ -25,7 +25,7 @@ from sr_robot_msgs.srv import ForceController
 from functools import partial
 import threading, time, math
 
-#from sr_friction_compensation.u_map_computation_main import FrictionCompensation
+from sr_friction_compensation.u_map_computation_main import FrictionCompensation
 
 from std_msgs.msg import Float64
 
@@ -104,14 +104,16 @@ class FullMovement(threading.Thread):
 
 
 class RunFriction(threading.Thread):
-    def __init__(self, joint_name):
+    def __init__(self, joint_name, parent):
         threading.Thread.__init__(self)
+        self.parent = parent
         self.joint_name = joint_name
         self.stopped = False
-        #self.FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0)
+        self.FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0)
 
     def run(self):
         self.FC.run()
+        self.parent.friction_finished()
 
 
 class JointPidSetter(QtGui.QFrame):
@@ -239,11 +241,23 @@ class JointPidSetter(QtGui.QFrame):
                 self.btn_move.setIcon(self.green_icon)
                 self.btn_move.setEnabled(False)
 
-            self.friction_thread = RunFriction(self.joint_name)
+            self.friction_thread = RunFriction(self.joint_name, self)
             self.friction_thread.start()
 
             self.friction = True
             self.btn_friction_compensation.setIcon(self.red_icon)
+
+    def friction_finished(self):
+        #TODO: add a popup to tell people the friction finished properly,
+        # may be we should display the points + the line
+        self.btn_friction_compensation.setIcon(self.green_icon)
+        self.friction_thread.tuning = False
+        self.friction_thread.FC.stop()
+        self.friction_thread = None
+
+        self.btn_friction_compensation.setIcon(self.green_icon)
+        self.friction = False
+        self.btn_move.setEnabled(True)
 
 
     def automatic_tuning(self):

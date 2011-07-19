@@ -7,7 +7,7 @@ import subprocess , time, string
 
 from sr_friction_compensation.utils.utilitarian import Utilitarian
 
-class Python_Robot_Lib(object):
+class EtherCAT_Robot_Lib(object):
 
 ### Constructor
 #
@@ -15,26 +15,18 @@ class Python_Robot_Lib(object):
         self.utilitarian = Utilitarian()
 
     def set_PID(self, P, I, D, Shift, smart_motor):
-        options = 'sensor ' + self.position_sensor + ' target ' + self.target
-        self.contrlr(smart_motor, options )
-
-        # Set the PID values
-        options = 'p ' + P + ' i ' + I + ' d ' + D + ' motor_maxforce 16384 motor_safeforce 16383 force_out_shift 255 sensor_out_shift ' + Shift + ' sensor_deadband 128 sensor_offset 0 max_temperature 15000  max_current 200 type_of_sensor 0 type_of_setpoint 0'
-        self.contrlr(smart_motor, options )
-
-        # Set the imax value
-        options = 'sensor_imax 3000'
-        self.contrlr(smart_motor, options)
+        #for the ethercat library, we don't want to
+        # setup the PID: we're using the currently set
+        # parameters
+        pass
 
     def set_imax(self, imax_value, smart_motor):
-        options = 'sensor_imax '+imax_value
-        self.contrlr(smart_motor, options)
+        #We're not doing any imax regulation
+        pass
 
     def set_max_temperature(self, temperature_value, smart_motor):
-        options = 'max_temperature '+temperature_value
-        self.lib.contrlr(smart_motor, options)
-
-
+        #We're not changing the max temperature
+        pass
 
 ### listvalues in python
 #

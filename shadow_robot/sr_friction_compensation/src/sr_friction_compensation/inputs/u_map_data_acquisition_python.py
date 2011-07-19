@@ -13,7 +13,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
     #
     def __init__(self, joint_name, direction, imax_regulation):
         U_Map_Data_Acquisition.__init__(self, joint_name, direction)
-        
+
         self.imax_regulation = imax_regulation
         self.lib = Python_Robot_Lib()
         self.position_dead_band = 0.5
@@ -37,7 +37,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
         #
         # Configure the motor
         self.lib.set_PID(P, I, D, Shift, self.smart_motor)
-        
+
         # Set motion parameter
         self.set_motion_parameters()
 
@@ -62,32 +62,32 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
     #
     def drive_to_initial_position(self, position_dead_band):
         if imax_regulation:
-            # Set the imax value high enough to move faster            
+            # Set the imax value high enough to move faster
             self.lib.set_imax(3000, self.smart_motor)
-        
+
         cur_pos = self.lib.get_current_value(self.position_sensor)
         # Move until it reaches the initial position
         while (abs(cur_pos-self.initial_position)> position_dead_band):
             self.lib.sendupdate(self.position_sensor, self.initial_range_end)
             cur_pos = self.lib.get_current_value(self.position_sensor)
             time.sleep(0.5)
-        
-        if imax_regulation:  
+
+        if imax_regulation:
           # Set the imax and max temperature to 0, to make sure that the joint stops
           self.lib.set_imax(0, self.smart_motor)
           self.lib.set_max_temperature(0, self.smart_motor)
-          
+
     ### Carry out Imax regulation
     #
     def move_joint_and_regule_imax(self, position_dead_band):
-        
+
         if imax_regulation:
             # Set imax and maximum temperature values to enable motion
             self.set_imax_regulation_parameters()
             imax = self.initial_imax
             self.lib.set_imax(imax, self.smart_motor)
             self.lib.set_max_temperature(15000, self.smart_motor)
-                      
+
         # Check if the joint has reached the final position
         cur_pos = self.lib.get_current_value(self.position_sensor)
         while abs(cur_pos - self.final_position) > position_dead_band:
@@ -97,7 +97,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
             # send the target position (repeated at each step maybe not always useful)
             self.lib.sendupdate(self, self.position_sensor, self.final_range_end)
             time.sleep(self.imax_time)
-            
+
             # Regulate the I_max value according to the motion speed
             prev_pos = cur_pos
             cur_pos = self.lib.get_current_value(self.position_sensor)
@@ -107,7 +107,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
                 if abs(cur_pos-prev_pos) < self.imax_min_delta_p:
                     imax += self.imax_inc
                     self.lib.set_imax(imax, self.smart_motor)
-                    
+
                 # if the joint is too fast, it decreases the imax value
                 elif abs(cur_pos-prev_pos) > self.imax_max_delta_p:
                     imax -= self.imax_dec
@@ -116,7 +116,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
         # Set the imax and max temperature to 0, to make sure that the joint stops
         self.lib.set_imax(0, self.smart_motor)
         self.lib.set_max_temperature(0, self.smart_motor)
-          
+
 
     ### set imax regulation parameters
     #
@@ -135,7 +135,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
             self.imax_time = 2
             self.imax_min_delta_p = 0.55
             self.imax_max_delta_p = 1
-    
+
     ### Set motion parameters
     #
     def set_motion_parameters(self):
@@ -149,7 +149,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
             self.initial_range_end = self.max_angle
             self.final_position = self.min_osc_angle
             self.final_range_end = self.min_angle
-        
+
 
 
     ### Prepare and run data treatment
@@ -160,18 +160,26 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
         # note: As the speed is very low:
         # D value should be closed to 0
         # I value should be rather high
-        
-        # For tests ONLY
-        if self.direction == 'forward':
-            data_location = "test.txt"
-        else:
-            data_location = "ffj4_pos_pid_backward_unique.txt"
 
-        # get measured data        
+        # For tests ONLY
+        data_location = ""
+        if self.direction == 'forward':
+            data_location = "/tmp/test.txt"
+        else:
+            data_location = "/tmp/ffj4_pos_pid_backward_unique.txt"
+
+        print "data loc: ", data_location
+
+        # get measured data
         [self.position_hex, self.pid_out_hex] = self.lib.get_data( data_location)
+
+        print "ok got data"
+
 
         # run data_treatment
         [self.position, self.pid_out] = self.data_treatment(self.position_hex, self.pid_out_hex)
+
+        print "ran treatment: ", self.position, " ", self.pid_out
 
         # return the final data
         return [self.position, self.pid_out]

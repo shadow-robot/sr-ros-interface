@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import subprocess, string
+import subprocess, string, os
 class Utilitarian(object):
-  
+
 ### Constructor
 #
     def __init__(self):
@@ -12,15 +12,15 @@ class Utilitarian(object):
 
 ### Delete tuples (positions, pid_out) recorded several times
 #
-    def delete_repeated_tuples(self, position, pid_out):        
+    def delete_repeated_tuples(self, position, pid_out):
         i = 0
         final_position = position
-        final_pid_out = pid_out                
-        while i < min(len(final_position), len(final_pid_out))-1:                        
+        final_pid_out = pid_out
+        while i < min(len(final_position), len(final_pid_out))-1:
             pos_tested = final_position[i]
             pid_out_tested = final_pid_out[i]
             j = i+1
-            while j < min(len(final_position), len(final_pid_out)): 
+            while j < min(len(final_position), len(final_pid_out)):
               if (final_position[i]==final_position[j]) and (final_pid_out[i] == final_pid_out[j]):
                   final_position.pop(j)
                   final_pid_out.pop(j)
@@ -30,71 +30,71 @@ class Utilitarian(object):
         return [final_position, final_pid_out]
 
 ### Conversion of the position from hexadecimal values to decimal values
-#  
+#
       # hexadecimal format:
 	# signed floats (twos complement) 16 bits; fraction length 8 bits
 	# positive values: from 0x0000 to 0x7fff
-	# negative values: from 0x7fff to 0xffff	      
+	# negative values: from 0x7fff to 0xffff
     def position_conversion_to_float(self,position_hex):
-      
+
 	position_length = len(position_hex)
-	
-	float_position=[]                
-	
+
+	float_position=[]
+
 	for i in range(position_length):
-	  
+
 	  # Convert position and pid_out to integer values
 	    # positive values: from 0 to 32767
 	    # negative values: from 32767 to 65535
-	    int_position = int(position_hex[i], 0) 
-	  
+	    int_position = int(position_hex[i], 0)
+
 	  # shift negative positions: from -32767 to 0
 	    if (int_position >= self.sign_parameter):
 	      int_position -= self.twos_complement_shift
-	    
-	    
+
+
 	  # get the float value of the position by shifting the point of 8 bits (/2**8)
 	    int_position /= 256.0
-	  
+
 	  # Add the float position value to the output list
 	    float_position = float_position + [int_position]
 	return float_position
-	
+
 	#print float_position
-    
-  
-  
-  
+
+
+
+
 ### Conversion of the position from hexadecimal values to decimal values
-#  
-      # hexadecimal format: 
+#
+      # hexadecimal format:
 	# signed integers (twos complement) 16 bits
 	# positive values: from 0x0000 to 0x7fff
-	# negative values: from 0x7fff to 0xffff  
+	# negative values: from 0x7fff to 0xffff
     def pid_out_conversion_to_float(self,pid_out_hex):
-      
+
 	pid_out_length = len(pid_out_hex)
 	float_pid_out=[]
-	
+
 	for i in range(pid_out_length):
-	  
+
 	  # Convert position and pid_out to integer values
 	    # positive values: from 0 to 32767
 	    # negative values: from 32767 to 65535
 	    int_pid_out = int(pid_out_hex[i],0)
-	  
+
 	  # shift negative PID out: from -32767 to 0
-	    if (int_pid_out >= self.sign_parameter):   
+	    if (int_pid_out >= self.sign_parameter):
 	      int_pid_out -= self.twos_complement_shift
-	      
+
 	  # Add the float PID values to output list
 	    float_pid_out = float_pid_out + [int_pid_out]
-	  
+
 	return float_pid_out
-	  
+
 	#print float_pid_out
-	
-### Sort the data per incresing positions 
+
+### Sort the data per incresing positions
 #
     def sort_data_per_inc_position(self, position, pid_out):
 	position_tmp = position
@@ -102,7 +102,7 @@ class Utilitarian(object):
       #normally pid and position should  have the  same length
 	length = min(len(position),len(pid_out))
 	position_sorted = []
-	pid_out_sorted = []    
+	pid_out_sorted = []
 	for i in range(length):
 	  # look for the smallest position in position_tmp
 	    index_min_pos = position_tmp.index(min(position_tmp))
@@ -113,8 +113,8 @@ class Utilitarian(object):
 	    position_tmp.pop(index_min_pos)
 	    pid_out_tmp.pop(index_min_pos)
 	return [position_sorted, pid_out_sorted]
-	
-	
+
+
 ### Return some joint characteristics
 #
       # Inputs: joint name and hand number
@@ -122,15 +122,15 @@ class Utilitarian(object):
       # Outputs:
 	    # min_angle
 	    # max_angle
-	    # node_id	
+	    # node_id
 	    # min_osc_angle: position where oscillations appear (with velocity loop)
 	    # max_osc_angle: position where oscillations appear (with velocity loop)
-      # Those joint characteristics are used to generate the U_map text file 
-      
+      # Those joint characteristics are used to generate the U_map text file
+
     def joint_characteristics(self, joint_name, hand_nb):
-	
-      # First finger 
-	if (joint_name == "FFJ1"): 
+
+      # First finger
+	if (joint_name == "FFJ1"):
             motor = 'ff0';      min_osc_angle = 5;       max_osc_angle = 85;
 	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '12' + '0310'
 	elif (joint_name == "FFJ2" ):
@@ -142,9 +142,9 @@ class Utilitarian(object):
 	elif (joint_name == "FFJ4"):
             motor = 'ff4';      min_osc_angle = -15;     max_osc_angle = 15;
 	    min_angle = -25;    max_angle = 25;     node_id = 'node ' + hand_nb + '11' + '0310'
-	
+
       # Medium finger
-        
+
 	elif ( joint_name == 'MFJ1'):
             motor = 'mf0';      min_osc_angle = 5;       max_osc_angle = 85;
 	    min_angle = 0;      max_angle = 90;     node_id = 'node ' + hand_nb + '02' + '0310'
@@ -157,7 +157,7 @@ class Utilitarian(object):
 	elif ( joint_name == 'MFJ4'):
             motor = 'mf4';      min_osc_angle = -15;     max_osc_angle = 15;
 	    min_angle = -25;    max_angle = 25;     node_id = 'node ' + hand_nb + '01' + '0310'
-    
+
       # Right Finger:
 	elif ( joint_name == 'RFJ1'):
             motor = 'rf0';      min_osc_angle = 5;       max_osc_angle = 85;
@@ -187,7 +187,7 @@ class Utilitarian(object):
 	    min_angle = -25;    max_angle = 25;     node_id = 'node ' + hand_nb + '10' + '0310'
 	elif ( joint_name == 'LFJ5'):
             motor = 'lf5';      min_osc_angle = 10;      max_osc_angle = 35;
-	    min_angle = 0;      max_angle = 45;     node_id = 'node ' + hand_nb + '06' + '0310'    
+	    min_angle = 0;      max_angle = 45;     node_id = 'node ' + hand_nb + '06' + '0310'
 
       # Thumb
 	elif ( joint_name == 'THJ1'):
@@ -215,21 +215,21 @@ class Utilitarian(object):
 	    min_angle = -30;    max_angle = 10;     node_id = 'node ' + hand_nb + '17' + '0310'
 	else:
 	  print "The joint is wrong it should be in the following format 'FFJ4'"
-	  return 
-	  
+	  return
+
 	return [min_angle, max_angle, node_id, motor, min_osc_angle, max_osc_angle]
-	            
+
 ### To run a command with a subprocess
 #
       # parameters:
 	  # command: the command line
     def run_command(self, command):
-      # launch the subprocess        
-        p = subprocess.Popen(command.split(),stdout=subprocess.PIPE)        
+      # launch the subprocess
+        p = subprocess.Popen(command.split(),stdout=subprocess.PIPE)
       # allow external program to work
         p.wait()
       # read and return the result to a string
-        result_str = p.stdout.read()        
+        result_str = p.stdout.read()
         return result_str
 
 ### run a command without waiting for the end of its execution
@@ -237,10 +237,10 @@ class Utilitarian(object):
     def run_command_wait_free(self, command):
       # launch the subprocess
         p = subprocess.Popen(command.split(),stdout=subprocess.PIPE)
-        return p 
-        
-### Compute the sign of a list    
-#   
+        return p
+
+### Compute the sign of a list
+#
       # return:
 	  # 1 if the majority of the parameter list elements are stricly positive
 	  # 0 if the number of positive and negative values in data_list is the same
@@ -251,7 +251,7 @@ class Utilitarian(object):
 	pos_counter = 0
       # Computation
 	for i in range(len(data_list)):
-	    if (data_list[i] > 0.0 ):		
+	    if (data_list[i] > 0.0 ):
 		pos_counter += 1
 	    elif (data_list[i] < 0.0):
 		neg_counter += 1
@@ -262,30 +262,30 @@ class Utilitarian(object):
 	    return -1
 	else:
 	    return 0
-	    
+
 ### Convert the position to the U_map format
 #
       # angles: signed float to unsigned integer coded on 16 bits
-          # conversion steps: 
+          # conversion steps:
                 # - *256 gives a signed integer
                 # - + 2^15 changes the top bit
                 # - conversion to hex considering the values as unsigned integers
     def set_pos_to_u_map_format(self, position):
-	u_map_position = []            
+	u_map_position = []
         for i in range(len(position)):
-	  u_map_position = u_map_position + [hex(2**15 + int(position[i] * 256))]	  
+	  u_map_position = u_map_position + [hex(2**15 + int(position[i] * 256))]
 	return u_map_position
-	
+
 
 ### Convert the pid output to the U_map format
 #
-      # PID: signed integer to signed float: 
+      # PID: signed integer to signed float:
             # Conversion steps:
                 # - /256 (move the point of 8 bits (2**8))
     def set_pid_to_u_map_format(self, pid):
 	u_map_pid = []
 	for i in range(len(pid)):
-	  u_map_pid = u_map_pid + [pid[i]/256.0]	  
+	  u_map_pid = u_map_pid + [pid[i]/256.0]
       	return u_map_pid
 
 
@@ -329,75 +329,86 @@ class Utilitarian(object):
 #
       # needs the direction to set the right table name
     def write_u_map_in_text_file(self, u_map_position, u_map_pid_out, output_file, node_id, direction):
-      # Text file name    
+      # Text file name
+          print "writing to : ", output_file
+          directory = "/".join(output_file.split("/")[:-1])
+          print "   -> ",directory
+          self.ensure_dir(directory)
+
           fout = open(output_file, 'w')
-          
-          
-      # Node id      
+
+
+      # Node id
           fout.write(node_id)
           fout.write('\n')
           fout.write('\n')
-          
+
           if (direction == "forward"):
-            # POSITIVE DIRECTION TABLE          
+            # POSITIVE DIRECTION TABLE
                 fout.write('#FRICTION_MAP_POSITIVE_DIRECTION')
                 fout.write('\n')
                 fout.write('tbl 5')
                 fout.write('\n')
           else:
-            # NEGATIVE DIRECTION TABLE      
+            # NEGATIVE DIRECTION TABLE
                 fout.write('#FRICTION_MAP_NEGATIVE_DIRECTION')
                 fout.write('\n')
                 fout.write('tbl 6')
                 fout.write('\n')
-              
-          for j in range(len(u_map_position)):        
+
+          for j in range(len(u_map_position)):
               fout.write(str(u_map_position[j]))
               fout.write(' @ ')
               fout.write(str(u_map_pid_out[j]))
               fout.write('\n')
           fout.write('\n')
-          
-          
+
+
 
 
 
 
 ### Write forward AND backward U_map values in ONE text file
 #
-      # Normally this function is unused but can be useful for debuging    
+      # Normally this function is unused but can be useful for debuging
     def write_forward_and_backward_u_map_in_one_text_file(self, u_map_position_forward, u_map_pid_out_forward, u_map_position_backward, u_map_pid_out_backward, output_file, node_id):
 
       # Text file name
           fout = open(output_file, 'w')
-          
-      # Node id      
+
+      # Node id
           fout.write(node_id)
           fout.write('\n')
           fout.write('\n')
-      
-      # POSITIVE DIRECTION TABLE          
+
+      # POSITIVE DIRECTION TABLE
           fout.write('#FRICTION_MAP_POSITIVE_DIRECTION')
           fout.write('\n')
           fout.write('tbl 5')
           fout.write('\n')
-          
-          for j in range(len(u_map_position_forward)):        
+
+          for j in range(len(u_map_position_forward)):
               fout.write(str(u_map_position_forward[j]))
               fout.write(' @ ')
               fout.write(str(u_map_pid_out_forward[j]))
               fout.write('\n')
           fout.write('\n')
-          
-          
-      # NEGATIVE DIRECTION TABLE      
+
+
+      # NEGATIVE DIRECTION TABLE
           fout.write('#FRICTION_MAP_NEGATIVE_DIRECTION')
           fout.write('\n')
           fout.write('tbl 6')
           fout.write('\n')
-          
+
           for j in range(len(u_map_position_backward)):
               fout.write(str(u_map_position_backward[j]))
               fout.write(' @ ')
               fout.write(str(u_map_pid_out_backward[j]))
               fout.write('\n')
+
+    def ensure_dir(self, f):
+        try:
+            os.makedirs(f)
+        except:
+            pass

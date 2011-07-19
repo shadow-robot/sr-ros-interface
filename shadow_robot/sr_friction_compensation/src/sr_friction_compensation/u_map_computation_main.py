@@ -23,23 +23,30 @@ class FrictionCompensation(object):
         self.I = I
         self.D = D
         self.shift = shift
-        self.stopped = True
+        self.stopped = False
         self.data_acquisition_python = None
 
    def run(self):
 
+      print " STARTING FC"
+
       computation_steps = ['forward', 'backward']
 
       for direction in computation_steps:
+         print " 1"
          if self.stopped:
             return
 
+         print "2"
+
          # Class instanciations
-         self.data_acquisition_python = U_Map_Data_Acquisition_Python(self.joint_name, direction, imax_regulation = 'false')
+         self.data_acquisition_python = U_Map_Data_Acquisition_Python(self.joint_name, direction, imax_regulation = False)
          output_file = U_Map_Output_File(self.joint_name, self.hand_number, direction)
 
 	 # Data acquisition
-         [ position, pid_out ] = data_acquisition_python.run_data_acquisition(self.P, self.I, self.D, self.shift)
+         [ position, pid_out ] = self.data_acquisition_python.run_data_acquisition(self.P, self.I, self.D, self.shift)
+         print "data acquired"
+
 
 	 # Output computation
          [u_map_position_float, u_map_pid_out_float, final_u_map_position, final_u_map_pid_out] = output_file.u_map_computation(position, pid_out, self.n)
@@ -63,10 +70,10 @@ class FrictionCompensation(object):
          # Send U_map table
          output_file.send_umap(final_u_map_position, final_u_map_pid_out)
 
-      def stop(self):
-         self.stopped = True
-         if self.data_acquisition_python != None:
-            self.data_acquisition_python.stop()
+   def stop(self):
+      self.stopped = True
+      if self.data_acquisition_python != None:
+         self.data_acquisition_python.stop()
 
 ### main execution
 #
