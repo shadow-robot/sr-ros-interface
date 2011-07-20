@@ -181,14 +181,18 @@ class Genetic_Algorithm(object):
         if first_genome_is_the_best==True:
             if self.fitness_vect0 != None:
                 basic_convergence_end=Record_Last_Data(self.fitness_vect0,self.first_genome,self.joint_name,self.clock_time)
+
 	else:
             if self.fitness_vect_next != None:
                 basic_convergence_end=Record_Last_Data(self.fitness_vect_next,self.genome_GA,self.joint_name,self.clock_time)
+
+        result = None
         if basic_convergence_end != None:
-            basic_convergence_end.record_data_in_file()
+            result = basic_convergence_end.record_data_in_file()
         self.stop_system()
 
-        return
+        return result
+
 
     def push_the_genome_on_robot_tree(self,genome):
 	"""

@@ -109,8 +109,6 @@ class Callback_EtherCAT (Subscriber_Movement):
             self.time=0
             time.sleep(1)
         else:
-            print "target received"
-
             if self.pos_received:
                 self.record_in_file(self.time,self.time_1, self.last_pos, msg.data)
                 self.time+=1
@@ -136,9 +134,7 @@ class Callback_EtherCAT (Subscriber_Movement):
 	@return: nothing
 	"""
 
-        target_topic_name = "/sh_"+self.joint_name.lower()+"_"+self.current_controller_name + "_controller/command/data"
-
-        print "subscribing to : ", target_topic_name
+        target_topic_name = "/sh_"+self.joint_name.lower()+"_"+self.current_controller_name + "_controller/command"
 
 	self.subscriber_target_  = rospy.Subscriber(target_topic_name, Float64, self.callback_target_)
         self.subscriber_pos_     = rospy.Subscriber("/joint_states", JointState, self.callback_pos_)

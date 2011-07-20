@@ -211,15 +211,14 @@ class RunGA(threading.Thread):
                                   self.callback,
                                   self.robot_lib)
     def run(self):
-	self.GA.give_life_to_the_system()
-
+	result = self.GA.give_life_to_the_system()
         if self.callback.subscriber_pos_ != None:
             self.callback.subscriber_pos_.unregister()
 
         if self.callback.subscriber_target_ != None:
             self.callback.subscriber_target_.unregister()
 
-        self.parent.ga_stopped(True)
+        self.parent.ga_stopped(result)
 
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):
@@ -505,12 +504,18 @@ class JointPidSetter(QtGui.QFrame):
                 self.tuning = True
                 self.btn_automatic_pid.setIcon(self.red_icon)
 
-    def ga_stopped(self, success = False):
-        if success:
-            rospy.loginfo("Successfully tuned the joint: " + self.joint_name)
+    def ga_stopped(self, result = None):
+        if result is not None:
+            ch = result["best_chromosome"]
+            #QtGui.QMessageBox.information( self,
+            #                               "Successfully tuned the joint: " + self.joint_name,
+            #                               " best fitness: " + str( result["best_fitness"]) +" for: [P:"+str( ch["p"] )+" I:"+str( ch["i"] ) +" D:"+str( ch["d"] )+" Imax:"+str( ch["imax"] )+"]" )
+
+            rospy.loginfo( "Successfully tuned the joint: " + self.joint_name + " best fitness: " + str( result["best_fitness"]) +" for: [P:"+str( ch["p"] )+" I:"+str( ch["i"] ) +" D:"+str( ch["d"] )+" Imax:"+str( ch["imax"] )+"]" )
+
         self.GA_thread.tuning = False
         self.GA_thread.robot_lib.stopped = True
-        if not success:
+        if result is None:
             self.GA_thread.join()
         self.GA_thread = None
 

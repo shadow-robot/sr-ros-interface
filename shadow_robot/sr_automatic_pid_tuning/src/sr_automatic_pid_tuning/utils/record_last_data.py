@@ -70,5 +70,11 @@ class Record_Last_Data(object):
 
         last_file.close()
 
-        return
+        return {"best_fitness":best_fit, "best_chromosome":{ "p": best_chrom[0],
+                                                             "i": best_chrom[1],
+                                                             "d": best_chrom[2],
+                                                             "imax": best_chrom[3],
+                                                             "deadband": best_chrom[4],
+                                                             "shift": best_chrom[5],
+                                                             "offset": best_chrom[6]} }
 
