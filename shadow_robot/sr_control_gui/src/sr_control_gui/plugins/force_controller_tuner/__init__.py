@@ -37,21 +37,38 @@ class AutomaticTuningDialog(QtGui.QDialog):
     """
     Set the parameters for the automatic pid tuner.
     """
-    def __init__(self, parent, joint_name):
+    def __init__(self, parent, joint_name, parameters, hidden_parameters):
         QtGui.QDialog.__init__(self,parent)
         self.layout = QtGui.QVBoxLayout()
 
-        frame = QtGui.QFrame()
+        self.ordered_parameters = [["population size", "int", 2, 30 ], ["number of generations", "int", 5, 100],["percentage of mutation", "float", 0.0, 1.0],
+                                   ["P_min", "int", 0, 10000], ["P_max", "int", 0, 10000],
+                                   ["I_min", "int", 0, 10000], ["I_max", "int", 0, 10000],
+                                   ["D_min", "int", 0, 10000], ["D_max", "int", 0, 10000],
+                                   ["Imax_min", "int", 0, 10000], ["Imax_max", "int", 0, 10000],
+                                   ["sign", "hidden"], ["max_pwm", "hidden"]]
 
-        self.ordered_parameters = [["population size", "int", 2, 30 ], ["number of generations", "int", 5, 100],["percentage of mutation", "float", 0.0, 1.0] ]
-        self.parameters = {"population size":10, "number of generations":7,"percentage of mutation":0.25}
+        min_max = self.compute_min_max( parameters, ["p", "i", "d", "imax"])
 
-        self.layout_ = QtGui.QHBoxLayout()
+        self.parameters = {"population size":10, "number of generations":7,"percentage of mutation":0.25,
+                           "P_min":min_max["p"][0], "P_max": min_max["p"][1],
+                           "I_min":min_max["i"][0], "I_max": min_max["i"][1],
+                           "D_min":min_max["d"][0], "D_max": min_max["d"][1],
+                           "Imax_min":min_max["imax"][0], "Imax_max": min_max["imax"][1],
+                           "sign": hidden_parameters["sign"][0],
+                           "max_pwm": hidden_parameters["max_pwm"][0]
+                           }
+        frame_ga = QtGui.QFrame()
+        frame_min_max = QtGui.QFrame()
+        layout_ga = QtGui.QHBoxLayout()
+        layout_min_max = QtGui.QHBoxLayout()
 
         self.text_edits = []
         for param in self.ordered_parameters:
+            if param[1] == "hidden":
+                continue
+
             label = QtGui.QLabel(param[0])
-            self.layout_.addWidget(label)
 
             text_edit = QtGui.QLineEdit()
             text_edit.setFixedHeight(30)
@@ -67,10 +84,19 @@ class AutomaticTuningDialog(QtGui.QDialog):
             text_edit.setValidator(validator)
 
             self.text_edits.append(text_edit)
-            self.layout_.addWidget(text_edit)
 
-        frame.setLayout(self.layout_)
-        self.layout.addWidget(frame)
+            if "_min" in param[0] or "_max" in param[0]:
+                layout_min_max.addWidget(label)
+                layout_min_max.addWidget(text_edit)
+            else:
+                layout_ga.addWidget(label)
+                layout_ga.addWidget(text_edit)
+
+        frame_ga.setLayout(layout_ga)
+        self.layout.addWidget(frame_ga)
+
+        frame_min_max.setLayout(layout_min_max)
+        self.layout.addWidget(frame_min_max)
 
         self.btn_box = QtGui.QDialogButtonBox(self)
         self.btn_box.setOrientation(QtCore.Qt.Horizontal)
@@ -83,9 +109,17 @@ class AutomaticTuningDialog(QtGui.QDialog):
         QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("rejected()"), self.reject)
         QtCore.QMetaObject.connectSlotsByName(self)
 
+    def compute_min_max(self, parameters, names):
+        min_max = {}
+        for name in names:
+            mini = max( parameters[name][0] - 500  , 0 )
+            maxi = min( parameters[name][0] + 500  , 10000 )
+            min_max[name] = [mini, maxi]
+        return min_max
+
     def getValues(self):
         for param,text_edit in zip(self.ordered_parameters, self.text_edits):
-            if param[1] == "int":
+            if param[1] == "int" or param[1] == "hidden":
                 self.parameters[ param[0] ] = text_edit.text().toInt()[0]
             elif param[1] == "float":
                 self.parameters[ param[0] ] = text_edit.text().toDouble()[0]
@@ -147,13 +181,18 @@ class RunGA(threading.Thread):
         self.tuning = True
         self.parameters = parameters
 
-	self.robot_lib=Robot_Lib_EtherCAT()
+	self.robot_lib=Robot_Lib_EtherCAT( max_pwm = parameters["max_pwm"], sign=parameters["sign"])
 	self.callback = Callback_EtherCAT(joint_name, "force")
 	##mettre ici le roslib
 	self.robot_lib.init_subscriber(self.callback)
 
 	self.GA=Genetic_Algorithm(parameters["population size"],
                                   parameters["number of generations"],
+                                  {"P_min":parameters["P_min"], "P_max": parameters["P_max"],
+                                   "I_min": parameters["I_min"], "I_max": parameters["I_max"],
+                                   "D_min": parameters["D_min"], "D_max":parameters["D_max"],
+                                   "Imax_min": parameters["Imax_min"], "Imax_max": parameters["Imax_max"],
+                                   "sign":parameters["sign"], "max_pwm":parameters["max_pwm"]},
                                   4, # number of genes affected by mutation
                                   parameters["percentage of mutation"],self.joint_name,
                                   "random",
@@ -449,7 +488,9 @@ class JointPidSetter(QtGui.QFrame):
                 self.btn_move.setIcon(self.green_icon)
                 self.btn_move.setEnabled(False)
 
-            aut_tuning_dialog = AutomaticTuningDialog( self, self.joint_name )
+            aut_tuning_dialog = AutomaticTuningDialog( self, self.joint_name,
+                                                       self.important_parameters,
+                                                       self.advanced_parameters)
             if aut_tuning_dialog.exec_():
                 pid_settings = aut_tuning_dialog.getValues()
 

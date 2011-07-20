@@ -5,15 +5,18 @@ import rospy
 
 import subprocess , time, string
 
+from sr_friction_compensation.lib.robot_lib import RobotLib
 from sr_friction_compensation.utils.utilitarian import Utilitarian
 
-class Python_Robot_Lib(object):
+class Python_Robot_Lib(RobotLib):
 
-### Constructor
-#
+    ### Constructor
+    #
     def __init__(self):
         self.utilitarian = Utilitarian()
 
+    ### Configure the motor
+    #
     def set_PID(self, P, I, D, Shift, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         options = 'sensor ' + position_sensor + ' target ' + target
@@ -27,11 +30,15 @@ class Python_Robot_Lib(object):
         options = 'sensor_imax 3000'
         self.contrlr(smart_motor, options)
 
+    ### Set imax value
+    #
     def set_imax(self, imax_value, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         options = 'sensor_imax '+imax_value
         self.contrlr(smart_motor, options)
 
+    ### Set the maximum temperature
+    #
     def set_max_temperature(self, temperature_value, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         options = 'max_temperature '+temperature_value
@@ -39,8 +46,8 @@ class Python_Robot_Lib(object):
 
 
 
-### listvalues in python
-#
+    ### Return the position value
+    #
     def get_current_value(self, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         command = "listvalues -i 1 -d 100 " + position_sensor
@@ -52,6 +59,8 @@ class Python_Robot_Lib(object):
         return result
         #print 'result = ' + result.strip('\n')
 
+    ### Launch the recording of position and pid output in a file
+    #
     def start_record(self, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         options = '-d 10 -r -p -l'
@@ -64,9 +73,13 @@ class Python_Robot_Lib(object):
         p = subprocess.Popen(command.split(),stdout=subprocess.PIPE)
         return [p , output_file]
 
+    ### Stop the record of position and PID output
+    #
     def stop_record(self, process):
         process.terminate()
 
+    ### Read measured data in file and return them in float format
+    #
     def get_data(self, data_location):
         # here data location is the name of the text file
         # Put data into lists
@@ -79,37 +92,43 @@ class Python_Robot_Lib(object):
         float_pid_out = self.utilitarian.pid_out_conversion_to_float(pid_out_hex)
 
         return [float_position, float_position]
-        
 
-### Sendupdate in python
-#
+
+    ### Sendupdate in python (send a position target)
+    #
     def sendupdate(self, joint_name, hand_nb, value):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         command = 'sendupdate ' + position_sensor + ' ' + value
         answer = self.utilitarian.run_command(command)
 
-### Contrlr in python
-#
+    ### Contrlr in python
+    #
     def contrlr(self, joint_name, hand_nb, options ):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         command = 'contrlr ' + smart_motor + ' ' + options
         answer = self.utilitarian.run_command(command)
 
-### Send the U_map table to the firmware
-#
+    ### Send the U_map table to the firmware
+    #
     def send_u_map_to_firmware(self, u_map_position, u_map_pid_out, direction, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
+
+        # Conversion to the U_map format
+        final_u_map_position = self.utilitarian.set_pos_to_u_map_format(u_map_position)
+        final_u_map_pid_out = self.utilitarian.set_pid_to_u_map_format(u_map_pid_out)
+
         # send the u_map table
         date = time.localtime()
         output_file =  "/tmp/" + str(date.tm_year)+ '_' + str(date.tm_mon)+ '_' +str(date.tm_mday)+ '_' +str(date.tm_hour)+ '_' +str(date.tm_min)+ '_' +str(date.tm_sec)+'/'+ joint_name + "_" + direction +"_friction_compensation.txt"
 
         # Generate u_map file
-        self.utilitarian.write_u_map_in_text_file(u_map_position, u_map_pid_out, output_file, node_id, direction )
+        self.utilitarian.write_u_map_in_text_file(final_u_map_position, final_u_map_pid_out, output_file, node_id, direction )
 
         command = "sendcal "+ output_file
         #answer = self.utilitarian.run_command(command)
 
-
+    ### Return firmware ids of the joint
+    #
     def get_joint_ids(self, joint_name, hand_nb):
         # First finger
         if (joint_name == "FFJ1"):
@@ -125,8 +144,7 @@ class Python_Robot_Lib(object):
             motor = 'ff4';
             node_id = 'node ' + hand_nb + '11' + '0310'
 
-      # Medium finger
-
+        # Medium finger
         elif ( joint_name == 'MFJ1'):
             motor = 'mf0';
             node_id = 'node ' + hand_nb + '02' + '0310'
@@ -140,7 +158,7 @@ class Python_Robot_Lib(object):
             motor = 'mf4';
             node_id = 'node ' + hand_nb + '01' + '0310'
 
-      # Right Finger:
+        # Right Finger:
         elif ( joint_name == 'RFJ1'):
             motor = 'rf0';
             node_id = 'node ' + hand_nb + '04' + '0310'
@@ -154,7 +172,7 @@ class Python_Robot_Lib(object):
             motor = 'rf4';
             node_id = 'node ' + hand_nb + '03' + '0310'
 
-      # Little finger
+        # Little finger
         elif ( joint_name == 'LFJ1'):
             motor = 'lf0';
             node_id = 'node ' + hand_nb + '09' + '0310'
@@ -171,7 +189,7 @@ class Python_Robot_Lib(object):
             motor = 'lf5';
             node_id = 'node ' + hand_nb + '06' + '0310'
 
-      # Thumb
+        # Thumb
         elif ( joint_name == 'THJ1'):
             motor = 'th1';
             node_id = 'node ' + hand_nb + '14' + '0310'
@@ -188,7 +206,7 @@ class Python_Robot_Lib(object):
             motor = 'th5';
             node_id = 'node ' + hand_nb + '20' + '0310'
 
-      # Wrist
+        # Wrist
         elif ( joint_name == 'WRJ1'):
             motor = 'wr1';
             node_id = 'node ' + hand_nb + '18' + '0310'

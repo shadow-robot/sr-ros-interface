@@ -5,10 +5,10 @@ import rospy
 
 import subprocess , time, string
 
+from sr_friction_compensation.lib.robot_lib import RobotLib
 from sr_friction_compensation.utils.utilitarian import Utilitarian
 
-class EtherCAT_Robot_Lib(object):
-
+class EtherCAT_Robot_Lib(RobotLib):
 ### Constructor
 #
     def __init__(self):

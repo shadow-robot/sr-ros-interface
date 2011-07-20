@@ -42,6 +42,7 @@ import signal
 class Genetic_Algorithm(object):
 
     def __init__(self,populationSize, numberOfGenerations,
+                 parameters_set,
                  numberOfGenesAffectedByMutation, percentageOfMutation,
                  jointName, init_genome_type, instance_callback,
                  robot_lib  ):
@@ -55,21 +56,25 @@ class Genetic_Algorithm(object):
         else:
             self.populationSize=populationSize
 
+        self.parameters_set = parameters_set
+
         self.chromosome=["P_sensor","I_sensor","D_sensor","Imax_sensor","DeadBand_sensor","Shift_sensor","Offset_sensor",0]
         self.numberOfGenerations=numberOfGenerations
         self.alien_genes=numberOfGenesAffectedByMutation
         self.percentageOfMutation=percentageOfMutation
         self.joint_name=jointName
         ##Sub SIG
-        fichier_path=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['PID_SIG_SUB_path']+self.joint_name+".txt"
-        fichier=open(fichier_path,"r")
-	line=fichier.readline()
-	fichier.close()
+        f_path=Path_Config_Dict.path_root + Path_Config_Dict.path_record_data['PID_SIG_SUB_path']+self.joint_name+".txt"
+        f=open(f_path,"r")
+	line=f.readline()
+	f.close()
 	self.PID=int(line)
 	##
         ##first genome
         self.answer=init_genome_type
-        self.genome=Genome(self.populationSize,self.alien_genes,self.percentageOfMutation,self.chromosome,self.answer)
+        self.genome=Genome(self.populationSize, self.parameters_set,
+                           self.alien_genes, self.percentageOfMutation,
+                           self.chromosome, self.answer)
         self.genome.choose_first_genome()
         self.first_genome=self.genome.get_actual_genome()
         ###Clock
