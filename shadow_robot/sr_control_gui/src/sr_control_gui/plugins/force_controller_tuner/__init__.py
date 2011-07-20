@@ -513,6 +513,17 @@ class JointPidSetter(QtGui.QFrame):
 
             rospy.loginfo( "Successfully tuned the joint: " + self.joint_name + " best fitness: " + str( result["best_fitness"]) +" for: [P:"+str( ch["p"] )+" I:"+str( ch["i"] ) +" D:"+str( ch["d"] )+" Imax:"+str( ch["imax"] )+"]" )
 
+            #use the best parameters
+            self.important_parameters["p"][0] = ch["p"]
+            self.important_parameters["p"][1].setText(str( ch["p"]) )
+            self.important_parameters["i"][0] = ch["i"]
+            self.important_parameters["i"][1].setText(str( ch["i"]) )
+            self.important_parameters["d"][0] = ch["d"]
+            self.important_parameters["d"][1].setText(str( ch["d"]) )
+            self.important_parameters["imax"][0] = ch["imax"]
+            self.important_parameters["imax"][1].setText(str( ch["imax"]) )
+            self.set_pid()
+
         self.GA_thread.tuning = False
         self.GA_thread.robot_lib.stopped = True
         if result is None:
