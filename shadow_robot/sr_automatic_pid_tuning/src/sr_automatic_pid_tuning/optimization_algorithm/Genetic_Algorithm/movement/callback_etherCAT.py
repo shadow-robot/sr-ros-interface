@@ -45,7 +45,7 @@ class Callback_EtherCAT (Subscriber_Movement):
         self.last_target = 0
         self.pos_received = False
         self.target_received = False
-        self.index_joint = None
+        self.index_joint = []
 
     def callback_pos_(self, msg):
 	"""
@@ -60,22 +60,33 @@ class Callback_EtherCAT (Subscriber_Movement):
         else:
             pos = 0.0
 
-            if self.index_joint == None:
+            names = []
+            if "J0" in self.joint_name:
+                finger = self.joint_name.split("J0")
+                names.append( finger[0]+"J1" )
+                names.append( finger[0]+"J2" )
+            else:
+                names.append( self.joint_name )
+
+            if self.index_joint == []:
                 for index,name in enumerate(msg.name):
-                    print name, " ", self.joint_name
-                    if name in self.joint_name:
-                        self.index_joint = index
-                        break
-            if self.index_joint is None:
+                    for joint_name in names:
+                        if name in joint_name:
+                            self.index_joint.append( index )
+
+            if len( self.index_joint ) == 0:
                 rospy.logerr("Joint not found: " + self.joint_name)
                 return
 
             if self.current_controller == self.possible_controllers["effort"]:
-                pos = msg.effort[self.index_joint]
+                for index_joint in self.index_joint:
+                    pos += msg.effort[index_joint]
             elif self.current_controller == self.possible_controllers["velocity"]:
-                pos = msg.velocity[self.index_joint]
+                for index_joint in self.index_joint:
+                    pos += msg.velocity[index_joint]
             elif self.current_controller == self.possible_controllers["position"]:
-                pos = msg.position[self.index_joint]
+                for index_joint in self.index_joint:
+                    pos = msg.position[self.index_joint]
 
             if self.target_received:
                 self.record_in_file(self.time,self.time_1,pos, self.last_target)

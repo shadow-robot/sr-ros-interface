@@ -176,8 +176,11 @@ class StepMovement(BaseMovement):
 
 
 class RunGA(threading.Thread):
-    def __init__(self, joint_name, parameters):
+    def __init__(self, joint_name, parameters, parent):
         threading.Thread.__init__(self)
+
+        self.parent = parent
+
         self.joint_name = joint_name
         self.tuning = True
         self.parameters = parameters
@@ -215,6 +218,8 @@ class RunGA(threading.Thread):
 
         if self.callback.subscriber_target_ != None:
             self.callback.subscriber_target_.unregister()
+
+        self.parent.ga_stopped(True)
 
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):
@@ -478,16 +483,7 @@ class JointPidSetter(QtGui.QFrame):
 
     def automatic_tuning(self):
         if self.tuning:
-            self.btn_automatic_pid.setIcon(self.green_icon)
-            self.GA_thread.tuning = False
-            self.GA_thread.robot_lib.stopped = True
-            self.GA_thread.join()
-            self.GA_thread = None
-
-            self.btn_automatic_pid.setIcon(self.green_icon)
-            self.tuning = False
-            self.btn_move.setEnabled(True)
-
+            self.ga_stopped()
         else:
             if self.moving:
                 self.full_movement.moving = False
@@ -503,13 +499,24 @@ class JointPidSetter(QtGui.QFrame):
             if aut_tuning_dialog.exec_():
                 pid_settings = aut_tuning_dialog.getValues()
 
-                self.GA_thread = RunGA(self.joint_name, pid_settings)
+                self.GA_thread = RunGA(self.joint_name, pid_settings, self)
                 self.GA_thread.start()
 
                 self.tuning = True
                 self.btn_automatic_pid.setIcon(self.red_icon)
 
+    def ga_stopped(self, success = False):
+        if success:
+            rospy.loginfo("Successfully tuned the joint: " + self.joint_name)
+        self.GA_thread.tuning = False
+        self.GA_thread.robot_lib.stopped = True
+        if not success:
+            self.GA_thread.join()
+        self.GA_thread = None
 
+        self.btn_automatic_pid.setIcon(self.green_icon)
+        self.tuning = False
+        self.btn_move.setEnabled(True)
 
 
     def set_pid(self):
