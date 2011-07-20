@@ -92,6 +92,8 @@ class Subscriber_Movement(object):
 	@return: nothing
 	"""
 
+        print "  recording: ", time, " ", time_1, " ",  position, " ",  target
+
 	fichier_saved0=open(self.path_complete_mvt, "a")
 	fichier_saved0.write("%s" %time_1)
 	fichier_saved0.write(" ")

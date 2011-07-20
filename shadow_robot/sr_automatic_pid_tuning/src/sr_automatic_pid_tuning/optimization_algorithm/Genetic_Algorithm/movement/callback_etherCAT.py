@@ -29,7 +29,7 @@ from sensor_msgs.msg import JointState
 import time
 
 class Callback_EtherCAT (Subscriber_Movement):
-    def __init__(self,joint_name, controller_type = "force"):
+    def __init__(self,joint_name, controller_type = "effort"):
 	Subscriber_Movement.__init__(self,joint_name)
 	self.pause=False
 	self.joint_name=joint_name
@@ -37,8 +37,9 @@ class Callback_EtherCAT (Subscriber_Movement):
         self.subscriber_pos_ = None
         self.subscriber_target_ = None
 
-        self.possible_controllers = {"force":0, "velocity":1, "position":2}
+        self.possible_controllers = {"effort":0, "velocity":1, "position":2}
         self.current_controller = self.possible_controllers[controller_type]
+        self.current_controller_name = controller_type
 
         self.last_pos = 0
         self.last_target = 0
@@ -67,8 +68,9 @@ class Callback_EtherCAT (Subscriber_Movement):
                         break
             if self.index_joint is None:
                 rospy.logerr("Joint not found: " + self.joint_name)
+                return
 
-            if self.current_controller == self.possible_controllers["force"]:
+            if self.current_controller == self.possible_controllers["effort"]:
                 pos = msg.effort[self.index_joint]
             elif self.current_controller == self.possible_controllers["velocity"]:
                 pos = msg.velocity[self.index_joint]
@@ -95,8 +97,9 @@ class Callback_EtherCAT (Subscriber_Movement):
         if self.pause==True:
             self.time=0
             time.sleep(1)
-
         else:
+            print "target received"
+
             if self.pos_received:
                 self.record_in_file(self.time,self.time_1, self.last_pos, msg.data)
                 self.time+=1
@@ -121,5 +124,10 @@ class Callback_EtherCAT (Subscriber_Movement):
 	init//calling callback
 	@return: nothing
 	"""
-	self.subscriber_target_    = rospy.Subscriber(self.topic_name, Float64, self.callback_target_)
-        self.subscriber_pos_ = rospy.Subscriber("/joint_states", JointState, self.callback_pos_)
+
+        target_topic_name = "/sh_"+self.joint_name.lower()+"_"+self.current_controller_name + "_controller/command/data"
+
+        print "subscribing to : ", target_topic_name
+
+	self.subscriber_target_  = rospy.Subscriber(target_topic_name, Float64, self.callback_target_)
+        self.subscriber_pos_     = rospy.Subscriber("/joint_states", JointState, self.callback_pos_)

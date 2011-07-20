@@ -21,11 +21,12 @@
 
 
 from sr_automatic_pid_tuning.communication_with_robot.robot_lib import Robot_Lib
-from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.global_movement import Global_Movement
 from sr_automatic_pid_tuning.fitness_function.fitness_function_GA import Fitness_Function_GA
 
 class Robot_Tree_Config_Automatic(object):
-    def __init__(self,genome,joint_name,instance_callback, robot_lib):
+    def __init__(self,genome,joint_name,instance_callback, robot_lib,
+                 global_movement):
+        self.global_movement = global_movement
 	self.genome=genome
 	self.joint_name=joint_name
         self.robot_lib = robot_lib
@@ -55,13 +56,12 @@ class Robot_Tree_Config_Automatic(object):
         Fellow the movement// com with sub// score //com with sub
         @return: the fitness vector in construction
         """
-        compute_the_movement=Global_Movement(self.joint_name,self.instance_callback, self.robot_lib)
-        compute_the_movement.run_movement_on_robot()
-        compute_the_movement.communication_with_subscriber_OFF()
+        self.global_movement.run_movement_on_robot()
+        self.global_movement.communication_with_subscriber_OFF()
         if not self.robot_lib.stopped:
             fitness_vector_partial=self.fitness_global.complete_fitness_vector(self.fitness_score)
             self.fitness_score=fitness_vector_partial
-            compute_the_movement.communication_with_subscriber_ON()
+            self.global_movement.communication_with_subscriber_ON()
 
         return self.fitness_score
 

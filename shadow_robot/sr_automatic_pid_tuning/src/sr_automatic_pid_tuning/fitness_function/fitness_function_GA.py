@@ -92,6 +92,8 @@ class Fitness_Function_GA(object):
         self.weighted_mean_()
         fit_global=0
         n=len(self.fit_part)
+        if n == 0:
+            return 0.
         summ=sum(self.fit_part)
         fit_global=summ/n
         self.global_fitness_score=fit_global
@@ -112,6 +114,9 @@ class Fitness_Function_GA(object):
 	self.vectors_getter=Get_Data_From_File_GA(self.joint_name)
         #get the vectors
         time_v,input_v,output_v=self.vectors_getter.get_vectors()
+
+        if len( time_v ) == 0:
+            return 0.
 
         self.partial_scores=[]
         #Computation of partial fitnesses scores in the same order then the coeff

@@ -26,6 +26,7 @@ import threading, time, math
 
 from std_msgs.msg import Float64
 
+from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement import *
 from sr_automatic_pid_tuning.communication_with_robot.robot_lib_etherCAT import Robot_Lib_EtherCAT
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.genetic_algorithm import Genetic_Algorithm
 from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.callback_etherCAT import Callback_EtherCAT
@@ -182,9 +183,16 @@ class RunGA(threading.Thread):
         self.parameters = parameters
 
 	self.robot_lib=Robot_Lib_EtherCAT( max_pwm = parameters["max_pwm"], sign=parameters["sign"])
-	self.callback = Callback_EtherCAT(joint_name, "force")
+
+	self.callback = Callback_EtherCAT(joint_name, "effort")
 	##mettre ici le roslib
 	self.robot_lib.init_subscriber(self.callback)
+
+        #specify the movement to do the tuning on
+        list_of_movements = [partial_movement_sinus.Partial_Movement_Sinus(self.joint_name, self.robot_lib)]
+
+        self.global_movement = global_movement.Global_Movement(self.joint_name, self.callback,
+                                                               self.robot_lib, list_of_movements)
 
 	self.GA=Genetic_Algorithm(parameters["population size"],
                                   parameters["number of generations"],
@@ -193,6 +201,7 @@ class RunGA(threading.Thread):
                                    "D_min": parameters["D_min"], "D_max":parameters["D_max"],
                                    "Imax_min": parameters["Imax_min"], "Imax_max": parameters["Imax_max"],
                                    "sign":parameters["sign"], "max_pwm":parameters["max_pwm"]},
+                                  self.global_movement,
                                   4, # number of genes affected by mutation
                                   parameters["percentage of mutation"],self.joint_name,
                                   "random",
