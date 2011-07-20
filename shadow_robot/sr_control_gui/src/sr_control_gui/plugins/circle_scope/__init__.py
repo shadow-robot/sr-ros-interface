@@ -459,7 +459,6 @@ class CircleScope(OpenGLGenericPlugin):
         self.all_pubs = []
         tmp = self.topic_checker.get_topics(publishers_only = True, topic_filter="std_msgs/Float64")
         for sub in tmp:
-            print sub
             topic = sub[0]
             if "position" in topic:
                 self.all_pubs.append(sub)

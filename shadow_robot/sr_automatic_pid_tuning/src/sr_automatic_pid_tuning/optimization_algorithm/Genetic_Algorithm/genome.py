@@ -29,14 +29,19 @@ import math
 
 class Genome(object):
 
-    def __init__(self,populationSize,numberOfGenesAffectedByMutation,percentageOfMutation,chromosome, init_genome_type):
+    def __init__(self,populationSize, parameters_set,
+                 numberOfGenesAffectedByMutation,
+                 percentageOfMutation, chromosome,
+                 init_genome_type):
+
+        self.parameters_set = parameters_set
         self.populationSize=populationSize
         self.percentageOfMutation=percentageOfMutation
         self.alien_genes=numberOfGenesAffectedByMutation
         self.chromosome=chromosome
         ##Protection against absurd choices on number of aliene genes
         if self.alien_genes>4:              #Only 4 genes can be affected by mutation
-            print("WARNING: wrong number of alien genes")
+            print "WARNING: Too many alien genes specified: ", self.alien_genes, " instead of 4"
             self.alien_genes=4
         if self.alien_genes<0:
             print("WARNING: wrong number of alien genes")
@@ -94,10 +99,10 @@ class Genome(object):
         col=0
 
         vector_of_ranges=[]
-        vector_of_ranges=[["P_sensor",Fitness_Config.coeff_dic['P_min'],Fitness_Config.coeff_dic['P_max']],
-                          ["I_sensor",Fitness_Config.coeff_dic['I_min'],Fitness_Config.coeff_dic['I_max']],
-                          ["D_sensor",Fitness_Config.coeff_dic['D_min'],Fitness_Config.coeff_dic['D_max']],
-                          ["Imax_sensor",Fitness_Config.coeff_dic['Imax_min'],Fitness_Config.coeff_dic['Imax_max']],
+        vector_of_ranges=[["P_sensor",self.parameters_set['P_min'],self.parameters_set['P_max']],
+                          ["I_sensor",self.parameters_set['I_min'],self.parameters_set['I_max']],
+                          ["D_sensor",self.parameters_set['D_min'],self.parameters_set['D_max']],
+                          ["Imax_sensor",self.parameters_set['Imax_min'],self.parameters_set['Imax_max']],
                           ["DeadBand_sensor",Fitness_Config.coeff_dic['DB']],
                           ["Shift_sensor",Fitness_Config.coeff_dic['Shift']],
                           ["Offset_sensor",Fitness_Config.coeff_dic['Offset']]]
