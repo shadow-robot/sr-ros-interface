@@ -45,7 +45,8 @@ namespace controller {
 
 SrhPositionController::SrhPositionController()
 : joint_state_(NULL), command_(0),
-  loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0)
+  loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
+  max_force_demand(1000.)
 {
 }
 
@@ -114,9 +115,11 @@ void SrhPositionController::starting()
   ROS_WARN("Reseting PID");
 }
 
-void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min)
+        void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min, const double &max_froce)
 {
   pid_controller_.setGains(p,i,d,i_max,i_min);
+
+  max_force_demand = max_force;
 }
 
 void SrhPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
@@ -162,6 +165,7 @@ void SrhPositionController::update()
 
   double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
 
+  commanded_effort = max(commanded_effort, max_force_demand);
 
   joint_state_->commanded_effort_ = commanded_effort;
 

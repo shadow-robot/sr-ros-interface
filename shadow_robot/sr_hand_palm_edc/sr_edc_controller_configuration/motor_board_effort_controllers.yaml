@@ -1,0 +1,17 @@
+lfj0:
+  pid:
+    p: 8
+    i: 800
+    d: 2
+    imax: 3
+    max_pwm: 1023
+    sign: 1
+
+lfj4:
+  pid:
+    p: 8
+    i: 800
+    d: 2
+    imax: 3
+    max_pwm: 1023
+    sign: 1

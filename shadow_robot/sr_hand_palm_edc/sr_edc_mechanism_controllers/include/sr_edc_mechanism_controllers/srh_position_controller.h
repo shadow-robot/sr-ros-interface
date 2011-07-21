@@ -127,6 +127,9 @@ private:
   void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 
   control_toolbox::PidGainsSetter pid_gains_setter;
+
+  ///clamps the force demand to this value
+  double max_force_demand;
 };
 
 } // namespace

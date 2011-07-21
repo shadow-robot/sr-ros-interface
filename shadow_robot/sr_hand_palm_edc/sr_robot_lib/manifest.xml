@@ -14,6 +14,7 @@
   <depend package="sr_robot_msgs"/>
 
   <depend package="roscpp"/>
+  <depend package="rospy"/>
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_hand_lib"/>
