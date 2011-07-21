@@ -104,7 +104,7 @@ namespace controller
     virtual void update();
 
     void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
-    void setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min);
+    void setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min, const double &max_force);
 
     std::string getJointName();
     pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
@@ -127,7 +127,7 @@ namespace controller
     double friction_compensation( double position );
     std::vector<joint_calibration::Point> read_friction_map();
     boost::shared_ptr<shadow_robot::JointCalibration> friction_interpoler;
- 
+
     ros::Subscriber sub_command_;
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 

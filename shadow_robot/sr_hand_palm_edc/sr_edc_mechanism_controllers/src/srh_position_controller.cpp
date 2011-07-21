@@ -116,7 +116,7 @@ namespace controller {
     ROS_WARN("Reseting PID");
   }
 
-  void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min)
+  void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min, const double &max_force)
   {
     pid_controller_.setGains(p,i,d,i_max,i_min);
 
@@ -167,7 +167,7 @@ namespace controller {
     double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
 
     commanded_effort += friction_compensation( joint_state_->position_ );
-    commanded_effort = max( commanded_effort, max_force_demand )
+    commanded_effort = max( commanded_effort, max_force_demand );
 
     joint_state_->commanded_effort_ = commanded_effort;
 
