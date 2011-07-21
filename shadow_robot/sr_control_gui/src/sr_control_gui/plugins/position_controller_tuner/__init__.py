@@ -49,16 +49,17 @@ class BaseMovement(object):
         pass
 
 class SinusoidMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 0.15):
+    def __init__(self, joint_name, amplitude = 0.15, offset = 0.):
         BaseMovement.__init__(self,joint_name)
         self.amplitude = amplitude
+        self.offset = offset
 
     def update(self, mvt_percentage):
-        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.)
+        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.) + self.offset
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 1.57, nb_steps = 50):
+    def __init__(self, joint_name, amplitude = 0.15, nb_steps = 50):
         BaseMovement.__init__(self,joint_name)
         self.amplitude = amplitude
         self.nb_steps  = nb_steps
@@ -84,10 +85,9 @@ class FullMovement(threading.Thread):
         self.moving = False
         self.joint_name = joint_name
         self.iterations = 10000
-        self.movements = [StepMovement(joint_name),
-                          SinusoidMovement(joint_name),
-                          SinusoidMovement(joint_name),
-                          StepMovement(joint_name, nb_steps = 10)]
+        self.movements = [StepMovement(joint_name, amplitude = 3.1),
+                          SinusoidMovement(joint_name, amplitude = 1.5, offset = 1.5),
+                          StepMovement(joint_name, nb_steps = 10, amplitude = 3.1)]
 
     def run(self):
         while(True):

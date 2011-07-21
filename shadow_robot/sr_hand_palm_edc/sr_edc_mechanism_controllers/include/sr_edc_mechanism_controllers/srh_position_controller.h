@@ -124,16 +124,18 @@ namespace controller
       realtime_tools::RealtimePublisher<
       pr2_controllers_msgs::JointControllerState> > controller_state_publisher_ ;
 
+    double friction_compensation( double position );
+    std::vector<joint_calibration::Point> read_friction_map();
+    boost::shared_ptr<shadow_robot::JointCalibration> friction_interpoler;
+ 
     ros::Subscriber sub_command_;
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 
     control_toolbox::PidGainsSetter pid_gains_setter;
 
-    double friction_compensation( double position );
-    std::vector<joint_calibration::Point> read_friction_map();
-    boost::shared_ptr<shadow_robot::JointCalibration> friction_interpoler;
-  };
-
+    ///clamps the force demand to this value
+    double max_force_demand;
+};
 } // namespace
 
 /* For the emacs weenies in the crowd.

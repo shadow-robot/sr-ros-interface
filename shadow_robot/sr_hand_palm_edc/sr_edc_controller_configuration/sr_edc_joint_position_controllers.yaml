@@ -100,10 +100,10 @@ sh_lfj4_position_controller:
   type: sr_edc_mechanism_controllers/SrhPositionController
   joint: LFJ4
   pid:
-    p: -2.0
-    i: -0.5
-    d: 0.0
-    i_clamp: 1.0
+    p: 2400.0
+    i: 25000.0
+    d: 50.
+    i_clamp: 400.0
 sh_lfj5_position_controller:
   type: sr_edc_mechanism_controllers/SrhPositionController
   joint: LFJ5

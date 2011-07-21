@@ -45,7 +45,8 @@ namespace controller {
 
   SrhPositionController::SrhPositionController()
     : joint_state_(NULL), command_(0),
-      loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0)
+      loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
+      max_force_demand(1000.)
   {
     friction_interpoler = boost::shared_ptr<shadow_robot::JointCalibration>( new shadow_robot::JointCalibration( read_friction_map() ) );
   }
@@ -118,6 +119,8 @@ namespace controller {
   void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min)
   {
     pid_controller_.setGains(p,i,d,i_max,i_min);
+
+    max_force_demand = max_force;
   }
 
   void SrhPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
@@ -164,6 +167,7 @@ namespace controller {
     double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
 
     commanded_effort += friction_compensation( joint_state_->position_ );
+    commanded_effort = max( commanded_effort, max_force_demand )
 
     joint_state_->commanded_effort_ = commanded_effort;
 
