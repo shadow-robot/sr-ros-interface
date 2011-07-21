@@ -1,14 +1,15 @@
 <package>
-  <description brief="sr_edc_calibration_controllers">
+  <description brief="sr_edc_mechanism_controllers">
 
-     The sr_edc_calibration_controllers package contains the controllers
-     used to bring all the joints in the etherCAT hand to a calibrated state.
+     The sr_edc_mechanism_controllers package contains different types of
+     controllers for the etherCAT hand:(fake) calibration controllers,
+     position controllers, velocity controllers, force controllers.
 
   </description>
   <author>Ugo Cupcic</author>
   <license>GPL</license>
   <review status="NA" notes=""/>
-  <url>http://ros.org/wiki/sr_edc_calibration_controllers</url>
+  <url>http://ros.org/wiki/sr_edc_mechanism_controllers</url>
 
   <depend package="std_msgs" />
   <depend package="std_srvs" />

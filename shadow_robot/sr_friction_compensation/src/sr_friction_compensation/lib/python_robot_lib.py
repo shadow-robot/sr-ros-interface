@@ -91,7 +91,7 @@ class Python_Robot_Lib(RobotLib):
         # pid_out
         float_pid_out = self.utilitarian.pid_out_conversion_to_float(pid_out_hex)
 
-        return [float_position, float_position]
+        return [float_position, float_pid_out]
 
 
     ### Sendupdate in python (send a position target)

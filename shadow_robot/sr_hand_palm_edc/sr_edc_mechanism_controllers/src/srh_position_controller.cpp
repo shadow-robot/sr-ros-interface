@@ -32,26 +32,29 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "sr_edc_calibration_controllers/srh_joint_velocity_controller.hpp"
+#include "sr_edc_mechanism_controllers/srh_position_controller.h"
+#include "angles/angles.h"
 #include "pluginlib/class_list_macros.h"
+#include <math.h>
 
-PLUGINLIB_DECLARE_CLASS(sr_edc_calibration_controllers, SrhJointVelocityController, controller::SrhJointVelocityController, pr2_controller_interface::Controller)
+PLUGINLIB_DECLARE_CLASS(sr_edc_mechanism_controllers, SrhPositionController, controller::SrhPositionController, pr2_controller_interface::Controller)
 
 using namespace std;
 
 namespace controller {
 
-SrhJointVelocityController::SrhJointVelocityController()
-: joint_state_(NULL), command_(0), robot_(NULL), last_time_(0), loop_count_(0)
+SrhPositionController::SrhPositionController()
+: joint_state_(NULL), command_(0),
+  loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0)
 {
 }
 
-SrhJointVelocityController::~SrhJointVelocityController()
+SrhPositionController::~SrhPositionController()
 {
   sub_command_.shutdown();
 }
 
-bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
+bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
 				   const control_toolbox::Pid &pid)
 {
   assert(robot);
@@ -61,8 +64,13 @@ bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, co
   joint_state_ = robot_->getJointState(joint_name);
   if (!joint_state_)
   {
-    ROS_ERROR("SrhJointVelocityController could not find joint named \"%s\"\n",
+    ROS_ERROR("SrhPositionController could not find joint named \"%s\"\n",
               joint_name.c_str());
+    return false;
+  }
+  if (!joint_state_->calibrated_)
+  {
+    ROS_ERROR("Joint %s not calibrated for SrhPositionController", joint_name.c_str());
     return false;
   }
 
@@ -71,25 +79,17 @@ bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, co
   pid_gains_setter.add(&pid_controller_);
   pid_gains_setter.advertise(node_);
 
-
   return true;
 }
 
-bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
 {
   assert(robot);
   node_ = n;
-  robot_ = robot;
 
   std::string joint_name;
   if (!node_.getParam("joint", joint_name)) {
     ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
-    return false;
-  }
-  if (!(joint_state_ = robot->getJointState(joint_name)))
-  {
-    ROS_ERROR("Could not find joint \"%s\" (namespace: %s)",
-              joint_name.c_str(), node_.getNamespace().c_str());
     return false;
   }
 
@@ -101,49 +101,69 @@ bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, ro
     new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
     (node_, "state", 1));
 
-  sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhJointVelocityController::setCommandCB, this);
+  sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhPositionController::setCommandCB, this);
 
   return init(robot, joint_name, pid);
 }
 
 
-void SrhJointVelocityController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min)
+void SrhPositionController::starting()
 {
-  pid_controller_.setGains(p,i,d,i_max,i_min);
-
+  command_ = joint_state_->position_;
+  pid_controller_.reset();
+  ROS_WARN("Reseting PID");
 }
 
-void SrhJointVelocityController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
+void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min)
+{
+  pid_controller_.setGains(p,i,d,i_max,i_min);
+}
+
+void SrhPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
 {
   pid_controller_.getGains(p,i,d,i_max,i_min);
 }
 
-std::string SrhJointVelocityController::getJointName()
+std::string SrhPositionController::getJointName()
 {
   return joint_state_->joint_->name;
 }
 
-// Set the joint velocity command
-void SrhJointVelocityController::setCommand(double cmd)
+// Set the joint position command
+void SrhPositionController::setCommand(double cmd)
 {
   command_ = cmd;
 }
 
-// Return the current velocity command
-void SrhJointVelocityController::getCommand(double  & cmd)
+// Return the current position command
+void SrhPositionController::getCommand(double & cmd)
 {
   cmd = command_;
 }
 
-void SrhJointVelocityController::update()
+void SrhPositionController::update()
 {
-  assert(robot_ != NULL);
-  ros::Time time = robot_->getTime();
+  if (!joint_state_->calibrated_)
+    return;
 
-  double error = joint_state_->velocity_ - command_;
-  dt_ = time - last_time_;
-  double command = pid_controller_.updatePid(error, dt_);
-  joint_state_->commanded_effort_ += command;
+  assert(robot_ != NULL);
+  double error(0);
+  ros::Time time = robot_->getTime();
+  assert(joint_state_->joint_);
+  dt_= time - last_time_;
+
+  if (!initialized_)
+  {
+    initialized_ = true;
+    command_ = joint_state_->position_;
+  }
+
+  error = joint_state_->position_ - command_;
+
+  double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
+
+
+  joint_state_->commanded_effort_ = commanded_effort;
 
   if(loop_count_ % 10 == 0)
   {
@@ -151,10 +171,11 @@ void SrhJointVelocityController::update()
     {
       controller_state_publisher_->msg_.header.stamp = time;
       controller_state_publisher_->msg_.set_point = command_;
-      controller_state_publisher_->msg_.process_value = joint_state_->velocity_;
+      controller_state_publisher_->msg_.process_value = joint_state_->position_;
+      controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
       controller_state_publisher_->msg_.error = error;
       controller_state_publisher_->msg_.time_step = dt_.toSec();
-      controller_state_publisher_->msg_.command = command;
+      controller_state_publisher_->msg_.command = commanded_effort;
 
       double dummy;
       getGains(controller_state_publisher_->msg_.p,
@@ -170,9 +191,9 @@ void SrhJointVelocityController::update()
   last_time_ = time;
 }
 
-void SrhJointVelocityController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
+void SrhPositionController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
 {
   command_ = msg->data;
 }
 
-} // namespace
+}

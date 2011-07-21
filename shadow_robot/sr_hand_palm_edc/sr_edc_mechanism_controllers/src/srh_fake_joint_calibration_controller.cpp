@@ -32,11 +32,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "sr_edc_calibration_controllers/srh_fake_joint_calibration_controller.h"
+#include "sr_edc_mechanism_controllers/srh_fake_joint_calibration_controller.h"
 #include "ros/time.h"
 #include "pluginlib/class_list_macros.h"
 
-PLUGINLIB_DECLARE_CLASS(sr_edc_calibration_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
+PLUGINLIB_DECLARE_CLASS(sr_edc_mechanism_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
 
 using namespace std;
 

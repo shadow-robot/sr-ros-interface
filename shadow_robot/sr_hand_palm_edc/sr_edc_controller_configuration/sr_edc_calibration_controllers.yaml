@@ -2,109 +2,109 @@
 # Shadow Hand Defines
 
 cal_sh_ffj0:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: FFJ2
   actuator: FFJ0
   transmission: ffmiddle_transmission
 cal_sh_ffj3:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: FFJ3
   actuator: FFJ3
   transmission: ffproximal_transmission
 cal_sh_ffj4:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: FFJ4
   actuator: FFJ4
   transmission: ffknuckle_transmission
 
 
 cal_sh_mfj0:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: MFJ2
   actuator: MFJ0
   transmission: mfmiddle_transmission
 cal_sh_mfj3:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: MFJ3
   actuator: MFJ3
   transmission: mfproximal_transmission
 cal_sh_mfj4:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: MFJ4
   actuator: MFJ4
   transmission: mfknuckle_transmission
 
 cal_sh_rfj0:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: RFJ2
   actuator: RFJ0
   transmission: rfmiddle_transmission
 cal_sh_rfj3:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: RFJ3
   actuator: RFJ3
   transmission: rfproximal_transmission
 cal_sh_rfj4:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: RFJ4
   actuator: RFJ4
   transmission: rfknuckle_transmission
 
 cal_sh_lfj0:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: LFJ2
   actuator: LFJ0
   transmission: lfmiddle_transmission
 cal_sh_lfj3:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: LFJ3
   actuator: LFJ3
   transmission: lfproximal_transmission
 cal_sh_lfj4:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: LFJ4
   actuator: LFJ4
   transmission: lfknuckle_transmission
 cal_sh_lfj5:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: LFJ5
   actuator: LFJ5
   transmission: lfmetacarpal_transmission
 
 
 cal_sh_thj1:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: THJ1
   actuator: THJ1
   transmission: thdistal_transmission
 cal_sh_thj2:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: THJ2
   actuator: THJ2
   transmission: thmiddle_transmission
 cal_sh_thj3:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: THJ3
   actuator: THJ3
   transmission: thhub_transmission
 cal_sh_thj4:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: THJ4
   actuator: THJ4
   transmission: thproximal_transmission
 cal_sh_thj5:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: THJ5
   actuator: THJ5
   transmission: thbase_transmission
 
 cal_sh_wrj1:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: WRJ1
   actuator: WRJ1
   transmission: palm_transmission
 cal_sh_wrj2:
-  type: sr_edc_calibration_controllers/SrhFakeJointCalibrationController
+  type: sr_edc_mechanism_controllers/SrhFakeJointCalibrationController
   joint: WRJ2
   actuator: WRJ2
   transmission: wrist_transmission

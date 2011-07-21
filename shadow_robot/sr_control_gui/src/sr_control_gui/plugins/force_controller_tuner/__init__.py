@@ -192,7 +192,9 @@ class RunGA(threading.Thread):
 	self.robot_lib.init_subscriber(self.callback)
 
         #specify the movement to do the tuning on
-        list_of_movements = [partial_movement_sinus.Partial_Movement_Sinus(self.joint_name, self.robot_lib)]
+        sin = partial_movement_sinus.Partial_Movement_Sinus(self.joint_name, self.robot_lib)
+        sin.rate = rospy.Rate(500)
+        list_of_movements = [sin]
 
         self.global_movement = global_movement.Global_Movement(self.joint_name, self.callback,
                                                                self.robot_lib, list_of_movements)
