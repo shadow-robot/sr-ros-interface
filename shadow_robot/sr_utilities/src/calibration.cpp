@@ -26,7 +26,7 @@
  *
  */
 
-#include "sr_robot_lib/calibration.hpp"
+#include "sr_utilities/calibration.hpp"
 
 #include <boost/assert.hpp>
 #include <algorithm>

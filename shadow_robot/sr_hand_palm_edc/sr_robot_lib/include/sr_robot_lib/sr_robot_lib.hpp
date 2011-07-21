@@ -43,7 +43,7 @@
 #include <sr_robot_msgs/ForceController.h>
 #include <sr_robot_msgs/SetDebugData.h>
 
-#include "sr_robot_lib/calibration.hpp"
+#include <sr_utilities/calibration.hpp>
 #include "sr_robot_lib/motor_updater.hpp"
 
 #include <sr_external_dependencies/types_for_external.h>

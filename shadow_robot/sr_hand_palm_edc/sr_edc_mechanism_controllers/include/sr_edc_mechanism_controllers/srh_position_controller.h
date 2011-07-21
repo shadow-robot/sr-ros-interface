@@ -69,66 +69,78 @@
 #include <std_msgs/Float64.h>
 #include <pr2_controllers_msgs/JointControllerState.h>
 
+#include <sr_utilities/calibration.hpp>
+
 namespace controller
 {
 
-class SrhPositionController : public pr2_controller_interface::Controller
-{
-public:
+  class SrhPositionController : public pr2_controller_interface::Controller
+  {
+  public:
 
-  SrhPositionController();
-  ~SrhPositionController();
+    SrhPositionController();
+    ~SrhPositionController();
 
-  bool init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,const control_toolbox::Pid &pid);
-  bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
+    bool init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,const control_toolbox::Pid &pid);
+    bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
 
-  /*!
-   * \brief Give set position of the joint for next update: revolute (angle) and prismatic (position)
-   *
-   * \param command
-   */
-  void setCommand(double cmd);
+    /*!
+     * \brief Give set position of the joint for next update: revolute (angle) and prismatic (position)
+     *
+     * \param command
+     */
+    void setCommand(double cmd);
 
-  /*!
-   * \brief Get latest position command to the joint: revolute (angle) and prismatic (position).
-   */
-   void getCommand(double & cmd);
+    /*!
+     * \brief Get latest position command to the joint: revolute (angle) and prismatic (position).
+     */
+    void getCommand(double & cmd);
 
-  virtual void starting();
+    virtual void starting();
 
-  /*!
-   * \brief Issues commands to the joint. Should be called at regular intervals
-   */
-  virtual void update();
+    /*!
+     * \brief Issues commands to the joint. Should be called at regular intervals
+     */
+    virtual void update();
 
-  void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
-  void setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min);
+    void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
+    void setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min);
 
-  std::string getJointName();
-  pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
-  ros::Duration dt_;
-  double command_;                            /**< Last commanded position. */
+    std::string getJointName();
+    pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
+    ros::Duration dt_;
+    double command_;                            /**< Last commanded position. */
 
-private:
-  int loop_count_;
-  bool initialized_;
-  pr2_mechanism_model::RobotState *robot_;              /**< Pointer to robot structure. */
-  control_toolbox::Pid pid_controller_;       /**< Internal PID controller. */
-  ros::Time last_time_;                          /**< Last time stamp of update. */
+  private:
+    int loop_count_;
+    bool initialized_;
+    pr2_mechanism_model::RobotState *robot_;              /**< Pointer to robot structure. */
+    control_toolbox::Pid pid_controller_;       /**< Internal PID controller. */
+    ros::Time last_time_;                          /**< Last time stamp of update. */
 
+    ros::NodeHandle node_;
 
-  ros::NodeHandle node_;
-
-  boost::scoped_ptr<
-    realtime_tools::RealtimePublisher<
+    boost::scoped_ptr<
+      realtime_tools::RealtimePublisher<
       pr2_controllers_msgs::JointControllerState> > controller_state_publisher_ ;
 
-  ros::Subscriber sub_command_;
-  void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+    ros::Subscriber sub_command_;
+    void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 
-  control_toolbox::PidGainsSetter pid_gains_setter;
-};
+    control_toolbox::PidGainsSetter pid_gains_setter;
+
+    double friction_compensation( double position );
+    std::vector<joint_calibration::Point> read_friction_map();
+    boost::shared_ptr<shadow_robot::JointCalibration> friction_interpoler;
+  };
 
 } // namespace
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
+
 
 #endif

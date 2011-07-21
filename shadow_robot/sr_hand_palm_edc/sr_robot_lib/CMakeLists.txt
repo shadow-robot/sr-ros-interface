@@ -21,12 +21,10 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/calibration.cpp src/sr_robot_lib.cpp src/motor_updater.cpp)
+rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/sr_robot_lib.cpp src/motor_updater.cpp)
 
 ###############
 #     TESTS
-rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/calibration.cpp)
-
 SET(jenkins $ENV{JENKINS})
 
 IF(DEFINED jenkins)
@@ -34,7 +32,7 @@ IF(DEFINED jenkins)
   set_property(TARGET gcov PROPERTY IMPORTED_LOCATION /usr/lib/gcc/i486-linux-gnu/4.4/libgcov.a)
 ENDIF(DEFINED jenkins)
 
-rosbuild_add_executable(test/test_robot_lib test/test_robot_lib.cpp src/sr_robot_lib.cpp src/sr_hand_lib.cpp src/calibration.cpp src/motor_updater.cpp)
+rosbuild_add_executable(test/test_robot_lib test/test_robot_lib.cpp src/sr_robot_lib.cpp src/sr_hand_lib.cpp src/motor_updater.cpp)
 IF(DEFINED jenkins)
   rosbuild_add_compile_flags(test/test_robot_lib -g -pg -fprofile-arcs -ftest-coverage)
   target_link_libraries(test/test_robot_lib gcov)

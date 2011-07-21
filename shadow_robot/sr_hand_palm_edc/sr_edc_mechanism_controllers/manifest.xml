@@ -13,9 +13,11 @@
 
   <depend package="std_msgs" />
   <depend package="std_srvs" />
-  <depend package="pr2_controller_interface" />
-
   <depend package="roscpp" />
+
+  <depend package="sr_utilities" />
+
+  <depend package="pr2_controller_interface" />
   <depend package="pr2_mechanism_model" />
   <depend package="realtime_tools" />
   <depend package="robot_mechanism_controllers" />

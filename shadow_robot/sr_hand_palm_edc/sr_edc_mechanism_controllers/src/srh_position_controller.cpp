@@ -43,157 +43,231 @@ using namespace std;
 
 namespace controller {
 
-SrhPositionController::SrhPositionController()
-: joint_state_(NULL), command_(0),
-  loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0)
-{
-}
-
-SrhPositionController::~SrhPositionController()
-{
-  sub_command_.shutdown();
-}
-
-bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
-				   const control_toolbox::Pid &pid)
-{
-  assert(robot);
-  robot_ = robot;
-  last_time_ = robot->getTime();
-
-  joint_state_ = robot_->getJointState(joint_name);
-  if (!joint_state_)
+  SrhPositionController::SrhPositionController()
+    : joint_state_(NULL), command_(0),
+      loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0)
   {
-    ROS_ERROR("SrhPositionController could not find joint named \"%s\"\n",
-              joint_name.c_str());
-    return false;
+    friction_interpoler = boost::shared_ptr<shadow_robot::JointCalibration>( new shadow_robot::JointCalibration( read_friction_map() ) );
   }
-  if (!joint_state_->calibrated_)
+
+  SrhPositionController::~SrhPositionController()
   {
-    ROS_ERROR("Joint %s not calibrated for SrhPositionController", joint_name.c_str());
-    return false;
+    sub_command_.shutdown();
   }
 
-  pid_controller_ = pid;
+  bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
+                                   const control_toolbox::Pid &pid)
+  {
+    assert(robot);
+    robot_ = robot;
+    last_time_ = robot->getTime();
 
-  pid_gains_setter.add(&pid_controller_);
-  pid_gains_setter.advertise(node_);
+    joint_state_ = robot_->getJointState(joint_name);
+    if (!joint_state_)
+    {
+      ROS_ERROR("SrhPositionController could not find joint named \"%s\"\n",
+                joint_name.c_str());
+      return false;
+    }
+    if (!joint_state_->calibrated_)
+    {
+      ROS_ERROR("Joint %s not calibrated for SrhPositionController", joint_name.c_str());
+      return false;
+    }
 
-  return true;
-}
+    pid_controller_ = pid;
 
-bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
-{
-  assert(robot);
-  node_ = n;
+    pid_gains_setter.add(&pid_controller_);
+    pid_gains_setter.advertise(node_);
 
-  std::string joint_name;
-  if (!node_.getParam("joint", joint_name)) {
-    ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
-    return false;
+    return true;
   }
 
-  control_toolbox::Pid pid;
-  if (!pid.init(ros::NodeHandle(node_, "pid")))
-    return false;
+  bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  {
+    assert(robot);
+    node_ = n;
 
-  controller_state_publisher_.reset(
-    new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
-    (node_, "state", 1));
+    std::string joint_name;
+    if (!node_.getParam("joint", joint_name)) {
+      ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
+      return false;
+    }
 
-  sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhPositionController::setCommandCB, this);
+    control_toolbox::Pid pid;
+    if (!pid.init(ros::NodeHandle(node_, "pid")))
+      return false;
 
-  return init(robot, joint_name, pid);
-}
+    controller_state_publisher_.reset(
+      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
+      (node_, "state", 1));
+
+    sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhPositionController::setCommandCB, this);
+
+    return init(robot, joint_name, pid);
+  }
 
 
-void SrhPositionController::starting()
-{
-  command_ = joint_state_->position_;
-  pid_controller_.reset();
-  ROS_WARN("Reseting PID");
-}
+  void SrhPositionController::starting()
+  {
+    command_ = joint_state_->position_;
+    pid_controller_.reset();
+    ROS_WARN("Reseting PID");
+  }
 
-void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min)
-{
-  pid_controller_.setGains(p,i,d,i_max,i_min);
-}
+  void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min)
+  {
+    pid_controller_.setGains(p,i,d,i_max,i_min);
+  }
 
-void SrhPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
-{
-  pid_controller_.getGains(p,i,d,i_max,i_min);
-}
+  void SrhPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
+  {
+    pid_controller_.getGains(p,i,d,i_max,i_min);
+  }
 
-std::string SrhPositionController::getJointName()
-{
-  return joint_state_->joint_->name;
-}
+  std::string SrhPositionController::getJointName()
+  {
+    return joint_state_->joint_->name;
+  }
 
 // Set the joint position command
-void SrhPositionController::setCommand(double cmd)
-{
-  command_ = cmd;
-}
+  void SrhPositionController::setCommand(double cmd)
+  {
+    command_ = cmd;
+  }
 
 // Return the current position command
-void SrhPositionController::getCommand(double & cmd)
-{
-  cmd = command_;
-}
-
-void SrhPositionController::update()
-{
-  if (!joint_state_->calibrated_)
-    return;
-
-  assert(robot_ != NULL);
-  double error(0);
-  ros::Time time = robot_->getTime();
-  assert(joint_state_->joint_);
-  dt_= time - last_time_;
-
-  if (!initialized_)
+  void SrhPositionController::getCommand(double & cmd)
   {
-    initialized_ = true;
-    command_ = joint_state_->position_;
+    cmd = command_;
   }
 
-  error = joint_state_->position_ - command_;
-
-  double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
-
-
-  joint_state_->commanded_effort_ = commanded_effort;
-
-  if(loop_count_ % 10 == 0)
+  void SrhPositionController::update()
   {
-    if(controller_state_publisher_ && controller_state_publisher_->trylock())
+    if (!joint_state_->calibrated_)
+      return;
+
+    assert(robot_ != NULL);
+    double error(0);
+    ros::Time time = robot_->getTime();
+    assert(joint_state_->joint_);
+    dt_= time - last_time_;
+
+    if (!initialized_)
     {
-      controller_state_publisher_->msg_.header.stamp = time;
-      controller_state_publisher_->msg_.set_point = command_;
-      controller_state_publisher_->msg_.process_value = joint_state_->position_;
-      controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
-      controller_state_publisher_->msg_.error = error;
-      controller_state_publisher_->msg_.time_step = dt_.toSec();
-      controller_state_publisher_->msg_.command = commanded_effort;
-
-      double dummy;
-      getGains(controller_state_publisher_->msg_.p,
-               controller_state_publisher_->msg_.i,
-               controller_state_publisher_->msg_.d,
-               controller_state_publisher_->msg_.i_clamp,
-               dummy);
-      controller_state_publisher_->unlockAndPublish();
+      initialized_ = true;
+      command_ = joint_state_->position_;
     }
+
+    error = joint_state_->position_ - command_;
+
+    double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
+
+    commanded_effort += friction_compensation( joint_state_->position_ );
+
+    joint_state_->commanded_effort_ = commanded_effort;
+
+    if(loop_count_ % 10 == 0)
+    {
+      if(controller_state_publisher_ && controller_state_publisher_->trylock())
+      {
+        controller_state_publisher_->msg_.header.stamp = time;
+        controller_state_publisher_->msg_.set_point = command_;
+        controller_state_publisher_->msg_.process_value = joint_state_->position_;
+        controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
+        controller_state_publisher_->msg_.error = error;
+        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.command = commanded_effort;
+
+        double dummy;
+        getGains(controller_state_publisher_->msg_.p,
+                 controller_state_publisher_->msg_.i,
+                 controller_state_publisher_->msg_.d,
+                 controller_state_publisher_->msg_.i_clamp,
+                 dummy);
+        controller_state_publisher_->unlockAndPublish();
+      }
+    }
+    loop_count_++;
+
+    last_time_ = time;
   }
-  loop_count_++;
 
-  last_time_ = time;
+  double SrhPositionController::friction_compensation( double position )
+  {
+    double compensation = 0.0;
+    compensation = friction_interpoler->compute( position );
+    return compensation;
+  }
+
+  void SrhPositionController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
+  {
+    command_ = msg->data;
+  }
+
+
+  std::vector<joint_calibration::Point> SrhPositionController::read_friction_map()
+  {
+    std::vector<joint_calibration::Point> friction_map;
+    std::string param_name = "sr_friction_map";
+
+    bool joint_not_found = true;
+
+    XmlRpc::XmlRpcValue calib;
+    node_.getParam(param_name, calib);
+    ROS_ASSERT(calib.getType() == XmlRpc::XmlRpcValue::TypeArray);
+    //iterate on all the joints
+    for(int32_t index_cal = 0; index_cal < calib.size(); ++index_cal)
+    {
+      //check the calibration is well formatted:
+      // first joint name, then calibration table
+      ROS_ASSERT(calib[index_cal][0].getType() == XmlRpc::XmlRpcValue::TypeString);
+      ROS_ASSERT(calib[index_cal][1].getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+      std::string joint_name = static_cast<std::string> (calib[index_cal][0]);
+
+      if(  joint_name.compare( getJointName() ) != 0 )
+        continue;
+
+      joint_not_found = false;
+      //now iterates on the calibration table for the current joint
+      for(int32_t index_table=0; index_table < calib[index_cal][1].size(); ++index_table)
+      {
+        ROS_ASSERT(calib[index_cal][1][index_table].getType() == XmlRpc::XmlRpcValue::TypeArray);
+        //only 2 values per calibration point: raw and calibrated (doubles)
+        ROS_ASSERT(calib[index_cal][1][index_table].size() == 2);
+        ROS_ASSERT(calib[index_cal][1][index_table][0].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        ROS_ASSERT(calib[index_cal][1][index_table][1].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+
+
+        joint_calibration::Point point_tmp;
+        point_tmp.raw_value = static_cast<double> (calib[index_cal][1][index_table][0]);
+        point_tmp.calibrated_value = static_cast<double> (calib[index_cal][1][index_table][1]);
+        friction_map.push_back(point_tmp);
+      }
+
+      break;
+    }
+
+    if( joint_not_found )
+    {
+      joint_calibration::Point point_tmp;
+      point_tmp.raw_value = 0.0;
+      point_tmp.calibrated_value = 0.0;
+      friction_map.push_back(point_tmp);
+      friction_map.push_back(point_tmp);
+    }
+
+    return friction_map;
+  } //end read_friction_map
+
+
 }
 
-void SrhPositionController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
-{
-  command_ = msg->data;
-}
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
 
-}
+

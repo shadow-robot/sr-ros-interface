@@ -25,7 +25,7 @@
  *
  */
 
-#include "sr_robot_lib/calibration.hpp"
+#include "sr_utilities/calibration.hpp"
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 
