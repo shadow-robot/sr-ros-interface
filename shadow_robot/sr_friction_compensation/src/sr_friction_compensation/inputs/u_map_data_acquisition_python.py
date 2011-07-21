@@ -60,11 +60,14 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
             self.lib.set_imax(3000, self.joint_name, self.hand_nb)
 
         cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
+        initial_time = time.time()
+        t = time.time()        
         # Move until it reaches the initial position
-        while (abs(cur_pos-self.initial_position)> position_dead_band):
+        while (abs(cur_pos-self.initial_position)> position_dead_band)and (abs(initial_time-t)<300):
             self.lib.sendupdate(self.joint_name, self.hand_nb, self.initial_range_end)
             cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
             time.sleep(0.5)
+            t = time.time()
 
         if imax_regulation:
           # Set the imax and max temperature to 0, to make sure that the joint stops
@@ -84,7 +87,9 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
 
         # Check if the joint has reached the final position
         cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
-        while abs(cur_pos - self.final_position) > position_dead_band:
+        initial_time = time.time()
+        t = time.time()
+        while (abs(cur_pos - self.final_position) > position_dead_band) and (abs(initial_time-t)<300):
             if self.stopped:
                 break
 
@@ -106,6 +111,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
                 elif abs(cur_pos-prev_pos) > self.imax_max_delta_p:
                     imax -= self.imax_dec
                     self.lib.set_imax(imax, self.joint_name, self.hand_nb)
+            t = time.time()
 
         # Set the imax and max temperature to 0, to make sure that the joint stops
         self.lib.set_imax(0, self.joint_name, self.hand_nb)
