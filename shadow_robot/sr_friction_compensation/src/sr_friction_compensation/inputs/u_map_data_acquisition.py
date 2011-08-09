@@ -77,15 +77,21 @@ class U_Map_Data_Acquisition(object):
       # Delete tuples (positions, pid_out) recorded several times
     [self.position_uniq, self.pid_out_uniq] = self.utilitarian.delete_repeated_tuples(position_float, pid_out_float)
 
-     
+    # Display the filtered data in columns
+    #print "\n", "Unique data:"
+    #for i in range(len(self.position_uniq)):
+        #print i, "\t",self.position_uniq[i], "\t", self.pid_out_uniq[i] 
+        
       # Filter the data with a first order filter
-    self.position_filtered_1o = self.filter_1o.filter_fun(self.position_uniq, 0.05)
-    self.pid_out_filtered_1o = self.filter_1o.filter_fun(self.pid_out_uniq, 0.5)
+    #self.position_filtered_1o = self.filter_1o.filter_fun(self.position_uniq, 0.05)
+    #self.pid_out_filtered_1o = self.filter_1o.filter_fun(self.pid_out_uniq, 0.5)
+    self.position_filtered_1o = self.filter_1o.filter_fun(self.position_float, 0.05)
+    self.pid_out_filtered_1o = self.filter_1o.filter_fun(self.pid_out_float, 0.5)
 
     # Display the filtered data in columns
-          #print "\n", "Filtered data:"
-          #for i in range(len(self.position_filtered_1o)):
-            #print i, "\t",self.position_filtered_1o[i], "\t", self.pid_out_filtered_1o[i]
+    #print "\n", "Filtered data:"
+    #for i in range(len(self.position_filtered_1o)):
+       #print i, "\t",self.position_filtered_1o[i], "\t", self.pid_out_filtered_1o[i]
 
     # Sorting the data per increasing position
     [self.sorted_position, self.sorted_pid_out] = self.utilitarian.sort_data_per_inc_position(self.position_filtered_1o, self.pid_out_filtered_1o)

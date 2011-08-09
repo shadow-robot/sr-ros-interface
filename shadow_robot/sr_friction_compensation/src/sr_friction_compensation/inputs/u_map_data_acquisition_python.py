@@ -6,136 +6,113 @@ import rospy
 
 import time, string
 from sr_friction_compensation.inputs.u_map_data_acquisition import U_Map_Data_Acquisition
-
+from sr_friction_compensation.lib.python_robot_lib import Python_Robot_Lib
 class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
     ### Constructor
-    #
-    def __init__(self, joint_name, hand_nb, direction, lib, imax_regulation):
+    #    
+    def __init__(self, joint_name, hand_nb, direction, lib):
         U_Map_Data_Acquisition.__init__(self, joint_name, hand_nb, direction)
-
-        self.imax_regulation = imax_regulation
-        self.lib = lib
-        self.position_dead_band = 0.5
-        self.initial_imax = []
-        self.imax_inc = []
-        self.imax_dec = []
-        self.imax_time =[]
-        self.imax_min_delta_p = []
-        self.imax_max_delta_p = []        
-        [self.min_angle, self.max_angle, self.min_osc_angle, self.max_osc_angle] = self.utilitarian.joint_characteristics(self.joint_name, self.hand_nb)
+        print direction
         
+        self.lib = lib
+        self.position_dead_band = 1
+        [self.min_angle, self.max_angle, self.min_osc_angle, self.max_osc_angle] = self.utilitarian.joint_characteristics(self.joint_name, self.hand_nb)
+        self.initial_position = []
+        self.initial_range_end = []
+        self.final_position = []
+        self.final_range_end = []
     ### Run measurements in Python
     #
     def measurement_process(self, P, I, D, shift):
         ## Measurements preparation
         #
         # Configure the motor
-        self.lib.set_PID(P, I, D, Shift, self.joint_name, self.hand_nb)
+        self.lib.set_PID(P, I, D, shift, self.joint_name, self.hand_nb)
 
         # Set motion parameter
-        self.set_motion_parameters()
+        self.set_motion_parameters()  
+        
 
         # Drive the joint to the initial position
         self.drive_to_initial_position(self.position_dead_band)
 
-        # Measurements
-        #
-        # Start recording data
-        [process, data_location] = self.lib.start_record()
+        ## Measurements
+        ##
+        ## Start recording data
+        [process, data_location] = self.lib.start_record(self.joint_name, self.hand_nb)
+        print 'started'
+        time.sleep(1)
 
-        # Move the joint
-        self.move_joint_and_regule_imax( self.position_dead_band)
+        ## Move the joint        
+        self.move_joint( self.position_dead_band)
 
-        # Stop recording data
+        ## Stop recording data
         self.lib.stop_record(process)
+        print 'stop'
 
-        # Return the measurement file
+        ## Return the measurement file
+        print data_location
         return data_location
+        
 
     ### Drive the joint to initial position
     #
     def drive_to_initial_position(self, position_dead_band):
-        if imax_regulation:
-            # Set the imax value high enough to move faster
-            self.lib.set_imax(3000, self.joint_name, self.hand_nb)
+        
+       
 
         cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
         initial_time = time.time()
         t = time.time()        
+        print cur_pos
         # Move until it reaches the initial position
-        while (abs(cur_pos-self.initial_position)> position_dead_band)and (abs(initial_time-t)<300):
+        while (abs(cur_pos-self.initial_position)> position_dead_band)and (abs(initial_time-t)<100):
+            print abs(cur_pos-self.initial_position)
             self.lib.sendupdate(self.joint_name, self.hand_nb, self.initial_range_end)
+            #print self.initial_range_end
             cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
+            #print cur_pos
             time.sleep(0.5)
             t = time.time()
+            #print t
 
-        if imax_regulation:
-          # Set the imax and max temperature to 0, to make sure that the joint stops
-          self.lib.set_imax(0, self.joint_name, self.hand_nb)
-          self.lib.set_max_temperature(0, self.joint_name, self.hand_nb)
+        
+        
+        self.lib.set_max_temperature(0, self.joint_name, self.hand_nb)
 
-    ### Carry out Imax regulation
+    ### Move the joint
     #
-    def move_joint_and_regule_imax(self, position_dead_band):
+    def move_joint(self, position_dead_band):
 
-        if imax_regulation:
-            # Set imax and maximum temperature values to enable motion
-            self.set_imax_regulation_parameters()
-            imax = self.initial_imax
-            self.lib.set_imax(imax, self.joint_name, self.hand_nb)
-            self.lib.set_max_temperature(15000, self.joint_name, self.hand_nb)
+        self.lib.set_max_temperature(15000, self.joint_name, self.hand_nb)
 
         # Check if the joint has reached the final position
         cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
+        print cur_pos
         initial_time = time.time()
         t = time.time()
-        while (abs(cur_pos - self.final_position) > position_dead_band) and (abs(initial_time-t)<300):
-            if self.stopped:
-                break
+        while (abs(cur_pos - self.final_position) > position_dead_band) and (abs(initial_time-t)<100):
+            print abs(cur_pos - self.final_position)
+            #if self.stopped:
+                #break
 
             # send the target position (repeated at each step maybe not always useful)
-            self.lib.sendupdate(self, self.joint_name, self.hand_nb, self.final_range_end)
-            time.sleep(self.imax_time)
+            self.lib.sendupdate( self.joint_name, self.hand_nb, self.final_range_end)
+            #time.sleep(self.imax_time)
+            time.sleep(0.5)
 
             # Regulate the I_max value according to the motion speed
             prev_pos = cur_pos
             cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
 
-            if self.imax_regulation:
-                # if the joint is too slow it increases the imax value (otherwise sometimes the joint is stuck)
-                if abs(cur_pos-prev_pos) < self.imax_min_delta_p:
-                    imax += self.imax_inc
-                    self.lib.set_imax(imax, self.joint_name, self.hand_nb)
-
-                # if the joint is too fast, it decreases the imax value
-                elif abs(cur_pos-prev_pos) > self.imax_max_delta_p:
-                    imax -= self.imax_dec
-                    self.lib.set_imax(imax, self.joint_name, self.hand_nb)
+           
             t = time.time()
 
-        # Set the imax and max temperature to 0, to make sure that the joint stops
-        self.lib.set_imax(0, self.joint_name, self.hand_nb)
+        # Set the imax and max temperature to 0, to make sure that the joint stops        
         self.lib.set_max_temperature(0, self.joint_name, self.hand_nb)
 
 
-    ### set imax regulation parameters
-    #
-    def set_imax_regulation_parameters(self):
-        if self.direction == 'forward':
-            self.initial_imax = 1616
-            self.imax_inc = 5
-            self.imax_dec = 10
-            self.imax_time = 1
-            self.imax_min_delta_p = 0.55
-            self.imax_max_delta_p = 0.78
-        else:
-            self.initial_imax = 600
-            self.imax_inc = 20
-            self.imax_dec = 10
-            self.imax_time = 2
-            self.imax_min_delta_p = 0.55
-            self.imax_max_delta_p = 1
-
+   
     ### Set motion parameters
     #
     def set_motion_parameters(self):
@@ -156,19 +133,21 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
     #
     def run_data_acquisition(self, P, I, D, shift):
         # Run measurements
-        #[data_location] = self.measurement_process(P, I, D, shift)
+        [data_location] = self.measurement_process(P, I, D, shift)
         # note: As the speed is very low:
         # D value should be closed to 0
         # I value should be rather high
 
-        # For tests ONLY
-        data_location = ""
-        if self.direction == 'forward':
-            data_location = "/tmp/test.txt"
-        else:
-            data_location = "/tmp/ffj4_pos_pid_backward_unique.txt"
+        ## For tests ONLY
+        #data_location = ""
+        #if self.direction == 'forward':
+            ##data_location = "/tmp/test.txt"
+            #data_location = "test.txt"
+        #else:
+            ##data_location = "/tmp/ffj4_pos_pid_backward_unique.txt"
+            #data_location = "ffj4_pos_pid_backward_unique.txt"
 
-        print "data loc: ", data_location
+        #print "data loc: ", data_location
 
         # get measured data        
         [self.position_float, self.pid_out_float] = self.lib.get_data( data_location)
@@ -178,7 +157,19 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
         # run data_treatment        
         [self.position, self.pid_out] = self.data_treatment(self.position_float, self.pid_out_float)
 
-        print "ran treatment: ", self.position, " ", self.pid_out
+        #print "ran treatment: ", self.position, " ", self.pid_out
 
         # return the final data
         return [self.position, self.pid_out]
+        
+# ONLY for tests
+if __name__ == "__main__":
+    #print 'tets'    
+    lib = Python_Robot_Lib()
+    joint_name = 'THJ1'
+    hand_nb = '49'
+    #direction = 'forward'
+    direction = 'backward'    
+    data_acquisition = U_Map_Data_Acquisition_Python( joint_name , hand_nb , direction , lib)
+    data_acquisition.measurement_process(P = 0, I= -498, D=0, shift=7)
+    

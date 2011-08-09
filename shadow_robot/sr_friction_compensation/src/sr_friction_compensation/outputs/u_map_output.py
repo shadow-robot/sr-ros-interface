@@ -6,7 +6,6 @@ from __future__ import division
 
 import roslib; roslib.load_manifest('sr_friction_compensation')
 import rospy
-
 from sr_friction_compensation.utils.utilitarian import Utilitarian
 
 class U_Map_Output(object):

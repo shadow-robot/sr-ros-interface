@@ -20,29 +20,27 @@ class Python_Robot_Lib(RobotLib):
     def set_PID(self, P, I, D, Shift, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         options = 'sensor ' + position_sensor + ' target ' + target
-        self.contrlr(smart_motor, options )
+        self.contrlr(joint_name, options, hand_nb )
 
         # Set the PID values
-        options = 'p ' + P + ' i ' + I + ' d ' + D + ' motor_maxforce 16384 motor_safeforce 16383 force_out_shift 255 sensor_out_shift ' + Shift + ' sensor_deadband 128 sensor_offset 0 max_temperature 15000  max_current 200 type_of_sensor 0 type_of_setpoint 0'
-        self.contrlr(smart_motor, options )
+        options = 'p ' + str(P) + ' i ' + str(I) + ' d ' + str(D) + ' motor_maxforce 16384 motor_safeforce 16383 force_out_shift 255 sensor_out_shift ' + str(Shift) + ' sensor_deadband 128 sensor_offset 0 max_temperature 15000  max_current 200 type_of_sensor 0 type_of_setpoint 0'
+        self.contrlr(joint_name, options ,hand_nb)
 
         # Set the imax value
-        options = 'sensor_imax 3000'
-        self.contrlr(smart_motor, options)
+        options = 'sensor_imax 100'
+        self.contrlr(joint_name, options, hand_nb)
 
     ### Set imax value
     #
     def set_imax(self, imax_value, joint_name, hand_nb):
-        [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
-        options = 'sensor_imax '+imax_value
-        self.contrlr(smart_motor, options)
+        options = 'sensor_imax '+str(imax_value)
+        self.contrlr(joint_name, options, hand_nb)
 
     ### Set the maximum temperature
     #
     def set_max_temperature(self, temperature_value, joint_name, hand_nb):
-        [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
-        options = 'max_temperature '+temperature_value
-        self.lib.contrlr(smart_motor, options)
+        options = 'max_temperature '+str(temperature_value)
+        self.contrlr(joint_name, options, hand_nb)
 
 
 
@@ -51,7 +49,7 @@ class Python_Robot_Lib(RobotLib):
     def get_current_value(self, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         command = "listvalues -i 1 -d 100 " + position_sensor
-        answer = self.utilitarian.run_command(command)
+        answer = self.utilitarian.run_command(command)       
         #p = subprocess.Popen(command.split(),stdout=subprocess.PIPE)
         #p.wait()
         #answer = p.stdout.read()
@@ -63,13 +61,14 @@ class Python_Robot_Lib(RobotLib):
     #
     def start_record(self, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
-        options = '-d 10 -r -p -l'
-        sensors = motor_debug + '.13' + motor_debug + '.3'
+        options = '-d 10 -r -l'
+        sensors = motor_debug + '.13 ' + motor_debug + '.3'
         # Each output file is recorded in a dated folder
         date = time.localtime()
-        output_file = str(date.tm_year)+ '_' + str(date.tm_mon)+ '_' +str(date.tm_mday)+ '_' +str(date.tm_hour)+ '_' +str(date.tm_min)+ '_' +str(date.tm_sec)+'/measurement_file.txt'
+        output_file = '/tmp/'+ str(date.tm_year)+ '_' + str(date.tm_mon)+ '_' +str(date.tm_mday)+ '_' +str(date.tm_hour)+ '_' +str(date.tm_min)+ '_' +str(date.tm_sec)+'_measurement_file.txt'
 
         command = 'listvalues '+ options + ' ' + sensors + ' -o ' + output_file
+        print command
         p = subprocess.Popen(command.split(),stdout=subprocess.PIPE)
         return [p , output_file]
 
@@ -98,14 +97,17 @@ class Python_Robot_Lib(RobotLib):
     #
     def sendupdate(self, joint_name, hand_nb, value):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
-        command = 'sendupdate ' + position_sensor + ' ' + value
+        print position_sensor
+        command = 'sendupdate ' + target + ' ' + str(value)
         answer = self.utilitarian.run_command(command)
 
     ### Contrlr in python
     #
-    def contrlr(self, joint_name, hand_nb, options ):
+    def contrlr(self, joint_name, options, hand_nb ):
+        #print 'toto'
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         command = 'contrlr ' + smart_motor + ' ' + options
+        print command
         answer = self.utilitarian.run_command(command)
 
     ### Send the U_map table to the firmware
@@ -129,95 +131,97 @@ class Python_Robot_Lib(RobotLib):
 
     ### Return firmware ids of the joint
     #
-    def get_joint_ids(self, joint_name, hand_nb):
+    def get_joint_ids(self, joint_name, hand_nb):        
         # First finger
         if (joint_name == "FFJ1"):
-            motor = 'ff0';
+            motor = 'ff0'
             node_id = 'node ' + hand_nb + '12' + '0310'
         elif (joint_name == "FFJ2" ):
-            motor = 'ff0';
+            motor = 'ff0'
             node_id = 'node ' + hand_nb + '12' + '0310'
         elif (joint_name == "FFJ3"):
-            motor = 'ff3';
+            motor = 'ff3'
             node_id = 'node ' + hand_nb + '13'+'0310'
         elif (joint_name == "FFJ4"):
-            motor = 'ff4';
+            motor = 'ff4'
             node_id = 'node ' + hand_nb + '11' + '0310'
 
         # Medium finger
         elif ( joint_name == 'MFJ1'):
-            motor = 'mf0';
+            motor = 'mf0'
             node_id = 'node ' + hand_nb + '02' + '0310'
         elif ( joint_name == 'MFJ2'):
-            motor = 'mf0';
+            motor = 'mf0'
             node_id = 'node ' + hand_nb + '02' + '0310'
         elif ( joint_name == 'MFJ3'):
-            motor = 'mf3';
+            motor = 'mf3'
             node_id = 'node ' + hand_nb + '16' + '0310'
         elif ( joint_name == 'MFJ4'):
-            motor = 'mf4';
+            motor = 'mf4'
             node_id = 'node ' + hand_nb + '01' + '0310'
 
         # Right Finger:
         elif ( joint_name == 'RFJ1'):
-            motor = 'rf0';
+            motor = 'rf0'
             node_id = 'node ' + hand_nb + '04' + '0310'
         elif ( joint_name == 'RFJ2'):
-            motor = 'rf0';
+            motor = 'rf0'
             node_id = 'node ' + hand_nb + '04' + '0310'
         elif ( joint_name == 'RFJ3'):
-            motor = 'rf3';
+            motor = 'rf3'
             node_id = 'node ' + hand_nb + '05' + '0310'
         elif ( joint_name == 'RFJ4'):
-            motor = 'rf4';
+            motor = 'rf4'
             node_id = 'node ' + hand_nb + '03' + '0310'
 
         # Little finger
         elif ( joint_name == 'LFJ1'):
-            motor = 'lf0';
+            motor = 'lf0'
             node_id = 'node ' + hand_nb + '09' + '0310'
         elif ( joint_name == 'LFJ2'):
-            motor = 'lf0';
+            motor = 'lf0'
             node_id = 'node ' + hand_nb + '09' + '0310'
         elif ( joint_name == 'LFJ3'):
-            motor = 'lf3';
+            motor = 'lf3'
             node_id = 'node ' + hand_nb + '08' + '0310'
         elif ( joint_name == 'LFJ4'):
-            motor = 'lf4';
+            motor = 'lf4'
             node_id = 'node ' + hand_nb + '10' + '0310'
         elif ( joint_name == 'LFJ5'):
-            motor = 'lf5';
+            motor = 'lf5'
             node_id = 'node ' + hand_nb + '06' + '0310'
 
         # Thumb
         elif ( joint_name == 'THJ1'):
-            motor = 'th1';
+            motor = 'th1'
             node_id = 'node ' + hand_nb + '14' + '0310'
         elif ( joint_name == 'THJ2'):
-            motor = 'th2';
+            motor = 'th2'
             node_id = 'node ' + hand_nb + '15' + '0310'
         elif ( joint_name == 'THJ3'):
-            motor = 'th3';
+            motor = 'th3'
             node_id = 'node ' + hand_nb + '07' + '0310'
         elif ( joint_name == 'THJ4'):
-            motor = 'th4';
+            motor = 'th4'
             node_id = 'node ' + hand_nb + '19' + '0310'
         elif ( joint_name == 'THJ5'):
-            motor = 'th5';
+            motor = 'th5'
             node_id = 'node ' + hand_nb + '20' + '0310'
 
         # Wrist
         elif ( joint_name == 'WRJ1'):
-            motor = 'wr1';
+            motor = 'wr1'
             node_id = 'node ' + hand_nb + '18' + '0310'
         elif ( joint_name == 'WRJ2'):
-            motor = 'wr2';
+            motor = 'wr2'
             node_id = 'node ' + hand_nb + '17' + '0310'
         else:
           print "The joint is wrong it should be in the following format 'FFJ4'"
           return
         position_sensor = joint_name + "_Pos"
         target = joint_name +"_Target"
+        # for tests only
+        #target = "smart_motor_setpoints.352"
         motor_debug = "smart_motor_debug_" + motor
         smart_motor = "smart_motor_" + motor +".0"
 

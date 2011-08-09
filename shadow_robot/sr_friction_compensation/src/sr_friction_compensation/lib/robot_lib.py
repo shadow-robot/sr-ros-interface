@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import roslib; roslib.load_manifest('sr_friction_compensation')
 import rospy
 

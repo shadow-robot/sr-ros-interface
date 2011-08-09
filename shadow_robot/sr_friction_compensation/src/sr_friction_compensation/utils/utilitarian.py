@@ -188,8 +188,8 @@ class Utilitarian(object):
 
       # Thumb
 	elif ( joint_name == 'THJ1'):
-            min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+            min_osc_angle = 5;       max_osc_angle = 100;
+	    min_angle = 0;      max_angle = 110;
 	elif ( joint_name == 'THJ2'):
             min_osc_angle = -20;     max_osc_angle = 20;
 	    min_angle = -30;    max_angle = 30;
@@ -210,7 +210,7 @@ class Utilitarian(object):
 	elif ( joint_name == 'WRJ2'):
             min_osc_angle = -20;     max_osc_angle = 0;
 	    min_angle = -30;    max_angle = 10;
-	else:
+	else:	  
 	  print "The joint is wrong it should be in the following format 'FFJ4'"
 	  return
 
