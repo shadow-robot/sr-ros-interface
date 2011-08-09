@@ -232,6 +232,9 @@ namespace shadow_robot
       //convert the motor index to the index of the motor in the message
       int motor_index = reconfig_queue.front().first;
 
+      ROS_ERROR_STREAM("SENDING force pid settings [ motor " << motor_index << " ]: " << config_index << " -> " << reconfig_queue.front().second[config_index].word);
+
+
       //set the data we want to send to the given motor
       command->motor_data[motor_index] = reconfig_queue.front().second[config_index].word;
 

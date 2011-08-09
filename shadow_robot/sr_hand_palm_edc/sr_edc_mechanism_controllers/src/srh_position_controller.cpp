@@ -48,7 +48,6 @@ namespace controller {
       loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
       max_force_demand(1000.)
   {
-    friction_interpoler = boost::shared_ptr<shadow_robot::JointCalibration>( new shadow_robot::JointCalibration( read_friction_map() ) );
   }
 
   SrhPositionController::~SrhPositionController()
@@ -59,6 +58,9 @@ namespace controller {
   bool SrhPositionController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
                                    const control_toolbox::Pid &pid)
   {
+    ROS_DEBUG(" --------- ");
+    ROS_DEBUG_STREAM("Init: " << joint_name);
+
     assert(robot);
     robot_ = robot;
     last_time_ = robot->getTime();
@@ -76,10 +78,16 @@ namespace controller {
       return false;
     }
 
+    friction_interpoler = boost::shared_ptr<shadow_robot::JointCalibration>( new shadow_robot::JointCalibration( read_friction_map() ) );
+
     pid_controller_ = pid;
 
     pid_gains_setter.add(&pid_controller_);
     pid_gains_setter.advertise(node_);
+
+    ROS_DEBUG_STREAM(" joint_state name: " << joint_state_->joint_->name);
+    ROS_DEBUG_STREAM(" In Init: " << getJointName() << " This: " << this
+                     << " joint_state: "<<joint_state_ );
 
     return true;
   }
@@ -130,6 +138,8 @@ namespace controller {
 
   std::string SrhPositionController::getJointName()
   {
+    ROS_DEBUG_STREAM(" joint_state: "<<joint_state_ << " This: " << this);
+
     return joint_state_->joint_->name;
   }
 
@@ -166,7 +176,10 @@ namespace controller {
 
     double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
 
+    ROS_DEBUG_STREAM(getJointName() << ": before fc: effort=" << commanded_effort << " / pos: " << joint_state_->position_ );
     commanded_effort += friction_compensation( joint_state_->position_ );
+
+    ROS_DEBUG_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
     commanded_effort = max( commanded_effort, max_force_demand );
 
     joint_state_->commanded_effort_ = commanded_effort;
@@ -213,12 +226,16 @@ namespace controller {
   std::vector<joint_calibration::Point> SrhPositionController::read_friction_map()
   {
     std::vector<joint_calibration::Point> friction_map;
-    std::string param_name = "sr_friction_map";
+    std::string param_name = "/sr_friction_map";
 
     bool joint_not_found = true;
 
     XmlRpc::XmlRpcValue calib;
     node_.getParam(param_name, calib);
+
+    ROS_DEBUG_STREAM("  Reading friction for: " <<  getJointName());
+    ROS_DEBUG_STREAM(" value: " << calib);
+
     ROS_ASSERT(calib.getType() == XmlRpc::XmlRpcValue::TypeArray);
     //iterate on all the joints
     for(int32_t index_cal = 0; index_cal < calib.size(); ++index_cal)
@@ -230,8 +247,11 @@ namespace controller {
 
       std::string joint_name = static_cast<std::string> (calib[index_cal][0]);
 
+      ROS_DEBUG_STREAM("  Checking joint name: "<< joint_name << " / " << getJointName());
       if(  joint_name.compare( getJointName() ) != 0 )
         continue;
+
+      ROS_DEBUG_STREAM("   OK: joint name = "<< joint_name);
 
       joint_not_found = false;
       //now iterates on the calibration table for the current joint
@@ -255,12 +275,19 @@ namespace controller {
 
     if( joint_not_found )
     {
+      ROS_WARN_STREAM("  No friction compensation for: " << getJointName() );
+
       joint_calibration::Point point_tmp;
       point_tmp.raw_value = 0.0;
       point_tmp.calibrated_value = 0.0;
       friction_map.push_back(point_tmp);
+      point_tmp.raw_value = 1.0;
       friction_map.push_back(point_tmp);
     }
+
+    ROS_DEBUG_STREAM(" Friction map[" << getJointName() << "]");
+    for( unsigned int i=0; i<friction_map.size(); ++i )
+      ROS_DEBUG_STREAM("    -> position=" << friction_map[i].raw_value << " compensation: " << friction_map[i].calibrated_value);
 
     return friction_map;
   } //end read_friction_map

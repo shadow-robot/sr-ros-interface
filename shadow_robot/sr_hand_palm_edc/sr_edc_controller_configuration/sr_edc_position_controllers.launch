@@ -1,5 +1,6 @@
 <launch>
 
+  <rosparam command="load" file="$(find sr_robot_lib)/config/friction_compensation.yaml" />
   <rosparam command="load" file="$(find sr_edc_controller_configuration)/sr_edc_joint_position_controllers.yaml" />
 
 <!-- - -wait-for=/calibrated -->
