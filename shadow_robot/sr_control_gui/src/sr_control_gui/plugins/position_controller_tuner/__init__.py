@@ -29,6 +29,9 @@ from std_msgs.msg import Float64
 
 from PyQt4 import QtCore, QtGui, Qt
 
+from sr_friction_compensation.u_map_computation_main import FrictionCompensation
+from sr_friction_compensation.lib.ethercat_robot_lib import EtherCAT_Robot_Lib
+
 class BaseMovement(object):
     def __init__(self, joint_name):
         self.joint_name = joint_name
@@ -207,6 +210,9 @@ class JointPidSetter(QtGui.QFrame):
 
     def friction_compensation(self):
         print "Friction Compensation"
+        lib = EtherCAT_Robot_Lib()
+        FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0, lib = lib)
+        FC.run()
 
     def plus(self, param_name):
         param = self.parameters[param_name]

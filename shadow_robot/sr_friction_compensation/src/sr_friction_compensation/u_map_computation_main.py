@@ -41,7 +41,7 @@ class FrictionCompensation(object):
          print "2"
 
          # Class instanciations
-         self.data_acquisition_python = U_Map_Data_Acquisition_Python(self.joint_name, self.hand_number, direction, self.lib, imax_regulation = False)
+         self.data_acquisition_python = U_Map_Data_Acquisition_Python(self.joint_name, self.hand_number, direction, self.lib)
          output_file = U_Map_Output_File(self.joint_name, self.hand_number, self.lib, direction)
 
 	 # Data acquisition

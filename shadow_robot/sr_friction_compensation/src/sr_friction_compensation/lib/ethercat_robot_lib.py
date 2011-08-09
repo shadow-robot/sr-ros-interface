@@ -17,7 +17,7 @@ class EtherCAT_Robot_Lib(RobotLib):
         self.pid_out = []
         self.position = []
 
-    def set_PID(self, P, I, D, Shift, smart_motor):
+    def set_PID(self, P, I, D, Shift, smart_motor, hand_nb):
         #for the ethercat library, we don't want to
         # setup the PID: we're using the currently set
         # parameters
@@ -35,7 +35,7 @@ class EtherCAT_Robot_Lib(RobotLib):
 #
     def get_current_value(self,  joint_name, hand_nb):
         #TODO: add subscriber + return last received value for position
-
+        pass
 
     def start_record(self):
         #TODO: start filling a vector with the positions and the output of the controller
