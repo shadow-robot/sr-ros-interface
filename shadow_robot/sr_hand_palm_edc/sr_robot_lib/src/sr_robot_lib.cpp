@@ -114,7 +114,7 @@ namespace shadow_robot
       }
       //compute the velocity
       joint_tmp->motor->actuator->state_.velocity_ = (joint_tmp->last_positions.front().first - joint_tmp->last_positions.back().first) / (joint_tmp->last_positions.front().second - joint_tmp->last_positions.back().second);
-      if(joint_tmp->last_positions.size() > number_of_positions_to_keep)
+      if(queue_size > number_of_positions_to_keep)
         joint_tmp->last_positions.pop_front();
 
       //if no motor is associated to this joint, then continue

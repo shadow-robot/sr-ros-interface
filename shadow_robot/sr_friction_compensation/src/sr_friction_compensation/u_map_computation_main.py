@@ -46,7 +46,7 @@ class FrictionCompensation(object):
 
 	 # Data acquisition
          [ position, pid_out ] = self.data_acquisition_python.run_data_acquisition(self.P, self.I, self.D, self.shift)
-         print "data acquired"
+         print "data acquired ", position
 
 
 	 # Output computation
