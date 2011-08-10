@@ -26,6 +26,8 @@ from PyQt4 import QtCore, QtGui, Qt
 from generic_plugin import GenericPlugin
 from std_msgs.msg import Float64
 
+from etherCAT_hand_lib import EtherCAT_Hand_Lib
+
 class HandCalibration(object):
     """
     Calibration procedure for the etherCAT hand.
@@ -36,19 +38,20 @@ class HandCalibration(object):
         Calibration procedure for the etherCAT hand.
         """
         self.calibration_map = {}
+        self.robot_lib = EtherCAT_Hand_Lib()
+
+    def activate(self):
+        self.robot_lib.activate()
+
+    def on_close(self):
+        self.robot_lib.on_close()
 
     def calibrate(self, joint_name, calibrated_value):
-        raw_value = self.read_raw_value(joint_name)
+        raw_value = self.robot_lib.get_raw_value(joint_name)
+
         if joint_name not in self.calibration_map.keys():
             self.calibration_map[joint_name] = []
         self.calibration_map[joint_name].append([raw_value, calibrated_value])
-
-        return raw_value
-
-    def read_raw_value(self, joint_name):
-        raw_value = 1.0
-
-        print "TODO: implement this"
 
         return raw_value
 
@@ -129,8 +132,12 @@ class HandCalibrationPlugin(GenericPlugin):
     def activate(self):
         GenericPlugin.activate(self)
 
+        self.hand_calibration.activate()
+
     def on_close(self):
         GenericPlugin.on_close(self)
+
+        self.hand_calibration.on_close()
 
     def calibrate_item(self, item, value):
         #Check if it's not a top level item

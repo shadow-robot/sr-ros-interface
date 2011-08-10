@@ -18,6 +18,7 @@
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_hand_lib"/>
+    <python path="${prefix}/python_lib"/>
   </export>
 </package>
 

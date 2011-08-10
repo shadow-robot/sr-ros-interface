@@ -8,8 +8,10 @@
   <url>http://www.shadowrobot.com</url>
   <depend package="rospy"/>
   <depend package="sr_hand"/>
+  <depend package="sr_robot_lib"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
+  <depend package="sr_robot_msgs"/>
   <depend package="cyberglove"/>
   <depend package="control_toolbox"/>
   <depend package="sr_automatic_pid_tuning"/>
