@@ -43,8 +43,14 @@ class HandCalibration(object):
             self.calibration_map[joint_name] = []
         self.calibration_map[joint_name].append([raw_value, calibrated_value])
 
+        return raw_value
+
     def read_raw_value(self, joint_name):
-        pass
+        raw_value = 1.0
+
+        print "TODO: implement this"
+
+        return raw_value
 
     def write_calibration(self, path):
         pass
@@ -55,11 +61,41 @@ class HandCalibrationPlugin(GenericPlugin):
     """
     name = "Hand Calibration"
 
+    joint_map = {"First Finger":[ [ "FFJ1", [ ["0.0", "0.0"],
+                                              ["0.0", "90.0"] ] ],
+                                  [ "FFJ2", [ ["0.0", "0.0"],
+                                              ["0.0", "90.0"] ] ],
+                                  [ "FFJ3", [ ["0.0", "0.0"],
+                                              ["0.0", "90.0"] ] ],
+                                  [ "FFJ4", [ ["0.0", "-25.0"],
+                                              ["0.0", "25.0"] ] ] ],
+
+                 "Middle Finger":[ [ "MFJ1", [ ["0.0", "0.0"],
+                                               ["0.0", "90.0"] ] ],
+                                   [ "MFJ2", [ ["0.0", "0.0"],
+                                               ["0.0", "90.0"] ] ],
+                                   [ "MFJ3", [ ["0.0", "0.0"],
+                                               ["0.0", "90.0"] ] ],
+                                   [ "MFJ4", [ ["0.0", "-25.0"],
+                                               ["0.0", "25.0"] ] ] ],
+
+                 "Ring Finger":[ [ "RFJ1", [ ["0.0", "0.0"],
+                                             ["0.0", "90.0"] ] ],
+                                 [ "RFJ2", [ ["0.0", "0.0"],
+                                             ["0.0", "90.0"] ] ],
+                                 [ "RFJ3", [ ["0.0", "0.0"],
+                                             ["0.0", "90.0"] ] ],
+                                 [ "RFJ4", [ ["0.0", "-25.0"],
+                                             ["0.0", "25.0"] ] ] ]
+                 }
+
     def __init__(self, ):
         """
         Plugin for the calibration procedure for the etherCAT hand.
         """
         GenericPlugin.__init__(self)
+
+        self.hand_calibration = HandCalibration()
 
         self.frame = QtGui.QFrame()
         self.layout = QtGui.QHBoxLayout()
@@ -68,35 +104,8 @@ class HandCalibrationPlugin(GenericPlugin):
         self.tree_widget.setColumnCount(4)
         self.tree_widget.setHeaderLabels(["Finger", "Joint", "Raw Value", "Calibrated Value"])
 
-        joint_map = {"First Finger":[ [ "FFJ1", [ ["0.0", "0.0"],
-                                                  ["0.0", "90.0"] ] ],
-                                      [ "FFJ2", [ ["0.0", "0.0"],
-                                                  ["0.0", "90.0"] ] ],
-                                      [ "FFJ3", [ ["0.0", "0.0"],
-                                                  ["0.0", "90.0"] ] ],
-                                      [ "FFJ4", [ ["0.0", "-25.0"],
-                                                  ["0.0", "25.0"] ] ] ],
-
-                     "Middle Finger":[ [ "MFJ1", [ ["0.0", "0.0"],
-                                                   ["0.0", "90.0"] ] ],
-                                       [ "MFJ2", [ ["0.0", "0.0"],
-                                                   ["0.0", "90.0"] ] ],
-                                       [ "MFJ3", [ ["0.0", "0.0"],
-                                                   ["0.0", "90.0"] ] ],
-                                       [ "MFJ4", [ ["0.0", "-25.0"],
-                                                   ["0.0", "25.0"] ] ] ],
-
-                     "Ring Finger":[ [ "RFJ1", [ ["0.0", "0.0"],
-                                                 ["0.0", "90.0"] ] ],
-                                     [ "RFJ2", [ ["0.0", "0.0"],
-                                                 ["0.0", "90.0"] ] ],
-                                     [ "RFJ3", [ ["0.0", "0.0"],
-                                                 ["0.0", "90.0"] ] ],
-                                     [ "RFJ4", [ ["0.0", "-25.0"],
-                                                 ["0.0", "25.0"] ] ] ]
-                     }
-
-        for finger in joint_map.items():
+        #fill the tree with the values
+        for finger in self.joint_map.items():
             finger_item = QtGui.QTreeWidgetItem([finger[0], "", "", ""])
             self.tree_widget.addTopLevelItem(finger_item)
 
@@ -108,13 +117,29 @@ class HandCalibrationPlugin(GenericPlugin):
                 joint_item.setExpanded(True)
             finger_item.setExpanded(True)
 
+        #calibrate when double clicking on an item
+        self.frame.connect(self.tree_widget, QtCore.SIGNAL('itemDoubleClicked (QTreeWidgetItem *, int)'),
+                           self.calibrate_item)
+
         self.layout.addWidget(self.tree_widget)
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
-        self.window.setGeometry(0,0,700,400)
+        self.window.setGeometry(0,0,650,400)
 
     def activate(self):
         GenericPlugin.activate(self)
 
     def on_close(self):
         GenericPlugin.on_close(self)
+
+    def calibrate_item(self, item, value):
+        #Check if it's not a top level item
+        if item.parent() is None:
+            return
+
+        joint_name = str(item.parent().data(1,0).toString())
+        if joint_name is not "":
+            calibrated_value = float( item.data(3,0).toString() )
+            raw_value = self.hand_calibration.calibrate( joint_name, calibrated_value )
+
+            item.setData(2, 0, raw_value)
