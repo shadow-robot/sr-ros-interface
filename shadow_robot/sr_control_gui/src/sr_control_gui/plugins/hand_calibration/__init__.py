@@ -47,7 +47,7 @@ class HandCalibration(object):
         self.robot_lib.on_close()
 
     def calibrate(self, joint_name, calibrated_value):
-        raw_value = self.robot_lib.get_raw_value(joint_name)
+        raw_value = self.robot_lib.get_average_raw_value(joint_name, 100)
 
         if joint_name not in self.calibration_map.keys():
             self.calibration_map[joint_name] = []

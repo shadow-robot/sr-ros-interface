@@ -19,6 +19,8 @@
 import roslib; roslib.load_manifest('sr_robot_lib')
 import rospy
 
+import time
+
 from sr_robot_msgs.msg import EthercatDebug
 
 class EtherCAT_Hand_Lib(object):
@@ -44,9 +46,23 @@ class EtherCAT_Hand_Lib(object):
     def debug_callback(self, msg):
         self.raw_values = msg.sensors
 
-    def get_raw_value(self, joint_name):
-        index = self.sensors.index( joint_name )
+    def get_raw_value(self, sensor_name):
+        index = self.sensors.index( sensor_name )
         return self.raw_values[index]
+
+    def get_average_raw_value(self, sensor_name, number_of_samples=10):
+        """
+        Get the average raw value for the given sensor, average on
+        number_of_samples
+        """
+        tmp_raw_values = []
+        for i in range(0, number_of_samples):
+            tmp_raw_values.append( self.get_raw_value(sensor_name) )
+            time.sleep(0.01)
+
+        average = float( sum(tmp_raw_values) )/len(tmp_raw_values)
+        return average
+
 
     def activate(self):
         self.debug_subscriber = rospy.Subscriber("/debug_etherCAT_data", EthercatDebug, self.debug_callback)
