@@ -19,6 +19,7 @@
 
 import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
+from functools import partial
 
 from config import Config
 from PyQt4 import QtCore, QtGui, Qt
@@ -56,7 +57,61 @@ class HandCalibration(object):
         return raw_value
 
     def write_calibration(self, path):
-        pass
+        """
+        Generates the yaml configuration file from the
+        calibration map and write it to the specified
+        path.
+        """
+        #generates the yaml configuration file from the
+        # calibration map
+        lines = ["#Generated From sr_control_gui, Hand Calibration plugin."]
+        lines.append("")
+        lines.append("sr_calibrations: [")
+
+        items = self.calibration_map.items()
+        for joint_index in range(0, len(items) - 1):
+            joint = items[joint_index]
+            joint_lines = [ "[\"" + joint[0] +"\", [ "]
+
+            for index_values in range(0, len(joint[1]) - 1):
+                values = joint[1][index_values]
+
+                raw_value = values[0]
+                calibrated_value = values[1]
+                joint_lines.append("    [" + str( raw_value ) +", " + str(calibrated_value) + "], ")
+
+            values = joint[1][len(joint[1]) - 1]
+            raw_value = values[0]
+            calibrated_value = values[1]
+            joint_lines.append("    [" + str( raw_value ) +", " + str(calibrated_value) + "] ]], ")
+
+            lines += joint_lines
+
+        joint = items[len(items) - 1]
+        joint_lines = [ "[\"" + joint[0] +"\", [ "]
+
+        for index_values in range(0, len(joint[1]) - 1):
+            values = joint[1][index_values]
+
+            raw_value = values[0]
+            calibrated_value = values[1]
+            joint_lines.append("    [" + str( raw_value ) +", " + str(calibrated_value) + "], ")
+
+        values = joint[1][len(joint[1]) - 1]
+        raw_value = values[0]
+        calibrated_value = values[1]
+        joint_lines.append("    [" + str( raw_value ) +", " + str(calibrated_value) + "] ]] ")
+
+        lines += joint_lines
+        lines.append("]")
+
+        #now we write all those lines to the specified file
+        f = open(path, mode='w')
+        for line in lines:
+            f.write(line)
+            f.write("\n")
+        f.close()
+
 
 class HandCalibrationPlugin(GenericPlugin):
     """
@@ -101,7 +156,7 @@ class HandCalibrationPlugin(GenericPlugin):
         self.hand_calibration = HandCalibration()
 
         self.frame = QtGui.QFrame()
-        self.layout = QtGui.QHBoxLayout()
+        self.layout = QtGui.QVBoxLayout()
 
         self.tree_widget = QtGui.QTreeWidget()
         self.tree_widget.setColumnCount(4)
@@ -123,6 +178,12 @@ class HandCalibrationPlugin(GenericPlugin):
         #calibrate when double clicking on an item
         self.frame.connect(self.tree_widget, QtCore.SIGNAL('itemDoubleClicked (QTreeWidgetItem *, int)'),
                            self.calibrate_item)
+
+        self.write_calibration_btn = QtGui.QPushButton()
+        self.write_calibration_btn.setText("Save Calibration")
+        self.write_calibration_btn.clicked.connect(partial(self.write_calibration))
+
+        self.layout.addWidget(self.write_calibration_btn)
 
         self.layout.addWidget(self.tree_widget)
         self.frame.setLayout(self.layout)
@@ -150,3 +211,7 @@ class HandCalibrationPlugin(GenericPlugin):
             raw_value = self.hand_calibration.calibrate( joint_name, calibrated_value )
 
             item.setData(2, 0, raw_value)
+
+    def write_calibration(self):
+        filename = QtGui.QFileDialog.getOpenFileName(self.frame, Qt.QString("Write Calibration To"), Qt.QString(""), Qt.QString("*.yaml") )
+        self.hand_calibration.write_calibration(filename)
