@@ -44,11 +44,22 @@ class EtherCAT_Hand_Lib(object):
         self.debug_subscriber = None
 
         #TODO: read this from parameter server
-        self.compounds = {"THJ5": [ ["THJ5A", 0.5],
-                                    ["THJ5B", 0.5] ],
-                          "WRJ1": [ ["WRJ1A", 0.5],
-                                    ["WRJ1B", 0.5] ]
-                          }
+        self.compounds = {}
+
+        joint_to_sensor_mapping = []
+        try:
+            joint_to_sensor_mapping = rospy.get_param("/joint_to_sensor_mapping")
+        except:
+            rospy.logwarn("The parameter joint_to_sensor_mapping was not found, you won't be able to get the raw values from the the EtherCAT compound sensors.")
+
+        for mapping in joint_to_sensor_mapping:
+            if mapping[0] is 1:
+                if "THJ5" in mapping[1][0]:
+                    self.compounds["THJ5"] = [["THJ5A", mapping[1][1]],
+                                              ["THJ5B", mapping[2][1]]]
+                elif "WRJ1" in mapping[1][0]:
+                    self.compounds["WRJ1"] = [["WRJ1A", mapping[1][1]],
+                                              ["WRJ1B", mapping[2][1]]]
 
     def debug_callback(self, msg):
         self.raw_values = msg.sensors
