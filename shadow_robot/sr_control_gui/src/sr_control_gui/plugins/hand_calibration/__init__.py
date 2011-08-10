@@ -174,9 +174,11 @@ class HandCalibrationPlugin(GenericPlugin):
                                        ["0.0", "30.0"] ] ] ]
                  }
 
-
     green = QtGui.QColor(153, 231, 96)
     red = QtGui.QColor(236, 178, 178)
+
+    indexes_to_calibrate = []
+    calibrated_indexes   = []
 
     def __init__(self, ):
         """
@@ -193,21 +195,30 @@ class HandCalibrationPlugin(GenericPlugin):
         self.tree_widget.setColumnCount(4)
         self.tree_widget.setHeaderLabels(["Finger", "Joint", "Raw Value", "Calibrated Value"])
 
+        self.hand_item = QtGui.QTreeWidgetItem(["Hand", "", "", ""])
+        self.tree_widget.addTopLevelItem(self.hand_item)
         #fill the tree with the values
+        index_to_calibrate = 0
         for finger in self.joint_map.items():
-            finger_item = QtGui.QTreeWidgetItem([finger[0], "", "", ""])
+            finger_item = QtGui.QTreeWidgetItem(self.hand_item, [finger[0], "", "", ""])
             self.tree_widget.addTopLevelItem(finger_item)
+            index_to_calibrate += 1
 
             for joint in finger[1]:
                 joint_item = QtGui.QTreeWidgetItem(finger_item, ["", joint[0], "", ""])
+                index_to_calibrate += 1
                 for value in joint[1]:
                     value_item = QtGui.QTreeWidgetItem(joint_item, ["", "", str(value[0]), str(value[1])])
                     value_item.setBackgroundColor(0, QtGui.QColor(self.red))
 
                     self.tree_widget.addTopLevelItem(value_item)
+                    index_to_calibrate += 1
+                    self.indexes_to_calibrate.append(index_to_calibrate)
 
                 joint_item.setExpanded(True)
             finger_item.setExpanded(True)
+
+        self.hand_item.setExpanded(True)
 
         #calibrate when double clicking on an item
         self.frame.connect(self.tree_widget, QtCore.SIGNAL('itemDoubleClicked (QTreeWidgetItem *, int)'),
@@ -216,6 +227,9 @@ class HandCalibrationPlugin(GenericPlugin):
         self.write_calibration_btn = QtGui.QPushButton()
         self.write_calibration_btn.setText("Save Calibration")
         self.write_calibration_btn.clicked.connect(partial(self.write_calibration))
+        self.write_calibration_btn.setEnabled(False)
+
+        self.all_calibrated = False
 
         self.layout.addWidget(self.write_calibration_btn)
 
@@ -234,7 +248,7 @@ class HandCalibrationPlugin(GenericPlugin):
 
         self.hand_calibration.on_close()
 
-    def calibrate_item(self, item, value):
+    def calibrate_item(self, item, index):
         #Check if it's not a top level item
         if item.parent() is None:
             return
@@ -246,6 +260,31 @@ class HandCalibrationPlugin(GenericPlugin):
 
             item.setData(2, 0, raw_value)
             item.setBackgroundColor(0, QtGui.QColor(self.green))
+
+            row_index = self.compute_item_index(item)
+            self.all_calibrated = self.is_all_calibrated(row_index)
+
+            self.write_calibration_btn.setEnabled(self.all_calibrated)
+
+    def compute_item_index(self, item):
+        index = 0
+        it = QtGui.QTreeWidgetItemIterator(self.tree_widget)
+        while (it.value()):
+            if item == it.value():
+                return index
+
+            index += 1
+            it += 1
+        return - 1
+
+    def is_all_calibrated(self, index):
+        self.calibrated_indexes.append(index)
+
+        for index_to_calibrate in self.indexes_to_calibrate:
+            if index_to_calibrate not in self.calibrated_indexes:
+                return False
+        return True
+
 
     def write_calibration(self):
         filename = QtGui.QFileDialog.getOpenFileName(self.frame, Qt.QString("Write Calibration To"), Qt.QString(""), Qt.QString("*.yaml") )

@@ -84,7 +84,7 @@ class EtherCAT_Hand_Lib(object):
         tmp_raw_values = []
         for i in range(0, number_of_samples):
             tmp_raw_values.append( self.get_raw_value(sensor_name) )
-            time.sleep(0.01)
+            time.sleep(0.002)
 
         average = float( sum(tmp_raw_values) )/len(tmp_raw_values)
         return average
