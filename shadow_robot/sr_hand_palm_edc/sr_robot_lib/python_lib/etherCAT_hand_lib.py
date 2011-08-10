@@ -43,12 +43,27 @@ class EtherCAT_Hand_Lib(object):
         """
         self.debug_subscriber = None
 
+        #TODO: read this from parameter server
+        self.compounds = {"THJ5": [ ["THJ5A", 0.5],
+                                    ["THJ5B", 0.5] ],
+                          "WRJ1": [ ["WRJ1A", 0.5],
+                                    ["WRJ1B", 0.5] ]
+                          }
+
     def debug_callback(self, msg):
         self.raw_values = msg.sensors
 
     def get_raw_value(self, sensor_name):
-        index = self.sensors.index( sensor_name )
-        return self.raw_values[index]
+        value = 0.0
+        if sensor_name in self.compounds.keys():
+            for sub_compound in self.compounds[sensor_name]:
+                index = self.sensors.index( sub_compound[0] )
+                value = value + ( self.raw_values[index] * sub_compound[1] )
+        else:
+            index = self.sensors.index( sensor_name )
+            value = self.raw_values[index]
+
+        return value
 
     def get_average_raw_value(self, sensor_name, number_of_samples=10):
         """
