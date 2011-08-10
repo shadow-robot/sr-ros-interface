@@ -106,6 +106,9 @@ private:
 
   /// Debug real time publisher: publishes the raw ethercat data
   boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::EthercatDebug> > debug_publisher;
+
+  ///We're using 2 can busses, so can_bus_ is 1 for motors 0 to 9 and 2 for motors 10 to 19
+  int can_bus_;
 };
 
 

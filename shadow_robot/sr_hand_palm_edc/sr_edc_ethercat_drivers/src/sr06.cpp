@@ -127,7 +127,8 @@ SR06::SR06()
     flashing(false),
     can_message_sent(true),
     can_packet_acked(true),
-    zero_buffer_read(0)
+    zero_buffer_read(0),
+    can_bus_(0)
 {
   int res = 0;
   check_for_pthread_mutex_init_error(res);
@@ -343,7 +344,7 @@ void SR06::erase_flash(void)
       if ( !(err = pthread_mutex_trylock(&producing)) )
       {
         can_message_.message_length = 1;
-        can_message_.can_bus = 1;
+        can_message_.can_bus = can_bus_;
         can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | ERASE_FLASH_COMMAND;
         cmd_sent = 1;
         unlock(&producing);
@@ -407,7 +408,7 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
     if ( !(err = pthread_mutex_trylock(&producing)) )
     {
       ROS_WARN("Sending READ data ... position : %d", pos);
-      can_message_.can_bus = 1;
+      can_message_.can_bus = can_bus_;
       can_message_.message_length = 3;
       can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | READ_FLASH_COMMAND;
       can_message_.message_data[2] = baddru + ((offset + baddrl + (baddrh << 8)) >> 16);
@@ -491,7 +492,19 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
   int timeout, wait_time;
   bool timedout;
 
-  motor_being_flashed = req.motor_id;
+  // We're using 2 can busses,
+  // if motor id is between 0 and 9, then we're using the can_bus 1
+  // else, we're using the can bus 2.
+  int motor_id_tmp = req.motor_id;
+  if( motor_id_tmp > 9 )
+  {
+    motor_id_tmp -= 10;
+    can_bus_ = 2;
+  }
+  else
+    can_bus_ = 1;
+
+  motor_being_flashed = motor_id_tmp;
   binary_content = NULL;
   flashing = true;
 
@@ -522,7 +535,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     if ( !(err = pthread_mutex_trylock(&producing)) )
     {
       can_message_.message_length = 0;
-      can_message_.can_bus = 1;
+      can_message_.can_bus = can_bus_;
       can_message_.message_id = 0;
       cmd_sent = 1;
       unlock(&producing);
@@ -554,7 +567,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     if ( !(err = pthread_mutex_trylock(&producing)) )
     {
       can_message_.message_length = 8;
-      can_message_.can_bus = 1;
+      can_message_.can_bus = can_bus_;
       can_message_.message_id = 0x0600 | (req.motor_id << 5) | 0b1010;
 
       can_message_.message_data[0] = 0x55;
@@ -597,7 +610,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
       if ( !(err = pthread_mutex_trylock(&producing)) )
       {
         can_message_.message_length = 8;
-        can_message_.can_bus = 1;
+        can_message_.can_bus = can_bus_;
         can_message_.message_id = 0x0600 | (req.motor_id << 5) | 0b1010;
         can_message_.message_data[0] = 0x55;
         can_message_.message_data[1] = 0xAA;
@@ -706,7 +719,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
           if ( !(err = pthread_mutex_trylock(&producing)) )
           {
             can_message_.message_length = 3;
-            can_message_.can_bus = 1;
+            can_message_.can_bus = can_bus_;
             can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_ADDRESS_COMMAND;
             can_message_.message_data[2] = addru + ((pos + addrl + (addrh << 8)) >> 16);
             can_message_.message_data[1] = addrh + ((pos + addrl) >> 8); // User application start address is 0x4C0
@@ -746,7 +759,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
       {
         ROS_INFO("Sending data ... position == %d", pos);
         can_message_.message_length = 8;
-        can_message_.can_bus = 1;
+        can_message_.can_bus = can_bus_;
         can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_DATA_COMMAND;
         bzero(can_message_.message_data, 8);
         for (unsigned char j = 0 ; j < 8 ; ++j)
@@ -815,7 +828,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     if ( !(err = pthread_mutex_trylock(&producing)) )
     {
       can_message_.message_length = 0;
-      can_message_.can_bus = 1;
+      can_message_.can_bus = can_bus_;
       can_message_.message_id = 0x0600 | (req.motor_id << 5) | RESET_COMMAND;
       cmd_sent = 1;
       unlock(&producing);
@@ -1023,10 +1036,10 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
       ROS_DEBUG_STREAM("Ethercat Command data size: "<< ETHERCAT_COMMAND_DATA_SIZE);
       ROS_DEBUG_STREAM("Ethercat bridge data size: "<< ETHERCAT_CAN_BRIDGE_DATA_SIZE);
 
-      ROS_INFO("We send a CAN message for flashing !");
+      ROS_INFO("We're sending a CAN message for flashing.");
       memcpy(message, &can_message_, sizeof(can_message_));
       can_message_sent = true;
-      ROS_DEBUG("Sending : SID : 0x%04X ; bus : 0x%02X ; length : 0x%02X ; data : 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X",
+      ROS_ERROR("Sending : SID : 0x%04X ; bus : 0x%02X ; length : 0x%02X ; data : 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X",
 		message->message_id,
                 message->can_bus,
                 message->message_length,
@@ -1049,7 +1062,7 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
   }
   else
   {
-    message->can_bus        = 1;
+    message->can_bus        = can_bus_;
     message->message_id     = 0x00;
     message->message_length = 0;
   }
@@ -1068,10 +1081,12 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
 {
   int i;
 
+  ROS_INFO("AA ack sid : %04X", packet->message_id);
+
   if (packet->message_id == 0)
     return false;
 
-  ROS_DEBUG("ack sid : %04X", packet->message_id);
+  ROS_INFO("ack sid : %04X", packet->message_id);
 
   if ( (packet->message_id & 0b0000011111111111) == (0x0600 | (motor_being_flashed << 5) | 0x10 | READ_FLASH_COMMAND))
     return ( !memcmp(packet->message_data, binary_content + pos, 8) );
