@@ -174,6 +174,10 @@ class HandCalibrationPlugin(GenericPlugin):
                                        ["0.0", "30.0"] ] ] ]
                  }
 
+
+    green = QtGui.QColor(153, 231, 96)
+    red = QtGui.QColor(236, 178, 178)
+
     def __init__(self, ):
         """
         Plugin for the calibration procedure for the etherCAT hand.
@@ -198,7 +202,10 @@ class HandCalibrationPlugin(GenericPlugin):
                 joint_item = QtGui.QTreeWidgetItem(finger_item, ["", joint[0], "", ""])
                 for value in joint[1]:
                     value_item = QtGui.QTreeWidgetItem(joint_item, ["", "", str(value[0]), str(value[1])])
+                    value_item.setBackgroundColor(0, QtGui.QColor(self.red))
+
                     self.tree_widget.addTopLevelItem(value_item)
+
                 joint_item.setExpanded(True)
             finger_item.setExpanded(True)
 
@@ -238,6 +245,7 @@ class HandCalibrationPlugin(GenericPlugin):
             raw_value = self.hand_calibration.calibrate( joint_name, calibrated_value )
 
             item.setData(2, 0, raw_value)
+            item.setBackgroundColor(0, QtGui.QColor(self.green))
 
     def write_calibration(self):
         filename = QtGui.QFileDialog.getOpenFileName(self.frame, Qt.QString("Write Calibration To"), Qt.QString(""), Qt.QString("*.yaml") )
