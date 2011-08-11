@@ -20,11 +20,46 @@ import roslib; roslib.load_manifest('sr_automatic_pid_tuning')
 import rospy
 
 class FitnessFunction(object):
-    def __init__(self):
-        pass
+    def __init__( self, robot_communication, joint_name,
+                  movement):
+        self.robot_comm = robot_communication
+        self.joint_name = joint_name
 
-    def fitness_function(self, pids, additional_parameters, reduction_factor):
+        self.movement = movement
+
+        self.targets = []
+        self.positions = []
+
+    def fitness_function(self, pids, additional_parameters, reduction_factor,
+                         parameters_order):
+        param_dict = {}
+        index = 0
+
+        for param in pids:
+            param_dict[parameters_order[index]] = param * reduction_factor
+            index += 1
+        for param in additional_parameters:
+            param_dict[parameters_order[index]] = param
+            index += 1
+
+        print param_dict
+        self.robot_comm.set_pid(self.joint_name, param_dict)
+
+        self.move_and_record()
+
+        global_fitness = self.compute_fitness()
+
         #print pids, " Additional: ", additional_parameters,"  reduction:  ",reduction_factor
-        return 0.0
+        return global_fitness
 
+    def move_and_record(self):
+        self.targets, self.positions = self.movement.move_and_record()
 
+    def compute_fitness(self):
+        #TODO: extend this to use different evaluations
+        mean_square_error = 0
+        for target,pos in self.targets,self.positions:
+            mean_square_error += (target - pos)*(target - pos)
+        mean_square_error /= len(target - pos)
+
+        return mean_square_error

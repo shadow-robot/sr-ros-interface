@@ -21,6 +21,9 @@ import rospy
 
 import time
 
+from std_msgs.msg import Float64
+from sensor_msgs.msg import JointState
+from sr_robot_msgs.srv import ForceController
 from sr_robot_msgs.msg import EthercatDebug
 
 class EtherCAT_Hand_Lib(object):
@@ -36,13 +39,20 @@ class EtherCAT_Hand_Lib(object):
                 "ACCX",  "ACCY",  "ACCZ",
                 "GYRX",  "GYRY",  "GYRZ",
                 "AN0",   "AN1",   "AN2",  "AN3" ]
-    raw_values = []
 
     def __init__(self):
         """
         Useful python library to communicate with the etherCAT hand.
         """
         self.debug_subscriber = None
+        self.joint_state_subscriber = None
+        self.raw_values = []
+        self.pid_services = {}
+        self.publishers = {}
+        self.positions = {}
+
+        self.msg_to_send = Float64()
+        self.msg_to_send.data= 0.0
 
         #TODO: read this from parameter server
         self.compounds = {}
@@ -62,8 +72,43 @@ class EtherCAT_Hand_Lib(object):
                     self.compounds["WRJ1"] = [["WRJ1A", mapping[1][1]],
                                               ["WRJ1B", mapping[2][1]]]
 
+    def sendupdate(self, joint_name, target, controller_type = "effort"):
+        if not self.publishers.has_key(joint_name):
+            topic = "/sh_"+ joint_name.lower() +"_"+controller_type+"_controller/command"
+            self.publishers[joint_name] = rospy.Publisher(topic, Float64)
+
+        self.msg_to_send.data = math.radians( float( new_target ) )
+        self.publishers[joint_name].publish(self.msg_to_send)
+
+    def get_position(self, joint_name):
+        """
+        """
+        return self.positions[joint_name]
+
+    def set_pid(self, joint_name, pid_parameters):
+        """
+        """
+        if not self.pid_services.has_key(joint_name):
+            service_name =  "/realtime_loop/change_force_PID_"+joint_name
+            self.pid_services[joint_name] = rospy.ServiceProxy(service_name, ForceController)
+
+        self.pid_services[joint_name]( pid_parameters["max_pwm"],
+                                       pid_parameters["sgleftref"],
+                                       pid_parameters["sgrightref"],
+                                       pid_parameters["f"],
+                                       pid_parameters["p"],
+                                       pid_parameters["i"],
+                                       pid_parameters["d"],
+                                       pid_parameters["imax"],
+                                       pid_parameters["deadband"],
+                                       pid_parameters["sign"] )
+
     def debug_callback(self, msg):
         self.raw_values = msg.sensors
+
+    def joint_state_callback(self, msg):
+        for name,pos in zip( msg.name, msg.position ):
+            self.positions[name] = pos
 
     def get_raw_value(self, sensor_name):
         value = 0.0
@@ -98,8 +143,14 @@ class EtherCAT_Hand_Lib(object):
 
     def activate(self):
         self.debug_subscriber = rospy.Subscriber("/debug_etherCAT_data", EthercatDebug, self.debug_callback)
+        self.joint_state_subscriber = rospy.Subscriber("/joint_states", JointState, self.joint_state_callback)
 
     def on_close(self):
         if self.debug_subscriber is not None:
             self.debug_subscriber.unregister()
             self.debug_subscriber = None
+
+        if self.joint_state_subscriber is not None:
+            self.joint_state_subscriber.unregister()
+            self.joint_state_subscriber = None
+

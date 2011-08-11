@@ -28,7 +28,8 @@ class AutomaticPidTuner(object):
     """
     MAX_PARAM_CONST_ = 1000
 
-    def __init__(self, fitness_function, starting_vector = None,
+    def __init__(self, fitness_function, joint_name,
+                 starting_vector = None,
                  mask = [1,1,1,1,0,
                          0,0,0,
                          0,0],
@@ -40,6 +41,7 @@ class AutomaticPidTuner(object):
         Automatic pid tuning using downhill simplex.
 
         @param fitness_function: the function you want to use to compute the fitness.
+        @param joint_name:       the joint on which we want to run the optimization
         @param starting_vector:  [optional] if given, a starting vector for the simplex,
                                             otherwise we use a random vector.
         @param mask:             [optional] a mask to optimize only certain parameters
@@ -64,7 +66,9 @@ class AutomaticPidTuner(object):
             starting_vector = []
             for i in parameters_order:
                 starting_vector.append(scipy.random.randint(MAX_PARAM_CONST_))
-
+        else:
+            for index in range(0,len(starting_vector)):
+                starting_vector[index] /= reduction_factor
         #uses the mask to find out which values are going to be
         # optimized and which values are going to be left out.
         additional_parameters = []
@@ -87,7 +91,8 @@ class AutomaticPidTuner(object):
     def run(self):
         full_results = fmin( self.fitness_function,
                              self.starting_vector,
-                             [self.additional_parameters, self.reduction_factor],
+                             [ self.additional_parameters, self.reduction_factor,
+                               self.parameters_order ],
                              callback = self.callback,
                              full_output = True)
 
