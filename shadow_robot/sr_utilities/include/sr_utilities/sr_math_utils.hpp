@@ -55,6 +55,31 @@ namespace sr_math_utils
   {
     return !(is_bit_mask_index_true(bit_mask, index));
   }
+
+  /**
+   * Increment a counter given a value which can overflow.
+   *
+   * WARNING: only works if called often enough: if new_value > last_value but
+   * overflowed between the 2 calls, then we're not able to detect the overflow.
+   *
+   * @param full_value the full value (with no overflow)
+   * @param last_value the value we received last time, between 0 and max_value.
+   * @param new_value the new value we received, between 0 and max_value.
+   * @param max_value the maximum value (max_value +1 = 0), typically 65535 for a 16bit number.
+   *
+   * @return a
+   */
+  static inline int counter_with_overflow(int full_value, int last_value, int new_value, int max_value = 65535)
+  {
+    int value_to_add = 0;
+
+    if( new_value < last_value) // overflowing
+      value_to_add = (max_value + 1 - last_value) + new_value;
+    else // not overflowing
+      value_to_add = new_value - last_value;
+
+    return full_value + value_to_add;
+  }
 }
 
 /* For the emacs weenies in the crowd.

@@ -108,6 +108,44 @@ TEST(BitMasksGlobal, is_false__true)
   EXPECT_TRUE(sr_math_utils::is_bit_mask_index_false(bit_mask, 5));
 }
 
+TEST(CounterWithOverflow, no_overflows)
+{
+  int received_val, full_val, last_val = 0;
+
+  received_val = 1000;
+  full_val = sr_math_utils::counter_with_overflow(full_val, last_val, received_val);
+  EXPECT_EQ(full_val, 1000);
+  last_val = received_val;
+
+  received_val = 65535;
+  full_val = sr_math_utils::counter_with_overflow(full_val, last_val, received_val);
+  EXPECT_EQ(full_val, 65535);
+  last_val = received_val;
+}
+
+TEST(CounterWithOverflow, with_overflows)
+{
+  int received_val, full_val, last_val = 0;
+
+  full_val = 65535;
+  last_val = 65535;
+  received_val = 0;
+  full_val = sr_math_utils::counter_with_overflow(full_val, last_val, received_val);
+  EXPECT_EQ(full_val, 65536);
+  last_val = received_val;
+
+  received_val = 1000;
+  full_val = sr_math_utils::counter_with_overflow(full_val, last_val, received_val);
+  EXPECT_EQ(full_val, 66536);
+  last_val = received_val;
+
+  received_val = 0;
+  full_val = sr_math_utils::counter_with_overflow(full_val, last_val, received_val);
+  EXPECT_EQ(full_val, 131072);
+  last_val = received_val;
+
+}
+
 // Run all the tests that were declared with TEST()
 int main(int argc, char **argv)
 {

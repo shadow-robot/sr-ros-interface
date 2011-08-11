@@ -43,7 +43,8 @@ namespace shadow_robot
   const int SrRobotLib::number_of_positions_for_filter = 10;
 
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
-    : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(MOTOR_CONFIG_FIRST_VALUE), nh_tilde("~")
+    : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(MOTOR_CONFIG_FIRST_VALUE), nh_tilde("~"),
+      last_can_msgs_received(0), last_can_msgs_transmitted(0)
   {
     debug_motor_indexes_and_data.resize(nb_debug_publishers_const);
     for( int i = 0; i < nb_debug_publishers_const ; ++i )
@@ -406,10 +407,14 @@ namespace shadow_robot
         actuator->state_.temperature_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc) / 256.0;
         break;
       case MOTOR_DATA_CAN_NUM_RECEIVED:
-        actuator->state_.can_msgs_received_ = status_data->motor_data_packet[index_motor_in_msg].misc;
+        // those are 16 bits values and will overflow -> we compute the real value.
+        actuator->state_.can_msgs_received_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, status_data->motor_data_packet[index_motor_in_msg].misc);
+        last_can_msgs_received = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_CAN_NUM_TRANSMITTED:
-        actuator->state_.can_msgs_transmitted_ = status_data->motor_data_packet[index_motor_in_msg].misc;
+        // those are 16 bits values and will overflow -> we compute the real value.
+        actuator->state_.can_msgs_transmitted_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, status_data->motor_data_packet[index_motor_in_msg].misc);
+        last_can_msgs_transmitted = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_SVN_REVISION:
 	read_torque = false;

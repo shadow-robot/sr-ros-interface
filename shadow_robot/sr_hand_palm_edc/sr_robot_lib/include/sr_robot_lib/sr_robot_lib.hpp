@@ -280,6 +280,11 @@ namespace shadow_robot
     static const int number_of_positions_to_keep;
     static const int number_of_positions_for_filter;
 
+    ///We need to know if we're overflowing or not.
+    int last_can_msgs_received;
+    ///We need to know if we're overflowing or not.
+    int last_can_msgs_transmitted;
+
   };//end class
 }
 
