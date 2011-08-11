@@ -944,8 +944,8 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Measured Current", "%f", state->last_measured_current_);
           d.addf("Measured Voltage", "%f", state->motor_voltage_);
           d.addf("Temperature", "%f", state->temperature_);
-          d.addf("Number of CAN messages received", "%d", state->can_msgs_received_);
-          d.addf("Number of CAN messages transmitted", "%d", state->can_msgs_transmitted_);
+          d.addf("Number of CAN messages received", "%lld", state->can_msgs_received_);
+          d.addf("Number of CAN messages transmitted", "%lld", state->can_msgs_transmitted_);
 
           d.addf("Force control F", "%d", state->force_control_f_);
           d.addf("Force control P", "%d", state->force_control_p_);

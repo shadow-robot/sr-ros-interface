@@ -102,8 +102,8 @@ namespace sr_actuator
 
     double motor_voltage_; //!< Motor voltage (in volts)
 
-    int strain_gauge_left_;
-    int strain_gauge_right_;
+    unsigned long long int  strain_gauge_left_;
+    unsigned long long int strain_gauge_right_;
 
     std::vector<int> raw_sensor_values_;
     std::vector<double> calibrated_sensor_values_;

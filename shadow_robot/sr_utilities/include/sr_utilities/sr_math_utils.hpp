@@ -93,7 +93,7 @@ namespace sr_math_utils
    *
    * @return a
    */
-  static inline int counter_with_overflow(int full_value, int last_value, int new_value, int max_value = 65535)
+  static inline int counter_with_overflow(unsigned long long int full_value, int last_value, int new_value, int max_value = 65535)
   {
     int value_to_add = 0;
 
