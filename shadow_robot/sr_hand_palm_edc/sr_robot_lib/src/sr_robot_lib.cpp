@@ -423,7 +423,7 @@ namespace shadow_robot
         actuator->state_.server_firmware_svn_revision_ = status_data->motor_data_packet[index_motor_in_msg].torque;
         //the bit 15 tells us if the firmware version on the motor is a modified version of the svn.
         actuator->state_.firmware_modified_ = ( (status_data->motor_data_packet[index_motor_in_msg].misc & 0x8000) != 0 );
-        // the other 14 bits are the svn revision currently programmed on the pic
+        // the other 15 bits are the svn revision currently programmed on the pic
         actuator->state_.pic_firmware_svn_revision_ = ( status_data->motor_data_packet[index_motor_in_msg].misc & 0x7FFF );
         break;
       case MOTOR_DATA_CAN_ERROR_COUNTERS:

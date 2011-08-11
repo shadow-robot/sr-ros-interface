@@ -26,11 +26,6 @@ import threading, time, math
 
 from std_msgs.msg import Float64
 
-from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement import *
-from sr_automatic_pid_tuning.communication_with_robot.robot_lib_etherCAT import Robot_Lib_EtherCAT
-from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.genetic_algorithm import Genetic_Algorithm
-from sr_automatic_pid_tuning.optimization_algorithm.Genetic_Algorithm.movement.callback_etherCAT import Callback_EtherCAT
-
 from PyQt4 import QtCore, QtGui, Qt
 
 
@@ -185,41 +180,8 @@ class RunGA(threading.Thread):
         self.tuning = True
         self.parameters = parameters
 
-	self.robot_lib=Robot_Lib_EtherCAT( max_pwm = parameters["max_pwm"], sign=parameters["sign"])
-
-	self.callback = Callback_EtherCAT(joint_name, "effort")
-	##mettre ici le roslib
-	self.robot_lib.init_subscriber(self.callback)
-
-        #specify the movement to do the tuning on
-        sin = partial_movement_sinus.Partial_Movement_Sinus(self.joint_name, self.robot_lib)
-        sin.rate = rospy.Rate(500)
-        list_of_movements = [sin]
-        self.global_movement = global_movement.Global_Movement(self.joint_name, self.callback,
-                                                               self.robot_lib, list_of_movements)
-
-	self.GA=Genetic_Algorithm(parameters["population size"],
-                                  parameters["number of generations"],
-                                  {"P_min":parameters["P_min"], "P_max": parameters["P_max"],
-                                   "I_min": parameters["I_min"], "I_max": parameters["I_max"],
-                                   "D_min": parameters["D_min"], "D_max":parameters["D_max"],
-                                   "Imax_min": parameters["Imax_min"], "Imax_max": parameters["Imax_max"],
-                                   "sign":parameters["sign"], "max_pwm":parameters["max_pwm"]},
-                                  self.global_movement,
-                                  4, # number of genes affected by mutation
-                                  parameters["percentage of mutation"],self.joint_name,
-                                  "random",
-                                  self.callback,
-                                  self.robot_lib)
     def run(self):
-	result = self.GA.give_life_to_the_system()
-        if self.callback.subscriber_pos_ != None:
-            self.callback.subscriber_pos_.unregister()
-
-        if self.callback.subscriber_target_ != None:
-            self.callback.subscriber_target_.unregister()
-
-        self.parent.ga_stopped(result)
+        pass
 
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):
