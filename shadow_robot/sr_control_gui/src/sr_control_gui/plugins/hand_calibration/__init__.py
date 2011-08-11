@@ -255,6 +255,10 @@ class HandCalibrationPlugin(GenericPlugin):
         self.tree_widget.setColumnCount(4)
         self.tree_widget.setHeaderLabels(["Finger", "Joint", "Raw Value", "Calibrated Value"])
 
+        #keep the joint items in a vector to be able to
+        # display the current joint position
+        self.joint_items = []
+
         self.hand_item = QtGui.QTreeWidgetItem(["Hand", "", "", ""])
         self.tree_widget.addTopLevelItem(self.hand_item)
         #fill the tree with the values
@@ -266,6 +270,7 @@ class HandCalibrationPlugin(GenericPlugin):
 
             for joint in finger[1]:
                 joint_item = QtGui.QTreeWidgetItem(finger_item, ["", joint[0], "", ""])
+                self.joint_items.append(joint_item)
                 index_to_calibrate += 1
                 for value in joint[1]:
                     value_item = QtGui.QTreeWidgetItem(joint_item, ["", "", str(value[0]), str(value[1])])
@@ -302,16 +307,26 @@ class HandCalibrationPlugin(GenericPlugin):
         for i in range(0,4):
             self.tree_widget.resizeColumnToContents(i)
 
+        #display the current joint position in the GUI
+        self.timer = Qt.QTimer()
+        self.frame.connect(self.timer, QtCore.SIGNAL('timeout()'), self.update_joint_pos)
+
+    def update_joint_pos(self):
+        for joint_item in self.joint_items:
+            current_value = self.hand_calibration.robot_lib.get_raw_value( joint_item.text(1) )
+            joint_item.setText( 2, str(current_value) )
 
     def activate(self):
         GenericPlugin.activate(self)
 
         self.hand_calibration.activate()
+        self.timer.start(200)
 
     def on_close(self):
         GenericPlugin.on_close(self)
 
         self.hand_calibration.on_close()
+        self.timer.stop()
 
     def calibrate_item(self, item, index):
         #Check if it's not a top level item

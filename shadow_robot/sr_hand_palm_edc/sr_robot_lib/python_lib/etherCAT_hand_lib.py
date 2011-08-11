@@ -36,6 +36,7 @@ class EtherCAT_Hand_Lib(object):
                 "ACCX",  "ACCY",  "ACCZ",
                 "GYRX",  "GYRY",  "GYRZ",
                 "AN0",   "AN1",   "AN2",  "AN3" ]
+    raw_values = []
 
     def __init__(self):
         """
@@ -66,6 +67,11 @@ class EtherCAT_Hand_Lib(object):
 
     def get_raw_value(self, sensor_name):
         value = 0.0
+
+        if self.raw_values == []:
+            rospy.logwarn("No values received from the etherCAT hand.")
+            return -1.0
+
         if sensor_name in self.compounds.keys():
             for sub_compound in self.compounds[sensor_name]:
                 index = self.sensors.index( sub_compound[0] )
