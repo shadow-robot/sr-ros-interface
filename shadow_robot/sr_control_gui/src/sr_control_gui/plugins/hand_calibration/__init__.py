@@ -298,6 +298,11 @@ class HandCalibrationPlugin(GenericPlugin):
         self.window.setWidget(self.frame)
         self.window.setGeometry(0,0,650,400)
 
+        #adjust the column sizes
+        for i in range(0,4):
+            self.tree_widget.resizeColumnToContents(i)
+
+
     def activate(self):
         GenericPlugin.activate(self)
 
