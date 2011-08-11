@@ -408,11 +408,13 @@ namespace shadow_robot
         break;
       case MOTOR_DATA_CAN_NUM_RECEIVED:
         // those are 16 bits values and will overflow -> we compute the real value.
+        // This needs to be updated faster than the overflowing period (which should be roughly every 30s)
         actuator->state_.can_msgs_received_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, status_data->motor_data_packet[index_motor_in_msg].misc);
         last_can_msgs_received = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
       case MOTOR_DATA_CAN_NUM_TRANSMITTED:
         // those are 16 bits values and will overflow -> we compute the real value.
+        // This needs to be updated faster than the overflowing period (which should be roughly every 30s)
         actuator->state_.can_msgs_transmitted_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, status_data->motor_data_packet[index_motor_in_msg].misc);
         last_can_msgs_transmitted = status_data->motor_data_packet[index_motor_in_msg].misc;
         break;
