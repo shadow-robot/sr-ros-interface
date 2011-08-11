@@ -62,6 +62,19 @@ class HandCalibration(object):
         calibration map and write it to the specified
         path.
         """
+        #check the calibration is complete, if not, just add 0s
+        # so that the uncalibrated joints stay at 0.
+        all_joints = [ "FFJ1", "FFJ2", "FFJ3", "FFJ4",
+                       "MFJ1", "MFJ2", "MFJ3", "MFJ4",
+                       "RFJ1", "RFJ2", "RFJ3", "RFJ4",
+                       "LFJ1", "LFJ2", "LFJ3", "LFJ4", "LFJ5",
+                       "THJ1", "THJ2", "THJ3", "THJ4", "THJ5",
+                       "WRJ1", "WRJ2" ]
+
+        for joint in all_joints:
+            if joint not in self.calibration_map.keys():
+                self.calibration_map[joint] = [[0.0, 0.0], [0.0, 1.0]]
+
         #generates the yaml configuration file from the
         # calibration map
         lines = ["#Generated From sr_control_gui, Hand Calibration plugin."]
@@ -290,9 +303,8 @@ class HandCalibrationPlugin(GenericPlugin):
                            self.calibrate_item)
 
         self.write_calibration_btn = QtGui.QPushButton()
-        self.write_calibration_btn.setText("Save Calibration")
+        self.write_calibration_btn.setText("Save INCOMPLETE Calibration")
         self.write_calibration_btn.clicked.connect(partial(self.write_calibration))
-        self.write_calibration_btn.setEnabled(False)
 
         self.all_calibrated = False
 
@@ -344,7 +356,11 @@ class HandCalibrationPlugin(GenericPlugin):
             row_index = self.compute_item_index(item)
             self.all_calibrated = self.is_all_calibrated(row_index)
 
-            self.write_calibration_btn.setEnabled(self.all_calibrated)
+            if self.all_calibrated:
+                self.write_calibration_btn.setText("Save Calibration")
+            else:
+                self.write_calibration_btn.setText("Save INCOMPLETE Calibration")
+
 
     def compute_item_index(self, item):
         index = 0
