@@ -29,6 +29,30 @@
 
 namespace sr_math_utils
 {
+  /**
+   * Convert an angle in degrees to an angle in radians.
+   *
+   * @param degrees the value in degrees
+   *
+   * @return the value in radians.
+   */
+  static inline double to_rad(double degrees)
+  {
+    return degrees * 0.017453292519943295;
+  }
+
+  /**
+   * Convert an angle in degrees to an angle in degrees.
+   *
+   * @param degrees the value in radians.
+   *
+   * @return the value in degrees.
+   */
+  static inline double to_degrees(double rad)
+  {
+    return rad * 57.295779513082323;
+  }
+
   static inline int ipow(int base, int exp)
   {
     int result = 1;

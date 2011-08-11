@@ -30,6 +30,8 @@
 #include <string>
 #include <boost/foreach.hpp>
 
+#include <sr_utilities/sr_math_utils.hpp>
+
 #include <stdio.h>
 
 namespace shadow_robot
@@ -250,7 +252,7 @@ namespace shadow_robot
 
         joint_calibration::Point point_tmp;
         point_tmp.raw_value = static_cast<double> (calib[index_cal][1][index_table][0]);
-        point_tmp.calibrated_value = static_cast<double> (calib[index_cal][1][index_table][1]);
+        point_tmp.calibrated_value = sr_math_utils::to_rad( static_cast<double> (calib[index_cal][1][index_table][1]) );
         calib_table_tmp.push_back(point_tmp);
       }
 

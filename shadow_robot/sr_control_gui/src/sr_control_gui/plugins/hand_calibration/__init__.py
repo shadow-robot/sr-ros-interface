@@ -73,7 +73,7 @@ class HandCalibration(object):
 
         for joint in all_joints:
             if joint not in self.calibration_map.keys():
-                self.calibration_map[joint] = [[0.0, 0.0], [0.0, 1.0]]
+                self.calibration_map[joint] = [[0.0, 0.0], [1.0, 0.0]]
 
         #generates the yaml configuration file from the
         # calibration map
