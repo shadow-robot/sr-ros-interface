@@ -325,7 +325,7 @@ class HandCalibrationPlugin(GenericPlugin):
 
     def update_joint_pos(self):
         for joint_item in self.joint_items:
-            current_value = self.hand_calibration.robot_lib.get_raw_value( joint_item.text(1) )
+            current_value = self.hand_calibration.robot_lib.get_raw_value( str( joint_item.text(1) ) )
             joint_item.setText( 2, str(current_value) )
 
     def activate(self):
