@@ -58,8 +58,8 @@ class FitnessFunction(object):
     def compute_fitness(self):
         #TODO: extend this to use different evaluations
         mean_square_error = 0
-        for target,pos in self.targets,self.positions:
+        for target,pos in zip( self.targets,self.positions ):
             mean_square_error += (target - pos)*(target - pos)
-        mean_square_error /= len(target - pos)
+        mean_square_error /= len(self.targets)
 
         return mean_square_error

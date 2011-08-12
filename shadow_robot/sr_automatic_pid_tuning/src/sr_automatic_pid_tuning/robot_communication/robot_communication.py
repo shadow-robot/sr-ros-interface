@@ -45,6 +45,12 @@ class RobotCommunication(object):
         """
         pass
 
+    def stop_record(self, joint_name):
+        pass
+
+    def start_record(self, joint_name, callback):
+        pass
+
 
 
 class EtherCATRobotCommunication(RobotCommunication):
@@ -68,9 +74,15 @@ class EtherCATRobotCommunication(RobotCommunication):
     def get_position(self, joint_name):
         """
         """
-        self.robot_lib.get_position(joint_name)
+        return self.robot_lib.get_position(joint_name)
 
     def set_pid(self, joint_name, pid_parameters):
         """
         """
         self.robot_lib.set_pid(joint_name, pid_parameters)
+
+    def stop_record(self, joint_name):
+        self.robot_lib.stop_record(joint_name)
+
+    def start_record(self, joint_name, callback):
+        self.robot_lib.start_record(joint_name, callback)

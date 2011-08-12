@@ -19,7 +19,7 @@
 import roslib; roslib.load_manifest('sr_robot_lib')
 import rospy
 
-import time
+import time, math
 
 from std_msgs.msg import Float64
 from sensor_msgs.msg import JointState
@@ -46,10 +46,12 @@ class EtherCAT_Hand_Lib(object):
         """
         self.debug_subscriber = None
         self.joint_state_subscriber = None
+        self.record_js_callback = None
         self.raw_values = []
         self.pid_services = {}
         self.publishers = {}
         self.positions = {}
+        self.efforts = {}
 
         self.msg_to_send = Float64()
         self.msg_to_send.data= 0.0
@@ -77,13 +79,23 @@ class EtherCAT_Hand_Lib(object):
             topic = "/sh_"+ joint_name.lower() +"_"+controller_type+"_controller/command"
             self.publishers[joint_name] = rospy.Publisher(topic, Float64)
 
-        self.msg_to_send.data = math.radians( float( new_target ) )
+        self.msg_to_send.data = math.radians( float( target ) )
         self.publishers[joint_name].publish(self.msg_to_send)
 
     def get_position(self, joint_name):
         """
         """
         return self.positions[joint_name]
+
+    def get_effort(self, joint_name):
+        return self.efforts[joint_name]
+
+    def start_record(self, joint_name, callback):
+        self.record_js_callback = callback
+
+    def stop_record(self, joint_name):
+        self.callback = None
+
 
     def set_pid(self, joint_name, pid_parameters):
         """
@@ -107,8 +119,13 @@ class EtherCAT_Hand_Lib(object):
         self.raw_values = msg.sensors
 
     def joint_state_callback(self, msg):
-        for name,pos in zip( msg.name, msg.position ):
+        for name,pos,effort in zip( msg.name, msg.position, msg.effort ):
             self.positions[name] = pos
+            self.efforts[name] = effort
+
+        if self.record_js_callback is not None:
+            self.record_js_callback()
+
 
     def get_raw_value(self, sensor_name):
         value = 0.0

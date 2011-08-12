@@ -19,7 +19,7 @@
 import roslib; roslib.load_manifest('sr_automatic_pid_tuning')
 import rospy
 
-import numpy
+import numpy, scipy
 from scipy.optimize import fmin
 
 class AutomaticPidTuner(object):
@@ -65,10 +65,8 @@ class AutomaticPidTuner(object):
         if starting_vector is None:
             starting_vector = []
             for i in parameters_order:
-                starting_vector.append(scipy.random.randint(MAX_PARAM_CONST_))
-        else:
-            for index in range(0,len(starting_vector)):
-                starting_vector[index] /= reduction_factor
+                starting_vector.append(scipy.random.randint(self.MAX_PARAM_CONST_))
+
         #uses the mask to find out which values are going to be
         # optimized and which values are going to be left out.
         additional_parameters = []
@@ -76,7 +74,10 @@ class AutomaticPidTuner(object):
         if mask is not None:
             for param, optimize_this_param in zip(starting_vector, mask):
                 if optimize_this_param:
-                    starting_vector_tmp.append(param)
+                    #the values on which we run the simplex are divided by a reduction
+                    # factor, then multiplied by the same factor when setting them as
+                    # pids (in order to work with "real" numbers not ints)
+                    starting_vector_tmp.append(param / reduction_factor)
                 else:
                     additional_parameters.append(param)
         starting_vector = starting_vector_tmp
@@ -94,7 +95,10 @@ class AutomaticPidTuner(object):
                              [ self.additional_parameters, self.reduction_factor,
                                self.parameters_order ],
                              callback = self.callback,
-                             full_output = True)
+                             full_output = True,
+                             ftol = 100,
+                             maxiter = 100,
+                             maxfun = 3000)
 
         optimized_pids = full_results[0] * self.reduction_factor
         optimized_pids = numpy.hstack( (optimized_pids, self.additional_parameters) )

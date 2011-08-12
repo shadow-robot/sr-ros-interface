@@ -22,7 +22,7 @@ import rospy
 from sr_automatic_pid_tuning.sr_automatic_pid_tuning import AutomaticPidTuner
 from sr_automatic_pid_tuning.fitness_function.fitness_function import FitnessFunction
 from sr_automatic_pid_tuning.robot_communication.robot_communication import EtherCATRobotCommunication
-from sr_automatic_pid_tuning.movement.movement import Movement
+from sr_automatic_pid_tuning.fitness_function.movement.movement import Movement
 
 def main():
     """
@@ -30,13 +30,15 @@ def main():
     For more convenience, the pid tuner is integrated in the
     sr_control_gui.
     """
+    rospy.init_node('automatic_pid_tuner', anonymous=True)
+
     eth_com = EtherCATRobotCommunication()
 
     joint_name = "FFJ3"
 
     mvt = Movement(eth_com, joint_name)
 
-    fit = FitnessFunction(eth_com, joint_name, Movement)
+    fit = FitnessFunction(eth_com, joint_name, mvt)
 
     apt = AutomaticPidTuner( fit.fitness_function,
                              joint_name,
@@ -47,7 +49,7 @@ def main():
     optimized_pids, full_results = apt.run()
 
     print " ---- "
-    print optimized_pids, "  -> ", full_results[0]
+    print optimized_pids[:4], "  -> ", full_results[0]
 
 
 # start the script
