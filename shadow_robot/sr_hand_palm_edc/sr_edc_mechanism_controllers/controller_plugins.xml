@@ -12,4 +12,8 @@
          type="controller::SrhJointVelocityController"
          base_class_type="pr2_controller_interface::Controller" />
 
+  <class name="sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController"
+         type="controller::SrhMixedPositionVelocityJointController"
+         base_class_type="pr2_controller_interface::Controller" />
+
 </library>

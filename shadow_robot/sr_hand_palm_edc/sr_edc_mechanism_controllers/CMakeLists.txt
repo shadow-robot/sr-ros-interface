@@ -20,4 +20,5 @@ rosbuild_add_library(${PROJECT_NAME}
   src/srh_fake_joint_calibration_controller.cpp
   src/srh_position_controller.cpp
   src/srh_joint_velocity_controller.cpp
+  src/srh_mixed_position_velocity_controller.cpp
 )
