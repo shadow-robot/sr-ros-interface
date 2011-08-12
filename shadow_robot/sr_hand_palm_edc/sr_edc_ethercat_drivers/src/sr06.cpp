@@ -560,7 +560,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     }
   }
 
-  ROS_INFO("Sending magic CAN packet to put the motor in bootloading mode");
+  ROS_INFO_STREAM("Sending magic CAN packet to put the motor in bootloading mode to motor: "<< motor_being_flashed << " on bus: "<<can_bus_);
   cmd_sent = 0;
   while ( !cmd_sent )
   {
@@ -568,7 +568,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     {
       can_message_.message_length = 8;
       can_message_.can_bus = can_bus_;
-      can_message_.message_id = 0x0600 | (req.motor_id << 5) | 0b1010;
+      can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | 0b1010;
 
       can_message_.message_data[0] = 0x55;
       can_message_.message_data[1] = 0xAA;
@@ -611,7 +611,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
       {
         can_message_.message_length = 8;
         can_message_.can_bus = can_bus_;
-        can_message_.message_id = 0x0600 | (req.motor_id << 5) | 0b1010;
+        can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | 0b1010;
         can_message_.message_data[0] = 0x55;
         can_message_.message_data[1] = 0xAA;
         can_message_.message_data[2] = 0x55;
@@ -720,11 +720,11 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
           {
             can_message_.message_length = 3;
             can_message_.can_bus = can_bus_;
-            can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_ADDRESS_COMMAND;
+            can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | WRITE_FLASH_ADDRESS_COMMAND;
             can_message_.message_data[2] = addru + ((pos + addrl + (addrh << 8)) >> 16);
             can_message_.message_data[1] = addrh + ((pos + addrl) >> 8); // User application start address is 0x4C0
             can_message_.message_data[0] = addrl + pos;
-            ROS_INFO("Sending write address : 0x%02X%02X%02X", can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
+            ROS_INFO("Sending write address to motor %d : 0x%02X%02X%02X", motor_being_flashed, can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
             cmd_sent = 1;
             unlock(&producing);
           }
@@ -760,7 +760,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
         ROS_INFO("Sending data ... position == %d", pos);
         can_message_.message_length = 8;
         can_message_.can_bus = can_bus_;
-        can_message_.message_id = 0x0600 | (req.motor_id << 5) | WRITE_FLASH_DATA_COMMAND;
+        can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | WRITE_FLASH_DATA_COMMAND;
         bzero(can_message_.message_data, 8);
         for (unsigned char j = 0 ; j < 8 ; ++j)
           can_message_.message_data[j] = (pos > total_size) ? 0xFF : *(binary_content + pos + j);
@@ -829,7 +829,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     {
       can_message_.message_length = 0;
       can_message_.can_bus = can_bus_;
-      can_message_.message_id = 0x0600 | (req.motor_id << 5) | RESET_COMMAND;
+      can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | RESET_COMMAND;
       cmd_sent = 1;
       unlock(&producing);
     }
@@ -1080,8 +1080,6 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
 bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
 {
   int i;
-
-  ROS_INFO("AA ack sid : %04X", packet->message_id);
 
   if (packet->message_id == 0)
     return false;
