@@ -304,7 +304,8 @@ class JointPidSetter(QtGui.QFrame):
             param[1][0] = param[1][1].text().toInt()[0]
         try:
             self.pid_service( self.parameters["p"][0], self.parameters["i"][0],
-                              self.parameters["d"][0], self.parameters["iclamp"][0] )
+                              self.parameters["d"][0], self.parameters["iclamp"][0],
+                              2000)
         except:
             print "Failed to set pid."
 
