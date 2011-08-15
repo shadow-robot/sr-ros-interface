@@ -90,19 +90,6 @@ namespace shadow_robot
      * The size of the calibration table, used for quick access
      */
     unsigned int calibration_table_size_;
-
-    /**
-     * Interpolate linearly between the 2 points, for the given raw_value
-     *
-     * @param raw_reading the X value (raw_reading) to compute the interpolation for.
-     * @param low_point the first point of our line
-     * @param high_point the second point of our line
-     *
-     * @return the computed Y value (calibrated value)
-     */
-    double linear_interpolate_(double raw_reading,
-                               joint_calibration::Point low_point,
-                               joint_calibration::Point high_point);
   };
 }
 

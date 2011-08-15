@@ -104,6 +104,36 @@ namespace sr_math_utils
 
     return full_value + value_to_add;
   }
+
+
+  /**
+   * Interpolate linearly between the 2 points, for the given value
+   *
+   * y = y0 + (x-x0)*((y1-y0)/(x1-x0))
+   *
+   * @param x the X value to compute the interpolation for.
+   * @param x0 the X value of our first point
+   * @param y0 the Y value of our first point
+   * @param x1 the X value of our second point
+   * @param y1 the Y value of our second point
+   *
+   * @return the computed Y value (calibrated value)
+   */
+  static inline double linear_interpolate_(double x,
+                                           double x0, double y0,
+                                           double x1, double y1)
+  {
+    //y1 - y0
+    double y = y1 - y0;
+    // (y1 - y0) / (x1 - x0)
+    y /= (x1 - x0);
+    //  (x-x0)*((y1-y0)/(x1-x0))
+    y *= (x - x0);
+    //  y0 + (x-x0)*((y1-y0)/(x1-x0))
+    y += y0;
+
+    return y;
+  }
 }
 
 /* For the emacs weenies in the crowd.

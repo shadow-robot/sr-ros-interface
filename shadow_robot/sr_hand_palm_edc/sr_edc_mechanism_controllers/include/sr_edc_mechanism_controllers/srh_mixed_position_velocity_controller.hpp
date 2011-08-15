@@ -64,9 +64,12 @@
 #include <control_toolbox/pid.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
+#include "control_toolbox/pid_gains_setter.h"
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Float64.h>
 #include <pr2_controllers_msgs/JointControllerState.h>
+
+#include <sr_robot_msgs/SetVelocityMixedPositionVelocityController.h>
 
 #include <sr_utilities/calibration.hpp>
 
@@ -81,7 +84,7 @@ namespace controller
     ~SrhMixedPositionVelocityJointController();
 
     bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
-               const control_toolbox::Pid &pid_position, const control_toolbox::Pid &pid_velocity);
+               const control_toolbox::Pid &pid_velocity);
     bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
 
     /*!
@@ -111,15 +114,27 @@ namespace controller
     ros::Duration dt_;
     double command_;                            /**< Last commanded position. */
 
+    /**
+     * The callback for the set velocity service: updates the max_velocity_,
+     * min_velocity_, slope_velocity_, max_position_error_, min_position_error_.
+     *
+     * @param request The user request, containing the min/max velocity and the slope.
+     * @param response True if success
+     *
+     * @return True if success
+     */
+    bool set_velocity_callback(sr_robot_msgs::SetVelocityMixedPositionVelocityController::Request& request,
+                               sr_robot_msgs::SetVelocityMixedPositionVelocityController::Response& response);
+
+
   private:
     int loop_count_;
     bool initialized_;
     pr2_mechanism_model::RobotState *robot_;              /**< Pointer to robot structure. */
-    control_toolbox::Pid pid_controller_position_;       /**< Internal PID controller for the position loop. */
     control_toolbox::Pid pid_controller_velocity_;       /**< Internal PID controller for the velocity loop. */
     ros::Time last_time_;                          /**< Last time stamp of update. */
 
-    ros::NodeHandle node_;
+    ros::NodeHandle node_, n_tilde_;
 
     boost::scoped_ptr<
       realtime_tools::RealtimePublisher<
@@ -129,8 +144,38 @@ namespace controller
     std::vector<joint_calibration::Point> read_friction_map();
     boost::shared_ptr<shadow_robot::JointCalibration> friction_interpoler;
 
+    /**
+     * Compute the velocity demand from the position error:
+     *  we use this function (velocity_demand = f(position_error))
+     *  to converge smoothly on the position we want.
+     *       ____
+     *      /
+     *     /
+     * ___/
+     *
+     * @param position_error The current position error
+     *
+     * @return A velocity demand.
+     */
+    double compute_velocity_demand(double position_error);
+    /// The values defining the slope (min and max velocity + slope value)
+    double max_velocity_, min_velocity_, slope_velocity_;
+    /// those are the X values for the beginning and the end of the slope.
+    double max_position_error_, min_position_error_;
+    /**
+     * Compute the max_position_error and min_position_error_
+     * from the max_velocity / min_velocity_, slope_velocity_
+     * parameters.
+     *
+     */
+    void set_min_max_position_errors_();
+    /// Advertise a service to set the min/max velocity and the slope.
+    ros::ServiceServer velocity_service_;
+
     ros::Subscriber sub_command_;
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+
+    control_toolbox::PidGainsSetter velocity_pid_gains_setter;
 
     ///clamps the force demand to this value
     double max_force_demand;

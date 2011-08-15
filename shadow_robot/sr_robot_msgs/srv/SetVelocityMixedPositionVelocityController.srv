@@ -1,0 +1,5 @@
+float64 min_velocity
+float64 max_velocity
+float64 slope
+---
+bool success

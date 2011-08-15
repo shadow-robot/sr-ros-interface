@@ -27,6 +27,7 @@
  */
 
 #include "sr_utilities/calibration.hpp"
+#include "sr_utilities/sr_math_utils.hpp"
 
 #include <boost/assert.hpp>
 #include <algorithm>
@@ -107,34 +108,10 @@ namespace shadow_robot
       } // end if 2 values only in the table
     } //end if raw_reading before table
 
-    return linear_interpolate_(raw_reading, low_point, high_point);
-  }
-
-  /**
-   * Interpolate linearly between the 2 points, for the given raw_value
-   *
-   * y = y0 + (x-x0)*((y1-y0)/(x1-x0))
-   *
-   * @param raw_reading the X value (raw_reading) to compute the interpolation for.
-   * @param low_point the first point of our line
-   * @param high_point the second point of our line
-   *
-   * @return the computed Y value (calibrated value)
-   */
-  double JointCalibration::linear_interpolate_(double raw_reading,
-                                               joint_calibration::Point low_point,
-                                               joint_calibration::Point high_point)
-  {
-    //y1 - y0
-    double y = high_point.calibrated_value - low_point.calibrated_value;
-    // (y1 - y0) / (x1 - x0)
-    y /= (high_point.raw_value - low_point.raw_value);
-    //  (x-x0)*((y1-y0)/(x1-x0))
-    y *= (raw_reading - low_point.raw_value);
-    //  y0 + (x-x0)*((y1-y0)/(x1-x0))
-    y += low_point.calibrated_value;
-
-    return y;
+    return sr_math_utils::linear_interpolate_(raw_reading, low_point.raw_value,
+                                              low_point.calibrated_value,
+                                              high_point.raw_value,
+                                              high_point.calibrated_value);
   }
 }
 
