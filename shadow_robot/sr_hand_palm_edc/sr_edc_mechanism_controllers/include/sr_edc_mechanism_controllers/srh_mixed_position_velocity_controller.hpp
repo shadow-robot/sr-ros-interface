@@ -170,7 +170,7 @@ namespace controller
      */
     void set_min_max_position_errors_();
     /// Advertise a service to set the min/max velocity and the slope.
-    ros::ServiceServer velocity_service_;
+    std::vector<ros::ServiceServer> velocity_services_;
 
     ros::Subscriber sub_command_;
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);

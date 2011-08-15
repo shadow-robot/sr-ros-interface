@@ -35,6 +35,7 @@
 #include "sr_edc_mechanism_controllers/srh_mixed_position_velocity_controller.hpp"
 #include "angles/angles.h"
 #include "pluginlib/class_list_macros.h"
+#include <sstream>
 #include <math.h>
 #include "sr_utilities/sr_math_utils.hpp"
 
@@ -94,7 +95,10 @@ namespace controller {
     ROS_DEBUG_STREAM(" In Init: " << getJointName() << " This: " << this
                      << " joint_state: "<<joint_state_ );
 
-    velocity_service_ = n_tilde_.advertiseService("set_velocity", &SrhMixedPositionVelocityJointController::set_velocity_callback, this);
+    std::stringstream ss;
+    ss << getJointName() << "/set_velocity";
+
+    velocity_services_.push_back( n_tilde_.advertiseService(ss.str(), &SrhMixedPositionVelocityJointController::set_velocity_callback, this) );
 
     return true;
   }
@@ -215,11 +219,13 @@ namespace controller {
     double commanded_effort = pid_controller_velocity_.updatePid(error_velocity, joint_state_->velocity_, dt_);
 
     //Friction compensation
-    ROS_DEBUG_STREAM(getJointName() << ": before fc: effort=" << commanded_effort << " / pos: " << joint_state_->position_ );
+    //if( std::string("FFJ3").compare( getJointName() ) == 0 )
+    //  ROS_INFO_STREAM(getJointName() << ": before fc: velocity demand=" << commanded_velocity << " force demand=" << commanded_effort << " / error: " << error_velocity );
     commanded_effort += friction_compensation( joint_state_->position_ );
 
-    ROS_DEBUG_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
-    commanded_effort = max( commanded_effort, max_force_demand );
+    //if( std::string("FFJ3").compare( getJointName() ) == 0 )
+    //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
+    commanded_effort = min( commanded_effort, max_force_demand );
 
     joint_state_->commanded_effort_ = commanded_effort;
 
