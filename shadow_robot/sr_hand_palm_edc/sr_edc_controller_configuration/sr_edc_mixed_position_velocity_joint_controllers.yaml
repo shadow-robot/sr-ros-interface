@@ -1,0 +1,178 @@
+# Shadow Hand Defines .. Need Fixing as PID values are not correct
+
+sh_ffj0_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: FFJ2
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_ffj3_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: FFJ3
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_ffj4_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: FFJ4
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+sh_mfj0_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: MFJ2
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_mfj3_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: MFJ3
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_mfj4_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: MFJ4
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+
+sh_rfj0_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: RFJ2
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_rfj3_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: RFJ3
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_rfj4_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: RFJ4
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+
+sh_lfj0_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: LFJ2
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_lfj3_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: LFJ3
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_lfj4_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: LFJ4
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_lfj5_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: LFJ5
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+
+sh_thj1_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: THJ1
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_thj2_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: THJ2
+  pid:
+    p: -2.0
+    i: -0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_thj3_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: THJ3
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_thj4_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: THJ4
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+sh_thj5_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: THJ5
+  pid:
+    p: 2.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+
+
+
+sh_wrj1_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: WRJ1
+  pid:
+    p: 4.0
+    i: 1.0
+    d: 0.0
+    i_clamp: 1.0
+sh_wrj2_mixed_position_velocity_controller:
+  type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
+  joint: WRJ2
+  pid:
+    p: -4.0
+    i: -1.0
+    d: 0.0
+    i_clamp: 1.0
+
+
