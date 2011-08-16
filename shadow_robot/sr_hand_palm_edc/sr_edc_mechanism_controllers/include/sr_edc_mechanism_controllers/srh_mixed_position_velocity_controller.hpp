@@ -64,12 +64,11 @@
 #include <control_toolbox/pid.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
-#include "control_toolbox/pid_gains_setter.h"
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Float64.h>
 #include <pr2_controllers_msgs/JointControllerState.h>
 
-#include <sr_robot_msgs/SetVelocityMixedPositionVelocityController.h>
+#include <sr_robot_msgs/SetMixedPositionVelocityPidGains.h>
 
 #include <sr_utilities/calibration.hpp>
 
@@ -107,25 +106,12 @@ namespace controller
     virtual void update();
 
     void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
-    void setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min, const double &max_force);
+    bool setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req, sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp);
 
     std::string getJointName();
     pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
     ros::Duration dt_;
     double command_;                            /**< Last commanded position. */
-
-    /**
-     * The callback for the set velocity service: updates the max_velocity_,
-     * min_velocity_, slope_velocity_, max_position_error_, min_position_error_.
-     *
-     * @param request The user request, containing the min/max velocity and the slope.
-     * @param response True if success
-     *
-     * @return True if success
-     */
-    bool set_velocity_callback(sr_robot_msgs::SetVelocityMixedPositionVelocityController::Request& request,
-                               sr_robot_msgs::SetVelocityMixedPositionVelocityController::Response& response);
-
 
   private:
     int loop_count_;
@@ -172,10 +158,13 @@ namespace controller
     /// Advertise a service to set the min/max velocity and the slope.
     std::vector<ros::ServiceServer> velocity_services_;
 
+    ros::Publisher debug_pub;
+
+
     ros::Subscriber sub_command_;
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 
-    control_toolbox::PidGainsSetter velocity_pid_gains_setter;
+    ros::ServiceServer serve_set_gains_;
 
     ///clamps the force demand to this value
     double max_force_demand;

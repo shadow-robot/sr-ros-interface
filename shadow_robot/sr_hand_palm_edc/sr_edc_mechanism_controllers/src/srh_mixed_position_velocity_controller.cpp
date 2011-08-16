@@ -39,6 +39,8 @@
 #include <math.h>
 #include "sr_utilities/sr_math_utils.hpp"
 
+#include <std_msgs/Float64.h>
+
 PLUGINLIB_DECLARE_CLASS(sr_edc_mechanism_controllers, SrhMixedPositionVelocityJointController, controller::SrhMixedPositionVelocityJointController, pr2_controller_interface::Controller)
 
 using namespace std;
@@ -49,7 +51,7 @@ namespace controller {
     : joint_state_(NULL), command_(0),
       loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
       n_tilde_("~"),
-      max_velocity_(1.0), min_velocity_(-1.0), slope_velocity_(1.0),
+      max_velocity_(1.0), min_velocity_(-1.0), slope_velocity_(10.0),
       max_position_error_(0.0), min_position_error_(0.0),
       max_force_demand(1000.)
   {
@@ -88,8 +90,7 @@ namespace controller {
 
     pid_controller_velocity_ = pid_velocity;
 
-    velocity_pid_gains_setter.add(&pid_controller_velocity_);
-    velocity_pid_gains_setter.advertise(node_);
+    serve_set_gains_ = node_.advertiseService("set_gains", &SrhMixedPositionVelocityJointController::setGains, this);
 
     ROS_DEBUG_STREAM(" joint_state name: " << joint_state_->joint_->name);
     ROS_DEBUG_STREAM(" In Init: " << getJointName() << " This: " << this
@@ -98,7 +99,13 @@ namespace controller {
     std::stringstream ss;
     ss << getJointName() << "/set_velocity";
 
-    velocity_services_.push_back( n_tilde_.advertiseService(ss.str(), &SrhMixedPositionVelocityJointController::set_velocity_callback, this) );
+    if( std::string("FFJ3").compare(getJointName()) == 0)
+    {
+      ROS_INFO("Publishing debug infor for FFJ3 mixed position/velocity controller");
+      std::stringstream ss2;
+      ss2 << getJointName() << "debug_velocity";
+      debug_pub = n_tilde_.advertise<std_msgs::Float64>(ss2.str(), 2);
+    }
 
     return true;
   }
@@ -136,34 +143,21 @@ namespace controller {
     ROS_WARN("Reseting PID");
   }
 
-  void SrhMixedPositionVelocityJointController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min, const double &max_force)
+  bool SrhMixedPositionVelocityJointController::setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req,
+                                                         sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp)
   {
-    pid_controller_velocity_.setGains(p,i,d,i_max,i_min);
+    pid_controller_velocity_.setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
+    max_force_demand = req.max_force;
 
-    max_force_demand = max_force;
-  }
+    //setting the position controller parameters
+    min_velocity_ = req.min_velocity;
+    max_velocity_ = req.max_velocity;
+    slope_velocity_ = req.velocity_slope;
 
-  void SrhMixedPositionVelocityJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
-  {
-    pid_controller_velocity_.getGains(p,i,d,i_max,i_min);
-  }
-
-
-  bool SrhMixedPositionVelocityJointController::set_velocity_callback(sr_robot_msgs::SetVelocityMixedPositionVelocityController::Request& request,
-                                                                      sr_robot_msgs::SetVelocityMixedPositionVelocityController::Response& response)
-  {
-    min_velocity_ = request.min_velocity;
-    max_velocity_ = request.max_velocity;
-    slope_velocity_ = request.slope;
-
-    if( min_velocity_ < max_velocity_ )
+    if( slope_velocity_ != 0.0 )
     {
-      if( slope_velocity_ > 0.0 )
-      {
-        set_min_max_position_errors_();
-        response.success = true;
-        return true;
-      }
+      set_min_max_position_errors_();
+      return true;
     }
 
     min_velocity_ = -1.0;
@@ -171,6 +165,11 @@ namespace controller {
     slope_velocity_ = 1.0;
     set_min_max_position_errors_();
     return false;
+  }
+
+  void SrhMixedPositionVelocityJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
+  {
+    pid_controller_velocity_.getGains(p,i,d,i_max,i_min);
   }
 
 
@@ -199,7 +198,6 @@ namespace controller {
       return;
 
     assert(robot_ != NULL);
-    double error_position(0);
     ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
     dt_= time - last_time_;
@@ -211,12 +209,19 @@ namespace controller {
     }
 
     //Compute velocity demand from position error:
-    error_position = joint_state_->position_ - command_;
+    double error_position = joint_state_->position_ - command_;
     double commanded_velocity = compute_velocity_demand(error_position);
+
+    if( std::string("FFJ3").compare(getJointName()) == 0)
+    {
+      std_msgs::Float64 msg;
+      msg.data = commanded_velocity;
+      debug_pub.publish(msg);
+    }
 
     //velocity loop:
     double error_velocity = joint_state_->velocity_ - commanded_velocity;
-    double commanded_effort = pid_controller_velocity_.updatePid(error_velocity, joint_state_->velocity_, dt_);
+    double commanded_effort = pid_controller_velocity_.updatePid(error_velocity, dt_);
 
     //Friction compensation
     //if( std::string("FFJ3").compare( getJointName() ) == 0 )
@@ -225,9 +230,14 @@ namespace controller {
 
     //if( std::string("FFJ3").compare( getJointName() ) == 0 )
     //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
+
+    commanded_effort += joint_state_->commanded_effort_;
+
     commanded_effort = min( commanded_effort, max_force_demand );
+    commanded_effort = max( commanded_effort, -max_force_demand );
 
     joint_state_->commanded_effort_ = commanded_effort;
+
 
     if(loop_count_ % 10 == 0)
     {

@@ -62,7 +62,6 @@
 
 #include <pr2_controller_interface/controller.h>
 #include <control_toolbox/pid.h>
-#include "control_toolbox/pid_gains_setter.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <realtime_tools/realtime_publisher.h>
@@ -70,6 +69,7 @@
 #include <pr2_controllers_msgs/JointControllerState.h>
 
 #include <sr_utilities/calibration.hpp>
+#include <sr_robot_msgs/SetPidGains.h>
 
 namespace controller
 {
@@ -103,8 +103,8 @@ namespace controller
      */
     virtual void update();
 
-    void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
-    void setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min, const double &max_force);
+    void getGains(double &p, double &i, double &d, double &i_max, double &i_min, double &max_force);
+    bool setGains(sr_robot_msgs::SetPidGains::Request &req, sr_robot_msgs::SetPidGains::Response &resp);
 
     std::string getJointName();
     pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
@@ -131,7 +131,7 @@ namespace controller
     ros::Subscriber sub_command_;
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 
-    control_toolbox::PidGainsSetter pid_gains_setter;
+    ros::ServiceServer serve_set_gains_;
 
     ///clamps the force demand to this value
     double max_force_demand;

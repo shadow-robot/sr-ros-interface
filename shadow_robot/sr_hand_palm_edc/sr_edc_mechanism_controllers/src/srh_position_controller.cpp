@@ -82,8 +82,7 @@ namespace controller {
 
     pid_controller_ = pid;
 
-    pid_gains_setter.add(&pid_controller_);
-    pid_gains_setter.advertise(node_);
+    serve_set_gains_ = node_.advertiseService("set_gains", &SrhPositionController::setGains, this);
 
     ROS_DEBUG_STREAM(" joint_state name: " << joint_state_->joint_->name);
     ROS_DEBUG_STREAM(" In Init: " << getJointName() << " This: " << this
@@ -124,16 +123,19 @@ namespace controller {
     ROS_WARN("Reseting PID");
   }
 
-  void SrhPositionController::setGains(const double &p, const double &i, const double &d, const double &i_max, const double &i_min, const double &max_force)
+  bool SrhPositionController::setGains(sr_robot_msgs::SetPidGains::Request &req,
+                                       sr_robot_msgs::SetPidGains::Response &resp)
   {
-    pid_controller_.setGains(p,i,d,i_max,i_min);
+    pid_controller_.setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
+    max_force_demand = req.max_force;
 
-    max_force_demand = max_force;
+    return true;
   }
 
-  void SrhPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
+  void SrhPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min, double &max_force)
   {
     pid_controller_.getGains(p,i,d,i_max,i_min);
+    max_force = max_force_demand;
   }
 
   std::string SrhPositionController::getJointName()
@@ -176,11 +178,14 @@ namespace controller {
 
     double commanded_effort = pid_controller_.updatePid(error, joint_state_->velocity_, dt_);
 
-    ROS_DEBUG_STREAM(getJointName() << ": before fc: effort=" << commanded_effort << " / pos: " << joint_state_->position_ );
+    //if( std::string("FFJ3").compare(getJointName()) == 0)
+    //  ROS_INFO_STREAM(getJointName() << ": before fc: effort=" << commanded_effort << " / pos: " << joint_state_->position_  << " / max force: " << max_force_demand);
     commanded_effort += friction_compensation( joint_state_->position_ );
 
     ROS_DEBUG_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
-    commanded_effort = max( commanded_effort, max_force_demand );
+
+    commanded_effort = min( commanded_effort, max_force_demand );
+    commanded_effort = max( commanded_effort, -max_force_demand );
 
     joint_state_->commanded_effort_ = commanded_effort;
 
@@ -196,12 +201,13 @@ namespace controller {
         controller_state_publisher_->msg_.time_step = dt_.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
-        double dummy;
+        double max_force, imin = 0.0;
         getGains(controller_state_publisher_->msg_.p,
                  controller_state_publisher_->msg_.i,
                  controller_state_publisher_->msg_.d,
+                 imin,
                  controller_state_publisher_->msg_.i_clamp,
-                 dummy);
+                 max_force);
         controller_state_publisher_->unlockAndPublish();
       }
     }
