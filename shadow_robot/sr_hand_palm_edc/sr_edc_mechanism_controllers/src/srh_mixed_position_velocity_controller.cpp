@@ -1,36 +1,36 @@
-/*********************************************************************
- * Software License Agreement (BSD License)
+/**
+ * @file   srh_mixed_position_velocity_controller.cpp
+ * @author Ugo Cupcic <ugo@shadowrobot.com>
+ * @date   Wed Aug 17 12:32:01 2011
  *
- *  Copyright (c) 2008, Willow Garage, Inc.
- *  All rights reserved.
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*
+ * @brief Compute a velocity demand from the position error:
+ *  we use this function (velocity_demand = f(position_error))
+ *  to converge smoothly on the position we want.
+ *       ____
+ *      /
+ *     /
+ * ___/
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
+ * The velocity demand is then converted into a force demand by a
+ * PID loop.
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer in the documentation and/or other materials provided
- *     with the distribution.
- *   * Neither the name of the Willow Garage nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
- *********************************************************************/
+ */
 
 #include "sr_edc_mechanism_controllers/srh_mixed_position_velocity_controller.hpp"
 #include "angles/angles.h"
@@ -86,7 +86,7 @@ namespace controller {
       return false;
     }
 
-    friction_interpoler = boost::shared_ptr<shadow_robot::JointCalibration>( new shadow_robot::JointCalibration( read_friction_map() ) );
+    friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
 
     pid_controller_velocity_ = pid_velocity;
 
@@ -210,37 +210,43 @@ namespace controller {
 
     //Compute velocity demand from position error:
     double error_position = joint_state_->position_ - command_;
-    double commanded_velocity = compute_velocity_demand(error_position);
 
-    if( std::string("FFJ3").compare(getJointName()) == 0)
-    {
-      std_msgs::Float64 msg;
-      msg.data = commanded_velocity;
-      debug_pub.publish(msg);
-    }
+    double commanded_velocity = 0.0;
+    double error_velocity = 0.0;
+    double commanded_effort = 0.0;
+    //if (error_position > 0.005)
+    //{
+      commanded_velocity = compute_velocity_demand(error_position);
 
-    //velocity loop:
-    double error_velocity = joint_state_->velocity_ - commanded_velocity;
-    double commanded_effort = pid_controller_velocity_.updatePid(error_velocity, dt_);
+      //velocity loop:
+      error_velocity = joint_state_->velocity_ - commanded_velocity;
+      commanded_effort = pid_controller_velocity_.updatePid(error_velocity, dt_);
 
-    //Friction compensation
-    //if( std::string("FFJ3").compare( getJointName() ) == 0 )
-    //  ROS_INFO_STREAM(getJointName() << ": before fc: velocity demand=" << commanded_velocity << " force demand=" << commanded_effort << " / error: " << error_velocity );
-    commanded_effort += friction_compensation( joint_state_->position_ );
+      commanded_effort += joint_state_->commanded_effort_;
 
-    //if( std::string("FFJ3").compare( getJointName() ) == 0 )
-    //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
+      commanded_effort = min( commanded_effort, max_force_demand );
+      commanded_effort = max( commanded_effort, -max_force_demand );
 
-    commanded_effort += joint_state_->commanded_effort_;
+      //Friction compensation
+      //if( std::string("FFJ3").compare( getJointName() ) == 0 )
+      //  ROS_INFO_STREAM(getJointName() << ": before fc: velocity demand=" << commanded_velocity << " force demand=" << commanded_effort << " / error: " << error_velocity );
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort) );
 
-    commanded_effort = min( commanded_effort, max_force_demand );
-    commanded_effort = max( commanded_effort, -max_force_demand );
+      //if( std::string("FFJ3").compare( getJointName() ) == 0 )
+      //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
+      //}
 
     joint_state_->commanded_effort_ = commanded_effort;
 
-
     if(loop_count_ % 10 == 0)
     {
+      if( std::string("FFJ3").compare(getJointName()) == 0)
+      {
+        std_msgs::Float64 msg;
+        msg.data = commanded_velocity;
+        debug_pub.publish(msg);
+      }
+
       if(controller_state_publisher_ && controller_state_publisher_->trylock())
       {
         controller_state_publisher_->msg_.header.stamp = time;
@@ -265,87 +271,10 @@ namespace controller {
     last_time_ = time;
   }
 
-  double SrhMixedPositionVelocityJointController::friction_compensation( double position )
-  {
-    double compensation = 0.0;
-    compensation = friction_interpoler->compute( position );
-    return compensation;
-  }
-
   void SrhMixedPositionVelocityJointController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
   {
     command_ = msg->data;
   }
-
-
-  std::vector<joint_calibration::Point> SrhMixedPositionVelocityJointController::read_friction_map()
-  {
-    std::vector<joint_calibration::Point> friction_map;
-    std::string param_name = "/sr_friction_map";
-
-    bool joint_not_found = true;
-
-    XmlRpc::XmlRpcValue calib;
-    node_.getParam(param_name, calib);
-
-    ROS_DEBUG_STREAM("  Reading friction for: " <<  getJointName());
-    ROS_DEBUG_STREAM(" value: " << calib);
-
-    ROS_ASSERT(calib.getType() == XmlRpc::XmlRpcValue::TypeArray);
-    //iterate on all the joints
-    for(int32_t index_cal = 0; index_cal < calib.size(); ++index_cal)
-    {
-      //check the calibration is well formatted:
-      // first joint name, then calibration table
-      ROS_ASSERT(calib[index_cal][0].getType() == XmlRpc::XmlRpcValue::TypeString);
-      ROS_ASSERT(calib[index_cal][1].getType() == XmlRpc::XmlRpcValue::TypeArray);
-
-      std::string joint_name = static_cast<std::string> (calib[index_cal][0]);
-
-      ROS_DEBUG_STREAM("  Checking joint name: "<< joint_name << " / " << getJointName());
-      if(  joint_name.compare( getJointName() ) != 0 )
-        continue;
-
-      ROS_DEBUG_STREAM("   OK: joint name = "<< joint_name);
-
-      joint_not_found = false;
-      //now iterates on the calibration table for the current joint
-      for(int32_t index_table=0; index_table < calib[index_cal][1].size(); ++index_table)
-      {
-        ROS_ASSERT(calib[index_cal][1][index_table].getType() == XmlRpc::XmlRpcValue::TypeArray);
-        //only 2 values per calibration point: raw and calibrated (doubles)
-        ROS_ASSERT(calib[index_cal][1][index_table].size() == 2);
-        ROS_ASSERT(calib[index_cal][1][index_table][0].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-        ROS_ASSERT(calib[index_cal][1][index_table][1].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-
-
-        joint_calibration::Point point_tmp;
-        point_tmp.raw_value = static_cast<double> (calib[index_cal][1][index_table][0]);
-        point_tmp.calibrated_value = static_cast<double> (calib[index_cal][1][index_table][1]);
-        friction_map.push_back(point_tmp);
-      }
-
-      break;
-    }
-
-    if( joint_not_found )
-    {
-      ROS_WARN_STREAM("  No friction compensation for: " << getJointName() );
-
-      joint_calibration::Point point_tmp;
-      point_tmp.raw_value = 0.0;
-      point_tmp.calibrated_value = 0.0;
-      friction_map.push_back(point_tmp);
-      point_tmp.raw_value = 1.0;
-      friction_map.push_back(point_tmp);
-    }
-
-    ROS_DEBUG_STREAM(" Friction map[" << getJointName() << "]");
-    for( unsigned int i=0; i<friction_map.size(); ++i )
-      ROS_DEBUG_STREAM("    -> position=" << friction_map[i].raw_value << " compensation: " << friction_map[i].calibrated_value);
-
-    return friction_map;
-  } //end read_friction_map
 
   double SrhMixedPositionVelocityJointController::compute_velocity_demand(double position_error)
   {

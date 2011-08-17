@@ -1,15 +1,8 @@
-##
-# This file contains the calibration map for the hand.
-#
-# The format is the following:
-# [[joint_name, [ [position, friction],
-#                 [position, friction],
-#                 [...] ] ]]
-# if the joint is not specified, then no friction map is used.
-#
-##
-
 sr_friction_map: [
-  ["LFJ4", [ [0.0,  1.0],
-             [10.0,  1.0] ]]   #LFJ4
+  ["FFJ3", -1, [  [0.0, -200.0],
+  [90.0, -200.0] ]],
+
+  ["FFJ3", 1, [  [0.0, 200.0],
+  [90.0, 200.0] ]]
+
 ]

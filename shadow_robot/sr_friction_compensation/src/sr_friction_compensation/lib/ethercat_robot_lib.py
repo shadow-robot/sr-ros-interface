@@ -47,6 +47,7 @@ class EtherCAT_Robot_Lib(RobotLib):
     def get_current_value(self,  joint_name, hand_nb):
         #TODO: add subscriber + return last received value for position
         if self.subscriber == None:
+            print "init subscriber"
             self.subscriber = rospy.Subscriber("/joint_states", JointState, self.callback_)
 
         iterations = 0
@@ -54,7 +55,7 @@ class EtherCAT_Robot_Lib(RobotLib):
             if iterations > 1000:
                 print "Couldn't read the current position for ", joint_name
                 return
-            time.sleep(0.001)
+            time.sleep(0.01)
 
         #return the last position
         return self.position[-1]
@@ -82,7 +83,7 @@ class EtherCAT_Robot_Lib(RobotLib):
             return
 
         for index_joint in self.index_joint:
-            pos += msg.position[index_joint]
+            pos += math.degrees( msg.position[index_joint] )
             effort += msg.effort[index_joint]
 
         self.position.append( pos )
@@ -113,10 +114,12 @@ class EtherCAT_Robot_Lib(RobotLib):
     def sendupdate(self, joint_name, hand_nb, value):
         #TODO: send a target in velocity
         if self.publisher == None:
-            topic = "/sh_"+ joint_name.lower() +"_velocity_controller/command"
+            topic = "/sh_"+ joint_name.lower() +"_mixed_position_velocity_controller/command"
             self.publisher = rospy.Publisher(topic, Float64)
 
         self.msg_to_send.data = math.radians( float( value ) )
+
+        #print "Sending update: "+joint_name + " -> ",value, " on: ", topic
         self.publisher.publish(self.msg_to_send)
 
 ### Contrlr in python
@@ -127,12 +130,40 @@ class EtherCAT_Robot_Lib(RobotLib):
 
 ### Send the U_map table to the firmware
 #
-    def send_u_map_to_firmware(self, u_map_position, u_map_pid_out, node_id, direction, joint_name, hand_nb):
+    def send_u_map_to_firmware(self, u_map_position, u_map_pid_out, direction, joint_name, hand_nb):
         # send the u_map table
         date = time.localtime()
-        output_file =  "/tmp/" + str(date.tm_year)+ '_' + str(date.tm_mon)+ '_' +str(date.tm_mday)+ '_' +str(date.tm_hour)+ '_' +str(date.tm_min)+ '_' +str(date.tm_sec)+'/'+ joint_name + "_" + direction +"_friction_compensation.txt"
+        path =  "/tmp/" + str(date.tm_year)+ '_' + str(date.tm_mon)+ '_' +str(date.tm_mday)+ '_' +str(date.tm_hour)+ '_' +str(date.tm_min)+ '_' +str(date.tm_sec)+'_'+ joint_name + "_" + direction +"_friction_compensation.yaml"
+        output_file = open(path, mode='w')
 
-        #TODO: write the u map somewhere. (ask the user for it?)
-        # Generate u_map file
-        # u_map_position -> u_map_pid_out
+        print "output file: ", path
 
+        print "u_map_position ", u_map_position
+        print ""
+        print "u_map_pid_out ", u_map_pid_out
+
+        lines = []
+        lines.append("sr_friction_map: [\n")
+
+        if direction == "forward":
+            lines.append("  [\""+joint_name+"\", 1 ,[ ")
+        else:
+            lines.append("  [\""+joint_name+"\", -1 ,[ ")
+
+        for index in range(0, len(u_map_pid_out) - 1):
+            pos = u_map_position[index]
+            fric = u_map_pid_out[index]
+
+            lines.append(" ["+str(float(pos))+","+str(float(fric))+"],\n")
+
+        index += 1
+        pos = u_map_position[index]
+        fric = u_map_pid_out[index]
+        lines.append("["+str(pos)+","+str(fric)+"] ]]\n")
+
+        lines.append("]\n")
+
+        for line in lines:
+            output_file.write(line)
+
+        output_file.close()

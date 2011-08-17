@@ -9,7 +9,10 @@ from  inputs.u_map_data_acquisition_python import U_Map_Data_Acquisition_Python
 from  outputs.u_map_output_file import U_Map_Output_File
 from  utils.utilitarian import Utilitarian
 from  lib.python_robot_lib import Python_Robot_Lib
+from lib.ethercat_robot_lib import EtherCAT_Robot_Lib
 
+import roslib; roslib.load_manifest('sr_friction_compensation')
+import rospy
 
 ### Run the friction compensation process
 #
@@ -34,11 +37,8 @@ class FrictionCompensation(object):
       computation_steps = ['forward', 'backward']
 
       for direction in computation_steps:
-         print " 1"
          if self.stopped:
             return
-
-         print "2"
 
          # Class instanciations
          self.data_acquisition_python = U_Map_Data_Acquisition_Python(self.joint_name, self.hand_number, direction, self.lib)
@@ -75,7 +75,11 @@ class FrictionCompensation(object):
 ### main execution
 #
 if __name__ == "__main__":
-   lib = Python_Robot_Lib()
-   FC = FrictionCompensation(joint_name = "FFJ4", n = 15,P=0, I=0, D=0, shift=0, lib = lib)
+   rospy.init_node("sr_friction_compensation")
+
+   joint_name = "FFJ3"
+
+   robot_lib = EtherCAT_Robot_Lib(joint_name)
+   FC = FrictionCompensation(joint_name = joint_name, n = 15,P=0, I=0, D=0, shift=0, lib = robot_lib)
 
    FC.run()

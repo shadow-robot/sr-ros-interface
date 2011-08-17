@@ -1,62 +1,40 @@
-/*********************************************************************
- * Software License Agreement (BSD License)
+/**
+ * @file   srh_mixed_position_velocity_controller.hpp
+ * @author Ugo Cupcic <ugo@shadowrobot.com>
+ * @date   Wed Aug 17 12:32:01 2011
  *
- *  Copyright (c) 2008, Willow Garage, Inc.
- *  All rights reserved.
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*
+ * @brief Compute a velocity demand from the position error:
+ *  we use this function (velocity_demand = f(position_error))
+ *  to converge smoothly on the position we want.
+ *       ____
+ *      /
+ *     /
+ * ___/
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
+ * The velocity demand is then converted into a force demand by a
+ * PID loop.
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer in the documentation and/or other materials provided
- *     with the distribution.
- *   * Neither the name of the Willow Garage nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
- *********************************************************************/
+ */
+
 
 #ifndef SRH_MIXED_POSITION_VELOCITY_CONTROLLER_H
 #define SRH_MIXED_POSITION_VELOCITY_CONTROLLER_H
-
-/**
-   @class pr2_controller_interface::SrhMixedPositionVelocityController
-   @brief Joint Position Controller
-
-   This class controls positon using a pid loop.
-
-   @section ROS ROS interface
-
-   @param type Must be "SrhMixedPositionVelocityController"
-   @param joint Name of the joint to control.
-   @param pid Contains the gains for the PID loop around position.  See: control_toolbox::Pid
-
-   Subscribes to:
-
-   - @b command (std_msgs::Float64) : The joint position to achieve.
-
-   Publishes:
-
-   - @b state (robot_mechanism_controllers::JointControllerState) :
-     Current state of the controller, including pid error and gains.
-
-*/
 
 #include <ros/node_handle.h>
 
@@ -68,9 +46,12 @@
 #include <std_msgs/Float64.h>
 #include <pr2_controllers_msgs/JointControllerState.h>
 
+#include <utility>
+
 #include <sr_robot_msgs/SetMixedPositionVelocityPidGains.h>
 
-#include <sr_utilities/calibration.hpp>
+#include <sr_edc_mechanism_controllers/sr_friction_compensation.hpp>
+
 
 namespace controller
 {
@@ -126,9 +107,7 @@ namespace controller
       realtime_tools::RealtimePublisher<
         pr2_controllers_msgs::JointControllerState> > controller_state_publisher_ ;
 
-    double friction_compensation( double position );
-    std::vector<joint_calibration::Point> read_friction_map();
-    boost::shared_ptr<shadow_robot::JointCalibration> friction_interpoler;
+    boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator> friction_compensator;
 
     /**
      * Compute the velocity demand from the position error:

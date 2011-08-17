@@ -123,19 +123,19 @@ class Utilitarian(object):
 	    # min_angle
 	    # max_angle
 	    # min_osc_angle: position where oscillations appear (with velocity loop)
-	    # max_osc_angle: position where oscillations appear (with velocity loop)      
+	    # max_osc_angle: position where oscillations appear (with velocity loop)
     def joint_characteristics(self, joint_name, hand_nb):
 
       # First finger
 	if (joint_name == "FFJ1"):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif (joint_name == "FFJ2" ):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif (joint_name == "FFJ3"):
-            min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+            min_osc_angle = 5;       max_osc_angle = 79;
+	    min_angle = 0;      max_angle = 79;
 	elif (joint_name == "FFJ4"):
             min_osc_angle = -15;     max_osc_angle = 15;
 	    min_angle = -25;    max_angle = 25;
@@ -144,13 +144,13 @@ class Utilitarian(object):
 
 	elif ( joint_name == 'MFJ1'):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'MFJ2'):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'MFJ3'):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'MFJ4'):
             min_osc_angle = -15;     max_osc_angle = 15;
 	    min_angle = -25;    max_angle = 25;
@@ -158,13 +158,13 @@ class Utilitarian(object):
       # Right Finger:
 	elif ( joint_name == 'RFJ1'):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'RFJ2'):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'RFJ3'):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'RFJ4'):
             min_osc_angle = -15;     max_osc_angle = 15;
 	    min_angle = -25;    max_angle = 25;
@@ -172,13 +172,13 @@ class Utilitarian(object):
       # Little finger
 	elif ( joint_name == 'LFJ1'):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'LFJ2'):
 	    min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'LFJ3'):
             min_osc_angle = 5;       max_osc_angle = 85;
-	    min_angle = 0;      max_angle = 90;
+	    min_angle = 0;      max_angle = 85;
 	elif ( joint_name == 'LFJ4'):
             min_osc_angle = -15;     max_osc_angle = 15;
 	    min_angle = -25;    max_angle = 25;
@@ -210,7 +210,7 @@ class Utilitarian(object):
 	elif ( joint_name == 'WRJ2'):
             min_osc_angle = -20;     max_osc_angle = 0;
 	    min_angle = -30;    max_angle = 10;
-	else:	  
+	else:
 	  print "The joint is wrong it should be in the following format 'FFJ4'"
 	  return
 

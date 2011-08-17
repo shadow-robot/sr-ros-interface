@@ -12,7 +12,6 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
     #
     def __init__(self, joint_name, hand_nb, direction, lib):
         U_Map_Data_Acquisition.__init__(self, joint_name, hand_nb, direction)
-        print direction
 
         self.lib = lib
         self.position_dead_band = 1
@@ -27,15 +26,18 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
         ## Measurements preparation
         #
         # Configure the motor
+        print "set pid"
         self.lib.set_PID(P, I, D, shift, self.joint_name, self.hand_nb)
 
         # Set motion parameter
+        print "set motion param"
         self.set_motion_parameters()
 
-
+        print "drive to initial pos"
         # Drive the joint to the initial position
         self.drive_to_initial_position(self.position_dead_band)
 
+        print "starting to record"
         ## Measurements
         ##
         ## Start recording data
@@ -58,17 +60,17 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
     ### Drive the joint to initial position
     #
     def drive_to_initial_position(self, position_dead_band):
-
-
-
+        print "driving to: ", self.initial_position, " deadband = ", position_dead_band
         cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
         initial_time = time.time()
         t = time.time()
         #print cur_pos
         # Move until it reaches the initial position
+        print "pos: ",cur_pos, " target: ", self.initial_position, "error: ", abs(cur_pos - self.initial_position), " deadband: ",position_dead_band
         while (abs(cur_pos-self.initial_position)> position_dead_band)and (abs(initial_time-t)<100):
+            print "pos: ",cur_pos, " target: ", self.initial_position, "error: ", abs(cur_pos - self.initial_position), " deadband: ",position_dead_band
             #print abs(cur_pos-self.initial_position)
-            self.lib.sendupdate(self.joint_name, self.hand_nb, self.initial_range_end)
+            self.lib.sendupdate(self.joint_name, self.hand_nb, self.initial_position)
             #print self.initial_range_end
             cur_pos = self.lib.get_current_value(self.joint_name, self.hand_nb)
             #print cur_pos
@@ -91,7 +93,7 @@ class U_Map_Data_Acquisition_Python(U_Map_Data_Acquisition):
         print cur_pos
         initial_time = time.time()
         t = time.time()
-        while (abs(cu_pos - self.final_position) > position_dead_band) and (abs(initial_time-t)<100):
+        while (abs(cur_pos - self.final_position) > position_dead_band) and (abs(initial_time-t)<100):
             print abs(cur_pos - self.final_position)
             #if self.stopped:
                 #break
