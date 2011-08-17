@@ -47,13 +47,20 @@ namespace sr_friction_compensation
   double SrFrictionCompensator::friction_compensation( double position, int force_demand_sign )
   {
     double compensation = 0.0;
+
     if( force_demand_sign > 0 )
     {
-      compensation = friction_interpoler_forward->compute( position );
+      if( force_demand_sign < 50 )
+        compensation = 0.0;
+      else
+        compensation = friction_interpoler_forward->compute( position );
     }
     else
     {
-      compensation = friction_interpoler_backward->compute( position );
+      if( force_demand_sign > -50 )
+        compensation = 0.0;
+      else
+        compensation = friction_interpoler_backward->compute( position );
     }
     return compensation;
   }
