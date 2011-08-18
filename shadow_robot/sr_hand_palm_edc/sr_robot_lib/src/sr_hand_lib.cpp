@@ -155,9 +155,98 @@ namespace shadow_robot
   {
     ROS_INFO_STREAM("Received new force PID parameters for motor " << motor_index);
 
-    generate_force_control_config(motor_index, request.maxpwm, request.sgleftref,
-                                  request.sgrightref, request.f, request.p, request.i,
-                                  request.d, request.imax, request.deadband, request.sign);
+    //Check the parameters are in the correct ranges
+    if( motor_index > 20 )
+    {
+      ROS_WARN_STREAM(" Wrong motor index specified: " << motor_index);
+      response.configured = false;;
+      return false;
+    }
+
+    if( !( (request.maxpwm > MOTOR_DEMAND_PWM_RANGE_MIN) &&
+           (request.maxpwm < MOTOR_DEMAND_PWM_RANGE_MAX) )
+      )
+    {
+      ROS_WARN_STREAM(" pid parameter maxpwm is out of range : " << request.maxpwm << " -> not in [" <<
+                      MOTOR_DEMAND_PWM_RANGE_MIN << " ; " << MOTOR_DEMAND_PWM_RANGE_MAX << "]");
+      response.configured = false;
+      return false;
+    }
+
+    if( !( (request.f > MOTOR_CONFIG_F_RANGE_MIN) &&
+           (request.maxpwm < MOTOR_CONFIG_F_RANGE_MAX) )
+      )
+    {
+      ROS_WARN_STREAM(" pid parameter f is out of range : " << request.f << " -> not in [" <<
+                      MOTOR_CONFIG_F_RANGE_MIN << " ; " << MOTOR_CONFIG_F_RANGE_MAX << "]");
+      response.configured = false;
+      return false;
+    }
+
+    if( !( (request.p > MOTOR_CONFIG_P_RANGE_MIN) &&
+           (request.p < MOTOR_CONFIG_P_RANGE_MAX) )
+      )
+    {
+      ROS_WARN_STREAM(" pid parameter p is out of range : " << request.p << " -> not in [" <<
+                      MOTOR_CONFIG_P_RANGE_MIN << " ; " << MOTOR_CONFIG_P_RANGE_MAX << "]");
+      response.configured = false;
+      return false;
+    }
+
+    if( !( (request.i > MOTOR_CONFIG_I_RANGE_MIN) &&
+           (request.i < MOTOR_CONFIG_I_RANGE_MAX) )
+      )
+    {
+      ROS_WARN_STREAM(" pid parameter i is out of range : " << request.i << " -> not in [" <<
+                      MOTOR_CONFIG_I_RANGE_MIN << " ; " << MOTOR_CONFIG_I_RANGE_MAX << "]");
+      response.configured = false;
+      return false;
+    }
+
+    if( !( (request.d > MOTOR_CONFIG_D_RANGE_MIN) &&
+           (request.d < MOTOR_CONFIG_D_RANGE_MAX) )
+      )
+    {
+      ROS_WARN_STREAM(" pid parameter d is out of range : " << request.d << " -> not in [" <<
+                      MOTOR_CONFIG_D_RANGE_MIN << " ; " << MOTOR_CONFIG_D_RANGE_MAX << "]");
+      response.configured = false;
+      return false;
+    }
+
+    if( !( (request.imax > MOTOR_CONFIG_IMAX_RANGE_MIN) &&
+           (request.imax < MOTOR_CONFIG_IMAX_RANGE_MAX) )
+      )
+    {
+      ROS_WARN_STREAM(" pid parameter imax is out of range : " << request.imax << " -> not in [" <<
+                      MOTOR_CONFIG_IMAX_RANGE_MIN << " ; " << MOTOR_CONFIG_IMAX_RANGE_MAX << "]");
+      response.configured = false;
+      return false;
+    }
+
+    if( !( (request.deadband > MOTOR_CONFIG_DEADBAND_RANGE_MIN) &&
+           (request.deadband < MOTOR_CONFIG_DEADBAND_RANGE_MAX) )
+      )
+    {
+      ROS_WARN_STREAM(" pid parameter deadband is out of range : " << request.deadband << " -> not in [" <<
+                      MOTOR_CONFIG_DEADBAND_RANGE_MIN << " ; " << MOTOR_CONFIG_DEADBAND_RANGE_MAX << "]");
+      response.configured = false;
+      return false;
+    }
+
+    if( !( (request.sign > MOTOR_CONFIG_SIGN_RANGE_MIN) &&
+           (request.sign < MOTOR_CONFIG_SIGN_RANGE_MAX) )
+      )
+    {
+      ROS_WARN_STREAM(" pid parameter sign is out of range : " << request.sign << " -> not in [" <<
+                      MOTOR_CONFIG_SIGN_RANGE_MIN << " ; " << MOTOR_CONFIG_SIGN_RANGE_MAX << "]");
+      response.configured = false;
+      return false;
+    }
+
+    //ok, the parameters sent are coherent, send the demand to the motor.
+    generate_force_control_config( motor_index, request.maxpwm, request.sgleftref,
+                                   request.sgrightref, request.f, request.p, request.i,
+                                   request.d, request.imax, request.deadband, request.sign );
     response.configured = true;
     return true;
   }
@@ -170,7 +259,7 @@ namespace shadow_robot
     std::map<std::string, int> sensors_map;
     for(unsigned int i=0; i < SENSORS_NUM_0220; ++i)
     {
-      sensors_map[sensor_names[i] ] = i;
+      sensors_map[ sensor_names[i] ] = i;
     }
 
     XmlRpc::XmlRpcValue joint_to_sensor_mapping;
