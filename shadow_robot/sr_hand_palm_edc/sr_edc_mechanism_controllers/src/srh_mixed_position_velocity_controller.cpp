@@ -53,7 +53,8 @@ namespace controller {
       n_tilde_("~"),
       max_velocity_(1.0), min_velocity_(-1.0), slope_velocity_(10.0),
       max_position_error_(0.0), min_position_error_(0.0),
-      max_force_demand(1000.)
+      max_force_demand(1000.), position_deadband(0.05), friction_deadband(5),
+      last_error_position(0.0), compute_error(true), changed_sign_since_new_command(false)
   {
     set_min_max_position_errors_();
   }
@@ -148,6 +149,8 @@ namespace controller {
   {
     pid_controller_velocity_.setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
     max_force_demand = req.max_force;
+    friction_deadband = req.friction_deadband;
+    position_deadband = req.position_deadband;
 
     //setting the position controller parameters
     min_velocity_ = req.min_velocity;
@@ -211,11 +214,45 @@ namespace controller {
     //Compute velocity demand from position error:
     double error_position = joint_state_->position_ - command_;
 
+
+    //hysteresis deadband: each time the error is changing sign, we check if the
+    // error is leaving a deadband which is larger than the noise. (i.e. go to the
+    // target, then once you're there, don't send any motor demand unless the
+    // position error is more than the sensor noise.
+
+    // Are we in the hysteresis deadband? If we are in it, then we're just
+    // sending a force demand of 0.
+
+    // Received a new command:
+    if( last_command != command_ )
+    {
+      changed_sign_since_new_command = false;
+      last_error_position = error_position;
+    }
+    //check if the error changed sign since we received a new command
+    if( !changed_sign_since_new_command )
+      changed_sign_since_new_command = ( sr_math_utils::sign(error_position) != sr_math_utils::sign(last_error_position) );
+
+    //we always compute the error if we still haven't changed sign
+    if (!changed_sign_since_new_command)
+      compute_error = true;
+    else
+    {
+      if( abs(error_position) > position_deadband ) //we're outside of the deadband -> compute the error
+        compute_error = true;
+      else                                          //we're in the deadband -> send a force demand of 0.0
+        compute_error = false;
+    }
+    //save the last error in position and the last command
+    last_error_position = error_position;
+    last_command = command_;
+
     double commanded_velocity = 0.0;
     double error_velocity = 0.0;
     double commanded_effort = 0.0;
-    //if (error_position > 0.005)
-    //{
+    if(compute_error)
+    {
+      //compute the velocity demand from the simple interpoler
       commanded_velocity = compute_velocity_demand(error_position);
 
       //velocity loop:
@@ -224,18 +261,25 @@ namespace controller {
 
       commanded_effort += joint_state_->commanded_effort_;
 
+      //clamp the result to max force
       commanded_effort = min( commanded_effort, max_force_demand );
       commanded_effort = max( commanded_effort, -max_force_demand );
 
       //Friction compensation
       //if( std::string("FFJ3").compare( getJointName() ) == 0 )
       //  ROS_INFO_STREAM(getJointName() << ": before fc: velocity demand=" << commanded_velocity << " force demand=" << commanded_effort << " / error: " << error_velocity );
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort) );
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
 
       //if( std::string("FFJ3").compare( getJointName() ) == 0 )
       //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
-      //}
-
+    }
+    /*
+      else
+      {
+      if( std::string("FFJ3").compare(getJointName()) == 0)
+      ROS_ERROR("in deadband");
+      }
+    **/
     joint_state_->commanded_effort_ = commanded_effort;
 
     if(loop_count_ % 10 == 0)

@@ -147,6 +147,22 @@ namespace controller
 
     ///clamps the force demand to this value
     double max_force_demand;
+    ///the deadband on the position demand
+    double position_deadband;
+    ///the deadband for the friction compensation algorithm
+    int friction_deadband;
+
+    ///stores the last error position for the hysteresis deadband
+    double last_error_position;
+    ///stores the last_command for the hysteresis deadband
+    double last_command;
+    /**
+     * True if we need to compute the error, false if we're in
+     * the hysteresis deadband and we only need to send 0.
+     */
+    bool compute_error;
+    ///have we changed sign since we received the last command?
+    bool changed_sign_since_new_command;
   };
 } // namespace
 

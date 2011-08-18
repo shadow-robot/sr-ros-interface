@@ -107,6 +107,8 @@ namespace controller
 
     ///clamps the force demand to this value
     double max_force_demand;
+    ///the deadband for the friction compensation algorithm
+    int friction_deadband;
   };
 } // namespace
 

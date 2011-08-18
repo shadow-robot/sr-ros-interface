@@ -134,6 +134,18 @@ namespace sr_math_utils
 
     return y;
   }
+
+  /**
+   * Checks the sign of a given number.
+   *
+   * @param x the number we want to study.
+   *
+   * @return 1 if x is positive, -1 if negative.
+   */
+  static inline int sign(double x)
+  {
+    return x < 0.0 ? -1 : 1;
+  }
 }
 
 /* For the emacs weenies in the crowd.

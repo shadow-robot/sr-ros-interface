@@ -44,24 +44,18 @@ namespace sr_friction_compensation
   SrFrictionCompensator::~SrFrictionCompensator()
   {}
 
-  double SrFrictionCompensator::friction_compensation( double position, int force_demand_sign )
+  double SrFrictionCompensator::friction_compensation( double position, int force_demand_sign, int deadband )
   {
     double compensation = 0.0;
 
-    if( force_demand_sign > 0 )
+    if( abs(force_demand_sign) > deadband )
     {
-      if( force_demand_sign < 50 )
-        compensation = 0.0;
-      else
+      if( force_demand_sign > 0 )
         compensation = friction_interpoler_forward->compute( position );
-    }
-    else
-    {
-      if( force_demand_sign > -50 )
-        compensation = 0.0;
       else
         compensation = friction_interpoler_backward->compute( position );
     }
+
     return compensation;
   }
 
@@ -125,11 +119,11 @@ namespace sr_friction_compensation
     }
 
     /*
-    ROS_INFO_STREAM(" Friction map forward: [" << joint_name_ << "]");
-    for( unsigned int i=0; i<friction_map_forward.size(); ++i )
+      ROS_INFO_STREAM(" Friction map forward: [" << joint_name_ << "]");
+      for( unsigned int i=0; i<friction_map_forward.size(); ++i )
       ROS_INFO_STREAM("    -> position=" << friction_map_forward[i].raw_value << " compensation: " << friction_map_forward[i].calibrated_value);
-    ROS_INFO_STREAM(" Friction map backward: [" << joint_name_ << "]");
-    for( unsigned int i=0; i<friction_map_backward.size(); ++i )
+      ROS_INFO_STREAM(" Friction map backward: [" << joint_name_ << "]");
+      for( unsigned int i=0; i<friction_map_backward.size(); ++i )
       ROS_INFO_STREAM("    -> position=" << friction_map_backward[i].raw_value << " compensation: " << friction_map_backward[i].calibrated_value);
     */
 

@@ -45,7 +45,7 @@ namespace controller {
     : joint_state_(NULL), command_(0),
       loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
       n_tilde_("~"),
-      max_force_demand(1000.)
+      max_force_demand(1000.), friction_deadband(5)
   {
   }
 
@@ -113,6 +113,7 @@ namespace controller {
                                           sr_robot_msgs::SetEffortControllerGains::Response &resp)
   {
     max_force_demand = req.max_force;
+    friction_deadband = req.friction_deadband;
 
     return true;
   }
@@ -172,7 +173,7 @@ namespace controller {
       //Friction compensation
       //if( std::string("FFJ3").compare( getJointName() ) == 0 )
       //  ROS_INFO_STREAM(getJointName() << ": before fc: force demand=" << commanded_effort );
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort) );
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
 
       //if( std::string("FFJ3").compare( getJointName() ) == 0 )
       //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
