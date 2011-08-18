@@ -28,6 +28,7 @@
 #include <sstream>
 #include <math.h>
 #include "sr_utilities/sr_math_utils.hpp"
+#include "sr_utilities/sr_deadband.hpp"
 
 namespace sr_friction_compensation
 {
@@ -48,7 +49,7 @@ namespace sr_friction_compensation
   {
     double compensation = 0.0;
 
-    if( abs(force_demand_sign) > deadband )
+    if( sr_deadband::simple_deadband<int>(force_demand_sign, deadband) )
     {
       if( force_demand_sign > 0 )
         compensation = friction_interpoler_forward->compute( position );

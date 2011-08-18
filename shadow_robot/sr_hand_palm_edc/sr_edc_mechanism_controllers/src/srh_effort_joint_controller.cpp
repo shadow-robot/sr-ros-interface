@@ -162,22 +162,13 @@ namespace controller {
     // the PID loop for the force controller is running on the
     // motorboard.
     double commanded_effort = command_;
-    //if (error_position > 0.005)
-    //{
-    //if( std::string("FFJ3").compare( getJointName() ) == 0 )
-    //  ROS_INFO_STREAM(getJointName() << " measured effort: "<< joint_state_->measured_effort_ << " command: " << command_ << " error: " << commanded_effort );
 
-      commanded_effort = min( commanded_effort, max_force_demand );
-      commanded_effort = max( commanded_effort, -max_force_demand );
+    //Clamps the effort
+    commanded_effort = min( commanded_effort, max_force_demand );
+    commanded_effort = max( commanded_effort, -max_force_demand );
 
-      //Friction compensation
-      //if( std::string("FFJ3").compare( getJointName() ) == 0 )
-      //  ROS_INFO_STREAM(getJointName() << ": before fc: force demand=" << commanded_effort );
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
-
-      //if( std::string("FFJ3").compare( getJointName() ) == 0 )
-      //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
-      //}
+    //Friction compensation
+    commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
 
     joint_state_->commanded_effort_ = commanded_effort;
 
