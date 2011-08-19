@@ -383,63 +383,63 @@ namespace shadow_robot
       switch(status_data->motor_data_type)
       {
       case MOTOR_DATA_SGL:
-        actuator->state_.strain_gauge_left_ = static_cast<int>( status_data->motor_data_packet[index_motor_in_msg].misc );
+        actuator->state_.strain_gauge_left_ = static_cast<int16s>( status_data->motor_data_packet[index_motor_in_msg].misc );
         break;
       case MOTOR_DATA_SGR:
-        actuator->state_.strain_gauge_right_ =  static_cast<int>( status_data->motor_data_packet[index_motor_in_msg].misc );
+        actuator->state_.strain_gauge_right_ =  static_cast<int16s>( status_data->motor_data_packet[index_motor_in_msg].misc );
         break;
       case MOTOR_DATA_PWM:
-        actuator->state_.last_executed_effort_ =  static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc);
+        actuator->state_.last_executed_effort_ =  static_cast<double>(static_cast<int16s>(status_data->motor_data_packet[index_motor_in_msg].misc));
         break;
       case MOTOR_DATA_FLAGS:
         actuator->state_.flags_ = humanize_flags(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_CURRENT:
         //we're receiving the current in milli amps
-        actuator->state_.last_measured_current_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc)/1000.0;
+        actuator->state_.last_measured_current_ = static_cast<double>(static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc))/1000.0;
         break;
       case MOTOR_DATA_VOLTAGE:
-        actuator->state_.motor_voltage_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc ) / 256.0;
+        actuator->state_.motor_voltage_ = static_cast<double>(static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) ) / 256.0;
         break;
       case MOTOR_DATA_TEMPERATURE:
-        actuator->state_.temperature_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].misc) / 256.0;
+        actuator->state_.temperature_ = static_cast<double>(static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc)) / 256.0;
         break;
       case MOTOR_DATA_CAN_NUM_RECEIVED:
         // those are 16 bits values and will overflow -> we compute the real value.
         // This needs to be updated faster than the overflowing period (which should be roughly every 30s)
-        actuator->state_.can_msgs_received_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, status_data->motor_data_packet[index_motor_in_msg].misc);
-        last_can_msgs_received = static_cast<unsigned int>( status_data->motor_data_packet[index_motor_in_msg].misc );
+        actuator->state_.can_msgs_received_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc));
+        last_can_msgs_received = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
         break;
       case MOTOR_DATA_CAN_NUM_TRANSMITTED:
         // those are 16 bits values and will overflow -> we compute the real value.
         // This needs to be updated faster than the overflowing period (which should be roughly every 30s)
-        actuator->state_.can_msgs_transmitted_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, status_data->motor_data_packet[index_motor_in_msg].misc);
-        last_can_msgs_transmitted = static_cast<unsigned int>( status_data->motor_data_packet[index_motor_in_msg].misc );
+        actuator->state_.can_msgs_transmitted_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+        last_can_msgs_transmitted = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
         break;
       case MOTOR_DATA_SVN_REVISION:
 	read_torque = false;
-        actuator->state_.server_firmware_svn_revision_ = static_cast<unsigned int>( status_data->motor_data_packet[index_motor_in_msg].torque );
+        actuator->state_.server_firmware_svn_revision_ = static_cast<unsigned int>(static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque) );
         //the bit 15 tells us if the firmware version on the motor is a modified version of the svn.
         actuator->state_.firmware_modified_ = ( (status_data->motor_data_packet[index_motor_in_msg].misc & 0x8000) != 0 );
         // the other 15 bits are the svn revision currently programmed on the pic
         actuator->state_.pic_firmware_svn_revision_ = ( status_data->motor_data_packet[index_motor_in_msg].misc & 0x7FFF );
         break;
       case MOTOR_DATA_CAN_ERROR_COUNTERS:
-        actuator->state_.tests_ = status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.tests_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_F_P:
 	read_torque = false;
-        actuator->state_.force_control_f_ = status_data->motor_data_packet[index_motor_in_msg].torque;
-        actuator->state_.force_control_p_ = status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.force_control_f_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque);
+        actuator->state_.force_control_p_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_I_D:
 	read_torque = false;
-        actuator->state_.force_control_i_ = status_data->motor_data_packet[index_motor_in_msg].torque;
-        actuator->state_.force_control_d_ = status_data->motor_data_packet[index_motor_in_msg].misc;
+        actuator->state_.force_control_i_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque);
+        actuator->state_.force_control_d_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
       case MOTOR_DATA_IMAX_DEADBAND_SIGN:
 	read_torque = false;
-        actuator->state_.force_control_imax_ = status_data->motor_data_packet[index_motor_in_msg].torque;
+        actuator->state_.force_control_imax_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque);
 
         tmp_value.word = status_data->motor_data_packet[index_motor_in_msg].misc;
         actuator->state_.force_control_deadband_ = static_cast<int>(tmp_value.byte[0]);
@@ -451,7 +451,7 @@ namespace shadow_robot
       }
 
       if( read_torque )
-	actuator->state_.last_measured_effort_ = static_cast<double>(status_data->motor_data_packet[index_motor_in_msg].torque);
+	actuator->state_.last_measured_effort_ = static_cast<double>( static_cast<int16s>(status_data->motor_data_packet[index_motor_in_msg].torque) );
     }
   }
 

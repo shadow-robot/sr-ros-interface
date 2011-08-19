@@ -169,7 +169,6 @@ namespace controller {
     node_.param<int>(full_param.str(), imax, 0);
     full_param.str("");
     full_param << "/" << act_name << "/pid/max_pwm";
-    ROS_ERROR_STREAM("Full param: "<< full_param.str());
     node_.param<int>(full_param.str(), max_pwm, 0);
     full_param.str("");
     full_param << "/" << act_name << "/pid/sg_left";
