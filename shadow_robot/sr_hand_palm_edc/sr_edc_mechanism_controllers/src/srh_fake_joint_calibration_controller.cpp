@@ -151,8 +151,7 @@ namespace controller {
     std::stringstream full_param;
 
     int f, p, i, d, imax, max_pwm, sg_left, sg_right, deadband, sign;
-    std::transform(joint_name_.begin(), joint_name_.end(),
-                   joint_name_.begin(), ::tolower);
+    boost::to_lower(joint_name_);
 
     full_param << "/" << joint_name_ << "/pid/f";
     node_.param<int>(full_param.str(), f, 0);

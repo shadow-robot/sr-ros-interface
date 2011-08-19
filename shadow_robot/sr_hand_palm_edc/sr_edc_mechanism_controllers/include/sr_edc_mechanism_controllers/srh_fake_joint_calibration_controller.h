@@ -87,7 +87,6 @@ namespace controller
      * to set them on the hand.
      */
     void initialize_pids();
-
   };
 
 }
