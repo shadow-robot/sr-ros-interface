@@ -163,8 +163,8 @@ namespace shadow_robot
       return false;
     }
 
-    if( !( (request.maxpwm > MOTOR_DEMAND_PWM_RANGE_MIN) &&
-           (request.maxpwm < MOTOR_DEMAND_PWM_RANGE_MAX) )
+    if( !( (request.maxpwm >= MOTOR_DEMAND_PWM_RANGE_MIN) &&
+           (request.maxpwm <= MOTOR_DEMAND_PWM_RANGE_MAX) )
       )
     {
       ROS_WARN_STREAM(" pid parameter maxpwm is out of range : " << request.maxpwm << " -> not in [" <<
@@ -173,8 +173,8 @@ namespace shadow_robot
       return false;
     }
 
-    if( !( (request.f > MOTOR_CONFIG_F_RANGE_MIN) &&
-           (request.maxpwm < MOTOR_CONFIG_F_RANGE_MAX) )
+    if( !( (request.f >= MOTOR_CONFIG_F_RANGE_MIN) &&
+           (request.maxpwm <= MOTOR_CONFIG_F_RANGE_MAX) )
       )
     {
       ROS_WARN_STREAM(" pid parameter f is out of range : " << request.f << " -> not in [" <<
@@ -183,8 +183,8 @@ namespace shadow_robot
       return false;
     }
 
-    if( !( (request.p > MOTOR_CONFIG_P_RANGE_MIN) &&
-           (request.p < MOTOR_CONFIG_P_RANGE_MAX) )
+    if( !( (request.p >= MOTOR_CONFIG_P_RANGE_MIN) &&
+           (request.p <= MOTOR_CONFIG_P_RANGE_MAX) )
       )
     {
       ROS_WARN_STREAM(" pid parameter p is out of range : " << request.p << " -> not in [" <<
@@ -193,8 +193,8 @@ namespace shadow_robot
       return false;
     }
 
-    if( !( (request.i > MOTOR_CONFIG_I_RANGE_MIN) &&
-           (request.i < MOTOR_CONFIG_I_RANGE_MAX) )
+    if( !( (request.i >= MOTOR_CONFIG_I_RANGE_MIN) &&
+           (request.i <= MOTOR_CONFIG_I_RANGE_MAX) )
       )
     {
       ROS_WARN_STREAM(" pid parameter i is out of range : " << request.i << " -> not in [" <<
@@ -203,8 +203,8 @@ namespace shadow_robot
       return false;
     }
 
-    if( !( (request.d > MOTOR_CONFIG_D_RANGE_MIN) &&
-           (request.d < MOTOR_CONFIG_D_RANGE_MAX) )
+    if( !( (request.d >= MOTOR_CONFIG_D_RANGE_MIN) &&
+           (request.d <= MOTOR_CONFIG_D_RANGE_MAX) )
       )
     {
       ROS_WARN_STREAM(" pid parameter d is out of range : " << request.d << " -> not in [" <<
@@ -213,8 +213,8 @@ namespace shadow_robot
       return false;
     }
 
-    if( !( (request.imax > MOTOR_CONFIG_IMAX_RANGE_MIN) &&
-           (request.imax < MOTOR_CONFIG_IMAX_RANGE_MAX) )
+    if( !( (request.imax >= MOTOR_CONFIG_IMAX_RANGE_MIN) &&
+           (request.imax <= MOTOR_CONFIG_IMAX_RANGE_MAX) )
       )
     {
       ROS_WARN_STREAM(" pid parameter imax is out of range : " << request.imax << " -> not in [" <<
@@ -223,8 +223,8 @@ namespace shadow_robot
       return false;
     }
 
-    if( !( (request.deadband > MOTOR_CONFIG_DEADBAND_RANGE_MIN) &&
-           (request.deadband < MOTOR_CONFIG_DEADBAND_RANGE_MAX) )
+    if( !( (request.deadband >= MOTOR_CONFIG_DEADBAND_RANGE_MIN) &&
+           (request.deadband <= MOTOR_CONFIG_DEADBAND_RANGE_MAX) )
       )
     {
       ROS_WARN_STREAM(" pid parameter deadband is out of range : " << request.deadband << " -> not in [" <<
@@ -233,8 +233,8 @@ namespace shadow_robot
       return false;
     }
 
-    if( !( (request.sign > MOTOR_CONFIG_SIGN_RANGE_MIN) &&
-           (request.sign < MOTOR_CONFIG_SIGN_RANGE_MAX) )
+    if( !( (request.sign >= MOTOR_CONFIG_SIGN_RANGE_MIN) &&
+           (request.sign <= MOTOR_CONFIG_SIGN_RANGE_MAX) )
       )
     {
       ROS_WARN_STREAM(" pid parameter sign is out of range : " << request.sign << " -> not in [" <<

@@ -119,11 +119,11 @@ namespace sr_actuator
 
     double temperature_;
 
-    int can_msgs_received_;
-    int can_msgs_transmitted_;
+    unsigned int can_msgs_received_;
+    unsigned int can_msgs_transmitted_;
 
-    int pic_firmware_svn_revision_;
-    int server_firmware_svn_revision_;
+    unsigned int pic_firmware_svn_revision_;
+    unsigned int server_firmware_svn_revision_;
     bool firmware_modified_;
 
     int tests_;

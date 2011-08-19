@@ -22,7 +22,7 @@ void SRBridge::construct(EtherCAT_SlaveHandler *sh, int &start_address)
   fmmu = new EtherCAT_FMMU_Config(0);
   sh_->set_fmmu_config(fmmu);
 
-  EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(0); 
+  EtherCAT_PD_Config *pd = new EtherCAT_PD_Config(0);
   sh_->set_pd_config(pd);
 
 }
@@ -34,8 +34,8 @@ int SRBridge::initialize(pr2_hardware_interface::HardwareInterface *hw, bool all
     return result;
 
   assert(sh_->get_product_code() == PRODUCT_CODE);
-  
-  if (device_offset_ != 0) 
+
+  if (device_offset_ != 0)
   {
     ROS_FATAL("Device offset of SRBRIDGE should be 0 not %d", device_offset_);
     return -1;
@@ -50,12 +50,12 @@ int SRBridge::initialize(pr2_hardware_interface::HardwareInterface *hw, bool all
 
   rv = readData(&com, 0x100, &data, 2);
   if (rv != 0) ROS_ERROR("can't read open status");
-    
+
   new_data = data & ~0xc000;
 
   rv = writeData(&com, 0x100, &new_data, 2);
   if (rv != 0) ROS_ERROR("can't write DL values");
-    
+
   rv = readData(&com, 0x100, &data, 2);
   if (rv != 0) ROS_ERROR("can't read open status");
 
@@ -80,5 +80,5 @@ void SRBridge::diagnostics(diagnostic_updater::DiagnosticStatusWrapper &d, unsig
   d.addf("Serial", "%08x", sh_->get_serial());
   d.addf("Revision", "%08x", sh_->get_revision());
 
-  this->ethercatDiagnostics(d, 2); 
+  this->ethercatDiagnostics(d, 2);
 }
