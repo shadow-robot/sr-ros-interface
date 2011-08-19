@@ -135,7 +135,10 @@ namespace controller
 
     ///clamps the force demand to this value
     double max_force_demand;
-};
+
+    ///read all the controller settings from the parameter server
+    void read_parameters();
+  };
 } // namespace
 
 /* For the emacs weenies in the crowd.

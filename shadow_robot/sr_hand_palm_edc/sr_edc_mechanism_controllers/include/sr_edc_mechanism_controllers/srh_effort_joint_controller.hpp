@@ -109,6 +109,9 @@ namespace controller
     double max_force_demand;
     ///the deadband for the friction compensation algorithm
     int friction_deadband;
+
+    ///read all the controller settings from the parameter server
+    void read_parameters();
   };
 } // namespace
 

@@ -51,9 +51,9 @@ namespace controller {
     : joint_state_(NULL), command_(0),
       loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
       n_tilde_("~"),
-      max_velocity_(1.0), min_velocity_(-1.0), slope_velocity_(10.0),
+      max_velocity_(1.0), min_velocity_(-1.0), slope_velocity_(20.0),
       max_position_error_(0.0), min_position_error_(0.0),
-      max_force_demand(1000.), position_deadband(0.05), friction_deadband(5)
+      max_force_demand(1023.), position_deadband(0.05), friction_deadband(5)
   {
     set_min_max_position_errors_();
   }
@@ -140,6 +140,8 @@ namespace controller {
   {
     command_ = joint_state_->position_;
     pid_controller_velocity_.reset();
+    read_parameters();
+
     ROS_WARN("Reseting PID");
   }
 
@@ -309,6 +311,17 @@ namespace controller {
     max_position_error_ = max_velocity_ / slope_velocity_;
   }
 
+  void SrhMixedPositionVelocityJointController::read_parameters()
+  {
+    node_.param<double>("pid/max_force", max_force_demand, 1023.0);
+    node_.param<double>("pid/min_velocity", min_velocity_, -1.0);
+    node_.param<double>("pid/max_velocity", max_velocity_, 1.0);
+    node_.param<double>("pid/velocity_slope", slope_velocity_, 10.0);
+    node_.param<double>("pid/position_deadband", position_deadband, 0.015);
+    node_.param<int>("pid/friction_deadband", friction_deadband, 5);
+
+    set_min_max_position_errors_();
+  }
 }
 
 /* For the emacs weenies in the crowd.

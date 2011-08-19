@@ -5,6 +5,8 @@ sh_ffj0_effort_controller:
 sh_ffj3_effort_controller:
   type: sr_edc_mechanism_controllers/SrhEffortJointController
   joint: FFJ3
+  max_force: 1000.0
+  friction_deadband: 5
 sh_ffj4_effort_controller:
   type: sr_edc_mechanism_controllers/SrhEffortJointController
   joint: FFJ4

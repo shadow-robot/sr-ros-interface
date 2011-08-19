@@ -16,6 +16,9 @@ sh_ffj3_velocity_controller:
     i: -0.5
     d: 0.0
     i_clamp: 1.0
+    max_force: 1023.0
+    velocity_deadband: 0.015
+    friction_deadband: 5
 sh_ffj4_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
   joint: FFJ4

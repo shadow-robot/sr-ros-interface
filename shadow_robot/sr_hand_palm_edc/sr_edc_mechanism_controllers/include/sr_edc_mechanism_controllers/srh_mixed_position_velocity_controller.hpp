@@ -156,6 +156,9 @@ namespace controller
 
     ///We're using an hysteresis deadband.
     sr_deadband::HysteresisDeadband<double> hysteresis_deadband;
+
+    ///read all the controller settings from the parameter server
+    void read_parameters();
   };
 } // namespace
 

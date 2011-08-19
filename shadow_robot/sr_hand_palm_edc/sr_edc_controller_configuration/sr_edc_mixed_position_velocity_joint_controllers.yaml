@@ -12,10 +12,17 @@ sh_ffj3_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: FFJ3
   pid:
-    p: -2.0
-    i: -0.5
+    p: 0.0
+    i: -3500.0
     d: 0.0
-    i_clamp: 1.0
+    i_clamp: 300.0
+    max_force: 1000.0
+    min_velocity: -0.5
+    max_velocity: 0.5
+    velocity_slope: 10.0
+    position_deadband: 0.015
+    friction_deadband: 5
+
 sh_ffj4_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: FFJ4

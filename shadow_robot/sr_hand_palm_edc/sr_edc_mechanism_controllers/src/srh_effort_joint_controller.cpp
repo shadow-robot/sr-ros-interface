@@ -105,8 +105,9 @@ namespace controller {
 
   void SrhEffortJointController::starting()
   {
-    command_ = joint_state_->position_;
+    command_ = joint_state_->measured_effort_;
     ROS_WARN("Reseting PID");
+    read_parameters();
   }
 
   bool SrhEffortJointController::setGains(sr_robot_msgs::SetEffortControllerGains::Request &req,
@@ -201,6 +202,12 @@ namespace controller {
   void SrhEffortJointController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
   {
     command_ = msg->data;
+  }
+
+  void SrhEffortJointController::read_parameters()
+  {
+    node_.param<double>("max_force", max_force_demand, 1023.0);
+    node_.param<int>("friction_deadband", friction_deadband, 5);
   }
 
 }
