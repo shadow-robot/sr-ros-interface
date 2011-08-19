@@ -26,7 +26,7 @@
  *
  */
 
-#include "sr_edc_mechanism_controllers/srh_effort_joint_controller.hpp"
+#include "sr_edc_mechanism_controllers/srh_joint_effort_controller.hpp"
 #include "angles/angles.h"
 #include "pluginlib/class_list_macros.h"
 #include <sstream>
