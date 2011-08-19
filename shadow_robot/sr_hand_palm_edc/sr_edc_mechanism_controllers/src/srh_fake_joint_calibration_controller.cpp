@@ -88,9 +88,9 @@ namespace controller {
                 actuator_name.c_str(), node_.getNamespace().c_str());
       return false;
     }
+    actuator_name_ = actuator_name;
 
     // Transmission
-
     std::string transmission_name;
     if (!node_.getParam("transmission", transmission_name))
     {
@@ -151,42 +151,42 @@ namespace controller {
     std::stringstream full_param;
 
     int f, p, i, d, imax, max_pwm, sg_left, sg_right, deadband, sign;
-    boost::to_lower(joint_name_);
+    std::string act_name = boost::to_lower_copy(actuator_name_);
 
-    full_param << "/" << joint_name_ << "/pid/f";
+    full_param << "/" << act_name << "/pid/f";
     node_.param<int>(full_param.str(), f, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/p";
+    full_param << "/" << act_name << "/pid/p";
     node_.param<int>(full_param.str(), p, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/i";
+    full_param << "/" << act_name << "/pid/i";
     node_.param<int>(full_param.str(), i, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/d";
+    full_param << "/" << act_name << "/pid/d";
     node_.param<int>(full_param.str(), d, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/imax";
+    full_param << "/" << act_name << "/pid/imax";
     node_.param<int>(full_param.str(), imax, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/max_pwm";
+    full_param << "/" << act_name << "/pid/max_pwm";
     ROS_ERROR_STREAM("Full param: "<< full_param.str());
     node_.param<int>(full_param.str(), max_pwm, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/sg_left";
+    full_param << "/" << act_name << "/pid/sg_left";
     node_.param<int>(full_param.str(), sg_left, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/sg_right";
+    full_param << "/" << act_name << "/pid/sg_right";
     node_.param<int>(full_param.str(), sg_right, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/deadband";
+    full_param << "/" << act_name << "/pid/deadband";
     node_.param<int>(full_param.str(), deadband, 0);
     full_param.str("");
-    full_param << "/" << joint_name_ << "/pid/sign";
+    full_param << "/" << act_name << "/pid/sign";
     node_.param<int>(full_param.str(), sign, 0);
     full_param.str("");
 
-    std::string joint_name_upper = boost::to_upper_copy( joint_name_ );
-    std::string service_name = "/realtime_loop/change_force_PID_" + joint_name_upper;
+    std::string act_name_upper = boost::to_upper_copy( act_name );
+    std::string service_name = "/realtime_loop/change_force_PID_" + act_name_upper;
     if( ros::service::waitForService (service_name, ros::Duration(2.0)) )
     {
       sr_robot_msgs::ForceController::Request pid_request;
@@ -207,7 +207,7 @@ namespace controller {
       }
     }
 
-    ROS_WARN_STREAM( "Didn't load the force pid settings for the motor in joint " << joint_name_ );
+    ROS_WARN_STREAM( "Didn't load the force pid settings for the motor in joint " << act_name );
   }
 
 } // namespace

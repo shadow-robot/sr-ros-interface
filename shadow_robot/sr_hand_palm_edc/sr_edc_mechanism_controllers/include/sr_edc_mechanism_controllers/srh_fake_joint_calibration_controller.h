@@ -80,7 +80,7 @@ namespace controller
     pr2_mechanism_model::JointState *joint_;
     pr2_mechanism_model::Transmission *transmission_;
 
-    std::string joint_name_;
+    std::string joint_name_, actuator_name_;
 
     /**
      * Read the pids values from the parameter server and calls the service
