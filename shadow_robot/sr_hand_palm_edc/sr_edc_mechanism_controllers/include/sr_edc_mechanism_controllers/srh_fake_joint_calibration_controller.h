@@ -45,44 +45,58 @@
 namespace controller
 {
 
-class SrhFakeJointCalibrationController : public pr2_controller_interface::Controller
-{
-public:
-  SrhFakeJointCalibrationController();
-  virtual ~SrhFakeJointCalibrationController();
-
-  virtual bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
-
-  virtual void update();
-
-  bool calibrated() { return state_ == CALIBRATED; }
-  void beginCalibration()
+  class SrhFakeJointCalibrationController : public pr2_controller_interface::Controller
   {
-    if (state_ == INITIALIZED)
-      state_ = BEGINNING;
-  }
+  public:
+    SrhFakeJointCalibrationController();
+    virtual ~SrhFakeJointCalibrationController();
 
-protected:
+    virtual bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
 
-  pr2_mechanism_model::RobotState* robot_;
-  ros::NodeHandle node_;
-  boost::scoped_ptr<realtime_tools::RealtimePublisher<std_msgs::Empty> > pub_calibrated_;
-  ros::Time last_publish_time_;
+    virtual void update();
 
-  enum { INITIALIZED, BEGINNING, MOVING_TO_LOW, MOVING_TO_HIGH, CALIBRATED };
-  int state_;
-  int countdown_;
+    bool calibrated() { return state_ == CALIBRATED; }
+    void beginCalibration()
+    {
+      if (state_ == INITIALIZED)
+        state_ = BEGINNING;
+    }
 
-  double search_velocity_, reference_position_;
-  bool original_switch_state_;
+  protected:
 
-  pr2_hardware_interface::Actuator *actuator_;
-  pr2_mechanism_model::JointState *joint_;
-  pr2_mechanism_model::Transmission *transmission_;
+    pr2_mechanism_model::RobotState* robot_;
+    ros::NodeHandle node_;
+    boost::scoped_ptr<realtime_tools::RealtimePublisher<std_msgs::Empty> > pub_calibrated_;
+    ros::Time last_publish_time_;
 
-};
+    enum { INITIALIZED, BEGINNING, MOVING_TO_LOW, MOVING_TO_HIGH, CALIBRATED };
+    int state_;
+    int countdown_;
+
+    double search_velocity_, reference_position_;
+    bool original_switch_state_;
+
+    pr2_hardware_interface::Actuator *actuator_;
+    pr2_mechanism_model::JointState *joint_;
+    pr2_mechanism_model::Transmission *transmission_;
+
+    std::string joint_name_;
+
+    /**
+     * Read the pids values from the parameter server and calls the service
+     * to set them on the hand.
+     */
+    void initialize_pids();
+
+  };
 
 }
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
 
 
 #endif

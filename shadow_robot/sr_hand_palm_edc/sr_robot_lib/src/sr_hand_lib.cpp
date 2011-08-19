@@ -27,12 +27,11 @@
  */
 
 #include "sr_robot_lib/sr_hand_lib.hpp"
+#include <algorithm>
 #include <string>
 #include <boost/foreach.hpp>
 
 #include <sr_utilities/sr_math_utils.hpp>
-
-#include <stdio.h>
 
 namespace shadow_robot
 {
@@ -441,7 +440,6 @@ namespace shadow_robot
     response.success = true;
     return true;
   }
-
 }
 
 /* For the emacs weenies in the crowd.

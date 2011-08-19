@@ -35,6 +35,9 @@
 #include "sr_edc_mechanism_controllers/srh_fake_joint_calibration_controller.h"
 #include "ros/time.h"
 #include "pluginlib/class_list_macros.h"
+#include <boost/algorithm/string.hpp>
+#include <string>
+#include <sr_robot_msgs/ForceController.h>
 
 PLUGINLIB_DECLARE_CLASS(sr_edc_mechanism_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
 
@@ -42,102 +45,176 @@ using namespace std;
 
 namespace controller {
 
-SrhFakeJointCalibrationController::SrhFakeJointCalibrationController()
-: robot_(NULL), last_publish_time_(0), state_(INITIALIZED),
-  actuator_(NULL), joint_(NULL), transmission_(NULL)
-{
-}
-
-SrhFakeJointCalibrationController::~SrhFakeJointCalibrationController()
-{
-}
-
-bool SrhFakeJointCalibrationController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
-{
-  robot_ = robot;
-  node_ = n;
-
-  // Joint
-
-  std::string joint_name;
-  if (!node_.getParam("joint", joint_name))
+  SrhFakeJointCalibrationController::SrhFakeJointCalibrationController()
+    : robot_(NULL), last_publish_time_(0), state_(INITIALIZED),
+      actuator_(NULL), joint_(NULL), transmission_(NULL)
   {
-    ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
-    return false;
-  }
-  if (!(joint_ = robot->getJointState(joint_name)))
-  {
-    ROS_ERROR("Could not find joint %s (namespace: %s)",
-              joint_name.c_str(), node_.getNamespace().c_str());
-    return false;
   }
 
-  // Actuator
-  std::string actuator_name;
-  if (!node_.getParam("actuator", actuator_name))
+  SrhFakeJointCalibrationController::~SrhFakeJointCalibrationController()
   {
-    ROS_ERROR("No actuator given (namespace: %s)", node_.getNamespace().c_str());
-    return false;
-  }
-  if (!(actuator_ = robot->model_->getActuator(actuator_name)))
-  {
-    ROS_ERROR("Could not find actuator %s (namespace: %s)",
-              actuator_name.c_str(), node_.getNamespace().c_str());
-    return false;
   }
 
-  // Transmission
-
-  std::string transmission_name;
-  if (!node_.getParam("transmission", transmission_name))
+  bool SrhFakeJointCalibrationController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
   {
-    ROS_ERROR("No transmission given (namespace: %s)", node_.getNamespace().c_str());
-    return false;
-  }
-  if (!(transmission_ = robot->model_->getTransmission(transmission_name)))
-  {
-    ROS_ERROR("Could not find transmission %s (namespace: %s)",
-              transmission_name.c_str(), node_.getNamespace().c_str());
-    return false;
-  }
+    robot_ = robot;
+    node_ = n;
+    // Joint
 
-  // "Calibrated" topic
-  pub_calibrated_.reset(
-    new realtime_tools::RealtimePublisher<std_msgs::Empty>(node_, "calibrated", 1));
-
-  return true;
-}
-
-
-void SrhFakeJointCalibrationController::update()
-{
-  assert(joint_);
-  assert(actuator_);
-
-  switch(state_)
-  {
-  case INITIALIZED:
-    state_ = BEGINNING;
-    break;
-  case BEGINNING:
-    joint_->calibrated_ = true;
-    state_ = CALIBRATED;
-    break;
-  case CALIBRATED:
-    if (pub_calibrated_)
+    std::string joint_name;
+    if (!node_.getParam("joint", joint_name))
     {
-      if (last_publish_time_ + ros::Duration(0.5) < robot_->getTime())
+      ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
+      return false;
+    }
+    if (!(joint_ = robot->getJointState(joint_name)))
+    {
+      ROS_ERROR("Could not find joint %s (namespace: %s)",
+                joint_name.c_str(), node_.getNamespace().c_str());
+      return false;
+    }
+    joint_name_ = joint_name;
+
+    // Actuator
+    std::string actuator_name;
+    if (!node_.getParam("actuator", actuator_name))
+    {
+      ROS_ERROR("No actuator given (namespace: %s)", node_.getNamespace().c_str());
+      return false;
+    }
+    if (!(actuator_ = robot->model_->getActuator(actuator_name)))
+    {
+      ROS_ERROR("Could not find actuator %s (namespace: %s)",
+                actuator_name.c_str(), node_.getNamespace().c_str());
+      return false;
+    }
+
+    // Transmission
+
+    std::string transmission_name;
+    if (!node_.getParam("transmission", transmission_name))
+    {
+      ROS_ERROR("No transmission given (namespace: %s)", node_.getNamespace().c_str());
+      return false;
+    }
+    if (!(transmission_ = robot->model_->getTransmission(transmission_name)))
+    {
+      ROS_ERROR("Could not find transmission %s (namespace: %s)",
+                transmission_name.c_str(), node_.getNamespace().c_str());
+      return false;
+    }
+
+    // "Calibrated" topic
+    pub_calibrated_.reset(
+      new realtime_tools::RealtimePublisher<std_msgs::Empty>(node_, "calibrated", 1));
+
+    return true;
+  }
+
+
+  void SrhFakeJointCalibrationController::update()
+  {
+    assert(joint_);
+    assert(actuator_);
+
+    switch(state_)
+    {
+    case INITIALIZED:
+      state_ = BEGINNING;
+      break;
+    case BEGINNING:
+      initialize_pids();
+      joint_->calibrated_ = true;
+      state_ = CALIBRATED;
+      break;
+    case CALIBRATED:
+      if (pub_calibrated_)
       {
-        assert(pub_calibrated_);
-        if (pub_calibrated_->trylock())
+        if (last_publish_time_ + ros::Duration(0.5) < robot_->getTime())
         {
-          last_publish_time_ = robot_->getTime();
-          pub_calibrated_->unlockAndPublish();
+          assert(pub_calibrated_);
+          if (pub_calibrated_->trylock())
+          {
+            last_publish_time_ = robot_->getTime();
+            pub_calibrated_->unlockAndPublish();
+          }
         }
       }
+      break;
     }
-    break;
   }
-}
+
+  void SrhFakeJointCalibrationController::initialize_pids()
+  {
+    //read the parameters from the parameter server and set the pid
+    // values.
+    std::stringstream full_param;
+
+    int f, p, i, d, imax, max_pwm, sg_left, sg_right, deadband, sign;
+    std::transform(joint_name_.begin(), joint_name_.end(),
+                   joint_name_.begin(), ::tolower);
+
+    full_param << "/" << joint_name_ << "/pid/f";
+    node_.param<int>(full_param.str(), f, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/p";
+    node_.param<int>(full_param.str(), p, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/i";
+    node_.param<int>(full_param.str(), i, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/d";
+    node_.param<int>(full_param.str(), d, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/imax";
+    node_.param<int>(full_param.str(), imax, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/max_pwm";
+    ROS_ERROR_STREAM("Full param: "<< full_param.str());
+    node_.param<int>(full_param.str(), max_pwm, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/sg_left";
+    node_.param<int>(full_param.str(), sg_left, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/sg_right";
+    node_.param<int>(full_param.str(), sg_right, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/deadband";
+    node_.param<int>(full_param.str(), deadband, 0);
+    full_param.str("");
+    full_param << "/" << joint_name_ << "/pid/sign";
+    node_.param<int>(full_param.str(), sign, 0);
+    full_param.str("");
+
+    std::string joint_name_upper = boost::to_upper_copy( joint_name_ );
+    std::string service_name = "/realtime_loop/change_force_PID_" + joint_name_upper;
+    if( ros::service::waitForService (service_name, ros::Duration(2.0)) )
+    {
+      sr_robot_msgs::ForceController::Request pid_request;
+      pid_request.maxpwm = max_pwm;
+      pid_request.sgleftref = sg_left;
+      pid_request.sgrightref = sg_right;
+      pid_request.f = f;
+      pid_request.p = p;
+      pid_request.i = i;
+      pid_request.d = d;
+      pid_request.imax = imax;
+      pid_request.deadband = deadband;
+      pid_request.sign = sign;
+      sr_robot_msgs::ForceController::Response pid_response;
+      if( ros::service::call(service_name, pid_request, pid_response) )
+      {
+        return;
+      }
+    }
+
+    ROS_WARN_STREAM( "Didn't load the force pid settings for the motor in joint " << joint_name_ );
+  }
 
 } // namespace
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
