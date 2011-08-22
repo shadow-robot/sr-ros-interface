@@ -33,6 +33,13 @@ ELSE($ENV{GAZEBO} EQUAL 1)
   MESSAGE("Compiling without Gazebo support")
 ENDIF($ENV{GAZEBO} EQUAL 1)
 
+#EtherCAT compatibility Interface
+SET(ethercat_compat $ENV{ETHERCAT})
+IF(DEFINED ethercat_compat)
+  MESSAGE(" [x] EtherCAT compatibility interface.")
+ELSE(DEFINED ethercat_compat)
+  MESSAGE(" [ ] EtherCAT compatibility interface.")
+ENDIF(DEFINED ethercat_compat)
 ##################
 #  VIRTUAL ARM  #
 ##################
@@ -46,6 +53,14 @@ rosbuild_link_boost(shadowarm_virtual thread)
 ##################
 rosbuild_add_executable(shadowhand_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp)
 rosbuild_link_boost(shadowhand_virtual thread)
+
+#########################################
+#  ETHERCAT COMPATIBILITY WRAPPER HAND  #
+#########################################
+IF(DEFINED ethercat_compat)
+  rosbuild_add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
+  rosbuild_link_boost(shadowhand_virtual thread)
+ENDIF(DEFINED ethercat_compat)
 
 ##################
 #    REAL HAND   #

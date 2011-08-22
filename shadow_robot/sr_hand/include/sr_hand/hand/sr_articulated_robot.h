@@ -2,7 +2,7 @@
  * @file   shadowhand.h
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:50:47 2010
- * 
+ *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -24,7 +24,7 @@
  * the same utilities to interact with the hand.
  * One (or more) ROS subscriber and publisher can then share the same instance
  * of a Shadowhand object to update the information contained in this object.
- * 
+ *
  */
 
 #ifndef   	SHADOWHAND_H_
@@ -59,21 +59,17 @@ struct JointData
     double min;
     double max;
     short isJointZero;
-#ifdef GAZEBO
     /**
-     * GAZEBO has one publisher / subscriber per joint. We store those in
-     * the JointData struct to be able to get and send data to the Gazebo
-     * model with our standard ROS interface.
+     * GAZEBO and the etherCAT wrapper have one publisher / subscriber
+     * per joint. We store those in the JointData struct to be able
+     * to get and send data to the Gazebo model and the EherCAT hand
+     * with our standard ROS interface.
      */
     int publisher_index;
-#endif
     ros::Time last_pos_time;
     double last_pos;
     double velocity;
 
-
-
-#ifdef GAZEBO
     JointData() :
         position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0), publisher_index(0), last_pos_time(0.0), last_pos(0.0), velocity(0.0)
     {
@@ -90,25 +86,6 @@ struct JointData
             flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max), isJointZero(jd.isJointZero), publisher_index(jd.publisher_index), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
     {
     }
-#else
-    JointData() :
-        position(0.0), target(0.0), temperature(0.0), current(0.0), force(0.0), flags(""), jointIndex(0), min(0.0), max(90.0), isJointZero(0), last_pos_time(0.0), last_pos(0.0), velocity(0.0)
-    {
-    }
-
-    JointData( JointData& jd ) :
-        position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force), flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max),
-                isJointZero(jd.isJointZero), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
-    {
-    }
-
-    JointData( const JointData& jd ) :
-        position(jd.position), target(jd.target), temperature(jd.temperature), current(jd.current), force(jd.force), flags(jd.flags), jointIndex(jd.jointIndex), min(jd.min), max(jd.max),
-                isJointZero(jd.isJointZero), last_pos_time(jd.last_pos_time), last_pos(jd.last_pos), velocity(jd.velocity)
-    {
-    }
-#endif
-
 };
 
 /**

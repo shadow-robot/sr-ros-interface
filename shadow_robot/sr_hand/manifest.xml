@@ -14,6 +14,7 @@
   <depend package="roslib"/>
   <depend package="roscpp"/>
   <depend package="rospy"/>
+  <depend package="sr_utilities"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
