@@ -98,7 +98,11 @@ namespace shadowrobot
      */
     void initializeMap();
 
+    ///This vector stores publishers to each joint controller.
     std::vector< ros::Publisher > etherCAT_publishers;
+
+    ///a subscriber for the /joint_states topic.
+    ros::Subscriber joint_state_subscriber;
   }; //end class
 }
 
