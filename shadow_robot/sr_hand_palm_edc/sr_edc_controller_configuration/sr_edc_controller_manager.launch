@@ -1,7 +1,7 @@
 <launch>
 
-<!--  
-      This launch file configures the controller manager, and brings three 
+<!--
+      This launch file configures the controller manager, and brings three
       nodes that use the data published by the controller manager:
        * the robot state publisher listens to joint_state messages and publishes tf
        * the controllers_to_diagnostics listens to mechanism_statistics and
@@ -22,7 +22,7 @@
   </node>
 
 <!-- Diagnostics -->
-  <node pkg="srh_controller_configuration" type="controllers_to_diagnostics.py" name="controller_diagnostics" />
-  <node pkg="srh_controller_configuration" type="joints_to_diagnostics.py" name="joint_state_logging" />
+  <node pkg="sr_edc_controller_configuration" type="controllers_to_diagnostics.py" name="controller_diagnostics" />
+  <node pkg="sr_edc_controller_configuration" type="joints_to_diagnostics.py" name="joint_state_logging" />
 
 </launch>

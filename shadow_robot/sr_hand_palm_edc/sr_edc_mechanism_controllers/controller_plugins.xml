@@ -4,8 +4,8 @@
          type="controller::SrhFakeJointCalibrationController"
          base_class_type="pr2_controller_interface::Controller" />
 
-  <class name="sr_edc_mechanism_controllers/SrhPositionController"
-         type="controller::SrhPositionController"
+  <class name="sr_edc_mechanism_controllers/SrhJointPositionController"
+         type="controller::SrhJointPositionController"
          base_class_type="pr2_controller_interface::Controller" />
 
   <class name="sr_edc_mechanism_controllers/SrhEffortJointController"
