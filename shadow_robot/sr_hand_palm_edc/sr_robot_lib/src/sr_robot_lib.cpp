@@ -36,9 +36,11 @@
 
 namespace shadow_robot
 {
+#ifdef DEBUG_PUBLISHER
   //max of 20 publishers for debug
   const int SrRobotLib::nb_debug_publishers_const = 20;
   const int SrRobotLib::debug_mutex_lock_wait_time = 100;
+#endif
   const int SrRobotLib::number_of_positions_to_keep = 20;
   const int SrRobotLib::number_of_positions_for_filter = 10;
 
@@ -46,6 +48,7 @@ namespace shadow_robot
     : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(MOTOR_CONFIG_FIRST_VALUE), nh_tilde("~"),
       last_can_msgs_received(0), last_can_msgs_transmitted(0)
   {
+#ifdef DEBUG_PUBLISHER
     debug_motor_indexes_and_data.resize(nb_debug_publishers_const);
     for( int i = 0; i < nb_debug_publishers_const ; ++i )
     {
@@ -53,6 +56,7 @@ namespace shadow_robot
       ss << "srh/debug_" << i;
       debug_publishers.push_back(node_handle.advertise<std_msgs::Int16>(ss.str().c_str(),100));
     }
+#endif
   }
 
 
@@ -185,6 +189,7 @@ namespace shadow_robot
 	  //ROS_ERROR_STREAM(" LFJ3 "<< joint_tmp->motor->actuator->command_.effort_);
           command->motor_data[joint_tmp->motor->motor_id] = joint_tmp->motor->actuator->command_.effort_;
 
+#ifdef DEBUG_PUBLISHER
           //publish the debug values for the given motors.
           // NB: debug_motor_indexes_and_data is smaller
           //     than debug_publishers.
@@ -212,10 +217,8 @@ namespace shadow_robot
 
             debug_mutex.unlock();
           } //end try_lock
+#endif
 
-	  /*if(joint_tmp->motor->motor_id == 6)
-	    command->motor_data[joint_tmp->motor->motor_id] = 100;
-	  */
           joint_tmp->motor->actuator->state_.last_commanded_effort_ = joint_tmp->motor->actuator->command_.effort_;
         } //end if has_motor
       } // end for each joint
@@ -345,6 +348,7 @@ namespace shadow_robot
 
     if(joint_tmp->motor->motor_ok && !(joint_tmp->motor->bad_data) )
     {
+#ifdef DEBUG_PUBLISHER
       int publisher_index = 0;
       //publish the debug values for the given motors.
       // NB: debug_motor_indexes_and_data is smaller
@@ -377,6 +381,7 @@ namespace shadow_robot
 
         debug_mutex.unlock();
       } //end try_lock
+#endif
 
       //we received the data and it was correct
       bool read_torque = true;

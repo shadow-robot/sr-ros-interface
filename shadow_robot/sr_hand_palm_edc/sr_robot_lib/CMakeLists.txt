@@ -16,10 +16,16 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
+#if you compile with "DEBUG=1 make", some debug data are going to be published
+SET(debug $ENV{DEBUG})
+MESSAGE(" ----- Shadow Robot EtherCAT driver configuration:")
+IF(DEFINED debug)
+  SET( CMAKE_CXX_FLAGS "-D DEBUG_PUBLISHER")
+  MESSAGE(" [x] Debug publisher")
+ELSE(DEFINED debug)
+  MESSAGE(" [ ] Debug publisher")
+ENDIF(DEFINED debug)
+MESSAGE(" ----- ")
 
 rosbuild_add_library(sr_hand_lib src/sr_hand_lib.cpp src/sr_robot_lib.cpp src/motor_updater.cpp)
 

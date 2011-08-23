@@ -75,53 +75,52 @@ const unsigned int       SR06::max_retry                  = 10;
 
 PLUGINLIB_REGISTER_CLASS(6, SR06, EthercatDevice);
 
-#define check_for_pthread_mutex_init_error(x)	switch(x) \
-						{ \
-							case EAGAIN: \
-                                                          ROS_ERROR("The system temporarily lacks the resources to create another mutex : %s:%d", __FILE__, __LINE__); \
-								exit(1); \
-								break; \
-							case EINVAL: \
-								ROS_ERROR("The value specified as attribute is invalid for mutex init : %s:%d", __FILE__, __LINE__); \
-								exit(1); \
-								break; \
-							case ENOMEM: \
-								ROS_ERROR("The process cannot allocate enough memory to create another mutex : %s:%d", __FILE__, __LINE__); \
-								exit(1); \
-								break; \
-							case 0: /* SUCCESS */ \
-								break; \
-							default: \
-								ROS_ERROR("unknown error value, is this POSIX system ? : %s:%d", __FILE__, __LINE__); \
-								exit(1); \
-						}
+#define check_for_pthread_mutex_init_error(x)	switch(x)               \
+  {                                                                     \
+  case EAGAIN:                                                          \
+    ROS_ERROR("The system temporarily lacks the resources to create another mutex : %s:%d", __FILE__, __LINE__); \
+    exit(1);                                                            \
+    break;                                                              \
+  case EINVAL:                                                          \
+    ROS_ERROR("The value specified as attribute is invalid for mutex init : %s:%d", __FILE__, __LINE__); \
+    exit(1);                                                            \
+    break;                                                              \
+  case ENOMEM:                                                          \
+    ROS_ERROR("The process cannot allocate enough memory to create another mutex : %s:%d", __FILE__, __LINE__); \
+    exit(1);                                                            \
+    break;                                                              \
+  case 0: /* SUCCESS */                                                 \
+    break;                                                              \
+  default:                                                              \
+    ROS_ERROR("unknown error value, is this POSIX system ? : %s:%d", __FILE__, __LINE__); \
+    exit(1);                                                            \
+  }
 
-#define unlock(x)	switch ( pthread_mutex_unlock(x) ) \
-			{ \
-				case EINVAL: \
-					ROS_ERROR("The value specified as a mutex is invalid : %s:%d", __FILE__, __LINE__); \
-					exit(1); \
-					break; \
-				case EPERM: \
-					ROS_ERROR("The current thread does not hold a lock on the mutex : %s:%d", __FILE__, __LINE__); \
-					exit(1); \
-					break; \
-			}
+#define unlock(x)	switch ( pthread_mutex_unlock(x) )              \
+  {                                                                     \
+  case EINVAL:                                                          \
+    ROS_ERROR("The value specified as a mutex is invalid : %s:%d", __FILE__, __LINE__); \
+    exit(1);                                                            \
+    break;                                                              \
+  case EPERM:                                                           \
+    ROS_ERROR("The current thread does not hold a lock on the mutex : %s:%d", __FILE__, __LINE__); \
+    exit(1);                                                            \
+    break;                                                              \
+  }
 
-#define check_for_trylock_error(x)	if (x == EINVAL) \
-					{ \
-						ROS_ERROR("mutex error %s:%d", __FILE__, __LINE__); \
-						exit(1); \
-					}
+#define check_for_trylock_error(x)	if (x == EINVAL)        \
+  {                                                             \
+    ROS_ERROR("mutex error %s:%d", __FILE__, __LINE__);         \
+    exit(1);                                                    \
+  }
 
 
 /** \brief Constructor of the SR06 driver
  *
- *  This is the Constructor of the driver. it creates a bunch of real time publishers to publich the joints data
- *  initializes a few boolean values, a mutex and creates the Flashing service.
+ *  This is the Constructor of the driver. We
+ *  initialize a few boolean values, a mutex
+ *  and create the Bootloading service.
  */
-//, com_(EthercatDirectCom(EtherCAT_DataLinkLayer::instance()))
-
 SR06::SR06()
   : SR0X(),
     flashing(false),
@@ -135,23 +134,6 @@ SR06::SR06()
   counter_ = 0;
 
   ROS_INFO("There are %d sensors", nb_sensors_const);
-
-/*
-  if (EC_PALM_EDC_COMMAND_PHY_BASE+ETHERCAT_COMMAND_DATA_SIZE > EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE)
-  ROS_ERROR("Not enough space for ETHERCAT_COMMAND_DATA\n");
-  else
-  ROS_ERROR("Enough space for ETHERCAT_COMMAND_DATA\n");
-
-  if (EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE+sizeof( ETHERCAT_CAN_BRIDGE_DATA) > EC_PALM_EDC_DATA_PHY_BASE)
-  ROS_ERROR("Not enough space for EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE\n");
-  else
-  ROS_ERROR("Enough space for EC_PALM_EDC_CAN_BRIDGE_MASTER_OUT_BASE\n");
-
-  if (EC_PALM_EDC_DATA_PHY_BASE+ETHERCAT_STATUS_DATA_SIZE > EC_PALM_EDC_CAN_BRIDGE_MASTER_IN_BASE)
-  ROS_ERROR("Not enough space for EC_PALM_EDC_DATA_PHY_BASE\n");
-  else
-  ROS_ERROR("Enough space for EC_PALM_EDC_DATA_PHY_BASE\n");
-*/
   ROS_INFO(     "device_pub_freq_const = %d", device_pub_freq_const      );
   ROS_INFO(        "ros_pub_freq_const = %d", ros_pub_freq_const         );
   ROS_INFO(            "max_iter_const = %d", max_iter_const             );
@@ -164,7 +146,7 @@ SR06::SR06()
   serviceServer = nodehandle_.advertiseService("SimpleMotorFlasher", &SR06::simple_motor_flasher, this);
 }
 
-/** \brief Desctructor of the SR06 driver
+/** \brief Destructor of the SR06 driver
  *
  *  This is the Destructor of the driver. it frees the FMMUs and SyncManagers which have been allocated during the construct.
  */
@@ -304,7 +286,6 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   if(retval != 0)
     return retval;
 
-
   sr_hand_lib = boost::shared_ptr<shadow_robot::SrHandLib>( new shadow_robot::SrHandLib(hw) );
 
   ROS_INFO("ETHERCAT_STATUS_DATA_SIZE      = %4d bytes", static_cast<int>(ETHERCAT_STATUS_DATA_SIZE) );
@@ -314,11 +295,10 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   // Tactile sensor real time publisher
   tactile_publisher = boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray> >( new realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray>(nodehandle_ , "tactile", 4));
 
+#ifdef DEBUG_PUBLISHER
   // Debug real time publisher: publishes the raw ethercat data
   debug_publisher = boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::EthercatDebug> >( new realtime_tools::RealtimePublisher<sr_robot_msgs::EthercatDebug>(nodehandle_ , "debug_etherCAT_data", 4));
-
-//  com_ = EthercatDirectCom(EtherCAT_DataLinkLayer::instance());
-
+#endif
   return retval;
 }
 
@@ -336,7 +316,7 @@ void SR06::erase_flash(void)
   int err;
 
   do {
-    ROS_WARN("Sending the ERASE FLASH command");
+    ROS_INFO("Sending the ERASE FLASH command");
     // First we send the erase command
     cmd_sent = 0;
     while (! cmd_sent )
@@ -517,18 +497,17 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
   {
     ROS_FATAL("error opening the file %s", req.firmware.c_str());
   }
-/*	for (s = fd->sections ; s ; s = s->next)
-	{*/
-  if (!bfd_check_format (fd, bfd_object)) {
-    if (bfd_get_error () != bfd_error_file_ambiguously_recognized) {
+  if (!bfd_check_format (fd, bfd_object))
+  {
+    if (bfd_get_error () != bfd_error_file_ambiguously_recognized)
+    {
       ROS_FATAL("Incompatible format");
     }
   }
 
+  ROS_INFO("firmware %s's format is : %s.", req.firmware.c_str(), fd->xvec->name);
 
-  ROS_WARN("firmware %s's format is : %s.", req.firmware.c_str(), fd->xvec->name);
-
-  ROS_INFO("Sending dummy packet");
+  ROS_DEBUG("Sending dummy packet");
   cmd_sent = 0;
   while ( !cmd_sent )
   {
@@ -560,7 +539,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     }
   }
 
-  ROS_INFO_STREAM("Sending magic CAN packet to put the motor in bootloading mode to motor: "<< motor_being_flashed << " on bus: "<<can_bus_);
+  ROS_INFO_STREAM("Sending magic CAN packet to put the motor "<< motor_being_flashed << " in bootloading mode on bus: "<<can_bus_);
   cmd_sent = 0;
   while ( !cmd_sent )
   {
@@ -724,7 +703,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
             can_message_.message_data[2] = addru + ((pos + addrl + (addrh << 8)) >> 16);
             can_message_.message_data[1] = addrh + ((pos + addrl) >> 8); // User application start address is 0x4C0
             can_message_.message_data[0] = addrl + pos;
-            ROS_INFO("Sending write address to motor %d : 0x%02X%02X%02X", motor_being_flashed, can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
+            ROS_DEBUG("Sending write address to motor %d : 0x%02X%02X%02X", motor_being_flashed, can_message_.message_data[2], can_message_.message_data[1], can_message_.message_data[0]);
             cmd_sent = 1;
             unlock(&producing);
           }
@@ -757,7 +736,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     {
       if ( !(err = pthread_mutex_trylock(&producing)) )
       {
-        ROS_INFO("Sending data ... position == %d", pos);
+        ROS_DEBUG("Sending data ... position == %d", pos);
         can_message_.message_length = 8;
         can_message_.can_bus = can_bus_;
         can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | WRITE_FLASH_DATA_COMMAND;
@@ -797,7 +776,7 @@ bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Req
     }
   }
 
-//	close(fd); // We do not need the file anymore
+  // We do not need the file anymore
   bfd_close(fd);
 
   // Now we have to read back the flash content
@@ -1036,10 +1015,10 @@ void SR06::packCommand(unsigned char *buffer, bool halt, bool reset)
       ROS_DEBUG_STREAM("Ethercat Command data size: "<< ETHERCAT_COMMAND_DATA_SIZE);
       ROS_DEBUG_STREAM("Ethercat bridge data size: "<< ETHERCAT_CAN_BRIDGE_DATA_SIZE);
 
-      ROS_INFO("We're sending a CAN message for flashing.");
+      ROS_DEBUG("We're sending a CAN message for flashing.");
       memcpy(message, &can_message_, sizeof(can_message_));
       can_message_sent = true;
-      ROS_ERROR("Sending : SID : 0x%04X ; bus : 0x%02X ; length : 0x%02X ; data : 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X",
+      ROS_DEBUG("Sending : SID : 0x%04X ; bus : 0x%02X ; length : 0x%02X ; data : 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X",
 		message->message_id,
                 message->can_bus,
                 message->message_length,
@@ -1084,37 +1063,37 @@ bool SR06::can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet)
   if (packet->message_id == 0)
     return false;
 
-  ROS_INFO("ack sid : %04X", packet->message_id);
+  ROS_DEBUG("ack sid : %04X", packet->message_id);
 
   if ( (packet->message_id & 0b0000011111111111) == (0x0600 | (motor_being_flashed << 5) | 0x10 | READ_FLASH_COMMAND))
     return ( !memcmp(packet->message_data, binary_content + pos, 8) );
 
   if (packet->message_length != can_message_.message_length)
     return false;
-  ROS_INFO("Length is OK");
+  ROS_DEBUG("Length is OK");
 
   for (i = 0 ; i < packet->message_length ; ++i)
   {
-    ROS_INFO("packet sent, data[%d] : %02X ; ack, data[%d] : %02X", i, can_message_.message_data[i], i, packet->message_data[i]);
+    ROS_DEBUG("packet sent, data[%d] : %02X ; ack, data[%d] : %02X", i, can_message_.message_data[i], i, packet->message_data[i]);
     if (packet->message_data[i] != can_message_.message_data[i])
       return false;
   }
-  ROS_INFO("Data is OK");
+  ROS_DEBUG("Data is OK");
 
   if ( !(0x0010 & packet->message_id))
     return false;
 
-  ROS_INFO("This is an ACK");
+  ROS_DEBUG("This is an ACK");
 
   if ( (packet->message_id & 0b0000000111101111) != (can_message_.message_id & 0b0000000111101111) )
-    {
-      ROS_ERROR_STREAM("Bad packet id: " << packet->message_id);
+  {
+    ROS_ERROR_STREAM("Bad packet id: " << packet->message_id);
     return false;
-    }
+  }
 
-  ROS_INFO("SID is OK");
+  ROS_DEBUG("SID is OK");
 
-  ROS_INFO("Everything is OK, this is our ACK !");
+  ROS_DEBUG("Everything is OK, this is our ACK !");
   return true;
 }
 
@@ -1154,6 +1133,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     return true;
   }
 
+#ifdef DEBUG_PUBLISHER
   // publishes the debug information (a slightly formatted version of the incoming ethercat packet):
   if(debug_publisher->trylock())
   {
@@ -1184,7 +1164,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
     debug_publisher->unlockAndPublish();
   }
-
+#endif
 
   //We received a coherent message.
   //Update the library (positions, diagnostics values, actuators, etc...)

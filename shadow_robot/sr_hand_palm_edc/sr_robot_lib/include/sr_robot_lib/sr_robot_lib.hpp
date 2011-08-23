@@ -153,6 +153,12 @@ namespace shadow_robot
      */
     void update(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_STATUS* status_data);
 
+    /**
+     * Builds a motor command: either send a torque demand or a configuration
+     * demand if one is waiting.
+     *
+     * @param command The command we're building.
+     */
     void build_motor_command(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command);
 
     /// The vector containing all the robot joints.
@@ -217,6 +223,22 @@ namespace shadow_robot
      */
     std::vector<std::pair<std::string, bool> > humanize_flags(int flag);
 
+    /**
+     * Generates a force control config and adds it to the reconfig_queue with its
+     * CRC. The config will be sent as soon as possible.
+     *
+     * @param motor_index The motor index.
+     * @param max_pwm The max pwm the motor will apply
+     * @param sg_left Strain gauge left
+     * @param sg_right Strain gauge right
+     * @param f The feedforward term (directly adds f*error to the output of the PID)
+     * @param p The p value.
+     * @param i the i value.
+     * @param d the d value.
+     * @param imax the imax value.
+     * @param deadband the deadband on the force.
+     * @param sign can be 0 or 1 depending on the way the motor is plugged in.
+     */
     void generate_force_control_config(int motor_index, int max_pwm, int sg_left, int sg_right,
                                        int f, int p, int i, int d, int imax,
                                        int deadband, int sign);
@@ -260,6 +282,7 @@ namespace shadow_robot
     /// a ROS nodehandle to be able to advertise the Force PID service
     ros::NodeHandle nh_tilde;
 
+#ifdef DEBUG_PUBLISHER
     ///These publishers are useful for debugging
     static const int nb_debug_publishers_const;
     std::vector<ros::Publisher> debug_publishers;
@@ -275,9 +298,14 @@ namespace shadow_robot
     boost::shared_mutex debug_mutex;
     ros::NodeHandle node_handle;
     std_msgs::Int16 msg_debug;
+#endif
 
-    ///the maximum number of position to keep per joint
+    /**
+     * The maximum number of position to keep per joint.
+     *  Must be bigger than number_of_positions_for_filter
+     */
     static const int number_of_positions_to_keep;
+    ///The number of positions we're using for the filter.
     static const int number_of_positions_for_filter;
 
     ///We need to know if we're overflowing or not.
@@ -286,7 +314,7 @@ namespace shadow_robot
     int last_can_msgs_transmitted;
 
   };//end class
-}
+}//end namespace
 
 /* For the emacs weenies in the crowd.
 Local Variables:

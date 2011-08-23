@@ -57,6 +57,7 @@ namespace shadow_robot
                             sr_robot_msgs::ForceController::Response& response,
                             int motor_index);
 
+#ifdef DEBUG_PUBLISHER
     /**
      * This is a service callback: we set the debug data we want to publish
      * at full speed in the debug topics.
@@ -68,9 +69,17 @@ namespace shadow_robot
      */
     bool set_debug_data_to_publish(sr_robot_msgs::SetDebugData::Request& request,
                                    sr_robot_msgs::SetDebugData::Response& response);
-
+#endif
 
   protected:
+    /**
+     * Initializes the hand library with the needed values.
+     *
+     * @param joint_names A vector containing all the joint names.
+     * @param motor_ids A vector containing the corresponding motor ids.
+     * @param joint_to_sensors A vector mapping the joint to the sensor index we read from the palm.
+     * @param actuators A vector containing the actuators for the different joints.
+     */
     virtual void initialize(std::vector<std::string> joint_names, std::vector<int> motor_ids,
                             std::vector<shadow_joints::JointToSensor> joint_to_sensors,
                             std::vector<sr_actuator::SrActuator*> actuators);

@@ -21,6 +21,18 @@ rosbuild_genmsg()
 #uncomment if you have defined services
 rosbuild_gensrv()
 
+
+#if you compile with "DEBUG=1 make", some debug data are going to be published
+SET(debug $ENV{DEBUG})
+MESSAGE(" ----- Shadow Robot EtherCAT driver configuration:")
+IF(DEFINED debug)
+  SET( CMAKE_CXX_FLAGS "-D DEBUG_PUBLISHER")
+  MESSAGE(" [x] Debug publisher")
+ELSE(DEFINED debug)
+  MESSAGE(" [ ] Debug publisher")
+ENDIF(DEFINED debug)
+MESSAGE(" ----- ")
+
 rosbuild_add_library(sr_edc_ethercat_drivers src/sr0x.cpp src/sr06.cpp src/srbridge.cpp src/srcan.cpp src/srdmotor.cpp src/motor_trace_buffer.cpp)
 target_link_libraries(sr_edc_ethercat_drivers sr_hand_lib)
 rosbuild_add_link_flags(sr_edc_ethercat_drivers -lbfd)

@@ -100,8 +100,10 @@ namespace shadow_robot
       tactiles_vector.push_back( new TACTILE_SENSOR_OUT() );
     }
 
+#ifdef DEBUG_PUBLISHER
     //advertise the debug service, used to set which data we want to publish on the debug topics
     debug_service = nh_tilde.advertiseService( "set_debug_publishers", &SrHandLib::set_debug_data_to_publish, this);
+#endif
   }
 
   SrHandLib::~SrHandLib()
@@ -399,6 +401,7 @@ namespace shadow_robot
     return update_rate_configs_vector;
   }
 
+#ifdef DEBUG_PUBLISHER
   bool SrHandLib::set_debug_data_to_publish(sr_robot_msgs::SetDebugData::Request& request,
                                             sr_robot_msgs::SetDebugData::Response& response)
   {
@@ -440,7 +443,9 @@ namespace shadow_robot
     response.success = true;
     return true;
   }
-}
+#endif
+
+}// end namespace
 
 /* For the emacs weenies in the crowd.
 Local Variables:
