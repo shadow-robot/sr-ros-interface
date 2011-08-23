@@ -29,7 +29,7 @@ from std_msgs.msg import Float64
 from PyQt4 import QtCore, QtGui, Qt
 
 from pr2_mechanism_msgs.srv import ListControllers
-from controller_tuner.automatic_procedures import RunGA, RunFriction
+from controller_tuner.automatic_procedures import RunGA, RunFriction, FullMovement
 
 class AdvancedDialog(QtGui.QDialog):
     """
@@ -164,12 +164,14 @@ class JointPidSetter(QtGui.QFrame):
         self.btn_automatic_pid.setToolTip("Finishes the PID tuning automatically using a genetic algorithm.")
         self.connect(self.btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
         self.layout_.addWidget(self.btn_automatic_pid)
+        self.btn_automatic_pid.setEnabled(False)
 
         self.btn_friction_compensation = QtGui.QPushButton()
         self.btn_friction_compensation.setText( "Friction" )
         self.btn_friction_compensation.setToolTip("Computes the Friction Compensation umap")
         self.connect(self.btn_friction_compensation, QtCore.SIGNAL('clicked()'),self.friction_compensation)
         self.layout_.addWidget(self.btn_friction_compensation)
+        self.btn_friction_compensation.setEnabled(False)
 
         self.tuning = False
         self.GA_thread = None
@@ -181,6 +183,8 @@ class JointPidSetter(QtGui.QFrame):
         self.btn_move.setText("Move")
         self.btn_move.setToolTip("Move the joint through a continuous movement, press again to stop.")
         self.connect(self.btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
+        if self.controller_type == "Motor Force":
+            self.btn_move.setEnabled(False)
         self.layout_.addWidget(self.btn_move)
 
         self.setLayout(self.layout_)
@@ -253,7 +257,7 @@ class JointPidSetter(QtGui.QFrame):
             self.btn_move.setIcon(self.green_icon)
         else:
             self.moving = True
-            self.full_movement = FullMovement(self.joint_name)
+            self.full_movement = FullMovement(self.joint_name, self.controller_type)
             self.full_movement.moving = True
             self.full_movement.start()
             self.btn_move.setIcon(self.red_icon)

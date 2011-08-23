@@ -16,12 +16,17 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import roslib; roslib.load_manifest('sr_control_gui')
+import rospy
+
 from sr_friction_compensation.u_map_computation_main import FrictionCompensation
 from sr_friction_compensation.lib.ethercat_robot_lib import EtherCAT_Robot_Lib
 
 from PyQt4 import QtCore, QtGui, Qt
 from functools import partial
 import threading, time, math
+
+from std_msgs.msg import Float64
 
 
 
@@ -118,14 +123,19 @@ class AutomaticTuningDialog(QtGui.QDialog):
         return self.parameters
 
 class BaseMovement(object):
-    def __init__(self, joint_name):
+    topic_based_on_controller_type = {"Motor Force":None,
+                                      "Position":"_position_controller/command",
+                                      "Velocity":"_velocity_controller/command",
+                                      "Mixed Position/Velocity":"_mixed_position_velocity_controller/command",
+                                      "Effort":"_effort_controller/command"}
+    def __init__(self, joint_name, controller_type):
         self.joint_name = joint_name
 
         self.msg_to_send = Float64()
         self.msg_to_send.data = 0.0
         self.sleep_time = 0.0001
 
-        topic = "/sh_"+ joint_name.lower() +"_effort_controller/command"
+        topic = "/sh_"+ joint_name.lower() + self.topic_based_on_controller_type[controller_type]
         self.publisher = rospy.Publisher(topic, Float64)
 
     def publish(self, mvt_percentage):
@@ -137,17 +147,18 @@ class BaseMovement(object):
         pass
 
 class SinusoidMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 400):
-        BaseMovement.__init__(self,joint_name)
+    def __init__(self, joint_name, amplitude = 400, offset = 0, controller_type = None):
+        BaseMovement.__init__(self,joint_name, controller_type)
+        self.offset = offset
         self.amplitude = amplitude
 
     def update(self, mvt_percentage):
-        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.)
+        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.) + self.offset
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 400, nb_steps = 50):
-        BaseMovement.__init__(self,joint_name)
+    def __init__(self, joint_name, amplitude = 400, nb_steps = 50, controller_type = None):
+        BaseMovement.__init__(self,joint_name, controller_type)
         self.amplitude = amplitude
         self.nb_steps  = nb_steps
 
@@ -195,13 +206,29 @@ class RunFriction(threading.Thread):
 
 
 class FullMovement(threading.Thread):
-    def __init__(self, joint_name):
+    def __init__(self, joint_name, controller_type):
         threading.Thread.__init__(self)
+
+
+        self.possible_movements = {"Motor Force": None,
+                                   "Position":[ StepMovement(joint_name, amplitude = 0.3, nb_steps = 100, controller_type = "Position"),
+                                                SinusoidMovement(joint_name, amplitude = 0.7, offset = 0.7, controller_type = "Position"),
+                                                StepMovement(joint_name, amplitude=0.5, nb_steps = 10, controller_type = "Position")],
+                                   "Velocity":[ StepMovement(joint_name, amplitude = 0.3, nb_steps = 100, controller_type = "Velocity"),
+                                                SinusoidMovement(joint_name, amplitude = 0.1, offset = 0.0, controller_type = "Velocity"),
+                                                StepMovement(joint_name, amplitude=0.5, nb_steps = 10, controller_type = "Velocity")],
+                                   "Mixed Position/Velocity": [ StepMovement(joint_name, amplitude = 0.3, nb_steps = 100,  controller_type = "Mixed Position/Velocity"),
+                                                                SinusoidMovement(joint_name, amplitude = 0.7, offset = 0.7, controller_type = "Mixed Position/Velocity"),
+                                                                StepMovement(joint_name, amplitude=0.5, nb_steps = 10, controller_type = "Mixed Position/Velocity")],
+                                   "Effort": [ StepMovement(joint_name, amplitude = 500, nb_steps = 100, controller_type = "Effort"),
+                                               SinusoidMovement(joint_name, amplitude = 400, offset = 0, controller_type = "Effort"),
+                                               StepMovement(joint_name, amplitude=500, nb_steps = 10, controller_type = "Effort")]}
+
+
         self.moving = False
         self.joint_name = joint_name
         self.iterations = 10000
-        self.movements = [StepMovement(joint_name), SinusoidMovement(joint_name),
-                          StepMovement(joint_name, amplitude=600, nb_steps = 10)]
+        self.movements = self.possible_movements[controller_type]
 
     def run(self):
         while(True):
