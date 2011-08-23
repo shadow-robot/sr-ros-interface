@@ -26,201 +26,10 @@ import threading, time, math
 
 from std_msgs.msg import Float64
 
-from sr_friction_compensation.u_map_computation_main import FrictionCompensation
-from sr_friction_compensation.lib.ethercat_robot_lib import EtherCAT_Robot_Lib
-
-
-
 from PyQt4 import QtCore, QtGui, Qt
 
-
-class AutomaticTuningDialog(QtGui.QDialog):
-    """
-    Set the parameters for the automatic pid tuner.
-    """
-    def __init__(self, parent, joint_name, parameters, hidden_parameters):
-        QtGui.QDialog.__init__(self,parent)
-        self.layout = QtGui.QVBoxLayout()
-
-        self.ordered_parameters = [["population size", "int", 2, 30 ], ["number of generations", "int", 5, 100],["percentage of mutation", "float", 0.0, 1.0],
-                                   ["P_min", "int", 0, 10000], ["P_max", "int", 0, 10000],
-                                   ["I_min", "int", 0, 10000], ["I_max", "int", 0, 10000],
-                                   ["D_min", "int", 0, 10000], ["D_max", "int", 0, 10000],
-                                   ["Imax_min", "int", 0, 10000], ["Imax_max", "int", 0, 10000],
-                                   ["sign", "hidden"], ["max_pwm", "hidden"]]
-
-        min_max = self.compute_min_max( parameters, ["p", "i", "d", "imax"])
-
-        self.parameters = {"population size":10, "number of generations":7,"percentage of mutation":0.25,
-                           "P_min":min_max["p"][0], "P_max": min_max["p"][1],
-                           "I_min":min_max["i"][0], "I_max": min_max["i"][1],
-                           "D_min":min_max["d"][0], "D_max": min_max["d"][1],
-                           "Imax_min":min_max["imax"][0], "Imax_max": min_max["imax"][1],
-                           "sign": hidden_parameters["sign"][0],
-                           "max_pwm": hidden_parameters["max_pwm"][0]
-                           }
-        frame_ga = QtGui.QFrame()
-        frame_min_max = QtGui.QFrame()
-        layout_ga = QtGui.QHBoxLayout()
-        layout_min_max = QtGui.QHBoxLayout()
-
-        self.text_edits = []
-        for param in self.ordered_parameters:
-            if param[1] == "hidden":
-                continue
-
-            label = QtGui.QLabel(param[0])
-
-            text_edit = QtGui.QLineEdit()
-            text_edit.setFixedHeight(30)
-            text_edit.setFixedWidth(50)
-
-            text_edit.setText( str(self.parameters[ param[0] ]) )
-
-            if param[1] == "int":
-                validator = QtGui.QIntValidator(param[2], param[3], self)
-            elif param[1] == "float":
-                print param, " -> float"
-                validator = QtGui.QDoubleValidator(param[2], param[3], 2, self)
-            text_edit.setValidator(validator)
-
-            self.text_edits.append(text_edit)
-
-            if "_min" in param[0] or "_max" in param[0]:
-                layout_min_max.addWidget(label)
-                layout_min_max.addWidget(text_edit)
-            else:
-                layout_ga.addWidget(label)
-                layout_ga.addWidget(text_edit)
-
-        frame_ga.setLayout(layout_ga)
-        self.layout.addWidget(frame_ga)
-
-        frame_min_max.setLayout(layout_min_max)
-        self.layout.addWidget(frame_min_max)
-
-        self.btn_box = QtGui.QDialogButtonBox(self)
-        self.btn_box.setOrientation(QtCore.Qt.Horizontal)
-        self.btn_box.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.layout.addWidget(self.btn_box)
-        self.setLayout(self.layout)
-        self.setWindowTitle("Automatic PID tuning: "+joint_name)
-
-        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("accepted()"), self.accept)
-        QtCore.QObject.connect(self.btn_box, QtCore.SIGNAL("rejected()"), self.reject)
-        QtCore.QMetaObject.connectSlotsByName(self)
-
-    def compute_min_max(self, parameters, names):
-        min_max = {}
-        for name in names:
-            mini = max( parameters[name][0] - 500  , 0 )
-            maxi = min( parameters[name][0] + 500  , 10000 )
-            min_max[name] = [mini, maxi]
-        return min_max
-
-    def getValues(self):
-        for param,text_edit in zip(self.ordered_parameters, self.text_edits):
-            if param[1] == "int" or param[1] == "hidden":
-                self.parameters[ param[0] ] = text_edit.text().toInt()[0]
-            elif param[1] == "float":
-                self.parameters[ param[0] ] = text_edit.text().toDouble()[0]
-        return self.parameters
-
-class BaseMovement(object):
-    def __init__(self, joint_name):
-        self.joint_name = joint_name
-
-        self.msg_to_send = Float64()
-        self.msg_to_send.data = 0.0
-        self.sleep_time = 0.0001
-
-        topic = "/sh_"+ joint_name.lower() +"_effort_controller/command"
-        self.publisher = rospy.Publisher(topic, Float64)
-
-    def publish(self, mvt_percentage):
-        self.update(mvt_percentage)
-        self.publisher.publish(self.msg_to_send)
-        time.sleep(self.sleep_time)
-
-    def update(self, mvt_percentage):
-        pass
-
-class SinusoidMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 400):
-        BaseMovement.__init__(self,joint_name)
-        self.amplitude = amplitude
-
-    def update(self, mvt_percentage):
-        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.)
-        self.msg_to_send.data = value
-
-class StepMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 400, nb_steps = 50):
-        BaseMovement.__init__(self,joint_name)
-        self.amplitude = amplitude
-        self.nb_steps  = nb_steps
-
-        self.steps = []
-        for i in range(0, int(nb_steps/2)):
-            self.steps.append(2.*float(i)*float(self.amplitude / nb_steps))
-        reversed_steps = self.steps[:]
-        reversed_steps.reverse()
-        self.steps += reversed_steps
-
-    def update(self, mvt_percentage):
-        index = int(self.nb_steps * mvt_percentage / 100.)
-        if index >= len(self.steps):
-            index = len(self.steps) - 1
-        value = self.steps[ index ]
-        self.msg_to_send.data = value
-
-
-class RunGA(threading.Thread):
-    def __init__(self, joint_name, parameters, parent):
-        threading.Thread.__init__(self)
-
-        self.parent = parent
-
-        self.joint_name = joint_name
-        self.tuning = True
-        self.parameters = parameters
-
-    def run(self):
-        pass
-
-
-class RunFriction(threading.Thread):
-    def __init__(self, joint_name, parent):
-        threading.Thread.__init__(self)
-        self.parent = parent
-        self.joint_name = joint_name
-        self.stopped = False
-        self.robot_lib = EtherCAT_Robot_Lib(joint_name)
-        self.FC = FrictionCompensation(joint_name = joint_name, n = 15,P=0, I=0, D=0, shift=0, lib = self.robot_lib)
-
-    def run(self):
-        self.FC.run()
-        self.parent.friction_finished()
-
-
-class FullMovement(threading.Thread):
-    def __init__(self, joint_name):
-        threading.Thread.__init__(self)
-        self.moving = False
-        self.joint_name = joint_name
-        self.iterations = 10000
-        self.movements = [StepMovement(joint_name), SinusoidMovement(joint_name),
-                          StepMovement(joint_name, amplitude=600, nb_steps = 10)]
-
-    def run(self):
-        while(True):
-            for movement in self.movements:
-                for mvt_percentage in range(0, self.iterations):
-                    if self.moving == False:
-                        return
-                    else:
-                        movement.publish(mvt_percentage/(self.iterations/100.))
-
+from pr2_mechanism_msgs.srv import ListControllers
+from controller_tuner.automatic_procedures import RunGA, RunFriction
 
 class AdvancedDialog(QtGui.QDialog):
     """
@@ -326,80 +135,13 @@ class JointPidSetter(QtGui.QFrame):
         self.friction = False
         self.friction_thread = None
 
-        #/realtime_loop/change_force_PID_FFJ0
-        service_name =  "/realtime_loop/change_force_PID_"+joint_name
-        self.pid_service = rospy.ServiceProxy(service_name, ForceController)
-
         self.layout_ = QtGui.QHBoxLayout()
 
-        label = QtGui.QLabel("<font color=red>"+joint_name+"</font>")
-        self.layout_.addWidget( label )
+        self.frame_important_parameters = QtGui.QFrame()
+        self.layout_important_param = QtGui.QHBoxLayout()
+        self.frame_important_parameters.setLayout(self.layout_important_param)
 
-        self.ordered_params = {"important":["f",
-                                            "p",
-                                            "i",
-                                            "d",
-                                            "imax"],
-                               "advanced":["max_pwm",
-                                           "sgleftref",
-                                           "sgrightref",
-                                           "deadband",
-                                           "sign"]}
-
-        self.important_parameters = {}
-        for param in self.ordered_params["important"]:
-            #a parameter contains:
-            #   - the value
-            #   - a QLineEdit to be able to modify the value
-            #   - an array containing the min/max
-            self.important_parameters[param] = [0,0,[0,65535]]
-
-        self.advanced_parameters = {}
-        for param in self.ordered_params["advanced"]:
-            #a parameter contains:
-            #   - the value
-            #   - a QLineEdit to be able to modify the value
-            #   - an array containing the min/max
-            self.advanced_parameters[param] = [0,0,[0,65535]]
-
-        self.advanced_parameters["max_pwm"][0] = 1023
-
-        for parameter_name in self.ordered_params["important"]:
-            parameter = self.important_parameters[parameter_name]
-            label = QtGui.QLabel(parameter_name)
-            self.layout_.addWidget( label )
-
-            text_edit = QtGui.QLineEdit()
-            text_edit.setFixedHeight(30)
-            text_edit.setFixedWidth(50)
-            text_edit.setText( str(parameter[0]) )
-
-            validator = QtGui.QIntValidator(parameter[2][0], parameter[2][1], self)
-            text_edit.setValidator(validator)
-
-
-            parameter[1] = text_edit
-            self.layout_.addWidget(text_edit)
-            plus_minus_frame = QtGui.QFrame()
-            plus_minus_layout = QtGui.QVBoxLayout()
-
-            plus_btn = QtGui.QPushButton()
-            plus_btn.setText("+")
-            plus_btn.setFixedWidth(20)
-            plus_btn.setFixedHeight(20)
-            plus_btn.clicked.connect(partial(self.plus, parameter_name))
-            plus_minus_layout.addWidget(plus_btn)
-
-            minus_btn = QtGui.QPushButton()
-            minus_btn.setText("-")
-            minus_btn.setFixedWidth(20)
-            minus_btn.setFixedHeight(20)
-            minus_btn.clicked.connect(partial(self.minus, parameter_name))
-            plus_minus_layout.addWidget(minus_btn)
-
-            plus_minus_frame.setLayout(plus_minus_layout)
-
-            self.layout_.addWidget(plus_minus_frame)
+        self.layout_.addWidget(self.frame_important_parameters)
 
         btn = QtGui.QPushButton()
         btn.setText("SET")
@@ -587,11 +329,114 @@ class JointPidSetter(QtGui.QFrame):
             for param in modified_adv_param.items():
                 self.advanced_parameters[param[0]] = param[1]
 
+    def refresh_available_controllers(self):
+        rospy.wait_for_service('/pr2_controller_manager/list_controllers')
+        controllers = rospy.ServiceProxy('/pr2_controller_manager/list_controllers', ListControllers)
+        resp = None
+        try:
+            resp = controllers()
+        except rospy.ServiceException, e:
+            print "Service did not process request: %s"%str(e)
+
+        self.controller_type = "default"
+        controllers_tmp = []
+        if resp != None:
+            for state,controller in zip(resp.state,resp.controllers):
+                if state == "running":
+                    split = controller.split("_")
+                    joint_name = split[1]
+                    controllers_tmp.append( [joint_name, controller + "/command"] )
+
+                    self.controller_type = split[2]
+        controllers_tmp.sort()
+
+        return controllers_tmp
+
     def activate(self):
+        #/realtime_loop/change_force_PID_FFJ0
+        service_name =  "/realtime_loop/change_force_PID_"+self.joint_name
+        self.pid_service = rospy.ServiceProxy(service_name, ForceController)
+
+        label = QtGui.QLabel("<font color=red>"+self.joint_name+"</font>")
+        self.layout_important_param.addWidget( label )
+
+        self.ordered_params = {"important":["f",
+                                            "p",
+                                            "i",
+                                            "d",
+                                            "imax"],
+                               "advanced":["max_pwm",
+                                           "sgleftref",
+                                           "sgrightref",
+                                           "deadband",
+                                           "sign"]}
+
+        self.important_parameters = {}
+        for param in self.ordered_params["important"]:
+            #a parameter contains:
+            #   - the value
+            #   - a QLineEdit to be able to modify the value
+            #   - an array containing the min/max
+            self.important_parameters[param] = [0,0,[0,65535]]
+
+        self.advanced_parameters = {}
+        for param in self.ordered_params["advanced"]:
+            #a parameter contains:
+            #   - the value
+            #   - a QLineEdit to be able to modify the value
+            #   - an array containing the min/max
+            self.advanced_parameters[param] = [0,0,[0,65535]]
+
+        self.advanced_parameters["max_pwm"][0] = 1023
+
+        for parameter_name in self.ordered_params["important"]:
+            parameter = self.important_parameters[parameter_name]
+            label = QtGui.QLabel(parameter_name)
+            self.layout_important_param.addWidget( label )
+
+            text_edit = QtGui.QLineEdit()
+            text_edit.setFixedHeight(30)
+            text_edit.setFixedWidth(50)
+            text_edit.setText( str(parameter[0]) )
+
+            validator = QtGui.QIntValidator(parameter[2][0], parameter[2][1], self)
+            text_edit.setValidator(validator)
+
+
+            parameter[1] = text_edit
+            self.layout_important_param.addWidget(text_edit)
+            plus_minus_frame = QtGui.QFrame()
+            plus_minus_layout = QtGui.QVBoxLayout()
+
+            plus_btn = QtGui.QPushButton()
+            plus_btn.setText("+")
+            plus_btn.setFixedWidth(20)
+            plus_btn.setFixedHeight(20)
+            plus_btn.clicked.connect(partial(self.plus, parameter_name))
+            plus_minus_layout.addWidget(plus_btn)
+
+            minus_btn = QtGui.QPushButton()
+            minus_btn.setText("-")
+            minus_btn.setFixedWidth(20)
+            minus_btn.setFixedHeight(20)
+            minus_btn.clicked.connect(partial(self.minus, parameter_name))
+            plus_minus_layout.addWidget(minus_btn)
+
+            plus_minus_frame.setLayout(plus_minus_layout)
+
+            self.layout_important_param.addWidget(plus_minus_frame)
+
+
+
         self.green_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/green.png')
         self.red_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/red.png')
         self.btn_move.setIcon(self.green_icon)
         self.btn_automatic_pid.setIcon(self.green_icon)
+
+        Qt.QTimer.singleShot(0, self.adjustSize)
+        Qt.QTimer.singleShot(0, self.parent.parent.window.adjustSize)
+
+
 
     def on_close(self):
         if self.full_movement != None:
@@ -610,10 +455,12 @@ class FingerPIDSetter(QtGui.QFrame):
     set the PID settings for the finger.
     """
 
-    def __init__(self, finger_name, joint_names, parent):
+    def __init__(self, finger_name, joint_names, controller_type, parent):
         QtGui.QFrame.__init__(self)
         self.parent = parent
         self.setFrameShape(QtGui.QFrame.Box)
+
+        self.controller_type = controller_type
 
         self.finger_name = finger_name
         self.joint_names = joint_names
@@ -629,7 +476,6 @@ class FingerPIDSetter(QtGui.QFrame):
 
         self.setLayout(self.layout_)
 
-    def activate(self):
         for jps in self.joint_pid_setter:
             jps.activate()
 
@@ -649,30 +495,57 @@ class ControllerTuner(GenericPlugin):
         self.frame = QtGui.QFrame()
         self.layout = QtGui.QVBoxLayout()
 
-        self.joints = {"FF": ["FFJ0", "FFJ3", "FFJ4"],
-                       "MF": ["MFJ0", "MFJ3", "MFJ4"],
-                       "RF": ["RFJ0", "RFJ3", "RFJ4"],
-                       "LF": ["LFJ0", "LFJ3", "LFJ4", "LFJ5"],
-                       "TH": ["THJ1", "THJ2", "THJ3", "THJ4", "THJ5"]}
+        self.frame_controller_type = QtGui.QFrame()
+        self.layout_controller_type = QtGui.QHBoxLayout()
+
+        #add a combo box to select the controller type
+        self.label_control = QtGui.QLabel("Controller type: ")
+        self.layout_controller_type.addWidget(self.label_control)
+        self.controller_combo_box = QtGui.QComboBox(self.frame_controller_type)
+        self.controller_combo_box.setToolTip("Choose the type of controller you want to tune.")
+
+        self.controller_types_const = ["Motor Force", "Position", "Velocity",
+                                       "Mixed Position/Velocity", "Effort"]
+
+        for control_type in self.controller_types_const:
+            self.controller_combo_box.addItem(control_type)
+
+        self.frame_controller_type.connect(self.controller_combo_box, QtCore.SIGNAL('activated(int)'), self.changed_controller_type)
+        self.layout_controller_type.addWidget(self.controller_combo_box)
+        self.frame_controller_type.setLayout(self.layout_controller_type)
+
+        self.layout.addWidget(self.frame_controller_type)
+
         self.finger_pid_setters = []
-
-        for finger in self.joints.items():
-            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1], self) )
-
         self.qtab_widget = QtGui.QTabWidget()
-        for f_pid_setter in self.finger_pid_setters:
-            self.qtab_widget.addTab(f_pid_setter, f_pid_setter.finger_name)
-
         self.layout.addWidget( self.qtab_widget )
 
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
 
+    def changed_controller_type(self, index):
+        self.joints = {"FF": ["FFJ0", "FFJ3", "FFJ4"],
+                       "MF": ["MFJ0", "MFJ3", "MFJ4"],
+                       "RF": ["RFJ0", "RFJ3", "RFJ4"],
+                       "LF": ["LFJ0", "LFJ3", "LFJ4", "LFJ5"],
+                       "TH": ["THJ1", "THJ2", "THJ3", "THJ4", "THJ5"]}
+
+        for fps in self.finger_pid_setters:
+            fps.setParent(None)
+            del fps
+        self.finger_pid_setters = []
+
+        for finger in self.joints.items():
+            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1], self.controller_types_const[index], self) )
+        for f_pid_setter in self.finger_pid_setters:
+            self.qtab_widget.addTab(f_pid_setter, f_pid_setter.finger_name)
+
+        Qt.QTimer.singleShot(0, self.window.adjustSize)
+
     def activate(self):
         GenericPlugin.activate(self)
-        for fps in self.finger_pid_setters:
-            fps.activate()
 
+        self.changed_controller_type(0)
         self.set_icon(self.parent.parent.rootPath + '/images/icons/iconHand.png')
 
     def on_close(self):

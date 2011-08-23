@@ -213,10 +213,11 @@ class LightJointSlider(GenericPlugin):
             slider.setParent(None)
             self.sliders.remove(slider)
             del slider
-        self.super_slider.setParent(None)
-        del self.super_slider
         self.sliders = []
-        self.super_slider = None
+        if self.super_slider != None:
+            self.super_slider.setParent(None)
+            del self.super_slider
+            self.super_slider = None
 
         GenericPlugin.on_close(self)
 
