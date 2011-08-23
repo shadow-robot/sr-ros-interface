@@ -62,6 +62,9 @@ int SR0X::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
             sh_->get_product_code(), fw_major_, fw_minor_,
             'A' + board_major_, board_minor_,
             sh_->get_serial());
+
+  device_offset_ = sh_->get_ring_position();// - hand_->getBridgeRingPosition();
+
   return 0;
 }
 

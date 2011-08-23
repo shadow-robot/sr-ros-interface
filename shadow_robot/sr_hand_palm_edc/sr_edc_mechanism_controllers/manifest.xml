@@ -3,7 +3,7 @@
 
      The sr_edc_mechanism_controllers package contains different types of
      controllers for the etherCAT hand:(fake) calibration controllers,
-     position controllers, velocity controllers, force controllers.
+     position controllers, velocity controllers, force controllers, ...
 
   </description>
   <author>Ugo Cupcic</author>
