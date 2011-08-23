@@ -296,29 +296,6 @@ class JointPidSetter(QtGui.QFrame):
             for param in modified_adv_param.items():
                 self.advanced_parameters[param[0]] = param[1]
 
-    def refresh_available_controllers(self):
-        rospy.wait_for_service('/pr2_controller_manager/list_controllers')
-        controllers = rospy.ServiceProxy('/pr2_controller_manager/list_controllers', ListControllers)
-        resp = None
-        try:
-            resp = controllers()
-        except rospy.ServiceException, e:
-            print "Service did not process request: %s"%str(e)
-
-        self.controller_type = "default"
-        controllers_tmp = []
-        if resp != None:
-            for state,controller in zip(resp.state,resp.controllers):
-                if state == "running":
-                    split = controller.split("_")
-                    joint_name = split[1]
-                    controllers_tmp.append( [joint_name, controller + "/command"] )
-
-                    self.controller_type = split[2]
-        controllers_tmp.sort()
-
-        return controllers_tmp
-
     def activate(self):
         #use the correct service
         self.pid_service = None
@@ -469,6 +446,8 @@ class ControllerTuner(GenericPlugin):
         self.controller_combo_box = QtGui.QComboBox(self.frame_controller_type)
         self.controller_combo_box.setToolTip("Choose the type of controller you want to tune.")
 
+        self.all_controller_types = ["Motor Force", "Position", "Velocity",
+                                     "Mixed Position/Velocity", "Effort"]
         self.ordered_controller_types = ["Motor Force", "Position", "Velocity",
                                          "Mixed Position/Velocity", "Effort"]
         self.controller_params = {"Motor Force": { "important":["f",
@@ -511,14 +490,19 @@ class ControllerTuner(GenericPlugin):
 
                                   "Effort":{ "important":["max_force", "friction_deadband"]}}
 
-        for control_type in self.ordered_controller_types:
-            self.controller_combo_box.addItem(control_type)
-
         self.frame_controller_type.connect(self.controller_combo_box, QtCore.SIGNAL('activated(int)'), self.changed_controller_type)
         self.layout_controller_type.addWidget(self.controller_combo_box)
         self.frame_controller_type.setLayout(self.layout_controller_type)
 
+        self.refresh_btn = QtGui.QPushButton()
+        self.refresh_btn.setText("Refresh Controllers")
+        self.refresh_btn.setToolTip("Check with the controller manager to see which controller is currently running")
+        self.frame_controller_type.connect(self.refresh_btn, QtCore.SIGNAL('clicked()'),self.refresh_available_controllers)
+        self.layout_controller_type.addWidget(self.refresh_btn)
+
         self.layout.addWidget(self.frame_controller_type)
+
+        self.refresh_available_controllers()
 
         self.finger_pid_setters = []
         self.qtab_widget = QtGui.QTabWidget()
@@ -526,6 +510,33 @@ class ControllerTuner(GenericPlugin):
 
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
+
+
+    def refresh_available_controllers(self):
+        rospy.wait_for_service('/pr2_controller_manager/list_controllers')
+        controllers = rospy.ServiceProxy('/pr2_controller_manager/list_controllers', ListControllers)
+        resp = None
+        try:
+            resp = controllers()
+        except rospy.ServiceException, e:
+            print "Service did not process request: %s"%str(e)
+
+        self.controller_type = "default"
+        controllers_tmp = []
+        self.ordered_controller_types = []
+        self.controller_combo_box.clear()
+        self.controller_combo_box.addItem("Motor Force")
+        self.ordered_controller_types.append("Motor Force")
+        if resp != None:
+            for state,controller in zip(resp.state,resp.controllers):
+                if state == "running":
+                    split = controller.split("_")
+                    ctrl_type_tmp = split[2]
+                    for defined_ctrl_type in self.all_controller_types:
+                        if ctrl_type_tmp.lower() in defined_ctrl_type.lower():
+                            self.controller_combo_box.addItem(defined_ctrl_type)
+                            self.ordered_controller_types.append(defined_ctrl_type)
+                            return
 
     def changed_controller_type(self, index):
         self.joints = {"FF": ["FFJ0", "FFJ3", "FFJ4"],
