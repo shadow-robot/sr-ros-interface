@@ -20,7 +20,7 @@ import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
 from generic_plugin import GenericPlugin
-from sr_robot_msgs.srv import ForceController
+from sr_robot_msgs.srv import ForceController, SetEffortControllerGains, SetMixedPositionVelocityPidGains, SetPidGains
 from functools import partial
 import threading, time, math
 
@@ -55,7 +55,7 @@ class AdvancedDialog(QtGui.QDialog):
             text_edit.setFixedWidth(50)
             text_edit.setText( str(parameter[0]) )
 
-            validator = QtGui.QIntValidator(parameter[2][0], parameter[2][1], self)
+            validator = QtGui.QDoubleValidator(parameter[2][0], parameter[2][1], 4, self)
             text_edit.setValidator(validator)
 
             parameter[1] = text_edit
@@ -116,7 +116,7 @@ class AdvancedDialog(QtGui.QDialog):
 
     def getValues(self):
         for param in self.parameters.items():
-            param[1][0] = param[1][1].text().toInt()[0]
+            param[1][0] = param[1][1].text().toDouble()[0]
 
         return self.parameters
 
@@ -125,12 +125,13 @@ class JointPidSetter(QtGui.QFrame):
     Set the force PID settings for a given joint.
     """
 
-    def __init__(self, joint_name, ordered_params, parent):
+    def __init__(self, joint_name, ordered_params, controller_type, parent):
         """
         """
         QtGui.QFrame.__init__(self)
 
         self.ordered_params = ordered_params
+        self.controller_type = controller_type
 
         self.joint_name = joint_name
         self.parent = parent
@@ -315,14 +316,32 @@ class JointPidSetter(QtGui.QFrame):
     def set_pid(self):
         for param in self.important_parameters.items():
             param[1][0] = param[1][1].text().toInt()[0]
+
         try:
-            self.pid_service(self.advanced_parameters["max_pwm"][0], self.advanced_parameters["sgleftref"][0],
-                             self.advanced_parameters["sgrightref"][0], self.important_parameters["f"][0],
-                             self.important_parameters["p"][0], self.important_parameters["i"][0],
-                             self.important_parameters["d"][0], self.important_parameters["imax"][0],
-                             self.advanced_parameters["deadband"][0], self.advanced_parameters["sign"][0] )
+            if self.controller_type == "Motor Force":
+                self.pid_service(int(self.advanced_parameters["max_pwm"][0]), int(self.advanced_parameters["sgleftref"][0]),
+                                 int(self.advanced_parameters["sgrightref"][0]), int(self.important_parameters["f"][0]),
+                                 int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
+                                 int(self.important_parameters["d"][0]), int(self.important_parameters["imax"][0]),
+                                 int(self.advanced_parameters["deadband"][0]), int(self.advanced_parameters["sign"][0]) )
+            elif self.controller_type == "Position" or self.controller_type == "Velocity":
+                self.pid_service(int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
+                                 int(self.important_parameters["d"][0]), int(self.important_parameters["i_clamp"][0]),
+                                 int(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["deadband"][0]),
+                                 int(self.advanced_parameters["friction_deadband"][0]) )
+            elif self.controller_type == "Mixed Position/Velocity":
+                self.pid_service(int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
+                                 int(self.important_parameters["d"][0]), int(self.important_parameters["i_clamp"][0]),
+                                 int(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["min_velocity"][0]),
+                                 float(self.advanced_parameters["max_velocity"][0]), float(self.advanced_parameters["velocity_slope"][0]),
+                                 float(self.advanced_parameters["position_deadband"][0]), int(self.advanced_parameters["friction_deadband"][0]) )
+            elif self.controller_type == "Effort":
+                self.pid_service(int(self.advanced_parameters["max_force"][0]), int(self.advanced_parameters["friction_deadband"][0]) )
+            else:
+                print "", self.controller_type, " is not a recognized controller type."
+
         except:
-            print "Failed to set pid."
+            print "Failed to set pid for ",self.controller_type, " controllers."
 
     def advanced_options(self):
         adv_dial = AdvancedDialog(self, self.joint_name, self.advanced_parameters,
@@ -356,9 +375,35 @@ class JointPidSetter(QtGui.QFrame):
         return controllers_tmp
 
     def activate(self):
-        #/realtime_loop/change_force_PID_FFJ0
-        service_name =  "/realtime_loop/change_force_PID_"+self.joint_name
-        self.pid_service = rospy.ServiceProxy(service_name, ForceController)
+        #use the correct service
+        self.pid_service = None
+        if self.controller_type == "Motor Force":
+            #/realtime_loop/change_force_PID_FFJ0
+            service_name =  "/realtime_loop/change_force_PID_"+self.joint_name.upper()
+            self.pid_service = rospy.ServiceProxy(service_name, ForceController)
+
+        elif self.controller_type == "Position":
+            #/sh_ffj3_position_controller/set_gains
+            service_name =  "/sh_"+self.joint_name.lower()+"_position_controller/set_gains"
+            self.pid_service = rospy.ServiceProxy(service_name, SetPidGains)
+
+        elif self.controller_type == "Velocity":
+            #/sh_ffj3_velocity_controller/set_gains
+            service_name =  "/sh_"+self.joint_name.lower()+"_velocity_controller/set_gains"
+            self.pid_service = rospy.ServiceProxy(service_name, SetPidGains)
+
+        elif self.controller_type == "Mixed Position/Velocity":
+            #/sh_ffj3_mixed_position_velocity_controller/set_gains
+            service_name =  "/sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/set_gains"
+            self.pid_service = rospy.ServiceProxy(service_name, SetMixedPositionVelocityPidGains)
+
+        elif self.controller_type == "Effort":
+            #/sh_ffj3_effort_controller/set_gains
+            service_name =  "/sh_"+self.joint_name.lower()+"_effort_controller/set_gains"
+            self.pid_service = rospy.ServiceProxy(service_name, SetEffortControllerGains)
+
+        else:
+            print "", self.controller_type, " is not a recognized controller type."
 
         label = QtGui.QLabel("<font color=red>"+self.joint_name+"</font>")
         self.layout_important_param.addWidget( label )
@@ -369,7 +414,7 @@ class JointPidSetter(QtGui.QFrame):
             #   - the value
             #   - a QLineEdit to be able to modify the value
             #   - an array containing the min/max
-            self.important_parameters[param] = [0,0,[0,65535]]
+            self.important_parameters[param] = [0,0,[-65535,65535]]
 
         self.advanced_parameters = {}
         if self.ordered_params.has_key("advanced"):
@@ -379,10 +424,12 @@ class JointPidSetter(QtGui.QFrame):
                 #   - the value
                 #   - a QLineEdit to be able to modify the value
                 #   - an array containing the min/max
-                self.advanced_parameters[param] = [0,0,[0,65535]]
+                self.advanced_parameters[param] = [0,0,[-65535,65535]]
 
             if self.advanced_parameters.has_key("max_pwm"):
                 self.advanced_parameters["max_pwm"][0] = 1023
+            if self.advanced_parameters.has_key("max_force"):
+                self.advanced_parameters["max_force"][0] = 1000
         else:
             self.btn_advanced.setEnabled(False)
 
@@ -452,12 +499,10 @@ class FingerPIDSetter(QtGui.QFrame):
     set the PID settings for the finger.
     """
 
-    def __init__(self, finger_name, joint_names, ordered_params, parent):
+    def __init__(self, finger_name, joint_names, ordered_params, controller_type, parent):
         QtGui.QFrame.__init__(self)
         self.parent = parent
         self.setFrameShape(QtGui.QFrame.Box)
-
-        self.ordered_params = ordered_params
 
         self.finger_name = finger_name
         self.joint_names = joint_names
@@ -466,7 +511,7 @@ class FingerPIDSetter(QtGui.QFrame):
 
         self.joint_pid_setter = []
         for joint_name in self.joint_names:
-            self.joint_pid_setter.append( JointPidSetter(joint_name, self.ordered_params, self) )
+            self.joint_pid_setter.append( JointPidSetter(joint_name, ordered_params, controller_type, self) )
 
         for j_pid_setter in self.joint_pid_setter:
             self.layout_.addWidget( j_pid_setter )
@@ -571,9 +616,10 @@ class ControllerTuner(GenericPlugin):
             del fps
         self.finger_pid_setters = []
 
-        params = self.controller_params[ self.ordered_controller_types[index] ]
+        controller_type = self.ordered_controller_types[index]
+        params = self.controller_params[ controller_type ]
         for finger in self.joints.items():
-            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1], params, self) )
+            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1], params, controller_type, self) )
         for f_pid_setter in self.finger_pid_setters:
             self.qtab_widget.addTab(f_pid_setter, f_pid_setter.finger_name)
 
