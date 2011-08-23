@@ -488,7 +488,7 @@ namespace shadow_robot
                                                  int deadband, int sign)
   {
     ROS_INFO_STREAM("Setting new pid values for motor" << motor_index << ": max_pwm="<< max_pwm
-		    <<"sg_left=" << sg_left << " sg_right=" << sg_right << " f=" << f << " p="
+		    <<" sg_left=" << sg_left << " sg_right=" << sg_right << " f=" << f << " p="
 		    << p << " i=" << i << " d="<< d << " imax=" << imax
 		    << " deadband="<< deadband << " sign=" << sign);
 

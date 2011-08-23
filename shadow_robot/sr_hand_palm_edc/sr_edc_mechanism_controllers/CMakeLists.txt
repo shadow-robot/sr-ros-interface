@@ -16,6 +16,17 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
+#if you compile with "DEBUG=1 make", some debug data are going to be published
+SET(debug $ENV{DEBUG})
+MESSAGE(" ----- Shadow Robot EtherCAT driver configuration:")
+IF(DEFINED debug)
+  SET( CMAKE_CXX_FLAGS "-D DEBUG_PUBLISHER")
+  MESSAGE(" [x] Debug publisher")
+ELSE(DEFINED debug)
+  MESSAGE(" [ ] Debug publisher")
+ENDIF(DEFINED debug)
+MESSAGE(" ----- ")
+
 rosbuild_add_library(${PROJECT_NAME}
   src/srh_fake_joint_calibration_controller.cpp
   src/srh_joint_position_controller.cpp

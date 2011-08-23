@@ -139,8 +139,9 @@ namespace controller
     /// Advertise a service to set the min/max velocity and the slope.
     std::vector<ros::ServiceServer> velocity_services_;
 
+#ifdef DEBUG_PUBLISHER
     ros::Publisher debug_pub;
-
+#endif
 
     ros::Subscriber sub_command_;
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
