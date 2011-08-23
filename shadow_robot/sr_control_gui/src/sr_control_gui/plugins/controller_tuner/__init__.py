@@ -125,10 +125,13 @@ class JointPidSetter(QtGui.QFrame):
     Set the force PID settings for a given joint.
     """
 
-    def __init__(self, joint_name, parent):
+    def __init__(self, joint_name, ordered_params, parent):
         """
         """
         QtGui.QFrame.__init__(self)
+
+        self.ordered_params = ordered_params
+
         self.joint_name = joint_name
         self.parent = parent
 
@@ -149,11 +152,11 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(btn, QtCore.SIGNAL('clicked()'),self.set_pid)
         self.layout_.addWidget(btn)
 
-        btn_advanced = QtGui.QPushButton()
-        btn_advanced.setText("Advanced")
-        btn_advanced.setToolTip("Set advanced parameters for this joint force controller.")
-        self.connect(btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
-        self.layout_.addWidget(btn_advanced)
+        self.btn_advanced = QtGui.QPushButton()
+        self.btn_advanced.setText("Advanced")
+        self.btn_advanced.setToolTip("Set advanced parameters for this joint force controller.")
+        self.connect(self.btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
+        self.layout_.addWidget(self.btn_advanced)
 
         self.btn_automatic_pid = QtGui.QPushButton()
         self.btn_automatic_pid.setText( "Automatic" )
@@ -360,17 +363,6 @@ class JointPidSetter(QtGui.QFrame):
         label = QtGui.QLabel("<font color=red>"+self.joint_name+"</font>")
         self.layout_important_param.addWidget( label )
 
-        self.ordered_params = {"important":["f",
-                                            "p",
-                                            "i",
-                                            "d",
-                                            "imax"],
-                               "advanced":["max_pwm",
-                                           "sgleftref",
-                                           "sgrightref",
-                                           "deadband",
-                                           "sign"]}
-
         self.important_parameters = {}
         for param in self.ordered_params["important"]:
             #a parameter contains:
@@ -380,14 +372,19 @@ class JointPidSetter(QtGui.QFrame):
             self.important_parameters[param] = [0,0,[0,65535]]
 
         self.advanced_parameters = {}
-        for param in self.ordered_params["advanced"]:
-            #a parameter contains:
-            #   - the value
-            #   - a QLineEdit to be able to modify the value
-            #   - an array containing the min/max
-            self.advanced_parameters[param] = [0,0,[0,65535]]
+        if self.ordered_params.has_key("advanced"):
+            self.btn_advanced.setEnabled(True)
+            for param in self.ordered_params["advanced"]:
+                #a parameter contains:
+                #   - the value
+                #   - a QLineEdit to be able to modify the value
+                #   - an array containing the min/max
+                self.advanced_parameters[param] = [0,0,[0,65535]]
 
-        self.advanced_parameters["max_pwm"][0] = 1023
+            if self.advanced_parameters.has_key("max_pwm"):
+                self.advanced_parameters["max_pwm"][0] = 1023
+        else:
+            self.btn_advanced.setEnabled(False)
 
         for parameter_name in self.ordered_params["important"]:
             parameter = self.important_parameters[parameter_name]
@@ -455,12 +452,12 @@ class FingerPIDSetter(QtGui.QFrame):
     set the PID settings for the finger.
     """
 
-    def __init__(self, finger_name, joint_names, controller_type, parent):
+    def __init__(self, finger_name, joint_names, ordered_params, parent):
         QtGui.QFrame.__init__(self)
         self.parent = parent
         self.setFrameShape(QtGui.QFrame.Box)
 
-        self.controller_type = controller_type
+        self.ordered_params = ordered_params
 
         self.finger_name = finger_name
         self.joint_names = joint_names
@@ -469,7 +466,7 @@ class FingerPIDSetter(QtGui.QFrame):
 
         self.joint_pid_setter = []
         for joint_name in self.joint_names:
-            self.joint_pid_setter.append( JointPidSetter(joint_name, self) )
+            self.joint_pid_setter.append( JointPidSetter(joint_name, self.ordered_params, self) )
 
         for j_pid_setter in self.joint_pid_setter:
             self.layout_.addWidget( j_pid_setter )
@@ -504,10 +501,49 @@ class ControllerTuner(GenericPlugin):
         self.controller_combo_box = QtGui.QComboBox(self.frame_controller_type)
         self.controller_combo_box.setToolTip("Choose the type of controller you want to tune.")
 
-        self.controller_types_const = ["Motor Force", "Position", "Velocity",
-                                       "Mixed Position/Velocity", "Effort"]
+        self.ordered_controller_types = ["Motor Force", "Position", "Velocity",
+                                         "Mixed Position/Velocity", "Effort"]
+        self.controller_params = {"Motor Force": { "important":["f",
+                                                                "p",
+                                                                "i",
+                                                                "d",
+                                                                "imax"],
+                                                   "advanced":["max_pwm",
+                                                               "sgleftref",
+                                                               "sgrightref",
+                                                               "deadband",
+                                                               "sign"] },
 
-        for control_type in self.controller_types_const:
+                                  "Position":{ "important":[ "p",
+                                                             "i",
+                                                             "d",
+                                                             "i_clamp"],
+                                               "advanced":["max_force",
+                                                           "deadband",
+                                                           "friction_deadband"] },
+
+                                  "Velocity":{ "important":[ "p",
+                                                             "i",
+                                                             "d",
+                                                             "i_clamp"],
+                                               "advanced":["max_force",
+                                                           "deadband",
+                                                           "friction_deadband"] },
+
+                                  "Mixed Position/Velocity":{ "important":[ "p",
+                                                                            "i",
+                                                                            "d",
+                                                                            "i_clamp"],
+                                                              "advanced":["max_force",
+                                                                          "min_velocity",
+                                                                          "max_velocity",
+                                                                          "velocity_slope",
+                                                                          "position_deadband",
+                                                                          "friction_deadband"] },
+
+                                  "Effort":{ "important":["max_force", "friction_deadband"]}}
+
+        for control_type in self.ordered_controller_types:
             self.controller_combo_box.addItem(control_type)
 
         self.frame_controller_type.connect(self.controller_combo_box, QtCore.SIGNAL('activated(int)'), self.changed_controller_type)
@@ -535,8 +571,9 @@ class ControllerTuner(GenericPlugin):
             del fps
         self.finger_pid_setters = []
 
+        params = self.controller_params[ self.ordered_controller_types[index] ]
         for finger in self.joints.items():
-            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1], self.controller_types_const[index], self) )
+            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1], params, self) )
         for f_pid_setter in self.finger_pid_setters:
             self.qtab_widget.addTab(f_pid_setter, f_pid_setter.finger_name)
 
