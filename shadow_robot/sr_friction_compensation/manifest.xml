@@ -1,7 +1,8 @@
 <package>
   <description brief="sr_friction_compensation">
 
-     sr_friction_compensation
+     sr_friction_compensation computes the friction compensation map by slowly moving a joint
+     through its range and measuring the necessary force.
 
   </description>
   <author>Ugo Cupcic</author>
