@@ -1,10 +1,10 @@
 [Core]
-Name = velocity_sliders
-Module = VelocityJointSlider
+Name = ethercat_sliders
+Module = EtherCATJointSlider
 Category = etherCAT_hand
 
 [Documentation]
 Author = Ugo Cupcic
 Version = 0.1
 Website = http://www.shadowrobot.com
-Description = Velocity Sliders.
+Description = Sliders for the loaded controllers.

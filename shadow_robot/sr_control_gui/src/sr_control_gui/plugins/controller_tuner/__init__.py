@@ -26,6 +26,11 @@ import threading, time, math
 
 from std_msgs.msg import Float64
 
+from sr_friction_compensation.u_map_computation_main import FrictionCompensation
+from sr_friction_compensation.lib.ethercat_robot_lib import EtherCAT_Robot_Lib
+
+
+
 from PyQt4 import QtCore, QtGui, Qt
 
 
@@ -183,6 +188,21 @@ class RunGA(threading.Thread):
     def run(self):
         pass
 
+
+class RunFriction(threading.Thread):
+    def __init__(self, joint_name, parent):
+        threading.Thread.__init__(self)
+        self.parent = parent
+        self.joint_name = joint_name
+        self.stopped = False
+        self.robot_lib = EtherCAT_Robot_Lib(joint_name)
+        self.FC = FrictionCompensation(joint_name = joint_name, n = 15,P=0, I=0, D=0, shift=0, lib = self.robot_lib)
+
+    def run(self):
+        self.FC.run()
+        self.parent.friction_finished()
+
+
 class FullMovement(threading.Thread):
     def __init__(self, joint_name):
         threading.Thread.__init__(self)
@@ -303,6 +323,9 @@ class JointPidSetter(QtGui.QFrame):
         self.joint_name = joint_name
         self.parent = parent
 
+        self.friction = False
+        self.friction_thread = None
+
         #/realtime_loop/change_force_PID_FFJ0
         service_name =  "/realtime_loop/change_force_PID_"+joint_name
         self.pid_service = rospy.ServiceProxy(service_name, ForceController)
@@ -339,7 +362,7 @@ class JointPidSetter(QtGui.QFrame):
             #   - an array containing the min/max
             self.advanced_parameters[param] = [0,0,[0,65535]]
 
-        self.advanced_parameters["max_pwm"][0] = 100
+        self.advanced_parameters["max_pwm"][0] = 1023
 
         for parameter_name in self.ordered_params["important"]:
             parameter = self.important_parameters[parameter_name]
@@ -396,6 +419,12 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(self.btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
         self.layout_.addWidget(self.btn_automatic_pid)
 
+        self.btn_friction_compensation = QtGui.QPushButton()
+        self.btn_friction_compensation.setText( "Friction" )
+        self.btn_friction_compensation.setToolTip("Computes the Friction Compensation umap")
+        self.connect(self.btn_friction_compensation, QtCore.SIGNAL('clicked()'),self.friction_compensation)
+        self.layout_.addWidget(self.btn_friction_compensation)
+
         self.tuning = False
         self.GA_thread = None
 
@@ -409,6 +438,46 @@ class JointPidSetter(QtGui.QFrame):
         self.layout_.addWidget(self.btn_move)
 
         self.setLayout(self.layout_)
+
+    def friction_compensation(self):
+        if self.friction:
+            self.btn_friction_compensation.setIcon(self.green_icon)
+            self.friction_thread.tuning = False
+            self.friction_thread.FC.stop()
+            self.friction_thread.join()
+            self.friction_thread = None
+
+            self.btn_friction_compensation.setIcon(self.green_icon)
+            self.friction = False
+            self.btn_move.setEnabled(True)
+
+        else:
+            if self.moving:
+                self.full_movement.moving = False
+                self.moving = False
+                self.full_movement.join()
+                self.full_movement = None
+                self.btn_move.setIcon(self.green_icon)
+                self.btn_move.setEnabled(False)
+
+            self.friction_thread = RunFriction(self.joint_name, self)
+            self.friction_thread.start()
+
+            self.friction = True
+            self.btn_friction_compensation.setIcon(self.red_icon)
+
+    def friction_finished(self):
+        #TODO: add a popup to tell people the friction finished properly,
+        # may be we should display the points + the line
+        self.btn_friction_compensation.setIcon(self.green_icon)
+        self.friction_thread.tuning = False
+        self.friction_thread.FC.stop()
+        self.friction_thread = None
+
+        self.btn_friction_compensation.setIcon(self.green_icon)
+        self.friction = False
+        self.btn_move.setEnabled(True)
+
 
     def plus(self, param_name):
         param = self.important_parameters[param_name]
@@ -569,11 +638,11 @@ class FingerPIDSetter(QtGui.QFrame):
             j_pid_setter.on_close()
 
 
-class ForceControllerTuner(GenericPlugin):
+class ControllerTuner(GenericPlugin):
     """
-    A plugin to easily tune the force controller on the etherCAT hand.
+    A plugin to easily tune the controllers on the etherCAT hand.
     """
-    name = "Force Controller Tuner"
+    name = "Controllers Tuner"
 
     def __init__(self):
         GenericPlugin.__init__(self)

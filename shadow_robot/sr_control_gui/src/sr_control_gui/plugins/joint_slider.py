@@ -39,8 +39,8 @@ class ExtendedSlider(QtGui.QWidget):
     """
     This slider displays the current position and the target as well.
     """
-    def __init__(self, joint, plugin_parent):
-        QtGui.QWidget.__init__(self)
+    def __init__(self, joint, plugin_parent, parent=None):
+        QtGui.QWidget.__init__(self, parent)
         self.plugin_parent = plugin_parent
         self.name = joint.name
 
@@ -104,8 +104,8 @@ class ExtendedSlider(QtGui.QWidget):
         self.is_selected = value
 
 class ExtendedSuperSlider(ExtendedSlider):
-    def __init__(self, joint, plugin_parent):
-        ExtendedSlider.__init__(self, joint, plugin_parent)
+    def __init__(self, joint, plugin_parent, parent = None):
+        ExtendedSlider.__init__(self, joint, plugin_parent, parent)
         self.plugin_parent = plugin_parent
         self.position.close()
         self.target.setText("Target: 0%")
@@ -145,13 +145,13 @@ class JointSlider(ShadowGenericPlugin):
         #Add the sliders
         self.sliders = []
         for joint in joints_list:
-            slider = ExtendedSlider(joint, self)
+            slider = ExtendedSlider(joint, self, self.frame)
             self.layout.addWidget(slider)
             self.sliders.append(slider)
 
         #Add a slider to control all the selected sliders
         selected_joints = Joint("Move Selected Joints", -100, 100)
-        self.super_slider = ExtendedSuperSlider(selected_joints, self)
+        self.super_slider = ExtendedSuperSlider(selected_joints, self, self.frame)
         self.layout.addWidget(self.super_slider)
 
         self.frame.setLayout(self.layout)
@@ -174,34 +174,50 @@ class LightJointSlider(GenericPlugin):
     """
     name = "Joint Slider"
 
-    def __init__(self, joints_list):
+    def __init__(self):
         GenericPlugin.__init__(self)
 
         self.layout = QtGui.QHBoxLayout()
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
         self.frame = QtGui.QFrame()
-
-        #Add the sliders
-        self.sliders = []
-        for joint in joints_list:
-            slider = ExtendedSlider(joint, self)
-            self.layout.addWidget(slider)
-            self.sliders.append(slider)
-
-        #Add a slider to control all the selected sliders
-        selected_joints = Joint("Move Selected Joints", -100, 100)
-        self.super_slider = ExtendedSuperSlider(selected_joints, self)
-        self.layout.addWidget(self.super_slider)
-
         self.frame.setLayout(self.layout)
         self.window.setWidget(self.frame)
 
     def sendupdate(self, dict):
         rospy.logerr("Virtual method, please implement.")
 
-    def activate(self):
+    def activate(self, controller_type, joints_list):
+        self.window.setWindowTitle(controller_type)
         GenericPlugin.activate(self)
+
+        #Add the sliders
+        self.sliders = []
+        for joint in joints_list:
+            slider = ExtendedSlider(joint, self, self.frame)
+            self.layout.addWidget(slider)
+            self.sliders.append(slider)
+
+        #Add a slider to control all the selected sliders
+        selected_joints = Joint("Move Selected Joints", -100, 100)
+        self.super_slider = ExtendedSuperSlider(selected_joints, self, self.frame)
+        self.layout.addWidget(self.super_slider)
+
+        Qt.QTimer.singleShot(0, self.window.adjustSize)
+
         for slider in self.sliders:
             slider.timer.start(200)
+
+    def on_close(self):
+        for slider in self.sliders:
+            slider.timer.stop()
+            slider.setParent(None)
+            self.sliders.remove(slider)
+            del slider
+        self.super_slider.setParent(None)
+        del self.super_slider
+        self.sliders = []
+        self.super_slider = None
+
+        GenericPlugin.on_close(self)
 
 
