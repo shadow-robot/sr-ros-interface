@@ -4,8 +4,8 @@
      sr_edc_defs
 
   </description>
-  <author>Derek King</author>
-  <license>BSD</license>
+  <author>Ugo Cupcic</author>
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_edc_defs</url>
 

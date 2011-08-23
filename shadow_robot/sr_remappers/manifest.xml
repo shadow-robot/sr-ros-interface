@@ -9,7 +9,7 @@
 
   </description>
   <author>Ugo Cupcic</author>
-  <license>BSD</license>
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_remappers</url>
   <depend package="roscpp"/>

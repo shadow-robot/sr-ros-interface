@@ -4,8 +4,8 @@
      sr_mechanism_model
 
   </description>
-  <author>hugo</author>
-  <license>BSD</license>
+  <author>Ugo Cupcic</author>
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_mechanism_model</url>
   <depend package="roscpp"/>

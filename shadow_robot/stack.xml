@@ -1,12 +1,12 @@
 <stack>
   <description brief="shadow_robot">
 
-  This stack regroups the different ros interfaces developped for Shadow Robot's 
+  This stack regroups the different ros interfaces developped for Shadow Robot's
   Hardware. It provides an interface to both simulated and real hardware.
 
   </description>
   <author>Maintained by Ugo Cupcic: ugo@shadowrobot.com, contact@shadowrobot.com</author>
-  <license>BSD,GPL</license>  
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/shadow_robot</url>
   <depend stack="common" /> <!-- tinyxml -->

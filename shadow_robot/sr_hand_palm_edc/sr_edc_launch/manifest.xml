@@ -5,15 +5,15 @@
 
   </description>
   <author>Yann Sionneau</author>
-  <license>BSD</license>
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_edc_launch</url>
 
   <depend package="roscpp" />
   <depend package="diagnostic_aggregator" />
   <depend package="diagnostic_updater" />
-  <depend package="diagnostic_msgs" />  
-  <depend package="self_test" />  
+  <depend package="diagnostic_msgs" />
+  <depend package="self_test" />
   <depend package="urdf" />
   <depend package="xacro"/>
   <depend package="convex_decomposition"/>

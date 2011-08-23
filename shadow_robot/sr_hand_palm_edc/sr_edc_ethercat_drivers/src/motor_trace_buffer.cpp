@@ -1,3 +1,30 @@
+/**
+ * @file   motor_trace_buffer.cpp
+ * @author Ugo Cupcic <ugo@shadowrobot.com>
+ * @date   Tue Aug 23 11:39:25 2011
+*
+* Copyright 2011 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+ *
+ * @brief  Publishes the last second of the motor controller.
+ *
+ *
+ */
+
+
 #include <sr_edc_ethercat_drivers/motor_trace_buffer.h>
 
 namespace sr_edc_ethercat_drivers
@@ -6,8 +33,8 @@ namespace sr_edc_ethercat_drivers
 /**
  *
  */
-MotorTraceBuffer::MotorTraceBuffer(unsigned trace_size) : 
-  trace_size_(trace_size), 
+MotorTraceBuffer::MotorTraceBuffer(unsigned trace_size) :
+  trace_size_(trace_size),
   trace_index_(0),
   published_traces_(0)
 {
@@ -32,7 +59,7 @@ bool MotorTraceBuffer::initialize(const sr_edc_ethercat_drivers::ActuatorInfo &a
   if (!actuator_info.name.empty())
     topic = topic + "/" + actuator_info.name;
   publisher_ = new realtime_tools::RealtimePublisher<sr_edc_ethercat_drivers::MotorTrace>(ros::NodeHandle(), topic, 1, true);
-  if (publisher_ == NULL) 
+  if (publisher_ == NULL)
     return false;
 
   sr_edc_ethercat_drivers::MotorTrace &msg(publisher_->msg_);
@@ -56,12 +83,12 @@ void MotorTraceBuffer::checkPublish()
   ++published_traces_;
 
   assert(publisher_ != NULL);
-  if ((publisher_==NULL) || (!publisher_->trylock())) 
+  if ((publisher_==NULL) || (!publisher_->trylock()))
     return;
-  
+
   sr_edc_ethercat_drivers::MotorTrace &msg(publisher_->msg_);
-  
-  msg.header.stamp = ros::Time::now();  
+
+  msg.header.stamp = ros::Time::now();
   msg.reason = publish_reason_;
   unsigned size=trace_buffer_.size();
   msg.samples.clear();
@@ -81,13 +108,13 @@ void MotorTraceBuffer::checkPublish()
 
 
 
-/** \brief flags delayed publish of motor trace. 
+/** \brief flags delayed publish of motor trace.
  *
  * New publish will only take precedence of previous publish iff level is higher than previous level
  */
 void MotorTraceBuffer::flagPublish(const std::string &reason, int level, int delay)
 {
-  if (delay < 0) 
+  if (delay < 0)
     delay = 0;
   else if (delay > 900) {
     delay = 900;
@@ -101,7 +128,7 @@ void MotorTraceBuffer::flagPublish(const std::string &reason, int level, int del
 }
 
 
-/**  \brief Adds sample to motor trace.        
+/**  \brief Adds sample to motor trace.
  */
 void MotorTraceBuffer::sample(const sr_edc_ethercat_drivers::MotorTraceSample &s)
 {
