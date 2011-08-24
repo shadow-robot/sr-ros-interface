@@ -56,9 +56,9 @@ class ExtendedSlider(QtGui.QWidget):
         self.label = QtGui.QLabel(self)
         self.label.setText(joint.name)
         self.position = QtGui.QLabel(self)
-        self.position.setText("Pos: " + str(0))
+        self.position.setText("P: " + str(0))
         self.target = QtGui.QLabel(self)
-        self.target.setText("Target: " + str(0))
+        self.target.setText("T: " + str(0))
 
         self.layout = QtGui.QGridLayout()#QVBoxLayout()
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
@@ -85,7 +85,7 @@ class ExtendedSlider(QtGui.QWidget):
         self.show()
 
     def changeValue(self, value):
-        self.target.setText("Target: " + str(value))
+        self.target.setText("T: " + str(value))
         self.sendupdate(value)
 
     def sendupdate(self, value):
@@ -96,7 +96,7 @@ class ExtendedSlider(QtGui.QWidget):
     def update(self):
         try:
             self.current_value = round(self.plugin_parent.parent.parent.libraries["sr_library"].valueof(self.name),1)
-            self.position.setText("Pos: " + str(self.current_value))
+            self.position.setText("P: " + str(self.current_value))
         except:
             pass
 
@@ -108,7 +108,7 @@ class ExtendedSuperSlider(ExtendedSlider):
         ExtendedSlider.__init__(self, joint, plugin_parent, parent)
         self.plugin_parent = plugin_parent
         self.position.close()
-        self.target.setText("Target: 0%")
+        self.target.setText("T: 0%")
         self.layout.removeWidget(self.selected)
         self.selected.close()
 
@@ -123,7 +123,7 @@ class ExtendedSuperSlider(ExtendedSlider):
 
         self.current_value = value
         self.plugin_parent.sendupdate(joint_dict)
-        self.target.setText("Target: " + str(value) + "%")
+        self.target.setText("T: " + str(value) + "%")
 
     def update(self):
         return
@@ -177,10 +177,25 @@ class LightJointSlider(GenericPlugin):
     def __init__(self):
         GenericPlugin.__init__(self)
 
-        self.layout = QtGui.QHBoxLayout()
-        self.layout.setAlignment(QtCore.Qt.AlignCenter)
+        self.sliders = []
+        self.super_slider = None
+
+        self.layout = QtGui.QVBoxLayout()
         self.frame = QtGui.QFrame()
+
+        self.control_frame = QtGui.QFrame()
+        self.control_layout = QtGui.QHBoxLayout()
+        self.control_frame.setLayout(self.control_layout)
+        self.layout.addWidget(self.control_frame)
+
+        self.sliders_layout = QtGui.QHBoxLayout()
+        self.sliders_layout.setAlignment(QtCore.Qt.AlignCenter)
+        self.sliders_frame = QtGui.QFrame()
+        self.sliders_frame.setLayout(self.sliders_layout)
+
+        self.layout.addWidget(self.sliders_frame)
         self.frame.setLayout(self.layout)
+
         self.window.setWidget(self.frame)
 
     def sendupdate(self, dict):
@@ -194,7 +209,7 @@ class LightJointSlider(GenericPlugin):
         self.sliders = []
         for joint in joints_list:
             slider = ExtendedSlider(joint, self, self.frame)
-            self.layout.addWidget(slider)
+            self.sliders_layout.addWidget(slider)
             self.sliders.append(slider)
 
         #Add a slider to control all the selected sliders
