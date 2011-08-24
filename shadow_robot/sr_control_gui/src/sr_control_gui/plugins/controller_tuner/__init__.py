@@ -262,31 +262,30 @@ class JointPidSetter(QtGui.QFrame):
         for param in self.important_parameters.items():
             param[1][0] = param[1][1].text().toInt()[0]
 
-        try:
-            if self.controller_type == "Motor Force":
-                self.pid_service(int(self.advanced_parameters["max_pwm"][0]), int(self.advanced_parameters["sgleftref"][0]),
-                                 int(self.advanced_parameters["sgrightref"][0]), int(self.important_parameters["f"][0]),
-                                 int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
-                                 int(self.important_parameters["d"][0]), int(self.important_parameters["imax"][0]),
-                                 int(self.advanced_parameters["deadband"][0]), int(self.advanced_parameters["sign"][0]) )
-            elif self.controller_type == "Position" or self.controller_type == "Velocity":
-                self.pid_service(int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
-                                 int(self.important_parameters["d"][0]), int(self.important_parameters["i_clamp"][0]),
-                                 int(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["deadband"][0]),
-                                 int(self.advanced_parameters["friction_deadband"][0]) )
-            elif self.controller_type == "Mixed Position/Velocity":
-                self.pid_service(int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
-                                 int(self.important_parameters["d"][0]), int(self.important_parameters["i_clamp"][0]),
-                                 int(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["min_velocity"][0]),
-                                 float(self.advanced_parameters["max_velocity"][0]), float(self.advanced_parameters["velocity_slope"][0]),
-                                 float(self.advanced_parameters["position_deadband"][0]), int(self.advanced_parameters["friction_deadband"][0]) )
-            elif self.controller_type == "Effort":
-                self.pid_service(int(self.advanced_parameters["max_force"][0]), int(self.advanced_parameters["friction_deadband"][0]) )
-            else:
-                print "", self.controller_type, " is not a recognized controller type."
-
-        except:
-            print "Failed to set pid for ",self.controller_type, " controllers."
+        if self.controller_type == "Motor Force":
+            self.pid_service(int(self.advanced_parameters["max_pwm"][0]), int(self.advanced_parameters["sgleftref"][0]),
+                             int(self.advanced_parameters["sgrightref"][0]), int(self.important_parameters["f"][0]),
+                             int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
+                             int(self.important_parameters["d"][0]), int(self.important_parameters["imax"][0]),
+                             int(self.advanced_parameters["deadband"][0]), int(self.advanced_parameters["sign"][0]) )
+        elif self.controller_type == "Position" or self.controller_type == "Velocity":
+            self.pid_service(int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
+                             int(self.important_parameters["d"][0]), int(self.important_parameters["i_clamp"][0]),
+                             int(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["deadband"][0]),
+                             int(self.advanced_parameters["friction_deadband"][0]) )
+        elif self.controller_type == "Mixed Position/Velocity":
+            self.pid_service(float(self.important_parameters["p"][0]), float(self.important_parameters["i"][0]),
+                             float(self.important_parameters["d"][0]), float(self.important_parameters["i_clamp"][0]),
+                             float(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["min_velocity"][0]),
+                             float(self.advanced_parameters["max_velocity"][0]), float(self.advanced_parameters["velocity_slope"][0]),
+                             float(self.advanced_parameters["position_deadband"][0]), int(self.advanced_parameters["friction_deadband"][0]) )
+        elif self.controller_type == "Effort":
+            try:
+                self.pid_service(int(self.important_parameters["max_force"][0]), int(self.important_parameters["friction_deadband"][0]) )
+            except rospy.ServiceException, e:
+                print "Service did not process request: %s"%str(e)
+        else:
+            print "", self.controller_type, " is not a recognized controller type."
 
     def advanced_options(self):
         adv_dial = AdvancedDialog(self, self.joint_name, self.advanced_parameters,
@@ -352,6 +351,13 @@ class JointPidSetter(QtGui.QFrame):
                 self.advanced_parameters["max_pwm"][0] = 1023
             if self.advanced_parameters.has_key("max_force"):
                 self.advanced_parameters["max_force"][0] = 1000
+            if self.advanced_parameters.has_key("min_velocity"):
+                self.advanced_parameters["min_velocity"][0] = -0.5
+            if self.advanced_parameters.has_key("min_velocity"):
+                self.advanced_parameters["min_velocity"][0] = 0.5
+            if self.advanced_parameters.has_key("velocity_slope"):
+                self.advanced_parameters["velocity_slope"][0] = 5.0
+
         else:
             self.btn_advanced.setEnabled(False)
 
