@@ -607,7 +607,8 @@ class ControllerTuner(GenericPlugin):
                        "MF": ["MFJ0", "MFJ3", "MFJ4"],
                        "RF": ["RFJ0", "RFJ3", "RFJ4"],
                        "LF": ["LFJ0", "LFJ3", "LFJ4", "LFJ5"],
-                       "TH": ["THJ1", "THJ2", "THJ3", "THJ4", "THJ5"]}
+                       "TH": ["THJ1", "THJ2", "THJ3", "THJ4", "THJ5"],
+                       "WR": ["WRJ1", "WRJ2"]}
 
         for fps in self.finger_pid_setters:
             fps.setParent(None)
@@ -616,8 +617,11 @@ class ControllerTuner(GenericPlugin):
 
         controller_type = self.ordered_controller_types[index]
         params = self.controller_params[ controller_type ]
-        for finger in self.joints.items():
-            self.finger_pid_setters.append( FingerPIDSetter(finger[0], finger[1], params, controller_type, self) )
+
+        keys = self.joints.keys()
+        keys.sort()
+        for key in keys:
+            self.finger_pid_setters.append( FingerPIDSetter(key, self.joints[key], params, controller_type, self) )
         for f_pid_setter in self.finger_pid_setters:
             self.qtab_widget.addTab(f_pid_setter, f_pid_setter.finger_name)
 

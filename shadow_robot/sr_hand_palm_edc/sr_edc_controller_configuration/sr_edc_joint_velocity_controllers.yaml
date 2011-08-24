@@ -15,8 +15,8 @@ sh_ffj3_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
   joint: FFJ3
   pid:
-    p: -2.0
-    i: -0.5
+    p: -2
+    i: 0
     d: 0
     i_clamp: 1
     max_force: 1023
@@ -97,8 +97,8 @@ sh_rfj4_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
   joint: RFJ4
   pid:
-    p: -2.0
-    i: -0.5
+    p: 2
+    i: 0
     d: 0
     i_clamp: 1
     max_force: 1023
@@ -111,8 +111,8 @@ sh_lfj0_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
   joint: LFJ2
   pid:
-    p: -2.0
-    i: -0.5
+    p: 2
+    i: 0
     d: 0
     i_clamp: 1
     max_force: 1023
@@ -133,8 +133,8 @@ sh_lfj4_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
   joint: LFJ4
   pid:
-    p: -2.0
-    i: -0.5
+    p: 2
+    i: 0
     d: 0
     i_clamp: 1
     max_force: 1023
@@ -144,8 +144,8 @@ sh_lfj5_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
   joint: LFJ5
   pid:
-    p: -2.0
-    i: -0.5
+    p: 2
+    i: 0
     d: 0
     i_clamp: 1
     max_force: 1023
@@ -169,8 +169,8 @@ sh_thj2_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
   joint: THJ2
   pid:
-    p: -2.0
-    i: -0.5
+    p: 2
+    i: 0
     d: 0
     i_clamp: 1
     max_force: 1023
