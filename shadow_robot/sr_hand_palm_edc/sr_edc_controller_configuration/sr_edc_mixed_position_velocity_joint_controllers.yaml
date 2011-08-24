@@ -4,10 +4,10 @@ sh_ffj0_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: FFJ2
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -20,8 +20,8 @@ sh_ffj3_mixed_position_velocity_controller:
   pid:
     p: 0.0
     i: -3500.0
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -33,10 +33,10 @@ sh_ffj4_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: FFJ4
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -49,10 +49,10 @@ sh_mfj0_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: MFJ2
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -63,10 +63,10 @@ sh_mfj3_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: MFJ3
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -79,8 +79,8 @@ sh_mfj4_mixed_position_velocity_controller:
   pid:
     p: -2.0
     i: -0.5
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -94,10 +94,10 @@ sh_rfj0_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: RFJ2
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -108,10 +108,10 @@ sh_rfj3_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: RFJ3
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -124,8 +124,8 @@ sh_rfj4_mixed_position_velocity_controller:
   pid:
     p: -2.0
     i: -0.5
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -141,8 +141,8 @@ sh_lfj0_mixed_position_velocity_controller:
   pid:
     p: -2.0
     i: -0.5
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -153,10 +153,10 @@ sh_lfj3_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: LFJ3
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -169,8 +169,8 @@ sh_lfj4_mixed_position_velocity_controller:
   pid:
     p: -2.0
     i: -0.5
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -183,8 +183,8 @@ sh_lfj5_mixed_position_velocity_controller:
   pid:
     p: -2.0
     i: -0.5
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -198,10 +198,10 @@ sh_thj1_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: THJ1
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -214,8 +214,8 @@ sh_thj2_mixed_position_velocity_controller:
   pid:
     p: -2.0
     i: -0.5
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -226,10 +226,10 @@ sh_thj3_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: THJ3
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -240,10 +240,10 @@ sh_thj4_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: THJ4
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -254,10 +254,10 @@ sh_thj5_mixed_position_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhMixedPositionVelocityJointController
   joint: THJ5
   pid:
-    p: 2.0
-    i: 0.5
-    d: 0.0
-    i_clamp: 300.0
+    p: 2
+    i: 0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -273,8 +273,8 @@ sh_wrj1_mixed_position_velocity_controller:
   pid:
     p: 4.0
     i: 1.0
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5
@@ -287,8 +287,8 @@ sh_wrj2_mixed_position_velocity_controller:
   pid:
     p: -4.0
     i: -1.0
-    d: 0.0
-    i_clamp: 300.0
+    d: 0
+    i_clamp: 300
     max_force: 1000.0
     min_velocity: -0.5
     max_velocity: 0.5

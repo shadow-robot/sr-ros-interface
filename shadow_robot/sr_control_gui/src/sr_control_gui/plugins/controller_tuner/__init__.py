@@ -29,6 +29,7 @@ from std_msgs.msg import Float64
 from PyQt4 import QtCore, QtGui, Qt
 
 from pr2_mechanism_msgs.srv import ListControllers
+from controller_tuner.pid_loader_and_saver import PidLoader, PidSaver
 from controller_tuner.automatic_procedures import RunGA, RunFriction, FullMovement
 
 class AdvancedDialog(QtGui.QDialog):
@@ -91,6 +92,8 @@ class JointPidSetter(QtGui.QFrame):
         """
         QtGui.QFrame.__init__(self)
 
+        self.pid_loader = PidLoader()
+
         self.ordered_params = ordered_params
         self.controller_type = controller_type
 
@@ -148,7 +151,47 @@ class JointPidSetter(QtGui.QFrame):
             self.btn_move.setEnabled(False)
         self.layout_.addWidget(self.btn_move)
 
+        self.btn_save = QtGui.QPushButton()
+        self.btn_save.setText("Save")
+        self.btn_save.setToolTip("Save the last set parameters to the yaml configuration file.")
+        self.connect(self.btn_save, QtCore.SIGNAL('clicked()'),self.save_clicked)
+        self.layout_.addWidget(self.btn_save)
+
         self.setLayout(self.layout_)
+
+    def save_clicked(self):
+        param_name = []
+        filter_files = "*.yaml"
+        if self.controller_type == "Motor Force":
+            param_name = [""+self.joint_name.lower() ,"pid"]
+            filter_files = "*motor"+filter_files
+        elif self.controller_type == "Position":
+            param_name =  ["sh_"+self.joint_name.lower()+"_position_controller" , "pid"]
+            filter_files = "*position_controller"+filter_files
+        elif self.controller_type == "Velocity":
+            param_name =  ["sh_"+self.joint_name.lower()+"_velocity_controller" , "pid"]
+            filter_files = "*velocity_controller"+filter_files
+        elif self.controller_type == "Mixed Position/Velocity":
+            param_name =  ["sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller" , "pid"]
+            filter_files = "*position_velocity"+filter_files
+        elif self.controller_type == "Effort":
+            param_name =  ["sh_"+self.joint_name.lower()+"_effort_controller"]
+            filter_files = "*effort_controller"+filter_files
+
+        if self.parent.pid_saver == None:
+            filename = QtGui.QFileDialog.getOpenFileName(self, Qt.QString("Save Controller Settings"), Qt.QString(""), Qt.QString(filter_files) )
+            if filename == "":
+                return
+            self.parent.pid_saver = PidSaver(filename)
+
+
+        full_param_dict = {}
+        for item in self.important_parameters.items():
+            full_param_dict[item[0]] = item[1][0]
+        if self.advanced_parameters != None:
+            for item in self.advanced_parameters.items():
+                full_param_dict[item[0]] = item[1][0]
+        self.parent.pid_saver.save_settings(param_name, full_param_dict)
 
     def friction_compensation(self):
         if self.friction:
@@ -298,6 +341,7 @@ class JointPidSetter(QtGui.QFrame):
     def activate(self):
         #use the correct service
         self.pid_service = None
+        service_name = ""
         if self.controller_type == "Motor Force":
             #/realtime_loop/change_force_PID_FFJ0
             service_name =  "/realtime_loop/change_force_PID_"+self.joint_name.upper()
@@ -317,7 +361,6 @@ class JointPidSetter(QtGui.QFrame):
             #/sh_ffj3_mixed_position_velocity_controller/set_gains
             service_name =  "/sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/set_gains"
             self.pid_service = rospy.ServiceProxy(service_name, SetMixedPositionVelocityPidGains)
-
         elif self.controller_type == "Effort":
             #/sh_ffj3_effort_controller/set_gains
             service_name =  "/sh_"+self.joint_name.lower()+"_effort_controller/set_gains"
@@ -337,6 +380,19 @@ class JointPidSetter(QtGui.QFrame):
             #   - an array containing the min/max
             self.important_parameters[param] = [0,0,[-65535,65535]]
 
+        param_name = ""
+        if self.controller_type == "Motor Force":
+            param_name = "/"+self.joint_name.lower() +"/pid"
+        elif self.controller_type == "Position":
+            param_name =  "/sh_"+self.joint_name.lower()+"_position_controller/pid"
+        elif self.controller_type == "Velocity":
+            param_name =  "/sh_"+self.joint_name.lower()+"_velocity_controller/pid"
+        elif self.controller_type == "Mixed Position/Velocity":
+            param_name =  "/sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/pid"
+        elif self.controller_type == "Effort":
+            param_name =  "/sh_"+self.joint_name.lower()+"_effort_controller"
+        parameters_from_server = self.pid_loader.get_settings(param_name)
+
         self.advanced_parameters = {}
         if self.ordered_params.has_key("advanced"):
             self.btn_advanced.setEnabled(True)
@@ -347,19 +403,18 @@ class JointPidSetter(QtGui.QFrame):
                 #   - an array containing the min/max
                 self.advanced_parameters[param] = [0,0,[-65535,65535]]
 
-            if self.advanced_parameters.has_key("max_pwm"):
-                self.advanced_parameters["max_pwm"][0] = 1023
-            if self.advanced_parameters.has_key("max_force"):
-                self.advanced_parameters["max_force"][0] = 1000
-            if self.advanced_parameters.has_key("min_velocity"):
-                self.advanced_parameters["min_velocity"][0] = -0.5
-            if self.advanced_parameters.has_key("min_velocity"):
-                self.advanced_parameters["min_velocity"][0] = 0.5
-            if self.advanced_parameters.has_key("velocity_slope"):
-                self.advanced_parameters["velocity_slope"][0] = 5.0
+            #set the parameter values to those read from the parameter server
+            for adv_param in self.advanced_parameters.keys():
+                if parameters_from_server.has_key(adv_param):
+                    self.advanced_parameters[adv_param][0] = parameters_from_server[adv_param]
 
         else:
             self.btn_advanced.setEnabled(False)
+
+        #set the parameter values to those read from the parameter server
+        for imp_param in self.important_parameters.keys():
+            if parameters_from_server.has_key(imp_param):
+                self.important_parameters[imp_param][0] = parameters_from_server[imp_param]
 
         for parameter_name in self.ordered_params["important"]:
             parameter = self.important_parameters[parameter_name]
@@ -413,6 +468,8 @@ class FingerPIDSetter(QtGui.QFrame):
         self.finger_name = finger_name
         self.joint_names = joint_names
 
+        self.pid_saver = None
+
         self.layout_ = QtGui.QVBoxLayout()
 
         self.joint_pid_setter = []
@@ -440,6 +497,7 @@ class ControllerTuner(GenericPlugin):
 
     def __init__(self):
         GenericPlugin.__init__(self)
+
         self.frame = QtGui.QFrame()
         self.layout = QtGui.QVBoxLayout()
 
