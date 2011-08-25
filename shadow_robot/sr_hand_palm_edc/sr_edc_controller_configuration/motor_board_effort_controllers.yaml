@@ -13,10 +13,10 @@ ffj0:
 ffj3:
   pid:
     f: 0
-    p: 44
-    i: 10500
-    d: 0
-    imax: 20
+    p: 75
+    i: 30500
+    d: 50
+    imax: 14
     max_pwm: 1023
     sg_left: 0
     sg_right: 0

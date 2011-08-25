@@ -164,7 +164,7 @@ class StepMovement(BaseMovement):
 
         self.steps = []
         for i in range(0, int(nb_steps/2)):
-            self.steps.append(2.*float(i)*float(self.amplitude / nb_steps))
+            self.steps.append(2.*float(i)*float(self.amplitude / nb_steps) - self.amplitude / 2.0)
         reversed_steps = self.steps[:]
         reversed_steps.reverse()
         self.steps += reversed_steps
@@ -220,9 +220,11 @@ class FullMovement(threading.Thread):
                                    "Mixed Position/Velocity": [ StepMovement(joint_name, amplitude = 0.3, nb_steps = 100,  controller_type = "Mixed Position/Velocity"),
                                                                 SinusoidMovement(joint_name, amplitude = 0.7, offset = 0.7, controller_type = "Mixed Position/Velocity"),
                                                                 StepMovement(joint_name, amplitude=0.5, nb_steps = 10, controller_type = "Mixed Position/Velocity")],
-                                   "Effort": [ StepMovement(joint_name, amplitude = 500, nb_steps = 100, controller_type = "Effort"),
-                                               SinusoidMovement(joint_name, amplitude = 400, offset = 0, controller_type = "Effort"),
-                                               StepMovement(joint_name, amplitude=500, nb_steps = 10, controller_type = "Effort")]}
+                                   "Effort": [StepMovement(joint_name, amplitude=1200, nb_steps = 10, controller_type = "Effort"),
+                                              SinusoidMovement(joint_name, amplitude = 400, offset = 0, controller_type = "Effort"),
+                                              StepMovement(joint_name, amplitude = 500, nb_steps = 100, controller_type = "Effort") ] }
+
+
 
 
         self.moving = False
