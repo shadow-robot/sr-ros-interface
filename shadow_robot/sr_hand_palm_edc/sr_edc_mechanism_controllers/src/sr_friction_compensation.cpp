@@ -69,39 +69,42 @@ namespace sr_friction_compensation
     bool joint_not_found_backward = true;
 
     XmlRpc::XmlRpcValue calib;
-    node_.getParam(param_name, calib);
-
-    ROS_DEBUG_STREAM("  Reading friction for: " <<  joint_name_);
-    ROS_DEBUG_STREAM(" value: " << calib);
-
-    ROS_ASSERT(calib.getType() == XmlRpc::XmlRpcValue::TypeArray);
-    //iterate on all the joints
-    for(int32_t index_cal = 0; index_cal < calib.size(); ++index_cal)
+    if( node_.hasParam(param_name) )
     {
-      //check the calibration is well formatted:
-      // first joint name, then calibration table
-      ROS_ASSERT(calib[index_cal][0].getType() == XmlRpc::XmlRpcValue::TypeString);
-      ROS_ASSERT(calib[index_cal][1].getType() == XmlRpc::XmlRpcValue::TypeInt);
-      ROS_ASSERT(calib[index_cal][2].getType() == XmlRpc::XmlRpcValue::TypeArray);
+      node_.getParam(param_name, calib);
 
-      std::string joint_name_tmp = static_cast<std::string> (calib[index_cal][0]);
+      ROS_DEBUG_STREAM("  Reading friction for: " <<  joint_name_);
+      ROS_DEBUG_STREAM(" value: " << calib);
 
-      ROS_DEBUG_STREAM("  Checking joint name: "<< joint_name_tmp << " / " << joint_name_);
-      if(  joint_name_tmp.compare( joint_name_ ) != 0 )
-        continue;
-
-      //reading the forward map:
-      if( static_cast<int>(calib[index_cal][1]) == 1 )
+      ROS_ASSERT(calib.getType() == XmlRpc::XmlRpcValue::TypeArray);
+      //iterate on all the joints
+      for(int32_t index_cal = 0; index_cal < calib.size(); ++index_cal)
       {
-        joint_not_found_forward = false;
+        //check the calibration is well formatted:
+        // first joint name, then calibration table
+        ROS_ASSERT(calib[index_cal][0].getType() == XmlRpc::XmlRpcValue::TypeString);
+        ROS_ASSERT(calib[index_cal][1].getType() == XmlRpc::XmlRpcValue::TypeInt);
+        ROS_ASSERT(calib[index_cal][2].getType() == XmlRpc::XmlRpcValue::TypeArray);
 
-        friction_map_forward = read_one_way_map(calib[index_cal][2]);
-      }
-      else
-      {
-        joint_not_found_backward = false;
+        std::string joint_name_tmp = static_cast<std::string> (calib[index_cal][0]);
 
-        friction_map_backward = read_one_way_map(calib[index_cal][2]);
+        ROS_DEBUG_STREAM("  Checking joint name: "<< joint_name_tmp << " / " << joint_name_);
+        if(  joint_name_tmp.compare( joint_name_ ) != 0 )
+          continue;
+
+        //reading the forward map:
+        if( static_cast<int>(calib[index_cal][1]) == 1 )
+        {
+          joint_not_found_forward = false;
+
+          friction_map_forward = read_one_way_map(calib[index_cal][2]);
+        }
+        else
+        {
+          joint_not_found_backward = false;
+
+          friction_map_backward = read_one_way_map(calib[index_cal][2]);
+        }
       }
     }
 

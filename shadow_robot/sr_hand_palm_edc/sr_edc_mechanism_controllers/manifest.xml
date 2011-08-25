@@ -17,7 +17,6 @@
 
   <depend package="sr_robot_msgs" />
   <depend package="sr_utilities" />
-
   <depend package="pr2_controller_interface" />
   <depend package="pr2_mechanism_model" />
   <depend package="realtime_tools" />
