@@ -1,4 +1,5 @@
 <launch>
-  <rosparam command="load" file="$(find sr_edc_controller_configuration)/motor_board_effort_controllers.yaml" />
-  <test test-name="test_joint_position_controller" pkg="sr_edc_mechanism_controllers" type="test_joint_position_controller" />
+  <test test-name="test_joint_position_controller" pkg="sr_edc_mechanism_controllers" type="test_joint_position_controller">
+    <param name="with_friction_compensation" type="int" value="0"/>
+  </test>
 </launch>

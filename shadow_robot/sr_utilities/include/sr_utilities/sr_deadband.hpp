@@ -43,7 +43,7 @@ namespace sr_deadband
   template <class T>
   static inline bool simple_deadband (T value, T deadband)
   {
-    return ( abs(value) > deadband );
+    return ( fabs(value) > deadband );
   }
 
   template <class T>
@@ -94,7 +94,7 @@ namespace sr_deadband
         is_in_deadband = false;
       else
       {
-        if( abs(error) > deadband ) //we're outside of the deadband -> compute the error
+        if( fabs(error) > deadband ) //we're outside of the deadband -> compute the error
           is_in_deadband = false;
         else                                 //we're in the deadband -> send a force demand of 0.0
           is_in_deadband = true;

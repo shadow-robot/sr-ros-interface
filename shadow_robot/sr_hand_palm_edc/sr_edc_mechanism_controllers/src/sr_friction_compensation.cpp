@@ -55,6 +55,8 @@ namespace sr_friction_compensation
         compensation = friction_interpoler_forward->compute( position );
       else
         compensation = friction_interpoler_backward->compute( position );
+
+      ROS_ERROR_STREAM("Friction compensation (" << position << "): " << compensation);
     }
 
     return compensation;

@@ -57,4 +57,6 @@ IF(DEFINED jenkins)
   target_link_libraries(test/test_joint_position_controller gcov)
 ENDIF(DEFINED jenkins)
 rosbuild_add_gtest_build_flags(test/test_joint_position_controller)
+
 rosbuild_add_rostest(test/joint_pos_controller.test)
+rosbuild_add_rostest(test/joint_pos_controller_with_fc.test)

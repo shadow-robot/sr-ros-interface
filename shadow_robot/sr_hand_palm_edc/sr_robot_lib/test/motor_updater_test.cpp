@@ -83,7 +83,7 @@ public:
 
       time_spent = ros::Time::now() - start;
 
-      if(abs(time_spent.toSec() - 5.0) < tolerancy )
+      if(fabs(time_spent.toSec() - 5.0) < tolerancy )
       {
         if(command->from_motor_data_type == MOTOR_DATA_SVN_REVISION)
         {
@@ -98,7 +98,7 @@ public:
       }
 
 
-      if(abs(time_spent.toSec()-((double)( (int)time_spent.toSec() ) ) ) < tolerancy )
+      if(fabs(time_spent.toSec()-((double)( (int)time_spent.toSec() ) ) ) < tolerancy )
       {
         if(command->from_motor_data_type == MOTOR_DATA_CAN_NUM_RECEIVED)
         {
