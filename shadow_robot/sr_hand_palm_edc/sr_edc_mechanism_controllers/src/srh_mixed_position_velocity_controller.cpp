@@ -48,12 +48,9 @@ using namespace std;
 namespace controller {
 
   SrhMixedPositionVelocityJointController::SrhMixedPositionVelocityJointController()
-    : joint_state_(NULL), command_(0),
-      loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
-      n_tilde_("~"),
-      max_velocity_(1.0), min_velocity_(-1.0), slope_velocity_(20.0),
+    : SrController(), max_velocity_(1.0), min_velocity_(-1.0), slope_velocity_(20.0),
       max_position_error_(0.0), min_position_error_(0.0),
-      max_force_demand(1023.), position_deadband(0.05), friction_deadband(5)
+      position_deadband(0.05)
   {
     set_min_max_position_errors_();
   }
@@ -64,7 +61,7 @@ namespace controller {
   }
 
   bool SrhMixedPositionVelocityJointController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
-                                                     const control_toolbox::Pid &pid_velocity)
+                                                     boost::shared_ptr<control_toolbox::Pid> pid_velocity)
   {
     ROS_DEBUG(" --------- ");
     ROS_DEBUG_STREAM("Init: " << joint_name);
@@ -109,6 +106,7 @@ namespace controller {
     }
 #endif
 
+    after_init();
     return true;
   }
 
@@ -123,16 +121,14 @@ namespace controller {
       return false;
     }
 
-    control_toolbox::Pid pid_velocity;
-    if (!pid_velocity.init(ros::NodeHandle(node_, "pid")))
+    boost::shared_ptr<control_toolbox::Pid> pid_velocity = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid() );;
+    if (!pid_velocity->init(ros::NodeHandle(node_, "pid")))
       return false;
 
 
     controller_state_publisher_.reset(
       new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
       (node_, "state", 1));
-
-    sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhMixedPositionVelocityJointController::setCommandCB, this);
 
     return init(robot, joint_name, pid_velocity);
   }
@@ -141,7 +137,7 @@ namespace controller {
   void SrhMixedPositionVelocityJointController::starting()
   {
     command_ = joint_state_->position_;
-    pid_controller_velocity_.reset();
+    pid_controller_velocity_->reset();
     read_parameters();
 
     ROS_WARN("Reseting PID");
@@ -150,7 +146,7 @@ namespace controller {
   bool SrhMixedPositionVelocityJointController::setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req,
                                                          sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp)
   {
-    pid_controller_velocity_.setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
+    pid_controller_velocity_->setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
     max_force_demand = req.max_force;
     friction_deadband = req.friction_deadband;
     position_deadband = req.position_deadband;
@@ -175,27 +171,7 @@ namespace controller {
 
   void SrhMixedPositionVelocityJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
   {
-    pid_controller_velocity_.getGains(p,i,d,i_max,i_min);
-  }
-
-
-  std::string SrhMixedPositionVelocityJointController::getJointName()
-  {
-    ROS_DEBUG_STREAM(" joint_state: "<<joint_state_ << " This: " << this);
-
-    return joint_state_->joint_->name;
-  }
-
-// Set the joint position command
-  void SrhMixedPositionVelocityJointController::setCommand(double cmd)
-  {
-    command_ = cmd;
-  }
-
-// Return the current position command
-  void SrhMixedPositionVelocityJointController::getCommand(double & cmd)
-  {
-    cmd = command_;
+    pid_controller_velocity_->getGains(p,i,d,i_max,i_min);
   }
 
   void SrhMixedPositionVelocityJointController::update()
@@ -229,7 +205,7 @@ namespace controller {
 
       //velocity loop:
       error_velocity = joint_state_->velocity_ - commanded_velocity;
-      commanded_effort = pid_controller_velocity_.updatePid(error_velocity, dt_);
+      commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
 
       commanded_effort += joint_state_->commanded_effort_;
 
@@ -287,11 +263,6 @@ namespace controller {
     loop_count_++;
 
     last_time_ = time;
-  }
-
-  void SrhMixedPositionVelocityJointController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
-  {
-    command_ = msg->data;
   }
 
   double SrhMixedPositionVelocityJointController::compute_velocity_demand(double position_error)

@@ -78,6 +78,7 @@ namespace controller {
 
     serve_set_gains_ = node_.advertiseService("set_gains", &SrhJointPositionController::setGains, this);
 
+    after_init();
     return true;
   }
 
@@ -92,7 +93,7 @@ namespace controller {
       return false;
     }
 
-    boost::shared_ptr<control_toolbox::Pid> pid_position;
+    boost::shared_ptr<control_toolbox::Pid> pid_position = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid() );
     if (!pid_position->init(ros::NodeHandle(node_, "pid")))
       return false;
 

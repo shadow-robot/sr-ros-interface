@@ -40,10 +40,7 @@ using namespace std;
 namespace controller {
 
   SrhJointVelocityController::SrhJointVelocityController()
-    : joint_state_(NULL), command_(0),
-      loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
-      n_tilde_("~"),
-      max_force_demand(1023.), friction_deadband(5), velocity_deadband(0.015)
+    : SrController(), velocity_deadband(0.015)
   {
   }
 
@@ -53,7 +50,7 @@ namespace controller {
   }
 
   bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
-                                                     const control_toolbox::Pid &pid_velocity)
+                                        boost::shared_ptr<control_toolbox::Pid> pid_velocity)
   {
     ROS_DEBUG(" --------- ");
     ROS_DEBUG_STREAM("Init: " << joint_name);
@@ -81,6 +78,7 @@ namespace controller {
 
     serve_set_gains_ = node_.advertiseService("set_gains", &SrhJointVelocityController::setGains, this);
 
+    after_init();
     return true;
   }
 
@@ -95,16 +93,14 @@ namespace controller {
       return false;
     }
 
-    control_toolbox::Pid pid_velocity;
-    if (!pid_velocity.init(ros::NodeHandle(node_, "pid")))
+    boost::shared_ptr<control_toolbox::Pid> pid_velocity = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid() );;
+    if (!pid_velocity->init(ros::NodeHandle(node_, "pid")))
       return false;
 
 
     controller_state_publisher_.reset(
       new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
       (node_, "state", 1));
-
-    sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhJointVelocityController::setCommandCB, this);
 
     return init(robot, joint_name, pid_velocity);
   }
@@ -113,7 +109,7 @@ namespace controller {
   void SrhJointVelocityController::starting()
   {
     command_ = joint_state_->velocity_;
-    pid_controller_velocity_.reset();
+    pid_controller_velocity_->reset();
     read_parameters();
 
     ROS_WARN("Reseting PID");
@@ -122,7 +118,7 @@ namespace controller {
   bool SrhJointVelocityController::setGains(sr_robot_msgs::SetPidGains::Request &req,
                                             sr_robot_msgs::SetPidGains::Response &resp)
   {
-    pid_controller_velocity_.setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
+    pid_controller_velocity_->setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
     max_force_demand = req.max_force;
     friction_deadband = req.friction_deadband;
     velocity_deadband = req.deadband;
@@ -132,27 +128,7 @@ namespace controller {
 
   void SrhJointVelocityController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
   {
-    pid_controller_velocity_.getGains(p,i,d,i_max,i_min);
-  }
-
-
-  std::string SrhJointVelocityController::getJointName()
-  {
-    ROS_DEBUG_STREAM(" joint_state: "<<joint_state_ << " This: " << this);
-
-    return joint_state_->joint_->name;
-  }
-
-// Set the joint position command
-  void SrhJointVelocityController::setCommand(double cmd)
-  {
-    command_ = cmd;
-  }
-
-// Return the current position command
-  void SrhJointVelocityController::getCommand(double & cmd)
-  {
-    cmd = command_;
+    pid_controller_velocity_->getGains(p,i,d,i_max,i_min);
   }
 
   void SrhJointVelocityController::update()
@@ -179,7 +155,7 @@ namespace controller {
     //don't compute the error if we're in the deadband.
     if( !hysteresis_deadband.is_in_deadband(command_, error_velocity, velocity_deadband) )
     {
-      commanded_effort = pid_controller_velocity_.updatePid(error_velocity, dt_);
+      commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
       commanded_effort += joint_state_->commanded_effort_;
 
       //clamp the result to max force
@@ -213,11 +189,6 @@ namespace controller {
     loop_count_++;
 
     last_time_ = time;
-  }
-
-  void SrhJointVelocityController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
-  {
-    command_ = msg->data;
   }
 
   void SrhJointVelocityController::read_parameters()

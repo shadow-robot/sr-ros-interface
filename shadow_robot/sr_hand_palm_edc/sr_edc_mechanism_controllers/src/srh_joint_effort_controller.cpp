@@ -42,10 +42,7 @@ using namespace std;
 namespace controller {
 
   SrhEffortJointController::SrhEffortJointController()
-    : joint_state_(NULL), command_(0),
-      loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
-      n_tilde_("~"),
-      max_force_demand(1000.), friction_deadband(5)
+    : SrController()
   {
   }
 
@@ -79,6 +76,7 @@ namespace controller {
     ROS_DEBUG_STREAM(" In Init: " << getJointName() << " This: " << this
                      << " joint_state: "<<joint_state_ );
 
+    after_init();
     return true;
   }
 
@@ -97,8 +95,6 @@ namespace controller {
       new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
       (node_, "state", 1));
 
-    sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhEffortJointController::setCommandCB, this);
-
     return init(robot, joint_name);
   }
 
@@ -106,7 +102,6 @@ namespace controller {
   void SrhEffortJointController::starting()
   {
     command_ = joint_state_->measured_effort_;
-    ROS_WARN("Reseting PID");
     read_parameters();
   }
 
@@ -121,26 +116,6 @@ namespace controller {
 
   void SrhEffortJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
   {
-  }
-
-
-  std::string SrhEffortJointController::getJointName()
-  {
-    ROS_DEBUG_STREAM(" joint_state: "<<joint_state_ << " This: " << this);
-
-    return joint_state_->joint_->name;
-  }
-
-// Set the joint position command
-  void SrhEffortJointController::setCommand(double cmd)
-  {
-    command_ = cmd;
-  }
-
-// Return the current position command
-  void SrhEffortJointController::getCommand(double & cmd)
-  {
-    cmd = command_;
   }
 
   void SrhEffortJointController::update()
@@ -197,11 +172,6 @@ namespace controller {
     loop_count_++;
 
     last_time_ = time;
-  }
-
-  void SrhEffortJointController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
-  {
-    command_ = msg->data;
   }
 
   void SrhEffortJointController::read_parameters()

@@ -28,29 +28,13 @@
 #ifndef _SRH_JOINT_VELOCITY_CONTROLLER_HPP_
 #define _SRH_JOINT_VELOCITY_CONTROLLER_HPP_
 
-#include <ros/node_handle.h>
-
-#include <pr2_controller_interface/controller.h>
-#include <control_toolbox/pid.h>
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <realtime_tools/realtime_publisher.h>
-#include <std_msgs/Float64.h>
-#include <pr2_controllers_msgs/JointControllerState.h>
-
-#include <utility>
-
-#include <sr_robot_msgs/SetPidGains.h>
-
-#include <sr_utilities/sr_deadband.hpp>
-
+#include <sr_edc_mechanism_controllers/sr_controller.hpp>
 #include <sr_edc_mechanism_controllers/sr_friction_compensation.hpp>
 
 
 namespace controller
 {
-
-  class SrhJointVelocityController : public pr2_controller_interface::Controller
+  class SrhJointVelocityController : public SrController
   {
   public:
 
@@ -58,20 +42,8 @@ namespace controller
     ~SrhJointVelocityController();
 
     bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
-               const control_toolbox::Pid &pid_velocity);
+               boost::shared_ptr<control_toolbox::Pid> pid_velocity);
     bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
-
-    /*!
-     * \brief Give set position of the joint for next update: revolute (angle) and prismatic (position)
-     *
-     * \param command
-     */
-    void setCommand(double cmd);
-
-    /*!
-     * \brief Get latest position command to the joint: revolute (angle) and prismatic (position).
-     */
-    void getCommand(double & cmd);
 
     virtual void starting();
 
@@ -80,38 +52,12 @@ namespace controller
      */
     virtual void update();
 
-    void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
+    virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
     bool setGains(sr_robot_msgs::SetPidGains::Request &req, sr_robot_msgs::SetPidGains::Response &resp);
 
-    std::string getJointName();
-    pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
-    ros::Duration dt_;
-    double command_;                            /**< Last commanded position. */
-
   private:
-    int loop_count_;
-    bool initialized_;
-    pr2_mechanism_model::RobotState *robot_;              /**< Pointer to robot structure. */
-    control_toolbox::Pid pid_controller_velocity_;       /**< Internal PID controller for the velocity loop. */
-    ros::Time last_time_;                          /**< Last time stamp of update. */
+    boost::shared_ptr<control_toolbox::Pid> pid_controller_velocity_;       /**< Internal PID controller for the velocity loop. */
 
-    ros::NodeHandle node_, n_tilde_;
-
-    boost::scoped_ptr<
-      realtime_tools::RealtimePublisher<
-        pr2_controllers_msgs::JointControllerState> > controller_state_publisher_ ;
-
-    boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator> friction_compensator;
-
-    ros::Subscriber sub_command_;
-    void setCommandCB(const std_msgs::Float64ConstPtr& msg);
-
-    ros::ServiceServer serve_set_gains_;
-
-    ///clamps the force demand to this value
-    double max_force_demand;
-    ///the deadband for the friction compensation algorithm
-    int friction_deadband;
     ///the velocity deadband value used in the hysteresis_deadband
     double velocity_deadband;
 

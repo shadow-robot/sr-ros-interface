@@ -86,6 +86,9 @@ namespace controller
     double command_;                            /**< Last commanded position. */
 
   protected:
+    ///call this function at the end of the init function in the inheriting classes.
+    void after_init();
+
     int loop_count_;
     bool initialized_;
     pr2_mechanism_model::RobotState *robot_;              /**< Pointer to robot structure. */

@@ -42,7 +42,6 @@ namespace controller {
       n_tilde_("~"),
       max_force_demand(1023.), friction_deadband(5)
   {
-    sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrController::setCommandCB, this);
   }
 
   SrController::~SrController()
@@ -50,11 +49,14 @@ namespace controller {
     sub_command_.shutdown();
   }
 
+  void SrController::after_init()
+  {
+    sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrController::setCommandCB, this);
+  }
+
 
   std::string SrController::getJointName()
   {
-    ROS_DEBUG_STREAM(" joint_state: "<<joint_state_ << " This: " << this);
-
     return joint_state_->joint_->name;
   }
 
