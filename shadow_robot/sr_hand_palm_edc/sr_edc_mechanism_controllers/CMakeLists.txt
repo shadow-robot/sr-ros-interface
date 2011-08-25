@@ -34,6 +34,8 @@ rosbuild_add_library(${PROJECT_NAME}
   src/srh_joint_velocity_controller.cpp
   src/srh_mixed_position_velocity_controller.cpp
   src/sr_friction_compensation.cpp
+
+  src/sr_controller.cpp
 )
 
 
@@ -46,11 +48,13 @@ IF(DEFINED jenkins)
   set_property(TARGET gcov PROPERTY IMPORTED_LOCATION /usr/lib/gcc/i486-linux-gnu/4.4/libgcov.a)
 ENDIF(DEFINED jenkins)
 
-rosbuild_add_executable(test/test_joint_position_controller test/test_joint_position_controller.cpp src/srh_joint_position_controller.cpp)
+#building the actual test
+rosbuild_add_executable(test/test_joint_position_controller test/test_joint_position_controller.cpp test/test_controllers.cpp src/srh_joint_position_controller.cpp src/sr_controller.cpp)
+
 target_link_libraries(test/test_joint_position_controller ${PROJECT_NAME})
 IF(DEFINED jenkins)
   rosbuild_add_compile_flags(test/test_joint_position_controller -g -pg -fprofile-arcs -ftest-coverage)
   target_link_libraries(test/test_joint_position_controller gcov)
 ENDIF(DEFINED jenkins)
 rosbuild_add_gtest_build_flags(test/test_joint_position_controller)
-#rosbuild_add_rostest(launch/sr_hand_lib.test)
+rosbuild_add_rostest(test/joint_pos_controller.test)

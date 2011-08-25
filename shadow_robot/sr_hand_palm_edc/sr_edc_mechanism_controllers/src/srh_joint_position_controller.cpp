@@ -40,10 +40,7 @@ using namespace std;
 namespace controller {
 
   SrhJointPositionController::SrhJointPositionController()
-    : joint_state_(NULL), command_(0),
-      loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
-      n_tilde_("~"),
-      max_force_demand(1023.), friction_deadband(5), position_deadband(0.015)
+    : SrController(), position_deadband(0.015)
   {
   }
 
@@ -53,7 +50,7 @@ namespace controller {
   }
 
   bool SrhJointPositionController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
-                                                     const control_toolbox::Pid &pid_position)
+                                        boost::shared_ptr<control_toolbox::Pid> pid_position)
   {
     ROS_DEBUG(" --------- ");
     ROS_DEBUG_STREAM("Init: " << joint_name);
@@ -95,16 +92,13 @@ namespace controller {
       return false;
     }
 
-    control_toolbox::Pid pid_position;
-    if (!pid_position.init(ros::NodeHandle(node_, "pid")))
+    boost::shared_ptr<control_toolbox::Pid> pid_position;
+    if (!pid_position->init(ros::NodeHandle(node_, "pid")))
       return false;
-
 
     controller_state_publisher_.reset(
       new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
       (node_, "state", 1));
-
-    sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrhJointPositionController::setCommandCB, this);
 
     return init(robot, joint_name, pid_position);
   }
@@ -113,7 +107,7 @@ namespace controller {
   void SrhJointPositionController::starting()
   {
     command_ = joint_state_->position_;
-    pid_controller_position_.reset();
+    pid_controller_position_->reset();
     read_parameters();
 
     ROS_WARN("Reseting PID");
@@ -122,7 +116,7 @@ namespace controller {
   bool SrhJointPositionController::setGains(sr_robot_msgs::SetPidGains::Request &req,
                                             sr_robot_msgs::SetPidGains::Response &resp)
   {
-    pid_controller_position_.setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
+    pid_controller_position_->setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
     max_force_demand = req.max_force;
     friction_deadband = req.friction_deadband;
     position_deadband = req.deadband;
@@ -132,27 +126,7 @@ namespace controller {
 
   void SrhJointPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
   {
-    pid_controller_position_.getGains(p,i,d,i_max,i_min);
-  }
-
-
-  std::string SrhJointPositionController::getJointName()
-  {
-    ROS_DEBUG_STREAM(" joint_state: "<<joint_state_ << " This: " << this);
-
-    return joint_state_->joint_->name;
-  }
-
-// Set the joint position command
-  void SrhJointPositionController::setCommand(double cmd)
-  {
-    command_ = cmd;
-  }
-
-// Return the current position command
-  void SrhJointPositionController::getCommand(double & cmd)
-  {
-    cmd = command_;
+    pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
   void SrhJointPositionController::update()
@@ -178,14 +152,16 @@ namespace controller {
     //don't compute the error if we're in the deadband.
     if( !hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband) )
     {
-      commanded_effort = pid_controller_position_.updatePid(error_position, dt_);
+      commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
+      /*
       commanded_effort += joint_state_->commanded_effort_;
-
+      */
       //clamp the result to max force
       commanded_effort = min( commanded_effort, max_force_demand );
       commanded_effort = max( commanded_effort, -max_force_demand );
 
       commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
+
     }
     joint_state_->commanded_effort_ = commanded_effort;
 
@@ -212,11 +188,6 @@ namespace controller {
     loop_count_++;
 
     last_time_ = time;
-  }
-
-  void SrhJointPositionController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
-  {
-    command_ = msg->data;
   }
 
   void SrhJointPositionController::read_parameters()

@@ -23,70 +23,46 @@
  * demand by a PID loop.
  *
  */
-#include "sr_edc_mechanism_controllers/srh_joint_position_controller.hpp"
-#include <boost/smart_ptr.hpp>
-#include <gtest/gtest.h>
 
-#include <control_toolbox/pid.h>
-#include <pr2_hardware_interface/hardware_interface.h>
-#include <pr2_mechanism_model/robot.h>
-#include <tinyxml/tinyxml.h>
+#include "sr_edc_mechanism_controllers/test/test_controllers.hpp"
+
+#include "sr_edc_mechanism_controllers/srh_joint_position_controller.hpp"
+
+#include <gtest/gtest.h>
 
 using namespace controller;
 
-class TestJointPositionController
+class TestJointPositionController : public TestControllers
 {
 public:
-  boost::shared_ptr<SrhJointPositionController> controller;
-  boost::shared_ptr<pr2_hardware_interface::HardwareInterface> hw;
-  boost::shared_ptr<pr2_mechanism_model::Robot> robot;
-  boost::shared_ptr<pr2_mechanism_model::RobotState> robot_state;
-  boost::shared_ptr<TiXmlDocument> model;
-  boost::shared_ptr<pr2_hardware_interface::Actuator> actuator;
-  control_toolbox::Pid pid;
+  boost::shared_ptr<control_toolbox::Pid> pid;
 
-  pr2_mechanism_model::JointState* joint_state;
-
-  TestJointPositionController()
+  TestJointPositionController(boost::shared_ptr<control_toolbox::Pid> pid) :
+    TestControllers()
   {
+    this->pid = pid;
     controller = boost::shared_ptr<SrhJointPositionController>( new SrhJointPositionController() );
 
-    hw = boost::shared_ptr<pr2_hardware_interface::HardwareInterface>( new pr2_hardware_interface::HardwareInterface() );
-
-    //add a fake FFJ3 actuator
-    actuator = boost::shared_ptr<pr2_hardware_interface::Actuator>( new pr2_hardware_interface::Actuator("FFJ3") );
-    actuator->state_.is_enabled_ = true;
-    hw->addActuator( actuator.get() );
-
-    robot = boost::shared_ptr<pr2_mechanism_model::Robot>( new pr2_mechanism_model::Robot( hw.get()) );
-
-    model = boost::shared_ptr<TiXmlDocument>( new TiXmlDocument() );
-    bool loadOkay = model->LoadFile("/code/Projects/ROS_interfaces/sr-ros-interface/palm_edc/shadow_robot/sr_hand/model/robots/shadowhand_motor.urdf");
-
-    if ( loadOkay )
-    {
-      robot->initXml( model->RootElement() );
-
-      robot_state = boost::shared_ptr<pr2_mechanism_model::RobotState>( new pr2_mechanism_model::RobotState(robot.get()) );
-
-      joint_state = robot_state->getJointState("FFJ3");
-      joint_state->calibrated_ = true;
-
-      controller->init(robot_state.get(), "FFJ3", pid);
-    }
-    else
-    {
-      ROS_ERROR("Failed to load the model.");
-    }
+    init();
   }
 
   ~TestJointPositionController()
   {}
 
-  double compute_output(double input)
+  void init_controller()
   {
-    joint_state->position_ = 0.0;
+    controller::SrController* control_tmp = controller.get();
+    controller::SrhJointPositionController* sr_control_tmp = dynamic_cast< controller::SrhJointPositionController* >( control_tmp );
+    sr_control_tmp->init(robot_state.get(), "FFJ3", pid);
+  }
+
+  double compute_output(double input, double current_position)
+  {
+    hw->current_time_ = ros::Time::now();
+    joint_state->position_ = current_position;
     controller->setCommand( input );
+
+    controller->update();
 
     return joint_state->commanded_effort_;
   }
@@ -94,14 +70,79 @@ public:
 
 TEST(SrhJointPositionController, TestP)
 {
+  //TESTING A PURE P CONTROLLER
+  boost::shared_ptr<control_toolbox::Pid> pid;
+  pid = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid(1.0, 0.0, 0.0, 0.0, 0.0) );
+
   boost::shared_ptr<TestJointPositionController> test_jpc;
-  test_jpc = boost::shared_ptr<TestJointPositionController>( new TestJointPositionController() );
+  test_jpc = boost::shared_ptr<TestJointPositionController>( new TestJointPositionController( pid ) );
 
-  double ctrl_output = test_jpc->compute_output( 1.0 );
+  const unsigned int nb_values = 7;
+  const double values[nb_values] = {-123.123, -1.0, -0.5, 0.0, 0.5, 1.0, 456.456};
 
-  EXPECT_EQ(ctrl_output, 1.0);
+  ros::Duration pause(0.01);
+  double ctrl_output = 0.0;
+  for(unsigned int i = 0; i < nb_values; ++i)
+  {
+    ROS_INFO_STREAM("Sending demand: "<<values[i]);
+    pause.sleep();
+    ctrl_output = test_jpc->compute_output( values[i], 0.0 );
+    //double ctrl_output = test_jpc->compute_output( values[i] );
+    ROS_INFO_STREAM("Expected value: "<< values[i] << " Computed value: " <<ctrl_output);
+    EXPECT_EQ(ctrl_output, values[i]);
+  }
 }
 
+TEST(SrhJointPositionController, TestI)
+{
+  //TESTING A PURE P CONTROLLER
+  boost::shared_ptr<control_toolbox::Pid> pid;
+  pid = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid(1.0, 0.0, 0.0, 0.0, 0.0) );
+
+  boost::shared_ptr<TestJointPositionController> test_jpc;
+  test_jpc = boost::shared_ptr<TestJointPositionController>( new TestJointPositionController( pid ) );
+
+  const unsigned int nb_values = 7;
+  const double values[nb_values] = {-123.123, -1.0, -0.5, 0.0, 0.5, 1.0, 456.456};
+
+  double ctrl_output = 0.0;
+
+  //TESTING A PURE I CONTROLLER
+  pid->reset();
+  pid->setGains(0.0, 1.0, 0.0, 2.0, -2.0);
+
+  ros::Duration one_sec_pause(1.0);
+  ros::Duration half_sec_pause(0.5);
+  ros::Duration pause(0.01);
+
+  const double expected_values_one_sec[nb_values] = {-2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0};
+  const double expected_values_half_sec[nb_values] = {-2.0, -0.5, -0.25, 0.0, 0.25, 0.5, 2.0};
+
+  for(unsigned int i = 0; i < nb_values; ++i)
+  {
+    ROS_INFO_STREAM("Sending demand: "<<values[i]);
+    pid->reset();
+    pause.sleep();
+    ctrl_output = test_jpc->compute_output( 0.0, 0.0 );
+    one_sec_pause.sleep();
+    ctrl_output = test_jpc->compute_output( values[i], 0.0 );
+
+    ROS_INFO_STREAM("Expected value: "<< expected_values_one_sec[i] << " Computed value: " <<ctrl_output);
+    EXPECT_TRUE( abs(ctrl_output - expected_values_one_sec[i]) < 0.0001 );
+  }
+  for(unsigned int i = 0; i < nb_values; ++i)
+  {
+    ROS_INFO_STREAM("Sending demand: "<<values[i]);
+    pid->reset();
+    pause.sleep();
+    ctrl_output = test_jpc->compute_output( 0.0, 0.0 );
+    half_sec_pause.sleep();
+    ctrl_output = test_jpc->compute_output( values[i], 0.0 );
+
+    ROS_INFO_STREAM("Expected value: "<< expected_values_half_sec[i] << " Computed value: " <<ctrl_output);
+    EXPECT_TRUE( abs(ctrl_output - expected_values_half_sec[i]) < 0.0001 );
+  }
+}
 
 
 /////////////////////
