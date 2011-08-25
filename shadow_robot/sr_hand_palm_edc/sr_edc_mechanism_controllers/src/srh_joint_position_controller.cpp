@@ -154,9 +154,7 @@ namespace controller {
     if( !hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband) )
     {
       commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
-      /*
-      commanded_effort += joint_state_->commanded_effort_;
-      */
+
       //clamp the result to max force
       commanded_effort = min( commanded_effort, max_force_demand );
       commanded_effort = max( commanded_effort, -max_force_demand );
