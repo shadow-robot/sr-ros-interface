@@ -53,9 +53,6 @@ class MotorFlasher(QtCore.QThread):
                     self.emit( QtCore.SIGNAL("failed(QString)"),
                                QtCore.QString( "Failed to program the motor" ) )
                     return
-
-                motor.updated = False
-
                 programmed_motors += 1.
 
                 self.emit( QtCore.SIGNAL("motor_finished(QPoint)"),
@@ -68,8 +65,6 @@ class Motor(QtGui.QFrame):
 
         self.motor_name = motor_name
         self.motor_index = motor_index
-
-        self.updated = False
 
         self.layout = QtGui.QHBoxLayout()
 
@@ -263,30 +258,27 @@ class Bootloader(GenericPlugin):
     def diagnostics_callback(self, msg):
         for status in msg.status:
             for motor in self.motors:
-                if not motor.updated:
-                    if motor.motor_name in status.name:
-                        for key_values in status.values:
-                            if "Firmware svn revision" in key_values.key:
-                                server_current_modified = key_values.value.split(" / ")
+                if motor.motor_name in status.name:
+                    for key_values in status.values:
+                        if "Firmware svn revision" in key_values.key:
+                            server_current_modified = key_values.value.split(" / ")
 
-                                if server_current_modified[0] > self.server_revision:
-                                    self.server_revision = int( server_current_modified[0].strip() )
+                            if server_current_modified[0] > self.server_revision:
+                                self.server_revision = int( server_current_modified[0].strip() )
 
-                                palette = motor.revision_label.palette();
-                                palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.green)
-                                if server_current_modified[0].strip() != server_current_modified[1].strip():
-                                    palette.setColor(motor.revision_label.foregroundRole(), QtGui.QColor(255, 170, 23) )
-                                    motor.revision_label.setPalette(palette);
+                            palette = motor.revision_label.palette();
+                            palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.green)
+                            if server_current_modified[0].strip() != server_current_modified[1].strip():
+                                palette.setColor(motor.revision_label.foregroundRole(), QtGui.QColor(255, 170, 23) )
+                                motor.revision_label.setPalette(palette);
 
-                                if "True" in server_current_modified[2]:
-                                    palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.red)
-                                    motor.revision_label.setText( "svn: "+ server_current_modified[1] + " [M]" )
-                                    motor.revision_label.setPalette(palette);
-                                else:
-                                    motor.revision_label.setText( " svn: " + server_current_modified[1] )
-                                    motor.revision_label.setPalette(palette);
-
-                                motor.updated = True
+                            if "True" in server_current_modified[2]:
+                                palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.red)
+                                motor.revision_label.setText( "svn: "+ server_current_modified[1] + " [M]" )
+                                motor.revision_label.setPalette(palette);
+                            else:
+                                motor.revision_label.setText( " svn: " + server_current_modified[1] )
+                                motor.revision_label.setPalette(palette);
 
         self.server_revision_label.setText( "  Server svn revision: " +  str(self.server_revision) )
 
