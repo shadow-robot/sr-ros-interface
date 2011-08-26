@@ -306,27 +306,39 @@ class JointPidSetter(QtGui.QFrame):
             param[1][0] = param[1][1].text().toInt()[0]
 
         if self.controller_type == "Motor Force":
-            self.pid_service(int(self.advanced_parameters["max_pwm"][0]), int(self.advanced_parameters["sgleftref"][0]),
-                             int(self.advanced_parameters["sgrightref"][0]), int(self.important_parameters["f"][0]),
-                             int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
-                             int(self.important_parameters["d"][0]), int(self.important_parameters["imax"][0]),
-                             int(self.advanced_parameters["deadband"][0]), int(self.advanced_parameters["sign"][0]) )
+            try:
+                self.pid_service(int(self.advanced_parameters["max_pwm"][0]), int(self.advanced_parameters["sgleftref"][0]),
+                                 int(self.advanced_parameters["sgrightref"][0]), int(self.important_parameters["f"][0]),
+                                 int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
+                                 int(self.important_parameters["d"][0]), int(self.important_parameters["imax"][0]),
+                                 int(self.advanced_parameters["deadband"][0]), int(self.advanced_parameters["sign"][0]) )
+            except:
+                QtGui.QMessageBox.warning(self.frame_important_parameters, "Warning", "Failed to set the PID values (One of the value is probably out of range, check messages for more information)")
+
         elif self.controller_type == "Position" or self.controller_type == "Velocity":
-            self.pid_service(int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
-                             int(self.important_parameters["d"][0]), int(self.important_parameters["i_clamp"][0]),
-                             int(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["deadband"][0]),
-                             int(self.advanced_parameters["friction_deadband"][0]) )
+            try:
+                self.pid_service(int(self.important_parameters["p"][0]), int(self.important_parameters["i"][0]),
+                                 int(self.important_parameters["d"][0]), int(self.important_parameters["i_clamp"][0]),
+                                 int(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["deadband"][0]),
+                                 int(self.advanced_parameters["friction_deadband"][0]) )
+            except:
+                QtGui.QMessageBox.warning(self.frame_important_parameters, "Warning", "Failed to set the PID values (One of the value is probably out of range, check messages for more information)")
+
         elif self.controller_type == "Mixed Position/Velocity":
-            self.pid_service(float(self.important_parameters["p"][0]), float(self.important_parameters["i"][0]),
-                             float(self.important_parameters["d"][0]), float(self.important_parameters["i_clamp"][0]),
-                             float(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["min_velocity"][0]),
-                             float(self.advanced_parameters["max_velocity"][0]), float(self.advanced_parameters["velocity_slope"][0]),
-                             float(self.advanced_parameters["position_deadband"][0]), int(self.advanced_parameters["friction_deadband"][0]) )
+            try:
+                self.pid_service(float(self.important_parameters["p"][0]), float(self.important_parameters["i"][0]),
+                                 float(self.important_parameters["d"][0]), float(self.important_parameters["i_clamp"][0]),
+                                 float(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["min_velocity"][0]),
+                                 float(self.advanced_parameters["max_velocity"][0]), float(self.advanced_parameters["velocity_slope"][0]),
+                                 float(self.advanced_parameters["position_deadband"][0]), int(self.advanced_parameters["friction_deadband"][0]) )
+            except:
+                QtGui.QMessageBox.warning(self.frame_important_parameters, "Warning", "Failed to set the PID values (One of the value is probably out of range, check messages for more information)")
+
         elif self.controller_type == "Effort":
             try:
                 self.pid_service(int(self.important_parameters["max_force"][0]), int(self.important_parameters["friction_deadband"][0]) )
-            except rospy.ServiceException, e:
-                print "Service did not process request: %s"%str(e)
+            except:
+                QtGui.QMessageBox.warning(self.frame_important_parameters, "Warning", "Failed to set the PID values (One of the value is probably out of range, check messages for more information)")
         else:
             print "", self.controller_type, " is not a recognized controller type."
 
@@ -504,6 +516,8 @@ class ControllerTuner(GenericPlugin):
         self.frame_controller_type = QtGui.QFrame()
         self.layout_controller_type = QtGui.QHBoxLayout()
 
+        self.finger_pid_setters = []
+
         #add a combo box to select the controller type
         self.label_control = QtGui.QLabel("Controller type: ")
         self.layout_controller_type.addWidget(self.label_control)
@@ -585,6 +599,9 @@ class ControllerTuner(GenericPlugin):
         except rospy.ServiceException, e:
             print "Service did not process request: %s"%str(e)
 
+        for f_pid_setter in self.finger_pid_setters:
+            f_pid_setter.on_close()
+
         self.controller_type = "default"
         controllers_tmp = []
         self.ordered_controller_types = []
@@ -609,6 +626,9 @@ class ControllerTuner(GenericPlugin):
                        "LF": ["LFJ0", "LFJ3", "LFJ4", "LFJ5"],
                        "TH": ["THJ1", "THJ2", "THJ3", "THJ4", "THJ5"],
                        "WR": ["WRJ1", "WRJ2"]}
+
+        for f_pid_setter in self.finger_pid_setters:
+            f_pid_setter.on_close()
 
         for fps in self.finger_pid_setters:
             fps.setParent(None)
