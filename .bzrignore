@@ -154,3 +154,5 @@ shadow_robot/sr_utilities/bin/test/test_calibration
 shadow_robot/sr_control_gui/src/sr_control_gui/plugins/controller_tuner/tmp.py
 ￼
 shadow_robot/sr_hand_palm_edc/sr_edc_mechanism_controllers/bin/test/test_joint_position_controller
+￼
+shadow_robot/TAGS

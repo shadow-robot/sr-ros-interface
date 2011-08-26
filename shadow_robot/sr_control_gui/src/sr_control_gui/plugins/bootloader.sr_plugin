@@ -1,0 +1,10 @@
+[Core]
+Name = bootloader
+Module = Bootloader
+Category = etherCAT_hand
+
+[Documentation]
+Author = Ugo Cupcic
+Version = 0.1
+Website = http://www.shadowrobot.com
+Description = Bootload the given firmware into the selected motors.

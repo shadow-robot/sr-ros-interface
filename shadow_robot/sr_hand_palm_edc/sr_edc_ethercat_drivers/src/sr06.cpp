@@ -453,7 +453,7 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
  *
  *  @return This returns always true, the real return value is in the res parameter
  */
-bool SR06::simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res)
+bool SR06::simple_motor_flasher(sr_robot_msgs::SimpleMotorFlasher::Request &req, sr_robot_msgs::SimpleMotorFlasher::Response &res)
 {
   int err;
   unsigned char cmd_sent;

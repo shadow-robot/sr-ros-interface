@@ -31,7 +31,7 @@
 #include <sr_edc_ethercat_drivers/sr0x.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Int16.h>
-#include <sr_edc_ethercat_drivers/SimpleMotorFlasher.h>
+#include <sr_robot_msgs/SimpleMotorFlasher.h>
 #include <pthread.h>
 #include <bfd.h>
 #include <boost/smart_ptr.hpp>
@@ -61,7 +61,7 @@ public:
   int  initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_unprogrammed=true);
   void multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsigned char *buffer);
 
-  bool simple_motor_flasher(sr_edc_ethercat_drivers::SimpleMotorFlasher::Request &req, sr_edc_ethercat_drivers::SimpleMotorFlasher::Response &res);
+  bool simple_motor_flasher(sr_robot_msgs::SimpleMotorFlasher::Request &req, sr_robot_msgs::SimpleMotorFlasher::Response &res);
   void packCommand(unsigned char *buffer, bool halt, bool reset);
   bool unpackState(unsigned char *this_buffer, unsigned char *prev_buffer);
   bool can_data_is_ack(ETHERCAT_CAN_BRIDGE_DATA * packet);

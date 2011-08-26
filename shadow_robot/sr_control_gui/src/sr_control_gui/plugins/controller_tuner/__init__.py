@@ -580,8 +580,6 @@ class ControllerTuner(GenericPlugin):
 
         self.layout.addWidget(self.frame_controller_type)
 
-        self.refresh_available_controllers()
-
         self.finger_pid_setters = []
         self.qtab_widget = QtGui.QTabWidget()
         self.layout.addWidget( self.qtab_widget )
@@ -649,6 +647,8 @@ class ControllerTuner(GenericPlugin):
 
     def activate(self):
         GenericPlugin.activate(self)
+
+        self.refresh_available_controllers()
 
         self.changed_controller_type(0)
         self.set_icon(self.parent.parent.rootPath + '/images/icons/iconHand.png')
