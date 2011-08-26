@@ -19,11 +19,48 @@
 import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
+import time
+
 from generic_plugin import GenericPlugin
 from sr_robot_msgs.srv import SimpleMotorFlasher, SimpleMotorFlasherResponse
 from diagnostic_msgs.msg import DiagnosticArray
 
 from PyQt4 import QtCore, QtGui, Qt
+
+class MotorFlasher(QtCore.QThread):
+    def __init__(self, parent, nb_motors_to_program):
+        QtCore.QThread.__init__(self, None)
+        self.parent = parent
+        self.nb_motors_to_program = nb_motors_to_program
+
+        rospy.wait_for_service('SimpleMotorFlasher')
+        self.flasher_service = rospy.ServiceProxy('SimpleMotorFlasher', SimpleMotorFlasher)
+
+    def run(self):
+        programmed_motors = 0.
+        for motor in self.parent.motors:
+            if motor.checkbox.checkState() == QtCore.Qt.Checked:
+                resp = SimpleMotorFlasherResponse.FAIL
+                try:
+                    resp = self.flasher_service( str(self.parent.firmware_path), motor.motor_index )
+
+                except rospy.ServiceException, e:
+                    self.emit( QtCore.SIGNAL("failed(QString)"),
+                               QtCore.QString( "Service did not process request: %s"%str(e) ) )
+                    return
+
+                if resp == SimpleMotorFlasherResponse.FAIL:
+                    self.emit( QtCore.SIGNAL("failed(QString)"),
+                               QtCore.QString( "Failed to program the motor" ) )
+                    return
+
+                motor.updated = False
+
+                programmed_motors += 1.
+
+                self.emit( QtCore.SIGNAL("motor_finished(QPoint)"),
+                               QtCore.QPoint( programmed_motors / self.nb_motors_to_program * 100. , 0.0 ) )
+
 
 class Motor(QtGui.QFrame):
     def __init__(self, parent, motor_name, motor_index):
@@ -31,6 +68,8 @@ class Motor(QtGui.QFrame):
 
         self.motor_name = motor_name
         self.motor_index = motor_index
+
+        self.updated = False
 
         self.layout = QtGui.QHBoxLayout()
 
@@ -150,30 +189,39 @@ class Bootloader(GenericPlugin):
             QtGui.QMessageBox.warning(self.frame, "Warning", "No motors selected for flashing.")
             return
 
-        rospy.wait_for_service('SimpleMotorFlasher')
-        flasher_service = rospy.ServiceProxy('SimpleMotorFlasher', SimpleMotorFlasher)
+        self.cursor = Qt.QCursor()
+        self.cursor.setShape(QtCore.Qt.WaitCursor)
+        self.window.setCursor(self.cursor)
 
-        programmed_motors = 0.
+        self.motor_flasher = MotorFlasher(self, nb_motors_to_program)
+        self.frame.connect(self.motor_flasher, QtCore.SIGNAL("finished()"), self.finished_programming_motors)
+        self.frame.connect(self.motor_flasher, QtCore.SIGNAL("motor_finished(QPoint)"), self.one_motor_finished)
+        self.frame.connect(self.motor_flasher, QtCore.SIGNAL("failed(QString)"), self.failed_programming_motors)
+
         for motor in self.motors:
-            if motor.checkbox.checkState() == QtCore.Qt.Checked:
-                resp = SimpleMotorFlasherResponse.FAIL
-                try:
-                    cursor = Qt.QCursor()
-                    cursor.setShape(QtCore.Qt.WaitCursor)
-                    self.window.setCursor(cursor)
+            motor.checkbox.setEnabled(False)
+        self.file_btn.setEnabled(False)
+        self.select_all_btn.setEnabled(False)
+        self.program_btn.setEnabled(False)
 
-                    resp = flasher_service(str( self.firmware_path ), motor.motor_index)
+        self.motor_flasher.start()
 
-                    cursor.setShape(QtCore.Qt.ArrowCursor)
-                    self.window.setCursor(cursor)
-                except rospy.ServiceException, e:
-                    QtGui.QMessageBox.warning(self.frame, "Warning", "Service did not process request: %s"%str(e))
+    def one_motor_finished(self, point):
+        self.progress_bar.setValue( int(point.x()) )
 
-                if resp == SimpleMotorFlasherResponse.FAIL:
-                    QtGui.QMessageBox.warning(self.frame, "Warning", "Failed to bootload motor: "+str(motor.motor_name) )
 
-                programmed_motors += 1.
-                self.progress_bar.setValue(programmed_motors / nb_motors_to_program * 100.)
+    def finished_programming_motors(self):
+        for motor in self.motors:
+            motor.checkbox.setEnabled(True)
+        self.file_btn.setEnabled(True)
+        self.select_all_btn.setEnabled(True)
+        self.program_btn.setEnabled(True)
+
+        self.cursor.setShape(QtCore.Qt.ArrowCursor)
+        self.window.setCursor(self.cursor)
+
+    def failed_programming_motors(self, message):
+        QtGui.QMessageBox.warning(self.frame, "Warning", message)
 
     def populate_motors(self):
         if rospy.has_param("joint_to_motor_mapping"):
@@ -215,32 +263,37 @@ class Bootloader(GenericPlugin):
     def diagnostics_callback(self, msg):
         for status in msg.status:
             for motor in self.motors:
-                if motor.motor_name in status.name:
-                    for key_values in status.values:
-                        if "Firmware svn revision" in key_values.key:
-                            server_current_modified = key_values.value.split(" / ")
+                if not motor.updated:
+                    if motor.motor_name in status.name:
+                        for key_values in status.values:
+                            if "Firmware svn revision" in key_values.key:
+                                server_current_modified = key_values.value.split(" / ")
 
-                            if server_current_modified[0] > self.server_revision:
-                                self.server_revision = int( server_current_modified[0].strip() )
+                                if server_current_modified[0] > self.server_revision:
+                                    self.server_revision = int( server_current_modified[0].strip() )
 
-                            palette = motor.revision_label.palette();
-                            palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.green)
-                            if "True" in server_current_modified[2]:
-                                palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.red)
-                            elif server_current_modified[0].strip() != server_current_modified[1].strip():
-                                palette.setColor(motor.revision_label.foregroundRole(), QtGui.QColor(255, 170, 23) )
-                            motor.revision_label.setPalette(palette);
+                                palette = motor.revision_label.palette();
+                                palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.green)
+                                if server_current_modified[0].strip() != server_current_modified[1].strip():
+                                    palette.setColor(motor.revision_label.foregroundRole(), QtGui.QColor(255, 170, 23) )
+                                    motor.revision_label.setPalette(palette);
 
-                            if "True" in server_current_modified[2]:
-                                motor.revision_label.setText( "svn: "+ server_current_modified[1] + " [M]" )
-                            else:
-                                motor.revision_label.setText( " svn: " + server_current_modified[1] )
+                                if "True" in server_current_modified[2]:
+                                    palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.red)
+                                    motor.revision_label.setText( "svn: "+ server_current_modified[1] + " [M]" )
+                                    motor.revision_label.setPalette(palette);
+                                else:
+                                    motor.revision_label.setText( " svn: " + server_current_modified[1] )
+                                    motor.revision_label.setPalette(palette);
+
+                                motor.updated = True
 
         self.server_revision_label.setText( "  Server svn revision: " +  str(self.server_revision) )
 
     def on_close(self):
-        self.diag_sub.unregister()
-        self.diag_sub = None
+        if self.diag_sub != None:
+            self.diag_sub.unregister()
+            self.diag_sub = None
 
         for motor in self.motors:
             motor.setParent(None)
