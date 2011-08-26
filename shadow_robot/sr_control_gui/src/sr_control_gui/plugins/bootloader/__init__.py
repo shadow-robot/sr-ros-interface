@@ -21,6 +21,7 @@ import rospy
 
 from generic_plugin import GenericPlugin
 from sr_robot_msgs.srv import SimpleMotorFlasher, SimpleMotorFlasherResponse
+from diagnostic_msgs.msg import DiagnosticArray
 
 from PyQt4 import QtCore, QtGui, Qt
 
@@ -36,8 +37,13 @@ class Motor(QtGui.QFrame):
         self.checkbox = QtGui.QCheckBox("", self)
         self.layout.addWidget(self.checkbox)
 
-        self.label = QtGui.QLabel( motor_name + ": " + str(motor_index) )
+        self.label = QtGui.QLabel( motor_name + " [" + str(motor_index) +"]" )
+        self.label.setToolTip("Motor name and motor index")
         self.layout.addWidget(self.label)
+
+        self.revision_label = QtGui.QLabel( "" )
+        self.revision_label.setToolTip("Svn Revision")
+        self.layout.addWidget(self.revision_label)
 
         self.setLayout(self.layout)
 
@@ -50,6 +56,7 @@ class Bootloader(GenericPlugin):
     def __init__(self):
         GenericPlugin.__init__(self)
 
+        self.diag_sub = None
         self.firmware_path = None
 
         self.frame = QtGui.QFrame()
@@ -77,12 +84,21 @@ class Bootloader(GenericPlugin):
         self.motors_frame.setLayout(self.motors_layout)
         self.layout.addWidget(self.motors_frame)
 
+        self.frame_select_and_server_rev = QtGui.QFrame()
+        self.layout_select_and_server_rev = QtGui.QHBoxLayout()
+
         self.all_selected = False
         self.select_all_btn =  QtGui.QPushButton()
         self.select_all_btn.setText("Select/Deselect All")
         self.select_all_btn.setToolTip("Select or deselect all motors.")
         self.file_frame.connect(self.select_all_btn, QtCore.SIGNAL('clicked()'),self.select_all)
-        self.layout.addWidget(self.select_all_btn)
+        self.layout_select_and_server_rev.addWidget(self.select_all_btn)
+
+        self.server_revision_label = QtGui.QLabel("")
+        self.layout_select_and_server_rev.addWidget(self.server_revision_label)
+
+        self.frame_select_and_server_rev.setLayout(self.layout_select_and_server_rev)
+        self.layout.addWidget(self.frame_select_and_server_rev)
 
         self.program_frame = QtGui.QFrame()
         self.program_layout = QtGui.QHBoxLayout()
@@ -142,8 +158,14 @@ class Bootloader(GenericPlugin):
             if motor.checkbox.checkState() == QtCore.Qt.Checked:
                 resp = SimpleMotorFlasherResponse.FAIL
                 try:
-                    print self.firmware_path
+                    cursor = Qt.QCursor()
+                    cursor.setShape(QtCore.Qt.WaitCursor)
+                    self.window.setCursor(cursor)
+
                     resp = flasher_service(str( self.firmware_path ), motor.motor_index)
+
+                    cursor.setShape(QtCore.Qt.ArrowCursor)
+                    self.window.setCursor(cursor)
                 except rospy.ServiceException, e:
                     QtGui.QMessageBox.warning(self.frame, "Warning", "Service did not process request: %s"%str(e))
 
@@ -161,7 +183,8 @@ class Bootloader(GenericPlugin):
                         ["MFJ0", "MFJ1", "MFJ2", "MFJ3", "MFJ4"],
                         ["RFJ0", "RFJ1", "RFJ2", "RFJ3", "RFJ4"],
                         ["LFJ0", "LFJ1", "LFJ2", "LFJ3", "LFJ4", "LFJ5"],
-                        ["THJ1", "THJ2", "THJ3", "THJ4", "THJ5"],
+                        ["THJ1", "THJ2", "THJ3", "THJ4"],
+                        ["THJ5"],
                         ["WRJ1", "WRJ2"] ]
 
         row = 0
@@ -178,14 +201,47 @@ class Bootloader(GenericPlugin):
                     col += 1
                 index_jtm_mapping += 1
             row += 1
-        Qt.QTimer.singleShot(0, self.window.adjustSize)
 
     def activate(self):
         GenericPlugin.activate(self)
         self.set_icon(self.parent.parent.rootPath + '/images/icons/iconHand.png')
         self.populate_motors()
 
+        self.server_revision = 0
+        self.diag_sub = rospy.Subscriber("/diagnostics", DiagnosticArray, self.diagnostics_callback)
+        Qt.QTimer.singleShot(0, self.window.adjustSize)
+        Qt.QTimer.singleShot(1500, self.window.adjustSize)
+
+    def diagnostics_callback(self, msg):
+        for status in msg.status:
+            for motor in self.motors:
+                if motor.motor_name in status.name:
+                    for key_values in status.values:
+                        if "Firmware svn revision" in key_values.key:
+                            server_current_modified = key_values.value.split(" / ")
+
+                            if server_current_modified[0] > self.server_revision:
+                                self.server_revision = int( server_current_modified[0].strip() )
+
+                            palette = motor.revision_label.palette();
+                            palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.green)
+                            if "True" in server_current_modified[2]:
+                                palette.setColor(motor.revision_label.foregroundRole(), QtCore.Qt.red)
+                            elif server_current_modified[0].strip() != server_current_modified[1].strip():
+                                palette.setColor(motor.revision_label.foregroundRole(), QtGui.QColor(255, 170, 23) )
+                            motor.revision_label.setPalette(palette);
+
+                            if "True" in server_current_modified[2]:
+                                motor.revision_label.setText( "svn: "+ server_current_modified[1] + " [M]" )
+                            else:
+                                motor.revision_label.setText( " svn: " + server_current_modified[1] )
+
+        self.server_revision_label.setText( "  Server svn revision: " +  str(self.server_revision) )
+
     def on_close(self):
+        self.diag_sub.unregister()
+        self.diag_sub = None
+
         for motor in self.motors:
             motor.setParent(None)
         self.motors = []

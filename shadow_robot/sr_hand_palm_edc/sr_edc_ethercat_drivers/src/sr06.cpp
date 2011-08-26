@@ -387,7 +387,7 @@ bool SR06::read_flash(unsigned int offset, unsigned char baddrl, unsigned char b
   {
     if ( !(err = pthread_mutex_trylock(&producing)) )
     {
-      ROS_WARN("Sending READ data ... position : %d", pos);
+      ROS_INFO("Sending READ data ... position : %d", pos);
       can_message_.can_bus = can_bus_;
       can_message_.message_length = 3;
       can_message_.message_id = 0x0600 | (motor_being_flashed << 5) | READ_FLASH_COMMAND;
