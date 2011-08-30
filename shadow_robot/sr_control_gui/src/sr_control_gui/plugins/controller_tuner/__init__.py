@@ -24,6 +24,8 @@ from sr_robot_msgs.srv import ForceController, SetEffortControllerGains, SetMixe
 from functools import partial
 import threading, time, math
 
+import subprocess
+
 from std_msgs.msg import Float64
 
 from PyQt4 import QtCore, QtGui, Qt
@@ -98,6 +100,12 @@ class JointPidSetter(QtGui.QFrame):
         self.controller_type = controller_type
 
         self.joint_name = joint_name
+
+        try:
+            self.joint_index_in_joint_state = ['WRJ2', 'WRJ1', 'FFJ4', 'FFJ3', 'FFJ1', 'FFJ2', 'MFJ4', 'MFJ3', 'MFJ1', 'MFJ2', 'RFJ4', 'RFJ3', 'RFJ1', 'RFJ2', 'LFJ5', 'LFJ4', 'LFJ3', 'LFJ1', 'LFJ2', 'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1'].index(joint_name.upper())
+        except:
+            self.joint_index_in_joint_state = None
+
         self.parent = parent
 
         self.friction = False
@@ -157,7 +165,29 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(self.btn_save, QtCore.SIGNAL('clicked()'),self.save_clicked)
         self.layout_.addWidget(self.btn_save)
 
+        if self.joint_index_in_joint_state != None:
+            self.btn_plot = QtGui.QPushButton()
+            self.btn_plot.setText("Plot")
+            self.btn_plot.setToolTip("Plot the current joint effort")
+            self.connect(self.btn_plot, QtCore.SIGNAL('clicked()'),self.launch_rxplot)
+            self.layout_.addWidget(self.btn_plot)
+
         self.setLayout(self.layout_)
+
+    def launch_rxplot(self):
+        rxplot_str = "rxplot -b 10 "
+        if self.controller_type == "Motor Force":
+            rxplot_str += "/joint_states/effort["+ str(self.joint_index_in_joint_state) +"]"
+        elif self.controller_type == "Position":
+            rxplot_str += "sh_"+self.joint_name.lower()+"_position_controller/command/data,/joint_states/position["+ str(self.joint_index_in_joint_state) +"]"
+        elif self.controller_type == "Velocity":
+            rxplot_str += "sh_"+self.joint_name.lower()+"_velocity_controller/command/data,/joint_states/velocity["+ str(self.joint_index_in_joint_state) +"]"
+        elif self.controller_type == "Mixed Position/Velocity":
+            rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/command/data,/joint_states/position["+ str(self.joint_index_in_joint_state) +"]"
+        elif self.controller_type == "Effort":
+            rxplot_str += "sh_"+self.joint_name.lower()+"_effort_controller/command/data,/joint_states/effort["+ str(self.joint_index_in_joint_state) +"]"
+
+        subprocess.Popen(rxplot_str.split())
 
     def save_clicked(self):
         param_name = []
