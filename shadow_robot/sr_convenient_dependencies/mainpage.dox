@@ -1,8 +1,0 @@
-/**
-\mainpage
-\htmlinclude manifest.html
-
-\b sr_convenient_dependencies is just an empty package used to have an easy way of building the usefull ros tools we'll need with our interface: rviz and such. 
-
-
-*/
