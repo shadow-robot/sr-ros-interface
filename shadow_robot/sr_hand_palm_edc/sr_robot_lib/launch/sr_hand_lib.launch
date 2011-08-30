@@ -1,5 +1,0 @@
-<launch>
-  <rosparam command="load" file="$(find sr_robot_lib)/config/sensor_to_joint.yaml" />
-  <rosparam command="load" file="$(find sr_robot_lib)/config/calibration.yaml" />
-  <rosparam command="load" file="$(find sr_robot_lib)/config/joint_to_motor_mapping.yaml" />
-</launch>

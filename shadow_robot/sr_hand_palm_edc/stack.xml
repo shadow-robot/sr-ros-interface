@@ -1,9 +1,0 @@
-<stack>
-  <description brief="sr_hand_palm_edc">sr_hand_palm_edc</description>
-  <author>Maintained by Yann Sionneau</author>
-  <license>BSD</license>  
-  <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/sr_hand_palm_edc</url>
-  <depend stack="ros" />
-
-</stack>

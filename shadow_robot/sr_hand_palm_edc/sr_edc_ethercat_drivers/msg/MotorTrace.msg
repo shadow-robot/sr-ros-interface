@@ -1,4 +1,0 @@
-Header header
-string reason
-sr_edc_ethercat_drivers/ActuatorInfo actuator_info
-sr_edc_ethercat_drivers/MotorTraceSample[] samples
