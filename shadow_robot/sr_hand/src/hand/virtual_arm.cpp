@@ -270,6 +270,7 @@ std::vector<DiagnosticData> VirtualArm::getDiagnostics()
         tmpDiag.level = 0;
         tmpDiag.flags = "";
         tmpDiag.target_sensor_num = 0;
+        tmpDiag.position_sensor_num = 0;
         tmpDiag.target = it->second.target;
         tmpDiag.position = it-> second.position;
 

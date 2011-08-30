@@ -2,7 +2,7 @@
  * @file   virtual_shadowhand.h
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:51:10 2010
- *
+ * 
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -22,8 +22,8 @@
  * @brief  The Virtual Shadowhand can be used as a simulator. As both the real hand and the virtual hand are children
  * from the shadowhand class, using a virtual or a real hand doesn't change anything in the way you call them in your
  * programs.
- *
- *
+ * 
+ * 
  */
 
 #ifndef   	VIRTUAL_SHADOWHAND_H_
@@ -125,7 +125,6 @@ protected:
     {
         return rad * 180.0 / 3.14159265;
     }
-
 }; //end class
 }
 #endif 	    /* !VIRTUAL_SHADOWHAND_H_ */

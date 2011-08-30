@@ -557,6 +557,7 @@ namespace shadowrobot
       tmpDiag.flags = "";
       tmpDiag.target_sensor_num = 0;
       tmpDiag.target = it->second.target;
+      tmpDiag.position_sensor_num = 0;
       tmpDiag.position = it-> second.position;
 
       returnVect.push_back(tmpDiag);
@@ -616,8 +617,10 @@ namespace shadowrobot
 
     joints_map_mutex.unlock();
   }
+
 #endif
 } //end namespace
+
 
 /* For the emacs weenies in the crowd.
 Local Variables:

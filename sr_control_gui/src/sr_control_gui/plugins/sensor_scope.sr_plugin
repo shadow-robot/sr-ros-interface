@@ -1,0 +1,10 @@
+[Core]
+Name = sensor_scope
+Module = SensorScope
+Category = etherCAT_hand
+
+[Documentation]
+Author = Ugo Cupcic
+Version = 0.1
+Website = http://www.shadowrobot.com
+Description = A real time plotting utility. Useful for debugging.

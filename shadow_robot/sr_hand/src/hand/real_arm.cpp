@@ -201,6 +201,7 @@ std::vector<DiagnosticData> RealArm::getDiagnostics()
     tmpDiag.flags = "";
     tmpDiag.target_sensor_num = 0;
     tmpDiag.target = it->second.target;
+    tmpDiag.position_sensor_num = 0;
     tmpDiag.position = it-> second.position;
 
     returnVect.push_back(tmpDiag);

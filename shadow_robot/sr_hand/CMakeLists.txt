@@ -63,6 +63,14 @@ ELSE(DEFINED valves)
 ENDIF(DEFINED valves)
 MESSAGE("---------")
 
+#EtherCAT compatibility Interface
+SET(ethercat_compat $ENV{ETHERCAT})
+IF(DEFINED ethercat_compat)
+  MESSAGE(" [x] EtherCAT compatibility interface.")
+ELSE(DEFINED ethercat_compat)
+  MESSAGE(" [ ] EtherCAT compatibility interface.")
+ENDIF(DEFINED ethercat_compat)
+
 ##################
 #  VIRTUAL ARM  #
 ##################
@@ -80,8 +88,6 @@ rosbuild_link_boost(shadowhand_virtual thread)
 ##################
 #    REAL HAND   #
 ##################
-
-##uncomment those lines if you build for the real hand
 IF(DEFINED real_hand)
   include_directories(/usr/realtime/include/)
   LINK_LIBRARIES(pthread)
@@ -91,6 +97,14 @@ IF(DEFINED real_hand)
   rosbuild_link_boost(shadowhand_real thread)
   target_link_libraries(shadowhand_real robot)
 ENDIF(DEFINED real_hand)
+
+#########################################
+#  ETHERCAT COMPATIBILITY WRAPPER HAND  #
+#########################################
+IF(DEFINED ethercat_compat)
+  rosbuild_add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
+  rosbuild_link_boost(shadowhand_virtual thread)
+ENDIF(DEFINED ethercat_compat)
 
 ##################
 #    REAL ARM    #
