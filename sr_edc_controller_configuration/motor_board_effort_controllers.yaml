@@ -98,16 +98,18 @@ lfj5:
     sign: 0.0
 mfj0:
   pid:
-    d: 0
-    deadband: 0
+    d: 50
+    deadband: 0.0
     f: 0
-    i: 0
-    imax: 0
-    max_pwm: 1023
-    p: 0
+    i: 30400
+    imax: 14
+    max_pwm: 1023.0
+    p: 17000
     sg_left: 0
     sg_right: 0
-    sign: 1
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
 mfj3:
   pid:
     d: 50

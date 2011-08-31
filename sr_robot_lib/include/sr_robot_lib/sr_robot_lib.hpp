@@ -113,6 +113,12 @@ namespace shadow_joints
      * motor.
      */
     ros::ServiceServer force_pid_service;
+
+    /**
+     * A service used to reset the
+     * motors.
+     */
+    ros::ServiceServer reset_motor_service;
   };
 
   struct Joint
@@ -262,6 +268,10 @@ namespace shadow_robot
     std::queue<ForceConfig, std::list<ForceConfig> > reconfig_queue;
     ///this index is used to iterate over the config we're sending.
     int config_index;
+
+    ///contains a queue of motor indexes to reset
+    std::queue<short, std::list<short> > reset_motors_queue;
+
 
     /// The current actuator.
     sr_actuator::SrActuator* actuator;

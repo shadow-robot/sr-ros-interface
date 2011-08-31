@@ -12,6 +12,7 @@
   <depend package="pr2_hardware_interface"/>
   <depend package="sr_external_dependencies"/>
   <depend package="sr_robot_msgs"/>
+  <depend package="std_srvs"/>
 
   <depend package="roscpp"/>
   <depend package="rospy"/>

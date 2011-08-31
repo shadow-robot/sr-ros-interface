@@ -29,6 +29,7 @@
 #define _SR_HAND_LIB_HPP_
 
 #include "sr_robot_lib/sr_robot_lib.hpp"
+#include <std_srvs/Empty.h>
 
 //to be able to load the configuration from the
 //parameter server
@@ -56,6 +57,19 @@ namespace shadow_robot
     bool force_pid_callback(sr_robot_msgs::ForceController::Request& request,
                             sr_robot_msgs::ForceController::Response& response,
                             int motor_index);
+
+    /**
+     * Reset the motor at motor index.
+     *
+     * @param request empty
+     * @param response empty
+     * @param motor_index The index of the motor for the given joint.
+     *
+     * @return true if success
+     */
+    bool reset_motor_callback(std_srvs::Empty::Request& request,
+                              std_srvs::Empty::Response& response,
+                              int motor_index);
 
 #ifdef DEBUG_PUBLISHER
     /**

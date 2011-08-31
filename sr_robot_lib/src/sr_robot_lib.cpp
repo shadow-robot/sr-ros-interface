@@ -174,8 +174,9 @@ namespace shadow_robot
     // Now we chose the command to send to the motor
     // by default we send a torque demand (we're running
     // the force control on the motors), but if we have a waiting
-    // configuration, then we send the configuration.
-    if( reconfig_queue.empty() )
+    // configuration or a reset command, then we send the configuration
+    // or the reset.
+    if( reconfig_queue.empty() && reset_motors_queue.empty() )
     {
       //no config to send
       command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
@@ -225,48 +226,77 @@ namespace shadow_robot
     } //endif reconfig_queue.empty()
     else
     {
-      //we have a waiting config:
-      // we need to send all the config, finishing by the
-      // CRC. We'll remove the config from the queue only
-      // when the whole config has been sent
-
-      // the motor data type correspond to the index
-      // in the config array.
-      command->to_motor_data_type   = static_cast<TO_MOTOR_DATA_TYPE>(config_index);
-
-      //convert the motor index to the index of the motor in the message
-      int motor_index = reconfig_queue.front().first;
-
-      //set the data we want to send to the given motor
-      command->motor_data[motor_index] = reconfig_queue.front().second[config_index].word;
-
-      //We're now sending the CRC. We need to send the correct CRC to
-      // the motor we updated, and CRC=0 to all the other motors in its
-      // group (odd/even) to tell them to ignore the new
-      // configuration.
-      // Once the config has been transmitted, pop the element
-      // and reset the config_index to the beginning of the
-      // config values
-      if( config_index == static_cast<int>(MOTOR_CONFIG_CRC) )
+      if( !reset_motors_queue.empty() )
       {
-	//loop on all the motors and send a CRC of 0
-        // except for the motor we're reconfiguring
-        for( int i = 0 ; i < NUM_MOTORS ; ++i )
+        //we have some reset command waiting.
+        // We'll send all of them
+        command->to_motor_data_type = MOTOR_SYSTEM_RESET;
+
+        while( !reset_motors_queue.empty() )
         {
-          if( i != motor_index )
-            command->motor_data[i] = 0;
+          short motor_id = reset_motors_queue.front();
+          reset_motors_queue.pop();
+
+          ROS_ERROR_STREAM("sending reset to motor: "<< motor_id);
+
+          // we send the MOTOR_RESET_SYSTEM_KEY
+          // and the motor id (on the bus)
+          crc_unions::union16 to_send;
+          to_send.byte[0] = MOTOR_SYSTEM_RESET_KEY >> 8;
+          if( motor_id > 9 )
+            motor_id -= 10;
+          to_send.byte[1] = motor_id;
+
+          command->motor_data[motor_id] = to_send.word;
         }
 
-        //reset the config_index and remove the configuration
-        // we just sent from the configurations queue
-        reconfig_queue.pop();
-        config_index = MOTOR_CONFIG_FIRST_VALUE;
-
-      }
+      } // end if reset queue not empty
       else
-	++config_index;
+      {
+        if( !reconfig_queue.empty() )
+        {
+          //we have a waiting config:
+          // we need to send all the config, finishing by the
+          // CRC. We'll remove the config from the queue only
+          // when the whole config has been sent
 
-    } //endelse reconfig_queue.size()
+          // the motor data type correspond to the index
+          // in the config array.
+          command->to_motor_data_type   = static_cast<TO_MOTOR_DATA_TYPE>(config_index);
+
+          //convert the motor index to the index of the motor in the message
+          int motor_index = reconfig_queue.front().first;
+
+          //set the data we want to send to the given motor
+          command->motor_data[motor_index] = reconfig_queue.front().second[config_index].word;
+
+          //We're now sending the CRC. We need to send the correct CRC to
+          // the motor we updated, and CRC=0 to all the other motors in its
+          // group (odd/even) to tell them to ignore the new
+          // configuration.
+          // Once the config has been transmitted, pop the element
+          // and reset the config_index to the beginning of the
+          // config values
+          if( config_index == static_cast<int>(MOTOR_CONFIG_CRC) )
+          {
+            //loop on all the motors and send a CRC of 0
+            // except for the motor we're reconfiguring
+            for( int i = 0 ; i < NUM_MOTORS ; ++i )
+            {
+              if( i != motor_index )
+                command->motor_data[i] = 0;
+            }
+
+            //reset the config_index and remove the configuration
+            // we just sent from the configurations queue
+            reconfig_queue.pop();
+            config_index = MOTOR_CONFIG_FIRST_VALUE;
+          }
+          else
+            ++config_index;
+        } //end if reconfig queue not empty
+      } // end else reset_queue.empty
+    } //endelse reconfig_queue.empty() && reset_queue.empty()
   }
 
 
@@ -421,14 +451,26 @@ namespace shadow_robot
         actuator->state_.can_msgs_transmitted_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
         last_can_msgs_transmitted = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
         break;
-      case MOTOR_DATA_SVN_REVISION:
-	read_torque = false;
-        actuator->state_.server_firmware_svn_revision_ = static_cast<unsigned int>(static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque) );
-        //the bit 15 tells us if the firmware version on the motor is a modified version of the svn.
-        actuator->state_.firmware_modified_ = ( (status_data->motor_data_packet[index_motor_in_msg].misc & 0x8000) != 0 );
-        // the other 15 bits are the svn revision currently programmed on the pic
-        actuator->state_.pic_firmware_svn_revision_ = ( status_data->motor_data_packet[index_motor_in_msg].misc & 0x7FFF );
+      case MOTOR_DATA_SLOW_MISC:
+        crc_unions::union16 received;
+        received.word = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
+        switch( received.byte[0] )
+        {
+        case MOTOR_SLOW_DATA_SVN_REVISION:
+          actuator->state_.pic_firmware_svn_revision_ = received.byte[1];
+          break;
+        case MOTOR_SLOW_DATA_SVN_SERVER_REVISION:
+          actuator->state_.server_firmware_svn_revision_ = received.byte[1];
+          break;
+        case MOTOR_SLOW_DATA_SVN_MODIFIED:
+          actuator->state_.firmware_modified_ = received.byte[1];
+          break;
+        default:
+          //TODO: read the other slow data
+          break;
+        }
         break;
+
       case MOTOR_DATA_CAN_ERROR_COUNTERS:
         actuator->state_.tests_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;

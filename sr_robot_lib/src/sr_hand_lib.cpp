@@ -38,14 +38,14 @@ namespace shadow_robot
   const int SrHandLib::nb_motor_data = 13;
   const char* SrHandLib::human_readable_motor_data_types[nb_motor_data] = {"sgl", "sgr", "pwm", "flags", "current",
                                                                            "voltage", "temperature", "can_num_received",
-                                                                           "can_num_transmitted", "svn_revision",
+                                                                           "can_num_transmitted", "slow_data",
                                                                            "f_p", "i_d", "imax_deadband_sign"};
 
   const FROM_MOTOR_DATA_TYPE SrHandLib::motor_data_types[nb_motor_data] = {MOTOR_DATA_SGL, MOTOR_DATA_SGR,
                                                                            MOTOR_DATA_PWM, MOTOR_DATA_FLAGS,
                                                                            MOTOR_DATA_CURRENT, MOTOR_DATA_VOLTAGE,
                                                                            MOTOR_DATA_TEMPERATURE, MOTOR_DATA_CAN_NUM_RECEIVED,
-                                                                           MOTOR_DATA_CAN_NUM_TRANSMITTED, MOTOR_DATA_SVN_REVISION,
+                                                                           MOTOR_DATA_CAN_NUM_TRANSMITTED, MOTOR_DATA_SLOW_MISC,
                                                                            MOTOR_DATA_F_P, MOTOR_DATA_I_D,
                                                                            MOTOR_DATA_IMAX_DEADBAND_SIGN};
 
@@ -146,9 +146,23 @@ namespace shadow_robot
       //initialize the force pid service
       joint->motor->force_pid_service = nh_tilde.advertiseService<sr_robot_msgs::ForceController::Request,sr_robot_msgs::ForceController::Response>( ss.str().c_str(),
                                                                                                                                                      boost::bind( &SrHandLib::force_pid_callback, this, _1, _2, joint->motor->motor_id) );
+
+      ss.str("");
+      ss << "reset_motor_" << joint_names[index];
+      //initialize the force pid service
+      joint->motor->reset_motor_service = nh_tilde.advertiseService<std_srvs::Empty::Request,std_srvs::Empty::Response>( ss.str().c_str(),
+                                                                                                                         boost::bind( &SrHandLib::reset_motor_callback, this, _1, _2, joint->motor->motor_id) );
+
     } //end for joints.
   }
 
+  bool SrHandLib::reset_motor_callback(std_srvs::Empty::Request& request,
+                                       std_srvs::Empty::Response& response,
+                                       int motor_index)
+  {
+    reset_motors_queue.push(motor_index);
+    return true;
+  }
 
   bool SrHandLib::force_pid_callback(sr_robot_msgs::ForceController::Request& request,
                                      sr_robot_msgs::ForceController::Response& response,
