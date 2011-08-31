@@ -149,7 +149,7 @@ namespace shadow_robot
 
       ss.str("");
       ss << "reset_motor_" << joint_names[index];
-      //initialize the force pid service
+      //initialize the reset motor service
       joint->motor->reset_motor_service = nh_tilde.advertiseService<std_srvs::Empty::Request,std_srvs::Empty::Response>( ss.str().c_str(),
                                                                                                                          boost::bind( &SrHandLib::reset_motor_callback, this, _1, _2, joint->motor->motor_id) );
 

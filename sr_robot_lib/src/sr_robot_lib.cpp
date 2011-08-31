@@ -451,19 +451,21 @@ namespace shadow_robot
         actuator->state_.can_msgs_transmitted_ = sr_math_utils::counter_with_overflow(actuator->state_.can_msgs_received_, last_can_msgs_received, static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
         last_can_msgs_transmitted = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
         break;
+
       case MOTOR_DATA_SLOW_MISC:
-        crc_unions::union16 received;
-        received.word = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
-        switch( received.byte[0] )
+        //We received a slow data:
+        // the slow data type is contained in .torque, while
+        // the actual data is in .misc.
+        switch( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque) )
         {
         case MOTOR_SLOW_DATA_SVN_REVISION:
-          actuator->state_.pic_firmware_svn_revision_ = received.byte[1];
+          actuator->state_.pic_firmware_svn_revision_ = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
           break;
         case MOTOR_SLOW_DATA_SVN_SERVER_REVISION:
-          actuator->state_.server_firmware_svn_revision_ = received.byte[1];
+          actuator->state_.server_firmware_svn_revision_ = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
           break;
         case MOTOR_SLOW_DATA_SVN_MODIFIED:
-          actuator->state_.firmware_modified_ = received.byte[1];
+          actuator->state_.firmware_modified_ = static_cast<bool>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
           break;
         default:
           //TODO: read the other slow data
