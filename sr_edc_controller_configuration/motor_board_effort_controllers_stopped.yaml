@@ -1,0 +1,278 @@
+ffj0:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+ffj3:
+  pid:
+    d: 0
+    deadband: 0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0
+    sgrightref: 0
+    sign: 0
+ffj4:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+lfj0:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+lfj3:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+lfj4:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+lfj5:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+mfj0:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+mfj3:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+mfj4:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+rfj0:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+rfj3:
+  pid:
+    d: 70
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 20
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+rfj4:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj1:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj2:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj3:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj4:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj5:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+wrj1:
+  pid:
+    d: 0
+    deadband: 0.0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023.0
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+wrj2:
+  pid:
+    d: 0
+    deadband: 0
+    f: 0
+    i: 0
+    imax: 0
+    max_pwm: 1023
+    p: 0
+    sg_left: 0
+    sg_right: 0
+    sign: 1

@@ -15,7 +15,7 @@ analyzers:
         num_items: 5
       right_finger:
         type: GenericAnalyzer
-        path: Right Finger
+        path: Ring Finger
         timeout: 5.0
         regex: 'SRDMotor .*RFJ[0-9].*'
         num_items: 5
