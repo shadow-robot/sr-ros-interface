@@ -49,7 +49,7 @@ class Python_Robot_Lib(RobotLib):
     def get_current_value(self, joint_name, hand_nb):
         [node_id, position_sensor, target, motor_debug, smart_motor] = self.get_joint_ids( joint_name, hand_nb)
         command = "listvalues -i 1 -d 100 " + position_sensor
-        answer = self.utilitarian.run_command(command)       
+        answer = self.utilitarian.run_command(command)
         #p = subprocess.Popen(command.split(),stdout=subprocess.PIPE)
         #p.wait()
         #answer = p.stdout.read()
@@ -131,7 +131,7 @@ class Python_Robot_Lib(RobotLib):
 
     ### Return firmware ids of the joint
     #
-    def get_joint_ids(self, joint_name, hand_nb):        
+    def get_joint_ids(self, joint_name, hand_nb):
         # First finger
         if (joint_name == "FFJ1"):
             motor = 'ff0'
@@ -160,7 +160,7 @@ class Python_Robot_Lib(RobotLib):
             motor = 'mf4'
             node_id = 'node ' + hand_nb + '01' + '0310'
 
-        # Right Finger:
+        # Ring Finger:
         elif ( joint_name == 'RFJ1'):
             motor = 'rf0'
             node_id = 'node ' + hand_nb + '04' + '0310'

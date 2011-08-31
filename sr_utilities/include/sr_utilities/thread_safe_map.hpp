@@ -44,7 +44,7 @@ namespace threadsafe
     Map()
     {
       mutex_ = boost::shared_ptr<boost::shared_mutex>(new boost::shared_mutex());
-//      map_ = boost::shared_ptr<InternalMap>(new InternalMap());
+      map_ = boost::shared_ptr<InternalMap>(new InternalMap());
     };
     ~Map() {};
 
@@ -52,7 +52,7 @@ namespace threadsafe
     {
       boost::shared_lock< boost::shared_mutex > lock( *(mutex_.get()) );
 
-      return map_.find(first)->second;
+      return map_->find(first)->second;
     }
 
     bool insert(const std::string& first, const T& value)
@@ -61,7 +61,7 @@ namespace threadsafe
         return false;
 
       keys_.push_back(first);
-      map_.insert(std::pair<std::string, T>(first, value));
+      map_->insert(std::pair<std::string, T>(first, value));
       mutex_->unlock();
       return true;
     }
@@ -87,7 +87,7 @@ namespace threadsafe
 
     typedef std::map<std::string , T> InternalMap;
 
-    InternalMap map_;
+    boost::shared_ptr<InternalMap> map_;
 
     boost::shared_ptr<boost::shared_mutex> mutex_;
     std::vector<std::string> keys_;

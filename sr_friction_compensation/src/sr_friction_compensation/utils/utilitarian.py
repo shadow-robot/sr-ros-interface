@@ -155,7 +155,7 @@ class Utilitarian(object):
             min_osc_angle = -15;     max_osc_angle = 15;
 	    min_angle = -25;    max_angle = 25;
 
-      # Right Finger:
+      # Ring Finger:
 	elif ( joint_name == 'RFJ1'):
             min_osc_angle = 5;       max_osc_angle = 85;
 	    min_angle = 0;      max_angle = 85;
