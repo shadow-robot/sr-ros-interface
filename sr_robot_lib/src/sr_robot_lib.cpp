@@ -237,8 +237,6 @@ namespace shadow_robot
           short motor_id = reset_motors_queue.front();
           reset_motors_queue.pop();
 
-          ROS_ERROR_STREAM("sending reset to motor: "<< motor_id);
-
           // we send the MOTOR_RESET_SYSTEM_KEY
           // and the motor id (on the bus)
           crc_unions::union16 to_send;
