@@ -242,10 +242,10 @@ namespace shadow_robot
           // we send the MOTOR_RESET_SYSTEM_KEY
           // and the motor id (on the bus)
           crc_unions::union16 to_send;
-          to_send.byte[0] = MOTOR_SYSTEM_RESET_KEY >> 8;
+          to_send.byte[1] = MOTOR_SYSTEM_RESET_KEY >> 8;
           if( motor_id > 9 )
             motor_id -= 10;
-          to_send.byte[1] = motor_id;
+          to_send.byte[0] = motor_id;
 
           command->motor_data[motor_id] = to_send.word;
         }
