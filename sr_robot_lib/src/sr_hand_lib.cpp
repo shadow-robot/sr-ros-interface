@@ -50,7 +50,6 @@ namespace shadow_robot
                                                                            MOTOR_DATA_CAN_ERROR_COUNTERS,
                                                                            MOTOR_DATA_PTERM, MOTOR_DATA_ITERM,
                                                                            MOTOR_DATA_DTERM};
-
   const unsigned int SrRobotLib::nb_tactiles = 5;
 
   SrHandLib::SrHandLib(pr2_hardware_interface::HardwareInterface *hw) :
@@ -101,7 +100,6 @@ namespace shadow_robot
     {
       tactiles_vector.push_back( new TACTILE_SENSOR_STATUS() );
     }
-
 #ifdef DEBUG_PUBLISHER
     //advertise the debug service, used to set which data we want to publish on the debug topics
     debug_service = nh_tilde.advertiseService( "set_debug_publishers", &SrHandLib::set_debug_data_to_publish, this);

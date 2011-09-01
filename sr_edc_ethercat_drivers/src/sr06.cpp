@@ -44,6 +44,8 @@
 #include <pthread.h>
 #include <bfd.h>
 
+#include <sr_utilities/sr_math_utils.hpp>
+
 using namespace std;
 
 #include <sr_external_dependencies/types_for_external.h>
