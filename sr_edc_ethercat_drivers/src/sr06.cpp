@@ -293,7 +293,7 @@ int SR06::initialize(pr2_hardware_interface::HardwareInterface *hw, bool allow_u
   ROS_INFO("ETHERCAT_CAN_BRIDGE_DATA_SIZE  = %4d bytes", static_cast<int>(ETHERCAT_CAN_BRIDGE_DATA_SIZE) );
 
   // Tactile sensor real time publisher
-  tactile_publisher = boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray> >( new realtime_tools::RealtimePublisher<sr_robot_msgs::TactileArray>(nodehandle_ , "tactile", 4));
+  tactile_publisher = boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::ShadowPST> >( new realtime_tools::RealtimePublisher<sr_robot_msgs::ShadowPST>(nodehandle_ , "tactile", 4));
 
 #ifdef DEBUG_PUBLISHER
   // Debug real time publisher: publishes the raw ethercat data
@@ -926,6 +926,10 @@ void SR06::multiDiagnostics(vector<diagnostic_msgs::DiagnosticStatus> &vec, unsi
           d.addf("Number of CAN messages received", "%lld", state->can_msgs_received_);
           d.addf("Number of CAN messages transmitted", "%lld", state->can_msgs_transmitted_);
 
+          d.addf("Force control Pterm", "%d", state->force_control_pterm);
+          d.addf("Force control Iterm", "%d", state->force_control_iterm);
+          d.addf("Force control Dterm", "%d", state->force_control_dterm);
+
           d.addf("Force control F", "%d", state->force_control_f_);
           d.addf("Force control P", "%d", state->force_control_p_);
           d.addf("Force control I", "%d", state->force_control_i_);
@@ -1174,22 +1178,28 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
   //Now publish the tactile sensor data:
   if(tactile_publisher->trylock())
   {
-    tactile_publisher->msg_.header.stamp = ros::Time::now();
-
-    std::vector<sr_robot_msgs::Tactile> tactiles(5);
+    //for the time being, we only have PSTs tactile sensors
+    sr_robot_msgs::ShadowPST tactiles;
+    tactiles.header.stamp = ros::Time::now();
     for(unsigned int id_tact = 0; id_tact < sr_hand_lib->nb_tactiles; ++id_tact)
     {
-      sr_robot_msgs::Tactile tmp_tact;
-      for( unsigned int id_tact_data = 0; id_tact_data < 8; ++id_tact_data)
+      if( sr_math_utils::is_bit_mask_index_true(sr_hand_lib->tactile_data_valid, id_tact) )
       {
-        std_msgs::Int16 data;
-        data.data = static_cast<int>( sr_hand_lib->tactiles_vector[id_tact].data[id_tact_data] );
-        tmp_tact.data.push_back( data );
+        TACTILE_SENSOR_SHADOW_PST_DATA_CONTENTS data;
+        data.pressure = sr_hand_lib->tactiles_vector[id_tact].data[0];
+        data.temperature = sr_hand_lib->tactiles_vector[id_tact].data[1];
+
+        tactiles.pressure.push_back( static_cast<int16u>(data.pressure) );
+        tactiles.temperature.push_back( static_cast<int16u>(data.temperature) );
       }
-      tactiles[id_tact] = tmp_tact;
+      else
+      {
+        tactiles.pressure.push_back( -1 );
+        tactiles.temperature.push_back( -1 );
+      }
     }
 
-    tactile_publisher->msg_.data = tactiles;
+    tactile_publisher->msg_ = tactiles;
     tactile_publisher->unlockAndPublish();
   }
 

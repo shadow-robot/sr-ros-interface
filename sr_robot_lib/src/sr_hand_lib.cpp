@@ -35,19 +35,21 @@
 
 namespace shadow_robot
 {
-  const int SrHandLib::nb_motor_data = 13;
+  const int SrHandLib::nb_motor_data = 14;
   const char* SrHandLib::human_readable_motor_data_types[nb_motor_data] = {"sgl", "sgr", "pwm", "flags", "current",
                                                                            "voltage", "temperature", "can_num_received",
                                                                            "can_num_transmitted", "slow_data",
-                                                                           "f_p", "i_d", "imax_deadband_sign"};
+                                                                           "can_error_counters",
+                                                                           "pterm", "iterm", "dterm"};
 
   const FROM_MOTOR_DATA_TYPE SrHandLib::motor_data_types[nb_motor_data] = {MOTOR_DATA_SGL, MOTOR_DATA_SGR,
                                                                            MOTOR_DATA_PWM, MOTOR_DATA_FLAGS,
                                                                            MOTOR_DATA_CURRENT, MOTOR_DATA_VOLTAGE,
                                                                            MOTOR_DATA_TEMPERATURE, MOTOR_DATA_CAN_NUM_RECEIVED,
                                                                            MOTOR_DATA_CAN_NUM_TRANSMITTED, MOTOR_DATA_SLOW_MISC,
-                                                                           MOTOR_DATA_F_P, MOTOR_DATA_I_D,
-                                                                           MOTOR_DATA_IMAX_DEADBAND_SIGN};
+                                                                           MOTOR_DATA_CAN_ERROR_COUNTERS,
+                                                                           MOTOR_DATA_PTERM, MOTOR_DATA_ITERM,
+                                                                           MOTOR_DATA_DTERM};
 
   const unsigned int SrRobotLib::nb_tactiles = 5;
 
@@ -97,7 +99,7 @@ namespace shadow_robot
     //initialize the vector of tactiles
     for(unsigned int i=0; i < nb_tactiles; ++i)
     {
-      tactiles_vector.push_back( new TACTILE_SENSOR_OUT() );
+      tactiles_vector.push_back( new TACTILE_SENSOR_STATUS() );
     }
 
 #ifdef DEBUG_PUBLISHER
@@ -363,6 +365,8 @@ namespace shadow_robot
       joint_calibration.insert(joint_name, boost::shared_ptr<shadow_robot::JointCalibration>(new shadow_robot::JointCalibration(calib_table_tmp)) );
     }
 
+    ROS_ERROR("Finished reading joint calib");
+
     return joint_calibration;
   } //end read_joint_calibration
 
@@ -396,6 +400,9 @@ namespace shadow_robot
     for(int i=0; i<nb_motor_data; ++i)
     {
       ConfPair tmp;
+
+      ROS_ERROR_STREAM(" read update rate config [" << i<< "] = "  << human_readable_motor_data_types[i]);
+
       tmp.first = base_param + human_readable_motor_data_types[i];
       tmp.second = motor_data_types[i];
       config.push_back(tmp);

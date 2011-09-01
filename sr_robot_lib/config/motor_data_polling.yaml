@@ -9,7 +9,8 @@ motor_data_update_rate: {
   can_num_received: -1,
   can_num_transmitted: -1,
   slow_data: 1.,
-  f_p: 1.,
-  i_d: 1.,
-  imax_deadband_sign: 1.
+  can_error_counters: -1,
+  pterm: -1.,
+  iterm: -1.,
+  dterm: -1.
   }

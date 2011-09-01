@@ -160,6 +160,7 @@ namespace shadow_robot
     } //end for joint
 
     //then we read the tactile sensors information
+    tactile_data_valid = static_cast<int16u>(status_data->tactile_data_valid);
     for( unsigned int id_tactile = 0; id_tactile < nb_tactiles; ++id_tactile)
     {
       tactiles_vector[id_tactile] = status_data->tactile[id_tactile];
@@ -465,34 +466,67 @@ namespace shadow_robot
         case MOTOR_SLOW_DATA_SVN_MODIFIED:
           actuator->state_.firmware_modified_ = static_cast<bool>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
           break;
+        case MOTOR_SLOW_DATA_SERIAL_NUMBER_LOW:
+          actuator->state_.serial_number_low = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_SERIAL_NUMBER_HIGH:
+          actuator->state_.serial_number_high = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_GEAR_RATIO:
+          actuator->state_.motor_gear_ratio = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_ASSEMBLY_DATE_YYYY:
+          actuator->state_.assembly_data_year = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_ASSEMBLY_DATE_MMDD:
+          actuator->state_.assembly_data_month = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc)/100 );
+          actuator->state_.assembly_data_day = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) ) - actuator->state_.assembly_data_month;
+          break;
+        case MOTOR_SLOW_DATA_CONTROLLER_F:
+          actuator->state_.force_control_f_ = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_CONTROLLER_P:
+          actuator->state_.force_control_p_ = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_CONTROLLER_I:
+          actuator->state_.force_control_i_ = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_CONTROLLER_D:
+          actuator->state_.force_control_d_ = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_CONTROLLER_IMAX:
+          actuator->state_.force_control_imax_ = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+        case MOTOR_SLOW_DATA_CONTROLLER_DEADSIGN:
+          tmp_value.word = status_data->motor_data_packet[index_motor_in_msg].misc;
+          actuator->state_.force_control_deadband_ = static_cast<int>(tmp_value.byte[0]);
+          actuator->state_.force_control_sign_ = static_cast<int>(tmp_value.byte[1]);
+          break;
+        case MOTOR_SLOW_DATA_CONTROLLER_FREQUENCY:
+          actuator->state_.force_control_frequency_ = static_cast<unsigned int>( static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc) );
+          break;
+
         default:
-          //TODO: read the other slow data
           break;
         }
         break;
 
       case MOTOR_DATA_CAN_ERROR_COUNTERS:
-        actuator->state_.tests_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
+        actuator->state_.can_error_counters = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
-      case MOTOR_DATA_F_P:
+      case MOTOR_DATA_PTERM:
 	read_torque = false;
-        actuator->state_.force_control_f_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque);
-        actuator->state_.force_control_p_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
+        actuator->state_.force_control_pterm = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
-      case MOTOR_DATA_I_D:
+      case MOTOR_DATA_ITERM:
 	read_torque = false;
-        actuator->state_.force_control_i_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque);
-        actuator->state_.force_control_d_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
+        actuator->state_.force_control_iterm = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
         break;
-      case MOTOR_DATA_IMAX_DEADBAND_SIGN:
+      case MOTOR_DATA_DTERM:
 	read_torque = false;
-        actuator->state_.force_control_imax_ = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].torque);
+        actuator->state_.force_control_dterm = static_cast<int16u>(status_data->motor_data_packet[index_motor_in_msg].misc);
+        break;
 
-        tmp_value.word = status_data->motor_data_packet[index_motor_in_msg].misc;
-        actuator->state_.force_control_deadband_ = static_cast<int>(tmp_value.byte[0]);
-        //how do I read the sign?
-        actuator->state_.force_control_sign_ = static_cast<int>(tmp_value.byte[1]);
-        break;
       default:
         break;
       }

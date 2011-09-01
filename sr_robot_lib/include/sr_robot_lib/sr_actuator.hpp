@@ -56,14 +56,22 @@ namespace sr_actuator
       pic_firmware_svn_revision_(0),
       server_firmware_svn_revision_(0),
       firmware_modified_(0),
+      serial_number_low(0),
+      serial_number_high(0),
+      motor_gear_ratio(0),
+      assembly_data_year(0),
+      assembly_data_month(0),
+      assembly_data_day(0),
       tests_(0),
+      can_error_counters(0),
       force_control_f_(0),
       force_control_p_(0),
       force_control_i_(0),
       force_control_d_(0),
       force_control_imax_(0),
       force_control_deadband_(0),
-      force_control_sign_(0)
+      force_control_sign_(0),
+      force_control_frequency_(0)
     {}
 
     /**
@@ -126,7 +134,16 @@ namespace sr_actuator
     unsigned int server_firmware_svn_revision_;
     bool firmware_modified_;
 
+    unsigned int serial_number_low;
+    unsigned int serial_number_high;
+
+    unsigned int motor_gear_ratio;
+    unsigned int assembly_data_year;
+    unsigned int assembly_data_month;
+    unsigned int assembly_data_day;
+
     int tests_;
+    unsigned int can_error_counters;
 
     int force_control_f_;
     int force_control_p_;
@@ -135,6 +152,11 @@ namespace sr_actuator
     int force_control_imax_;
     int force_control_deadband_;
     int force_control_sign_;
+    int force_control_frequency_;
+
+    int force_control_pterm;
+    int force_control_iterm;
+    int force_control_dterm;
   }; //end class SrActuatorState
 
 

@@ -173,7 +173,9 @@ namespace shadow_robot
     shadow_joints::CalibrationMap calibration_map;
 
     /// The vector containing all the tactile sensor information.
-    boost::ptr_vector<TACTILE_SENSOR_OUT> tactiles_vector;
+    boost::ptr_vector<TACTILE_SENSOR_STATUS> tactiles_vector;
+    /// bitmask for the tactile sensors: Bit 0: FF, Bit 4: TH
+    int tactile_data_valid;
     /// Number of tactile sensors (TODO: should probably be defined in the protocol)
     static const unsigned int nb_tactiles;
 
