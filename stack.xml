@@ -1,9 +1,20 @@
 <stack>
-  <description brief="sr_hand_palm_edc">sr_hand_palm_edc</description>
-  <author>Maintained by Yann Sionneau</author>
-  <license>BSD</license>  
+  <description brief="shadow_robot_ethercat">
+    This stack contains the drivers and the controllers for Shadow Robot's EtherCAT Hand.
+  </description>
+  <author>Maintained by Ugo Cupcic</author>
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/sr_hand_palm_edc</url>
-  <depend stack="ros" />
+  <url>http://ros.org/wiki/shadow_robot_ethercat</url>
+  <depend stack="common" /> <!-- xacro, pluginlib -->
+  <depend stack="common_msgs" /> <!-- diagnostic_msgs -->
+  <depend stack="diagnostics" /> <!-- self_test, diagnostic_updater, diagnostic_aggregator -->
+  <depend stack="geometry" /> <!-- angles -->
+  <depend stack="pr2_controllers" /> <!-- pr2_mechanism_controllers, control_toolbox, robot_mechanism_controllers -->
+  <depend stack="pr2_mechanism" /> <!-- pr2_controller_manager, pr2_mechanism_model, realtime_tools, pr2_hardware_interface, pr2_controller_interface -->
+  <depend stack="robot_model" /> <!-- convex_decomposition, ivcon, urdf -->
+  <depend stack="ros" /> <!-- roslib -->
+  <depend stack="ros_comm" /> <!-- rosconsole, std_srvs, roscpp, xmlrpcpp, std_msgs, rospy -->
+  <depend stack="shadow_robot" /> <!-- sr_robot_msgs, sr_utilities -->
 
 </stack>

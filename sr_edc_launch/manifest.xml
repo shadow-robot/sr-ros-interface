@@ -19,12 +19,7 @@
   <depend package="convex_decomposition"/>
   <depend package="ivcon"/>
 
-  <depend package="srh_controller_configuration"/>
-  <depend package="srh_calibration_controllers"/>
-
   <depend package="robot_mechanism_controllers"/>
-
-
 </package>
 
 
