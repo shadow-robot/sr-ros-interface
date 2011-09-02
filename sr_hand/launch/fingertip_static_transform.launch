@@ -1,0 +1,7 @@
+<launch>
+ <node pkg="tf" type="static_transform_publisher" name="fftip_transform_pub"
+    args="0.0 0.0 0.025 0.0 0.0 0.0 /ffdistal /fftip 200" />
+
+ <node pkg="sr_utilities" type="fingertip_pos_publisher.py" name="fftip_pos_pub" />
+
+</launch>

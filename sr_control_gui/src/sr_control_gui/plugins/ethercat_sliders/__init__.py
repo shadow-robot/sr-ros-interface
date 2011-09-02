@@ -112,7 +112,7 @@ class EtherCATJointSlider(LightJointSlider):
     def sendupdate(self, dict):
         if( self.controller_type == "position" ):
             for item in dict.items():
-                self.publishers[item[0]].publish(Float64( math.to_rad( item[1] ) ))
+                self.publishers[item[0]].publish(Float64( math.radians( item[1] ) ))
         else:
             for item in dict.items():
                 self.publishers[item[0]].publish(Float64( item[1] ))
