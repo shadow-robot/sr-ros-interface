@@ -433,7 +433,7 @@ namespace shadow_robot
       if( request.motor_data_type > 0 )
       {
         if( (request.motor_data_type < MOTOR_DATA_SGL) ||
-            (request.motor_data_type > MOTOR_DATA_IMAX_DEADBAND_SIGN) )
+            (request.motor_data_type > MOTOR_DATA_DTERM) )
         {
           response.success = false;
           return false;

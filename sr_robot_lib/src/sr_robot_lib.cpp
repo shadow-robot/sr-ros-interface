@@ -161,6 +161,7 @@ namespace shadow_robot
 
     //then we read the tactile sensors information
     tactile_data_valid = static_cast<int16u>(status_data->tactile_data_valid);
+    //TODO: use memcopy instead?
     for( unsigned int id_tactile = 0; id_tactile < nb_tactiles; ++id_tactile)
     {
       for( unsigned int id_data = 0; id_data < 8; ++id_data)
