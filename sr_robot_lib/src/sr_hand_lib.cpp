@@ -363,8 +363,6 @@ namespace shadow_robot
       joint_calibration.insert(joint_name, boost::shared_ptr<shadow_robot::JointCalibration>(new shadow_robot::JointCalibration(calib_table_tmp)) );
     }
 
-    ROS_ERROR("Finished reading joint calib");
-
     return joint_calibration;
   } //end read_joint_calibration
 
@@ -399,7 +397,7 @@ namespace shadow_robot
     {
       ConfPair tmp;
 
-      ROS_ERROR_STREAM(" read update rate config [" << i<< "] = "  << human_readable_motor_data_types[i]);
+      ROS_DEBUG_STREAM(" read update rate config [" << i<< "] = "  << human_readable_motor_data_types[i]);
 
       tmp.first = base_param + human_readable_motor_data_types[i];
       tmp.second = motor_data_types[i];

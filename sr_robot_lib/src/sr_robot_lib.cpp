@@ -163,7 +163,6 @@ namespace shadow_robot
     tactile_data_valid = static_cast<int16u>(status_data->tactile_data_valid);
     for( unsigned int id_tactile = 0; id_tactile < nb_tactiles; ++id_tactile)
     {
-      //TODO: not nice
       for( unsigned int id_data = 0; id_data < 8; ++id_data)
       {
         tactiles_vector[id_tactile].data[id_data] = status_data->tactile[id_tactile].data[id_data];
