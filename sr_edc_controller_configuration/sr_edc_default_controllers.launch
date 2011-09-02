@@ -1,5 +1,6 @@
 <launch>
-  <rosparam command="load" file="$(find sr_edc_controller_configuration)/motor_board_effort_controllers.yaml" />
+<!-- <rosparam command="load" file="$(find sr_edc_controller_configuration)/motor_board_effort_controllers_stopped.yaml" /> -->
+ <rosparam command="load" file="$(find sr_edc_controller_configuration)/motor_board_effort_controllers.yaml" />
 
 <!--  <include file="$(find sr_edc_controller_configuration)/sr_edc_velocity_controllers.launch" /> -->
 <!-- <include file="$(find sr_edc_controller_configuration)/sr_edc_position_controllers.launch" /> -->
