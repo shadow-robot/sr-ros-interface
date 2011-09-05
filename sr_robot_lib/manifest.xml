@@ -1,10 +1,12 @@
 <package>
   <description brief="sr_robot_lib">
 
-     sr_robot_lib
+     sr_robot_lib contains the robot library used in the sr_edc_ethercat_drivers. The
+     library is used to store the incoming etherCAT messages in an easy to access format,
+     and prepare the messages to be send through etherCAT.
 
   </description>
-  <author>Ugo Cupcic</author>
+  <author>Ugo Cupcic / ugo@shadowrobot.com , contact@shadowrobot.com</author>
   <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_robot_lib</url>
