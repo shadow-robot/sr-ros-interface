@@ -1,6 +1,7 @@
 [Core]
 Name = circle_scope
 Module = CircleScope
+Category = etherCAT_hand
 
 [Documentation]
 Author = Ugo Cupcic

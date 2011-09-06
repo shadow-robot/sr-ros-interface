@@ -39,7 +39,7 @@ class BaseMovement(object):
         self.msg_to_send_j4 = Float64()
         self.msg_to_send_j4.data = 0.0
 
-        self.sleep_time = 0.0001
+        self.sleep_time = 0.01
 
         topic = "/sh_"+ finger_name.lower() +"j3_position_controller/command"
         self.publisher_j3 = rospy.Publisher(topic, Float64)
@@ -69,8 +69,8 @@ class EllipsoidMovement(BaseMovement):
         self.amplitude_j4 = amplitude_j4
 
     def update(self, mvt_percentage):
-        j3 = self.amplitude_j3 * math.sin(2.0*3.14159 * mvt_percentage/100.) 
-        j4 = 2.0*self.amplitude_j4 * math.cos(2.0*3.14159 * mvt_percentage/100.) 
+        j3 = self.amplitude_j3 * math.sin(2.0*3.14159 * mvt_percentage/100.)
+        j4 = 2.0*self.amplitude_j4 * math.cos(2.0*3.14159 * mvt_percentage/100.)
         self.msg_to_send_j3.data = j3
         self.msg_to_send_j4.data = j4
 
@@ -82,13 +82,13 @@ class Movement(threading.Thread):
         self.finger_name = finger_name
         self.iterations = 10000
         self.movements = []
-        
+
         for i in range(1, 5):
             self.movements.append( EllipsoidMovement(finger_name, amplitude_j3=(float(i)/10.0)*0.05, amplitude_j4=(float(i)/10.0)*0.05) )
         for i in range(0, 4):
             self.movements.append( EllipsoidMovement(finger_name, amplitude_j3=((5-float(i))/10.0)*0.05, amplitude_j4=((5.-float(i))/10.0)*0.05) )
 
-        
+
     def run(self):
         while(True):
             for movement in self.movements:
