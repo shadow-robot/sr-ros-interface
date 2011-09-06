@@ -64,7 +64,7 @@
       <dynamics damping="50.5"/>
     </joint>
 
-    <transmission type="pr2_mechanism_model/SimpleTransmission" name="lfknuckle_transmission">
+    <transmission type="sr_mechanism_model/SimpleTransmission" name="lfknuckle_transmission">
       <actuator name="LFJ4" />
       <joint name="LFJ4" />
       <mechanicalReduction>1</mechanicalReduction>
