@@ -102,9 +102,21 @@ class JointPidSetter(QtGui.QFrame):
         self.joint_name = joint_name
 
         try:
-            self.joint_index_in_joint_state = ['WRJ2', 'WRJ1', 'FFJ4', 'FFJ3', 'FFJ1', 'FFJ2', 'MFJ4', 'MFJ3', 'MFJ1', 'MFJ2', 'RFJ4', 'RFJ3', 'RFJ1', 'RFJ2', 'LFJ5', 'LFJ4', 'LFJ3', 'LFJ1', 'LFJ2', 'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1'].index(joint_name.upper())
+            self.joint_index_in_joint_state = ['WRJ2', 'WRJ1', 'FFJ4', 'FFJ3', 'FFJ1', 'FFJ2', 'FFJ1', 'MFJ4', 'MFJ3', 'MFJ1', 'MFJ2', 'MFJ1', 'RFJ4', 'RFJ3', 'RFJ1', 'RFJ2', 'RFJ1', 'LFJ5', 'LFJ4', 'LFJ3', 'LFJ1', 'LFJ2', 'LFJ1', 'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1'].index(joint_name.upper())
         except:
             self.joint_index_in_joint_state = None
+
+        # the joint 0s are published on a different topic: /joint_0s/joint_states
+        # we set their indexes to -(index in the topic + 1)
+        if joint_name.upper() == "FFJ0":
+            self.joint_index_in_joint_state = -1
+        if joint_name.upper() == "MFJ0":
+            self.joint_index_in_joint_state = -2
+        if joint_name.upper() == "RFJ0":
+            self.joint_index_in_joint_state = -3
+        if joint_name.upper() == "LFJ0":
+            self.joint_index_in_joint_state = -4
+
 
         self.parent = parent
 
@@ -176,16 +188,32 @@ class JointPidSetter(QtGui.QFrame):
 
     def launch_rxplot(self):
         rxplot_str = "rxplot -b 10 "
-        if self.controller_type == "Motor Force":
-            rxplot_str += "/joint_states/effort["+ str(self.joint_index_in_joint_state) +"]"
-        elif self.controller_type == "Position":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_position_controller/command/data,/joint_states/position["+ str(self.joint_index_in_joint_state) +"]"
-        elif self.controller_type == "Velocity":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_velocity_controller/command/data,/joint_states/velocity["+ str(self.joint_index_in_joint_state) +"]"
-        elif self.controller_type == "Mixed Position/Velocity":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/command/data,/joint_states/position["+ str(self.joint_index_in_joint_state) +"]"
-        elif self.controller_type == "Effort":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_effort_controller/command/data,/joint_states/effort["+ str(self.joint_index_in_joint_state) +"]"
+
+        # the joint 0s are published on a different topic: /joint_0s/joint_states
+        # we set their indexes to -(index in the topic + 1)
+        if self.joint_index_in_joint_state > 0:
+            if self.controller_type == "Motor Force":
+                rxplot_str += "/joint_states/effort["+ str(self.joint_index_in_joint_state) +"]"
+            elif self.controller_type == "Position":
+                rxplot_str += "sh_"+self.joint_name.lower()+"_position_controller/command/data,/joint_states/position["+ str(self.joint_index_in_joint_state) +"]"
+            elif self.controller_type == "Velocity":
+                rxplot_str += "sh_"+self.joint_name.lower()+"_velocity_controller/command/data,/joint_states/velocity["+ str(self.joint_index_in_joint_state) +"]"
+            elif self.controller_type == "Mixed Position/Velocity":
+                rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/command/data,/joint_states/position["+ str(self.joint_index_in_joint_state) +"]"
+            elif self.controller_type == "Effort":
+                rxplot_str += "sh_"+self.joint_name.lower()+"_effort_controller/command/data,/joint_states/effort["+ str(self.joint_index_in_joint_state) +"]"
+        else:
+            if self.controller_type == "Motor Force":
+                rxplot_str += "/joint_0s/joint_states/effort["+ str(- (self.joint_index_in_joint_state + 1) ) +"]"
+            elif self.controller_type == "Position":
+                rxplot_str += "sh_"+self.joint_name.lower()+"_position_controller/command/data,/joint_0s/joint_states/position["+ str(- (self.joint_index_in_joint_state + 1)) +"]"
+            elif self.controller_type == "Velocity":
+                rxplot_str += "sh_"+self.joint_name.lower()+"_velocity_controller/command/data,/joint_0s/joint_states/velocity["+ str(- (self.joint_index_in_joint_state + 1)) +"]"
+            elif self.controller_type == "Mixed Position/Velocity":
+                rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/command/data,/joint_0s/joint_states/position["+ str(- (self.joint_index_in_joint_state + 1)) +"]"
+            elif self.controller_type == "Effort":
+                rxplot_str += "sh_"+self.joint_name.lower()+"_effort_controller/command/data,/joint_0s/joint_states/effort["+ str(- (self.joint_index_in_joint_state + 1)) +"]"
+
 
         subprocess.Popen(rxplot_str.split())
 
