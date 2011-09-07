@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <string>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <sr_utilities/sr_math_utils.hpp>
 
@@ -151,18 +152,92 @@ namespace shadow_robot
       ss << "reset_motor_" << joint_names[index];
       //initialize the reset motor service
       joint->motor->reset_motor_service = nh_tilde.advertiseService<std_srvs::Empty::Request,std_srvs::Empty::Response>( ss.str().c_str(),
-                                                                                                                         boost::bind( &SrHandLib::reset_motor_callback, this, _1, _2, joint->motor->motor_id) );
+                                                                                                                         boost::bind( &SrHandLib::reset_motor_callback, this, _1, _2, std::pair<int,std::string>(joint->motor->motor_id, joint->joint_name) ) );
 
     } //end for joints.
   }
 
   bool SrHandLib::reset_motor_callback(std_srvs::Empty::Request& request,
                                        std_srvs::Empty::Response& response,
-                                       int motor_index)
+                                       std::pair<int,std::string> joint)
   {
-    reset_motors_queue.push(motor_index);
+    reset_motors_queue.push(joint.first);
+
+    //wait for the reset to be sent
+    usleep(300000);
+
+    //then reset the pids
+    resend_pids(joint.second);
+
     return true;
   }
+
+
+  void SrHandLib::resend_pids(std::string joint_name)
+  {
+    //read the parameters from the parameter server and set the pid
+    // values.
+    std::stringstream full_param;
+
+    int f, p, i, d, imax, max_pwm, sg_left, sg_right, deadband, sign;
+    std::string act_name = boost::to_lower_copy(joint_name);
+
+    full_param << "/" << act_name << "/pid/f";
+    nodehandle_.param<int>(full_param.str(), f, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/p";
+    nodehandle_.param<int>(full_param.str(), p, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/i";
+    nodehandle_.param<int>(full_param.str(), i, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/d";
+    nodehandle_.param<int>(full_param.str(), d, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/imax";
+    nodehandle_.param<int>(full_param.str(), imax, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/max_pwm";
+    nodehandle_.param<int>(full_param.str(), max_pwm, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/sg_left";
+    nodehandle_.param<int>(full_param.str(), sg_left, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/sg_right";
+    nodehandle_.param<int>(full_param.str(), sg_right, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/deadband";
+    nodehandle_.param<int>(full_param.str(), deadband, 0);
+    full_param.str("");
+    full_param << "/" << act_name << "/pid/sign";
+    nodehandle_.param<int>(full_param.str(), sign, 0);
+    full_param.str("");
+
+    std::string act_name_upper = boost::to_upper_copy( act_name );
+    std::string service_name = "/realtime_loop/change_force_PID_" + act_name_upper;
+    if( ros::service::waitForService (service_name, ros::Duration(2.0)) )
+    {
+      sr_robot_msgs::ForceController::Request pid_request;
+      pid_request.maxpwm = max_pwm;
+      pid_request.sgleftref = sg_left;
+      pid_request.sgrightref = sg_right;
+      pid_request.f = f;
+      pid_request.p = p;
+      pid_request.i = i;
+      pid_request.d = d;
+      pid_request.imax = imax;
+      pid_request.deadband = deadband;
+      pid_request.sign = sign;
+      sr_robot_msgs::ForceController::Response pid_response;
+      if( ros::service::call(service_name, pid_request, pid_response) )
+      {
+        return;
+      }
+    }
+
+    ROS_WARN_STREAM( "Didn't load the force pid settings for the motor in joint " << act_name );
+  }
+
 
   bool SrHandLib::force_pid_callback(sr_robot_msgs::ForceController::Request& request,
                                      sr_robot_msgs::ForceController::Response& response,

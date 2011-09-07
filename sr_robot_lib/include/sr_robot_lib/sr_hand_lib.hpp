@@ -63,13 +63,14 @@ namespace shadow_robot
      *
      * @param request empty
      * @param response empty
-     * @param motor_index The index of the motor for the given joint.
+     * @param joint A pair containing the index of the motor for the given
+     *              joint followed by the name of the joint we're resetting
      *
      * @return true if success
      */
     bool reset_motor_callback(std_srvs::Empty::Request& request,
                               std_srvs::Empty::Response& response,
-                              int motor_index);
+                              std::pair<int,std::string> joint);
 
 #ifdef DEBUG_PUBLISHER
     /**
@@ -142,6 +143,14 @@ namespace shadow_robot
 
     /// a service server for reconfiguring the debug data we want to publish
     ros::ServiceServer debug_service;
+
+    /**
+     * Read the motor board force pids from the parameter servers,
+     * called when resetting the motor.
+     *
+     * @param joint_name the joint we want to reset
+     */
+    void resend_pids(std::string joint_name);
   };
 
 }
