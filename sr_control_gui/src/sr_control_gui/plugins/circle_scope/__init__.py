@@ -394,6 +394,8 @@ class CircleScope(OpenGLGenericPlugin):
 
         self.add_topic_subscriber()
         self.control_frame.setLayout(self.control_layout)
+        Qt.QTimer.singleShot(0, self.window.adjustSize)
+
 
     def add_topic_subscriber(self):
         index = len(self.subscribe_topic_frames)
@@ -419,8 +421,8 @@ class CircleScope(OpenGLGenericPlugin):
 
         #this is a guestimate of the max received value
         # from which we'll compute the scaling factor
-        max_x = 0.2
-        max_y = 0.2
+        max_x = 1.5
+        max_y = 1.5
         scaling_factor_x = offset_x / max_x
         scaling_factor_y = offset_y / max_y
         for sub_frame in self.subscribe_topic_frames:

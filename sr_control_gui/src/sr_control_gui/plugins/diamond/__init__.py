@@ -27,7 +27,7 @@ from functools import partial
 from config import Config
 from generic_plugin import GenericPlugin
 from std_msgs.msg import Float64
-
+from sensor_msgs.msg import JointState
 
 class BaseMovement(object):
     def __init__(self, finger_name):
@@ -39,7 +39,7 @@ class BaseMovement(object):
         self.msg_to_send_j4 = Float64()
         self.msg_to_send_j4.data = 0.0
 
-        self.sleep_time = 0.01
+        self.sleep_time = 0.001
 
         topic = "/sh_"+ finger_name.lower() +"j3_position_controller/command"
         self.publisher_j3 = rospy.Publisher(topic, Float64)
@@ -48,10 +48,11 @@ class BaseMovement(object):
 
 
     def publish(self, mvt_percentage):
-        self.update(mvt_percentage)
+        result = self.update(mvt_percentage)
         self.publisher_j4.publish(self.msg_to_send_j3)
         self.publisher_j3.publish(self.msg_to_send_j4)
         time.sleep(self.sleep_time)
+        return result
 
     def update(self, mvt_percentage):
         pass
@@ -62,17 +63,68 @@ class BaseMovement(object):
         self.publisher_j3 = None
         self.publisher_j4 = None
 
-class EllipsoidMovement(BaseMovement):
-    def __init__(self, finger_name, amplitude_j3 = 0.15, amplitude_j4 = 0.3):
-        BaseMovement.__init__(self,finger_name)
+class BaseMovementWithLatching(BaseMovement):
+    def __init__(self, finger_name, epsilon = 0.008):
+        BaseMovement.__init__(self, finger_name)
+
+        self.mutex = threading.Lock()
+
+        self.subscriber = rospy.Subscriber("/srh/position/joint_states", JointState, self.callback)
+        self.indexes_in_joint_states = []
+        self.epsilon = epsilon
+
+        self.wait_counter = 0
+        self.j3_target_ok = True
+        self.j4_target_ok = True
+
+    def callback(self, msg):
+        if self.mutex.acquire(False):
+            if len(self.indexes_in_joint_states) == 0:
+                for index,name in enumerate(msg.name):
+                    if self.finger_name.upper()+"J3" == name:
+                        self.indexes_in_joint_states.append(index)
+                    elif self.finger_name.upper()+"J4" == name:
+                        self.indexes_in_joint_states.append(index)
+
+                if (self.msg_to_send_j3.data - msg.position[self.indexes_in_joint_states[0]]) < self.epsilon:
+                    self.j3_target_ok = True
+                if (self.msg_to_send_j4.data - msg.position[self.indexes_in_joint_states[0]]) < self.epsilon:
+                    self.j4_target_ok = True
+            self.wait_counter += 1
+            self.mutex.release()
+
+
+class EllipsoidMovement(BaseMovementWithLatching):
+    def __init__(self, finger_name, amplitude_j3 = 0.15, amplitude_j4 = 0.3, offset_j3 = 0.78, offset_j4 = 0.0, epsilon = 0.008):
+        BaseMovementWithLatching.__init__(self,finger_name, epsilon)
         self.amplitude_j3 = amplitude_j3
         self.amplitude_j4 = amplitude_j4
+        self.offset_j3 = offset_j3
+        self.offset_j4 = offset_j4
 
     def update(self, mvt_percentage):
-        j3 = self.amplitude_j3 * math.sin(2.0*3.14159 * mvt_percentage/100.)
-        j4 = 2.0*self.amplitude_j4 * math.cos(2.0*3.14159 * mvt_percentage/100.)
-        self.msg_to_send_j3.data = j3
-        self.msg_to_send_j4.data = j4
+        #get the mutex
+        trying_mutex_iteration = 0
+        while not self.mutex.acquire(False):
+            time.sleep(0.001)
+            trying_mutex_iteration += 1
+            if trying_mutex_iteration > 1000:
+                return False
+
+        if (self.j3_target_ok and self.j4_target_ok) or (self.wait_counter >= 1):
+            self.wait_counter = 0
+            self.j3_target_ok = False
+            self.j4_target_ok = False
+            j3 = self.amplitude_j3 * math.sin(2.0*3.14159 * mvt_percentage) + self.offset_j3
+            j4 = self.amplitude_j4 * math.cos(2.0*3.14159 * mvt_percentage) + self.offset_j4
+
+            self.msg_to_send_j3.data = j3
+            self.msg_to_send_j4.data = j4
+
+            self.mutex.release()
+            return True
+        self.mutex.release()
+        return False
 
 
 class Movement(threading.Thread):
@@ -80,27 +132,32 @@ class Movement(threading.Thread):
         threading.Thread.__init__(self)
         self.moving = False
         self.finger_name = finger_name
-        self.iterations = 10000
+        self.iterations_max = 1000
         self.movements = []
 
         for i in range(1, 5):
-            self.movements.append( EllipsoidMovement(finger_name, amplitude_j3=(float(i)/10.0)*0.05, amplitude_j4=(float(i)/10.0)*0.05) )
+            self.movements.append( EllipsoidMovement(finger_name, amplitude_j3=(float(i)/10.0), amplitude_j4=(float(i)/20.0)) )
         for i in range(0, 4):
-            self.movements.append( EllipsoidMovement(finger_name, amplitude_j3=((5-float(i))/10.0)*0.05, amplitude_j4=((5.-float(i))/10.0)*0.05) )
+            self.movements.append( EllipsoidMovement(finger_name, amplitude_j3=((5-float(i))/10.0), amplitude_j4=((5.-float(i))/20.0)) )
 
 
     def run(self):
         while(True):
             for movement in self.movements:
-                for mvt_percentage in range(0, self.iterations):
+                iteration = 0
+                while iteration < self.iterations_max:
                     if self.moving == False:
                         return
                     else:
-                        movement.publish(mvt_percentage/(self.iterations/100.))
+                        mvt_percentage = float(iteration) / float(self.iterations_max)
+
+                        go_to_next_target = movement.publish(mvt_percentage)
+                        if go_to_next_target:
+                            iteration += 1
 
     def close(self):
         self.moving = False
-        for movement in movements:
+        for movement in self.movements:
             movement.close()
 
 class Diamond(GenericPlugin):
