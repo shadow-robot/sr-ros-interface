@@ -25,7 +25,7 @@ joint_to_motor_mapping: [
         -1,     #LFJ2
         10,     #LFJ3
         11,     #LFJ4
-        12,     #LFJ4
+        12,     #LFJ5
 
         13,     #THJ1
         14,     #THJ2
