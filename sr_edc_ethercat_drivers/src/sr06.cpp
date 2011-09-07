@@ -1164,7 +1164,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
     debug_publisher->msg_.tactile.clear();
     for(unsigned int i=0; i < 5; ++i)
-      debug_publisher->msg_.tactile.push_back( *(status_data->tactile[i].data) );
+      debug_publisher->msg_.tactile.push_back( static_cast<int>(static_cast<int16u>(*(status_data->tactile[i].data))) );
 
     debug_publisher->msg_.idle_time_us = status_data->idle_time_us;
 
@@ -1183,6 +1183,9 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     //for the time being, we only have PSTs tactile sensors
     sr_robot_msgs::ShadowPST tactiles;
     tactiles.header.stamp = ros::Time::now();
+
+    //tactiles.pressure.push_back(sr_hand_lib->tactile_data_valid);
+
     for(unsigned int id_tact = 0; id_tact < sr_hand_lib->nb_tactiles; ++id_tact)
     {
       if( sr_math_utils::is_bit_mask_index_true(sr_hand_lib->tactile_data_valid, id_tact) )
@@ -1200,6 +1203,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
         tactiles.temperature.push_back( -1 );
       }
     }
+
 
     tactile_publisher->msg_ = tactiles;
     tactile_publisher->unlockAndPublish();

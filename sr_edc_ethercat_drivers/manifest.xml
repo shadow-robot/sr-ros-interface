@@ -4,7 +4,7 @@
      A package implementing an interface for the Shadow Robot Dextrous, etherCAT palm version, ROS interface.
 
   </description>
-  <author>Yann Sionneau</author>
+  <author>Yann Sionneau, Ugo Cupcic / ugo@shadowrobot.com, contact@shadowrobot.com</author>
   <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_edc_ethercat_drivers</url>

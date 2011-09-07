@@ -362,7 +362,6 @@ namespace shadow_robot
                          << " calibrated = " << calibrated_position);
       }
       actuator->state_.position_ = calibrated_position;
-
       ROS_DEBUG_STREAM("          => "<< actuator->state_.position_);
     }
   } //end calibrate_joint()

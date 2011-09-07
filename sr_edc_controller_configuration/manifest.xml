@@ -4,7 +4,7 @@
      Configuration files for Shadow Robot hand controllers.
 
   </description>
-  <author>Ugo Cupcic</author>
+  <author>Ugo Cupcic / ugo@shadowrobot.com , contact@shadowrobot.com</author>
   <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_edc_controller_configuration</url>

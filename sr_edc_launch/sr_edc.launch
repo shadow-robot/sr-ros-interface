@@ -2,6 +2,9 @@
   <include file="$(find sr_edc_launch)/sr_edc.machine" />
   <param name="/use_sim_time" value="false"/>
 
+  <!-- publishes joint 0s joint states on separate topic for debug/tuning -->
+  <node pkg="sr_utilities" name="joint_0_pub" type="joint_0_publisher.py"/>
+
   <!-- Loads the robot description -->
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_motor.urdf.xacro'" />
 
@@ -42,7 +45,7 @@
   <rosparam command="load" ns="srh" file="$(find sr_edc_launch)/sr_edc_sensor_gain_offset.yaml" />
 
   <!-- pr2_etherCAT -->
-  <node name="realtime_loop" machine="local" pkg="pr2_etherCAT" type="pr2_etherCAT" args="-i eth0 -x /robot_description" output="screen"  launch-prefix="nice -n -20"/> <!--launch-prefix="gdb -ex run -args" launch-prefix="xterm -hold -e strace -f -e trace=!gettimeofday,futex"/> -->
+  <node name="realtime_loop" machine="local" pkg="pr2_etherCAT" type="pr2_etherCAT" args="-i eth1 -x /robot_description" output="screen"  launch-prefix="nice -n -20"/> <!--launch-prefix="gdb -ex run -args" launch-prefix="xterm -hold -e strace -f -e trace=!gettimeofday,futex"/> -->
 
   <!--<node name="runtime_monitor" machine="local" pkg="runtime_monitor" type="monitor" />-->
 

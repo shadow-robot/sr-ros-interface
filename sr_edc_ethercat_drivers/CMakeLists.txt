@@ -37,3 +37,8 @@ rosbuild_add_library(sr_edc_ethercat_drivers src/sr0x.cpp src/sr06.cpp src/srbri
 target_link_libraries(sr_edc_ethercat_drivers sr_hand_lib)
 rosbuild_add_link_flags(sr_edc_ethercat_drivers -lbfd)
 
+
+###############
+#   EXAMPLES  #
+###############
+rosbuild_add_executable(examples/send_targets examples/send_targets.cpp)

@@ -24,3 +24,5 @@ sr_mechanism_model/build
 sr_robot_lib/build
 ￼
 sr_robot_lib/lib
+￼
+sr_edc_ethercat_drivers/bin/examples/send_targets

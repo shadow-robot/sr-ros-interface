@@ -1,2 +1,5 @@
 libbfd:
   debian: binutils-dev
+  ubuntu: binutils-dev
+tinyxml:
+  ubuntu: libtinyxml2.6.2 libtinyxml-dev
