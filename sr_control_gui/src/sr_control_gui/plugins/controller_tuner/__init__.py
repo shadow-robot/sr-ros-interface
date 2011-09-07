@@ -157,6 +157,9 @@ class JointPidSetter(QtGui.QFrame):
         self.layout_.addWidget(self.btn_friction_compensation)
         self.btn_friction_compensation.setEnabled(False)
 
+        if self.controller_type == "Mixed Position/Velocity":
+            self.btn_friction_compensation.setEnabled(True)
+
         self.tuning = False
         self.GA_thread = None
 
