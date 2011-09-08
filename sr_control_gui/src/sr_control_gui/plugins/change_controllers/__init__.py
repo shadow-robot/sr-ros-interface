@@ -68,7 +68,7 @@ class ChangeControllers(GenericPlugin):
             current_controllers = []
             all_loaded_controllers = resp1.controllers
             for state,tmp_contrl in zip(resp1.state,resp1.controllers):
-                if state == "started":
+                if state == "running":
                     current_controllers.append(tmp_contrl)
 
             controllers_to_start = self.controllers[controller]
