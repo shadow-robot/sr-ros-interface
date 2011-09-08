@@ -58,10 +58,12 @@ class BaseMovement(object):
         pass
 
     def close(self):
-        self.publisher_j3.unregister()
-        self.publisher_j4.unregister()
-        self.publisher_j3 = None
-        self.publisher_j4 = None
+        if self.publisher_j3 != None:
+            self.publisher_j3.unregister()
+            self.publisher_j3 = None
+        if self.publisher_j4 != None:
+            self.publisher_j4.unregister()
+            self.publisher_j4 = None
 
 class BaseMovementWithLatching(BaseMovement):
     def __init__(self, finger_name, epsilon = 0.008):
@@ -214,4 +216,4 @@ class Diamond(GenericPlugin):
         for movement in self.movements.values():
             movement.close()
 
-        OpenGLGenericPlugin.on_close(self)
+        GenericPlugin.on_close(self)
