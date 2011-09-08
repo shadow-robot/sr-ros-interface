@@ -25,7 +25,7 @@ from PyQt4 import QtCore, QtGui, Qt
 from config import Config
 from generic_plugin import GenericPlugin
 from functools import partial
-from pr2_mechanism_msgs.srv import ListControllers, SwitchController
+from pr2_mechanism_msgs.srv import ListControllers, SwitchController, LoadController
 
 class ChangeControllers(GenericPlugin):
     """
@@ -65,12 +65,28 @@ class ChangeControllers(GenericPlugin):
             success = False
 
         if success:
-            current_controllers = resp1.controllers
-            switch_controllers = rospy.ServiceProxy('pr2_controller_manager/switch_controller', SwitchController)
+            current_controllers = []
+            all_loaded_controllers = resp1.controllers
+            for state,tmp_contrl in zip(resp1.state,resp1.controllers):
+                if state == "started":
+                    current_controllers.append(tmp_contrl)
+
             controllers_to_start = self.controllers[controller]
+
+            load_controllers = rospy.ServiceProxy('/pr2_controller_manager/load_controller', LoadController)
+            for load_control in controllers_to_start:
+                if load_control not in all_loaded_controllers:
+                    try:
+                        resp1 = load_controllers(load_control)
+                    except rospy.ServiceException:
+                        success = False
+                    if not resp1.ok:
+                        success = False
+
+            switch_controllers = rospy.ServiceProxy('pr2_controller_manager/switch_controller', SwitchController)
             try:
-                resp1 = switch_controllers(controllers_to_start, current_controllers, SwitchController.BEST_EFFORT)
-            except rospy.ServiceExceptione:
+                resp1 = switch_controllers(controllers_to_start, current_controllers, 2)
+            except rospy.ServiceException:
                 success = False
 
             if not resp1.ok:
