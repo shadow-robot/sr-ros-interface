@@ -125,7 +125,7 @@ sh_rfj0_position_controller:
     max_force: 1023.0
     p: 2
     position_deadband: 0.014999999999999999
-  type: sr_edc_mechanism_controllers/SrhJointPositionCon9troller
+  type: sr_edc_mechanism_controllers/SrhJointPositionController
 sh_rfj3_position_controller:
   joint: RFJ3
   pid:
