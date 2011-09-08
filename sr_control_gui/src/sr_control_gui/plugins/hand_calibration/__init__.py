@@ -28,6 +28,7 @@ from generic_plugin import GenericPlugin
 from std_msgs.msg import Float64
 
 from etherCAT_hand_lib import EtherCAT_Hand_Lib
+from hand_calibration.calibration_saver import CalibrationSaver
 
 class HandCalibration(object):
     """
@@ -59,71 +60,17 @@ class HandCalibration(object):
     def write_calibration(self, path):
         """
         Generates the yaml configuration file from the
-        calibration map and write it to the specified
-        path.
+        calibration map and writes it to the specified
+        path, using the calibration saver (updates only
+        the recalibrated joints).
         """
-        #check the calibration is complete, if not, just add 0s
-        # so that the uncalibrated joints stay at 0.
-        all_joints = [ "FFJ1", "FFJ2", "FFJ3", "FFJ4",
-                       "MFJ1", "MFJ2", "MFJ3", "MFJ4",
-                       "RFJ1", "RFJ2", "RFJ3", "RFJ4",
-                       "LFJ1", "LFJ2", "LFJ3", "LFJ4", "LFJ5",
-                       "THJ1", "THJ2", "THJ3", "THJ4", "THJ5",
-                       "WRJ1", "WRJ2" ]
+        calibration_saver = CalibrationSaver(path)
 
-        for joint in all_joints:
-            if joint not in self.calibration_map.keys():
-                self.calibration_map[joint] = [[0.0, 0.0], [1.0, 0.0]]
+        calibration_to_save = []
+        for item in self.calibration_map.items():
+            calibration_to_save.append([[item[0]], item[1]])
 
-        #generates the yaml configuration file from the
-        # calibration map
-        lines = ["#Generated From sr_control_gui, Hand Calibration plugin."]
-        lines.append("")
-        lines.append("sr_calibrations: [")
-
-        items = self.calibration_map.items()
-        for joint_index in range(0, len(items) - 1):
-            joint = items[joint_index]
-            joint_lines = [ "[\"" + joint[0] +"\", [ "]
-
-            for index_values in range(0, len(joint[1]) - 1):
-                values = joint[1][index_values]
-
-                raw_value = values[0]
-                calibrated_value = values[1]
-                joint_lines.append("    [" + str( raw_value ) +", " + str(calibrated_value) + "], ")
-
-            values = joint[1][len(joint[1]) - 1]
-            raw_value = values[0]
-            calibrated_value = values[1]
-            joint_lines.append("    [" + str( raw_value ) +", " + str(calibrated_value) + "] ]], ")
-
-            lines += joint_lines
-
-        joint = items[len(items) - 1]
-        joint_lines = [ "[\"" + joint[0] +"\", [ "]
-
-        for index_values in range(0, len(joint[1]) - 1):
-            values = joint[1][index_values]
-
-            raw_value = values[0]
-            calibrated_value = values[1]
-            joint_lines.append("    [" + str( raw_value ) +", " + str(calibrated_value) + "], ")
-
-        values = joint[1][len(joint[1]) - 1]
-        raw_value = values[0]
-        calibrated_value = values[1]
-        joint_lines.append("    [" + str( raw_value ) +", " + str(calibrated_value) + "] ]] ")
-
-        lines += joint_lines
-        lines.append("]")
-
-        #now we write all those lines to the specified file
-        f = open(path, mode='w')
-        for line in lines:
-            f.write(line)
-            f.write("\n")
-        f.close()
+        calibration_saver.save_settings(calibration_to_save)
 
 
 class HandCalibrationPlugin(GenericPlugin):

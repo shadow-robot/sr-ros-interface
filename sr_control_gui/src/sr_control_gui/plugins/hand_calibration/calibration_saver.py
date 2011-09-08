@@ -53,9 +53,7 @@ class CalibrationSaver(object):
                 new_joint_name = new_joint[0][0]
                 new_joint_calibration = new_joint[1]
 
-                print new_joint_name, " ", old_joint_name
                 if new_joint_name == old_joint_name:
-                    print "joint found!"
                     yaml_config["sr_calibrations"][index][1] = new_joint_calibration
 
         f = open(self.path, 'w')
@@ -74,3 +72,4 @@ class CalibrationSaver(object):
 if __name__ == '__main__':
     calibration_saver = CalibrationSaver("/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_robot_lib/config/calibration.yaml")
     calibration_saver.save_settings([[["FFJ3"], [[0.0,0.0], [1.0,1.0]]]])
+[['THJ1', [[-1.0, 0.0], [-1.0, 22.5]]]]
