@@ -153,18 +153,18 @@ class SinusoidMovement(BaseMovement):
         self.amplitude = amplitude
 
     def update(self, mvt_percentage):
-        value = self.amplitude * math.sin(2.0*3.14159 * mvt_percentage/100.) + self.offset
+        value = float(self.amplitude) * math.sin(2.0*3.14159 * float(mvt_percentage)/100.) + float(self.offset)
         self.msg_to_send.data = value
 
 class StepMovement(BaseMovement):
-    def __init__(self, joint_name, amplitude = 400, nb_steps = 50, controller_type = None):
+    def __init__(self, joint_name, amplitude = 400, nb_steps = 50, offset = 0.0, controller_type = None):
         BaseMovement.__init__(self,joint_name, controller_type)
         self.amplitude = amplitude
         self.nb_steps  = nb_steps
 
         self.steps = []
         for i in range(0, int(nb_steps/2)):
-            self.steps.append(2.*float(i)*float(self.amplitude / nb_steps) - self.amplitude / 2.0)
+            self.steps.append(2.*float(i)*float(self.amplitude / nb_steps) - self.amplitude / 2.0 + offset)
         reversed_steps = self.steps[:]
         reversed_steps.reverse()
         self.steps += reversed_steps
@@ -211,9 +211,9 @@ class FullMovement(threading.Thread):
 
 
         self.possible_movements = {"Motor Force": None,
-                                   "Position":[ StepMovement(joint_name, amplitude = 0.3, nb_steps = 100, controller_type = "Position"),
-                                                SinusoidMovement(joint_name, amplitude = 0.7, offset = 0.7, controller_type = "Position"),
-                                                StepMovement(joint_name, amplitude=0.5, nb_steps = 10, controller_type = "Position")],
+                                   "Position":[ StepMovement(joint_name, amplitude = 1.0, offset= 0.6, nb_steps = 100, controller_type = "Position"),
+                                                SinusoidMovement(joint_name, amplitude = 0.6, offset = 0.65, controller_type = "Position"),
+                                                StepMovement(joint_name, amplitude=0.5, offset = 0.55, nb_steps = 10, controller_type = "Position")],
                                    "Velocity":[ StepMovement(joint_name, amplitude = 0.3, nb_steps = 100, controller_type = "Velocity"),
                                                 SinusoidMovement(joint_name, amplitude = 0.1, offset = 0.0, controller_type = "Velocity"),
                                                 StepMovement(joint_name, amplitude=0.5, nb_steps = 10, controller_type = "Velocity")],
