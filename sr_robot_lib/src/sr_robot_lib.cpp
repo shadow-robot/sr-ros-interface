@@ -162,13 +162,23 @@ namespace shadow_robot
     //then we read the tactile sensors information
     tactile_data_valid = static_cast<int16u>(status_data->tactile_data_valid);
     //TODO: use memcopy instead?
-    for( unsigned int id_tactile = 0; id_tactile < nb_tactiles; ++id_tactile)
+    //FF
+    for( unsigned int id_data = 0; id_data < 8; ++id_data)
     {
-      for( unsigned int id_data = 0; id_data < 8; ++id_data)
-      {
-        tactiles_vector[id_tactile].data[id_data] = static_cast<unsigned int>(static_cast<int16u>(status_data->tactile[id_tactile].data[id_data]) );
-      }
+      tactiles_vector[0].data[id_data] = static_cast<unsigned int>(static_cast<int16u>(status_data->tactile[2].data[id_data]) );
     }
+    //TH
+    for( unsigned int id_data = 0; id_data < 8; ++id_data)
+    {
+      tactiles_vector[4].data[id_data] = static_cast<unsigned int>(static_cast<int16u>(status_data->tactile[4].data[id_data]) );
+    }
+    //LF
+    for( unsigned int id_data = 0; id_data < 8; ++id_data)
+    {
+      tactiles_vector[3].data[id_data] = static_cast<unsigned int>(static_cast<int16u>(status_data->tactile[3].data[id_data]) );
+    }
+
+
   } //end update()
 
   void SrRobotLib::build_motor_command(ETHERCAT_DATA_STRUCTURE_0200_PALM_EDC_COMMAND* command)
