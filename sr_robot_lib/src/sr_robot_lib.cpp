@@ -166,7 +166,7 @@ namespace shadow_robot
     {
       for( unsigned int id_data = 0; id_data < 8; ++id_data)
       {
-        tactiles_vector[id_tactile].data[id_data] = status_data->tactile[id_tactile].data[id_data];
+        tactiles_vector[id_tactile].data[id_data] = static_cast<unsigned int>(static_cast<int16u>(status_data->tactile[id_tactile].data[id_data]) );
       }
     }
   } //end update()
@@ -603,6 +603,7 @@ namespace shadow_robot
     value.byte[0] = deadband;
     value.byte[1] = sign;
     full_config.at(MOTOR_CONFIG_DEADBAND_SIGN) = value;
+    ROS_DEBUG_STREAM("deadband: " << static_cast<int>(static_cast<int8u>(value.byte[0]) ) << " value: " << static_cast<int16u>(value.word));
 
 
     //compute crc

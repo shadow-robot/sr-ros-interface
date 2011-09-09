@@ -1,12 +1,12 @@
 ffj0:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -14,13 +14,13 @@ ffj0:
     sign: 0.0
 ffj3:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -28,13 +28,13 @@ ffj3:
     sign: 0.0
 ffj4:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -42,13 +42,13 @@ ffj4:
     sign: 0.0
 lfj0:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -56,13 +56,13 @@ lfj0:
     sign: 0.0
 lfj3:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -70,13 +70,13 @@ lfj3:
     sign: 0.0
 lfj4:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -84,13 +84,13 @@ lfj4:
     sign: 0.0
 lfj5:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -98,13 +98,13 @@ lfj5:
     sign: 0.0
 mfj0:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -112,13 +112,13 @@ mfj0:
     sign: 0.0
 mfj3:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -126,13 +126,13 @@ mfj3:
     sign: 0.0
 mfj4:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -140,13 +140,13 @@ mfj4:
     sign: 0.0
 rfj0:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -154,13 +154,13 @@ rfj0:
     sign: 0.0
 rfj3:
   pid:
-    d: 70
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 20
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -168,13 +168,13 @@ rfj3:
     sign: 0.0
 rfj4:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -182,13 +182,13 @@ rfj4:
     sign: 0.0
 thj1:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -196,13 +196,13 @@ thj1:
     sign: 0.0
 thj2:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -210,13 +210,13 @@ thj2:
     sign: 0.0
 thj3:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -224,13 +224,13 @@ thj3:
     sign: 0.0
 thj4:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
     max_pwm: 1023.0
-    p: 2500
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -238,13 +238,13 @@ thj4:
     sign: 0.0
 thj5:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
-    max_pwm: 1023.0
-    p: 2500
+    d: 18000
+    deadband: 15.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 50.0
+    p: 4800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -252,13 +252,13 @@ thj5:
     sign: 0.0
 wrj1:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 5000
+    deadband: 15.0
+    f: 1900
+    i: 250
+    imax: 1300
     max_pwm: 1023.0
-    p: 2500
+    p: 3300
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0
@@ -266,13 +266,13 @@ wrj1:
     sign: 0.0
 wrj2:
   pid:
-    d: 15000
-    deadband: 0.0
-    f: 1700
-    i: 1100
-    imax: 290
+    d: 5000
+    deadband: 15.0
+    f: 1900
+    i: 170
+    imax: 1100
     max_pwm: 1023.0
-    p: 2500
+    p: 2800
     sg_left: 0
     sg_right: 0
     sgleftref: 0.0

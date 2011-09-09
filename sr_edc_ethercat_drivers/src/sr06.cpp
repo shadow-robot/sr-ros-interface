@@ -1135,7 +1135,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
     ++zero_buffer_read;
     float percentage_packet_loss = 100.f * ((float)zero_buffer_read / (float)num_rxed_packets);
 
-    ROS_WARN("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
+    ROS_DEBUG("Reception error detected : %d errors out of %d rxed packets (%2.3f%%) ; idle time %dus", zero_buffer_read, num_rxed_packets, percentage_packet_loss, status_data->idle_time_us);
     return true;
   }
 
@@ -1164,7 +1164,7 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
     debug_publisher->msg_.tactile.clear();
     for(unsigned int i=0; i < 5; ++i)
-      debug_publisher->msg_.tactile.push_back( static_cast<int>(static_cast<int16u>(*(status_data->tactile[i].data))) );
+      debug_publisher->msg_.tactile.push_back( static_cast<unsigned int>(static_cast<int16u>(status_data->tactile[i].data[0])) );
 
     debug_publisher->msg_.idle_time_us = status_data->idle_time_us;
 
@@ -1188,20 +1188,21 @@ bool SR06::unpackState(unsigned char *this_buffer, unsigned char *prev_buffer)
 
     for(unsigned int id_tact = 0; id_tact < sr_hand_lib->nb_tactiles; ++id_tact)
     {
-      if( sr_math_utils::is_bit_mask_index_true(sr_hand_lib->tactile_data_valid, id_tact) )
-      {
-        TACTILE_SENSOR_SHADOW_PST_DATA_CONTENTS data;
-        data.pressure = sr_hand_lib->tactiles_vector[id_tact].data[0];
-        data.temperature = sr_hand_lib->tactiles_vector[id_tact].data[1];
+      //if( sr_math_utils::is_bit_mask_index_true(sr_hand_lib->tactile_data_valid, id_tact) )
+      //{
+      TACTILE_SENSOR_SHADOW_PST_DATA_CONTENTS data;
+      data.pressure = sr_hand_lib->tactiles_vector[id_tact].data[0];
+      data.temperature = sr_hand_lib->tactiles_vector[id_tact].data[1];
 
-        tactiles.pressure.push_back( static_cast<int16u>(data.pressure) );
-        tactiles.temperature.push_back( static_cast<int16u>(data.temperature) );
-      }
-      else
-      {
+      tactiles.pressure.push_back( static_cast<int16u>(data.pressure) );
+      tactiles.temperature.push_back( static_cast<int16u>(data.temperature) );
+      /*}
+        else
+        {
         tactiles.pressure.push_back( -1 );
         tactiles.temperature.push_back( -1 );
-      }
+        }
+      */
     }
 
 
