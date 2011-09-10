@@ -1,6 +1,7 @@
 <launch>
 <!-- <rosparam command="load" file="$(find sr_edc_controller_configuration)/motor_board_effort_controllers_stopped.yaml" /> -->
- <rosparam command="load" file="$(find sr_edc_controller_configuration)/motor_board_effort_controllers.yaml" />
+<!-- <rosparam command="load" file="$(find sr_edc_controller_configuration)/motor_board_effort_controllers.yaml" /> -->
+ <rosparam command="load" file="$(find sr_edc_controller_configuration)/motor_board_effort_controllers_ff_and_th.yaml" />
 
   <rosparam command="load" file="$(find sr_robot_lib)/config/friction_compensation.yaml" />
   <rosparam command="load" file="$(find sr_edc_controller_configuration)/sr_edc_effort_controllers.yaml" />

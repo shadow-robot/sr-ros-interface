@@ -30,7 +30,7 @@ sh_ffj4_position_controller:
     friction_deadband: 2000.0
     i: 800
     i_clamp: 300
-    max_force: 500.0
+    max_force: 400.0
     p: 4000
     position_deadband: 0.014999999999999999
   type: sr_edc_mechanism_controllers/SrhJointPositionController

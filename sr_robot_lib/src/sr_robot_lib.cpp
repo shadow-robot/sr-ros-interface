@@ -41,8 +41,8 @@ namespace shadow_robot
   const int SrRobotLib::nb_debug_publishers_const = 20;
   const int SrRobotLib::debug_mutex_lock_wait_time = 100;
 #endif
-  const int SrRobotLib::number_of_positions_to_keep = 20;
-  const int SrRobotLib::number_of_positions_for_filter = 10;
+  const int SrRobotLib::number_of_positions_to_keep = 60;
+  const int SrRobotLib::number_of_positions_for_filter = 50;
 
   SrRobotLib::SrRobotLib(pr2_hardware_interface::HardwareInterface *hw)
     : main_pic_idle_time(0), main_pic_idle_time_min(1000), config_index(MOTOR_CONFIG_FIRST_VALUE), nh_tilde("~"),
