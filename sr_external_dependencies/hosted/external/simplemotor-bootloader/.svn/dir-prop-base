@@ -1,0 +1,10 @@
+K 10
+svn:ignore
+V 78
+*.mcw
+boot.err
+pic18-bootloader.cof
+pic18-bootloader.hex
+pic18-bootloader.map
+
+END

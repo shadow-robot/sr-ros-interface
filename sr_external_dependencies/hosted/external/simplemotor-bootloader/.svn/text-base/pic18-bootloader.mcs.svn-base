@@ -1,0 +1,59 @@
+[Header]
+MagicCookie={0b13fe8c-dfe0-40eb-8900-6712719559a7}
+Version=1.0
+[File000]
+Location=C:\Code\EDC\simplemotor-bootloader\boot.o
+Folder=Intermediary
+DeviceName=PIC18F2580
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Program Files\Microchip\mplabc18\v3.37.01\bin\mcc18.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)|C:\Program Files\Microchip\mplabc18\v3.37.01\lib||$(LKRDIR)|C:\Code\pic18-bootloader||
+SOLK=<src>|boot.c|c018i-custom.c||<obj>||<lib>||<lkr>|bootloader.lkr||
+SuiteArgsString=
+ToolArgsString=
+TraceCmdString=/d__IT=0x000 /zTrace18.h
+DebugOptions=
+[File001]
+Location=C:\Code\EDC\simplemotor-bootloader\c018i-custom.o
+Folder=Intermediary
+DeviceName=PIC18F2580
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Program Files\Microchip\mplabc18\v3.37.01\bin\mcc18.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)|C:\Program Files\Microchip\mplabc18\v3.37.01\lib||$(LKRDIR)|C:\Code\pic18-bootloader||
+SOLK=<src>|boot.c|c018i-custom.c||<obj>||<lib>||<lkr>|bootloader.lkr||
+SuiteArgsString=
+ToolArgsString=
+TraceCmdString=/d__IT=0x000 /zTrace18.h
+DebugOptions=
+[File002]
+Location=C:\Code\EDC\simplemotor-bootloader\pic18-bootloader.cof
+Folder=Output
+DeviceName=PIC18F2580
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={96C98149-AA1B-4CF9-B967-FAE79CAB663C}
+LanguageToolLocation=C:\Program Files\Microchip\mplabc18\v3.37.01\bin\mplink.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)|C:\Program Files\Microchip\mplabc18\v3.37.01\lib||$(LKRDIR)|C:\Code\pic18-bootloader||
+SOLK=<src>|boot.c|c018i-custom.c||<obj>||<lib>||<lkr>|bootloader.lkr||
+SuiteArgsString=
+ToolArgsString=/o"$(BINDIR_)$(TARGETBASE).cof" /M"$(BINDIR_)$(TARGETBASE).map" /W
+TraceCmdString=
+DebugOptions=
+[File003]
+Location=C:\Code\EDC\simplemotor-bootloader\pic18-bootloader.hex
+Folder=Output
+DeviceName=PIC18F2580
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={96C98149-AA1B-4CF9-B967-FAE79CAB663C}
+LanguageToolLocation=C:\Program Files\Microchip\mplabc18\v3.37.01\bin\mplink.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)|C:\Program Files\Microchip\mplabc18\v3.37.01\lib||$(LKRDIR)|C:\Code\pic18-bootloader||
+SOLK=<src>|boot.c|c018i-custom.c||<obj>||<lib>||<lkr>|bootloader.lkr||
+SuiteArgsString=
+ToolArgsString=/o"$(BINDIR_)$(TARGETBASE).cof" /M"$(BINDIR_)$(TARGETBASE).map" /W
+TraceCmdString=
+DebugOptions=
+[TOOL_LOC_STAMPS]
+tool_loc{49D3CA3F-D9A3-4518-9943-226A347E8CC7}=C:\Program Files\Microchip\mplabc18\v3.37.01\mpasm\MPASMWIN.exe
+tool_loc{96C98149-AA1B-4CF9-B967-FAE79CAB663C}=C:\Program Files\Microchip\mplabc18\v3.37.01\bin\mplink.exe
+tool_loc{E56A1C86-9D32-4DF6-8C34-FE0388B1B644}=C:\Program Files\Microchip\mplabc18\v3.37.01\bin\mcc18.exe
