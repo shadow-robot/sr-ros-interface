@@ -183,7 +183,7 @@ rfj4:
 thj1:
   pid:
     d: 18000
-    deadband: 15.0
+    deadband: 30.0
     f: 1900
     i: 320
     imax: 1700
@@ -197,7 +197,7 @@ thj1:
 thj2:
   pid:
     d: 18000
-    deadband: 15.0
+    deadband: 30.0
     f: 1900
     i: 320
     imax: 1700

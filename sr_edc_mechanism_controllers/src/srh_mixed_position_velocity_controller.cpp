@@ -128,9 +128,9 @@ namespace controller {
                      << " joint_state: "<<joint_state_ );
 
 #ifdef DEBUG_PUBLISHER
-    if( std::string("FFJ3").compare(getJointName()) == 0)
+    if( std::string("THJ2").compare(getJointName()) == 0)
     {
-      ROS_INFO("Publishing debug infor for FFJ3 mixed position/velocity controller");
+      ROS_INFO("Publishing debug infor for THJ2 mixed position/velocity controller");
       std::stringstream ss2;
       ss2 << getJointName() << "debug_velocity";
       debug_pub = n_tilde_.advertise<std_msgs::Float64>(ss2.str(), 2);
@@ -285,7 +285,7 @@ namespace controller {
     if(loop_count_ % 10 == 0)
     {
 #ifdef DEBUG_PUBLISHER
-      if( std::string("FFJ3").compare(getJointName()) == 0)
+      if( std::string("THJ2").compare(getJointName()) == 0)
       {
         std_msgs::Float64 msg;
         msg.data = commanded_velocity;
