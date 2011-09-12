@@ -2,7 +2,7 @@
 
 sh_ffj0_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
-  joint: FFJ2
+  joint: FFJ0
   pid:
     p: 0
     i: 0
@@ -37,7 +37,7 @@ sh_ffj4_velocity_controller:
 
 sh_mfj0_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
-  joint: MFJ2
+  joint: MFJ0
   pid:
     p: 0
     i: 0
@@ -73,7 +73,7 @@ sh_mfj4_velocity_controller:
 
 sh_rfj0_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
-  joint: RFJ2
+  joint: RFJ0
   pid:
     p: 0
     i: 0
@@ -109,7 +109,7 @@ sh_rfj4_velocity_controller:
 
 sh_lfj0_velocity_controller:
   type: sr_edc_mechanism_controllers/SrhJointVelocityController
-  joint: LFJ2
+  joint: LFJ0
   pid:
     p: 0
     i: 0
