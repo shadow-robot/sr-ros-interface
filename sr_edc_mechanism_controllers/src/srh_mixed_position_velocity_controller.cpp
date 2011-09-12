@@ -70,19 +70,53 @@ namespace controller {
     robot_ = robot;
     last_time_ = robot->getTime();
 
-    joint_state_ = robot_->getJointState(joint_name);
-    if (!joint_state_)
-    {
-      ROS_ERROR("SrhMixedPositionVelocityController could not find joint named \"%s\"\n",
-                joint_name.c_str());
-      return false;
-    }
-    if (!joint_state_->calibrated_)
-    {
-      ROS_ERROR("Joint %s not calibrated for SrhMixedPositionVelocityJointController", joint_name.c_str());
-      return false;
-    }
 
+    //joint 0s
+    if( joint_name.substr(3,1).compare("0") == 0)
+    {
+      has_j2 = true;
+      std::string j1 = joint_name.substr(0,3) + "1";
+      std::string j2 = joint_name.substr(0,3) + "2";
+      ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
+
+      joint_state_ = robot_->getJointState(j1);
+      if (!joint_state_)
+      {
+        ROS_ERROR("SrhMixedPositionVelocityController could not find joint named \"%s\"\n",
+                  joint_name.c_str());
+        return false;
+      }
+
+      joint_state_2 = robot_->getJointState(j2);
+      if (!joint_state_2)
+      {
+        ROS_ERROR("SrhMixedPositionVelocityController could not find joint named \"%s\"\n",
+                  joint_name.c_str());
+        return false;
+      }
+      if (!joint_state_2->calibrated_)
+      {
+        ROS_ERROR("Joint %s not calibrated for SrhMixedPositionVelocityJointController", j2.c_str());
+        return false;
+      }
+    }
+    else //"normal" joints
+    {
+      has_j2 = false;
+
+      joint_state_ = robot_->getJointState(joint_name);
+      if (!joint_state_)
+      {
+        ROS_ERROR("SrhMixedPositionVelocityController could not find joint named \"%s\"\n",
+                  joint_name.c_str());
+        return false;
+      }
+      if (!joint_state_->calibrated_)
+      {
+        ROS_ERROR("Joint %s not calibrated for SrhMixedPositionVelocityJointController", joint_name.c_str());
+        return false;
+      }
+    }
     friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
 
     pid_controller_velocity_ = pid_velocity;
@@ -92,9 +126,6 @@ namespace controller {
     ROS_DEBUG_STREAM(" joint_state name: " << joint_state_->joint_->name);
     ROS_DEBUG_STREAM(" In Init: " << getJointName() << " This: " << this
                      << " joint_state: "<<joint_state_ );
-
-    std::stringstream ss;
-    ss << getJointName() << "/set_velocity";
 
 #ifdef DEBUG_PUBLISHER
     if( std::string("FFJ3").compare(getJointName()) == 0)
@@ -136,6 +167,8 @@ namespace controller {
 
   void SrhMixedPositionVelocityJointController::starting()
   {
+    if( has_j2 )
+      command_ = joint_state_->position_ + joint_state_2->position_;
     command_ = joint_state_->position_;
     pid_controller_velocity_->reset();
     read_parameters();
@@ -176,8 +209,11 @@ namespace controller {
 
   void SrhMixedPositionVelocityJointController::update()
   {
-    if (!joint_state_->calibrated_)
-      return;
+    if( !has_j2)
+    {
+      if (!joint_state_->calibrated_)
+        return;
+    }
 
     assert(robot_ != NULL);
     ros::Time time = robot_->getTime();
@@ -187,11 +223,21 @@ namespace controller {
     if (!initialized_)
     {
       initialized_ = true;
-      command_ = joint_state_->position_;
+      if( has_j2 )
+        command_ = joint_state_->position_ + joint_state_2->position_;
+      else
+        command_ = joint_state_->position_;
     }
 
     //Compute velocity demand from position error:
-    double error_position = joint_state_->position_ - command_;
+    double error_position = 0.0;
+    if( has_j2 )
+    {
+      error_position = (joint_state_->position_ + joint_state_2->position_) - command_;
+      ROS_DEBUG_STREAM("j0: " << joint_state_->position_ + joint_state_2->position_);
+    }
+    else
+      error_position = joint_state_->position_ - command_;
 
     double commanded_velocity = 0.0;
     double error_velocity = 0.0;
@@ -204,7 +250,10 @@ namespace controller {
       commanded_velocity = compute_velocity_demand(error_position);
 
       //velocity loop:
-      error_velocity = joint_state_->velocity_ - commanded_velocity;
+      if( has_j2 )
+        error_velocity = (joint_state_->velocity_ + joint_state_->velocity_) / 2.0 - commanded_velocity;
+      else
+        error_velocity = joint_state_->velocity_ - commanded_velocity;
       commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
 
       //clamp the result to max force
@@ -214,7 +263,10 @@ namespace controller {
       //Friction compensation
       //if( std::string("FFJ3").compare( getJointName() ) == 0 )
       //  ROS_INFO_STREAM(getJointName() << ": before fc: velocity demand=" << commanded_velocity << " force demand=" << commanded_effort << " / error: " << error_velocity );
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
+      if( has_j2 )
+        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , int(commanded_effort), friction_deadband );
+      else
+        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
 
       //if( std::string("FFJ3").compare( getJointName() ) == 0 )
       //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
@@ -226,8 +278,10 @@ namespace controller {
       ROS_ERROR("in deadband");
       }
     **/
-    joint_state_->commanded_effort_ = commanded_effort;
-
+    if( has_j2 )
+      joint_state_2->commanded_effort_ = commanded_effort;
+    else
+      joint_state_->commanded_effort_ = commanded_effort;
     if(loop_count_ % 10 == 0)
     {
 #ifdef DEBUG_PUBLISHER
@@ -243,8 +297,17 @@ namespace controller {
       {
         controller_state_publisher_->msg_.header.stamp = time;
         controller_state_publisher_->msg_.set_point = command_;
-        controller_state_publisher_->msg_.process_value = joint_state_->position_;
-        controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
+        if( has_j2 )
+        {
+          controller_state_publisher_->msg_.process_value = (joint_state_->position_ + joint_state_2->position_);
+          controller_state_publisher_->msg_.process_value_dot = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
+        }
+        else
+        {
+          controller_state_publisher_->msg_.process_value = joint_state_->position_;
+          controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
+        }
+
         controller_state_publisher_->msg_.error = error_velocity;
         controller_state_publisher_->msg_.time_step = dt_.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;

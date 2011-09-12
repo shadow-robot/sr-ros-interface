@@ -82,6 +82,8 @@ namespace controller
 
     std::string getJointName();
     pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
+    pr2_mechanism_model::JointState *joint_state_2;        /**< 2ndJoint we're controlling if joint 0. */
+    bool has_j2;         /**< true if this is a joint 0. */
     ros::Duration dt_;
     double command_;                            /**< Last commanded position. */
 

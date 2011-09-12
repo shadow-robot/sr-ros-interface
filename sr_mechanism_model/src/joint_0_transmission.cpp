@@ -149,7 +149,7 @@ namespace sr_mechanism_model
   void J0Transmission::propagatePositionBackwards(
     std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
   {
-    ROS_ERROR("propagate pos backward");
+    ROS_DEBUG("propagate pos backward");
 
     assert(as.size() == 1);
     assert(js.size() == 2);

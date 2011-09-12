@@ -60,6 +60,18 @@ namespace controller {
     robot_ = robot;
     last_time_ = robot->getTime();
 
+    //joint 0s
+    if( joint_name.substr(3,1).compare("0") == 0)
+    {
+      std::string j2 = joint_name.substr(0,3) + "2";
+      joint_state_ = robot_->getJointState(j2);
+      if (!joint_state_)
+      {
+        ROS_ERROR("SrhEffortJointController could not find joint named \"%s\"\n",
+                  joint_name.c_str());
+        return false;
+      }
+    }
     joint_state_ = robot_->getJointState(joint_name);
     if (!joint_state_)
     {
