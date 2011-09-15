@@ -211,9 +211,9 @@ class FullMovement(threading.Thread):
 
 
         self.possible_movements = {"Motor Force": None,
-                                   "Position":[ StepMovement(joint_name, amplitude = 1.0, offset= 0.6, nb_steps = 100, controller_type = "Position"),
-                                                SinusoidMovement(joint_name, amplitude = 0.6, offset = 0.65, controller_type = "Position"),
-                                                StepMovement(joint_name, amplitude=0.5, offset = 0.55, nb_steps = 10, controller_type = "Position")],
+                                   "Position":[ StepMovement(joint_name, amplitude = 0.1, offset= 0.3, nb_steps = 100, controller_type = "Position"),
+                                                SinusoidMovement(joint_name, amplitude = 0.1, offset = 0.3, controller_type = "Position"),
+                                                StepMovement(joint_name, amplitude=0.1, offset = 0.3, nb_steps = 10, controller_type = "Position")],
                                    "Velocity":[ StepMovement(joint_name, amplitude = 0.3, nb_steps = 100, controller_type = "Velocity"),
                                                 SinusoidMovement(joint_name, amplitude = 0.1, offset = 0.0, controller_type = "Velocity"),
                                                 StepMovement(joint_name, amplitude=0.5, nb_steps = 10, controller_type = "Velocity")],

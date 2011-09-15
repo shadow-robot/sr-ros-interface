@@ -49,8 +49,8 @@ class BaseMovement(object):
 
     def publish(self, mvt_percentage):
         result = self.update(mvt_percentage)
-        self.publisher_j4.publish(self.msg_to_send_j3)
-        self.publisher_j3.publish(self.msg_to_send_j4)
+        self.publisher_j3.publish(self.msg_to_send_j3)
+        self.publisher_j4.publish(self.msg_to_send_j4)
         time.sleep(self.sleep_time)
         return result
 
@@ -66,7 +66,7 @@ class BaseMovement(object):
             self.publisher_j4 = None
 
 class BaseMovementWithLatching(BaseMovement):
-    def __init__(self, finger_name, epsilon = 0.008):
+    def __init__(self, finger_name, epsilon = 0.03):
         BaseMovement.__init__(self, finger_name)
 
         self.mutex = threading.Lock()
@@ -97,7 +97,7 @@ class BaseMovementWithLatching(BaseMovement):
 
 
 class EllipsoidMovement(BaseMovementWithLatching):
-    def __init__(self, finger_name, amplitude_j3 = 0.15, amplitude_j4 = 0.3, offset_j3 = 0.78, offset_j4 = 0.0, epsilon = 0.008):
+    def __init__(self, finger_name, amplitude_j3 = 0.15, amplitude_j4 = 0.3, offset_j3 = 0.78, offset_j4 = 0.0, epsilon = 0.03):
         BaseMovementWithLatching.__init__(self,finger_name, epsilon)
         self.amplitude_j3 = amplitude_j3
         self.amplitude_j4 = amplitude_j4
@@ -119,6 +119,8 @@ class EllipsoidMovement(BaseMovementWithLatching):
             self.j4_target_ok = False
             j3 = self.amplitude_j3 * math.sin(2.0*3.14159 * mvt_percentage) + self.offset_j3
             j4 = self.amplitude_j4 * math.cos(2.0*3.14159 * mvt_percentage) + self.offset_j4
+
+            print " j3: ", j3, " j4: ", j4
 
             self.msg_to_send_j3.data = j3
             self.msg_to_send_j4.data = j4
