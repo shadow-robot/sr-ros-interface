@@ -10,33 +10,8 @@
   <!-- Controllers for the arm -->
   <rosparam file="$(find sr_hand)/model/hand_urdf/hand_controller.yaml" command="load"/>
   <rosparam file="$(find sr_hand)/model/arm_urdf/arm_controller.yaml" command="load"/>
-  <node name="spawn_trunk_controller" pkg="pr2_controller_manager" type="spawner" args="trunk_rotation_controller" respawn="false" output="screen" />
-  <node name="spawn_shoulder_controller" pkg="pr2_controller_manager" type="spawner" args="shoulder_rotation_controller" respawn="false" output="screen" />
-  <node name="spawn_elbow_controller" pkg="pr2_controller_manager" type="spawner" args="elbow_abduction_controller" respawn="false" output="screen" />
-  <node name="spawn_forearm_controller" pkg="pr2_controller_manager" type="spawner" args="forearm_rotation_controller" respawn="false" output="screen" />
-  <node name="spawn_wrist_controller" pkg="pr2_controller_manager" type="spawner" args="wrist_controller" respawn="false" output="screen" />
-  <node name="spawn_palm_controller" pkg="pr2_controller_manager" type="spawner" args="palm_controller" respawn="false" output="screen" />
-  <node name="spawn_ffknuckle_controller" pkg="pr2_controller_manager" type="spawner" args="ffknuckle_controller" respawn="false" output="screen" />
-  <node name="spawn_ffproximal_controller" pkg="pr2_controller_manager" type="spawner" args="ffproximal_controller" respawn="false" output="screen" />
-  <node name="spawn_ffmiddle_controller" pkg="pr2_controller_manager" type="spawner" args="ffmiddle_controller" respawn="false" output="screen" />
-  <node name="spawn_ffdistal_controller" pkg="pr2_controller_manager" type="spawner" args="ffdistal_controller" respawn="false" output="screen" />
-  <node name="spawn_mfknuckle_controller" pkg="pr2_controller_manager" type="spawner" args="mfknuckle_controller" respawn="false" output="screen" />
-  <node name="spawn_mfproximal_controller" pkg="pr2_controller_manager" type="spawner" args="mfproximal_controller" respawn="false" output="screen" />
-  <node name="spawn_mfmiddle_controller" pkg="pr2_controller_manager" type="spawner" args="mfmiddle_controller" respawn="false" output="screen" />
-  <node name="spawn_mfdistal_controller" pkg="pr2_controller_manager" type="spawner" args="mfdistal_controller" respawn="false" output="screen" />
-  <node name="spawn_rfknuckle_controller" pkg="pr2_controller_manager" type="spawner" args="rfknuckle_controller" respawn="false" output="screen" />
-  <node name="spawn_rfproximal_controller" pkg="pr2_controller_manager" type="spawner" args="rfproximal_controller" respawn="false" output="screen" />
-  <node name="spawn_rfmiddle_controller" pkg="pr2_controller_manager" type="spawner" args="rfmiddle_controller" respawn="false" output="screen" />
-  <node name="spawn_rfdistal_controller" pkg="pr2_controller_manager" type="spawner" args="rfdistal_controller" respawn="false" output="screen" />
-  <node name="spawn_lfmetacarpal_controller" pkg="pr2_controller_manager" type="spawner" args="lfmetacarpal_controller" respawn="false" output="screen" />
-  <node name="spawn_lfknuckle_controller" pkg="pr2_controller_manager" type="spawner" args="lfknuckle_controller" respawn="false" output="screen" />
-  <node name="spawn_lfproximal_controller" pkg="pr2_controller_manager" type="spawner" args="lfproximal_controller" respawn="false" output="screen" />
-  <node name="spawn_lfmiddle_controller" pkg="pr2_controller_manager" type="spawner" args="lfmiddle_controller" respawn="false" output="screen" />
-  <node name="spawn_lfdistal_controller" pkg="pr2_controller_manager" type="spawner" args="lfdistal_controller" respawn="false" output="screen" />
-  <node name="spawn_thbase_controller" pkg="pr2_controller_manager" type="spawner" args="thbase_controller" respawn="false" output="screen" />
-  <node name="spawn_thproximal_controller" pkg="pr2_controller_manager" type="spawner" args="thproximal_controller" respawn="false" output="screen" />
-  <node name="spawn_thhub_controller" pkg="pr2_controller_manager" type="spawner" args="thhub_controller" respawn="false" output="screen" />
-  <node name="spawn_thmiddle_controller" pkg="pr2_controller_manager" type="spawner" args="thmiddle_controller" respawn="false" output="screen" />
-  <node name="spawn_thdistal_controller" pkg="pr2_controller_manager" type="spawner" args="thdistal_controller" respawn="false" output="screen" />
+  <node name="spawn_gazebo_controllers"
+	pkg="pr2_controller_manager" type="spawner" respawn="false" output="screen"
+	args="trunk_rotation_controller shoulder_rotation_controller elbow_abduction_controller forearm_rotation_controller wrist_controller palm_controller ffknuckle_controller ffproximal_controller ffmiddle_controller mfknuckle_controller mfproximal_controller mfmiddle_controller rfknuckle_controller rfproximal_controller rfmiddle_controller lfmetacarpal_controller lfknuckle_controller lfproximal_controller lfmiddle_controller spawn_thbase_controller thbase_controller thproximal_controller thhub_controller thmiddle_controller thdistal_controller" />
 
 </launch>
