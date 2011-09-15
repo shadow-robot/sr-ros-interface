@@ -89,11 +89,13 @@
       <interface:audio name="dummy_gazebo_ros_time_iface_should_not_be_here"/>
     </controller:gazebo_ros_time>
     <!-- offer ROS services to spawn and delete models -->
+    <!--
     <controller:gazebo_ros_factory name="gazebo_ros_factory" plugin="libgazebo_ros_factory.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>1.0</updateRate>
       <interface:audio name="dummy_gazebo_ros_factory_iface_should_not_be_here"/>
     </controller:gazebo_ros_factory>
+    -->
   </model:physical>
 
   <!-- ground plane -->

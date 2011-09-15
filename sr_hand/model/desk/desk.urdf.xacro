@@ -23,6 +23,10 @@
   </link>
   <gazebo reference="desk_pillar">
     <material>Gazebo/Green</material>
+    <mu1>1000.0</mu1>
+    <mu2>1000.0</mu2>
+    <kp>10000000.0</kp>
+    <kd>1.0</kd>
     <selfCollide>true</selfCollide>
   </gazebo>
 
@@ -48,7 +52,15 @@
   </link>
   <gazebo reference="desk_support">
     <material>Gazebo/Green</material>
+    <mu1>1000.0</mu1>
+    <mu2>1000.0</mu2>
+    <kp>10000000.0</kp>
+    <kd>1.0</kd>
     <selfCollide>true</selfCollide>
+  </gazebo>
+
+  <gazebo>
+    <canonicalBody>desk_support</canonicalBody>
   </gazebo>
 
   <joint name="desk_joint" type="fixed">

@@ -8,19 +8,19 @@
 
   <link name="shadowarm_base">
     <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/> 
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.4" />
       <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"  izz="0.0" />
     </inertial>
     <visual>
-      <origin xyz="0 0 0.005" rpy="${M_PI/2} 0 0"/> 
+      <origin xyz="0 0 0.005" rpy="${M_PI/2} 0 0"/>
       <geometry name="shadowarm_base_visual">
         <mesh filename="package://sr_hand/model/meshes/arm/arm_base.mesh" scale="0.001 0.001 0.001" />
       </geometry>
       <material name="LightGrey" />
     </visual>
     <collision>
-      <origin xyz="0 0 0.005" rpy="0 0 0" /> 
+      <origin xyz="0 0 0.005" rpy="0 0 0" />
       <geometry name="shadowarm_base_collision">
         <box size="0.03 0.03 0.01"/>
       </geometry>
@@ -30,12 +30,6 @@
     <material>Gazebo/Grey</material>
     <selfCollide>true</selfCollide>
   </gazebo>
-
-  <joint name="base_fix" type="fixed">
-    <parent link="world"/>
-    <child link="shadowarm_base"/>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </joint>
 
 </xacro:macro>
 
