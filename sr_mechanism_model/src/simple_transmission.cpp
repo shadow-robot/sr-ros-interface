@@ -121,16 +121,22 @@ namespace sr_mechanism_model
   void SimpleTransmission::propagatePosition(
     std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
+    ROS_DEBUG(" propagate position");
+
     assert(as.size() == 1);
     assert(js.size() == 1);
     js[0]->position_ = (static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ / mechanical_reduction_) + js[0]->reference_position_;
     js[0]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
     js[0]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
+
+    ROS_DEBUG("end propagate position");
   }
 
   void SimpleTransmission::propagatePositionBackwards(
     std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
   {
+    ROS_DEBUG(" propagate position bw");
+
     assert(as.size() == 1);
     assert(js.size() == 1);
     static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ = (js[0]->position_ - js[0]->reference_position_) * mechanical_reduction_;
@@ -160,23 +166,33 @@ namespace sr_mechanism_model
 
     // simulate calibration sensors by filling out actuator states
     this->joint_calibration_simulator_.simulateJointCalibration(js[0],static_cast<sr_actuator::SrActuator*>(as[0]));
+
+    ROS_DEBUG(" end propagate position bw");
   }
 
   void SimpleTransmission::propagateEffort(
     std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
   {
+    ROS_DEBUG(" propagate effort");
+
     assert(as.size() == 1);
     assert(js.size() == 1);
     static_cast<sr_actuator::SrActuator*>(as[0])->command_.enable_ = true;
     static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ = js[0]->commanded_effort_ / mechanical_reduction_;
+
+    ROS_DEBUG("end propagate effort");
   }
 
   void SimpleTransmission::propagateEffortBackwards(
     std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
+    ROS_DEBUG(" propagate effort bw");
+
     assert(as.size() == 1);
     assert(js.size() == 1);
     js[0]->commanded_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ * mechanical_reduction_;
+
+    ROS_DEBUG("end propagate effort bw");
   }
 
 } //end namespace

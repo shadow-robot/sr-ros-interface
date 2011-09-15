@@ -68,6 +68,8 @@ namespace controller
 
     ///read all the controller settings from the parameter server
     void read_parameters();
+
+    std::string joint_name_;
   };
 } // namespace
 

@@ -55,6 +55,8 @@ namespace controller {
     ROS_DEBUG(" --------- ");
     ROS_DEBUG_STREAM("Init: " << joint_name);
 
+    joint_name_ = joint_name;
+
     assert(robot);
     robot_ = robot;
     last_time_ = robot->getTime();
@@ -166,6 +168,8 @@ namespace controller {
 
   void SrhJointPositionController::update()
   {
+    ROS_DEBUG_STREAM("updating controller: " << joint_name_);
+
     if( !has_j2)
     {
       if (!joint_state_->calibrated_)

@@ -121,6 +121,8 @@ namespace sr_mechanism_model
   void J0Transmission::propagatePosition(
     std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
+    ROS_DEBUG(" propagate position for j0");
+
     assert(as.size() == 1);
     assert(js.size() == 2);
 
@@ -145,12 +147,14 @@ namespace sr_mechanism_model
         js[1]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
       }
     }
+
+    ROS_DEBUG("end propagate position for j0");
   }
 
   void J0Transmission::propagatePositionBackwards(
     std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
   {
-    ROS_DEBUG("propagate pos backward");
+    ROS_DEBUG("propagate pos backward for j0");
 
     assert(as.size() == 1);
     assert(js.size() == 2);
@@ -183,26 +187,34 @@ namespace sr_mechanism_model
 
     // simulate calibration sensors by filling out actuator states
     this->joint_calibration_simulator_.simulateJointCalibration(js[0],static_cast<sr_actuator::SrActuator*>(as[0]));
+
+    ROS_DEBUG(" end propagate pos backward for j0");
   }
 
   void J0Transmission::propagateEffort(
     std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
   {
+    ROS_DEBUG(" propagate effort for j0");
+
     assert(as.size() == 1);
     assert(js.size() == 2);
     static_cast<sr_actuator::SrActuator*>(as[0])->command_.enable_ = true;
     static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ = (js[0]->commanded_effort_ + js[1]->commanded_effort_) / mechanical_reduction_;
+
+    ROS_DEBUG("end propagate effort for j0");
   }
 
   void J0Transmission::propagateEffortBackwards(
     std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
-    ROS_DEBUG("propagate effort backward");
+    ROS_DEBUG("propagate effort backward for j0");
 
     assert(as.size() == 1);
     assert(js.size() == 2);
     js[0]->commanded_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ * mechanical_reduction_;
     js[1]->commanded_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ * mechanical_reduction_;
+
+    ROS_DEBUG("end propagate effort backward for j0");
   }
 
 } //end namespace sr_mechanism_model
