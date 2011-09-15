@@ -129,20 +129,21 @@ namespace sr_mechanism_model
     int size = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_.size();
     if( size != 0)
     {
-      assert( size == 2 );
+      if( size == 2 )
+      {
+        ROS_DEBUG_STREAM( "READING pos " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_
+                          << " J1 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0]
+                          << " J2 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1] );
 
-      ROS_DEBUG_STREAM( "READING pos " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_
-                        << " J1 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0]
-                        << " J2 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1] );
+        js[0]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0];
+        js[1]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1];
 
-      js[0]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0];
-      js[1]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1];
+        js[0]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
+        js[1]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
 
-      js[0]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
-      js[1]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
-
-      js[0]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
-      js[1]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
+        js[0]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
+        js[1]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
+      }
     }
   }
 
@@ -196,7 +197,7 @@ namespace sr_mechanism_model
   void J0Transmission::propagateEffortBackwards(
     std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
   {
-    ROS_ERROR("propagate effort backward");
+    ROS_DEBUG("propagate effort backward");
 
     assert(as.size() == 1);
     assert(js.size() == 2);
