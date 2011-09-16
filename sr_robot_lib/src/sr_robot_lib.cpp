@@ -194,7 +194,7 @@ namespace shadow_robot
     if( reconfig_queue.empty() && reset_motors_queue.empty() )
     {
       //no config to send
-      command->to_motor_data_type   = MOTOR_DEMAND_TORQUE;
+      command->to_motor_data_type   = MOTOR_DEMAND_PWM;
 
       //loop on all the joints and update their motor: we're sending commands to all the motors.
       boost::ptr_vector<shadow_joints::Joint>::iterator joint_tmp = joints_vector.begin();
