@@ -1,5 +1,5 @@
 /**
- * @file   individual.hpp
+ * @file   population.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Fri Sep 16 15:09:56 2011
 *
@@ -24,28 +24,31 @@
  *
  */
 
-#ifndef _INDIVIDUAL_HPP_
-#define _INDIVIDUAL_HPP_
-
-#include <boost/ptr_container/ptr_vector.hpp>
-
-#include <sr_utilities/mtrand.h>
+#include "sr_genetic_algorithm/population.hpp"
 
 namespace shadow_robot
 {
-  class Individual
+  Population::Population(unsigned int genome_size; unsigned int population_size)
   {
-  public:
-    Individual(unsigned int genome_size);
-    virtual ~Individual();
+    for( unsigned int i=0; i < population_size; ++i)
+    {
+      individuals.push_back(new Individual(genome_size));
+    }
+  }
 
-  protected:
-    ///random number generator
-    sr_utilities::MTRand drand;
+  Population::Population(boost::ptr_vector<Individual> individuals)
+  {
+    this->individuals = individuals;
+  }
 
-    boost::ptr_vector<int> genome;
+  Population::~Population()
+  {
+  }
 
-  };
+  bool Population::run()
+  {
+
+  }
 }
 
 /* For the emacs weenies in the crowd.
@@ -53,5 +56,3 @@ Local Variables:
    c-basic-offset: 2
 End:
 */
-
-#endif

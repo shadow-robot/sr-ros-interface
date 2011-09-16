@@ -17,6 +17,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_library(sr_calibration src/calibration.cpp)
+rosbuild_add_library(mt_rand src/mtrand.cpp)
 
 
 rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/calibration.cpp)

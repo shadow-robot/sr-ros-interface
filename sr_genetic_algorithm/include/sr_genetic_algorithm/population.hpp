@@ -36,11 +36,22 @@ namespace shadow_robot
   class Population
   {
   public:
-    Population();
+    Population(unsigned int genome_size; unsigned int population_size);
+    Population(boost::ptr_vector<Individual> individuals);
     virtual ~Population();
+
+    bool run();
 
   protected:
     boost::ptr_vector<Individual> individuals;
+
+    void selection();
+    void reproduction();
+    bool termination();
+
+    void mutation();
+    void crossover();
+
   };
 }
 
