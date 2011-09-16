@@ -24,14 +24,14 @@
  *
  */
 
-#include "sr_edc_mechanism_controllers/srh_fake_joint_calibration_controller.h"
+#include "sr_mechanism_controllers/srh_fake_joint_calibration_controller.h"
 #include "ros/time.h"
 #include "pluginlib/class_list_macros.h"
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <sr_robot_msgs/ForceController.h>
 
-PLUGINLIB_DECLARE_CLASS(sr_edc_mechanism_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
+PLUGINLIB_DECLARE_CLASS(sr_mechanism_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
 
 using namespace std;
 

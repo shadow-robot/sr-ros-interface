@@ -23,7 +23,7 @@
  *
  */
 
-#include "sr_edc_mechanism_controllers/sr_controller.hpp"
+#include "sr_mechanism_controllers/sr_controller.hpp"
 #include "angles/angles.h"
 #include "pluginlib/class_list_macros.h"
 #include <sstream>

@@ -28,8 +28,8 @@
 #ifndef _SRH_JOINT_VELOCITY_CONTROLLER_HPP_
 #define _SRH_JOINT_VELOCITY_CONTROLLER_HPP_
 
-#include <sr_edc_mechanism_controllers/sr_controller.hpp>
-#include <sr_edc_mechanism_controllers/sr_friction_compensation.hpp>
+#include <sr_mechanism_controllers/sr_controller.hpp>
+#include <sr_mechanism_controllers/sr_friction_compensation.hpp>
 
 
 namespace controller

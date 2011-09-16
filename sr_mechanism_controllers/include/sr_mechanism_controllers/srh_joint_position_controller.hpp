@@ -28,7 +28,7 @@
 #ifndef _SRH_JOINT_POSITION_CONTROLLER_HPP_
 #define _SRH_JOINT_POSITION_CONTROLLER_HPP_
 
-#include <sr_edc_mechanism_controllers/sr_controller.hpp>
+#include <sr_mechanism_controllers/sr_controller.hpp>
 
 
 namespace controller

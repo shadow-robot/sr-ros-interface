@@ -36,7 +36,7 @@
 #ifndef SRH_MIXED_POSITION_VELOCITY_CONTROLLER_H
 #define SRH_MIXED_POSITION_VELOCITY_CONTROLLER_H
 
-#include <sr_edc_mechanism_controllers/sr_controller.hpp>
+#include <sr_mechanism_controllers/sr_controller.hpp>
 #include <sr_robot_msgs/SetMixedPositionVelocityPidGains.h>
 
 namespace controller

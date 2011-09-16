@@ -23,7 +23,7 @@
  *
  */
 
-#include "sr_edc_mechanism_controllers/sr_friction_compensation.hpp"
+#include "sr_mechanism_controllers/sr_friction_compensation.hpp"
 
 #include <sstream>
 #include <math.h>

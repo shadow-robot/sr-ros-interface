@@ -1,5 +1,5 @@
 wrist_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: WRJ2
   pid:
     p: 60.0
@@ -12,7 +12,7 @@ wrist_controller:
     position_deadband: 0.0
 
 palm_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: WRJ1
   pid:
     p: 60.0
@@ -25,7 +25,7 @@ palm_controller:
     position_deadband: 0.0
 
 ffknuckle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: FFJ4
   pid:
     p: 28.0
@@ -38,7 +38,7 @@ ffknuckle_controller:
     position_deadband: 0.0
 
 ffproximal_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: FFJ3
   pid:
     p: 44.0
@@ -51,7 +51,7 @@ ffproximal_controller:
     position_deadband: 0.0
 
 ffmiddle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: FFJ0
   pid:
     p: 39.0
@@ -64,7 +64,7 @@ ffmiddle_controller:
     position_deadband: 0.0
 
 mfknuckle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: MFJ4
   pid:
     p: 28.0
@@ -77,7 +77,7 @@ mfknuckle_controller:
     position_deadband: 0.0
 
 mfproximal_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: MFJ3
   pid:
     p: 44.0
@@ -90,7 +90,7 @@ mfproximal_controller:
     position_deadband: 0.0
 
 mfmiddle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: MFJ0
   pid:
     p: 39.0
@@ -103,7 +103,7 @@ mfmiddle_controller:
     position_deadband: 0.0
 
 rfknuckle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: RFJ4
   pid:
     p: 28.0
@@ -116,7 +116,7 @@ rfknuckle_controller:
     position_deadband: 0.0
 
 rfproximal_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: RFJ3
   pid:
     p: 44.0
@@ -129,7 +129,7 @@ rfproximal_controller:
     position_deadband: 0.0
 
 rfmiddle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: RFJ0
   pid:
     p: 39.0
@@ -142,7 +142,7 @@ rfmiddle_controller:
     position_deadband: 0.0
 
 lfmetacarpal_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: LFJ5
   pid:
     p: 8.0
@@ -155,7 +155,7 @@ lfmetacarpal_controller:
     position_deadband: 0.0
 
 lfknuckle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: LFJ4
   pid:
     p: 28.0
@@ -168,7 +168,7 @@ lfknuckle_controller:
     position_deadband: 0.0
 
 lfproximal_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: LFJ3
   pid:
     p: 44.0
@@ -181,7 +181,7 @@ lfproximal_controller:
     position_deadband: 0.0
 
 lfmiddle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: LFJ0
   pid:
     p: 39.0
@@ -194,7 +194,7 @@ lfmiddle_controller:
     position_deadband: 0.0
 
 thbase_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: THJ5
   pid:
     p: 55.0
@@ -207,7 +207,7 @@ thbase_controller:
     position_deadband: 0.0
 
 thproximal_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: THJ4
   pid:
     p: 52.0
@@ -220,7 +220,7 @@ thproximal_controller:
     position_deadband: 0.0
 
 thhub_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: THJ3
   pid:
     p: 48.0
@@ -233,7 +233,7 @@ thhub_controller:
     position_deadband: 0.0
 
 thmiddle_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: THJ2
   pid:
     p: 46.0
@@ -246,7 +246,7 @@ thmiddle_controller:
     position_deadband: 0.0
 
 thdistal_controller:
-  type: sr_edc_mechanism_controllers/SrhJointPositionController
+  type: sr_mechanism_controllers/SrhJointPositionController
   joint: THJ1
   pid:
     p: 43.0

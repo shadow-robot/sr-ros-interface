@@ -30,7 +30,7 @@
 #ifndef _SRH_EFFORT_CONTROLLER_HPP_
 #define _SRH_EFFORT_CONTROLLER_HPP_
 
-#include <sr_edc_mechanism_controllers/sr_controller.hpp>
+#include <sr_mechanism_controllers/sr_controller.hpp>
 #include <sr_robot_msgs/SetEffortControllerGains.h>
 
 namespace controller

@@ -24,9 +24,9 @@
  *
  */
 
-#include "sr_edc_mechanism_controllers/test/test_controllers.hpp"
+#include "sr_mechanism_controllers/test/test_controllers.hpp"
 
-#include "sr_edc_mechanism_controllers/srh_joint_position_controller.hpp"
+#include "sr_mechanism_controllers/srh_joint_position_controller.hpp"
 
 #include <gtest/gtest.h>
 

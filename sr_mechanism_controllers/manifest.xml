@@ -1,7 +1,7 @@
 <package>
-  <description brief="sr_edc_mechanism_controllers">
+  <description brief="sr_mechanism_controllers">
 
-     The sr_edc_mechanism_controllers package contains different types of
+     The sr_mechanism_controllers package contains different types of
      controllers for the etherCAT hand:(fake) calibration controllers,
      position controllers, velocity controllers, force controllers, ...
 
@@ -9,7 +9,7 @@
   <author>Ugo Cupcic / ugo@shadowrobot.com , contact@shadowrobot.com</author>
   <license>GPL</license>
   <review status="NA" notes=""/>
-  <url>http://ros.org/wiki/sr_edc_mechanism_controllers</url>
+  <url>http://ros.org/wiki/sr_mechanism_controllers</url>
 
   <depend package="std_msgs" />
   <depend package="std_srvs" />

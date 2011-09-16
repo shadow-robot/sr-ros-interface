@@ -23,7 +23,7 @@
  * demand by a PID loop.
  *
  */
-#include "sr_edc_mechanism_controllers/test/test_controllers.hpp"
+#include "sr_mechanism_controllers/test/test_controllers.hpp"
 
 TestControllers::TestControllers()
 {

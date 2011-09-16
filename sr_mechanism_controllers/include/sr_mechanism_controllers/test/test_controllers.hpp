@@ -27,7 +27,7 @@
 #ifndef _SR_TEST_CONTROLLERS_HPP_
 #define _SR_TEST_CONTROLLERS_HPP_
 
-#include "sr_edc_mechanism_controllers/sr_controller.hpp"
+#include "sr_mechanism_controllers/sr_controller.hpp"
 #include <boost/smart_ptr.hpp>
 
 #include <control_toolbox/pid.h>

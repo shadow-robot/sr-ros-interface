@@ -26,7 +26,7 @@
  *
  */
 
-#include "sr_edc_mechanism_controllers/srh_joint_effort_controller.hpp"
+#include "sr_mechanism_controllers/srh_joint_effort_controller.hpp"
 #include "angles/angles.h"
 #include "pluginlib/class_list_macros.h"
 #include <sstream>
@@ -35,7 +35,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_DECLARE_CLASS(sr_edc_mechanism_controllers, SrhEffortJointController, controller::SrhEffortJointController, pr2_controller_interface::Controller)
+PLUGINLIB_DECLARE_CLASS(sr_mechanism_controllers, SrhEffortJointController, controller::SrhEffortJointController, pr2_controller_interface::Controller)
 
 using namespace std;
 
