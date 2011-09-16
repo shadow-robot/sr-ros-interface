@@ -1,0 +1,14 @@
+<package>
+  <description brief="sr_genetic_algorithm">
+
+    This is a generic genetic algorithm library.
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_genetic_algorithm</url>
+  <depend package="roscpp"/>
+</package>
+
+
