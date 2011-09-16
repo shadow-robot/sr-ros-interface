@@ -1,0 +1,20 @@
+<package>
+  <description brief="sr_hardware_interface">
+
+    This package contains the actuator used in the hand model.
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_hardware_interface</url>
+  <depend package="roscpp"/>
+  <depend package="pr2_hardware_interface"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include"/>
+  </export>
+
+</package>
+
+

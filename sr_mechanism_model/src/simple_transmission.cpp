@@ -42,7 +42,7 @@
 #include "pr2_mechanism_model/robot.h"
 #include "sr_mechanism_model/simple_transmission.h"
 
-#include <sr_robot_lib/sr_actuator.hpp>
+#include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace pr2_hardware_interface;
 

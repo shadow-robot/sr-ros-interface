@@ -11,8 +11,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_mechanism_model</url>
   <depend package="roscpp"/>
+  <depend package="sr_hardware_interface"/>
   <depend package="pr2_mechanism_model"/>
-  <depend package="sr_robot_lib"/>
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_mechanism_model -Wl,-rpath,${prefix}/lib"/>

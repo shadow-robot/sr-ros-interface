@@ -10,7 +10,7 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
 
-The C compiler identification is GNU, found in "/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CompilerIdC/a.out"
+The C compiler identification is GNU, found in "/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CompilerIdC/a.out"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: /usr/bin/c++ 
@@ -26,33 +26,33 @@ CMakeCXXCompilerId.cpp:193: warning: deprecated conversion from string constant 
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
 
-The CXX compiler identification is GNU, found in "/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CompilerIdCXX/a.out"
+The CXX compiler identification is GNU, found in "/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CompilerIdCXX/a.out"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp
+Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp
 
 Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
-make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
 /usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
-make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
-/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1
 Building C object CMakeFiles/cmTryCompileExec.dir/testCCompiler.c.o
-/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec.dir/testCCompiler.c.o   -c /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp/testCCompiler.c
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec.dir/testCCompiler.c.o   -c /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp/testCCompiler.c
 Linking C executable cmTryCompileExec
 /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
 /usr/bin/gcc        CMakeFiles/cmTryCompileExec.dir/testCCompiler.c.o  -o cmTryCompileExec -rdynamic 
-make[2]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[2]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp
+Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp
 
 Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
-make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
 /usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
-make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
-/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1
 Building C object CMakeFiles/cmTryCompileExec.dir/CMakeCCompilerABI.c.o
 /usr/bin/gcc    -o CMakeFiles/cmTryCompileExec.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-2.8/Modules/CMakeCCompilerABI.c
 Linking C executable cmTryCompileExec
@@ -67,19 +67,19 @@ COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.4.5/:/usr/lib/gcc/x86_64-linux-gnu
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.4.5/:/usr/lib/gcc/x86_64-linux-gnu/4.4.5/:/usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../:/lib/:/usr/lib/:/usr/lib/x86_64-linux-gnu/
 COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec' '-rdynamic' '-mtune=generic'
  /usr/lib/gcc/x86_64-linux-gnu/4.4.5/collect2 --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=both -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec /usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.4.5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.4.5 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.5 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../.. -L/usr/lib/x86_64-linux-gnu CMakeFiles/cmTryCompileExec.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.4.5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib/crtn.o
-make[2]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[2]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
 
 
 Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp]
   ignore line: []
   ignore line: [Run Build Command:/usr/bin/make "cmTryCompileExec/fast"]
-  ignore line: [make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp']
+  ignore line: [make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp']
   ignore line: [/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build]
-  ignore line: [make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
   ignore line: [Building C object CMakeFiles/cmTryCompileExec.dir/CMakeCCompilerABI.c.o]
   ignore line: [/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-2.8/Modules/CMakeCCompilerABI.c]
   ignore line: [Linking C executable cmTryCompileExec]
@@ -143,30 +143,30 @@ Parsed C implicit link information from above output:
 
 
 Determining if the CXX compiler works passed with the following output:
-Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp
+Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp
 
 Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
-make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
 /usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
-make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
-/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1
 Building CXX object CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o
-/usr/bin/c++     -o CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o -c /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+/usr/bin/c++     -o CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o -c /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
 Linking CXX executable cmTryCompileExec
 /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
 /usr/bin/c++         CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec -rdynamic 
-make[2]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[2]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp
+Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp
 
 Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
-make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
 /usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
-make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
-/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1
 Building CXX object CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o
 /usr/bin/c++     -o CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-2.8/Modules/CMakeCXXCompilerABI.cpp
 Linking CXX executable cmTryCompileExec
@@ -181,19 +181,19 @@ COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.4.5/:/usr/lib/gcc/x86_64-linux-gnu
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.4.5/:/usr/lib/gcc/x86_64-linux-gnu/4.4.5/:/usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../:/lib/:/usr/lib/:/usr/lib/x86_64-linux-gnu/
 COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec' '-rdynamic' '-shared-libgcc' '-mtune=generic'
  /usr/lib/gcc/x86_64-linux-gnu/4.4.5/collect2 --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=both -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec /usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.4.5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.4.5 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.5 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../.. -L/usr/lib/x86_64-linux-gnu CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/4.4.5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.4.5/../../../../lib/crtn.o
-make[2]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[2]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp'
 
 
 Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp]
   ignore line: []
   ignore line: [Run Build Command:/usr/bin/make "cmTryCompileExec/fast"]
-  ignore line: [make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp']
+  ignore line: [make[1]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp']
   ignore line: [/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build]
-  ignore line: [make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [make[2]: Entering directory `/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
   ignore line: [Building CXX object CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o]
   ignore line: [/usr/bin/c++     -o CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-2.8/Modules/CMakeCXXCompilerABI.cpp]
   ignore line: [Linking CXX executable cmTryCompileExec]

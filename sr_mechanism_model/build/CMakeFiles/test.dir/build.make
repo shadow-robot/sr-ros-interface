@@ -32,10 +32,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model
+CMAKE_SOURCE_DIR = /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build
+CMAKE_BINARY_DIR = /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build
 
 # Utility rule file for test.
 
@@ -54,6 +54,6 @@ CMakeFiles/test.dir/clean:
 .PHONY : CMakeFiles/test.dir/clean
 
 CMakeFiles/test.dir/depend:
-	cd /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/CMakeFiles/test.dir/DependInfo.cmake --color=$(COLOR)
+	cd /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/CMakeFiles/test.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/test.dir/depend
 

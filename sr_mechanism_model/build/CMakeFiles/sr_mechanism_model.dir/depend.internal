@@ -3,8 +3,8 @@
 
 CMakeFiles/sr_mechanism_model.dir/src/joint_0_transmission.o
  ../include/sr_mechanism_model/joint_0_transmission.hpp
- /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/src/joint_0_transmission.cpp
- /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_robot_lib/include/sr_robot_lib/sr_actuator.hpp
+ /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_hardware_interface/include/sr_hardware_interface/sr_actuator.hpp
+ /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/src/joint_0_transmission.cpp
  /code/ros/common/pluginlib/include/Poco/Bugcheck.h
  /code/ros/common/pluginlib/include/Poco/ClassLibrary.h
  /code/ros/common/pluginlib/include/Poco/Config.h
@@ -90,8 +90,8 @@ CMakeFiles/sr_mechanism_model.dir/src/joint_0_transmission.o
  /code/ros/ros_comm/utilities/xmlrpcpp/src/XmlRpcValue.h
 CMakeFiles/sr_mechanism_model.dir/src/simple_transmission.o
  ../include/sr_mechanism_model/simple_transmission.h
- /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/src/simple_transmission.cpp
- /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_robot_lib/include/sr_robot_lib/sr_actuator.hpp
+ /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_hardware_interface/include/sr_hardware_interface/sr_actuator.hpp
+ /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/src/simple_transmission.cpp
  /code/ros/common/pluginlib/include/Poco/Bugcheck.h
  /code/ros/common/pluginlib/include/Poco/ClassLibrary.h
  /code/ros/common/pluginlib/include/Poco/Config.h

@@ -1,4 +1,4 @@
-# Install script for directory: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model
+# Install script for directory: /code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot_ethercat/sr_mechanism_model/build/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/code/Projects/ROS_interfaces/etherCAT_workspace/shadow_robot/sr_mechanism_model/build/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)
