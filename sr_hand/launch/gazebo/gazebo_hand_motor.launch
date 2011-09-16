@@ -11,6 +11,6 @@
   <rosparam file="$(find sr_hand)/model/hand_urdf/hand_controller.yaml" command="load"/>
   <node name="spawn_gazebo_controllers"
 	pkg="pr2_controller_manager" type="spawner" respawn="false" output="screen"
-	args="wrist_controller palm_controller ffknuckle_controller ffproximal_controller ffmiddle_controller mfknuckle_controller mfproximal_controller mfmiddle_controller rfknuckle_controller rfproximal_controller rfmiddle_controller lfmetacarpal_controller lfknuckle_controller lfproximal_controller lfmiddle_controller spawn_thbase_controller thbase_controller thproximal_controller thhub_controller thmiddle_controller thdistal_controller" />
+	args="wrist_controller palm_controller ffknuckle_controller ffproximal_controller ffmiddle_controller mfknuckle_controller mfproximal_controller mfmiddle_controller rfknuckle_controller rfproximal_controller rfmiddle_controller lfmetacarpal_controller lfknuckle_controller lfproximal_controller lfmiddle_controller thbase_controller thproximal_controller thhub_controller thmiddle_controller thdistal_controller" />
 
 </launch>
