@@ -37,7 +37,7 @@ namespace shadow_robot
     unsigned int max_number_function_evaluation;
 
     enum TerminationReason{NO_CONVERGENCE,
-                           BEST_FITNESS, MAX_ITERATION_NUMBER, MAX_NUMBER_FUNCTION_EVALUTION};
+                           BEST_FITNESS, MAX_ITERATION_NUMBER, MAX_NUMBER_FUNCTION_EVALUATION};
   };
 }
 

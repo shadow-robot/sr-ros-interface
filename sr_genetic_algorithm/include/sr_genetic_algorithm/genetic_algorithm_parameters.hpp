@@ -24,39 +24,16 @@
  *
  */
 
-#include "sr_genetic_algorithm/genetic_algorithm.hpp"
-#include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
+#ifndef _GENETIC_ALGORITHM_PARAMETERS_HPP_
+#define _GENETIC_ALGORITHM_PARAMETERS_HPP_
 
 namespace shadow_robot
 {
-  template <class GeneType>
-  GeneticAlgorithm<GeneType>::GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion)
+  struct GeneticAlgorithmParameters
   {
-    population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size, termination_criterion));
-  }
-
-  template <class GeneType>
-  GeneticAlgorithm<GeneType>::~GeneticAlgorithm()
-  {
-  }
-
-  template <class GeneType>
-  TerminationCriterion::TerminationReason GeneticAlgorithm<GeneType>::run()
-  {
-    return TerminationCriterion::NO_CONVERGENCE;
-  }
-
-  template <class GeneType>
-  bool GeneticAlgorithm<GeneType>::pause()
-  {
-    return true;
-  }
-
-  template <class GeneType>
-  bool GeneticAlgorithm<GeneType>::stop()
-  {
-    return true;
-  }
+    double crossover_probability;
+    double mutation_probability;
+  };
 }
 
 /* For the emacs weenies in the crowd.
@@ -64,3 +41,5 @@ Local Variables:
    c-basic-offset: 2
 End:
 */
+
+#endif

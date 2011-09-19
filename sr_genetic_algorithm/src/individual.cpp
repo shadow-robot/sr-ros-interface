@@ -32,7 +32,6 @@ namespace shadow_robot
   template <class GeneType>
   const GeneType Individual<GeneType>::gene_max_percentage_change = 0.5;
 
-
   template <class GeneType>
   Individual<GeneType>::Individual(std::vector<GeneType> starting_seed, double max_mutation_percentage_rate)
     : max_mutation_percentage_rate(max_mutation_percentage_rate)
@@ -57,6 +56,18 @@ namespace shadow_robot
     }
 
     range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
+  }
+
+  template <class GeneType>
+  Individual<GeneType>::Individual(Individual<GeneType> a, Individual<GeneType> b)
+  {
+    //create the new individual, using a crossover.
+    genome = a.genome;
+    range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
+
+    int index_for_crossover = range_rand();
+    for(unsigned int i=index_for_crossover; i < genome.size(); ++i)
+      genome[i] = b.genome[i];
   }
 
   template <class GeneType>

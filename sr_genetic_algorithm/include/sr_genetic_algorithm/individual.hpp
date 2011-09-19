@@ -39,12 +39,19 @@ namespace shadow_robot
   {
   public:
     Individual(std::vector<GeneType> starting_seed, double max_mutation_percentage_rate = 0.5);
+    /**
+     * Constructors for the crossover:
+     *  Creates a new individual from the 2 given individuals.
+     */
+    Individual(Individual<GeneType> a, Individual<GeneType> b);
     virtual ~Individual();
 
     /**
      * Randomly mutates a gene of this individual.
      */
     void mutate();
+
+    void compute_fitness();
 
     /**
      * Returns the fitness for this individual.
@@ -54,21 +61,34 @@ namespace shadow_robot
     {
       return fitness;
     };
-
-
   protected:
     double fitness;
-
-    ///random number generator
-    sr_utilities::MTRand drand;
-    boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> > range_rand;
 
     double max_mutation_percentage_rate;
 
     boost::ptr_vector<GeneType> genome;
 
+    ///random number generators
+    sr_utilities::MTRand drand;
+    boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> > range_rand;
+
     static const GeneType gene_max_percentage_change;
   };
+}
+
+namespace compare_fitness
+{
+  /**
+   * Used to sort the vector of individuals
+   * with their fitnesses.
+   *
+   * @return true if fitness Individual A < fitness Individual B.
+   */
+  template <class GeneType>
+  static bool sort_by_fitness( shadow_robot::Individual<GeneType> a, shadow_robot::Individual<GeneType> b )
+  {
+    return a.get_fitness() < b.get_fitness();
+  }
 }
 
 /* For the emacs weenies in the crowd.

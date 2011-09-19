@@ -31,6 +31,9 @@
 
 #include "sr_genetic_algorithm/individual.hpp"
 #include "sr_genetic_algorithm/termination_criterion.hpp"
+#include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
+
+#include <sr_utilities/mtrand.h>
 
 namespace shadow_robot
 {
@@ -53,14 +56,33 @@ namespace shadow_robot
     TerminationCriterion::TerminationReason cycle_once();
 
   protected:
+    /**
+     * Using a double buffer to store the individuals (swap from the recent to the old
+     *  one during the reproduction cycle).
+     */
     boost::shared_ptr<std::vector<Individual<GeneType> > > individuals, individuals_old;
 
-    void selection();
-    void reproduction();
+    GeneticAlgorithmParameters ga_parameters;
+
+    double total_fitness;
+
+    /**
+     * Select 2 individuals to be parents, using the roulette-wheel selection.
+     *
+     *
+     * @return a pair containing the 2 indexes of the selected parents.
+     */
+    std::pair<int, int> select();
+    int roulette_wheel();
+
+    ///random number generators
+    sr_utilities::MTRand drand;
+
+    void compute_fitnesses();
     TerminationCriterion::TerminationReason check_termination();
 
-    void mutation();
-    void crossover();
+    void mutation(int index);
+    void crossover(std::pair<int, int> selected_indexes);
 
     ///counts the number of iteration we did
     unsigned int iteration_index;
