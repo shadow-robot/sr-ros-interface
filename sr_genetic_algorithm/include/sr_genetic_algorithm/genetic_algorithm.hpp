@@ -30,17 +30,23 @@
 #include <boost/smart_ptr.hpp>
 
 #include "sr_genetic_algorithm/population.hpp"
+#include "sr_genetic_algorithm/termination_criterion.hpp"
 
 namespace shadow_robot
 {
+  template <class GeneType>
   class GeneticAlgorithm
   {
   public:
-    GeneticAlgorithm();
+    GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion);
     virtual ~GeneticAlgorithm();
 
+    TerminationCriterion::TerminationReason run();
+    bool pause();
+    bool stop();
+
   protected:
-    boost::shared_ptr<Population> population;
+    boost::shared_ptr<Population<GeneType> > population;
 
   };
 }

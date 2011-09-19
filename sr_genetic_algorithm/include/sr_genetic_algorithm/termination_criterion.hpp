@@ -1,5 +1,5 @@
 /**
- * @file   individual.hpp
+ * @file   genetic_algorithm.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Fri Sep 16 15:09:56 2011
 *
@@ -24,50 +24,20 @@
  *
  */
 
-#ifndef _INDIVIDUAL_HPP_
-#define _INDIVIDUAL_HPP_
-
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/smart_ptr.hpp>
-
-#include <sr_utilities/mtrand.h>
+#ifndef _TERMINATION_CRITERION_HPP_
+#define _TERMINATION_CRITERION_HPP_
 
 namespace shadow_robot
 {
-  template <class GeneType>
-  class Individual
+  struct TerminationCriterion
   {
-  public:
-    Individual(std::vector<GeneType> starting_seed, double max_mutation_percentage_rate = 0.5);
-    virtual ~Individual();
+    double best_fitness;
 
-    /**
-     * Randomly mutates a gene of this individual.
-     */
-    void mutate();
+    unsigned int max_iteration_number;
+    unsigned int max_number_function_evaluation;
 
-    /**
-     * Returns the fitness for this individual.
-     * @return fitness value
-     */
-    double get_fitness()
-    {
-      return fitness;
-    };
-
-
-  protected:
-    double fitness;
-
-    ///random number generator
-    sr_utilities::MTRand drand;
-    boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> > range_rand;
-
-    double max_mutation_percentage_rate;
-
-    boost::ptr_vector<GeneType> genome;
-
-    static const GeneType gene_max_percentage_change;
+    enum TerminationReason{NO_CONVERGENCE,
+                           BEST_FITNESS, MAX_ITERATION_NUMBER, MAX_NUMBER_FUNCTION_EVALUTION};
   };
 }
 

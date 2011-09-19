@@ -30,28 +30,44 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include "sr_genetic_algorithm/individual.hpp"
+#include "sr_genetic_algorithm/termination_criterion.hpp"
 
 namespace shadow_robot
 {
+  template <class GeneType>
   class Population
   {
   public:
-    Population(unsigned int genome_size; unsigned int population_size);
-    Population(boost::ptr_vector<Individual> individuals);
+    Population(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion);
+    Population(boost::shared_ptr<std::vector<Individual<GeneType> > > individuals, TerminationCriterion termination_criterion);
     virtual ~Population();
 
-    bool run();
+    /**
+     * Runs one cycle of the GA:
+     * - selection
+     * - reproduction
+     * - evaluate fitness
+     *
+     * @return NO_CONVERGENCE if no termination reached, a TerminationReason otherwise.
+     */
+    TerminationCriterion::TerminationReason cycle_once();
 
   protected:
-    boost::ptr_vector<Individual> individuals;
+    boost::shared_ptr<std::vector<Individual<GeneType> > > individuals, individuals_old;
 
     void selection();
     void reproduction();
-    bool termination();
+    TerminationCriterion::TerminationReason check_termination();
 
     void mutation();
     void crossover();
 
+    ///counts the number of iteration we did
+    unsigned int iteration_index;
+    ///counts the number of time we called the fitness function
+    unsigned int function_evaluation_index;
+    //Contains the different parameters for the termination:
+    struct TerminationCriterion termination_criterion;
   };
 }
 

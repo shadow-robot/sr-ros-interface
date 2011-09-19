@@ -28,13 +28,33 @@
 
 namespace shadow_robot
 {
-  GeneticAlgorithm::GeneticAlgorithm()
+  template <class GeneType>
+  GeneticAlgorithm<GeneType>::GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion)
   {
-
+    population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size, termination_criterion));
   }
 
-  GeneticAlgorithm::~GeneticAlgorithm()
+  template <class GeneType>
+  GeneticAlgorithm<GeneType>::~GeneticAlgorithm()
   {
+  }
+
+  template <class GeneType>
+  TerminationCriterion::TerminationReason GeneticAlgorithm<GeneType>::run()
+  {
+    return TerminationCriterion::NO_CONVERGENCE;
+  }
+
+  template <class GeneType>
+  bool GeneticAlgorithm<GeneType>::pause()
+  {
+    return true;
+  }
+
+  template <class GeneType>
+  bool GeneticAlgorithm<GeneType>::stop()
+  {
+    return true;
   }
 }
 

@@ -28,27 +28,78 @@
 
 namespace shadow_robot
 {
-  Population::Population(unsigned int genome_size; unsigned int population_size)
+  template <class GeneType>
+  Population<GeneType>::Population(std::vector<GeneType> starting_seed, unsigned int population_size,
+                                   TerminationCriterion termination_criterion)
   {
+    individuals = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
+
     for( unsigned int i=0; i < population_size; ++i)
     {
-      individuals.push_back(new Individual(genome_size));
+      individuals->push_back(Individual<GeneType>(starting_seed));
     }
+
+    individuals_old = boost::shared_ptr<std::vector<Individual<GeneType> > >( individuals->copy() );
+
+    this->termination_criterion = termination_criterion;
   }
 
-  Population::Population(boost::ptr_vector<Individual> individuals)
+  template <class GeneType>
+  Population<GeneType>::Population(boost::shared_ptr<std::vector<Individual<GeneType> > > individuals,
+                                   TerminationCriterion termination_criterion)
   {
     this->individuals = individuals;
+    this->termination_criterion = termination_criterion;
   }
 
-  Population::~Population()
+  template <class GeneType>
+  Population<GeneType>::~Population()
   {
   }
 
-  bool Population::run()
+  template <class GeneType>
+  TerminationCriterion::TerminationReason Population<GeneType>::cycle_once()
   {
-
+    return TerminationCriterion::NO_CONVERGENCE;
   }
+
+  template <class GeneType>
+  void Population<GeneType>::selection()
+  {
+  }
+
+  template <class GeneType>
+  void Population<GeneType>::reproduction()
+  {
+  }
+
+  template <class GeneType>
+  TerminationCriterion::TerminationReason Population<GeneType>::check_termination()
+  {
+    if( iteration_index >= termination_criterion.max_iteration_number)
+      return TerminationCriterion::MAX_ITERATION_NUMBER;
+    if( function_evaluation_index >= termination_criterion.max_number_function_evaluation)
+      return TerminationCriterion::MAX_NUMBER_FUNCTION_EVALUTION;
+
+    //the individuals are ordered from the best to the worst fitness value.
+    if( individuals[0].get_fitness() <= termination_criterion.best_fitness )
+      return TerminationCriterion::BEST_FITNESS;
+
+    return TerminationCriterion::NO_CONVERGENCE;
+  }
+
+  template <class GeneType>
+  void Population<GeneType>::mutation()
+  {
+    return true;
+  }
+
+  template <class GeneType>
+  void Population<GeneType>::crossover()
+  {
+  }
+
+
 }
 
 /* For the emacs weenies in the crowd.

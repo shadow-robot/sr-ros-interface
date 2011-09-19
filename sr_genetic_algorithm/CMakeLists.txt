@@ -22,7 +22,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
-rosbuild_add_library(${PROJECT_NAME} src/genetic_algorithm.cpp)
+rosbuild_add_library(${PROJECT_NAME} src/genetic_algorithm.cpp src/population.cpp src/individual.cpp)
 target_link_libraries(${PROJECT_NAME} mt_rand)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)

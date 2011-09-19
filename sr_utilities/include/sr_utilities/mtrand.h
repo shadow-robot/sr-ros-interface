@@ -158,6 +158,41 @@ namespace sr_utilities
     MTRand53(const MTRand53&); // copy constructor not defined
     void operator=(const MTRand53&); // assignment operator not defined
   };
+
+  template <class T>
+  class MTRangedRand
+  {
+  public:
+    /**
+     * Returns a random value between the lower bound (included)
+     * and the higher bound (excluded).
+     *
+     * @param lower_bound
+     * @param higher_bound
+     */
+    MTRangedRand(T lower_bound, T higher_bound)
+      : lower_bound(lower_bound), whole_range(higher_bound - lower_bound)
+    {};
+
+    ~MTRangedRand();
+
+    /**
+     * Computes a random value between the lower and the
+     * higher bound
+     *
+     *
+     * @return (random between 0 and 1) * (higher_bound - lower_bound)
+     *           + lower_bound
+     */
+    T operator()()
+    {
+      return static_cast<T>( (drand() * whole_range) + lower_bound );
+    }
+
+  private:
+    MTRand drand;
+    T lower_bound, whole_range;
+  };
 }
 
 
