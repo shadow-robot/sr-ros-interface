@@ -28,11 +28,18 @@
 #include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
 #include "sr_genetic_algorithm/termination_criterion.hpp"
 #include <boost/smart_ptr.hpp>
+#include <boost/function.hpp>
 
 #include <gtest/gtest.h>
 #include <ros/ros.h>
+#include <iostream>
 
 using namespace shadow_robot;
+
+double fitness_function()
+{
+  return 1.0;
+}
 
 TEST(GeneticAlgorithm, initialization)
 {
@@ -54,7 +61,9 @@ TEST(GeneticAlgorithm, initialization)
   ga_parameters.max_mutation_percentage_rate = 0.5;
 
 
-  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 1000, tc, ga_parameters) );
+  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 10, tc, ga_parameters, boost::bind(&fitness_function)) );
+
+  ga->run();
 
   EXPECT_EQ(0,0);
 }

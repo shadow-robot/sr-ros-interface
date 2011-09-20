@@ -33,19 +33,24 @@
 #include "sr_genetic_algorithm/termination_criterion.hpp"
 #include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
 #include <boost/foreach.hpp>
+#include <boost/function.hpp>
 #include <algorithm>
 #include <vector>
 
+#include <iostream>
 
 #include <sr_utilities/mtrand.h>
 
 namespace shadow_robot
 {
+
   template <class GeneType>
   class Population
   {
   public:
-    Population(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters)
+    Population(std::vector<GeneType> starting_seed, unsigned int population_size,
+               TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters,
+               boost::function<double()> fitness_function)
       : ga_parameters(parameters)
     {
       drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
@@ -53,13 +58,13 @@ namespace shadow_robot
       individuals = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
       for( unsigned int i=0; i < population_size; ++i)
       {
-        individuals->push_back(Individual<GeneType>(starting_seed, ga_parameters));
+        individuals->push_back(Individual<GeneType>(starting_seed, ga_parameters, fitness_function));
       }
 
       individuals_old = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
       for( unsigned int i=0; i < population_size; ++i)
       {
-        individuals->push_back(Individual<GeneType>(starting_seed, ga_parameters));
+        individuals_old->push_back(Individual<GeneType>(starting_seed, ga_parameters, fitness_function));
       }
 
       this->termination_criterion = termination_criterion;
@@ -86,14 +91,22 @@ namespace shadow_robot
     TerminationCriterion::TerminationReason cycle_once()
     {    //compute the fitnesses for all the individuals.
       compute_fitnesses();
+
+      std::cout << "sort" << std::endl;
+
       //sort the individuals by diminishing fitnesses
-      std::sort( individuals->begin(), individuals->end(), compare_fitness::sort_by_fitness<GeneType> );
+      //std::sort( individuals->begin(), individuals->end() );
+
+      std::cout << "swap" << std::endl;
 
       //create the new population:
       // -> set the current individuals as the parents
       // -> then select / crossover / mutate to create the new population
       // The new population has the same size as the old one.
       individuals_old.swap(individuals);
+
+      std::cout << "clear" << std::endl;
+
       individuals->clear();
       int index_new_indiv = 0;
       while( individuals->size() != individuals_old->size() )
@@ -101,9 +114,18 @@ namespace shadow_robot
         std::pair<int, int> selected_indexes = select();
 
         crossover(selected_indexes);
-        mutation(index_new_indiv);
 
-        ++index_new_indiv;
+        std::cout << " selected for crossover: " << selected_indexes.first << "," << selected_indexes.second << " selected for mutation: "<<index_new_indiv <<" ("<< individuals->size() << ","<< individuals_old->size() <<")" <<std::endl;
+
+        if( selected_indexes.first == -1 || selected_indexes.second == -1 )
+        {
+          std::cout << "WARNING: got an index of -1 while computing the indexes for crossover" << std::endl;
+        }
+        else
+        {
+          mutation(index_new_indiv);
+          ++index_new_indiv;
+        }
       }
 
       ++ iteration_index;
@@ -137,18 +159,20 @@ namespace shadow_robot
 
       return selected_indexes;
     };
+
     int roulette_wheel()
     {
       //generate a random number
-      double rand_for_roulette = drand();
+      double rand_for_roulette = drand->generate();
 
       //normalize the weights and compute the accumulated fitness value
       // until you reach the random number.
       double cumulated_fitness = 0.0;
       int selected_index = 0;
-      BOOST_FOREACH(Individual<GeneType> individual, individuals)
+      for(unsigned int i=0; i < individuals_old->size(); ++i)
       {
-        cumulated_fitness += (individual.get_fitness() / total_fitness);
+        cumulated_fitness += (individuals_old->at(i).get_fitness() / total_fitness);
+
         if( cumulated_fitness >= rand_for_roulette )
           return selected_index;
         selected_index += 1;
@@ -164,11 +188,11 @@ namespace shadow_robot
     void compute_fitnesses()
     {
       total_fitness = 0;
-      BOOST_FOREACH(Individual<GeneType> individual, individuals)
+      for(unsigned int i=0; i< individuals->size(); ++i)
       {
-        individual.compute_fitness();
+        individuals->at(i).compute_fitness();
 
-        total_fitness += individual.get_fitness();
+        total_fitness += individuals->at(i).get_fitness();
 
         ++ function_evaluation_index;
       }
@@ -182,7 +206,7 @@ namespace shadow_robot
         return TerminationCriterion::MAX_NUMBER_FUNCTION_EVALUATION;
 
       //the individuals are ordered from the best to the worst fitness value.
-      if( individuals[0].get_fitness() <= termination_criterion.best_fitness )
+      if( individuals->begin()->get_fitness() <= termination_criterion.best_fitness )
         return TerminationCriterion::BEST_FITNESS;
 
       // the population hasn't converged
@@ -191,25 +215,26 @@ namespace shadow_robot
 
     void mutation(int index)
     {
-      if( drand() < ga_parameters.mutation_probability )
+      if( drand->generate() < ga_parameters.mutation_probability )
       {
-        individuals[index].mutate();
+        individuals->at(index).mutate();
       }
     };
 
     void crossover(std::pair<int, int> selected_indexes)
     {
-      if( drand() < ga_parameters.crossover_probability )
+      if( drand->generate() < ga_parameters.crossover_probability )
       {
-        Individual<GeneType> new_individual( individuals_old[selected_indexes.first],
-                                             individuals_old[selected_indexes.second]);
+        Individual<GeneType> new_individual( individuals_old->at(selected_indexes.first),
+                                             individuals_old->at(selected_indexes.second) );
 
         individuals->push_back(new_individual );
       }
       else
       {
         //no crossovers -> we just keep parent A.
-        individuals->push_back( individuals_old[selected_indexes.first] );
+        //Individual<GeneType> new_individual( individuals_old->at(selected_indexes.first) );
+        //individuals->push_back( new_individual );
       }
     };
 

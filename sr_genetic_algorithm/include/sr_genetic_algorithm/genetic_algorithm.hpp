@@ -27,12 +27,14 @@
 #ifndef _GENETIC_ALGORITHM_HPP_
 #define _GENETIC_ALGORITHM_HPP_
 
-#include <boost/smart_ptr.hpp>
-
 #include "sr_genetic_algorithm/population.hpp"
 #include "sr_genetic_algorithm/termination_criterion.hpp"
 
 #include <boost/thread.hpp>
+#include <boost/function.hpp>
+#include <boost/smart_ptr.hpp>
+
+#include <iostream>
 
 namespace shadow_robot
 {
@@ -40,10 +42,14 @@ namespace shadow_robot
   class GeneticAlgorithm
   {
   public:
-    GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters)
+    GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size,
+                     TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters,
+                     boost::function<double()> fitness_function)
       : ga_parameters(parameters)
     {
-      population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size, termination_criterion, ga_parameters));
+      population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size,
+                                                                                     termination_criterion, ga_parameters,
+                                                                                     fitness_function));
     };
 
     virtual ~GeneticAlgorithm()
@@ -52,6 +58,7 @@ namespace shadow_robot
     TerminationCriterion::TerminationReason run()
     {
       thread_ga = boost::shared_ptr<boost::thread>( new boost::thread( boost::bind( &GeneticAlgorithm<GeneType>::iterate_cycles, this ) ) );
+      thread_ga->join();
       return TerminationCriterion::NO_CONVERGENCE;
     };
 
@@ -67,8 +74,9 @@ namespace shadow_robot
 
     void iterate_cycles()
     {
-      while( 1 )
+      for(unsigned int i=0; i<5; ++i)
       {
+        population->cycle_once();
         sleep(1);
       }
     };

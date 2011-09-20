@@ -190,7 +190,11 @@ namespace sr_utilities
     T operator()()
     {
       return static_cast<T>( (drand() * whole_range) + lower_bound );
-    }
+    };
+    T generate()
+    {
+      return static_cast<T>( (drand() * whole_range) + lower_bound );
+    };
 
   private:
     MTRand drand;

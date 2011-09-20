@@ -30,9 +30,12 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/foreach.hpp>
+#include <boost/function.hpp>
 
 #include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
 #include <sr_utilities/mtrand.h>
+
+#include <iostream>
 
 namespace shadow_robot
 {
@@ -40,8 +43,9 @@ namespace shadow_robot
   class Individual
   {
   public:
-    Individual(std::vector<GeneType> starting_seed, GeneticAlgorithmParameters parameters)
-      : ga_parameters(parameters)
+    Individual(std::vector<GeneType> starting_seed, GeneticAlgorithmParameters parameters,
+               boost::function<double()> fitness_function)
+      : fitness_function(fitness_function), ga_parameters(parameters)
     {
       drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
       range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
@@ -70,18 +74,34 @@ namespace shadow_robot
      * Constructors for the crossover:
      *  Creates a new individual from the 2 given individuals.
      */
-    Individual(Individual<GeneType> a, Individual<GeneType> b)
+    Individual(const Individual<GeneType>& a, const Individual<GeneType>& b)
     {
       drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
       range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
+      fitness_function = a.fitness_function;
 
       //create the new individual, using a crossover.
       genome = a.genome;
 
-      int index_for_crossover = range_rand();
+      int index_for_crossover = range_rand->generate();
       for(unsigned int i=index_for_crossover; i < genome.size(); ++i)
         genome[i] = b.genome[i];
     };
+
+    /**
+     * Copy Constructor for the crossover:
+     *  Creates a new individual but keep the same genome.
+     */
+    Individual(const Individual<GeneType>& a)
+    {
+      drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
+      range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
+      fitness_function = a.fitness_function;
+
+      //create the new individual, using a crossover.
+      genome = a.genome;
+    };
+
 
     virtual ~Individual(){};
 
@@ -90,7 +110,7 @@ namespace shadow_robot
      */
     void mutate()
     {
-      int index_to_mutate = range_rand();
+      int index_to_mutate = range_rand->generate();
 
       GeneType max_mutation = max_mutation_percentage_rate * genome[index_to_mutate];
 
@@ -101,18 +121,34 @@ namespace shadow_robot
         genome[index_to_mutate] = -genome[index_to_mutate];
     };
 
-    void compute_fitness();
+    void compute_fitness()
+    {
+      fitness = fitness_function();
+    };
 
     /**
      * Returns the fitness for this individual.
      * @return fitness value
      */
-    double get_fitness()
+    double get_fitness() const
     {
       return fitness;
     };
+
+      /**
+       * Used to sort the vector of individuals
+       * with their fitnesses.
+       *
+       * @return true if fitness Individual A < fitness Individual B.
+       */
+      bool operator< ( const Individual<GeneType>& b ) const
+      {
+        //std::cout << "a: " << &this << " b: "<< &b << std::endl;
+        return get_fitness() < b.get_fitness();
+      };
   protected:
     double fitness;
+    boost::function<double()> fitness_function;
 
     GeneticAlgorithmParameters ga_parameters;
 
@@ -124,21 +160,7 @@ namespace shadow_robot
     boost::shared_ptr<sr_utilities::MTRand> drand;
     boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> > range_rand;
   };
-}
 
-namespace compare_fitness
-{
-  /**
-   * Used to sort the vector of individuals
-   * with their fitnesses.
-   *
-   * @return true if fitness Individual A < fitness Individual B.
-   */
-  template <class GeneType>
-  static bool sort_by_fitness( shadow_robot::Individual<GeneType> a, shadow_robot::Individual<GeneType> b )
-  {
-    return a.get_fitness() < b.get_fitness();
-  }
 }
 
 /* For the emacs weenies in the crowd.
