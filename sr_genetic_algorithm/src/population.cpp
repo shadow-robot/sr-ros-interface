@@ -13,7 +13,7 @@
 * This program is distributed in the hope that it will be useful, but WITHOUT
 * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * more details.
 *
 * You should have received a copy of the GNU General Public License along
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -66,8 +66,6 @@ namespace shadow_robot
   {
     //compute the fitnesses for all the individuals.
     compute_fitnesses();
-    return check_termination();
-
     //sort the individuals by diminishing fitnesses
     std::sort( individuals->begin(), individuals->end(), compare_fitness::sort_by_fitness<GeneType> );
 
@@ -76,16 +74,20 @@ namespace shadow_robot
     // -> then select / crossover / mutate to create the new population
     // The new population has the same size as the old one.
     individuals_old.swap(individuals);
-    individuals = boost::shared_ptr<std::vector<Individual<GeneType> > >(new std::vector<Individual<GeneType> >());
+    individuals->clear();
+    int index_new_indiv = 0;
     while( individuals->size() != individuals_old->size() )
     {
       std::pair<int, int> selected_indexes = select();
 
       crossover(selected_indexes);
-      mutation(selected_indexes);
+      mutation(index_new_indiv);
+
+      ++index_new_indiv;
     }
 
     ++ iteration_index;
+    return check_termination();
   }
 
   template <class GeneType>

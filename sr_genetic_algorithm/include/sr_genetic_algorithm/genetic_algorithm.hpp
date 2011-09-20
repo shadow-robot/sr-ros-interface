@@ -32,6 +32,8 @@
 #include "sr_genetic_algorithm/population.hpp"
 #include "sr_genetic_algorithm/termination_criterion.hpp"
 
+#include <boost/thread.hpp>
+
 namespace shadow_robot
 {
   template <class GeneType>
@@ -45,9 +47,12 @@ namespace shadow_robot
     bool pause();
     bool stop();
 
+    void iterate_cycles();
+
   protected:
     boost::shared_ptr<Population<GeneType> > population;
 
+    boost::shared_ptr<boost::thread> thread_ga;
   };
 }
 

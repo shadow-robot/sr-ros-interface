@@ -25,7 +25,6 @@
  */
 
 #include "sr_genetic_algorithm/genetic_algorithm.hpp"
-#include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
 
 namespace shadow_robot
 {
@@ -41,8 +40,18 @@ namespace shadow_robot
   }
 
   template <class GeneType>
+  void GeneticAlgorithm<GeneType>::iterate_cycles()
+  {
+    while( 1 )
+    {
+      sleep(1);
+    }
+  }
+
+  template <class GeneType>
   TerminationCriterion::TerminationReason GeneticAlgorithm<GeneType>::run()
   {
+    thread_ga = boost::shared_ptr<boost::thread>( new boost::thread( boost::bind( &GeneticAlgorithm<GeneType>::iterate_cycles, this ) ) );
     return TerminationCriterion::NO_CONVERGENCE;
   }
 
