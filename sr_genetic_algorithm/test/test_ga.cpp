@@ -72,7 +72,7 @@ TEST(GeneticAlgorithm, initialization)
   ga_parameters.max_mutation_percentage_rate = 0.5;
 
 
-  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 10, tc, ga_parameters,
+  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 3, tc, ga_parameters,
                                                                             boost::bind(&fitness_function, _1),
                                                                             boost::bind(&callback, _1, _2, _3) ) );
 

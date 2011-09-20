@@ -93,26 +93,29 @@ namespace shadow_robot
     {    //compute the fitnesses for all the individuals.
       compute_fitnesses();
 
-      std::cout << "sort" << std::endl;
+      std::cout << "before sorting: " << std::endl;
+      for(unsigned int i=0; i < individuals->size(); ++i)
+        std::cout << individuals->at(i).get_fitness() << " ";
+      std::cout << std::endl;
 
-      //sort the individuals by diminishing fitnesses
       //TODO: Fix the sort function
-      //std::sort( individuals->begin(), individuals->end() );
+      //sort the individuals by diminishing fitnesses
+      std::sort( individuals->begin(), individuals->end(), greater<GeneType>() );
+
+      std::cout << " ... finished sorting: ";
+      for(unsigned int i=0; i < individuals->size(); ++i)
+        std::cout << individuals->at(i).get_fitness() << " ";
+      std::cout << std::endl;
 
       callback_function( individuals->begin()->get_genome(),
                          individuals->begin()->get_fitness(),
                          average_fitness);
-
-      std::cout << "swap" << std::endl;
 
       //create the new population:
       // -> set the current individuals as the parents
       // -> then select / crossover / mutate to create the new population
       // The new population has the same size as the old one.
       individuals_old.swap(individuals);
-
-      std::cout << "clear" << std::endl;
-
       individuals->clear();
       int index_new_indiv = 0;
       while( individuals->size() != individuals_old->size() )

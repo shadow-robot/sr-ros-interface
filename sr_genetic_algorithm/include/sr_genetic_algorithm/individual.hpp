@@ -140,17 +140,6 @@ namespace shadow_robot
       return genome;
     };
 
-    /**
-     * Used to sort the vector of individuals
-     * with their fitnesses.
-     *
-     * @return true if fitness Individual A < fitness Individual B.
-     */
-    bool operator< ( const Individual<GeneType>& b ) const
-    {
-      //std::cout << "a: " << &this << " b: "<< &b << std::endl;
-      return get_fitness() < b.get_fitness();
-    };
   protected:
     double fitness;
     boost::function<double( std::vector<GeneType> )> fitness_function;
@@ -166,6 +155,20 @@ namespace shadow_robot
     boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> > range_rand;
   };
 
+  /**
+   * Used to sort the vector of individuals
+   * with their fitnesses.
+   *
+   * @return true if fitness Individual A < fitness Individual B.
+   */
+  template <class GeneType>
+  struct greater
+  {
+    bool operator() (const Individual<GeneType>& x, const Individual<GeneType>& y) const
+    {
+      return x.get_fitness()>y.get_fitness();
+    }
+  };
 }
 
 /* For the emacs weenies in the crowd.
