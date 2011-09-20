@@ -41,15 +41,15 @@ using namespace shadow_robot;
 double fitness_function(std::vector<int> genome)
 {
   double sum = 0.0;
-  std::cout << " genome: ";
   for(unsigned int i=0; i < genome.size() ; ++ i)
-  {
-    std::cout << genome[i] << ", ";
     sum += static_cast<double>(genome[i]);
-  }
-  std::cout << std::endl;
 
   return 1.0 / sum;
+}
+
+void callback(std::vector<int> best_genome, double best_fitness, double average_fitness)
+{
+  std::cout << "best fitness: " << best_fitness << " average fitness: "<< average_fitness<< std::endl;
 }
 
 TEST(GeneticAlgorithm, initialization)
@@ -72,7 +72,9 @@ TEST(GeneticAlgorithm, initialization)
   ga_parameters.max_mutation_percentage_rate = 0.5;
 
 
-  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 10, tc, ga_parameters, boost::bind(&fitness_function, _1)) );
+  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 10, tc, ga_parameters,
+                                                                            boost::bind(&fitness_function, _1),
+                                                                            boost::bind(&callback, _1, _2, _3) ) );
 
   ga->run();
 

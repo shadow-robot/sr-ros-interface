@@ -135,6 +135,11 @@ namespace shadow_robot
       return fitness;
     };
 
+    std::vector<GeneType> get_genome() const
+    {
+      return genome;
+    };
+
     /**
      * Used to sort the vector of individuals
      * with their fitnesses.

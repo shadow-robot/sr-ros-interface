@@ -50,8 +50,9 @@ namespace shadow_robot
   public:
     Population(std::vector<GeneType> starting_seed, unsigned int population_size,
                TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters,
-               boost::function<double( std::vector<GeneType> )> fitness_function)
-      : ga_parameters(parameters)
+               boost::function<double( std::vector<GeneType> )> fitness_function,
+               boost::function<void(std::vector<int>, double, double)> callback_function)
+      : ga_parameters(parameters), callback_function(callback_function)
     {
       drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
 
@@ -95,7 +96,12 @@ namespace shadow_robot
       std::cout << "sort" << std::endl;
 
       //sort the individuals by diminishing fitnesses
+      //TODO: Fix the sort function
       //std::sort( individuals->begin(), individuals->end() );
+
+      callback_function( individuals->begin()->get_genome(),
+                         individuals->begin()->get_fitness(),
+                         average_fitness);
 
       std::cout << "swap" << std::endl;
 
@@ -115,7 +121,7 @@ namespace shadow_robot
 
         crossover(selected_indexes);
 
-        std::cout << " selected for crossover: " << selected_indexes.first << "," << selected_indexes.second << " selected for mutation: "<<index_new_indiv <<" ("<< individuals->size() << ","<< individuals_old->size() <<")" <<std::endl;
+        //std::cout << " selected for crossover: " << selected_indexes.first << "," << selected_indexes.second << " selected for mutation: "<<index_new_indiv <<" ("<< individuals->size() << ","<< individuals_old->size() <<")" <<std::endl;
 
         if( selected_indexes.first == -1 || selected_indexes.second == -1 )
         {
@@ -187,7 +193,7 @@ namespace shadow_robot
 
     void compute_fitnesses()
     {
-      total_fitness = 0;
+      total_fitness = 0.0;
       for(unsigned int i=0; i< individuals->size(); ++i)
       {
         individuals->at(i).compute_fitness();
@@ -196,6 +202,8 @@ namespace shadow_robot
 
         ++ function_evaluation_index;
       }
+
+      average_fitness = total_fitness / static_cast<double>( individuals->size() );
     };
 
     TerminationCriterion::TerminationReason check_termination()
@@ -237,6 +245,10 @@ namespace shadow_robot
         //individuals->push_back( new_individual );
       }
     };
+
+    boost::function<void(std::vector<int>, double, double)> callback_function;
+
+    double average_fitness;
 
     ///counts the number of iteration we did
     unsigned int iteration_index;

@@ -44,12 +44,13 @@ namespace shadow_robot
   public:
     GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size,
                      TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters,
-                     boost::function<double( std::vector<GeneType> )> fitness_function)
+                     boost::function<double( std::vector<GeneType> )> fitness_function,
+                     boost::function<void(std::vector<int>, double, double)> callback_function)
       : ga_parameters(parameters)
     {
       population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size,
                                                                                      termination_criterion, ga_parameters,
-                                                                                     fitness_function));
+                                                                                     fitness_function, callback_function));
     };
 
     virtual ~GeneticAlgorithm()
@@ -74,10 +75,9 @@ namespace shadow_robot
 
     void iterate_cycles()
     {
-      for(unsigned int i=0; i<5; ++i)
+      for(unsigned int i=0; i<20; ++i)
       {
         population->cycle_once();
-        sleep(1);
       }
     };
 
