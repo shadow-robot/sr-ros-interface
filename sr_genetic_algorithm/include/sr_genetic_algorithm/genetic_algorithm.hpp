@@ -40,17 +40,42 @@ namespace shadow_robot
   class GeneticAlgorithm
   {
   public:
-    GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion);
-    virtual ~GeneticAlgorithm();
+    GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters)
+      : ga_parameters(parameters)
+    {
+      population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size, termination_criterion, ga_parameters));
+    };
 
-    TerminationCriterion::TerminationReason run();
-    bool pause();
-    bool stop();
+    virtual ~GeneticAlgorithm()
+    {};
 
-    void iterate_cycles();
+    TerminationCriterion::TerminationReason run()
+    {
+      thread_ga = boost::shared_ptr<boost::thread>( new boost::thread( boost::bind( &GeneticAlgorithm<GeneType>::iterate_cycles, this ) ) );
+      return TerminationCriterion::NO_CONVERGENCE;
+    };
+
+    bool pause()
+    {
+      return true;
+    };
+
+    bool stop()
+    {
+      return true;
+    };
+
+    void iterate_cycles()
+    {
+      while( 1 )
+      {
+        sleep(1);
+      }
+    };
 
   protected:
     boost::shared_ptr<Population<GeneType> > population;
+    GeneticAlgorithmParameters ga_parameters;
 
     boost::shared_ptr<boost::thread> thread_ga;
   };

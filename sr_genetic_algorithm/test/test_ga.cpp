@@ -25,6 +25,7 @@
  */
 
 #include "sr_genetic_algorithm/genetic_algorithm.hpp"
+#include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
 #include "sr_genetic_algorithm/termination_criterion.hpp"
 #include <boost/smart_ptr.hpp>
 
@@ -45,7 +46,15 @@ TEST(GeneticAlgorithm, initialization)
   tc.max_number_function_evaluation = 1000000;
 
   boost::shared_ptr<GeneticAlgorithm<int> > ga;
-  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 1000, tc) );
+
+  GeneticAlgorithmParameters ga_parameters;
+  ga_parameters.crossover_probability = 0.5;
+  ga_parameters.mutation_probability = 0.0001;
+  ga_parameters.gene_max_percentage_change = 0.5;
+  ga_parameters.max_mutation_percentage_rate = 0.5;
+
+
+  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 1000, tc, ga_parameters) );
 
   EXPECT_EQ(0,0);
 }

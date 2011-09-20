@@ -33,6 +33,9 @@ namespace shadow_robot
   {
     double crossover_probability;
     double mutation_probability;
+
+    double gene_max_percentage_change;
+    double max_mutation_percentage_rate;
   };
 }
 

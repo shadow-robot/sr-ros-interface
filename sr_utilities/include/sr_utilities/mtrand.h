@@ -108,6 +108,8 @@ namespace sr_utilities
     ~MTRand() {}
     double operator()() {
       return static_cast<double>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32
+    double generate() {
+      return static_cast<double>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32
   private:
     MTRand(const MTRand&); // copy constructor not defined
     void operator=(const MTRand&); // assignment operator not defined
@@ -174,7 +176,8 @@ namespace sr_utilities
       : lower_bound(lower_bound), whole_range(higher_bound - lower_bound)
     {};
 
-    ~MTRangedRand();
+    ~MTRangedRand()
+    {};
 
     /**
      * Computes a random value between the lower and the

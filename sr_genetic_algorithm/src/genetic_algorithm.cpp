@@ -26,48 +26,6 @@
 
 #include "sr_genetic_algorithm/genetic_algorithm.hpp"
 
-namespace shadow_robot
-{
-  template <class GeneType>
-  GeneticAlgorithm<GeneType>::GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size, TerminationCriterion termination_criterion)
-  {
-    population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size, termination_criterion));
-  }
-
-  template <class GeneType>
-  GeneticAlgorithm<GeneType>::~GeneticAlgorithm()
-  {
-  }
-
-  template <class GeneType>
-  void GeneticAlgorithm<GeneType>::iterate_cycles()
-  {
-    while( 1 )
-    {
-      sleep(1);
-    }
-  }
-
-  template <class GeneType>
-  TerminationCriterion::TerminationReason GeneticAlgorithm<GeneType>::run()
-  {
-    thread_ga = boost::shared_ptr<boost::thread>( new boost::thread( boost::bind( &GeneticAlgorithm<GeneType>::iterate_cycles, this ) ) );
-    return TerminationCriterion::NO_CONVERGENCE;
-  }
-
-  template <class GeneType>
-  bool GeneticAlgorithm<GeneType>::pause()
-  {
-    return true;
-  }
-
-  template <class GeneType>
-  bool GeneticAlgorithm<GeneType>::stop()
-  {
-    return true;
-  }
-}
-
 /* For the emacs weenies in the crowd.
 Local Variables:
    c-basic-offset: 2

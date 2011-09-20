@@ -29,7 +29,9 @@
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/smart_ptr.hpp>
+#include <boost/foreach.hpp>
 
+#include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
 #include <sr_utilities/mtrand.h>
 
 namespace shadow_robot
@@ -38,18 +40,66 @@ namespace shadow_robot
   class Individual
   {
   public:
-    Individual(std::vector<GeneType> starting_seed, double max_mutation_percentage_rate = 0.5);
+    Individual(std::vector<GeneType> starting_seed, GeneticAlgorithmParameters parameters)
+      : ga_parameters(parameters)
+    {
+      drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
+      range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
+
+      BOOST_FOREACH(GeneType gene, starting_seed)
+      {
+        /**
+         * Generates a number that's a random number between the
+         *  given value - gene_max_percentage_change and the given
+         *  value + gene_max_percentage_change.
+         */
+        gene = static_cast<GeneType>( gene - ga_parameters.gene_max_percentage_change + (drand->generate() * static_cast<GeneType>(2) * ga_parameters.gene_max_percentage_change) );
+
+        /**
+         * Clamp it in the correct region: we want all the numbers
+         * to be positive.
+         */
+        if( gene < static_cast<GeneType>(0) )
+          gene = -gene;
+
+        genome.push_back( new GeneType( gene ) );
+      }
+    };
+
     /**
      * Constructors for the crossover:
      *  Creates a new individual from the 2 given individuals.
      */
-    Individual(Individual<GeneType> a, Individual<GeneType> b);
-    virtual ~Individual();
+    Individual(Individual<GeneType> a, Individual<GeneType> b)
+    {
+      drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
+      range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
+
+      //create the new individual, using a crossover.
+      genome = a.genome;
+
+      int index_for_crossover = range_rand();
+      for(unsigned int i=index_for_crossover; i < genome.size(); ++i)
+        genome[i] = b.genome[i];
+    };
+
+    virtual ~Individual(){};
 
     /**
      * Randomly mutates a gene of this individual.
      */
-    void mutate();
+    void mutate()
+    {
+      int index_to_mutate = range_rand();
+
+      GeneType max_mutation = max_mutation_percentage_rate * genome[index_to_mutate];
+
+      //mutate the gene
+      genome[index_to_mutate] = static_cast<GeneType>( genome[index_to_mutate] - max_mutation + 2.0 * drand->generate() * max_mutation );
+      //clamp to positive values
+      if( genome[index_to_mutate] < 0 )
+        genome[index_to_mutate] = -genome[index_to_mutate];
+    };
 
     void compute_fitness();
 
@@ -64,15 +114,15 @@ namespace shadow_robot
   protected:
     double fitness;
 
+    GeneticAlgorithmParameters ga_parameters;
+
     double max_mutation_percentage_rate;
 
     boost::ptr_vector<GeneType> genome;
 
     ///random number generators
-    sr_utilities::MTRand drand;
+    boost::shared_ptr<sr_utilities::MTRand> drand;
     boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> > range_rand;
-
-    static const GeneType gene_max_percentage_change;
   };
 }
 
@@ -92,9 +142,9 @@ namespace compare_fitness
 }
 
 /* For the emacs weenies in the crowd.
-Local Variables:
+   Local Variables:
    c-basic-offset: 2
-End:
+   End:
 */
 
 #endif
