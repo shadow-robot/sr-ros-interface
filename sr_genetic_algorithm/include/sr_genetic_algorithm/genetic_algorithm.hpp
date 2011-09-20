@@ -75,10 +75,13 @@ namespace shadow_robot
 
     void iterate_cycles()
     {
-      for(unsigned int i=0; i<2; ++i)
+      TerminationCriterion::TerminationReason reason = TerminationCriterion::NO_CONVERGENCE;
+      while( reason == TerminationCriterion::NO_CONVERGENCE )
       {
-        population->cycle_once();
+        reason  = population->cycle_once();
       }
+
+      std::cout << "FINISHED  termination reason: " << reason << std::endl;
     };
 
   protected:

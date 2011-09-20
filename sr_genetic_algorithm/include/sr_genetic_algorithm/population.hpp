@@ -93,21 +93,17 @@ namespace shadow_robot
     {    //compute the fitnesses for all the individuals.
       compute_fitnesses();
 
-      std::cout << "before sorting: " << std::endl;
-      for(unsigned int i=0; i < individuals->size(); ++i)
-        std::cout << individuals->at(i).fitness << " ";
-      std::cout << std::endl;
-
       //sort the individuals by diminishing fitnesses
       std::sort( individuals->begin(), individuals->end(), greater<GeneType>() );
 
-      std::cout << " ... finished sorting: ";
+      /*
+      std::cout << " Sorted Fitnesses: ";
       for(unsigned int i=0; i < individuals->size(); ++i)
-        std::cout << individuals->at(i).fitness << " ";
+        std::cout << individuals->at(i).get_fitness() << " ";
       std::cout << std::endl;
-
+      */
       callback_function( individuals->begin()->get_genome(),
-                         individuals->begin()->fitness,
+                         individuals->begin()->get_fitness(),
                          average_fitness);
 
       //create the new population:
@@ -116,7 +112,6 @@ namespace shadow_robot
       // The new population has the same size as the old one.
       individuals_old.swap(individuals);
       individuals->clear();
-      int index_new_indiv = 0;
       while( individuals->size() != individuals_old->size() )
       {
         std::pair<int, int> selected_indexes = select();
@@ -130,10 +125,7 @@ namespace shadow_robot
           std::cout << "WARNING: got an index of -1 while computing the indexes for crossover" << std::endl;
         }
         else
-        {
-          mutation(index_new_indiv);
-          ++index_new_indiv;
-        }
+          mutation();
       }
 
       ++ iteration_index;
@@ -216,19 +208,21 @@ namespace shadow_robot
         return TerminationCriterion::MAX_NUMBER_FUNCTION_EVALUATION;
 
       //the individuals are ordered from the best to the worst fitness value.
-      if( individuals->begin()->get_fitness() <= termination_criterion.best_fitness )
+      if( individuals->begin()->get_fitness() >= termination_criterion.best_fitness )
         return TerminationCriterion::BEST_FITNESS;
 
       // the population hasn't converged
       return TerminationCriterion::NO_CONVERGENCE;
     };
 
-    void mutation(int index)
+    /**
+     * Always mutate the last individual.
+     *
+     */
+    void mutation()
     {
       if( drand->generate() < ga_parameters.mutation_probability )
-      {
-        individuals->at(index).mutate();
-      }
+        individuals->end()->mutate();
     };
 
     void crossover(std::pair<int, int> selected_indexes)

@@ -142,9 +142,9 @@ namespace shadow_robot
       return genome;
     };
 
+  protected:
     double fitness;
 
-  protected:
     boost::function<double( std::vector<GeneType> )> fitness_function;
 
     GeneticAlgorithmParameters ga_parameters;
@@ -169,7 +169,7 @@ namespace shadow_robot
   {
     bool operator() (const Individual<GeneType>& x, const Individual<GeneType>& y) const
     {
-      return x.fitness > y.fitness;
+      return x.get_fitness() > y.get_fitness();
     }
   };
 }

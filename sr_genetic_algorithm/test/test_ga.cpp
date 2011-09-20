@@ -59,20 +59,20 @@ TEST(GeneticAlgorithm, initialization)
     seed.push_back(200);
 
   TerminationCriterion tc;
-  tc.best_fitness = 1;
-  tc.max_iteration_number = 1000;
+  tc.best_fitness = 1.0;
+  tc.max_iteration_number = 500;
   tc.max_number_function_evaluation = 1000000;
 
   boost::shared_ptr<GeneticAlgorithm<int> > ga;
 
   GeneticAlgorithmParameters ga_parameters;
-  ga_parameters.crossover_probability = 0.5;
+  ga_parameters.crossover_probability = 0.9;
   ga_parameters.mutation_probability = 0.0001;
   ga_parameters.gene_max_percentage_change = 0.5;
   ga_parameters.max_mutation_percentage_rate = 0.5;
 
 
-  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 3, tc, ga_parameters,
+  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 1000, tc, ga_parameters,
                                                                             boost::bind(&fitness_function, _1),
                                                                             boost::bind(&callback, _1, _2, _3) ) );
 
