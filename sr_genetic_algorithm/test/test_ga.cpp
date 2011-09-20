@@ -27,6 +27,8 @@
 #include "sr_genetic_algorithm/genetic_algorithm.hpp"
 #include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
 #include "sr_genetic_algorithm/termination_criterion.hpp"
+
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/function.hpp>
 
@@ -36,16 +38,25 @@
 
 using namespace shadow_robot;
 
-double fitness_function()
+double fitness_function(std::vector<int> genome)
 {
-  return 1.0;
+  double sum = 0.0;
+  std::cout << " genome: ";
+  for(unsigned int i=0; i < genome.size() ; ++ i)
+  {
+    std::cout << genome[i] << ", ";
+    sum += static_cast<double>(genome[i]);
+  }
+  std::cout << std::endl;
+
+  return 1.0 / sum;
 }
 
 TEST(GeneticAlgorithm, initialization)
 {
   std::vector<int> seed;
   for(unsigned int i=0; i < 10; ++i)
-    seed.push_back(0);
+    seed.push_back(200);
 
   TerminationCriterion tc;
   tc.best_fitness = 1;
@@ -61,7 +72,7 @@ TEST(GeneticAlgorithm, initialization)
   ga_parameters.max_mutation_percentage_rate = 0.5;
 
 
-  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 10, tc, ga_parameters, boost::bind(&fitness_function)) );
+  ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 10, tc, ga_parameters, boost::bind(&fitness_function, _1)) );
 
   ga->run();
 

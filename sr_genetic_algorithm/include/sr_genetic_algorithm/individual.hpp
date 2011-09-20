@@ -44,7 +44,7 @@ namespace shadow_robot
   {
   public:
     Individual(std::vector<GeneType> starting_seed, GeneticAlgorithmParameters parameters,
-               boost::function<double()> fitness_function)
+               boost::function<double( std::vector<GeneType> )> fitness_function)
       : fitness_function(fitness_function), ga_parameters(parameters)
     {
       drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
@@ -57,7 +57,7 @@ namespace shadow_robot
          *  given value - gene_max_percentage_change and the given
          *  value + gene_max_percentage_change.
          */
-        gene = static_cast<GeneType>( gene - ga_parameters.gene_max_percentage_change + (drand->generate() * static_cast<GeneType>(2) * ga_parameters.gene_max_percentage_change) );
+        gene = static_cast<GeneType>( gene - ga_parameters.gene_max_percentage_change * gene + (drand->generate() * static_cast<GeneType>(2) * ga_parameters.gene_max_percentage_change * gene) );
 
         /**
          * Clamp it in the correct region: we want all the numbers
@@ -66,7 +66,7 @@ namespace shadow_robot
         if( gene < static_cast<GeneType>(0) )
           gene = -gene;
 
-        genome.push_back( new GeneType( gene ) );
+        genome.push_back( gene );
       }
     };
 
@@ -123,7 +123,7 @@ namespace shadow_robot
 
     void compute_fitness()
     {
-      fitness = fitness_function();
+      fitness = fitness_function( genome );
     };
 
     /**
@@ -135,26 +135,26 @@ namespace shadow_robot
       return fitness;
     };
 
-      /**
-       * Used to sort the vector of individuals
-       * with their fitnesses.
-       *
-       * @return true if fitness Individual A < fitness Individual B.
-       */
-      bool operator< ( const Individual<GeneType>& b ) const
-      {
-        //std::cout << "a: " << &this << " b: "<< &b << std::endl;
-        return get_fitness() < b.get_fitness();
-      };
+    /**
+     * Used to sort the vector of individuals
+     * with their fitnesses.
+     *
+     * @return true if fitness Individual A < fitness Individual B.
+     */
+    bool operator< ( const Individual<GeneType>& b ) const
+    {
+      //std::cout << "a: " << &this << " b: "<< &b << std::endl;
+      return get_fitness() < b.get_fitness();
+    };
   protected:
     double fitness;
-    boost::function<double()> fitness_function;
+    boost::function<double( std::vector<GeneType> )> fitness_function;
 
     GeneticAlgorithmParameters ga_parameters;
 
     double max_mutation_percentage_rate;
 
-    boost::ptr_vector<GeneType> genome;
+    std::vector<GeneType> genome;
 
     ///random number generators
     boost::shared_ptr<sr_utilities::MTRand> drand;

@@ -44,7 +44,7 @@ namespace shadow_robot
   public:
     GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size,
                      TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters,
-                     boost::function<double()> fitness_function)
+                     boost::function<double( std::vector<GeneType> )> fitness_function)
       : ga_parameters(parameters)
     {
       population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size,
