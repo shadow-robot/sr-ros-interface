@@ -95,20 +95,19 @@ namespace shadow_robot
 
       std::cout << "before sorting: " << std::endl;
       for(unsigned int i=0; i < individuals->size(); ++i)
-        std::cout << individuals->at(i).get_fitness() << " ";
+        std::cout << individuals->at(i).fitness << " ";
       std::cout << std::endl;
 
-      //TODO: Fix the sort function
       //sort the individuals by diminishing fitnesses
       std::sort( individuals->begin(), individuals->end(), greater<GeneType>() );
 
       std::cout << " ... finished sorting: ";
       for(unsigned int i=0; i < individuals->size(); ++i)
-        std::cout << individuals->at(i).get_fitness() << " ";
+        std::cout << individuals->at(i).fitness << " ";
       std::cout << std::endl;
 
       callback_function( individuals->begin()->get_genome(),
-                         individuals->begin()->get_fitness(),
+                         individuals->begin()->fitness,
                          average_fitness);
 
       //create the new population:

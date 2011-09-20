@@ -98,6 +98,8 @@ namespace shadow_robot
       range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
       fitness_function = a.fitness_function;
 
+      //copy the fitness
+      fitness = a.fitness;
       //create the new individual, using a crossover.
       genome = a.genome;
     };
@@ -140,8 +142,9 @@ namespace shadow_robot
       return genome;
     };
 
-  protected:
     double fitness;
+
+  protected:
     boost::function<double( std::vector<GeneType> )> fitness_function;
 
     GeneticAlgorithmParameters ga_parameters;
@@ -166,7 +169,7 @@ namespace shadow_robot
   {
     bool operator() (const Individual<GeneType>& x, const Individual<GeneType>& y) const
     {
-      return x.get_fitness()>y.get_fitness();
+      return x.fitness > y.fitness;
     }
   };
 }

@@ -27,3 +27,6 @@ target_link_libraries(${PROJECT_NAME} mt_rand)
 
 rosbuild_add_gtest(test/test_ga test/test_ga.cpp)
 target_link_libraries(test/test_ga ${PROJECT_NAME})
+
+rosbuild_add_gtest(test/test_sort test/test_sort.cpp)
+target_link_libraries(test/test_sort ${PROJECT_NAME})
