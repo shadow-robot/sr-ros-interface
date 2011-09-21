@@ -1,6 +1,10 @@
 
 #include <boost/smart_ptr.hpp>
-#include <sr_utilities/mtrand.h>
+
+#include <boost/random.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_real.hpp>
+
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 
@@ -38,10 +42,20 @@ TEST(GeneticAlgorithm, sort)
 {
   boost::shared_ptr<std::vector<A<double> > > test = boost::shared_ptr<std::vector<A<double> > >( new std::vector<A<double> >() );
 
+  boost::mt19937 gen;
+  boost::uniform_real<> dist(1.0, 6.0);
 
-  sr_utilities::MTRand drand;
+  std::cout << " testing uniform int: " << dist(gen) << " " << dist(gen) << " " << dist(gen) << " " << dist(gen) << " " << dist(gen) << std::endl;
+
+  boost::mt19937 gen2;
+  boost::uniform_real<> dist2(1.0, 6.0);
+
+  std::cout << " testing uniform int2: " << dist2(gen2) << " " << dist2(gen2) << " " << dist2(gen2) << " " << dist2(gen2) << " " << dist2(gen2) << std::endl;
+
+
+  boost::mt19937 drand;
   for(unsigned int i=0; i < 10; ++i)
-    test->push_back(drand.generate());
+    test->push_back(drand());
 
   std::cout << "before sorting: " << std::endl;
   for(unsigned int i=0; i < test->size(); ++i)

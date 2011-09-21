@@ -33,7 +33,8 @@
 #include <boost/function.hpp>
 
 #include "sr_genetic_algorithm/genetic_algorithm_parameters.hpp"
-#include <sr_utilities/mtrand.h>
+
+#include <sr_utilities/sr_math_utils.hpp>
 
 #include <iostream>
 
@@ -44,11 +45,13 @@ namespace shadow_robot
   {
   public:
     Individual(std::vector<GeneType> starting_seed, GeneticAlgorithmParameters parameters,
-               boost::function<double( std::vector<GeneType> )> fitness_function)
-      : fitness_function(fitness_function), ga_parameters(parameters)
+               boost::function<double( std::vector<GeneType> )> fitness_function,
+               boost::shared_ptr<sr_math_utils::RandomDouble> drand,
+               boost::shared_ptr<sr_math_utils::RandomRangedInt> ranged_rand)
+      : fitness_function(fitness_function), ga_parameters(parameters),
+        drand(drand), ranged_rand(ranged_rand)
     {
-      drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
-      range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
+      BOOST_ASSERT(ranged_rand != 0);
 
       BOOST_FOREACH(GeneType gene, starting_seed)
       {
@@ -68,6 +71,14 @@ namespace shadow_robot
 
         genome.push_back( gene );
       }
+
+      /*
+      std::cout << std::endl;
+      std::cout << " new genome: ";
+      for(unsigned int i=0; i < genome.size(); ++i)
+        std::cout << genome[i] << " ";
+      std::cout << std::endl;
+      */
     };
 
     /**
@@ -75,17 +86,34 @@ namespace shadow_robot
      *  Creates a new individual from the 2 given individuals.
      */
     Individual(const Individual<GeneType>& a, const Individual<GeneType>& b)
+      : drand(a.drand), ranged_rand(a.ranged_rand)
     {
-      drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
-      range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
-      fitness_function = a.fitness_function;
+      BOOST_ASSERT(ranged_rand != 0);
 
+      fitness_function = a.fitness_function;
+      fitness = a.fitness;
       //create the new individual, using a crossover.
       genome = a.genome;
 
-      int index_for_crossover = range_rand->generate();
+      int index_for_crossover = ranged_rand->generate();
+
+      std::cout << " ----- " << std::endl;
+      std::cout << " genomes before crossover (at "<< index_for_crossover<<"): ";
+      for(unsigned int i=0; i < genome.size(); ++i)
+        std::cout << genome[i] << " ";
+      std::cout << " / ";
+      for(unsigned int i=0; i < genome.size(); ++i)
+        std::cout << genome[i] << " ";
+      std::cout << std::endl;
+
       for(unsigned int i=index_for_crossover; i < genome.size(); ++i)
         genome[i] = b.genome[i];
+
+      std::cout << " genome after crossover: ";
+      for(unsigned int i=0; i < genome.size(); ++i)
+        std::cout << genome[i] << " ";
+      std::cout << std::endl;
+
     };
 
     /**
@@ -93,15 +121,23 @@ namespace shadow_robot
      *  Creates a new individual but keep the same genome.
      */
     Individual(const Individual<GeneType>& a)
+      : drand(a.drand), ranged_rand(a.ranged_rand)
     {
-      drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
-      range_rand = boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> >(new sr_utilities::MTRangedRand<unsigned int>(0, genome.size()));
-      fitness_function = a.fitness_function;
+      BOOST_ASSERT(ranged_rand != 0);
 
+      fitness_function = a.fitness_function;
       //copy the fitness
       fitness = a.fitness;
       //create the new individual, using a crossover.
       genome = a.genome;
+
+      /*
+      std::cout << " ----- " << std::endl;
+      std::cout << " copied genome: ";
+      for(unsigned int i=0; i < genome.size(); ++i)
+        std::cout << genome[i] << " ";
+      std::cout << std::endl;
+      */
     };
 
 
@@ -112,12 +148,18 @@ namespace shadow_robot
      */
     void mutate()
     {
-      int index_to_mutate = range_rand->generate();
+      BOOST_ASSERT(ranged_rand != 0);
+      int index_to_mutate = ranged_rand->generate();
+
+      std::cout << "mutation on "<< index_to_mutate << " / " << genome.size() << " gene was: " << genome[index_to_mutate] << " -> ";
 
       GeneType max_mutation = max_mutation_percentage_rate * genome[index_to_mutate];
 
       //mutate the gene
       genome[index_to_mutate] = static_cast<GeneType>( genome[index_to_mutate] - max_mutation + 2.0 * drand->generate() * max_mutation );
+
+      std::cout << genome[index_to_mutate] << std::endl;
+
       //clamp to positive values
       if( genome[index_to_mutate] < 0 )
         genome[index_to_mutate] = -genome[index_to_mutate];
@@ -142,6 +184,8 @@ namespace shadow_robot
       return genome;
     };
 
+    std::vector<GeneType> genome;
+
   protected:
     double fitness;
 
@@ -151,11 +195,9 @@ namespace shadow_robot
 
     double max_mutation_percentage_rate;
 
-    std::vector<GeneType> genome;
-
     ///random number generators
-    boost::shared_ptr<sr_utilities::MTRand> drand;
-    boost::shared_ptr<sr_utilities::MTRangedRand<unsigned int> > range_rand;
+    boost::shared_ptr<sr_math_utils::RandomDouble> drand;
+    boost::shared_ptr<sr_math_utils::RandomRangedInt> ranged_rand;
   };
 
   /**

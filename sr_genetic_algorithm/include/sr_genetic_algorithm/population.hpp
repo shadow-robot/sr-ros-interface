@@ -39,7 +39,7 @@
 
 #include <iostream>
 
-#include <sr_utilities/mtrand.h>
+#include <sr_utilities/sr_math_utils.hpp>
 
 namespace shadow_robot
 {
@@ -52,28 +52,41 @@ namespace shadow_robot
                TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters,
                boost::function<double( std::vector<GeneType> )> fitness_function,
                boost::function<void(std::vector<int>, double, double)> callback_function)
-      : ga_parameters(parameters), callback_function(callback_function)
+      : ga_parameters(parameters), callback_function(callback_function), iteration_index(0)
     {
-      drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
+      drand = boost::shared_ptr<sr_math_utils::RandomDouble>( new sr_math_utils::RandomDouble() );
+      ranged_rand = boost::shared_ptr<sr_math_utils::RandomRangedInt>( new sr_math_utils::RandomRangedInt(0, starting_seed.size() ) );
 
       individuals = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
+
+      std::cout <<  " -_-_-_-_-_-_-" << std::endl;
+
       for( unsigned int i=0; i < population_size; ++i)
       {
-        individuals->push_back(Individual<GeneType>(starting_seed, ga_parameters, fitness_function));
+        individuals->push_back(Individual<GeneType>( starting_seed, ga_parameters, fitness_function,
+                                                     drand, ranged_rand ));
+
+        std::cout << " new individual(" << individuals->size() << " / " << individuals->at(i).genome.size()<< " ): ";
+        for( unsigned int j=0; j < individuals->at(i).genome.size(); ++j)
+               std::cout << individuals->at(i).genome[j]<< " ";
+        std::cout << std::endl;
       }
 
       individuals_old = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
       for( unsigned int i=0; i < population_size; ++i)
       {
-        individuals_old->push_back(Individual<GeneType>(starting_seed, ga_parameters, fitness_function));
+        individuals_old->push_back(Individual<GeneType>(starting_seed, ga_parameters, fitness_function,
+                                                        drand, ranged_rand));
       }
 
       this->termination_criterion = termination_criterion;
     };
 
     Population(boost::shared_ptr<std::vector<Individual<GeneType> > > individuals, TerminationCriterion termination_criterion)
+      : iteration_index(0)
     {
-      drand = boost::shared_ptr<sr_utilities::MTRand>( new sr_utilities::MTRand() );
+      drand = boost::shared_ptr<sr_math_utils::RandomDouble>( new sr_math_utils::RandomDouble() );
+      ranged_rand = boost::shared_ptr<sr_math_utils::RandomRangedInt>( new sr_math_utils::RandomRangedInt(0, individuals[0]->genome.size() ) );
 
       this->individuals = individuals;
       this->termination_criterion = termination_criterion;
@@ -90,17 +103,29 @@ namespace shadow_robot
      * @return NO_CONVERGENCE if no termination reached, a TerminationReason otherwise.
      */
     TerminationCriterion::TerminationReason cycle_once()
-    {    //compute the fitnesses for all the individuals.
+    {
+      std::cout <<  " -_-_-_-_-_-_-" << std::endl;
+      std::cout << " population: ";
+
+      for(unsigned int i=0; i < individuals->size(); ++i)
+      {
+        std::cout << std::endl;
+        for (unsigned int j=0; j< individuals->at(i).genome.size(); ++j)
+          std::cout << individuals->at(i).genome[j] << " ";
+      }
+      std::cout << std::endl;
+
+      //compute the fitnesses for all the individuals.
       compute_fitnesses();
 
       //sort the individuals by diminishing fitnesses
       std::sort( individuals->begin(), individuals->end(), greater<GeneType>() );
 
       /*
-      std::cout << " Sorted Fitnesses: ";
-      for(unsigned int i=0; i < individuals->size(); ++i)
+        std::cout << " Sorted Fitnesses: ";
+        for(unsigned int i=0; i < individuals->size(); ++i)
         std::cout << individuals->at(i).get_fitness() << " ";
-      std::cout << std::endl;
+        std::cout << std::endl;
       */
       callback_function( individuals->begin()->get_genome(),
                          individuals->begin()->get_fitness(),
@@ -183,7 +208,8 @@ namespace shadow_robot
     };
 
     ///random number generators
-    boost::shared_ptr<sr_utilities::MTRand> drand;
+    boost::shared_ptr<sr_math_utils::RandomDouble> drand;
+    boost::shared_ptr<sr_math_utils::RandomRangedInt> ranged_rand;
 
     void compute_fitnesses()
     {
@@ -230,15 +256,15 @@ namespace shadow_robot
       if( drand->generate() < ga_parameters.crossover_probability )
       {
         Individual<GeneType> new_individual( individuals_old->at(selected_indexes.first),
-                                             individuals_old->at(selected_indexes.second) );
+                                             individuals_old->at(selected_indexes.second));
 
-        individuals->push_back(new_individual );
+        individuals->push_back( new_individual );
       }
       else
       {
         //no crossovers -> we just keep parent A.
-        //Individual<GeneType> new_individual( individuals_old->at(selected_indexes.first) );
-        //individuals->push_back( new_individual );
+        Individual<GeneType> new_individual( individuals_old->at(selected_indexes.first) );
+        individuals->push_back( new_individual );
       }
     };
 

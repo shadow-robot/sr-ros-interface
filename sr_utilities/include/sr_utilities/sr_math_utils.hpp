@@ -27,6 +27,10 @@
 #ifndef _SR_MATH_UTILS_HPP_
 #define _SR_MATH_UTILS_HPP_
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_real.hpp>
+
 namespace sr_math_utils
 {
   /**
@@ -146,6 +150,61 @@ namespace sr_math_utils
   {
     return x < 0.0 ? -1 : 1;
   }
+
+  class RandomRangedInt
+  {
+  public:
+    RandomRangedInt(int min, int max)
+    {
+      dist = boost::uniform_int<>(min, max);
+    };
+
+    ~RandomRangedInt()
+    {};
+
+    /**
+     * Generate a random int between min and max
+     *
+     *
+     * @return an int between min and max.
+     */
+    int generate()
+    {
+      return dist(gen);
+    }
+
+  protected:
+    boost::mt19937 gen;
+    boost::uniform_int<> dist;
+  };
+
+  class RandomDouble
+  {
+  public:
+    RandomDouble(double min=0.0, double max=1.0)
+    {
+      dist = boost::uniform_real<>(min, max);
+    };
+
+    ~RandomDouble()
+    {};
+
+    /**
+     * Generate a random double between min and max
+     * (or between 0 and 1 by default)
+     *
+     *
+     * @return a double between min and max.
+     */
+    double generate()
+    {
+      return dist(gen);
+    }
+
+  protected:
+    boost::mt19937 gen;
+    boost::uniform_real<> dist;
+  };
 }
 
 /* For the emacs weenies in the crowd.

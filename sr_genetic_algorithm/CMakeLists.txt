@@ -7,7 +7,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+set(ROS_BUILD_TYPE Debug)
 
 rosbuild_init()
 
@@ -21,12 +21,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-#common commands for building c++ executables and libraries
 rosbuild_add_library(${PROJECT_NAME} src/genetic_algorithm.cpp src/population.cpp src/individual.cpp)
-target_link_libraries(${PROJECT_NAME} mt_rand)
 
 rosbuild_add_gtest(test/test_ga test/test_ga.cpp)
 target_link_libraries(test/test_ga ${PROJECT_NAME})
 
 rosbuild_add_gtest(test/test_sort test/test_sort.cpp)
-target_link_libraries(test/test_sort ${PROJECT_NAME})
