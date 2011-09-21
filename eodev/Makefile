@@ -1,15 +1,15 @@
 all: eodev
 
-TARBALL = build/E0-1.2.0.zip
+TARBALL = build/EO-1.2.0.zip
 TARBALL_URL = http://goo.gl/8WTPD
-SOURCE_DIR = build/E0-1.2.0
-MD5SUM_FILE = EO-1.2.0.zip.md5sum
+SOURCE_DIR = build/eo
+MD5SUM_FILE =
 UNPACK_CMD = unzip
 include $(shell rospack find mk)/download_unpack_build.mk
 
-eodev: $(SOURCE_DIR)/unpacked
+eodev: ${SOURCE_DIR}/unpacked
 	mkdir -p src
-	cd $(SOURCE_DIR)/eo && ./build_gcc_linux_release
+	cd $(SOURCE_DIR) && ./build_gcc_linux_release
 	rm -rf src
 clean:
 	-rm -rf src $(SOURCE_DIR) eodev
