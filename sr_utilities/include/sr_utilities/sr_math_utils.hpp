@@ -185,6 +185,19 @@ namespace sr_math_utils
     boost::uniform_real<> dist;
   };
 
+  /**
+   * This is the usable singleton of the Random class.
+   *
+   * The typical usage for this class is:
+   * -> generate double betwen 0 and 1
+   *  sr_math_utils::Random::instance().generate<double>()
+   *
+   * -> generate integer between 0 and 10
+   *  sr_math_utils::Random::instance().generate<int>(0, 10)
+   *
+   * -> generate double betwen 0 and 10
+   *  sr_math_utils::Random::instance().generate<double>(0, 10)
+   */
   typedef boost::detail::thread::singleton < class Random_ > Random;
 }
 

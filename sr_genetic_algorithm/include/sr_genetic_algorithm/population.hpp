@@ -54,17 +54,13 @@ namespace shadow_robot
                boost::function<void(std::vector<int>, double, double)> callback_function)
       : ga_parameters(parameters), callback_function(callback_function), iteration_index(0)
     {
-      drand = boost::shared_ptr<sr_math_utils::RandomDouble>( new sr_math_utils::RandomDouble() );
-      ranged_rand = boost::shared_ptr<sr_math_utils::RandomRangedInt>( new sr_math_utils::RandomRangedInt(0, starting_seed.size() ) );
-
       individuals = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
 
       std::cout <<  " -_-_-_-_-_-_-" << std::endl;
 
       for( unsigned int i=0; i < population_size; ++i)
       {
-        individuals->push_back(Individual<GeneType>( starting_seed, ga_parameters, fitness_function,
-                                                     drand, ranged_rand ));
+        individuals->push_back( Individual<GeneType>(starting_seed, ga_parameters, fitness_function) );
 
         std::cout << " new individual(" << individuals->size() << " / " << individuals->at(i).genome.size()<< " ): ";
         for( unsigned int j=0; j < individuals->at(i).genome.size(); ++j)
@@ -75,8 +71,7 @@ namespace shadow_robot
       individuals_old = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
       for( unsigned int i=0; i < population_size; ++i)
       {
-        individuals_old->push_back(Individual<GeneType>(starting_seed, ga_parameters, fitness_function,
-                                                        drand, ranged_rand));
+        individuals_old->push_back( Individual<GeneType>(starting_seed, ga_parameters, fitness_function) );
       }
 
       this->termination_criterion = termination_criterion;
@@ -85,9 +80,6 @@ namespace shadow_robot
     Population(boost::shared_ptr<std::vector<Individual<GeneType> > > individuals, TerminationCriterion termination_criterion)
       : iteration_index(0)
     {
-      drand = boost::shared_ptr<sr_math_utils::RandomDouble>( new sr_math_utils::RandomDouble() );
-      ranged_rand = boost::shared_ptr<sr_math_utils::RandomRangedInt>( new sr_math_utils::RandomRangedInt(0, individuals[0]->genome.size() ) );
-
       this->individuals = individuals;
       this->termination_criterion = termination_criterion;
     };
@@ -188,7 +180,7 @@ namespace shadow_robot
     int roulette_wheel()
     {
       //generate a random number
-      double rand_for_roulette = drand->generate();
+      double rand_for_roulette = sr_math_utils::Random::instance().generate<double>();
 
       //normalize the weights and compute the accumulated fitness value
       // until you reach the random number.
@@ -206,10 +198,6 @@ namespace shadow_robot
       //return the last index
       return selected_index - 1;
     };
-
-    ///random number generators
-    boost::shared_ptr<sr_math_utils::RandomDouble> drand;
-    boost::shared_ptr<sr_math_utils::RandomRangedInt> ranged_rand;
 
     void compute_fitnesses()
     {
@@ -247,13 +235,13 @@ namespace shadow_robot
      */
     void mutation()
     {
-      if( drand->generate() < ga_parameters.mutation_probability )
+      if( sr_math_utils::Random::instance().generate<double>() < ga_parameters.mutation_probability )
         individuals->end()->mutate();
     };
 
     void crossover(std::pair<int, int> selected_indexes)
     {
-      if( drand->generate() < ga_parameters.crossover_probability )
+      if( sr_math_utils::Random::instance().generate<double>() < ga_parameters.crossover_probability )
       {
         Individual<GeneType> new_individual( individuals_old->at(selected_indexes.first),
                                              individuals_old->at(selected_indexes.second));

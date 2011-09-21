@@ -45,14 +45,9 @@ namespace shadow_robot
   {
   public:
     Individual(std::vector<GeneType> starting_seed, GeneticAlgorithmParameters parameters,
-               boost::function<double( std::vector<GeneType> )> fitness_function,
-               boost::shared_ptr<sr_math_utils::RandomDouble> drand,
-               boost::shared_ptr<sr_math_utils::RandomRangedInt> ranged_rand)
-      : fitness_function(fitness_function), ga_parameters(parameters),
-        drand(drand), ranged_rand(ranged_rand)
+               boost::function<double( std::vector<GeneType> )> fitness_function)
+      : fitness_function(fitness_function), ga_parameters(parameters)
     {
-      BOOST_ASSERT(ranged_rand != 0);
-
       BOOST_FOREACH(GeneType gene, starting_seed)
       {
         /**
@@ -60,7 +55,9 @@ namespace shadow_robot
          *  given value - gene_max_percentage_change and the given
          *  value + gene_max_percentage_change.
          */
-        gene = static_cast<GeneType>( gene - ga_parameters.gene_max_percentage_change * gene + (drand->generate() * static_cast<GeneType>(2) * ga_parameters.gene_max_percentage_change * gene) );
+        GeneType min = gene - ga_parameters.gene_max_percentage_change * gene;
+        GeneType max = gene + ga_parameters.gene_max_percentage_change * gene;
+        gene = sr_math_utils::Random::instance().generate<GeneType>(min, max);
 
         /**
          * Clamp it in the correct region: we want all the numbers
@@ -86,16 +83,14 @@ namespace shadow_robot
      *  Creates a new individual from the 2 given individuals.
      */
     Individual(const Individual<GeneType>& a, const Individual<GeneType>& b)
-      : drand(a.drand), ranged_rand(a.ranged_rand)
+      : ga_parameters(a.ga_parameters)
     {
-      BOOST_ASSERT(ranged_rand != 0);
-
       fitness_function = a.fitness_function;
       fitness = a.fitness;
       //create the new individual, using a crossover.
       genome = a.genome;
 
-      int index_for_crossover = ranged_rand->generate();
+      int index_for_crossover = sr_math_utils::Random::instance().generate<int>(0, genome.size());
 
       std::cout << " ----- " << std::endl;
       std::cout << " genomes before crossover (at "<< index_for_crossover<<"): ";
@@ -103,7 +98,7 @@ namespace shadow_robot
         std::cout << genome[i] << " ";
       std::cout << " / ";
       for(unsigned int i=0; i < genome.size(); ++i)
-        std::cout << genome[i] << " ";
+        std::cout << b.genome[i] << " ";
       std::cout << std::endl;
 
       for(unsigned int i=index_for_crossover; i < genome.size(); ++i)
@@ -121,10 +116,8 @@ namespace shadow_robot
      *  Creates a new individual but keep the same genome.
      */
     Individual(const Individual<GeneType>& a)
-      : drand(a.drand), ranged_rand(a.ranged_rand)
+      : ga_parameters(a.ga_parameters)
     {
-      BOOST_ASSERT(ranged_rand != 0);
-
       fitness_function = a.fitness_function;
       //copy the fitness
       fitness = a.fitness;
@@ -148,17 +141,18 @@ namespace shadow_robot
      */
     void mutate()
     {
-      BOOST_ASSERT(ranged_rand != 0);
-      int index_to_mutate = ranged_rand->generate();
+      int index_to_mutate = sr_math_utils::Random::instance().generate<int>(0, genome.size());
 
-      std::cout << "mutation on "<< index_to_mutate << " / " << genome.size() << " gene was: " << genome[index_to_mutate] << " -> ";
+      std::cout << "mutation on "<< index_to_mutate << " / " << genome.size() << std::endl;
+      std::cout << " gene was: " << genome[index_to_mutate] << " -> ";
 
-      GeneType max_mutation = max_mutation_percentage_rate * genome[index_to_mutate];
-
+      GeneType max_mutation = ga_parameters.max_mutation_percentage_rate * genome[index_to_mutate];
+      GeneType min_new_gene = genome[index_to_mutate] - max_mutation;
+      GeneType max_new_gene = genome[index_to_mutate] + max_mutation;
       //mutate the gene
-      genome[index_to_mutate] = static_cast<GeneType>( genome[index_to_mutate] - max_mutation + 2.0 * drand->generate() * max_mutation );
+      genome[index_to_mutate] = sr_math_utils::Random::instance().generate<GeneType>(min_new_gene, max_new_gene);
 
-      std::cout << genome[index_to_mutate] << std::endl;
+      std::cout << genome[index_to_mutate] << "( between " << min_new_gene <<" and "<< max_new_gene << " / max: " << max_mutation<< " ; " << ga_parameters.max_mutation_percentage_rate<<")" <<std::endl;
 
       //clamp to positive values
       if( genome[index_to_mutate] < 0 )
@@ -192,12 +186,6 @@ namespace shadow_robot
     boost::function<double( std::vector<GeneType> )> fitness_function;
 
     GeneticAlgorithmParameters ga_parameters;
-
-    double max_mutation_percentage_rate;
-
-    ///random number generators
-    boost::shared_ptr<sr_math_utils::RandomDouble> drand;
-    boost::shared_ptr<sr_math_utils::RandomRangedInt> ranged_rand;
   };
 
   /**

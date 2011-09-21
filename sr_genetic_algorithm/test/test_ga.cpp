@@ -60,14 +60,14 @@ TEST(GeneticAlgorithm, initialization)
 
   TerminationCriterion tc;
   tc.best_fitness = 1.0;
-  tc.max_iteration_number = 200;
+  tc.max_iteration_number = 2;
   tc.max_number_function_evaluation = 1000000;
 
   boost::shared_ptr<GeneticAlgorithm<int> > ga;
 
   GeneticAlgorithmParameters ga_parameters;
   ga_parameters.crossover_probability = 1.0;
-  ga_parameters.mutation_probability = 0.01;
+  ga_parameters.mutation_probability = 0.5;
   ga_parameters.gene_max_percentage_change = 1.0;
   ga_parameters.max_mutation_percentage_rate = 1.0;
 
