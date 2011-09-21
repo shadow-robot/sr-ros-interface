@@ -1,0 +1,14 @@
+<package>
+  <description brief="eodev">
+
+     eodev
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/eodev</url>
+
+</package>
+
+
