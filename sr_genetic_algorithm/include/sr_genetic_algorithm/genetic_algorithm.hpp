@@ -44,8 +44,8 @@ namespace shadow_robot
   public:
     GeneticAlgorithm(std::vector<GeneType> starting_seed, unsigned int population_size,
                      TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters,
-                     boost::function<double( std::vector<GeneType> )> fitness_function,
-                     boost::function<void(std::vector<int>, double, double)> callback_function)
+                     boost::function<double( const std::vector<GeneType>* )> fitness_function,
+                     boost::function<void(const std::vector<GeneType>*, double, double)> callback_function)
       : ga_parameters(parameters)
     {
       population = boost::shared_ptr<Population<GeneType> >(new Population<GeneType>(starting_seed, population_size,
@@ -81,7 +81,7 @@ namespace shadow_robot
         reason  = population->cycle_once();
       }
 
-      std::cout << "FINISHED  termination reason: " << reason << std::endl;
+      std::cout << "FINISHED  termination reason: " << human_termination_reason[reason] << std::endl;
     };
 
   protected:

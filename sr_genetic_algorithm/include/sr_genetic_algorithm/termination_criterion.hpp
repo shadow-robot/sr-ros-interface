@@ -38,8 +38,13 @@ namespace shadow_robot
 
     enum TerminationReason{NO_CONVERGENCE,
                            BEST_FITNESS, MAX_ITERATION_NUMBER,
-                           MAX_NUMBER_FUNCTION_EVALUATION};
+                           MAX_NUMBER_FUNCTION_EVALUATION,
+                           LAST_TERMINATION_REASON};
   };
+
+  static const char* human_termination_reason[TerminationCriterion::LAST_TERMINATION_REASON] = { "NO CONVERGENCE", "BEST FITNESS",
+                                                                                                 "MAX ITERATION NUMBER",
+                                                                                                 "MAX NUMBER FUNCTION EVALUATION"};
 }
 
 /* For the emacs weenies in the crowd.

@@ -50,22 +50,15 @@ namespace shadow_robot
   public:
     Population(std::vector<GeneType> starting_seed, unsigned int population_size,
                TerminationCriterion termination_criterion, GeneticAlgorithmParameters parameters,
-               boost::function<double( std::vector<GeneType> )> fitness_function,
-               boost::function<void(std::vector<int>, double, double)> callback_function)
+               boost::function<double( const std::vector<GeneType>* )> fitness_function,
+               boost::function<void(const std::vector<GeneType>*, double, double)> callback_function)
       : ga_parameters(parameters), callback_function(callback_function), iteration_index(0)
     {
       individuals = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
 
-      std::cout <<  " -_-_-_-_-_-_-" << std::endl;
-
       for( unsigned int i=0; i < population_size; ++i)
       {
         individuals->push_back( Individual<GeneType>(starting_seed, ga_parameters, fitness_function) );
-
-        std::cout << " new individual(" << individuals->size() << " / " << individuals->at(i).genome.size()<< " ): ";
-        for( unsigned int j=0; j < individuals->at(i).genome.size(); ++j)
-               std::cout << individuals->at(i).genome[j]<< " ";
-        std::cout << std::endl;
       }
 
       individuals_old = boost::shared_ptr<std::vector<Individual<GeneType> > >( new std::vector<Individual<GeneType> >() );
@@ -76,6 +69,13 @@ namespace shadow_robot
 
       this->termination_criterion = termination_criterion;
     };
+
+    Population(const Population<GeneType>& p)
+      : ga_parameters(p.ga_parameters), individuals(p.individuals),
+        individuals_old(p.individuals_old), iteration_index(p.iteration_index),
+        callback_function(p.callback_function)
+    {
+    }
 
     Population(boost::shared_ptr<std::vector<Individual<GeneType> > > individuals, TerminationCriterion termination_criterion)
       : iteration_index(0)
@@ -96,31 +96,27 @@ namespace shadow_robot
      */
     TerminationCriterion::TerminationReason cycle_once()
     {
-      std::cout <<  " -_-_-_-_-_-_-" << std::endl;
-      std::cout << " population: ";
-
-      for(unsigned int i=0; i < individuals->size(); ++i)
-      {
-        std::cout << std::endl;
-        for (unsigned int j=0; j< individuals->at(i).genome.size(); ++j)
-          std::cout << individuals->at(i).genome[j] << " ";
-      }
-      std::cout << std::endl;
-
       //compute the fitnesses for all the individuals.
       compute_fitnesses();
 
       //sort the individuals by diminishing fitnesses
       std::sort( individuals->begin(), individuals->end(), greater<GeneType>() );
 
-      /*
-        std::cout << " Sorted Fitnesses: ";
-        for(unsigned int i=0; i < individuals->size(); ++i)
-        std::cout << individuals->at(i).get_fitness() << " ";
+      //debug prints
+      std::cout <<  " -_-_-_-_-_-_-" << std::endl;
+      std::cout << " population (sorted by fitness): ";
+      for(unsigned int i=0; i < individuals->size(); ++i)
+      {
         std::cout << std::endl;
-      */
-      callback_function( individuals->begin()->get_genome(),
-                         individuals->begin()->get_fitness(),
+        for (unsigned int j=0; j< individuals->at(i).get_genome()->size(); ++j)
+          std::cout << individuals->at(i).get_genome()->at(j) << " ";
+        std:: cout << " -> fit = " << individuals->at(i).get_fitness();
+      }
+      std::cout << std::endl;
+
+      //call the callback function specified by the user.
+      callback_function( individuals->at(0).get_genome(),
+                         individuals->at(0).get_fitness(),
                          average_fitness);
 
       //create the new population:
@@ -129,13 +125,23 @@ namespace shadow_robot
       // The new population has the same size as the old one.
       individuals_old.swap(individuals);
       individuals->clear();
+
+      //we're using elitism: we keep the N best individuals.
+      for(unsigned int i=0; i < static_cast<unsigned int>(static_cast<double>( individuals_old->size() )
+                                                          * ga_parameters.elitism_rate ); ++i)
+      {
+        Individual<GeneType> new_individual( individuals_old->at(i) );
+        individuals->push_back( new_individual );
+      }
+
       while( individuals->size() != individuals_old->size() )
       {
-        std::pair<int, int> selected_indexes = select();
+        std::cout << "new size: "<< individuals->size() << " / " << individuals_old->size() << std::endl;
+        if( individuals->size() > individuals_old->size() )
+          break;
 
+        std::pair<int,int> selected_indexes = select();
         crossover(selected_indexes);
-
-        //std::cout << " selected for crossover: " << selected_indexes.first << "," << selected_indexes.second << " selected for mutation: "<<index_new_indiv <<" ("<< individuals->size() << ","<< individuals_old->size() <<")" <<std::endl;
 
         if( selected_indexes.first == -1 || selected_indexes.second == -1 )
         {
@@ -179,6 +185,8 @@ namespace shadow_robot
 
     int roulette_wheel()
     {
+      return sr_math_utils::Random::instance().generate<int>(static_cast<int>(static_cast<double>( individuals_old->size() )* ga_parameters.elitism_rate), individuals_old->size());
+
       //generate a random number
       double rand_for_roulette = sr_math_utils::Random::instance().generate<double>();
 
@@ -222,7 +230,7 @@ namespace shadow_robot
         return TerminationCriterion::MAX_NUMBER_FUNCTION_EVALUATION;
 
       //the individuals are ordered from the best to the worst fitness value.
-      if( individuals->begin()->get_fitness() >= termination_criterion.best_fitness )
+      if( individuals->at(0).get_fitness() >= termination_criterion.best_fitness )
         return TerminationCriterion::BEST_FITNESS;
 
       // the population hasn't converged
@@ -236,27 +244,38 @@ namespace shadow_robot
     void mutation()
     {
       if( sr_math_utils::Random::instance().generate<double>() < ga_parameters.mutation_probability )
-        individuals->end()->mutate();
+        individuals->at( individuals->size() - 1 ).mutate();
     };
 
     void crossover(std::pair<int, int> selected_indexes)
     {
       if( sr_math_utils::Random::instance().generate<double>() < ga_parameters.crossover_probability )
       {
-        Individual<GeneType> new_individual( individuals_old->at(selected_indexes.first),
-                                             individuals_old->at(selected_indexes.second));
+        unsigned int index_for_crossover = sr_math_utils::Random::instance().generate<unsigned int>(0, individuals_old->at(selected_indexes.first).genome->size());
 
-        individuals->push_back( new_individual );
+        Individual<GeneType> indiv1( individuals_old->at(selected_indexes.first) );
+        Individual<GeneType> indiv2( individuals_old->at(selected_indexes.second) );
+
+        for(unsigned int i=0; i < index_for_crossover; ++i)
+          indiv1.genome->at(i) = indiv2.genome->at(i);
+        for(unsigned int i=index_for_crossover; i < indiv1.get_genome()->size(); ++i)
+          indiv2.genome->at(i) = indiv1.genome->at(i);
+
+        individuals->push_back( indiv1 );
+        individuals->push_back( indiv2 );
       }
       else
       {
-        //no crossovers -> we just keep parent A.
-        Individual<GeneType> new_individual( individuals_old->at(selected_indexes.first) );
-        individuals->push_back( new_individual );
+        //no crossovers -> we just keep both parents.
+        Individual<GeneType> indiv1( individuals_old->at(selected_indexes.first) );
+        Individual<GeneType> indiv2( individuals_old->at(selected_indexes.second) );
+
+        individuals->push_back( indiv1 );
+        individuals->push_back( indiv2 );
       }
     };
 
-    boost::function<void(std::vector<int>, double, double)> callback_function;
+    boost::function<void(const std::vector<GeneType>*, double, double)> callback_function;
 
     double average_fitness;
 
@@ -269,10 +288,10 @@ namespace shadow_robot
   };
 }
 
-/* For the emacs weenies in the crowd.
-Local Variables:
-   c-basic-offset: 2
-End:
-*/
+  /* For the emacs weenies in the crowd.
+     Local Variables:
+     c-basic-offset: 2
+     End:
+  */
 
 #endif

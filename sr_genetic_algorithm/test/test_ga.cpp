@@ -38,18 +38,22 @@
 
 using namespace shadow_robot;
 
-double fitness_function(std::vector<int> genome)
+double fitness_function(const std::vector<int>* genome)
 {
   double sum = 0.0;
-  for(unsigned int i=0; i < genome.size() ; ++ i)
-    sum += static_cast<double>(genome[i]);
+  for(unsigned int i=0; i < genome->size() ; ++ i)
+    sum += (static_cast<double>(genome->at(i)) - 200.0 );
 
   return 1.0 / sum;
 }
 
-void callback(std::vector<int> best_genome, double best_fitness, double average_fitness)
+void callback(const std::vector<int>* best_genome, double best_fitness, double average_fitness)
 {
-  std::cout << "best fitness: " << best_fitness << " average fitness: "<< average_fitness<< std::endl;
+  std::cout << "best fitness: " << best_fitness << " average fitness: "<< average_fitness;
+  std::cout << " for indiv: ";
+  for(unsigned int i=0;i < best_genome->size(); ++i)
+    std::cout << best_genome->at(i)<< " ";
+  std::cout << std::endl;
 }
 
 TEST(GeneticAlgorithm, initialization)
@@ -60,16 +64,17 @@ TEST(GeneticAlgorithm, initialization)
 
   TerminationCriterion tc;
   tc.best_fitness = 1.0;
-  tc.max_iteration_number = 2;
-  tc.max_number_function_evaluation = 1000000;
+  tc.max_iteration_number = 50;
+  tc.max_number_function_evaluation = 100000000;
 
   boost::shared_ptr<GeneticAlgorithm<int> > ga;
 
   GeneticAlgorithmParameters ga_parameters;
   ga_parameters.crossover_probability = 1.0;
-  ga_parameters.mutation_probability = 0.5;
-  ga_parameters.gene_max_percentage_change = 1.0;
-  ga_parameters.max_mutation_percentage_rate = 1.0;
+  ga_parameters.elitism_rate = 0.1;
+  ga_parameters.mutation_probability = 0.01;
+  ga_parameters.gene_max_change = 200.0;
+  ga_parameters.max_mutation = 200.0;
 
 
   ga = boost::shared_ptr<GeneticAlgorithm<int> >( new GeneticAlgorithm<int>(seed, 10, tc, ga_parameters,

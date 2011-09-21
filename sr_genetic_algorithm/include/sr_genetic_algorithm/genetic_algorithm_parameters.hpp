@@ -32,10 +32,11 @@ namespace shadow_robot
   struct GeneticAlgorithmParameters
   {
     double crossover_probability;
+    double elitism_rate;
     double mutation_probability;
 
-    double gene_max_percentage_change;
-    double max_mutation_percentage_rate;
+    double gene_max_change;
+    double max_mutation;
   };
 }
 
