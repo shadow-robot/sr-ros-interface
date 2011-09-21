@@ -30,6 +30,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_real.hpp>
+#include <boost/thread/detail/singleton.hpp>
 
 namespace sr_math_utils
 {
@@ -151,60 +152,40 @@ namespace sr_math_utils
     return x < 0.0 ? -1 : 1;
   }
 
-  class RandomRangedInt
+  /**
+   * This class is not supposed to be used as is: use the RandomDouble
+   * singleton instead.
+   */
+  class Random_
   {
   public:
-    RandomRangedInt(int min, int max)
+    Random_()
     {
-      dist = boost::uniform_int<>(min, max);
+      dist = boost::uniform_real<>(0.0, 1.0);
     };
 
-    ~RandomRangedInt()
+    ~Random_()
     {};
 
     /**
-     * Generate a random int between min and max
-     *
-     *
-     * @return an int between min and max.
-     */
-    int generate()
-    {
-      return dist(gen);
-    }
-
-  protected:
-    boost::mt19937 gen;
-    boost::uniform_int<> dist;
-  };
-
-  class RandomDouble
-  {
-  public:
-    RandomDouble(double min=0.0, double max=1.0)
-    {
-      dist = boost::uniform_real<>(min, max);
-    };
-
-    ~RandomDouble()
-    {};
-
-    /**
-     * Generate a random double between min and max
+     * Generate a random number between min and max
      * (or between 0 and 1 by default)
      *
      *
-     * @return a double between min and max.
+     * @return
      */
-    double generate()
+    template <typename T>
+    T generate(T min = static_cast<T>(0), T max = static_cast<T>(1))
     {
-      return dist(gen);
+      return static_cast<T>( min + dist(gen) * (max - min)  );
     }
 
   protected:
     boost::mt19937 gen;
     boost::uniform_real<> dist;
   };
+
+  typedef boost::detail::thread::singleton < class Random_ > Random;
 }
 
 /* For the emacs weenies in the crowd.

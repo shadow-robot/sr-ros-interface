@@ -1,9 +1,7 @@
 
 #include <boost/smart_ptr.hpp>
 
-#include <boost/random.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_real.hpp>
+#include <sr_utilities/sr_math_utils.hpp>
 
 #include <gtest/gtest.h>
 #include <ros/ros.h>
@@ -42,15 +40,14 @@ TEST(GeneticAlgorithm, sort)
 {
   boost::shared_ptr<std::vector<A<double> > > test = boost::shared_ptr<std::vector<A<double> > >( new std::vector<A<double> >() );
 
-  boost::mt19937 gen;
-  boost::uniform_real<> dist(1.0, 6.0);
-
-  std::cout << " testing uniform int: " << dist(gen) << " " << dist(gen) << " " << dist(gen) << " " << dist(gen) << " " << dist(gen) << std::endl;
-
-  boost::mt19937 gen2;
-  boost::uniform_real<> dist2(1.0, 6.0);
-
-  std::cout << " testing uniform int2: " << dist2(gen2) << " " << dist2(gen2) << " " << dist2(gen2) << " " << dist2(gen2) << " " << dist2(gen2) << std::endl;
+  std::cout << " testing random: ";
+  for (int i = 0; i < 50; ++i)
+  {
+    std::cout << sr_math_utils::Random::instance().generate<int>(0, 30) << " ";
+  }
+  std::cout << std::endl;
+  std::cout << std::endl;
+  std::cout << std::endl;
 
 
   boost::mt19937 drand;
