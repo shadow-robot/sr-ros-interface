@@ -28,3 +28,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
+
+rosbuild_add_executable(sr_automatic_pid_tuning src/sr_automatic_pid_tuning.cpp)
+target_link_libraries(sr_automatic_pid_tuning es ga eo eoutils)
+rosbuild_add_openmp_flags(sr_automatic_pid_tuning)
