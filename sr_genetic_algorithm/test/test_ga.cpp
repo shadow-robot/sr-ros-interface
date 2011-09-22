@@ -42,9 +42,9 @@ double fitness_function(const std::vector<int>* genome)
 {
   double sum = 0.0;
   for(unsigned int i=0; i < genome->size() ; ++ i)
-    sum += (static_cast<double>(genome->at(i)) - 200.0 );
+    sum += genome->at(i) * genome->at(i);
 
-  return 1.0 / sum;
+  return -sum;
 }
 
 void callback(const std::vector<int>* best_genome, double best_fitness, double average_fitness)

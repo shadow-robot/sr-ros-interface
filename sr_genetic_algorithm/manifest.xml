@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/sr_genetic_algorithm</url>
   <depend package="roscpp"/>
   <depend package="sr_utilities"/>
+  <depend package="eodev"/>
 </package>
 
 

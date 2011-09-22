@@ -21,9 +21,12 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_library(${PROJECT_NAME} src/genetic_algorithm.cpp src/population.cpp src/individual.cpp)
+#rosbuild_add_library(${PROJECT_NAME} src/genetic_algorithm.cpp src/population.cpp src/individual.cpp)
 
-rosbuild_add_gtest(test/test_ga test/test_ga.cpp)
-target_link_libraries(test/test_ga ${PROJECT_NAME})
+#rosbuild_add_gtest(test/test_ga test/test_ga.cpp)
+#target_link_libraries(test/test_ga ${PROJECT_NAME})
 
-rosbuild_add_gtest(test/test_sort test/test_sort.cpp)
+#rosbuild_add_gtest(test/test_sort test/test_sort.cpp)
+
+rosbuild_add_executable(test/test_eo test/test_eo.cpp)
+target_link_libraries(test/test_eo libeo.a libeoutils.a )
