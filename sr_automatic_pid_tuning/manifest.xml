@@ -8,11 +8,12 @@
   <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_automatic_pid_tuning</url>
-  <depend package="rospy"/>
+  <depend package="roscpp"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
   <depend package="sr_robot_lib"/>
+  <depend package="eodev"/>
 
   <rosdep name="python-scipy"/>
 
