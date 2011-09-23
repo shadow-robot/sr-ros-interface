@@ -1,8 +1,3 @@
-/** -*- mode: c++; c-indent-level: 4; c++-member-init-indent: 8; comment-column: 35; -*-
-
-The above line is usefulin Emacs-like editors
- */
-
 /*
 Template for evaluator in EO, a functor that computes the fitness of an EO
 ==========================================================================
@@ -26,11 +21,11 @@ template <class EOT>
 class eoSRAutomaticPidTuningEvalFunc : public eoEvalFunc<EOT>
 {
 public:
-	/// Ctor - no requirement
+  /// Ctor - no requirement
 // START eventually add or modify the anyVariable argument
   eoSRAutomaticPidTuningEvalFunc()
   //  eoSRAutomaticPidTuningEvalFunc( varType  _anyVariable) : anyVariable(_anyVariable)
-// END eventually add or modify the anyVariable argument
+  // END eventually add or modify the anyVariable argument
   {
     // START Code of Ctor of an eoSRAutomaticPidTuningEvalFunc object
     // END   Code of Ctor of an eoSRAutomaticPidTuningEvalFunc object
@@ -46,16 +41,26 @@ public:
   {
     // test for invalid to avoid recomputing fitness of unmodified individuals
     if (_eo.invalid())
-      {
-	double fit = 0.0;		   // to hold fitness value
-    // START Code of computation of fitness of the eoSRAutomaticPidTuning object
-        std::vector<int> pid_settings = _eo.get_pid_settings();
-        for( unsigned int i=0; i < pid_settings.size() ; ++i )
-          fit += static_cast<double>( pid_settings[i]*pid_settings[i] );
+    {
+      double fit = 0.0;		   // to hold fitness value
+      // START Code of computation of fitness of the eoSRAutomaticPidTuning object
+      std::vector<int> pid_settings = _eo.get_pid_settings();
 
-    // END   Code of computation of fitness of the eoSRAutomaticPidTuning object
-	_eo.fitness(fit);
+      //TODO: set the pid with the new values.
+
+      //then we move and record the error.
+      for(unsigned int i=0; i< 10; ++i)
+      {
+        _eo.publish(static_cast<double>(i) / 10.0);
+        double last_error = _eo.get_last_error();
+        fit += last_error*last_error;
+        usleep(10000);
       }
+
+      usleep(10000);
+      // END   Code of computation of fitness of the eoSRAutomaticPidTuning object
+      _eo.fitness(fit);
+    }
   }
 
 private:
@@ -66,9 +71,9 @@ private:
 
 
 /* For the emacs weenies in the crowd.
-Local Variables:
+   Local Variables:
    c-basic-offset: 2
-End:
+   End:
 */
 
 

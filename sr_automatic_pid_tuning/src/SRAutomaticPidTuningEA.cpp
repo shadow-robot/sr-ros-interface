@@ -21,6 +21,8 @@ Or you can wait until we do it :-)
 #include <iostream>
 using namespace std;
 
+#include <ros/ros.h>
+
 // eo general include
 #include <eo>
 // the real bounds (not yet in general eo include)
@@ -117,6 +119,9 @@ void make_help(eoParser & _parser);
 // now use all of the above, + representation dependent things
 int main(int argc, char* argv[])
 {
+  ros::init(argc, argv, "sr_automatic_pid_tuning");
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
   try
   {
     eoParser parser(argc, argv);  // for user-parameter reading
@@ -358,6 +363,8 @@ int main(int argc, char* argv[])
   {
     cout << e.what() << endl;
   }
+
+
   return 0;
 }
 

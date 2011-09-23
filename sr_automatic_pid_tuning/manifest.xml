@@ -1,7 +1,7 @@
 <package>
   <description brief="sr_automatic_pid_tuning">
 
-     sr_automatic_pid_tuning is an automatic pid tuner using downhill simplex.
+     sr_automatic_pid_tuning is an automatic pid tuner using eodev.
 
   </description>
   <author>Ugo Cupcic</author>
@@ -11,15 +11,10 @@
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
+  <depend package="pr2_controllers_msgs"/>
   <depend package="sr_robot_msgs"/>
-  <depend package="sr_robot_lib"/>
+  <depend package="sr_utilities"/>
   <depend package="eodev"/>
-
-  <rosdep name="python-scipy"/>
-
-  <export>
-    <python path="${prefix}/src"/>
-  </export>
 
 </package>
 

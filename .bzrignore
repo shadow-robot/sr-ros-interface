@@ -172,3 +172,5 @@ sr_hand/bin/examples/link_joints
 sr_robot_msgs/msg_gen
 ￼
 sr_robot_msgs/src
+￼
+sr_automatic_pid_tuning/Res

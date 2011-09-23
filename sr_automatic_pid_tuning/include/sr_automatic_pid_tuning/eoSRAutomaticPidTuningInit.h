@@ -27,7 +27,7 @@ class eoSRAutomaticPidTuningInit: public eoInit<GenotypeT> {
 public:
   /// Ctor - no requirement
 // START eventually add or modify the anyVariable argument
-  eoSRAutomaticPidTuningInit(std::vector<int> seed, std::vector<int> max_variations, std::string controller_topic)
+  eoSRAutomaticPidTuningInit(std::vector<int> seed, std::vector<int> max_variations, std::string joint_name)
   //  eoSRAutomaticPidTuningInit( varType  _anyVariable) : anyVariable(_anyVariable)
   // END eventually add or modify the anyVariable argument
   {
@@ -42,6 +42,13 @@ public:
       min_range.push_back(min_value);
       max_range.push_back(max_value);
     }
+
+    //generate the controller state topic, the controller command topic
+    // and the service name to change the pids.
+    state_topic = "/"+joint_name + "_controller/state";
+    command_topic = "/"+joint_name + "_controller/command";
+
+    pid_service = "/"+joint_name + "_controller/set_gains";
     // END   Code of Ctor of an eoSRAutomaticPidTuningInit object
   }
 
@@ -68,12 +75,20 @@ public:
     _genotype.set_pid_settings(initial_pids);
     _genotype.set_min_range(min_range);
     _genotype.set_max_range(max_range);
+
+    _genotype.set_state_topic( state_topic );
+    _genotype.set_command_topic( command_topic );
+    _genotype.set_pid_service( pid_service );
   }
 
 private:
 // START Private data of an eoSRAutomaticPidTuningInit object
   std::vector<int> min_range;
   std::vector<int> max_range;
+
+  std::string state_topic;
+  std::string command_topic;
+  std::string pid_service;
 // END   Private data of an eoSRAutomaticPidTuningInit object
 };
 

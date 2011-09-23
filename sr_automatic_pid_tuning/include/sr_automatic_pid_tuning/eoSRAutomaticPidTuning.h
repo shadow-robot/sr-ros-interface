@@ -26,6 +26,10 @@ The above line is usefulin Emacs-like editors
 #ifndef _eoSRAutomaticPidTuning_h
 #define _eoSRAutomaticPidTuning_h
 
+#include <ros/ros.h>
+#include <std_msgs/Float64.h>
+#include <pr2_controllers_msgs/JointControllerState.h>
+
 /**
  *  Always write a comment in this format before class definition
  *  if you want the class to be documented by Doxygen
@@ -113,6 +117,38 @@ public:
     // END   Code of input
   }
 
+  void controller_state_callback(const pr2_controllers_msgs::JointControllerState& msg)
+  {
+    last_msg = msg;
+  }
+
+  double get_last_error()
+  {
+    return last_msg.error;
+  }
+
+  void publish(double target)
+  {
+    std_msgs::Float64 msg;
+    msg.data = target;
+    pub.publish( msg );
+  }
+
+  /////
+  // Set the ROS subscriber / publisher / service proxy.
+  void set_state_topic(std::string topic)
+  {
+    sub = nh.subscribe(topic, 2, &eoSRAutomaticPidTuning::controller_state_callback, this);
+  }
+  void set_command_topic(std::string topic)
+  {
+    pub = nh.advertise<std_msgs::Float64>(topic, 5);
+  }
+  void set_pid_service(std::string topic)
+  {
+
+  }
+
   std::vector<int> get_pid_settings() const
   {
     return pid_settings;
@@ -144,6 +180,12 @@ private:			   // put all data here
   std::vector<int> pid_settings;
   std::vector<int> min_range;
   std::vector<int> max_range;
+
+  ros::NodeHandle nh;
+  ros::Publisher pub;
+  ros::Subscriber sub;
+
+  pr2_controllers_msgs::JointControllerState last_msg;
   // END   Private data of an eoSRAutomaticPidTuning object
 };
 
