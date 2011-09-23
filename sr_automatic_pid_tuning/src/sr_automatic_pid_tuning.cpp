@@ -34,13 +34,18 @@ namespace shadow_robot
 {
   SrAutomaticPidTuning::SrAutomaticPidTuning(eoParser parser)
   {
+
+    typedef eoReal<eoMinimizingFitness> EOT;
+
+    eoState state;    // keeps all things allocated
+
     ///// FIRST, problem or representation dependent stuff
     //////////////////////////////////////////////////////
 
     // The evaluation fn - encapsulated into an eval counter for output
     eoEvalFuncPtr<EOT, double, const std::vector<double>&>
-      mainEval( real_value );
-    eval = eoEvalFuncCounter<EOT>(mainEval);
+      mainEval( fitness );
+    eoEvalFuncCounter<EOT> eval(mainEval);
 
     // the genotype - through a genotype initializer
     eoRealInitBounded<EOT>& init = make_genotype(parser, state, EOT());
@@ -53,26 +58,20 @@ namespace shadow_robot
 
     // initialize the population - and evaluate
     // yes, this is representation indepedent once you have an eoInit
-    pop   = make_pop(parser, state, init);
+    eoPop<EOT>& pop   = make_pop(parser, state, init);
 
     // stopping criteria
     eoContinue<EOT> & term = make_continue(parser, state, eval);
     // output
     eoCheckPoint<EOT> & checkpoint = make_checkpoint(parser, state, eval, term);
     // algorithm (need the operator!)
-    ea = make_algo_scalar(parser, state, eval, checkpoint, op);
+    eoAlgo<EOT>& ea = make_algo_scalar(parser, state, eval, checkpoint, op);
 
     ///// End of construction of the algorith
     /////////////////////////////////////////
     // to be called AFTER all parameters have been read!!!
     make_help(parser);
-  }
 
-  SrAutomaticPidTuning::~SrAutomaticPidTuning()
-  {}
-
-  void SrAutomaticPidTuning::run()
-  {
     //// GO
     ///////
     // evaluate intial population AFTER help and status in case it takes time
@@ -88,17 +87,18 @@ namespace shadow_robot
     pop.sortedPrintOn(cout);
     cout << endl;
   }
+
+  SrAutomaticPidTuning::~SrAutomaticPidTuning()
+  {
+  }
 }
 
 int main(int argc, char* argv[])
 {
   eoParser parser(argc, argv);  // for user-parameter reading
-
-  shadow_robot::SrAutomaticPidTuning automatic_tuner;
-
   try
   {
-    automatic_tuner.run();
+    shadow_robot::SrAutomaticPidTuning automatic_tuner(parser);
   }
   catch(exception& e)
   {

@@ -30,6 +30,8 @@
 #include <es/make_real.h>
 #include <apply.h>
 
+#include <boost/smart_ptr.hpp>
+
 namespace shadow_robot
 {
   class SrAutomaticPidTuning
@@ -38,15 +40,9 @@ namespace shadow_robot
     SrAutomaticPidTuning(eoParser parser);
     virtual ~SrAutomaticPidTuning();
 
-  protected:
-    typedef eoReal<eoMinimizingFitness> EOT;
-
-    eoEvalFuncCounter<EOT> eval;
-    eoPop<EOT>& pop;
-    eoState state;
-    eoAlgo<EOT>& ea;
-
     void run();
+  protected:
+    eoState state;
   };
 }
 
