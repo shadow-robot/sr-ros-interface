@@ -43,7 +43,7 @@ namespace shadow_robot
     //////////////////////////////////////////////////////
 
     // The evaluation fn - encapsulated into an eval counter for output
-    eoEvalFuncPtr<EOT, double, const std::vector<double>&>
+    eoEvalFuncPtr<EOT, double, const std::vector<int>&>
       mainEval( fitness );
     eoEvalFuncCounter<EOT> eval(mainEval);
 

@@ -36,7 +36,7 @@
     @param _ind  vector<int>
 */
 
-double fitness(const std::vector<double>& _ind)
+double fitness(const std::vector<int>& _ind)
 {
   double sum = 0;
   for (unsigned i = 0; i < _ind.size(); i++)
