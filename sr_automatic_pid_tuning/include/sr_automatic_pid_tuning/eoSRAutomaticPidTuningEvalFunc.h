@@ -47,9 +47,12 @@ public:
     // test for invalid to avoid recomputing fitness of unmodified individuals
     if (_eo.invalid())
       {
-	double fit;		   // to hold fitness value
+	double fit = 0.0;		   // to hold fitness value
     // START Code of computation of fitness of the eoSRAutomaticPidTuning object
-	// fit = blablabla
+        std::vector<int> pid_settings = _eo.get_pid_settings();
+        for( unsigned int i=0; i < pid_settings.size() ; ++i )
+          fit -= static_cast<double>( pid_settings[i]*pid_settings[i] );
+
     // END   Code of computation of fitness of the eoSRAutomaticPidTuning object
 	_eo.fitness(fit);
       }
@@ -60,6 +63,13 @@ private:
   //  varType anyVariable;		   // for example ...
 // END   Private data of an eoSRAutomaticPidTuningEvalFunc object
 };
+
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
 
 
 #endif

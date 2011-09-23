@@ -130,7 +130,18 @@ try
     eoEvalFuncCounter<Indi> eval(plainEval);
 
     // a genotype initializer
-    eoSRAutomaticPidTuningInit<Indi> init;
+    std::vector<int> seed;
+    seed.push_back(10);
+    seed.push_back(20);
+    seed.push_back(30);
+    seed.push_back(40);
+    std::vector<int> max_variations;
+    max_variations.push_back(10);
+    max_variations.push_back(20);
+    max_variations.push_back(30);
+    max_variations.push_back(40);
+
+    eoSRAutomaticPidTuningInit<Indi> init(seed, max_variations);
     // or, if you need some parameters, you might as well
     // - write a constructor of the eoSRAutomaticPidTuningInit that uses a parser
     // - call it from here:
@@ -348,3 +359,9 @@ try
   }
   return 0;
 }
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/

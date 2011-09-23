@@ -68,4 +68,10 @@ private:
 // END   Private data of an eoSRAutomaticPidTuningQuadCrossover object
 };
 
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
+
 #endif

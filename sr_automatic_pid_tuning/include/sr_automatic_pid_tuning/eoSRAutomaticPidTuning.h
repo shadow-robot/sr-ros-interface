@@ -4,22 +4,22 @@ The above line is usefulin Emacs-like editors
  */
 
 /*
-Template for creating a new representation in EO
-================================================
+  Template for creating a new representation in EO
+  ================================================
 
-Mandatory:
-- a default constructor (constructor without any argument)
-- the I/O functions (readFrom and printOn)
+  Mandatory:
+  - a default constructor (constructor without any argument)
+  - the I/O functions (readFrom and printOn)
 
-However, if you are using dynamic memory, there are 2 places
-to allocate it: the default constructor (if possible?), or, more in
-the EO spirit, the eoInit object, that you will need to write anyway
-(template file init.tmpl).
+  However, if you are using dynamic memory, there are 2 places
+  to allocate it: the default constructor (if possible?), or, more in
+  the EO spirit, the eoInit object, that you will need to write anyway
+  (template file init.tmpl).
 
-But remember that a COPY CONSTRUCTOR will be used in many places in EO,
-so make sure that the default copy constructor works, or, even better,
-do write your own if in doubt.
-And of course write the corresponding destructor!
+  But remember that a COPY CONSTRUCTOR will be used in many places in EO,
+  so make sure that the default copy constructor works, or, even better,
+  do write your own if in doubt.
+  And of course write the corresponding destructor!
 
 */
 
@@ -60,11 +60,11 @@ public:
    * If this is the case, uncomment and fill the following
    */
   /*
-  eoSRAutomaticPidTuning(const eoSRAutomaticPidTuning &)
-  {
+    eoSRAutomaticPidTuning(const eoSRAutomaticPidTuning &)
+    {
     // START Code of copy Ctor of an eoSRAutomaticPidTuning object
     // END   Code of copy Ctor of an eoSRAutomaticPidTuning object
-  }
+    }
   */
 
 
@@ -77,41 +77,80 @@ public:
   virtual string className() const { return "eoSRAutomaticPidTuning"; }
 
   /** printing... */
-    void printOn(ostream& os) const
-    {
-      // First write the fitness
-      EO<FitT>::printOn(os);
-      os << ' ';
+  void printOn(ostream& os) const
+  {
+    // First write the fitness
+    EO<FitT>::printOn(os);
+    os << ' ';
     // START Code of default output
+    /** HINTS
+     * in EO we systematically write the sizes of things before the things
+     * so readFrom is easier to code (see below)
+     */
 
-	/** HINTS
-	 * in EO we systematically write the sizes of things before the things
-	 * so readFrom is easier to code (see below)
-	 */
-
-    // END   Code of default output
+    os << "size: " << pid_settings.size() << " values: ";
+    for( unsigned int i=0 ; i < pid_settings.size(); ++i)
+    {
+      os << pid_settings[i] << " ";
     }
+    // END   Code of default output
+  }
 
   /** reading...
    * of course, your readFrom must be able to read what printOn writes!!!
    */
-    void readFrom(istream& is)
-      {
-	// of course you should read the fitness first!
-	EO<FitT>::readFrom(is);
+  void readFrom(istream& is)
+  {
+    // of course you should read the fitness first!
+    EO<FitT>::readFrom(is);
     // START Code of input
 
-	/** HINTS
-	 * remember the eoSRAutomaticPidTuning object will come from the default ctor
-	 * this is why having the sizes written out is useful
-	 */
+    /** HINTS
+     * remember the eoSRAutomaticPidTuning object will come from the default ctor
+     * this is why having the sizes written out is useful
+     */
 
     // END   Code of input
-      }
+  }
 
+  std::vector<int> get_pid_settings() const
+  {
+    return pid_settings;
+  }
+  void set_pid_settings(std::vector<int> pids)
+  {
+    pid_settings = pids;
+  }
+
+  std::vector<int> get_min_range() const
+  {
+    return min_range;
+  }
+  void set_min_range(std::vector<int> mins)
+  {
+    min_range = mins;
+  }
+
+  std::vector<int> get_max_range() const
+  {
+    return max_range;
+  }
+  void set_max_range(std::vector<int> maxs)
+  {
+    max_range = maxs;
+  }
 private:			   // put all data here
-    // START Private data of an eoSRAutomaticPidTuning object
-    // END   Private data of an eoSRAutomaticPidTuning object
+  // START Private data of an eoSRAutomaticPidTuning object
+  std::vector<int> pid_settings;
+  std::vector<int> min_range;
+  std::vector<int> max_range;
+  // END   Private data of an eoSRAutomaticPidTuning object
 };
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
 
 #endif

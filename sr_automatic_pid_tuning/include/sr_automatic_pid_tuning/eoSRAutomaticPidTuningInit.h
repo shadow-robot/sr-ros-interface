@@ -13,7 +13,7 @@ Template for EO objects initialization in EO
 
 // include the base definition of eoInit
 #include <eoInit.h>
-
+#include <sr_utilities/sr_math_utils.hpp>
 /**
  *  Always write a comment in this format before class definition
  *  if you want the class to be documented by Doxygen
@@ -25,13 +25,26 @@ Template for EO objects initialization in EO
 template <class GenotypeT>
 class eoSRAutomaticPidTuningInit: public eoInit<GenotypeT> {
 public:
-	/// Ctor - no requirement
+  /// Ctor - no requirement
 // START eventually add or modify the anyVariable argument
-  eoSRAutomaticPidTuningInit()
+  eoSRAutomaticPidTuningInit(std::vector<int> seed, std::vector<int> max_variations)
   //  eoSRAutomaticPidTuningInit( varType  _anyVariable) : anyVariable(_anyVariable)
-// END eventually add or modify the anyVariable argument
+  // END eventually add or modify the anyVariable argument
   {
     // START Code of Ctor of an eoSRAutomaticPidTuningInit object
+    for ( unsigned int i=0; i < seed.size(); ++i)
+    {
+      int min_value = seed[i] - max_variations[i];
+      if( min_value < 0 )
+        min_value = 0;
+      int max_value = seed[i] + max_variations[i];
+
+      min_range.push_back(min_value);
+      max_range.push_back(max_value);
+
+      int gene = sr_math_utils::Random::instance().generate<int>(min_value, max_value);
+      initial_pids.push_back( gene );
+    }
     // END   Code of Ctor of an eoSRAutomaticPidTuningInit object
   }
 
@@ -46,12 +59,24 @@ public:
     // START Code of random initialization of an eoSRAutomaticPidTuning object
     // END   Code of random initialization of an eoSRAutomaticPidTuning object
     _genotype.invalidate();	   // IMPORTANT in case the _genotype is old
+
+    _genotype.set_pid_settings(initial_pids);
+    _genotype.set_min_range(min_range);
+    _genotype.set_max_range(max_range);
   }
 
 private:
 // START Private data of an eoSRAutomaticPidTuningInit object
-  //  varType anyVariable;		   // for example ...
+  std::vector<int> initial_pids;
+  std::vector<int> min_range;
+  std::vector<int> max_range;
 // END   Private data of an eoSRAutomaticPidTuningInit object
 };
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
 
 #endif
