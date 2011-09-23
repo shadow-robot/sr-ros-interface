@@ -51,7 +51,7 @@ public:
     // START Code of computation of fitness of the eoSRAutomaticPidTuning object
         std::vector<int> pid_settings = _eo.get_pid_settings();
         for( unsigned int i=0; i < pid_settings.size() ; ++i )
-          fit -= static_cast<double>( pid_settings[i]*pid_settings[i] );
+          fit += static_cast<double>( pid_settings[i]*pid_settings[i] );
 
     // END   Code of computation of fitness of the eoSRAutomaticPidTuning object
 	_eo.fitness(fit);

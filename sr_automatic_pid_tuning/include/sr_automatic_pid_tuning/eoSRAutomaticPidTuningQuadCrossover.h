@@ -32,7 +32,7 @@ public:
 // START eventually add or modify the anyVariable argument
   eoSRAutomaticPidTuningQuadCrossover()
   //  eoSRAutomaticPidTuningQuadCrossover( varType  _anyVariable) : anyVariable(_anyVariable)
-// END eventually add or modify the anyVariable argument
+  // END eventually add or modify the anyVariable argument
   {
     // START Code of Ctor of an eoSRAutomaticPidTuningEvalFunc object
     // END   Code of Ctor of an eoSRAutomaticPidTuningEvalFunc object
@@ -49,15 +49,58 @@ public:
    */
   bool operator()(GenotypeT& _genotype1, GenotypeT & _genotype2)
   {
-      bool oneAtLeastIsModified(true);
+    bool oneAtLeastIsModified(true);
     // START code for crossover of _genotype1 and _genotype2 objects
+    std::vector<int> pid_1 = _genotype1.get_pid_settings();
+    unsigned int index_to_modify1  = sr_math_utils::Random::instance().generate<unsigned int>(0, pid_1.size());
+    unsigned int index_to_modify2  = sr_math_utils::Random::instance().generate<unsigned int>(0, pid_1.size());
 
-       /** Requirement
-	* if (at least one genotype has been modified) // no way to distinguish
-	*     oneAtLeastIsModified = true;
-	* else
-	*     oneAtLeastIsModified = false;
-	*/
+    //make sure index_to_modify1 is smaller than index_to_modify2
+    int tmp;
+    if( index_to_modify1 > index_to_modify2)
+    {
+      tmp = index_to_modify2;
+      index_to_modify2 = index_to_modify1;
+      index_to_modify1 = tmp;
+    }
+
+    //if the crossover indexes wrap the whole genome, don't modify anything
+    if( index_to_modify1 == 0 && index_to_modify2 == (pid_1.size() - 1) )
+      oneAtLeastIsModified = false;
+    else
+    {
+      std::vector<int> pid_2 = _genotype2.get_pid_settings();
+      std::vector<int> pid1_new, pid2_new;
+
+      //between 0 and index_1 keep the values
+      for( unsigned int i=0; i<index_to_modify1; ++i)
+      {
+        pid1_new.push_back( pid_1[i]);
+        pid2_new.push_back( pid_2[i]);
+      }
+      //between index_1 and index_2, invert the values
+      for( unsigned int i=index_to_modify1; i<index_to_modify2; ++i)
+      {
+        pid1_new.push_back( pid_2[i]);
+        pid2_new.push_back( pid_1[i]);
+      }
+      //between index_2 and end, keep the values
+      for( unsigned int i=index_to_modify2; i<pid_1.size(); ++i)
+      {
+        pid1_new.push_back( pid_1[i]);
+        pid2_new.push_back( pid_2[i]);
+      }
+
+      _genotype1.set_pid_settings(pid_1);
+      _genotype2.set_pid_settings(pid_2);
+    }
+
+    /** Requirement
+     * if (at least one genotype has been modified) // no way to distinguish
+     *     oneAtLeastIsModified = true;
+     * else
+     *     oneAtLeastIsModified = false;
+     */
     return oneAtLeastIsModified;
     // END code for crossover of _genotype1 and _genotype2 objects
   }
