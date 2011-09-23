@@ -117,7 +117,7 @@ void make_help(eoParser & _parser);
 // now use all of the above, + representation dependent things
 int main(int argc, char* argv[])
 {
-try
+  try
   {
     eoParser parser(argc, argv);  // for user-parameter reading
 
@@ -128,6 +128,11 @@ try
     eoSRAutomaticPidTuningEvalFunc<Indi> plainEval/* (varType  _anyVariable) */;
     // turn that object into an evaluation counter
     eoEvalFuncCounter<Indi> eval(plainEval);
+
+    std::string joint = "ffj3";
+    joint = parser.createParam(joint, "joint", "Joint you want to tune", 'j', "Automatic PID Tuning" ).value();
+
+    std::cout << " Will tune joint: "<< joint <<std::endl;
 
     // a genotype initializer
     std::vector<int> seed;
@@ -141,7 +146,7 @@ try
     max_variations.push_back(30);
     max_variations.push_back(40);
 
-    eoSRAutomaticPidTuningInit<Indi> init(seed, max_variations);
+    eoSRAutomaticPidTuningInit<Indi> init(seed, max_variations, joint);
     // or, if you need some parameters, you might as well
     // - write a constructor of the eoSRAutomaticPidTuningInit that uses a parser
     // - call it from here:
@@ -182,13 +187,13 @@ try
 // double cross2Rate = parser.createParam(1.0, "cross2Rate", "Relative rate for crossover 2", '2', "Variation Operators").value();
 // cross.add(cross2, cross2Rate);
 
-  // NOTE: if you want some gentle output, the last one shoudl be like
-  //  cross.add(cross, crossXXXRate, true);
+    // NOTE: if you want some gentle output, the last one shoudl be like
+    //  cross.add(cross, crossXXXRate, true);
 
     /////////////// Same thing for MUTATION
 
-  // a (first) mutation   (possibly use the parser in its Ctor)
-  eoSRAutomaticPidTuningMutation<Indi> mut /* (parser) */;
+    // a (first) mutation   (possibly use the parser in its Ctor)
+    eoSRAutomaticPidTuningMutation<Indi> mut /* (parser) */;
 
     // IF MORE THAN ONE:
 
@@ -207,13 +212,13 @@ try
 // double mut2Rate = parser.createParam(1.0, "mut2Rate", "Relative rate for mutation 2", '2', "Variation Operators").value();
 // mut.add(mut2, mut2Rate);
 
-  // NOTE: if you want some gentle output, the last one shoudl be like
-  //  mut.add(mut, mutXXXRate, true);
+    // NOTE: if you want some gentle output, the last one shoudl be like
+    //  mut.add(mut, mutXXXRate, true);
 
-  // now encapsulate your crossover(s) and mutation(s) into an eoGeneralOp
-  // so you can fully benefit of the existing evolution engines
+    // now encapsulate your crossover(s) and mutation(s) into an eoGeneralOp
+    // so you can fully benefit of the existing evolution engines
 
-  // First read the individual level parameters
+    // First read the individual level parameters
     double pCross = parser.createParam(0.6, "pCross", "Probability of Crossover", 'C', "Variation Operators" ).value();
     // minimum check
     if ( (pCross < 0) || (pCross > 1) )
@@ -236,44 +241,42 @@ try
     // and possibly modify the parameters in the stat object creation
     //////////////////////////////////////////////
 
-  // initialize the population
-  // yes, this is representation indepedent once you have an eoInit
-  eoPop<Indi>& pop   = make_pop(parser, state, init);
+    // initialize the population
+    // yes, this is representation indepedent once you have an eoInit
+    eoPop<Indi>& pop   = make_pop(parser, state, init);
 
-  // stopping criteria
-  eoContinue<Indi> & term = make_continue(parser, state, eval);
-  // output
-  eoCheckPoint<Indi> & checkpoint = make_checkpoint(parser, state, eval, term);
-
-
-  // UNCOMMENT the following commented block if you want to add you stats
-
-  // if uncommented, it is assumed that you will want to print some stat.
-  // if not, then the following objects will be created uselessly - but what the heck!
-
-  eoSRAutomaticPidTuningStat<Indi>   myStat;       // or maybe myStat(parser);
-  checkpoint.add(myStat);
-  // This one is probably redundant with the one in make_checkpoint, but w.t.h.
-  eoIncrementorParam<unsigned> generationCounter("Gen.");
-  checkpoint.add(generationCounter);
-  // need to get the name of the redDir param (if any)
-  std::string dirName =  parser.getORcreateParam(std::string("Res"), "resDir", "Directory to store DISK outputs", '\0', "Output - Disk").value() + "/";
+    // stopping criteria
+    eoContinue<Indi> & term = make_continue(parser, state, eval);
+    // output
+    eoCheckPoint<Indi> & checkpoint = make_checkpoint(parser, state, eval, term);
 
 
-  // those need to be pointers because of the if's
-  eoStdoutMonitor *myStdOutMonitor;
-  eoFileMonitor   *myFileMonitor;
-#ifdef HAVE_GNUPLOT
-  eoGnuplot1DMonitor *myGnuMonitor;
-#endif
+    // UNCOMMENT the following commented block if you want to add you stats
 
-  // now check how you want to output the stat:
-  bool printSRAutomaticPidTuningStat = parser.createParam(false, "coutSRAutomaticPidTuningStat", "Prints my stat to screen, one line per generation", '\0', "My application").value();
-  bool fileSRAutomaticPidTuningStat = parser.createParam(false, "fileSRAutomaticPidTuningStat", "Saves my stat to file (in resDir", '\0', "My application").value();
-  bool plotSRAutomaticPidTuningStat = parser.createParam(false, "plotSRAutomaticPidTuningStat", "On-line plots my stat using gnuplot", '\0', "My application").value();
+    // if uncommented, it is assumed that you will want to print some stat.
+    // if not, then the following objects will be created uselessly - but what the heck!
 
-  // should we write it on StdOut ?
-  if (printSRAutomaticPidTuningStat)
+    eoSRAutomaticPidTuningStat<Indi>   myStat;       // or maybe myStat(parser);
+    checkpoint.add(myStat);
+    // This one is probably redundant with the one in make_checkpoint, but w.t.h.
+    eoIncrementorParam<unsigned> generationCounter("Gen.");
+    checkpoint.add(generationCounter);
+    // need to get the name of the redDir param (if any)
+    std::string dirName =  parser.getORcreateParam(std::string("Res"), "resDir", "Directory to store DISK outputs", '\0', "Output - Disk").value() + "/";
+
+
+    // those need to be pointers because of the if's
+    eoStdoutMonitor *myStdOutMonitor;
+    eoFileMonitor   *myFileMonitor;
+    eoGnuplot1DMonitor *myGnuMonitor;
+
+    // now check how you want to output the stat:
+    bool printSRAutomaticPidTuningStat = parser.createParam(false, "coutSRAutomaticPidTuningStat", "Prints my stat to screen, one line per generation", '\0', "Automatic PID Tuning").value();
+    bool fileSRAutomaticPidTuningStat = parser.createParam(false, "fileSRAutomaticPidTuningStat", "Saves my stat to file (in resDir", '\0', "Automatic PID Tuning").value();
+    bool plotSRAutomaticPidTuningStat = parser.createParam(false, "plotSRAutomaticPidTuningStat", "On-line plots my stat using gnuplot", '\0', "Automatic PID Tuning").value();
+
+    // should we write it on StdOut ?
+    if (printSRAutomaticPidTuningStat)
     {
       myStdOutMonitor = new eoStdoutMonitor(false);
       // don't forget to store the memory in the state
@@ -286,13 +289,13 @@ try
       myStdOutMonitor->add(myStat);
     }
 
-  // first check the directory (and creates it if not exists already):
-  if (fileSRAutomaticPidTuningStat || plotSRAutomaticPidTuningStat)
+    // first check the directory (and creates it if not exists already):
+    if (fileSRAutomaticPidTuningStat || plotSRAutomaticPidTuningStat)
       if (! testDirRes(dirName, true) )
 	throw runtime_error("Problem with resDir");
 
-  // should we write it to a file ?
-  if (fileSRAutomaticPidTuningStat)
+    // should we write it to a file ?
+    if (fileSRAutomaticPidTuningStat)
     {
       // the file name is hard-coded - of course you can read
       // a string parameter in the parser if you prefer
@@ -307,9 +310,8 @@ try
       myFileMonitor->add(myStat);
     }
 
-#ifdef HAVE_GNUPLOT
-  // should we PLOT it on StdOut ? (one dot per generation, incremental plot)
-  if (plotSRAutomaticPidTuningStat)
+    // should we PLOT it on StdOut ? (one dot per generation, incremental plot)
+    if (plotSRAutomaticPidTuningStat)
     {
       myGnuMonitor = new eoGnuplot1DMonitor(dirName+"plot_myStat.xg",minimizing_fitness<Indi>());
       // NOTE: you cand send commands to gnuplot at any time with the method
@@ -324,33 +326,32 @@ try
       myGnuMonitor->add(eval);
       myGnuMonitor->add(myStat);
     }
-#endif
 
-  // algorithm (need the operator!)
-  eoAlgo<Indi>& ga = make_algo_scalar(parser, state, eval, checkpoint, op);
-  // and the distance if you want to do sharing
-  // eoAlgo<Indi>& ga = make_algo_scalar(parser, state, eval, checkpoint, op, &dist);
+    // algorithm (need the operator!)
+    eoAlgo<Indi>& ga = make_algo_scalar(parser, state, eval, checkpoint, op);
+    // and the distance if you want to do sharing
+    // eoAlgo<Indi>& ga = make_algo_scalar(parser, state, eval, checkpoint, op, &dist);
 
-  ///// End of construction of the algorithm
+    ///// End of construction of the algorithm
 
-  /////////////////////////////////////////
-  // to be called AFTER all parameters have been read!!!
-  make_help(parser);
+    /////////////////////////////////////////
+    // to be called AFTER all parameters have been read!!!
+    make_help(parser);
 
-  //// GO
-  ///////
-  // evaluate intial population AFTER help and status in case it takes time
-  apply<Indi>(eval, pop);
-  // if you want to print it out
-//   cout << "Initial Population\n";
-//   pop.sortedPrintOn(cout);
-//   cout << endl;
+    //// GO
+    ///////
+    // evaluate intial population AFTER help and status in case it takes time
+    apply<Indi>(eval, pop);
+    // if you want to print it out
+    cout << "Initial Population\n";
+    pop.sortedPrintOn(cout);
+    cout << endl;
 
-  run_ea(ga, pop); // run the ga
+    run_ea(ga, pop); // run the ga
 
-  cout << "Final Population\n";
-  pop.sortedPrintOn(cout);
-  cout << endl;
+    cout << "Final Population\n";
+    pop.sortedPrintOn(cout);
+    cout << endl;
 
   }
   catch(exception& e)

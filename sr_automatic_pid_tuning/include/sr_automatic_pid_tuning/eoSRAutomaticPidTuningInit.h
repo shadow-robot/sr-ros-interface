@@ -27,7 +27,7 @@ class eoSRAutomaticPidTuningInit: public eoInit<GenotypeT> {
 public:
   /// Ctor - no requirement
 // START eventually add or modify the anyVariable argument
-  eoSRAutomaticPidTuningInit(std::vector<int> seed, std::vector<int> max_variations)
+  eoSRAutomaticPidTuningInit(std::vector<int> seed, std::vector<int> max_variations, std::string controller_topic)
   //  eoSRAutomaticPidTuningInit( varType  _anyVariable) : anyVariable(_anyVariable)
   // END eventually add or modify the anyVariable argument
   {
@@ -41,9 +41,6 @@ public:
 
       min_range.push_back(min_value);
       max_range.push_back(max_value);
-
-      int gene = sr_math_utils::Random::instance().generate<int>(min_value, max_value);
-      initial_pids.push_back( gene );
     }
     // END   Code of Ctor of an eoSRAutomaticPidTuningInit object
   }
@@ -60,6 +57,14 @@ public:
     // END   Code of random initialization of an eoSRAutomaticPidTuning object
     _genotype.invalidate();	   // IMPORTANT in case the _genotype is old
 
+    std::vector<int> initial_pids;
+    for ( unsigned int i=0; i < min_range.size(); ++i)
+    {
+      int min_value = min_range[i];
+      int max_value = max_range[i];
+      int gene = sr_math_utils::Random::instance().generate<int>(min_value, max_value);
+      initial_pids.push_back( gene );
+    }
     _genotype.set_pid_settings(initial_pids);
     _genotype.set_min_range(min_range);
     _genotype.set_max_range(max_range);
@@ -67,7 +72,6 @@ public:
 
 private:
 // START Private data of an eoSRAutomaticPidTuningInit object
-  std::vector<int> initial_pids;
   std::vector<int> min_range;
   std::vector<int> max_range;
 // END   Private data of an eoSRAutomaticPidTuningInit object
