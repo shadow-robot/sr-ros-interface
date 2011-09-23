@@ -27,6 +27,29 @@
 #ifndef _SR_AUTOMATIC_PID_TUNING_HPP_
 #define _SR_AUTOMATIC_PID_TUNING_HPP_
 
+#include <es/make_real.h>
+#include <apply.h>
+
+namespace shadow_robot
+{
+  class SrAutomaticPidTuning
+  {
+  public:
+    SrAutomaticPidTuning(eoParser parser);
+    virtual ~SrAutomaticPidTuning();
+
+  protected:
+    typedef eoReal<eoMinimizingFitness> EOT;
+
+    eoEvalFuncCounter<EOT> eval;
+    eoPop<EOT>& pop;
+    eoState state;
+    eoAlgo<EOT>& ea;
+
+    void run();
+  };
+}
+
 /* For the emacs weenies in the crowd.
 Local Variables:
    c-basic-offset: 2

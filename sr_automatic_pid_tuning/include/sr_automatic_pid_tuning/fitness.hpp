@@ -23,10 +23,11 @@
  *
  */
 
-#ifndef _SR_AUTOMATIC_PID_TUNING_HPP_
-#define _SR_AUTOMATIC_PID_TUNING_HPP_
+#ifndef _SR_FITNESS_HPP_
+#define _SR_FITNESS_HPP_
 
 #include <vector>
+#include <math.h>
 //-----------------------------------------------------------------------------
 
 
