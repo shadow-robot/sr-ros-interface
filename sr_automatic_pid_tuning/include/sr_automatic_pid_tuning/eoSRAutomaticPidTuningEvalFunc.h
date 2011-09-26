@@ -54,10 +54,17 @@ public:
         _eo.publish(static_cast<double>(i) / 10.0);
         double last_error = _eo.get_last_error();
         fit += last_error*last_error;
-        usleep(10000);
+        usleep(250000);
+      }
+      for(unsigned int i=10; i>0 ; --i)
+      {
+        _eo.publish(static_cast<double>(i) / 10.0);
+        double last_error = _eo.get_last_error();
+        fit += last_error*last_error;
+        usleep(250000);
       }
 
-      usleep(10000);
+      usleep(500000);
       // END   Code of computation of fitness of the eoSRAutomaticPidTuning object
       _eo.fitness(fit);
     }

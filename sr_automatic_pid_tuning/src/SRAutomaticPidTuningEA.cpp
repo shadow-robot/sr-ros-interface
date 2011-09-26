@@ -17,7 +17,7 @@ main file BitEA in tutorial/Lesson4 dir.
 Or you can wait until we do it :-)
 */
 
-// Miscilaneous include and declaration
+// Miscellaneous include and declaration
 #include <iostream>
 using namespace std;
 
@@ -36,7 +36,7 @@ using namespace std;
  */
 #include "sr_automatic_pid_tuning/eoSRAutomaticPidTuning.h"
 
-/** definition of initilizqtion:
+/** definition of initialisation:
  * class eoSRAutomaticPidTuningInit MUST derive from eoInit<eoSRAutomaticPidTuning>
  */
 #include "sr_automatic_pid_tuning/eoSRAutomaticPidTuningInit.h"
@@ -61,8 +61,8 @@ using namespace std;
 // GENOTYPE   eoSRAutomaticPidTuning ***MUST*** be templatized over the fitness
 
 //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-// START fitness type: double or eoMaximizingFitness if you are maximizing
-//                     eoMinimizingFitness if you are minimizing
+// START fitness type: double or eoMaximizingFitness if you are maximising
+//                     eoMinimizingFitness if you are minimising
 typedef eoMinimizingFitness MyFitT ;	// type of fitness
 // END fitness type
 //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -73,7 +73,7 @@ typedef eoSRAutomaticPidTuning<MyFitT> Indi;      // ***MUST*** derive from EO
 
 // Use existing modules to define representation independent routines
 
-// how to initialize the population
+// how to initialise the population
 // it IS representation independent if an eoInit is given
 #include <do/make_pop.h>
 eoPop<Indi >&  make_pop(eoParser& _parser, eoState& _state, eoInit<Indi> & _init)
@@ -105,7 +105,7 @@ eoAlgo<Indi>&  make_algo_scalar(eoParser& _parser, eoState& _state, eoEvalFunc<I
 // simple call to the algo. stays there for consistency reasons
 // no template for that one
 #include <do/make_run.h>
-// the instanciating fitnesses
+// the instantiating fitnesses
 #include <eoScalarFitness.h>
 void run_ea(eoAlgo<Indi>& _ga, eoPop<Indi>& _pop)
 {
@@ -141,15 +141,15 @@ int main(int argc, char* argv[])
 
     // a genotype initializer
     std::vector<int> seed;
-    seed.push_back(10);
-    seed.push_back(20);
-    seed.push_back(30);
-    seed.push_back(40);
+    seed.push_back(60);
+    seed.push_back(25);
+    seed.push_back(5);
+    seed.push_back(1);
     std::vector<int> max_variations;
-    max_variations.push_back(10);
-    max_variations.push_back(20);
-    max_variations.push_back(30);
-    max_variations.push_back(40);
+    max_variations.push_back(500);
+    max_variations.push_back(500);
+    max_variations.push_back(500);
+    max_variations.push_back(500);
 
     eoSRAutomaticPidTuningInit<Indi> init(seed, max_variations, joint);
     // or, if you need some parameters, you might as well

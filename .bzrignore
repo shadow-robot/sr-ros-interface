@@ -174,3 +174,7 @@ sr_robot_msgs/msg_gen
 sr_robot_msgs/src
 ￼
 sr_automatic_pid_tuning/Res
+sr_automatic_pid_tuning/.cproject
+sr_automatic_pid_tuning/.project
+sr_automatic_pid_tuning/.pydevproject
+sr_automatic_pid_tuning/cmake_install.cmake

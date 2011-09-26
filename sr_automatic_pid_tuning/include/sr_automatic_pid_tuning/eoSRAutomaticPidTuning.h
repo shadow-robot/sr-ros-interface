@@ -28,6 +28,7 @@ The above line is usefulin Emacs-like editors
 
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
+#include <sr_robot_msgs/SetPidGains.h>
 #include <pr2_controllers_msgs/JointControllerState.h>
 
 /**
@@ -146,7 +147,7 @@ public:
   }
   void set_pid_service(std::string topic)
   {
-
+    pid_service = nh.serviceClient<sr_robot_msgs::SetPidGains>("/ffproximal_controller/set_gains");
   }
 
   std::vector<int> get_pid_settings() const
@@ -156,6 +157,19 @@ public:
   void set_pid_settings(std::vector<int> pids)
   {
     pid_settings = pids;
+    sr_robot_msgs::SetPidGains::Request pid_req;
+    sr_robot_msgs::SetPidGains::Response pid_res;
+    pid_req.p = pids[0];
+    pid_req.i = pids[1];
+    pid_req.d = pids[2];
+    pid_req.i_clamp = pids[3];
+    pid_req.max_force = 1023;
+    pid_req.deadband = 0.0;
+    pid_req.friction_deadband = 5000;
+    if (pid_service.call(pid_req, pid_res))
+    {
+
+    }
   }
 
   std::vector<int> get_min_range() const
@@ -184,6 +198,7 @@ private:			   // put all data here
   ros::NodeHandle nh;
   ros::Publisher pub;
   ros::Subscriber sub;
+  ros::ServiceClient pid_service;
 
   pr2_controllers_msgs::JointControllerState last_msg;
   // END   Private data of an eoSRAutomaticPidTuning object
