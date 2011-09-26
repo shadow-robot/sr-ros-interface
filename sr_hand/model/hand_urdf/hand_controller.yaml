@@ -80,10 +80,10 @@ mfproximal_controller:
   type: sr_mechanism_controllers/SrhJointPositionController
   joint: MFJ3
   pid:
-    p: 44.0
-    i: 19.0
-    d: 3.0
-    i_clamp: 1
+    p: 448.0
+    i: 155.0
+    d: 71.0
+    i_clamp: 2
     deadband: 0
     friction_deadband: 2000
     max_force: 2000.0
