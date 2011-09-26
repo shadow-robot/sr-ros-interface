@@ -72,13 +72,13 @@ public:
       int gene = sr_math_utils::Random::instance().generate<int>(min_value, max_value);
       initial_pids.push_back( gene );
     }
-    _genotype.set_pid_settings(initial_pids);
-    _genotype.set_min_range(min_range);
-    _genotype.set_max_range(max_range);
-
     _genotype.set_state_topic( state_topic );
     _genotype.set_command_topic( command_topic );
     _genotype.set_pid_service( pid_service );
+
+    _genotype.set_pid_settings(initial_pids);
+    _genotype.set_min_range(min_range);
+    _genotype.set_max_range(max_range);
   }
 
 private:

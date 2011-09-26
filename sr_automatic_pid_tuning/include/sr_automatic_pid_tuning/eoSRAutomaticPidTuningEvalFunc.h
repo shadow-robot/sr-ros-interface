@@ -47,6 +47,7 @@ public:
       std::vector<int> pid_settings = _eo.get_pid_settings();
 
       //TODO: set the pid with the new values.
+      _eo.set_pid_settings(pid_settings);
 
       //then we move and record the error.
       for(unsigned int i=0; i< 10; ++i)

@@ -147,7 +147,7 @@ public:
   }
   void set_pid_service(std::string topic)
   {
-    pid_service = nh.serviceClient<sr_robot_msgs::SetPidGains>("/ffproximal_controller/set_gains");
+    pid_service = nh.serviceClient<sr_robot_msgs::SetPidGains>(topic);
   }
 
   std::vector<int> get_pid_settings() const
@@ -159,6 +159,7 @@ public:
     pid_settings = pids;
     sr_robot_msgs::SetPidGains::Request pid_req;
     sr_robot_msgs::SetPidGains::Response pid_res;
+
     pid_req.p = pids[0];
     pid_req.i = pids[1];
     pid_req.d = pids[2];
@@ -166,6 +167,7 @@ public:
     pid_req.max_force = 1023;
     pid_req.deadband = 0.0;
     pid_req.friction_deadband = 5000;
+
     if (pid_service.call(pid_req, pid_res))
     {
 
