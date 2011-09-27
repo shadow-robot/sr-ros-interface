@@ -1,8 +1,8 @@
 <package>
   <description brief="sr_movements">
 
-     A library which can be used to take the hand through a series of movements (perfect for tuning
-     controllers for example).
+    Contains a node which can be used to take the hand through a series of movements (perfect for tuning
+    controllers for example).
 
   </description>
   <author>Ugo Cupcic / ugo@shadowrobot.com</author>
@@ -12,9 +12,9 @@
   <depend package="sr_robot_msgs"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
-  <depend package="rospy"/>
   <depend package="roscpp"/>
 
+  <rosdep name="libpng++-dev"/>
 </package>
 
 

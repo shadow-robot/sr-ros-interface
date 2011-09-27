@@ -18,3 +18,7 @@ libspnav0:
 libspnav-dev:
   ubuntu: libspnav-dev
   debian: libspnav-dev
+
+libpng++-dev:
+  ubuntu: libpng++-dev
+  debian: libpng++-dev
