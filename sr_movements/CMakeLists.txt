@@ -19,3 +19,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 rosbuild_add_executable(sr_movements src/sr_movements.cpp src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
 rosbuild_add_compile_flags(sr_movements -I/usr/include/libpng12)
 rosbuild_add_link_flags(sr_movements -L/usr/lib -lpng12)
+
+rosbuild_add_library(sr_movement src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
+rosbuild_add_compile_flags(sr_movement -I/usr/include/libpng12)
+rosbuild_add_link_flags(sr_movement -L/usr/lib -lpng12)

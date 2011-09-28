@@ -30,6 +30,7 @@
 #include <ros/ros.h>
 #include <boost/thread.hpp>
 
+#include <std_msgs/Float64.h>
 #include "sr_movements/partial_movement.hpp"
 
 namespace shadowrobot
@@ -44,7 +45,15 @@ namespace shadowrobot
     void start();
     void stop();
 
+    /**
+     * Allows the user to control the movement step by
+     * step.
+     */
+    void execute_step(int index_mvt_step, int index_partial_movement);
+
     void add_movement(PartialMovement mvt);
+
+    void set_publisher(ros::Publisher publisher);
 
   protected:
     std::vector<PartialMovement> partial_movements;
@@ -53,6 +62,12 @@ namespace shadowrobot
 
     ros::Rate publishing_rate;
     double min, max;
+
+
+    std_msgs::Float64 msg;
+    double last_target_;
+
+    static const unsigned int nb_mvt_step;
   };
 }
 

@@ -24,14 +24,15 @@
  */
 
 #include "sr_movements/movement_publisher.hpp"
-#include <std_msgs/Float64.h>
 
 namespace shadowrobot
 {
+  const unsigned int MovementPublisher::nb_mvt_step = 1000;
+
   MovementPublisher::MovementPublisher(double min_value, double max_value,
                                        double rate)
     : nh_tilde("~"), publishing_rate( rate ),
-      min(min_value), max(max_value)
+      min(min_value), max(max_value), last_target_(0.0)
   {
     pub = nh_tilde.advertise<std_msgs::Float64>("targets", 5);
   }
@@ -41,17 +42,16 @@ namespace shadowrobot
 
   void MovementPublisher::start()
   {
-    std_msgs::Float64 msg;
     double last_target = 0.0;
     for( unsigned int i=0; i<partial_movements.size(); ++i)
     {
-      for(unsigned int j=0; j<1000; ++j)
+      for(unsigned int j=0; j<nb_mvt_step; ++j)
       {
         if( !ros::ok() )
           return;
 
         //get the target
-        msg.data = partial_movements[i].get_target( static_cast<double>(j) / 1000.0);
+        msg.data = partial_movements[i].get_target( static_cast<double>(j) / static_cast<double>(nb_mvt_step));
         //interpolate to the correct range
         msg.data = min + msg.data * (max - min);
 
@@ -70,12 +70,41 @@ namespace shadowrobot
     }
   }
 
+
+  void MovementPublisher::execute_step(int index_mvt_step, int index_partial_movement)
+  {
+    if( !ros::ok() )
+      return;
+
+    //get the target
+    msg.data = partial_movements[index_partial_movement].get_target( static_cast<double>(index_mvt_step) / static_cast<double>(nb_mvt_step));
+    //interpolate to the correct range
+    msg.data = min + msg.data * (max - min);
+
+    //there was not target -> resend the last target
+    if( msg.data == -1.0 )
+      msg.data = last_target_;
+
+    //publish the message
+    pub.publish( msg );
+
+    //wait for a bit
+    publishing_rate.sleep();
+
+    last_target_ = msg.data;
+  }
+
   void MovementPublisher::stop()
   {}
 
   void MovementPublisher::add_movement(PartialMovement mvt)
   {
     partial_movements.push_back( mvt );
+  }
+
+  void MovementPublisher::set_publisher(ros::Publisher publisher)
+  {
+    pub = publisher;
   }
 }
 
