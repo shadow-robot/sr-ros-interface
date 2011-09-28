@@ -14,6 +14,7 @@ Template for EO objects initialization in EO
 // include the base definition of eoInit
 #include <eoInit.h>
 #include <sr_utilities/sr_math_utils.hpp>
+#include "sr_movements/movement_publisher.hpp"
 /**
  *  Always write a comment in this format before class definition
  *  if you want the class to be documented by Doxygen
@@ -27,7 +28,7 @@ class eoSRAutomaticPidTuningInit: public eoInit<GenotypeT> {
 public:
   /// Ctor - no requirement
 // START eventually add or modify the anyVariable argument
-  eoSRAutomaticPidTuningInit(std::vector<int> seed, std::vector<int> max_variations, std::string joint_name)
+  eoSRAutomaticPidTuningInit(std::vector<int> seed, std::vector<int> max_variations, std::string joint_name, shadowrobot::MovementPublisher mvt_pub)
   //  eoSRAutomaticPidTuningInit( varType  _anyVariable) : anyVariable(_anyVariable)
   // END eventually add or modify the anyVariable argument
   {
@@ -49,6 +50,8 @@ public:
     command_topic = "/"+joint_name + "_controller/command";
 
     pid_service = "/"+joint_name + "_controller/set_gains";
+
+    mvt_publisher = mvt_pub;
     // END   Code of Ctor of an eoSRAutomaticPidTuningInit object
   }
 
@@ -74,6 +77,7 @@ public:
     }
     _genotype.set_state_topic( state_topic );
     _genotype.set_command_topic( command_topic );
+    _genotype.set_mvt_publisher( mvt_publisher );
     _genotype.set_pid_service( pid_service );
 
     _genotype.set_pid_settings(initial_pids);
@@ -89,6 +93,8 @@ private:
   std::string state_topic;
   std::string command_topic;
   std::string pid_service;
+
+  shadowrobot::MovementPublisher mvt_publisher;
 // END   Private data of an eoSRAutomaticPidTuningInit object
 };
 

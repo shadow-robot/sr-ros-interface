@@ -50,22 +50,13 @@ public:
       _eo.set_pid_settings(pid_settings);
 
       //then we move and record the error.
-      for(unsigned int i=0; i< 10; ++i)
+      for(unsigned int i=0; i<1000; ++i )
       {
-        _eo.publish(static_cast<double>(i) / 10.0);
+        _eo.execute_mvt_step(i);
         double last_error = _eo.get_last_error();
         fit += last_error*last_error;
-        usleep(250000);
-      }
-      for(unsigned int i=10; i>0 ; --i)
-      {
-        _eo.publish(static_cast<double>(i) / 10.0);
-        double last_error = _eo.get_last_error();
-        fit += last_error*last_error;
-        usleep(250000);
       }
 
-      usleep(500000);
       // END   Code of computation of fitness of the eoSRAutomaticPidTuning object
       _eo.fitness(fit);
     }

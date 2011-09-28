@@ -168,10 +168,20 @@ public:
     pid_req.deadband = 0.0;
     pid_req.friction_deadband = 5000;
 
-    if (pid_service.call(pid_req, pid_res))
+    if (!pid_service.call(pid_req, pid_res))
     {
-
+      ROS_ERROR("failed to set pid");
     }
+  }
+
+  void set_mvt_publisher(shadowrobot::MovementPublisher mvt_pub)
+  {
+    mvt_publisher = mvt_pub;
+    mvt_pub.set_publisher( pub );
+  }
+  void execute_mvt_step(int index_step)
+  {
+    mvt_publisher.execute_step(index_step, 0);
   }
 
   std::vector<int> get_min_range() const
@@ -201,6 +211,8 @@ private:			   // put all data here
   ros::Publisher pub;
   ros::Subscriber sub;
   ros::ServiceClient pid_service;
+
+  shadowrobot::MovementPublisher mvt_publisher;
 
   pr2_controllers_msgs::JointControllerState last_msg;
   // END   Private data of an eoSRAutomaticPidTuning object

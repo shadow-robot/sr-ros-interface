@@ -23,6 +23,9 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include "sr_movements/movement_from_image.hpp"
+#include "sr_movements/movement_publisher.hpp"
+
 // eo general include
 #include <eo>
 // the real bounds (not yet in general eo include)
@@ -139,19 +142,82 @@ int main(int argc, char* argv[])
 
     std::cout << " Will tune joint: "<< joint <<std::endl;
 
-    // a genotype initializer
+    ros::NodeHandle nh_tilde("~");
     std::vector<int> seed;
-    seed.push_back(60);
-    seed.push_back(25);
-    seed.push_back(5);
-    seed.push_back(1);
-    std::vector<int> max_variations;
-    max_variations.push_back(500);
-    max_variations.push_back(500);
-    max_variations.push_back(500);
-    max_variations.push_back(500);
 
-    eoSRAutomaticPidTuningInit<Indi> init(seed, max_variations, joint);
+    XmlRpc::XmlRpcValue seed_tmp;
+
+    if( !nh_tilde.getParam("starting_seed", seed_tmp) )
+    {
+      std::cout << "No Starting seed" << std::endl;
+      // a genotype initializer
+      seed.push_back(60);
+      seed.push_back(25);
+      seed.push_back(5);
+      seed.push_back(1);
+    }
+    else
+    {
+      ROS_ASSERT(seed_tmp.getType() == XmlRpc::XmlRpcValue::TypeArray);
+      for (int32_t i = 0; i < seed_tmp.size(); ++i)
+      {
+        ROS_ASSERT(seed_tmp[i].getType() == XmlRpc::XmlRpcValue::TypeInt);
+        seed.push_back( static_cast<int>(seed_tmp[i]) );
+      }
+
+      std::cout << "Starting seed provided: ";
+      for( unsigned int i=0; i<seed.size(); ++i)
+        std:: cout << seed[i] << " ";
+    }
+    std::cout << std::endl;
+
+
+    XmlRpc::XmlRpcValue max_var_tmp;
+    std::vector<int> max_variations;
+    if( !nh_tilde.getParam("max_variations", max_var_tmp) )
+    {
+      std::cout << "No maximum variations provided" << std::endl;
+      max_variations.push_back(500);
+      max_variations.push_back(500);
+      max_variations.push_back(500);
+      max_variations.push_back(500);
+    }
+    else
+    {
+      ROS_ASSERT(max_var_tmp.getType() == XmlRpc::XmlRpcValue::TypeArray);
+      for (int32_t i = 0; i < max_var_tmp.size(); ++i)
+      {
+        ROS_ASSERT(max_var_tmp[i].getType() == XmlRpc::XmlRpcValue::TypeInt);
+        max_variations.push_back( static_cast<int>(max_var_tmp[i]) );
+      }
+
+      std::cout << "Max Variations: ";
+      for( unsigned int i=0; i<max_variations.size(); ++i)
+        std:: cout << max_variations[i] << " ";
+    }
+
+    //Setup the movement on which the tuning will run.
+    std::string img_path;
+    if( !nh_tilde.getParam("image_path", img_path) )
+    {
+      ROS_ERROR("No movement selected.");
+      return -1;
+    }
+    shadowrobot::MovementFromImage mvt_im( img_path );
+
+    double min, max, publish_rate;
+    if( !nh_tilde.getParam("min", min) )
+      min = 0.0;
+    if( !nh_tilde.getParam("max", max) )
+      max = 1.5;
+    if( !nh_tilde.getParam("publish_rate", publish_rate) )
+      publish_rate = 100.0;
+
+    shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate );
+    mvt_pub.add_movement( mvt_im );
+
+    eoSRAutomaticPidTuningInit<Indi> init( seed, max_variations, joint,
+                                           mvt_pub);
     // or, if you need some parameters, you might as well
     // - write a constructor of the eoSRAutomaticPidTuningInit that uses a parser
     // - call it from here:
@@ -175,50 +241,10 @@ int main(int argc, char* argv[])
     // A (first) crossover (possibly use the parser in its Ctor)
     eoSRAutomaticPidTuningQuadCrossover<Indi> cross /* (eoParser parser) */;
 
-    // IF MORE THAN ONE:
-
-    // read its relative rate in the combination
-// double cross1Rate = parser.createParam(1.0, "cross1Rate", "Relative rate for crossover 1", '1', "Variation Operators").value();
-
-    // create the combined operator with the first one (rename it cross1 !!!)
-// eoPropCombinedQuadOp<Indi> cross(cross1, cross1Rate);
-
-    // and as many as you want the following way:
-    // 1- write the new class by mimicking eoSRAutomaticPidTuningQuadCrossover.h
-    // 2- include that file here together with eoSRAutomaticPidTuningQuadCrossover above
-    // 3- uncomment and duplicate the following lines:
-    //
-// eoSRAutomaticPidTuningSecondCrossover<Indi> cross2(eoParser parser);
-// double cross2Rate = parser.createParam(1.0, "cross2Rate", "Relative rate for crossover 2", '2', "Variation Operators").value();
-// cross.add(cross2, cross2Rate);
-
-    // NOTE: if you want some gentle output, the last one shoudl be like
-    //  cross.add(cross, crossXXXRate, true);
-
     /////////////// Same thing for MUTATION
 
     // a (first) mutation   (possibly use the parser in its Ctor)
     eoSRAutomaticPidTuningMutation<Indi> mut /* (parser) */;
-
-    // IF MORE THAN ONE:
-
-    // read its relative rate in the combination
-// double mut1Rate = parser.createParam(1.0, "mut1Rate", "Relative rate for mutation 1", '1', "Variation Operators").value();
-
-    // create the combined operator with the first one (rename it cross1 !!!)
-// eoPropCombinedMonOp<Indi> mut(mut1, mut1Rate);
-
-    // and as many as you want the following way:
-    // 1- write the new class by mimicking eoSRAutomaticPidTuningMutation.h
-    // 2- include that file here together with eoSRAutomaticPidTuningMutation above
-    // 3- uncomment and duplicate the following lines:
-    //
-// eoSRAutomaticPidTuningSecondMutation<Indi> mut2(eoParser parser);
-// double mut2Rate = parser.createParam(1.0, "mut2Rate", "Relative rate for mutation 2", '2', "Variation Operators").value();
-// mut.add(mut2, mut2Rate);
-
-    // NOTE: if you want some gentle output, the last one shoudl be like
-    //  mut.add(mut, mutXXXRate, true);
 
     // now encapsulate your crossover(s) and mutation(s) into an eoGeneralOp
     // so you can fully benefit of the existing evolution engines
