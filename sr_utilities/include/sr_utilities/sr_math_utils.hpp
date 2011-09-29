@@ -34,6 +34,8 @@
 
 namespace sr_math_utils
 {
+  static const double pi = 3.14159265;
+
   /**
    * Convert an angle in degrees to an angle in radians.
    *

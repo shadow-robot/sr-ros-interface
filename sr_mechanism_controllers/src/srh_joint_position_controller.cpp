@@ -106,6 +106,9 @@ namespace controller {
       }
     }
 
+    //get the min and max value for the current joint:
+    get_min_max( robot_->model_->robot_model_, joint_name );
+
     friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
 
     pid_controller_position_ = pid_position;
@@ -190,6 +193,8 @@ namespace controller {
       else
         command_ = joint_state_->position_;
     }
+
+    command_ = clamp_command( command_ );
 
     //Compute position demand from position error:
     double error_position = 0.0;

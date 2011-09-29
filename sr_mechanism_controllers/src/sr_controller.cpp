@@ -38,6 +38,7 @@ namespace controller {
 
   SrController::SrController()
     : joint_state_(NULL), command_(0),
+      min_(0.0), max_(sr_math_utils::pi),
       loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
       n_tilde_("~"),
       max_force_demand(1023.), friction_deadband(5)
@@ -91,6 +92,39 @@ namespace controller {
 
   void SrController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
   {}
+
+  void SrController::get_min_max( urdf::Model model, std::string joint_name )
+  {
+    if( joint_name.substr(3,1).compare("0") == 0)
+    {
+      std::string j1 = joint_name.substr(0,3) + "1";
+      std::string j2 = joint_name.substr(0,3) + "2";
+
+      boost::shared_ptr<const urdf::Joint> joint1 = model.getJoint( j1 );
+      boost::shared_ptr<const urdf::Joint> joint2 = model.getJoint( j2 );
+
+      min_ = joint1->limits->lower + joint2->limits->lower;
+      max_ = joint1->limits->upper + joint2->limits->upper;
+    }
+    else
+    {
+      boost::shared_ptr<const urdf::Joint> joint = model.getJoint( joint_name );
+
+      min_ = joint->limits->lower;
+      max_ = joint->limits->upper;
+    }
+  }
+
+  double SrController::clamp_command( double cmd )
+  {
+    if(cmd < min_)
+      return min_;
+
+    if(cmd > max_)
+      return max_;
+
+    return cmd;
+  }
 }
 
 /* For the emacs weenies in the crowd.

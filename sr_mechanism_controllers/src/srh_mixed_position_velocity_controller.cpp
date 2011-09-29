@@ -119,6 +119,9 @@ namespace controller {
     }
     friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
 
+    //get the min and max value for the current joint:
+    get_min_max( robot_->model_->robot_model_, joint_name );
+
     pid_controller_velocity_ = pid_velocity;
 
     serve_set_gains_ = node_.advertiseService("set_gains", &SrhMixedPositionVelocityJointController::setGains, this);
@@ -228,6 +231,9 @@ namespace controller {
       else
         command_ = joint_state_->position_;
     }
+
+    //Clamps the command to the correct range.
+    command_ = clamp_command( command_ );
 
     //Compute velocity demand from position error:
     double error_position = 0.0;

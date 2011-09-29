@@ -91,6 +91,28 @@ namespace controller
     ///call this function at the end of the init function in the inheriting classes.
     void after_init();
 
+    /**
+     * Clamps the command to the correct range
+     * (between min and max).
+     *
+     * @param cmd the command we want to clamp
+     *
+     * @return the clamped command
+     */
+    double clamp_command( double cmd );
+
+    /**
+     * Reads the min and max from the robot model for
+     * the current joint.
+     *
+     * @param model the urdf description of the robot
+     * @param joint_name the name of the joint
+     */
+    void get_min_max( urdf::Model model, std::string joint_name );
+
+    ///Min and max range of the joint, used to clamp the command.
+    double min_, max_;
+
     int loop_count_;
     bool initialized_;
     pr2_mechanism_model::RobotState *robot_;              /**< Pointer to robot structure. */
@@ -103,7 +125,6 @@ namespace controller
         pr2_controllers_msgs::JointControllerState> > controller_state_publisher_ ;
 
     boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator> friction_compensator;
-
 
     ros::Subscriber sub_command_;
     ros::ServiceServer serve_set_gains_;
