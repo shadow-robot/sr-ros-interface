@@ -125,9 +125,9 @@ namespace sr_mechanism_model
 
     assert(as.size() == 1);
     assert(js.size() == 1);
-    js[0]->position_ = (static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ / mechanical_reduction_) + js[0]->reference_position_;
-    js[0]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / mechanical_reduction_;
-    js[0]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ * mechanical_reduction_;
+    js[0]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_;
+    js[0]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_;
+    js[0]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_;
 
     ROS_DEBUG("end propagate position");
   }
@@ -139,9 +139,9 @@ namespace sr_mechanism_model
 
     assert(as.size() == 1);
     assert(js.size() == 1);
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ = (js[0]->position_ - js[0]->reference_position_) * mechanical_reduction_;
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ = js[0]->velocity_ * mechanical_reduction_;
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ = js[0]->measured_effort_ / mechanical_reduction_;
+    static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ = js[0]->position_;
+    static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ = js[0]->velocity_;
+    static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ = js[0]->measured_effort_;
 
     // Update the timing (making sure it's initialized).
     if (! simulated_actuator_timestamp_initialized_)
@@ -178,7 +178,7 @@ namespace sr_mechanism_model
     assert(as.size() == 1);
     assert(js.size() == 1);
     static_cast<sr_actuator::SrActuator*>(as[0])->command_.enable_ = true;
-    static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ = js[0]->commanded_effort_ / mechanical_reduction_;
+    static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ = js[0]->commanded_effort_;
 
     ROS_DEBUG("end propagate effort");
   }
@@ -190,7 +190,7 @@ namespace sr_mechanism_model
 
     assert(as.size() == 1);
     assert(js.size() == 1);
-    js[0]->commanded_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ * mechanical_reduction_;
+    js[0]->commanded_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_;
 
     ROS_DEBUG("end propagate effort bw");
   }

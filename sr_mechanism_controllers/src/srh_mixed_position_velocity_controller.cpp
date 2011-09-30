@@ -172,7 +172,8 @@ namespace controller {
   {
     if( has_j2 )
       command_ = joint_state_->position_ + joint_state_2->position_;
-    command_ = joint_state_->position_;
+    else
+      command_ = joint_state_->position_;
     pid_controller_velocity_->reset();
     read_parameters();
 
@@ -239,11 +240,11 @@ namespace controller {
     double error_position = 0.0;
     if( has_j2 )
     {
-      error_position = (joint_state_->position_ + joint_state_2->position_) - command_;
+      error_position = command_ - (joint_state_->position_ + joint_state_2->position_);
       ROS_DEBUG_STREAM("j0: " << joint_state_->position_ + joint_state_2->position_);
     }
     else
-      error_position = joint_state_->position_ - command_;
+      error_position = command_ - joint_state_->position_;
 
     double commanded_velocity = 0.0;
     double error_velocity = 0.0;
@@ -257,7 +258,7 @@ namespace controller {
 
       //velocity loop:
       if( has_j2 )
-        error_velocity = (joint_state_->velocity_ + joint_state_->velocity_) / 2.0 - commanded_velocity;
+        error_velocity = (joint_state_->velocity_ + joint_state_2->velocity_) - commanded_velocity;
       else
         error_velocity = joint_state_->velocity_ - commanded_velocity;
       commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
@@ -305,8 +306,8 @@ namespace controller {
         controller_state_publisher_->msg_.set_point = command_;
         if( has_j2 )
         {
-          controller_state_publisher_->msg_.process_value = (joint_state_->position_ + joint_state_2->position_);
-          controller_state_publisher_->msg_.process_value_dot = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
+          controller_state_publisher_->msg_.process_value = joint_state_->position_ + joint_state_2->position_;
+          controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_ + joint_state_2->velocity_;
         }
         else
         {

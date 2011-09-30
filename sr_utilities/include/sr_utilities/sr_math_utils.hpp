@@ -32,6 +32,9 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/thread/detail/singleton.hpp>
 
+
+#include <ros/ros.h>
+
 namespace sr_math_utils
 {
   static const double pi = 3.14159265;
@@ -153,6 +156,74 @@ namespace sr_math_utils
   {
     return x < 0.0 ? -1 : 1;
   }
+
+  ////////////////
+  //  FILTERS  //
+  //////////////
+  namespace filters
+  {
+    /**
+     * An alpha beta filter as described on:
+     *  http://en.wikipedia.org/wiki/Alpha_beta_filter
+     *
+     */
+    class AlphaBetaFilter
+    {
+    public:
+      AlphaBetaFilter(double alpha = 0.85, double beta = 0.005)
+        : a(alpha), b(beta),
+          xk_1(0.0), vk_1(0.0), xk(0.0), vk(0.0), rk(0.0),
+          dt(0.0), timestamp_1(0.0)
+      {};
+
+      ~AlphaBetaFilter()
+      {};
+
+      /**
+       * Computes the filtered value and its derivative.
+       *
+       * @param xm the newly received value.
+       * @param timestamp the time at which the last
+       *                  measurement was made (in sec).
+       *
+       * @return a pair containing the filtered value first, then
+       *         the derivative.
+       */
+      std::pair<double, double> compute(double xm, double timestamp)
+      {
+        dt = timestamp - timestamp_1;
+
+        xk = xk_1 + ( vk_1 * dt );
+        vk = vk_1;
+
+        rk = xm - xk;
+
+        xk += a * rk;
+        vk += ( b * rk ) / dt;
+
+        value_derivative.first = xk;
+        value_derivative.second = vk;
+
+        xk_1 = xk;
+        vk_1 = vk;
+        timestamp_1 = timestamp;
+
+        return value_derivative;
+      };
+
+    protected:
+      double a, b;
+      double xk_1, vk_1, xk, vk, rk;
+      double dt, timestamp_1;
+
+      std::pair<double, double> value_derivative;
+    };
+  };
+
+
+  ////////////////
+  //  RANDOM   //
+  //////////////
 
   /**
    * This class is not supposed to be used as is: use the RandomDouble
