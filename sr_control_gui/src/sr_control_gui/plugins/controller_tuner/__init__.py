@@ -27,6 +27,7 @@ import threading, time, math
 import subprocess
 
 from std_msgs.msg import Float64
+from sensor_msgs.msg import JointState
 
 from PyQt4 import QtCore, QtGui, Qt
 
@@ -101,10 +102,7 @@ class JointPidSetter(QtGui.QFrame):
 
         self.joint_name = joint_name
 
-        try:
-            self.joint_index_in_joint_state = ['WRJ2', 'WRJ1', 'FFJ4', 'FFJ3', 'FFJ1', 'FFJ2', 'FFJ1', 'MFJ4', 'MFJ3', 'MFJ1', 'MFJ2', 'MFJ1', 'RFJ4', 'RFJ3', 'RFJ1', 'RFJ2', 'RFJ1', 'LFJ5', 'LFJ4', 'LFJ3', 'LFJ1', 'LFJ2', 'LFJ1', 'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1'].index(joint_name.upper())
-        except:
-            self.joint_index_in_joint_state = None
+        self.joint_index_in_joint_state = None
 
         # the joint 0s are published on a different topic: /joint_0s/joint_states
         # we set their indexes to -(index in the topic + 1)
@@ -116,6 +114,23 @@ class JointPidSetter(QtGui.QFrame):
             self.joint_index_in_joint_state = -3
         if joint_name.upper() == "LFJ0":
             self.joint_index_in_joint_state = -4
+
+        if self.joint_index_in_joint_state == None:
+            self.joint_states_sub = rospy.Subscriber("joint_states", JointState, self.callback_js_tmp)
+
+            nb_try = 0
+            while self.joint_index_in_joint_state == None:
+                time.sleep(0.01)
+                if nb_try > 10:
+                    rospy.logwarn("Didn't read the real indexes, the plots for "+joint_name.upper()+" may be wrong")
+                    try:
+                        self.joint_index_in_joint_state = ['WRJ2', 'WRJ1', 'FFJ4', 'FFJ3', 'FFJ2', 'FFJ1', 'MFJ4', 'MFJ3', 'MFJ2', 'MFJ1', 'RFJ4', 'RFJ3', 'RFJ2', 'RFJ1', 'LFJ5', 'LFJ4', 'LFJ3', 'LFJ2', 'LFJ1', 'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1'].index(joint_name.upper())
+                    except:
+                        self.joint_index_in_joint_state = None
+                    break
+                nb_try = nb_try + 1
+
+            self.joint_states_sub = None
 
 
         self.parent = parent
@@ -219,6 +234,13 @@ class JointPidSetter(QtGui.QFrame):
 
 
         subprocess.Popen(rxplot_str.split())
+
+    def callback_js_tmp(self, msg):
+        if self.joint_index_in_joint_state == None:
+            try:
+                self.joint_index_in_joint_state = msg.name.index( self.joint_name.upper() )
+            except:
+                self.joint_index_in_joint_state = None
 
     def save_clicked(self):
         param_name = []
