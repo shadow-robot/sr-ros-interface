@@ -1,3 +1,3 @@
 sr_automatic_pid_tuning:
-  starting_seed: [ 3536, 1449, 40, 67]
-  max_variations: [5000, 5000, 5000, 5000]
+  starting_seed: [ 1000, 4000, 1000, 10000, 1000]
+  max_variations: [1500, 3000, 1000, 10000, 2000]

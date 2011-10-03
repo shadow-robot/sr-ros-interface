@@ -29,7 +29,16 @@ The above line is usefulin Emacs-like editors
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 #include <sr_robot_msgs/SetPidGains.h>
+#include <sr_robot_msgs/ForceController.h>
 #include <pr2_controllers_msgs/JointControllerState.h>
+
+static enum {
+  MOTOR_CONTROLLER,
+  POSITION_CONTROLLER,
+  VELOCITY_CONTROLLER,
+  MIXED_CONTROLLER,
+  GAZEBO_CONTROLLER
+} controller_types;
 
 /**
  *  Always write a comment in this format before class definition
@@ -145,9 +154,31 @@ public:
   {
     pub = nh.advertise<std_msgs::Float64>(topic, 5);
   }
-  void set_pid_service(std::string topic)
+  void set_pid_service(std::string topic, int controller_type)
   {
-    pid_service = nh.serviceClient<sr_robot_msgs::SetPidGains>(topic);
+    this->controller_type = controller_type;
+
+    switch( controller_type )
+    {
+    case GAZEBO_CONTROLLER:
+      std::cout << " -- TUNING GAZEBO POSITION CONTROLLERS --" <<std::endl;
+      pid_service = nh.serviceClient<sr_robot_msgs::SetPidGains>(topic);
+      break;
+    case MOTOR_CONTROLLER:
+      std::cout << " -- TUNING MOTOR FORCE CONTROLLERS --" <<std::endl;
+      pid_service = nh.serviceClient<sr_robot_msgs::ForceController>(topic);
+      break;
+
+    case POSITION_CONTROLLER:
+      std::cout << " Automatic tuning for Position controllers not implemented yet" << std::endl;
+      break;
+    case VELOCITY_CONTROLLER:
+      std::cout << " Automatic tuning for Velocity controllers not implemented yet" << std::endl;
+      break;
+    case MIXED_CONTROLLER:
+      std::cout << " Automatic tuning for Mixed controllers not implemented yet" << std::endl;
+      break;
+    }
   }
 
   std::vector<int> get_pid_settings() const
@@ -157,20 +188,60 @@ public:
   void set_pid_settings(std::vector<int> pids)
   {
     pid_settings = pids;
-    sr_robot_msgs::SetPidGains::Request pid_req;
-    sr_robot_msgs::SetPidGains::Response pid_res;
 
-    pid_req.p = pids[0];
-    pid_req.i = pids[1];
-    pid_req.d = pids[2];
-    pid_req.i_clamp = pids[3];
-    pid_req.max_force = 1023;
-    pid_req.deadband = 0.0;
-    pid_req.friction_deadband = 5000;
-
-    if (!pid_service.call(pid_req, pid_res))
+    switch( controller_type )
     {
-      ROS_ERROR("failed to set pid");
+    case GAZEBO_CONTROLLER:
+    {
+      sr_robot_msgs::SetPidGains::Request gazebo_pid_req;
+      sr_robot_msgs::SetPidGains::Response gazebo_pid_res;
+
+      gazebo_pid_req.p = pids[0];
+      gazebo_pid_req.i = pids[1];
+      gazebo_pid_req.d = pids[2];
+      gazebo_pid_req.i_clamp = pids[3];
+      gazebo_pid_req.max_force = 1023;
+      gazebo_pid_req.deadband = 0.0;
+      gazebo_pid_req.friction_deadband = 5000;
+
+      if (!pid_service.call(gazebo_pid_req, gazebo_pid_res))
+      {
+        ROS_ERROR("failed to set pid");
+      }
+    }
+    break;
+    case MOTOR_CONTROLLER:
+    {
+      sr_robot_msgs::ForceController::Request motor_pid_req;
+      sr_robot_msgs::ForceController::Response motor_pid_res;
+
+      motor_pid_req.f = pids[0];
+      motor_pid_req.p = pids[1];
+      motor_pid_req.i = pids[2];
+      motor_pid_req.d = pids[3];
+      motor_pid_req.imax = pids[4];
+      motor_pid_req.maxpwm = 1023;
+      motor_pid_req.deadband = 0;
+      motor_pid_req.sgleftref = 0;
+      motor_pid_req.sgrightref = 0;
+      motor_pid_req.sign = 0;
+
+      if (!pid_service.call(motor_pid_req, motor_pid_res))
+      {
+        ROS_ERROR("failed to set pid");
+      }
+    }
+    break;
+
+    case POSITION_CONTROLLER:
+      std::cout << " Automatic tuning for Position controllers not implemented yet" << std::endl;
+      break;
+    case VELOCITY_CONTROLLER:
+      std::cout << " Automatic tuning for Velocity controllers not implemented yet" << std::endl;
+      break;
+    case MIXED_CONTROLLER:
+      std::cout << " Automatic tuning for Mixed controllers not implemented yet" << std::endl;
+      break;
     }
   }
 
@@ -201,6 +272,7 @@ public:
   {
     max_range = maxs;
   }
+
 private:			   // put all data here
   // START Private data of an eoSRAutomaticPidTuning object
   std::vector<int> pid_settings;
@@ -211,6 +283,8 @@ private:			   // put all data here
   ros::Publisher pub;
   ros::Subscriber sub;
   ros::ServiceClient pid_service;
+
+  int controller_type;
 
   shadowrobot::MovementPublisher mvt_publisher;
 

@@ -139,8 +139,38 @@ int main(int argc, char* argv[])
 
     std::string joint = "ffj3";
     joint = parser.createParam(joint, "joint", "Joint you want to tune", 'j', "Automatic PID Tuning" ).value();
-
     std::cout << " Will tune joint: "<< joint <<std::endl;
+
+    std::string cont_type = "motor";
+    cont_type = parser.createParam(cont_type, "controller", "Type of controller you want to tune: motor, position, mixed, velocity or gazebo", 'c', "Automatic PID Tuning" ).value();
+    int controller_type = 0;
+    if( cont_type.compare("motor") == 0)
+      controller_type = MOTOR_CONTROLLER;
+    else
+    {
+      if( cont_type.compare("position") == 0 )
+        controller_type = POSITION_CONTROLLER;
+      else
+      {
+        if( cont_type.compare("mixed") == 0)
+          controller_type = MIXED_CONTROLLER;
+        else
+        {
+          if( cont_type.compare("velocity") == 0)
+            controller_type = VELOCITY_CONTROLLER;
+          else
+          {
+            if( cont_type.compare("gazebo") == 0)
+              controller_type = GAZEBO_CONTROLLER;
+            else
+            {
+              ROS_ERROR_STREAM("Controller type not recognized: " << cont_type);
+            }
+          }
+        }
+      }
+    }
+
 
     ros::NodeHandle nh_tilde("~");
     std::vector<int> seed;
@@ -217,7 +247,7 @@ int main(int argc, char* argv[])
     mvt_pub.add_movement( mvt_im );
 
     eoSRAutomaticPidTuningInit<Indi> init( seed, max_variations, joint,
-                                           mvt_pub);
+                                           mvt_pub, controller_type);
     // or, if you need some parameters, you might as well
     // - write a constructor of the eoSRAutomaticPidTuningInit that uses a parser
     // - call it from here:
