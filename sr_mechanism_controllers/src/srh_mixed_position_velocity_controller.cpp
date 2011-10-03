@@ -315,7 +315,7 @@ namespace controller {
           controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
         }
 
-        controller_state_publisher_->msg_.error = error_velocity;
+        controller_state_publisher_->msg_.error = error_position;
         controller_state_publisher_->msg_.time_step = dt_.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 

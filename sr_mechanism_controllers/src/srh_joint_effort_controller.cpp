@@ -166,9 +166,10 @@ namespace controller {
       {
         controller_state_publisher_->msg_.header.stamp = time;
         controller_state_publisher_->msg_.set_point = command_;
-        controller_state_publisher_->msg_.process_value = joint_state_->position_;
-        controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
-        controller_state_publisher_->msg_.error = commanded_effort;
+        controller_state_publisher_->msg_.process_value = joint_state_->measured_effort_;
+        //TODO: compute the derivative of the effort.
+        controller_state_publisher_->msg_.process_value_dot = -1.0;
+        controller_state_publisher_->msg_.error = commanded_effort - joint_state_->measured_effort_;
         controller_state_publisher_->msg_.time_step = dt_.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
