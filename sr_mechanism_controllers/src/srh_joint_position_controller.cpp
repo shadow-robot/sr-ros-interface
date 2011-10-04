@@ -231,9 +231,16 @@ namespace controller {
         controller_state_publisher_->msg_.header.stamp = time;
         controller_state_publisher_->msg_.set_point = command_;
         if( has_j2 )
-          controller_state_publisher_->msg_.process_value = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
+        {
+          controller_state_publisher_->msg_.process_value = joint_state_->position_ + joint_state_2->position_;
+          controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_ + joint_state_2->velocity_;
+        }
         else
-          controller_state_publisher_->msg_.process_value = joint_state_->velocity_;
+        {
+          controller_state_publisher_->msg_.process_value = joint_state_->position_;
+          controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
+        }
+
         controller_state_publisher_->msg_.error = error_position;
         controller_state_publisher_->msg_.time_step = dt_.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
