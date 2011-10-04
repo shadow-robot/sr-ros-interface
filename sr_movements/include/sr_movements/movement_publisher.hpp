@@ -39,7 +39,7 @@ namespace shadowrobot
   {
   public:
     MovementPublisher( double min_value = 0.0, double max_value = 1.5,
-                       double rate=100.0 );
+                       double rate=100.0, int repetition = 1 );
     virtual ~MovementPublisher();
 
     void start();
@@ -61,6 +61,7 @@ namespace shadowrobot
     ros::Publisher pub;
 
     ros::Rate publishing_rate;
+    int repetition;
     double min, max;
 
 

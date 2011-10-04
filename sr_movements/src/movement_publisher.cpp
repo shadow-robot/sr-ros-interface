@@ -30,8 +30,8 @@ namespace shadowrobot
   const unsigned int MovementPublisher::nb_mvt_step = 1000;
 
   MovementPublisher::MovementPublisher(double min_value, double max_value,
-                                       double rate)
-    : nh_tilde("~"), publishing_rate( rate ),
+                                       double rate, int repetition)
+    : nh_tilde("~"), publishing_rate( rate ), repetition(repetition),
       min(min_value), max(max_value), last_target_(0.0)
   {
     pub = nh_tilde.advertise<std_msgs::Float64>("targets", 5);
@@ -43,29 +43,32 @@ namespace shadowrobot
   void MovementPublisher::start()
   {
     double last_target = 0.0;
-    for( unsigned int i=0; i<partial_movements.size(); ++i)
+    for(unsigned int i_rep = 0; i_rep < repetition; ++i_rep)
     {
-      for(unsigned int j=0; j<nb_mvt_step; ++j)
+      for( unsigned int i=0; i<partial_movements.size(); ++i)
       {
-        if( !ros::ok() )
-          return;
+        for(unsigned int j=0; j<nb_mvt_step; ++j)
+        {
+          if( !ros::ok() )
+            return;
 
-        //get the target
-        msg.data = partial_movements[i].get_target( static_cast<double>(j) / static_cast<double>(nb_mvt_step));
-        //interpolate to the correct range
-        msg.data = min + msg.data * (max - min);
+          //get the target
+          msg.data = partial_movements[i].get_target( static_cast<double>(j) / static_cast<double>(nb_mvt_step));
+          //interpolate to the correct range
+          msg.data = min + msg.data * (max - min);
 
-        //there was not target -> resend the last target
-        if( msg.data == -1.0 )
-          msg.data = last_target;
+          //there was not target -> resend the last target
+          if( msg.data == -1.0 )
+            msg.data = last_target;
 
-        //publish the message
-        pub.publish( msg );
+          //publish the message
+          pub.publish( msg );
 
-        //wait for a bit
-        publishing_rate.sleep();
+          //wait for a bit
+          publishing_rate.sleep();
 
-        last_target = msg.data;
+          last_target = msg.data;
+        }
       }
     }
   }

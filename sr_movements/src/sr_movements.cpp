@@ -50,7 +50,11 @@ int main(int argc, char *argv[])
     if( !nh_tilde.getParam("publish_rate", publish_rate) )
       publish_rate = 100.0;
 
-    shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate );
+    int repetition;
+    if( !nh_tilde.getParam("repetition", repetition) )
+      repetition = 1;
+
+    shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate, repetition );
     mvt_pub.add_movement( mvt_im );
 
     mvt_pub.start();
