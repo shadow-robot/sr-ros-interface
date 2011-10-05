@@ -74,13 +74,33 @@ public:
    * If this is the case, uncomment and fill the following
    */
   /*
-    eoSRAutomaticPidTuning(const eoSRAutomaticPidTuning &)
+    eoSRAutomaticPidTuning(const eoSRAutomaticPidTuning & eo_pid_tuning)
     {
     // START Code of copy Ctor of an eoSRAutomaticPidTuning object
+    pid_settings = eo_pid_tuning.pid_settings;
+    min_range = eo_pid_tuning.min_range;
+    max_range = eo_pid_tuning.max_range;
+
+    nh = eo_pid_tuning.nh;
+    pub = eo_pid_tuning.pub;
+    sub = eo_pid_tuning.sub;
+    pid_service = eo_pid_tuning.pid_service;
+
+    controller_type = eo_pid_tuning.controller_type;
+    mvt_publisher = eo_pid_tuning.mvt_publisher;
+    last_msg = eo_pid_tuning.last_msg;
+
+    try
+    {
+    this->fitness( eo_pid_tuning.fitness() );
+    }
+    catch(exception& e)
+    {
+    this->fitness( 1000000000.0 );
+    }
     // END   Code of copy Ctor of an eoSRAutomaticPidTuning object
     }
   */
-
 
   virtual ~eoSRAutomaticPidTuning()
   {
@@ -119,6 +139,7 @@ public:
     EO<FitT>::readFrom(is);
     // START Code of input
 
+    ROS_ERROR_STREAM("readfrom: " << is);
     /** HINTS
      * remember the eoSRAutomaticPidTuning object will come from the default ctor
      * this is why having the sizes written out is useful
@@ -134,7 +155,8 @@ public:
 
   double get_last_error()
   {
-    return last_msg.error;
+    double error = last_msg.error;
+    return error;
   }
 
   void publish(double target)
@@ -161,17 +183,13 @@ public:
     switch( controller_type )
     {
     case GAZEBO_CONTROLLER:
-      std::cout << " -- TUNING GAZEBO POSITION CONTROLLERS --" <<std::endl;
+    case POSITION_CONTROLLER:
       pid_service = nh.serviceClient<sr_robot_msgs::SetPidGains>(topic);
       break;
     case MOTOR_CONTROLLER:
-      std::cout << " -- TUNING MOTOR FORCE CONTROLLERS --" <<std::endl;
       pid_service = nh.serviceClient<sr_robot_msgs::ForceController>(topic);
       break;
 
-    case POSITION_CONTROLLER:
-      std::cout << " Automatic tuning for Position controllers not implemented yet" << std::endl;
-      break;
     case VELOCITY_CONTROLLER:
       std::cout << " Automatic tuning for Velocity controllers not implemented yet" << std::endl;
       break;
@@ -192,14 +210,15 @@ public:
     switch( controller_type )
     {
     case GAZEBO_CONTROLLER:
+    case POSITION_CONTROLLER:
     {
       sr_robot_msgs::SetPidGains::Request gazebo_pid_req;
       sr_robot_msgs::SetPidGains::Response gazebo_pid_res;
 
-      gazebo_pid_req.p = pids[0];
-      gazebo_pid_req.i = pids[1];
-      gazebo_pid_req.d = pids[2];
-      gazebo_pid_req.i_clamp = pids[3];
+      gazebo_pid_req.p = -pids[0];
+      gazebo_pid_req.i = -pids[1];
+      gazebo_pid_req.d = 0.0;
+      gazebo_pid_req.i_clamp = pids[2];
       gazebo_pid_req.max_force = 1023;
       gazebo_pid_req.deadband = 0.0;
       gazebo_pid_req.friction_deadband = 5000;
@@ -210,6 +229,7 @@ public:
       }
     }
     break;
+
     case MOTOR_CONTROLLER:
     {
       sr_robot_msgs::ForceController::Request motor_pid_req;
@@ -233,9 +253,6 @@ public:
     }
     break;
 
-    case POSITION_CONTROLLER:
-      std::cout << " Automatic tuning for Position controllers not implemented yet" << std::endl;
-      break;
     case VELOCITY_CONTROLLER:
       std::cout << " Automatic tuning for Velocity controllers not implemented yet" << std::endl;
       break;
@@ -293,9 +310,9 @@ private:			   // put all data here
 };
 
 /* For the emacs weenies in the crowd.
-Local Variables:
+   Local Variables:
    c-basic-offset: 2
-End:
+   End:
 */
 
 #endif

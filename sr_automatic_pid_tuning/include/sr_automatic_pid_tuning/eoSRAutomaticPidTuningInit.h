@@ -66,7 +66,10 @@ public:
       break;
 
     case POSITION_CONTROLLER:
-      std::cout << " Automatic tuning for Position controllers not implemented yet" << std::endl;
+      state_topic = "/sh_"+joint_name+"_position_controller/state";
+      command_topic = "/sh_"+joint_name+"_position_controller/command";
+
+      pid_service = "/sh_"+joint_name+"_position_controller/set_gains";
       break;
     case VELOCITY_CONTROLLER:
       std::cout << " Automatic tuning for Velocity controllers not implemented yet" << std::endl;

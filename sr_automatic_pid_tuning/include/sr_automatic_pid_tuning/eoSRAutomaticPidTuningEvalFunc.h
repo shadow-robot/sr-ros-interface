@@ -46,7 +46,7 @@ public:
       // START Code of computation of fitness of the eoSRAutomaticPidTuning object
       std::vector<int> pid_settings = _eo.get_pid_settings();
 
-      //TODO: set the pid with the new values.
+      //setting the pid with the new values.
       _eo.set_pid_settings(pid_settings);
 
       //then we move and record the error.
@@ -54,8 +54,13 @@ public:
       {
         _eo.execute_mvt_step(i);
         double last_error = _eo.get_last_error();
+
         fit += last_error*last_error;
       }
+      fit /= 1000.0;
+
+      ROS_INFO_STREAM(" Fitness = " << fit << " P:" << pid_settings[0] << " I:"<<pid_settings[1]
+                      << " D:" << pid_settings[2] << " Imax:" << pid_settings[3]);
 
       // END   Code of computation of fitness of the eoSRAutomaticPidTuning object
       _eo.fitness(fit);

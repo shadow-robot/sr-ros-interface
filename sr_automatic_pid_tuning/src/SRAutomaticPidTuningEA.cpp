@@ -144,8 +144,12 @@ int main(int argc, char* argv[])
     std::string cont_type = "motor";
     cont_type = parser.createParam(cont_type, "controller", "Type of controller you want to tune: motor, position, mixed, velocity or gazebo", 'c', "Automatic PID Tuning" ).value();
     int controller_type = 0;
+
+    ROS_INFO_STREAM("Tuning the " << cont_type << " controllers.");
     if( cont_type.compare("motor") == 0)
+    {
       controller_type = MOTOR_CONTROLLER;
+    }
     else
     {
       if( cont_type.compare("position") == 0 )
