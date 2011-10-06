@@ -51,14 +51,13 @@ namespace sr_deadband
   {
   public:
     /**
-     * Hysteresis deadband: each time the error is changing sign, we check if the
-     * error is leaving a deadband which is larger than the noise. (i.e. go to the
-     * target, then once you're there, don't send any motor demand unless the
-     * position error is more than the sensor noise.
-     *
+     * Hysteresis deadband: we average the last N errors. If this average is less
+     * than a small deadband, we "enter the deadband zone" and send only a command
+     * of zero to the motor. We leave the deadband zone if the average of the error
+     * is getting bigger than x*deadband, or if we receive a new command.
      */
     HysteresisDeadband() :
-      last_demand(static_cast<T>(0.0)), last_error(static_cast<T>(0.0)), changed_sign_since_new_command(false)
+      last_demand(static_cast<T>(0.0)), entered_small_deadband(false)
     {
     };
 
@@ -72,44 +71,66 @@ namespace sr_deadband
      * @param demand The demand
      * @param error The error (demand - actual value)
      * @param deadband the deadband value
+     * @param deadband_multiplicator the value by which we multiply the deadband
+     *                               to have the bigger deadband against which we
+     *                               check for leaving the deadband zone
+     * @param nb_errors_for_avg the nb of errors we keep for averaging
      *
-     * @return true if the demand is in hte deadband.
+     * @return true if the demand is in the deadband.
      */
-    bool is_in_deadband(T demand, T error, T deadband)
+    bool is_in_deadband(T demand, T error, T deadband, double deadband_multiplicator = 5.0, unsigned int nb_errors_for_avg = 50)
     {
       bool is_in_deadband;
+
+      last_errors.push_back( error );
+      double avg_error = 0.0;
+      for( unsigned int i = 0 ; i < last_errors.size(); ++i )
+      {
+        avg_error += last_errors[i];
+      }
+      avg_error /= last_errors.size();
 
       // Received a new command:
       if( last_demand != demand )
       {
-        changed_sign_since_new_command = false;
-        last_error = error;
+        entered_small_deadband = false;
+        last_demand = demand;
       }
-      //check if the error changed sign since we received a new command
-      if( !changed_sign_since_new_command )
-        changed_sign_since_new_command = ( sr_math_utils::sign(error) != sr_math_utils::sign(last_error) );
-
-      //we always compute the error if we still haven't changed sign
-      if (!changed_sign_since_new_command)
-        is_in_deadband = false;
       else
       {
-        if( fabs(error) > deadband ) //we're outside of the deadband -> compute the error
+        //check if we entered the small deadband
+        if( !entered_small_deadband )
+        {
+          entered_small_deadband = fabs(avg_error) < deadband;
+        }
+
+        //we always compute the error if we still haven't changed sign
+        if (!entered_small_deadband)
           is_in_deadband = false;
-        else                                 //we're in the deadband -> send a force demand of 0.0
-          is_in_deadband = true;
+        else
+        {
+          if( fabs(avg_error) > deadband_multiplicator*deadband ) //we're outside of the deadband -> compute the error
+          {
+            is_in_deadband = false;
+            //when we leave the big deadband we wait until we're back in the small deadband before stopping the motor
+            entered_small_deadband = false;
+          }
+          else                                 //we're in the deadband -> send a force demand of 0.0
+            is_in_deadband = true;
+        }
       }
-      //save the last error in position and the last command
-      last_error = error;
-      last_demand = demand;
+
+      if( last_errors.size() > nb_errors_for_avg )
+        last_errors.pop_front();
 
       return is_in_deadband;
     };
 
   private:
     T deadband;
-    T last_demand, last_error;
-    bool changed_sign_since_new_command;
+    T last_demand;
+    std::deque<T> last_errors;
+    bool entered_small_deadband;
   };
 
 }
