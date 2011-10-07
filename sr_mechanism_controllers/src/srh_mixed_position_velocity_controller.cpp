@@ -131,9 +131,9 @@ namespace controller {
                      << " joint_state: "<<joint_state_ );
 
 #ifdef DEBUG_PUBLISHER
-    if( std::string("THJ2").compare(getJointName()) == 0)
+    if( std::string("FFJ3").compare(getJointName()) == 0)
     {
-      ROS_INFO("Publishing debug infor for THJ2 mixed position/velocity controller");
+      ROS_INFO("Publishing debug infor for FFJ3 mixed position/velocity controller");
       std::stringstream ss2;
       ss2 << getJointName() << "debug_velocity";
       debug_pub = n_tilde_.advertise<std_msgs::Float64>(ss2.str(), 2);
@@ -250,41 +250,35 @@ namespace controller {
     double error_velocity = 0.0;
     double commanded_effort = 0.0;
 
-    //don't compute the error if we're in the deadband.
+    //compute the velocity demand from the simple interpoler
+    commanded_velocity = compute_velocity_demand(error_position);
+
+    //velocity loop:
     if( !hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband) )
     {
-      //compute the velocity demand from the simple interpoler
-      commanded_velocity = compute_velocity_demand(error_position);
-
-      //velocity loop:
+      //we're not in the deadband, compute the error
       if( has_j2 )
         error_velocity = (joint_state_->velocity_ + joint_state_2->velocity_) - commanded_velocity;
       else
         error_velocity = joint_state_->velocity_ - commanded_velocity;
-      commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
-
-      //clamp the result to max force
-      commanded_effort = min( commanded_effort, max_force_demand );
-      commanded_effort = max( commanded_effort, -max_force_demand );
-
-      //Friction compensation
-      //if( std::string("FFJ3").compare( getJointName() ) == 0 )
-      //  ROS_INFO_STREAM(getJointName() << ": before fc: velocity demand=" << commanded_velocity << " force demand=" << commanded_effort << " / error: " << error_velocity );
-      if( has_j2 )
-        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , int(commanded_effort), friction_deadband );
-      else
-        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
-
-      //if( std::string("FFJ3").compare( getJointName() ) == 0 )
-      //  ROS_INFO_STREAM(getJointName() << ": after fc: effort=" << commanded_effort );
     }
-    /*
-      else
-      {
-      if( std::string("FFJ3").compare(getJointName()) == 0)
-      ROS_ERROR("in deadband");
-      }
-    **/
+    else
+    {
+      //set the error to 0 if we're in the deadband.
+      error_velocity = 0.0;
+    }
+    commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
+
+    //clamp the result to max force
+    commanded_effort = min( commanded_effort, max_force_demand );
+    commanded_effort = max( commanded_effort, -max_force_demand );
+
+    //Friction compensation
+    if( has_j2 )
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , int(commanded_effort), friction_deadband );
+    else
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
+
     if( has_j2 )
       joint_state_2->commanded_effort_ = commanded_effort;
     else
@@ -292,7 +286,7 @@ namespace controller {
     if(loop_count_ % 10 == 0)
     {
 #ifdef DEBUG_PUBLISHER
-      if( std::string("THJ2").compare(getJointName()) == 0)
+      if( std::string("FFJ3").compare(getJointName()) == 0)
       {
         std_msgs::Float64 msg;
         msg.data = commanded_velocity;
