@@ -104,18 +104,18 @@ namespace sr_deadband
           entered_small_deadband = fabs(avg_error) < deadband;
         }
 
-        //we always compute the error if we still haven't changed sign
+        //we always compute the error if we haven't entered the small deadband
         if (!entered_small_deadband)
           is_in_deadband = false;
         else
         {
-          if( fabs(avg_error) > deadband_multiplicator*deadband ) //we're outside of the deadband -> compute the error
+          if( fabs(avg_error) > deadband_multiplicator*deadband ) //we're outside of the big deadband -> compute the error
           {
             is_in_deadband = false;
             //when we leave the big deadband we wait until we're back in the small deadband before stopping the motor
             entered_small_deadband = false;
           }
-          else                                 //we're in the deadband -> send a force demand of 0.0
+          else                                 //we're in the big deadband -> send a force demand of 0.0
             is_in_deadband = true;
         }
       }
