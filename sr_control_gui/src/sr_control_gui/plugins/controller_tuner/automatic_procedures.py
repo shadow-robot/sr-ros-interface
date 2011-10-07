@@ -19,8 +19,8 @@
 import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
-from sr_friction_compensation.u_map_computation_main import FrictionCompensation
-from sr_friction_compensation.lib.ethercat_robot_lib import EtherCAT_Robot_Lib
+#from sr_friction_compensation.u_map_computation_main import FrictionCompensation
+#from sr_friction_compensation.lib.ethercat_robot_lib import EtherCAT_Robot_Lib
 
 from PyQt4 import QtCore, QtGui, Qt
 from functools import partial
@@ -197,11 +197,11 @@ class RunFriction(threading.Thread):
         self.parent = parent
         self.joint_name = joint_name
         self.stopped = False
-        self.robot_lib = EtherCAT_Robot_Lib(joint_name)
-        self.FC = FrictionCompensation(joint_name = joint_name, n = 15,P=0, I=0, D=0, shift=0, lib = self.robot_lib)
+        #self.robot_lib = EtherCAT_Robot_Lib(joint_name)
+        #self.FC = FrictionCompensation(joint_name = joint_name, n = 15,P=0, I=0, D=0, shift=0, lib = self.robot_lib)
 
     def run(self):
-        self.FC.run()
+        #self.FC.run()
         self.parent.friction_finished()
 
 
