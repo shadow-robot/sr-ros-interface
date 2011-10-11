@@ -48,9 +48,6 @@ namespace sr_friction_compensation
 
   double SrFrictionCompensator::friction_compensation( double position, double velocity, int force_demand_sign, int deadband )
   {
-    if( force_demand_sign == 0)
-      return 0.0;
-
     double compensation = 0.0;
 
     if( force_demand_sign > 0 )
@@ -65,8 +62,6 @@ namespace sr_friction_compensation
     {
       tmp = exp( -fabs(velocity - velocity_for_static_friction)*500 );
     }
-    if( joint_name_.compare("FFJ3") )
-      ROS_ERROR_STREAM("f: " << force_demand_sign <<"pos: " << position << " v: "<< velocity <<" comp= "<< compensation << " * "<<tmp << " ==> "<< compensation*tmp);
 
     compensation *= tmp;
 

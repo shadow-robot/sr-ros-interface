@@ -29,6 +29,7 @@
 #ifndef _SR_CALIBRATION_HPP_
 #define _SR_CALIBRATION_HPP_
 
+#include <iostream>
 #include <vector>
 
 namespace joint_calibration
@@ -79,6 +80,22 @@ namespace shadow_robot
      * @return the calibrated joint position in radians.
      */
     double compute(double raw_reading);
+
+    /**
+     * Overload the << operator, for easier debugging.
+     */
+    friend std::ostream& operator<<(std::ostream& out, const JointCalibration& calib )
+    {
+      out << " calibration = {";
+      out << "size: " << calib.calibration_table_size_;
+      for( unsigned int i=0; i< calib.calibration_table_.size(); ++i)
+      {
+        out << " [raw: " << calib.calibration_table_[i].raw_value;
+        out << ", cal: " << calib.calibration_table_[i].calibrated_value<<"]";
+      }
+      out << " }";
+      return out;
+    };
 
   private:
     /**

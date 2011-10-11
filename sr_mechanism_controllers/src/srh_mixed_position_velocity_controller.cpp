@@ -240,7 +240,6 @@ namespace controller {
     // POSITION
     /////
 
-
     //Compute velocity demand from position error:
     double error_position = 0.0;
     if( has_j2 )
@@ -261,9 +260,11 @@ namespace controller {
     ////////////
     // VELOCITY
     /////
+    //are we in the deadband?
+    bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
 
     //velocity loop:
-    if( !hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband) )
+    if( !in_deadband )
     {
       //we're not in the deadband, compute the error
       if( has_j2 )
@@ -282,11 +283,14 @@ namespace controller {
     commanded_effort = min( commanded_effort, max_force_demand );
     commanded_effort = max( commanded_effort, -max_force_demand );
 
-    //Friction compensation
-    if( has_j2 )
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
-    else
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
+    //Friction compensation, only if we're not in the deadband.
+    if( !in_deadband )
+    {
+      if( has_j2 )
+        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
+      else
+        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
+    }
 
     if( has_j2 )
       joint_state_2->commanded_effort_ = commanded_effort;
