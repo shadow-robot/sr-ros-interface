@@ -236,6 +236,11 @@ namespace controller {
     //Clamps the command to the correct range.
     command_ = clamp_command( command_ );
 
+    ////////////
+    // POSITION
+    /////
+
+
     //Compute velocity demand from position error:
     double error_position = 0.0;
     if( has_j2 )
@@ -252,6 +257,10 @@ namespace controller {
 
     //compute the velocity demand from the simple interpoler
     commanded_velocity = compute_velocity_demand(error_position);
+
+    ////////////
+    // VELOCITY
+    /////
 
     //velocity loop:
     if( !hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband) )
@@ -275,9 +284,9 @@ namespace controller {
 
     //Friction compensation
     if( has_j2 )
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , int(commanded_effort), friction_deadband );
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
     else
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
 
     if( has_j2 )
       joint_state_2->commanded_effort_ = commanded_effort;

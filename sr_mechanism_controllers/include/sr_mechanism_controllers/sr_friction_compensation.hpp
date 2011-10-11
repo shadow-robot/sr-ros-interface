@@ -77,7 +77,7 @@ namespace sr_friction_compensation
      *
      * @return the force necessary to have the joint ready to move.
      */
-    double friction_compensation( double position, int force_demand, int deadband );
+    double friction_compensation( double position, double velocity, int force_demand, int deadband );
 
   private:
     ///node handle for reading the map from the parameters server.
@@ -118,6 +118,9 @@ namespace sr_friction_compensation
 
     ///the joint name
     std::string joint_name_;
+
+    ///the threshold under which we use the static friction map
+    static const double velocity_for_static_friction;
   };
 } // namespace
 

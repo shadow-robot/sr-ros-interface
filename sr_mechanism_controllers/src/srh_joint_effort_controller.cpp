@@ -156,7 +156,7 @@ namespace controller {
     commanded_effort = max( commanded_effort, -max_force_demand );
 
     //Friction compensation
-    commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
+    commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
 
     joint_state_->commanded_effort_ = commanded_effort;
 

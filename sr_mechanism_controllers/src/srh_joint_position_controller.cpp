@@ -214,9 +214,9 @@ namespace controller {
       commanded_effort = max( commanded_effort, -max_force_demand );
 
       if( has_j2 )
-        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , int(commanded_effort), friction_deadband );
+        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
       else
-        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , int(commanded_effort), friction_deadband );
+        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
 
     }
     if( has_j2 )

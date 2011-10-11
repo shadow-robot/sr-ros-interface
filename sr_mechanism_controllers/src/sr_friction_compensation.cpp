@@ -32,6 +32,7 @@
 
 namespace sr_friction_compensation
 {
+  const double SrFrictionCompensator::velocity_for_static_friction = 0.02;
 
   SrFrictionCompensator::SrFrictionCompensator(std::string joint_name)
   {
@@ -45,17 +46,29 @@ namespace sr_friction_compensation
   SrFrictionCompensator::~SrFrictionCompensator()
   {}
 
-  double SrFrictionCompensator::friction_compensation( double position, int force_demand_sign, int deadband )
+  double SrFrictionCompensator::friction_compensation( double position, double velocity, int force_demand_sign, int deadband )
   {
+    if( force_demand_sign == 0)
+      return 0.0;
+
     double compensation = 0.0;
 
-    if( sr_deadband::simple_deadband<int>(force_demand_sign, deadband) )
+    if( force_demand_sign > 0 )
+      compensation = friction_interpoler_forward->compute( position );
+    else
+      compensation = friction_interpoler_backward->compute( position );
+
+    double tmp = 1.0;
+    //we're out of the "finger is stopped" zone ->
+    //   progressively decrease the amount of compensation
+    if(fabs(velocity) > velocity_for_static_friction)
     {
-      if( force_demand_sign > 0 )
-        compensation = friction_interpoler_forward->compute( position );
-      else
-        compensation = friction_interpoler_backward->compute( position );
+      tmp = exp( -fabs(velocity - velocity_for_static_friction)*500 );
     }
+    if( joint_name_.compare("FFJ3") )
+      ROS_ERROR_STREAM("f: " << force_demand_sign <<"pos: " << position << " v: "<< velocity <<" comp= "<< compensation << " * "<<tmp << " ==> "<< compensation*tmp);
+
+    compensation *= tmp;
 
     return compensation;
   }
