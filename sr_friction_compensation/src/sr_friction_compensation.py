@@ -22,7 +22,11 @@ import rospy
 from etherCAT_hand_lib import EtherCAT_Hand_Lib
 #from sensor_msgs import JointState
 from std_msgs.msg import Float64
+from pylab import plot, show
 
+from scipy.optimize import leastsq
+#from numpy import interp
+import numpy
 import time
 
 epsilon = 0.02
@@ -44,7 +48,7 @@ class SrFrictionCompensation(object):
         if rospy.has_param("min"):
             self.min = rospy.get_param("min")
 
-        self.max = 1.57
+        self.max = 1.55
         if rospy.has_param("max"):
             self.min = rospy.get_param("max")
 
@@ -68,6 +72,10 @@ class SrFrictionCompensation(object):
         time.sleep(1)
 
         self.record_map( -self.sign )
+        self.interpolate_map()
+
+        self.record_map( self.sign, False )
+        self.interpolate_map()
 
     def move_to_start(self):
         msg = Float64()
@@ -88,13 +96,25 @@ class SrFrictionCompensation(object):
 
         rospy.loginfo("Starting position reached")
 
-    def record_map(self, sign):
+    def record_map(self, sign, increasing = True):
         rospy.loginfo("Recording map")
-        while (self.lib.get_position(self.joint_name) < self.max) and not rospy.is_shutdown():
-            force, pos = self.find_smallest_force(self.lib.get_position(self.joint_name), sign)
-            if force != False:
-                self.forces.append(force)
-                self.positions.append(pos)
+        msg = Float64()
+
+        if( increasing ):
+            while (self.lib.get_position(self.joint_name) < self.max) and not rospy.is_shutdown():
+                self.map_step(sign, msg)
+        else:
+            while (self.lib.get_position(self.joint_name) > self.min) and not rospy.is_shutdown():
+                self.map_step(sign, msg)
+
+    def map_step(self, sign, msg):
+        force, pos = self.find_smallest_force(self.lib.get_position(self.joint_name), sign)
+        if force != False:
+            self.forces.append(force)
+            self.positions.append(pos)
+            msg.data = 0.0
+            self.publisher.publish(msg)
+            rospy.Rate(2).sleep()
 
     def find_smallest_force(self, first_position, sign):
         msg = Float64()
@@ -105,14 +125,42 @@ class SrFrictionCompensation(object):
 
             if abs(self.lib.get_position(self.joint_name) - first_position) > epsilon:
                 #ok, the finger moved, return the necessary force
-                print "finger moved from ",first_position, " with force ", force
-                return force, first_position
+                measured_force = self.lib.get_effort(self.joint_name)
+                print "finger moved from ",first_position, " with force ", measured_force
+                return measured_force, first_position
             else:
                 msg.data = sign*force
                 self.publisher.publish(msg)
             self.rate.sleep()
 
         return False, False
+
+    def interpolate_map(self):
+
+        interp_pos = numpy.linspace(self.min, self.max, 10)
+        fp = lambda v, x: v[0]+ v[1]*x
+
+        v = self.linear_interp(-1, -1)
+        print v
+
+        plot(interp_pos, fp(v, interp_pos), '-')
+        plot(self.positions, self.forces, 'o')
+
+        show()
+
+    def linear_interp(self, min_index, max_index):
+
+        fp = lambda v, x: v[0]+ v[1]*x
+        e = lambda v, x, y: (fp(v,x)-y)
+
+        v0 = [3., 1, 4.]
+
+        v = 0
+        if min_index == -1 and max_index == -1:
+            v, success = leastsq(e, v0, args=(self.positions,self.forces), maxfev=10000)
+        else:
+            v, success = leastsq(e, v0, args=(self.positions[min_index:max_index],self.forces[min_index:max_index]), maxfev=10000)
+        return v
 
 
 if __name__ == '__main__':
