@@ -32,7 +32,7 @@
 
 namespace sr_friction_compensation
 {
-  const double SrFrictionCompensator::velocity_for_static_friction = 0.02;
+  const double SrFrictionCompensator::velocity_for_static_friction = 0.01;
 
   SrFrictionCompensator::SrFrictionCompensator(std::string joint_name)
   {
@@ -46,24 +46,41 @@ namespace sr_friction_compensation
   SrFrictionCompensator::~SrFrictionCompensator()
   {}
 
-  double SrFrictionCompensator::friction_compensation( double position, double velocity, int force_demand_sign, int deadband )
+  double SrFrictionCompensator::friction_compensation( double position, double velocity, int force_demand, int deadband )
   {
     double compensation = 0.0;
 
-    if( force_demand_sign > 0 )
+    if( force_demand > 0 )
       compensation = friction_interpoler_forward->compute( position );
     else
       compensation = friction_interpoler_backward->compute( position );
 
-    double tmp = 1.0;
+    //A value by which we'll multiply the compensation computed by the
+    // friction map.
+    double mult = 1.0;
     //we're out of the "finger is stopped" zone ->
     //   progressively decrease the amount of compensation
     if(fabs(velocity) > velocity_for_static_friction)
     {
-      tmp = exp( -fabs(velocity - velocity_for_static_friction)*500 );
+      if( velocity < 0.0 )
+        mult = exp( -fabs(velocity + velocity_for_static_friction)*100 );
+      else
+        mult = exp( -fabs(velocity - velocity_for_static_friction)*100 );
     }
 
-    compensation *= tmp;
+    //decrease the compensation around the force sign change
+    // to have less discontinuity. Use the deadband for this.
+    if( abs(force_demand) < deadband )
+    {
+      //we want the multiplier to be 1 if force_demand = deadband
+      // and 0 if force_demand = 0
+      mult = sr_math_utils::linear_interpolate_(force_demand,
+                                                0, 0,
+                                                deadband, 1);
+    }
+
+    //amend the compensation value
+    compensation *= mult;
 
     return compensation;
   }
