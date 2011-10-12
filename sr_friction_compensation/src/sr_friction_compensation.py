@@ -22,7 +22,7 @@ import rospy
 from etherCAT_hand_lib import EtherCAT_Hand_Lib
 #from sensor_msgs import JointState
 from std_msgs.msg import Float64
-from pylab import plot, show
+from pylab import plot, savefig
 
 from scipy.optimize import leastsq
 #from numpy import interp
@@ -41,20 +41,26 @@ class SrFrictionCompensation(object):
         self.lib = EtherCAT_Hand_Lib()
 
         self.joint_name = "FFJ3"
-        if rospy.has_param("joint_name"):
-            self.joint_name = rospy.get_param("joint_name")
+        if rospy.has_param("~joint_name"):
+            self.joint_name = rospy.get_param("~joint_name")
 
         self.min = 0.0
-        if rospy.has_param("min"):
-            self.min = rospy.get_param("min")
+        if rospy.has_param("~min"):
+            self.min = rospy.get_param("~min")
 
         self.max = 1.55
-        if rospy.has_param("max"):
-            self.min = rospy.get_param("max")
+        if rospy.has_param("~max"):
+            self.min = rospy.get_param("~max")
+
+        self.nb_repetition = 2
+        if rospy.has_param("~nb_repetition"):
+            self.nb_repetition = rospy.get_param("~nb_repetition")
+
+        print " nb repetition: ", self.nb_repetition
 
         self.sign = -1
-        sign_param_name = rospy.search_param('sign')
-        self.sign = int(rospy.get_param(sign_param_name))
+        if rospy.has_param("~sign"):
+            self.sign = rospy.get_param("~sign")
         rospy.loginfo("sign: "+str(self.sign))
 
         self.publisher = rospy.Publisher("/sr_friction_compensation/"+self.joint_name, Float64)
@@ -67,27 +73,50 @@ class SrFrictionCompensation(object):
         self.lib.activate()
         time.sleep(0.5)
 
-        self.move_to_start()
+        for i in range(0,self.nb_repetition):
+            self.move_to_start()
+            time.sleep(1)
+            self.record_map( -self.sign )
+            time.sleep(1)
 
-        time.sleep(1)
+            print "forces length: ", len(self.forces), " pos length: ", len(self.positions)
 
-        self.record_map( -self.sign )
-        self.interpolate_map()
+        self.interpolate_map(1)
 
-        self.record_map( self.sign, False )
-        self.interpolate_map()
+        self.forces = []
+        self.positions = []
 
-    def move_to_start(self):
+        for i in range(0, self.nb_repetition):
+            self.move_to_start(False)
+            time.sleep(1)
+            self.record_map( self.sign, False )
+            time.sleep(1)
+            print "forces length: ", len(self.forces), " pos length: ", len(self.positions)
+
+
+        self.interpolate_map(2)
+
+    def move_to_start(self, start_at_min = True):
         msg = Float64()
 
-        #200 should be big enough to move the finger to the end of its range
-        msg.data = self.sign * 250
-
         #try to get past the minimum
-        rospy.loginfo("Moving to the starting position")
-        while (self.lib.get_position(self.joint_name) > self.min) and not rospy.is_shutdown():
-            self.publisher.publish(msg)
-            self.rate.sleep()
+        if start_at_min:
+            rospy.loginfo("Moving to the starting position (min)")
+        else:
+            rospy.loginfo("Moving to the starting position (max)")
+        if( start_at_min ):
+            #250 should be big enough to move the finger to the end of its range
+            msg.data = self.sign * 250
+            while (self.lib.get_position(self.joint_name) > self.min) and not rospy.is_shutdown():
+                self.publisher.publish(msg)
+                self.rate.sleep()
+        else:
+            #250 should be big enough to move the finger to the end of its range
+            msg.data = -self.sign * 250
+
+            while (self.lib.get_position(self.joint_name) < self.max) and not rospy.is_shutdown():
+                self.publisher.publish(msg)
+                self.rate.sleep()
 
         msg.data = 0.0
         for i in range(0,20):
@@ -97,7 +126,10 @@ class SrFrictionCompensation(object):
         rospy.loginfo("Starting position reached")
 
     def record_map(self, sign, increasing = True):
-        rospy.loginfo("Recording map")
+        if increasing:
+            rospy.loginfo("Recording increasing map")
+        else:
+            rospy.loginfo("Recording decreasing map")
         msg = Float64()
 
         if( increasing ):
@@ -105,21 +137,27 @@ class SrFrictionCompensation(object):
                 self.map_step(sign, msg)
         else:
             while (self.lib.get_position(self.joint_name) > self.min) and not rospy.is_shutdown():
-                self.map_step(sign, msg)
+                self.map_step(sign, msg, False)
 
-    def map_step(self, sign, msg):
-        force, pos = self.find_smallest_force(self.lib.get_position(self.joint_name), sign)
+    def map_step(self, sign, msg, increasing=True):
+        #keep the tendon under tension
+        min_force = 0.
+        if increasing:
+            min_force = 0.
+        else:
+            min_force = 70.
+        force, pos = self.find_smallest_force(self.lib.get_position(self.joint_name), sign, min_force)
         if force != False:
             self.forces.append(force)
             self.positions.append(pos)
-            msg.data = 0.0
+            msg.data = sign*min_force
             self.publisher.publish(msg)
             rospy.Rate(2).sleep()
 
-    def find_smallest_force(self, first_position, sign):
+    def find_smallest_force(self, first_position, sign, min_force):
         msg = Float64()
 
-        for force in range(0, 400):
+        for force in range(min_force, 400):
             if rospy.is_shutdown():
                 break
 
@@ -135,7 +173,7 @@ class SrFrictionCompensation(object):
 
         return False, False
 
-    def interpolate_map(self):
+    def interpolate_map(self, index):
 
         interp_pos = numpy.linspace(self.min, self.max, 10)
         fp = lambda v, x: v[0]+ v[1]*x
@@ -144,9 +182,11 @@ class SrFrictionCompensation(object):
         print v
 
         plot(interp_pos, fp(v, interp_pos), '-')
+
+        print "forces length: ", len(self.forces), " pos length: ", len(self.positions)
         plot(self.positions, self.forces, 'o')
 
-        show()
+        savefig("friction_compensation_"+self.joint_name+".png")
 
     def linear_interp(self, min_index, max_index):
 
