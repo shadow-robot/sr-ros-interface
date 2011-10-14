@@ -30,7 +30,17 @@ class PidLoader(object):
         pass
 
     def get_settings(self, controller_topic):
-        param_dict = rospy.get_param(controller_topic)
+        param_dict = {}
+        if len(controller_topic) == 2:
+            tmp_dict = rospy.get_param(controller_topic[0])
+            for item in tmp_dict.items():
+                param_dict["position_pid/"+item[0]] = item[1]
+
+            tmp_dict = rospy.get_param(controller_topic[1])
+            for item in tmp_dict.items():
+                param_dict["velocity_pid/"+item[0]] = item[1]
+        else:
+            param_dict = rospy.get_param(controller_topic)
         return param_dict
 
 class PidSaver(object):

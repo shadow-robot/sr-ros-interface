@@ -50,7 +50,7 @@ namespace sr_friction_compensation
   {
     double compensation = 0.0;
 
-    if( force_demand > 0 )
+    if( force_demand > 0.0 )
       compensation = friction_interpoler_forward->compute( position );
     else
       compensation = friction_interpoler_backward->compute( position );
@@ -63,9 +63,9 @@ namespace sr_friction_compensation
     if(fabs(velocity) > velocity_for_static_friction)
     {
       if( velocity < 0.0 )
-        mult = exp( -fabs(velocity + velocity_for_static_friction)*100 );
+        mult = exp( -fabs(velocity + velocity_for_static_friction)*20 );
       else
-        mult = exp( -fabs(velocity - velocity_for_static_friction)*100 );
+        mult = exp( -fabs(velocity - velocity_for_static_friction)*20 );
     }
 
     //decrease the compensation around the force sign change
@@ -74,7 +74,7 @@ namespace sr_friction_compensation
     {
       //we want the multiplier to be 1 if force_demand = deadband
       // and 0 if force_demand = 0
-      mult = sr_math_utils::linear_interpolate_(force_demand,
+      mult = sr_math_utils::linear_interpolate_(abs(force_demand),
                                                 0, 0,
                                                 deadband, 1);
     }

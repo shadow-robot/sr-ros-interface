@@ -38,6 +38,7 @@
 
 #include <sr_mechanism_controllers/sr_controller.hpp>
 #include <sr_robot_msgs/SetMixedPositionVelocityPidGains.h>
+#include <sr_robot_msgs/JointControllerState.h>
 
 namespace controller
 {
@@ -66,6 +67,9 @@ namespace controller
   private:
     boost::shared_ptr<control_toolbox::Pid> pid_controller_position_;       /**< Internal PID controller for the position loop. */
     boost::shared_ptr<control_toolbox::Pid> pid_controller_velocity_;       /**< Internal PID controller for the velocity loop. */
+
+    //publish our joint controller state
+    boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointControllerState> > controller_state_publisher_;
 
     /// The values for the velocity demand saturation
     double max_velocity_, min_velocity_;

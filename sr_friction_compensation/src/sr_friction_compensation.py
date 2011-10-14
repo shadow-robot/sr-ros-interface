@@ -50,7 +50,7 @@ class SrFrictionCompensation(object):
 
         self.max = 1.55
         if rospy.has_param("~max"):
-            self.min = rospy.get_param("~max")
+            self.max = rospy.get_param("~max")
 
         self.nb_repetition = 2
         if rospy.has_param("~nb_repetition"):
@@ -101,9 +101,9 @@ class SrFrictionCompensation(object):
 
         #try to get past the minimum
         if start_at_min:
-            rospy.loginfo("Moving to the starting position (min)")
+            rospy.loginfo("Moving to the starting position ("+str(self.min)+")")
         else:
-            rospy.loginfo("Moving to the starting position (max)")
+            rospy.loginfo("Moving to the starting position ("+str(self.max)+")")
         if( start_at_min ):
             #250 should be big enough to move the finger to the end of its range
             msg.data = self.sign * 250
@@ -127,9 +127,9 @@ class SrFrictionCompensation(object):
 
     def record_map(self, sign, increasing = True):
         if increasing:
-            rospy.loginfo("Recording increasing map")
+            rospy.loginfo("Recording increasing map, until "+str(self.max))
         else:
-            rospy.loginfo("Recording decreasing map")
+            rospy.loginfo("Recording decreasing map, until"+str(self.min))
         msg = Float64()
 
         if( increasing ):

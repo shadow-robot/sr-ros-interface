@@ -164,7 +164,7 @@ namespace controller {
       return false;
 
     controller_state_publisher_.reset(
-      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
+      new realtime_tools::RealtimePublisher<sr_robot_msgs::JointControllerState>
       (node_, "state", 1));
 
     return init(robot, joint_name, pid_position, pid_velocity);
@@ -188,6 +188,8 @@ namespace controller {
   bool SrhMixedPositionVelocityJointController::setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req,
                                                          sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp)
   {
+    ROS_INFO_STREAM("New parameters: " << "PID pos: [" <<req.position_p << ", " <<req.position_i << ", " <<req.position_d << ", " <<req.position_i_clamp << "] PID vel: ["<< req.velocity_p << ", " <<req.velocity_i << ", " <<req.velocity_d << ", " <<req.velocity_i_clamp << "], max force: " <<req.max_force << ", friction deadband: "<< req.friction_deadband << " pos deadband: "<<req.position_deadband << " min and max vel: ["<<req.min_velocity << ", " << req.max_velocity <<"]");
+
     pid_controller_position_->setGains(req.position_p,req.position_i,req.position_d,req.position_i_clamp,-req.position_i_clamp);
 
     pid_controller_velocity_->setGains(req.velocity_p,req.velocity_i,req.velocity_d,req.velocity_i_clamp,-req.velocity_i_clamp);
@@ -283,9 +285,9 @@ namespace controller {
     commanded_effort = max( commanded_effort, -max_force_demand );
 
     //Friction compensation, only if we're not in the deadband.
+    int friction_offset = 0;
     if( !in_deadband )
     {
-      int friction_offset = 0;
       if( has_j2 )
         friction_offset = friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
       else
@@ -298,17 +300,9 @@ namespace controller {
       joint_state_2->commanded_effort_ = commanded_effort;
     else
       joint_state_->commanded_effort_ = commanded_effort;
+
     if(loop_count_ % 10 == 0)
     {
-#ifdef DEBUG_PUBLISHER
-      if( std::string("FFJ3").compare(getJointName()) == 0)
-      {
-        std_msgs::Float64 msg;
-        msg.data = commanded_velocity;
-        debug_pub.publish(msg);
-      }
-#endif
-
       if(controller_state_publisher_ && controller_state_publisher_->trylock())
       {
         controller_state_publisher_->msg_.header.stamp = time;
@@ -323,10 +317,15 @@ namespace controller {
           controller_state_publisher_->msg_.process_value = joint_state_->position_;
           controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
         }
+        controller_state_publisher_->msg_.commanded_velocity = commanded_velocity;
 
         controller_state_publisher_->msg_.error = error_position;
         controller_state_publisher_->msg_.time_step = dt_.toSec();
+
         controller_state_publisher_->msg_.command = commanded_effort;
+        controller_state_publisher_->msg_.measured_effort = joint_state_->measured_effort_;
+
+        controller_state_publisher_->msg_.friction_compensation = friction_offset;
 
         double dummy;
         getGains(controller_state_publisher_->msg_.p,

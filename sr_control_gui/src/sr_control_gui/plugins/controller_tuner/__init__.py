@@ -158,22 +158,22 @@ class JointPidSetter(QtGui.QFrame):
         self.connect(self.btn_advanced, QtCore.SIGNAL('clicked()'),self.advanced_options)
         self.layout_.addWidget(self.btn_advanced)
 
-        self.btn_automatic_pid = QtGui.QPushButton()
-        self.btn_automatic_pid.setText( "Automatic" )
-        self.btn_automatic_pid.setToolTip("Finishes the PID tuning automatically using a genetic algorithm.")
-        self.connect(self.btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
-        self.layout_.addWidget(self.btn_automatic_pid)
-        self.btn_automatic_pid.setEnabled(False)
+        #self.btn_automatic_pid = QtGui.QPushButton()
+        #self.btn_automatic_pid.setText( "Automatic" )
+        #self.btn_automatic_pid.setToolTip("Finishes the PID tuning automatically using a genetic algorithm.")
+        #self.connect(self.btn_automatic_pid, QtCore.SIGNAL('clicked()'),self.automatic_tuning)
+        #self.layout_.addWidget(self.btn_automatic_pid)
+        #self.btn_automatic_pid.setEnabled(False)
 
-        self.btn_friction_compensation = QtGui.QPushButton()
-        self.btn_friction_compensation.setText( "Friction" )
-        self.btn_friction_compensation.setToolTip("Computes the Friction Compensation umap")
-        self.connect(self.btn_friction_compensation, QtCore.SIGNAL('clicked()'),self.friction_compensation)
-        self.layout_.addWidget(self.btn_friction_compensation)
-        self.btn_friction_compensation.setEnabled(False)
+        #self.btn_friction_compensation = QtGui.QPushButton()
+        #self.btn_friction_compensation.setText( "Friction" )
+        #self.btn_friction_compensation.setToolTip("Computes the Friction Compensation umap")
+        #self.connect(self.btn_friction_compensation, QtCore.SIGNAL('clicked()'),self.friction_compensation)
+        #self.layout_.addWidget(self.btn_friction_compensation)
+        #self.btn_friction_compensation.setEnabled(False)
 
-        if self.controller_type == "Mixed Position/Velocity":
-            self.btn_friction_compensation.setEnabled(True)
+        #if self.controller_type == "Mixed Position/Velocity":
+        #    self.btn_friction_compensation.setEnabled(True)
 
         self.tuning = False
         self.GA_thread = None
@@ -205,7 +205,7 @@ class JointPidSetter(QtGui.QFrame):
         self.setLayout(self.layout_)
 
     def launch_rxplot(self):
-        rxplot_str = "rxplot -b 10 "
+        rxplot_str = "rxplot -b 30 -p 30 "
 
         # the joint 0s are published on a different topic: /joint_0s/joint_states
         # we set their indexes to -(index in the topic + 1)
@@ -221,7 +221,7 @@ class JointPidSetter(QtGui.QFrame):
         elif self.controller_type == "Velocity":
             rxplot_str += "sh_"+self.joint_name.lower()+"_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_velocity_controller/state/process_value"
         elif self.controller_type == "Mixed Position/Velocity":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value"
+            rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value_dot sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/command "
         elif self.controller_type == "Effort":
             rxplot_str += "sh_"+self.joint_name.lower()+"_effort_controller/state/set_point,sh_"+self.joint_name.lower()+"_effort_controller/state/process_value"
 
@@ -270,13 +270,13 @@ class JointPidSetter(QtGui.QFrame):
 
     def friction_compensation(self):
         if self.friction:
-            self.btn_friction_compensation.setIcon(self.green_icon)
+            #self.btn_friction_compensation.setIcon(self.green_icon)
             self.friction_thread.tuning = False
             self.friction_thread.FC.stop()
             self.friction_thread.join()
             self.friction_thread = None
 
-            self.btn_friction_compensation.setIcon(self.green_icon)
+            #self.btn_friction_compensation.setIcon(self.green_icon)
             self.friction = False
             self.btn_move.setEnabled(True)
 
@@ -293,17 +293,17 @@ class JointPidSetter(QtGui.QFrame):
             self.friction_thread.start()
 
             self.friction = True
-            self.btn_friction_compensation.setIcon(self.red_icon)
+            #self.btn_friction_compensation.setIcon(self.red_icon)
 
     def friction_finished(self):
         #TODO: add a popup to tell people the friction finished properly,
         # may be we should display the points + the line
-        self.btn_friction_compensation.setIcon(self.green_icon)
+        #self.btn_friction_compensation.setIcon(self.green_icon)
         self.friction_thread.tuning = False
         self.friction_thread.FC.stop()
         self.friction_thread = None
 
-        self.btn_friction_compensation.setIcon(self.green_icon)
+        #self.btn_friction_compensation.setIcon(self.green_icon)
         self.friction = False
         self.btn_move.setEnabled(True)
 
@@ -343,7 +343,7 @@ class JointPidSetter(QtGui.QFrame):
                 self.GA_thread.start()
 
                 self.tuning = True
-                self.btn_automatic_pid.setIcon(self.red_icon)
+                #self.btn_automatic_pid.setIcon(self.red_icon)
 
     def ga_stopped(self, result = None):
         if result is not None:
@@ -371,14 +371,14 @@ class JointPidSetter(QtGui.QFrame):
             self.GA_thread.join()
         self.GA_thread = None
 
-        self.btn_automatic_pid.setIcon(self.green_icon)
+        #self.btn_automatic_pid.setIcon(self.green_icon)
         self.tuning = False
         self.btn_move.setEnabled(True)
 
 
     def set_pid(self):
         for param in self.important_parameters.items():
-            param[1][0] = param[1][1].text().toInt()[0]
+            param[1][0] = param[1][1].text().toFloat()[0]
 
         if self.controller_type == "Motor Force":
             try:
@@ -401,13 +401,19 @@ class JointPidSetter(QtGui.QFrame):
 
         elif self.controller_type == "Mixed Position/Velocity":
             try:
-                self.pid_service(float(self.important_parameters["p"][0]), float(self.important_parameters["i"][0]),
-                                 float(self.important_parameters["d"][0]), float(self.important_parameters["i_clamp"][0]),
-                                 float(self.advanced_parameters["max_force"][0]), float(self.advanced_parameters["min_velocity"][0]),
-                                 float(self.advanced_parameters["max_velocity"][0]), float(self.advanced_parameters["velocity_slope"][0]),
-                                 float(self.advanced_parameters["position_deadband"][0]), int(self.advanced_parameters["friction_deadband"][0]) )
+                print " position pid: ", float(self.important_parameters["position_pid/p"][0])
+
+                self.pid_service(float(self.important_parameters["position_pid/p"][0]), float(self.important_parameters["position_pid/i"][0]),
+                                 float(self.important_parameters["position_pid/d"][0]), float(self.important_parameters["position_pid/i_clamp"][0]),
+                                 float(self.advanced_parameters["position_pid/min_velocity"][0]), float(self.advanced_parameters["position_pid/max_velocity"][0]),
+                                 float(self.advanced_parameters["position_pid/position_deadband"][0]),
+                                 float(self.important_parameters["velocity_pid/p"][0]), float(self.important_parameters["velocity_pid/i"][0]),
+                                 float(self.important_parameters["velocity_pid/d"][0]), float(self.important_parameters["velocity_pid/i_clamp"][0]),
+                                 float(self.advanced_parameters["velocity_pid/max_force"][0]),
+                                 int(self.advanced_parameters["velocity_pid/friction_deadband"][0]) )
             except:
-                QtGui.QMessageBox.warning(self.frame_important_parameters, "Warning", "Failed to set the PID values (One of the value is probably out of range, check messages for more information)")
+                pass
+                #QtGui.QMessageBox.warning(self.frame_important_parameters, "Warning", "Failed to set the PID values (One of the value is probably out of range, check messages for more information)")
 
         elif self.controller_type == "Effort":
             try:
@@ -475,7 +481,8 @@ class JointPidSetter(QtGui.QFrame):
         elif self.controller_type == "Velocity":
             param_name =  "/sh_"+self.joint_name.lower()+"_velocity_controller/pid"
         elif self.controller_type == "Mixed Position/Velocity":
-            param_name =  "/sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/pid"
+            param_name = ["/sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/position_pid",
+                          "/sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/velocity_pid" ]
         elif self.controller_type == "Effort":
             param_name =  "/sh_"+self.joint_name.lower()+"_effort_controller"
         parameters_from_server = self.pid_loader.get_settings(param_name)
@@ -513,7 +520,7 @@ class JointPidSetter(QtGui.QFrame):
             text_edit.setFixedWidth(50)
             text_edit.setText( str(parameter[0]) )
 
-            validator = QtGui.QIntValidator(parameter[2][0], parameter[2][1], self)
+            validator = QtGui.QDoubleValidator(float(parameter[2][0]), float(parameter[2][1]), 2, self)
             text_edit.setValidator(validator)
 
 
@@ -523,7 +530,7 @@ class JointPidSetter(QtGui.QFrame):
         self.green_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/green.png')
         self.red_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/red.png')
         self.btn_move.setIcon(self.green_icon)
-        self.btn_automatic_pid.setIcon(self.green_icon)
+        #self.btn_automatic_pid.setIcon(self.green_icon)
 
         Qt.QTimer.singleShot(0, self.adjustSize)
         Qt.QTimer.singleShot(0, self.parent.parent.window.adjustSize)
@@ -630,16 +637,20 @@ class ControllerTuner(GenericPlugin):
                                                            "deadband",
                                                            "friction_deadband"] },
 
-                                  "Mixed Position/Velocity":{ "important":[ "p",
-                                                                            "i",
-                                                                            "d",
-                                                                            "i_clamp"],
-                                                              "advanced":["max_force",
-                                                                          "min_velocity",
-                                                                          "max_velocity",
-                                                                          "velocity_slope",
-                                                                          "position_deadband",
-                                                                          "friction_deadband"] },
+                                  "Mixed Position/Velocity":{ "important":[ "position_pid/p",
+                                                                            "position_pid/i",
+                                                                            "position_pid/d",
+                                                                            "position_pid/i_clamp",
+                                                                            "velocity_pid/p",
+                                                                            "velocity_pid/i",
+                                                                            "velocity_pid/d",
+                                                                            "velocity_pid/i_clamp",
+                                                                            ],
+                                                              "advanced":["velocity_pid/max_force",
+                                                                          "position_pid/min_velocity",
+                                                                          "position_pid/max_velocity",
+                                                                          "position_pid/position_deadband",
+                                                                          "velocity_pid/friction_deadband"] },
 
                                   "Effort":{ "important":["max_force", "friction_deadband"]}}
 
