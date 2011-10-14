@@ -48,11 +48,9 @@ using namespace std;
 namespace controller {
 
   SrhMixedPositionVelocityJointController::SrhMixedPositionVelocityJointController()
-    : SrController(), max_velocity_(1.0), min_velocity_(-1.0), slope_velocity_(20.0),
-      max_position_error_(0.0), min_position_error_(0.0),
+    : SrController(), max_velocity_(1.0), min_velocity_(-1.0),
       position_deadband(0.05)
   {
-    set_min_max_position_errors_();
   }
 
   SrhMixedPositionVelocityJointController::~SrhMixedPositionVelocityJointController()
@@ -61,6 +59,7 @@ namespace controller {
   }
 
   bool SrhMixedPositionVelocityJointController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
+                                                     boost::shared_ptr<control_toolbox::Pid> pid_position,
                                                      boost::shared_ptr<control_toolbox::Pid> pid_velocity)
   {
     ROS_DEBUG(" --------- ");
@@ -122,6 +121,7 @@ namespace controller {
     //get the min and max value for the current joint:
     get_min_max( robot_->model_->robot_model_, joint_name );
 
+    pid_controller_position_ = pid_position;
     pid_controller_velocity_ = pid_velocity;
 
     serve_set_gains_ = node_.advertiseService("set_gains", &SrhMixedPositionVelocityJointController::setGains, this);
@@ -155,16 +155,19 @@ namespace controller {
       return false;
     }
 
-    boost::shared_ptr<control_toolbox::Pid> pid_velocity = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid() );;
-    if (!pid_velocity->init(ros::NodeHandle(node_, "pid")))
+    boost::shared_ptr<control_toolbox::Pid> pid_position = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid() );;
+    if (!pid_position->init(ros::NodeHandle(node_, "position_pid")))
       return false;
 
+    boost::shared_ptr<control_toolbox::Pid> pid_velocity = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid() );;
+    if (!pid_velocity->init(ros::NodeHandle(node_, "velocity_pid")))
+      return false;
 
     controller_state_publisher_.reset(
       new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
       (node_, "state", 1));
 
-    return init(robot, joint_name, pid_velocity);
+    return init(robot, joint_name, pid_position, pid_velocity);
   }
 
 
@@ -174,6 +177,8 @@ namespace controller {
       command_ = joint_state_->position_ + joint_state_2->position_;
     else
       command_ = joint_state_->position_;
+
+    pid_controller_position_->reset();
     pid_controller_velocity_->reset();
     read_parameters();
 
@@ -183,7 +188,9 @@ namespace controller {
   bool SrhMixedPositionVelocityJointController::setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req,
                                                          sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp)
   {
-    pid_controller_velocity_->setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
+    pid_controller_position_->setGains(req.position_p,req.position_i,req.position_d,req.position_i_clamp,-req.position_i_clamp);
+
+    pid_controller_velocity_->setGains(req.velocity_p,req.velocity_i,req.velocity_d,req.velocity_i_clamp,-req.velocity_i_clamp);
     max_force_demand = req.max_force;
     friction_deadband = req.friction_deadband;
     position_deadband = req.position_deadband;
@@ -191,18 +198,7 @@ namespace controller {
     //setting the position controller parameters
     min_velocity_ = req.min_velocity;
     max_velocity_ = req.max_velocity;
-    slope_velocity_ = req.velocity_slope;
 
-    if( slope_velocity_ != 0.0 )
-    {
-      set_min_max_position_errors_();
-      return true;
-    }
-
-    min_velocity_ = -1.0;
-    max_velocity_ = 1.0;
-    slope_velocity_ = 1.0;
-    set_min_max_position_errors_();
     return false;
   }
 
@@ -254,8 +250,11 @@ namespace controller {
     double error_velocity = 0.0;
     double commanded_effort = 0.0;
 
-    //compute the velocity demand from the simple interpoler
-    commanded_velocity = compute_velocity_demand(error_position);
+    //compute the velocity demand using the position pid loop
+    commanded_velocity = pid_controller_position_->updatePid(error_position, dt_);
+    //saturate the velocity demand
+    commanded_velocity = max( commanded_velocity, min_velocity_ );
+    commanded_velocity = min( commanded_velocity, max_velocity_ );
 
     ////////////
     // VELOCITY
@@ -286,10 +285,13 @@ namespace controller {
     //Friction compensation, only if we're not in the deadband.
     if( !in_deadband )
     {
+      int friction_offset = 0;
       if( has_j2 )
-        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
+        friction_offset = friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
       else
-        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
+        friction_offset = friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
+
+      commanded_effort += friction_offset;
     }
 
     if( has_j2 )
@@ -340,37 +342,14 @@ namespace controller {
     last_time_ = time;
   }
 
-  double SrhMixedPositionVelocityJointController::compute_velocity_demand(double position_error)
-  {
-    if( position_error < min_position_error_ )
-      return min_velocity_;
-
-    if( position_error > max_position_error_ )
-      return max_velocity_;
-
-    return sr_math_utils::linear_interpolate_(position_error,
-                                              min_position_error_, min_velocity_,
-                                              max_position_error_, max_velocity_);
-  }
-
-  void SrhMixedPositionVelocityJointController::set_min_max_position_errors_()
-  {
-    //Because the slope goes through (0,0), we have:
-    // velocity = slope_velocity_ * position_error
-    min_position_error_ = min_velocity_ / slope_velocity_;
-    max_position_error_ = max_velocity_ / slope_velocity_;
-  }
-
   void SrhMixedPositionVelocityJointController::read_parameters()
   {
-    node_.param<double>("pid/max_force", max_force_demand, 1023.0);
-    node_.param<double>("pid/min_velocity", min_velocity_, -1.0);
-    node_.param<double>("pid/max_velocity", max_velocity_, 1.0);
-    node_.param<double>("pid/velocity_slope", slope_velocity_, 10.0);
-    node_.param<double>("pid/position_deadband", position_deadband, 0.015);
-    node_.param<int>("pid/friction_deadband", friction_deadband, 5);
+    node_.param<double>("position_pid/min_velocity", min_velocity_, -1.0);
+    node_.param<double>("position_pid/max_velocity", max_velocity_, 1.0);
+    node_.param<double>("position_pid/position_deadband", position_deadband, 0.015);
 
-    set_min_max_position_errors_();
+    node_.param<int>("velocity_pid/friction_deadband", friction_deadband, 5);
+    node_.param<double>("velocity_pid/max_force", max_force_demand, 1023.0);
   }
 }
 

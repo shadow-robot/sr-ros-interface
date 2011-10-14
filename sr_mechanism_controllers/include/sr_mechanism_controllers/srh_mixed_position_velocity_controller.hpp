@@ -49,6 +49,7 @@ namespace controller
     ~SrhMixedPositionVelocityJointController();
 
     bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
+               boost::shared_ptr<control_toolbox::Pid> pid_position,
                boost::shared_ptr<control_toolbox::Pid> pid_velocity);
     bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
 
@@ -63,35 +64,11 @@ namespace controller
     bool setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req, sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp);
 
   private:
+    boost::shared_ptr<control_toolbox::Pid> pid_controller_position_;       /**< Internal PID controller for the position loop. */
     boost::shared_ptr<control_toolbox::Pid> pid_controller_velocity_;       /**< Internal PID controller for the velocity loop. */
 
-    /**
-     * Compute the velocity demand from the position error:
-     *  we use this function (velocity_demand = f(position_error))
-     *  to converge smoothly on the position we want.
-     *       ____
-     *      /
-     *     /
-     * ___/
-     *
-     * @param position_error The current position error
-     *
-     * @return A velocity demand.
-     */
-    double compute_velocity_demand(double position_error);
-    /// The values defining the slope (min and max velocity + slope value)
-    double max_velocity_, min_velocity_, slope_velocity_;
-    /// those are the X values for the beginning and the end of the slope.
-    double max_position_error_, min_position_error_;
-    /**
-     * Compute the max_position_error and min_position_error_
-     * from the max_velocity / min_velocity_, slope_velocity_
-     * parameters.
-     *
-     */
-    void set_min_max_position_errors_();
-    /// Advertise a service to set the min/max velocity and the slope.
-    std::vector<ros::ServiceServer> velocity_services_;
+    /// The values for the velocity demand saturation
+    double max_velocity_, min_velocity_;
 
 #ifdef DEBUG_PUBLISHER
     ros::Publisher debug_pub;
