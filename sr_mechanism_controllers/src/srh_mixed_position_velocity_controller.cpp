@@ -202,7 +202,7 @@ namespace controller {
   {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
-  void SrhMixedPositionVelocityJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
+  void SrhMixedPositionVelocityJointController::getGains_velocity(double &p, double &i, double &d, double &i_max, double &i_min)
   {
     pid_controller_velocity_->getGains(p,i,d,i_max,i_min);
   }
