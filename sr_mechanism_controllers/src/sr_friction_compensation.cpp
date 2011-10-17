@@ -74,7 +74,7 @@ namespace sr_friction_compensation
     {
       //we want the multiplier to be 1 if force_demand = deadband
       // and 0 if force_demand = 0
-      mult = sr_math_utils::linear_interpolate_(static_cast<double>(abs(force_demand)),
+      mult *= sr_math_utils::linear_interpolate_(static_cast<double>(abs(force_demand)),
                                                 0.0, 0.0,
                                                 static_cast<double>(deadband), 1.0);
     }
