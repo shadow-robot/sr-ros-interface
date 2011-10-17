@@ -235,7 +235,6 @@ namespace controller {
     ////////////
     // POSITION
     /////
-
     //Compute velocity demand from position error:
     double error_position = 0.0;
     if( has_j2 )
