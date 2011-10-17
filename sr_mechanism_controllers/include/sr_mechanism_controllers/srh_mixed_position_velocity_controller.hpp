@@ -19,16 +19,10 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *
- * @brief Compute a velocity demand from the position error:
- *  we use this function (velocity_demand = f(position_error))
- *  to converge smoothly on the position we want.
- *       ____
- *      /
- *     /
- * ___/
- *
- * The velocity demand is then converted into a force demand by a
- * PID loop.
+ * @brief Compute a velocity demand from the position error using
+ *        a PID loop.
+ *        The velocity demand is then converted into a force demand by a
+ *        second PID loop and is sent to the motor.
  *
  */
 
@@ -62,6 +56,7 @@ namespace controller
     virtual void update();
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
+    virtual void getGains_velocity(double &p, double &i, double &d, double &i_max, double &i_min);
     bool setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req, sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp);
 
   private:
