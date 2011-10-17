@@ -19,16 +19,10 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *
- * @brief Compute a velocity demand from the position error:
- *  we use this function (velocity_demand = f(position_error))
- *  to converge smoothly on the position we want.
- *       ____
- *      /
- *     /
- * ___/
- *
- * The velocity demand is then converted into a force demand by a
- * PID loop.
+ * @brief Compute a velocity demand from the position error using
+ *        a PID loop.
+ *        The velocity demand is then converted into a force demand by a
+ *        second PID loop and is sent to the motor.
  *
  */
 
@@ -206,6 +200,10 @@ namespace controller {
 
   void SrhMixedPositionVelocityJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
   {
+    pid_controller_position_->getGains(p,i,d,i_max,i_min);
+  }
+  void SrhMixedPositionVelocityJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
+  {
     pid_controller_velocity_->getGains(p,i,d,i_max,i_min);
   }
 
@@ -265,18 +263,13 @@ namespace controller {
     bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
 
     //velocity loop:
-    if( !in_deadband )
+    if( !in_deadband ) //don't compute the error if we're in the deadband
     {
       //we're not in the deadband, compute the error
       if( has_j2 )
         error_velocity = (joint_state_->velocity_ + joint_state_2->velocity_) - commanded_velocity;
       else
         error_velocity = joint_state_->velocity_ - commanded_velocity;
-    }
-    else
-    {
-      //set the error to 0 if we're in the deadband.
-      error_velocity = 0.0;
     }
     commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
 
@@ -328,11 +321,18 @@ namespace controller {
         controller_state_publisher_->msg_.friction_compensation = friction_offset;
 
         double dummy;
-        getGains(controller_state_publisher_->msg_.p,
-                 controller_state_publisher_->msg_.i,
-                 controller_state_publisher_->msg_.d,
-                 controller_state_publisher_->msg_.i_clamp,
+        getGains(controller_state_publisher_->msg_.position_p,
+                 controller_state_publisher_->msg_.position_i,
+                 controller_state_publisher_->msg_.position_d,
+                 controller_state_publisher_->msg_.position_i_clamp,
                  dummy);
+
+        getGains_velocity(controller_state_publisher_->msg_.velocity_p,
+                 controller_state_publisher_->msg_.velocity_i,
+                 controller_state_publisher_->msg_.velocity_d,
+                 controller_state_publisher_->msg_.velocity_i_clamp,
+                 dummy);
+
         controller_state_publisher_->unlockAndPublish();
       }
     }
