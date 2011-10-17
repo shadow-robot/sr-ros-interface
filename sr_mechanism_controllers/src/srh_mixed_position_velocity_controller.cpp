@@ -267,9 +267,9 @@ namespace controller {
     {
       //we're not in the deadband, compute the error
       if( has_j2 )
-        error_velocity = (joint_state_->velocity_ + joint_state_2->velocity_) - commanded_velocity;
+        error_velocity = commanded_velocity - (joint_state_->velocity_ + joint_state_2->velocity_);
       else
-        error_velocity = joint_state_->velocity_ - commanded_velocity;
+        error_velocity = commanded_velocity - joint_state_->velocity_;
     }
     commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
 
