@@ -181,13 +181,13 @@ class JointPidSetter(QtGui.QFrame):
         self.moving = False
         self.full_movement = None
 
-        self.btn_move = QtGui.QPushButton()
-        self.btn_move.setText("Move")
-        self.btn_move.setToolTip("Move the joint through a continuous movement, press again to stop.")
-        self.connect(self.btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
-        if self.controller_type == "Motor Force":
-            self.btn_move.setEnabled(False)
-        self.layout_.addWidget(self.btn_move)
+        #self.btn_move = QtGui.QPushButton()
+        #self.btn_move.setText("Move")
+        #self.btn_move.setToolTip("Move the joint through a continuous movement, press again to stop.")
+        #self.connect(self.btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
+        #if self.controller_type == "Motor Force":
+        #    self.btn_move.setEnabled(False)
+        #self.layout_.addWidget(self.btn_move)
 
         self.btn_save = QtGui.QPushButton()
         self.btn_save.setText("Save")
@@ -277,7 +277,7 @@ class JointPidSetter(QtGui.QFrame):
 
             #self.btn_friction_compensation.setIcon(self.green_icon)
             self.friction = False
-            self.btn_move.setEnabled(True)
+            #self.btn_move.setEnabled(True)
 
         else:
             if self.moving:
@@ -285,8 +285,8 @@ class JointPidSetter(QtGui.QFrame):
                 self.moving = False
                 self.full_movement.join()
                 self.full_movement = None
-                self.btn_move.setIcon(self.green_icon)
-                self.btn_move.setEnabled(False)
+                #self.btn_move.setIcon(self.green_icon)
+                #self.btn_move.setEnabled(False)
 
             self.friction_thread = RunFriction(self.joint_name, self)
             self.friction_thread.start()
@@ -304,7 +304,7 @@ class JointPidSetter(QtGui.QFrame):
 
         #self.btn_friction_compensation.setIcon(self.green_icon)
         self.friction = False
-        self.btn_move.setEnabled(True)
+        #self.btn_move.setEnabled(True)
 
     def move_clicked(self):
         if self.moving:
@@ -312,13 +312,13 @@ class JointPidSetter(QtGui.QFrame):
             self.moving = False
             self.full_movement.join()
             self.full_movement = None
-            self.btn_move.setIcon(self.green_icon)
+            #self.btn_move.setIcon(self.green_icon)
         else:
             self.moving = True
             self.full_movement = FullMovement(self.joint_name, self.controller_type)
             self.full_movement.moving = True
             self.full_movement.start()
-            self.btn_move.setIcon(self.red_icon)
+            #self.btn_move.setIcon(self.red_icon)
 
     def automatic_tuning(self):
         if self.tuning:
@@ -329,8 +329,8 @@ class JointPidSetter(QtGui.QFrame):
                 self.moving = False
                 self.full_movement.join()
                 self.full_movement = None
-                self.btn_move.setIcon(self.green_icon)
-                self.btn_move.setEnabled(False)
+                #self.btn_move.setIcon(self.green_icon)
+                #self.btn_move.setEnabled(False)
 
             aut_tuning_dialog = AutomaticTuningDialog( self, self.joint_name,
                                                        self.important_parameters,
@@ -372,7 +372,7 @@ class JointPidSetter(QtGui.QFrame):
 
         #self.btn_automatic_pid.setIcon(self.green_icon)
         self.tuning = False
-        self.btn_move.setEnabled(True)
+        #self.btn_move.setEnabled(True)
 
 
     def set_pid(self):
@@ -526,7 +526,7 @@ class JointPidSetter(QtGui.QFrame):
 
         self.green_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/green.png')
         self.red_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/red.png')
-        self.btn_move.setIcon(self.green_icon)
+        #self.btn_move.setIcon(self.green_icon)
         #self.btn_automatic_pid.setIcon(self.green_icon)
 
         Qt.QTimer.singleShot(0, self.adjustSize)
