@@ -217,11 +217,11 @@ class JointPidSetter(QtGui.QFrame):
                 rxplot_str += "/joint_0s/joint_states/effort["+ str(- (self.joint_index_in_joint_state + 1) ) +"]"
 
         if self.controller_type == "Position":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_position_controller/state/set_point,sh_"+self.joint_name.lower()+"_position_controller/state/process_value"
+            rxplot_str += "sh_"+self.joint_name.lower()+"_position_controller/state/set_point,sh_"+self.joint_name.lower()+"_position_controller/state/process_value /sh_" + self.joint_name.lower()+"_position_controller/state/command"
         elif self.controller_type == "Velocity":
             rxplot_str += "sh_"+self.joint_name.lower()+"_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_velocity_controller/state/process_value"
         elif self.controller_type == "Mixed Position/Velocity":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value_dot sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/command "
+            rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value_dot,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/commanded_velocity sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/command,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/measured_effort,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/friction_compensation"
         elif self.controller_type == "Effort":
             rxplot_str += "sh_"+self.joint_name.lower()+"_effort_controller/state/set_point,sh_"+self.joint_name.lower()+"_effort_controller/state/process_value"
 
@@ -258,7 +258,6 @@ class JointPidSetter(QtGui.QFrame):
             if filename == "":
                 return
             self.parent.pid_saver = PidSaver(filename)
-
 
         full_param_dict = {}
         for item in self.important_parameters.items():
@@ -401,8 +400,6 @@ class JointPidSetter(QtGui.QFrame):
 
         elif self.controller_type == "Mixed Position/Velocity":
             try:
-                print " position pid: ", float(self.important_parameters["position_pid/p"][0])
-
                 self.pid_service(float(self.important_parameters["position_pid/p"][0]), float(self.important_parameters["position_pid/i"][0]),
                                  float(self.important_parameters["position_pid/d"][0]), float(self.important_parameters["position_pid/i_clamp"][0]),
                                  float(self.advanced_parameters["position_pid/min_velocity"][0]), float(self.advanced_parameters["position_pid/max_velocity"][0]),
