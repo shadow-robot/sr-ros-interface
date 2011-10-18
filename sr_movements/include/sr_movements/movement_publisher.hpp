@@ -32,6 +32,8 @@
 
 #include <std_msgs/Float64.h>
 #include "sr_movements/partial_movement.hpp"
+#include <sr_robot_msgs/JointControllerState.h>
+#include <math.h>
 
 namespace shadowrobot
 {
@@ -44,6 +46,13 @@ namespace shadowrobot
 
     void start();
     void stop();
+
+    /**
+	 * Used to listen to a mixed_position_velocity_controller/state
+	 * and calculate the square mean error of every movement repetition
+	 */
+    void start_error_calculation();
+    void calculateErrorCallback(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
 
     /**
      * Allows the user to control the movement step by
@@ -59,6 +68,8 @@ namespace shadowrobot
     std::vector<PartialMovement> partial_movements;
     ros::NodeHandle nh_tilde;
     ros::Publisher pub;
+    ros::Publisher pub_2;
+    ros::Subscriber sub_;
 
     ros::Rate publishing_rate;
     unsigned int repetition;
@@ -68,6 +79,9 @@ namespace shadowrobot
     double last_target_;
 
     unsigned int nb_mvt_step;
+	double SError_;
+	double MSError_;
+	unsigned int n_samples_;
   };
 }
 

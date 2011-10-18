@@ -32,12 +32,14 @@
 #include <ros/ros.h>
 #include <iostream>
 
+
 int main(int argc, char *argv[])
 {
   ros::init(argc, argv, "sr_movements");
 
   ros::NodeHandle nh_tilde("~");
   std::string img_path;
+
   if( nh_tilde.getParam("image_path", img_path) )
   {
     shadowrobot::MovementFromImage mvt_im( img_path );
@@ -70,6 +72,7 @@ int main(int argc, char *argv[])
   }
   return 0;
 }
+
 
 
 /* For the emacs weenies in the crowd.
