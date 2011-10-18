@@ -11,7 +11,8 @@
 * Software Foundation, either version 2 of the License, or (at your option)
 * any later version.
 *
-* This program is distributed in the hope that it will be useful, but WITHOUT
+* This program is distributed
+    shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate, repetition );in the hope that it will be useful, but WITHOUT
 * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 * more details.
@@ -27,12 +28,10 @@
 
 namespace shadowrobot
 {
-  const unsigned int MovementPublisher::nb_mvt_step = 1000;
-
   MovementPublisher::MovementPublisher(double min_value, double max_value,
-                                       double rate, int repetition)
+                                       double rate, unsigned int repetition, unsigned int nb_mvt_step)
     : nh_tilde("~"), publishing_rate( rate ), repetition(repetition),
-      min(min_value), max(max_value), last_target_(0.0)
+      min(min_value), max(max_value), last_target_(0.0), nb_mvt_step(nb_mvt_step)
   {
     pub = nh_tilde.advertise<std_msgs::Float64>("targets", 5);
   }
@@ -54,12 +53,12 @@ namespace shadowrobot
 
           //get the target
           msg.data = partial_movements[i].get_target( static_cast<double>(j) / static_cast<double>(nb_mvt_step));
-          //interpolate to the correct range
-          msg.data = min + msg.data * (max - min);
-
           //there was not target -> resend the last target
           if( msg.data == -1.0 )
             msg.data = last_target;
+
+          //interpolate to the correct range
+          msg.data = min + msg.data * (max - min);
 
           //publish the message
           pub.publish( msg );
@@ -70,6 +69,7 @@ namespace shadowrobot
           last_target = msg.data;
         }
       }
+      ROS_INFO_STREAM("toto" << last_target);
     }
   }
 
