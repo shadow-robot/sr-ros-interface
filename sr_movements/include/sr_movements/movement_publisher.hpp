@@ -32,6 +32,7 @@
 
 #include <std_msgs/Float64.h>
 #include "sr_movements/partial_movement.hpp"
+#include <pr2_controllers_msgs/JointControllerState.h>
 #include <sr_robot_msgs/JointControllerState.h>
 #include <math.h>
 
@@ -41,18 +42,27 @@ namespace shadowrobot
   {
   public:
     MovementPublisher( double min_value = 0.0, double max_value = 1.5,
-                       double rate=100.0, unsigned int repetition = 1, unsigned int nb_mvt_step = 1000 );
+                       double rate=100.0, unsigned int repetition = 1, unsigned int nb_mvt_step = 1000 , std::string controller_type = "");
     virtual ~MovementPublisher();
 
     void start();
     void stop();
 
     /**
-	 * Used to listen to a mixed_position_velocity_controller/state
-	 * and calculate the square mean error of every movement repetition
+	 * Used to listen to a sr_robot_msgs::JointControllerState
+	 * and calculate the mean square error of every movement repetition
+	 *
+	 * @msg the current state of the controller.
 	 */
-    void start_error_calculation();
     void calculateErrorCallback(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
+
+    /**
+	 * Used to listen to a pr2_controller_msgs::JointControllerState
+	 * and calculate the mean square error of every movement repetition
+	 *
+	 * @msg the current state of the controller.
+	 */
+    void pr2_calculateErrorCallback(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg);
 
     /**
      * Allows the user to control the movement step by
@@ -82,6 +92,7 @@ namespace shadowrobot
 	double SError_;
 	double MSError_;
 	unsigned int n_samples_;
+	std::string controller_type;
   };
 }
 

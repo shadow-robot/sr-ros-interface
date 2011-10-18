@@ -60,8 +60,12 @@ int main(int argc, char *argv[])
         if( !nh_tilde.getParam("nb_step", nb_mvt_step) )
         	nb_mvt_step = 1000;
 
+	std::string controller_type;
+		if( !nh_tilde.getParam("msg_type", controller_type) )
+			controller_type = "";
+
     shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate, static_cast<unsigned int>(repetition),
-    										static_cast<unsigned int>(nb_mvt_step));
+    										static_cast<unsigned int>(nb_mvt_step), controller_type);
     mvt_pub.add_movement( mvt_im );
 
     mvt_pub.start();

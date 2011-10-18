@@ -29,13 +29,28 @@
 namespace shadowrobot
 {
   MovementPublisher::MovementPublisher(double min_value, double max_value,
-                                       double rate, unsigned int repetition, unsigned int nb_mvt_step)
+                                       double rate, unsigned int repetition, unsigned int nb_mvt_step, std::string controller_type)
     : nh_tilde("~"), publishing_rate( rate ), repetition(repetition),
       min(min_value), max(max_value), last_target_(0.0), nb_mvt_step(nb_mvt_step),
-      SError_(0.0), MSError_(0.0), n_samples_(0)
+      SError_(0.0), MSError_(0.0), n_samples_(0), controller_type(controller_type)
   {
     pub = nh_tilde.advertise<std_msgs::Float64>("targets", 5);
     pub_2 = nh_tilde.advertise<std_msgs::Float64>("mse_out", 5);
+    if(controller_type.compare("sr")==0)
+    {
+		//nb_mvt_step is used to set the size of the buffer
+		sub_ = nh_tilde.subscribe("inputs", nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
+    }
+    else if(controller_type.compare("pr2")==0)
+    {
+    	sub_ = nh_tilde.subscribe("pr2_inputs", nb_mvt_step, &MovementPublisher::pr2_calculateErrorCallback, this);
+    }
+    else
+    {
+    	ROS_WARN_STREAM("Warning: You didn't choose a msg_type to listen. sr_robot_msgs was chosen by default");
+    	//nb_mvt_step is used to set the size of the buffer
+    	sub_ = nh_tilde.subscribe("inputs", nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
+    }
   }
 
   MovementPublisher::~MovementPublisher()
@@ -44,10 +59,6 @@ namespace shadowrobot
   void MovementPublisher::start()
   {
     double last_target = 0.0;
-
-    //Subscribe to the selected topic mixed_position_velocity_controller/state
-	//and calculate the square mean error of every movement repetition
-    start_error_calculation();
 
     for(unsigned int i_rep = 0; i_rep < repetition; ++i_rep)
     {
@@ -73,10 +84,12 @@ namespace shadowrobot
           //wait for a bit
           publishing_rate.sleep();
 
+          ros::spinOnce();
+
           last_target = msg.data;
         }
       }
-      //send the error information
+      //print the error information
       ROS_INFO_STREAM("MSE: " << MSError_);
 
       //publish the error information
@@ -89,24 +102,28 @@ namespace shadowrobot
     }
   }
 
-
-  void MovementPublisher::start_error_calculation()
-  {
-	  //nb_mvt_step is used to set the size of the buffer
-	  sub_ = nh_tilde.subscribe("inputs", nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
-  }
-
   void MovementPublisher::calculateErrorCallback(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
   {
-	  ROS_ERROR("CB");
-	  double error = (msg->set_point)-(msg->process_value);
-	  ROS_INFO_STREAM("Error: " << error);
-	  SError_ = SError_ + (error * error);
-	  ROS_INFO_STREAM("SError: " << SError_);
-	  n_samples_++;
-	  ROS_INFO_STREAM("Samples: " << n_samples_);
-	  MSError_ = SError_/static_cast<double>(n_samples_);
-	  ROS_INFO_STREAM("MSe: " << MSError_);
+	double error = msg->set_point - msg->process_value;
+	ROS_DEBUG_STREAM("Error: " << error);
+	SError_ = SError_ + ( error * error );
+	ROS_DEBUG_STREAM("SError: " << SError_);
+	n_samples_++;
+	ROS_DEBUG_STREAM("Samples: " << n_samples_);
+	MSError_ = SError_ / ( static_cast<double>(n_samples_) );
+	ROS_DEBUG_STREAM("MSe: " << MSError_);
+  }
+
+  void MovementPublisher::pr2_calculateErrorCallback(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg)
+  {
+	double error = msg->set_point - msg->process_value;
+	ROS_DEBUG_STREAM("Error: " << error);
+	SError_ = SError_ + ( error * error );
+	ROS_DEBUG_STREAM("SError: " << SError_);
+	n_samples_++;
+	ROS_DEBUG_STREAM("Samples: " << n_samples_);
+	MSError_ = SError_ / ( static_cast<double>(n_samples_) );
+	ROS_DEBUG_STREAM("MSe: " << MSError_);
   }
 
   void MovementPublisher::execute_step(int index_mvt_step, int index_partial_movement)
