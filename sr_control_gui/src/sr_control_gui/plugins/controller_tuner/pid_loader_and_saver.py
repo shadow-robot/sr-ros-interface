@@ -57,7 +57,12 @@ class PidSaver(object):
         yaml_config = yaml.load(document)
         if len(param_path) == 2:
             for item in parameters_dict.items():
-                yaml_config[param_path[0]][param_path[1]][item[0]] = item[1]
+                if "position_pid/" in item[0]:
+                    yaml_config[param_path[0]]["position_pid"][item[0].split("position_pid/")[1]] = item[1]
+                elif "velocity_pid/" in item[0]:
+                    yaml_config[param_path[0]]["velocity_pid"][item[0].split("velocity_pid/")[1]] = item[1]
+                else:
+                    yaml_config[param_path[0]][param_path[1]][item[0]] = item[1]
         elif len(param_path) == 1:
             for item in parameters_dict.items():
                 yaml_config[param_path][param_path][item[0]] = item[1]

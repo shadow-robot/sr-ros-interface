@@ -181,13 +181,13 @@ class JointPidSetter(QtGui.QFrame):
         self.moving = False
         self.full_movement = None
 
-        self.btn_move = QtGui.QPushButton()
-        self.btn_move.setText("Move")
-        self.btn_move.setToolTip("Move the joint through a continuous movement, press again to stop.")
-        self.connect(self.btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
-        if self.controller_type == "Motor Force":
-            self.btn_move.setEnabled(False)
-        self.layout_.addWidget(self.btn_move)
+        #self.btn_move = QtGui.QPushButton()
+        #self.btn_move.setText("Move")
+        #self.btn_move.setToolTip("Move the joint through a continuous movement, press again to stop.")
+        #self.connect(self.btn_move, QtCore.SIGNAL('clicked()'),self.move_clicked)
+        #if self.controller_type == "Motor Force":
+        #    self.btn_move.setEnabled(False)
+        #self.layout_.addWidget(self.btn_move)
 
         self.btn_save = QtGui.QPushButton()
         self.btn_save.setText("Save")
@@ -217,11 +217,11 @@ class JointPidSetter(QtGui.QFrame):
                 rxplot_str += "/joint_0s/joint_states/effort["+ str(- (self.joint_index_in_joint_state + 1) ) +"]"
 
         if self.controller_type == "Position":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_position_controller/state/set_point,sh_"+self.joint_name.lower()+"_position_controller/state/process_value"
+            rxplot_str += "sh_"+self.joint_name.lower()+"_position_controller/state/set_point,sh_"+self.joint_name.lower()+"_position_controller/state/process_value /sh_" + self.joint_name.lower()+"_position_controller/state/command"
         elif self.controller_type == "Velocity":
             rxplot_str += "sh_"+self.joint_name.lower()+"_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_velocity_controller/state/process_value"
         elif self.controller_type == "Mixed Position/Velocity":
-            rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value_dot sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/command "
+            rxplot_str += "sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/set_point,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/process_value_dot,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/commanded_velocity sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/command,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/measured_effort,sh_"+self.joint_name.lower()+"_mixed_position_velocity_controller/state/friction_compensation"
         elif self.controller_type == "Effort":
             rxplot_str += "sh_"+self.joint_name.lower()+"_effort_controller/state/set_point,sh_"+self.joint_name.lower()+"_effort_controller/state/process_value"
 
@@ -259,7 +259,6 @@ class JointPidSetter(QtGui.QFrame):
                 return
             self.parent.pid_saver = PidSaver(filename)
 
-
         full_param_dict = {}
         for item in self.important_parameters.items():
             full_param_dict[item[0]] = item[1][0]
@@ -278,7 +277,7 @@ class JointPidSetter(QtGui.QFrame):
 
             #self.btn_friction_compensation.setIcon(self.green_icon)
             self.friction = False
-            self.btn_move.setEnabled(True)
+            #self.btn_move.setEnabled(True)
 
         else:
             if self.moving:
@@ -286,8 +285,8 @@ class JointPidSetter(QtGui.QFrame):
                 self.moving = False
                 self.full_movement.join()
                 self.full_movement = None
-                self.btn_move.setIcon(self.green_icon)
-                self.btn_move.setEnabled(False)
+                #self.btn_move.setIcon(self.green_icon)
+                #self.btn_move.setEnabled(False)
 
             self.friction_thread = RunFriction(self.joint_name, self)
             self.friction_thread.start()
@@ -305,7 +304,7 @@ class JointPidSetter(QtGui.QFrame):
 
         #self.btn_friction_compensation.setIcon(self.green_icon)
         self.friction = False
-        self.btn_move.setEnabled(True)
+        #self.btn_move.setEnabled(True)
 
     def move_clicked(self):
         if self.moving:
@@ -313,13 +312,13 @@ class JointPidSetter(QtGui.QFrame):
             self.moving = False
             self.full_movement.join()
             self.full_movement = None
-            self.btn_move.setIcon(self.green_icon)
+            #self.btn_move.setIcon(self.green_icon)
         else:
             self.moving = True
             self.full_movement = FullMovement(self.joint_name, self.controller_type)
             self.full_movement.moving = True
             self.full_movement.start()
-            self.btn_move.setIcon(self.red_icon)
+            #self.btn_move.setIcon(self.red_icon)
 
     def automatic_tuning(self):
         if self.tuning:
@@ -330,8 +329,8 @@ class JointPidSetter(QtGui.QFrame):
                 self.moving = False
                 self.full_movement.join()
                 self.full_movement = None
-                self.btn_move.setIcon(self.green_icon)
-                self.btn_move.setEnabled(False)
+                #self.btn_move.setIcon(self.green_icon)
+                #self.btn_move.setEnabled(False)
 
             aut_tuning_dialog = AutomaticTuningDialog( self, self.joint_name,
                                                        self.important_parameters,
@@ -373,7 +372,7 @@ class JointPidSetter(QtGui.QFrame):
 
         #self.btn_automatic_pid.setIcon(self.green_icon)
         self.tuning = False
-        self.btn_move.setEnabled(True)
+        #self.btn_move.setEnabled(True)
 
 
     def set_pid(self):
@@ -401,8 +400,6 @@ class JointPidSetter(QtGui.QFrame):
 
         elif self.controller_type == "Mixed Position/Velocity":
             try:
-                print " position pid: ", float(self.important_parameters["position_pid/p"][0])
-
                 self.pid_service(float(self.important_parameters["position_pid/p"][0]), float(self.important_parameters["position_pid/i"][0]),
                                  float(self.important_parameters["position_pid/d"][0]), float(self.important_parameters["position_pid/i_clamp"][0]),
                                  float(self.advanced_parameters["position_pid/min_velocity"][0]), float(self.advanced_parameters["position_pid/max_velocity"][0]),
@@ -529,7 +526,7 @@ class JointPidSetter(QtGui.QFrame):
 
         self.green_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/green.png')
         self.red_icon = QtGui.QIcon(self.parent.parent.parent.parent.rootPath + '/images/icons/colors/red.png')
-        self.btn_move.setIcon(self.green_icon)
+        #self.btn_move.setIcon(self.green_icon)
         #self.btn_automatic_pid.setIcon(self.green_icon)
 
         Qt.QTimer.singleShot(0, self.adjustSize)
