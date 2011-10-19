@@ -43,7 +43,7 @@ namespace shadowrobot
     }
     else if(controller_type.compare("pr2")==0)
     {
-    	sub_ = nh_tilde.subscribe("pr2_inputs", nb_mvt_step, &MovementPublisher::pr2_calculateErrorCallback, this);
+    	sub_ = nh_tilde.subscribe("inputs", nb_mvt_step, &MovementPublisher::pr2_calculateErrorCallback, this);
     }
     else
     {
