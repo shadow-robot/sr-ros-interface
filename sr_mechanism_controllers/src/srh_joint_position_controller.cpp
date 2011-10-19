@@ -199,16 +199,17 @@ namespace controller {
     //Compute position demand from position error:
     double error_position = 0.0;
     double commanded_effort = 0.0;
+    if( has_j2 )
+      error_position = (joint_state_->position_ + joint_state_2->position_) - command_;
+    else
+      error_position = joint_state_->position_ - command_;
 
     bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
+
     //don't compute the error if we're in the deadband.
-    if( !in_deadband )
-    {
-      if( has_j2 )
-        error_position = (joint_state_->position_ + joint_state_2->position_) - command_;
-      else
-        error_position = joint_state_->position_ - command_;
-    }
+    if( in_deadband )
+      error_position = 0.0;
+
     commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
 
     //clamp the result to max force
