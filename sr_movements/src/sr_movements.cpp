@@ -16,7 +16,7 @@
 * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 * more details.
 *
-* You should have received a copy of the GNU General Public License along
+* You should have received a copy of the GNU General Public License alongpublish_rate
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
  * @brief  Reads an image and publishes its content as std_msgs::Float64 on
@@ -32,12 +32,14 @@
 #include <ros/ros.h>
 #include <iostream>
 
+
 int main(int argc, char *argv[])
 {
   ros::init(argc, argv, "sr_movements");
 
   ros::NodeHandle nh_tilde("~");
   std::string img_path;
+
   if( nh_tilde.getParam("image_path", img_path) )
   {
     shadowrobot::MovementFromImage mvt_im( img_path );
@@ -54,7 +56,16 @@ int main(int argc, char *argv[])
     if( !nh_tilde.getParam("repetition", repetition) )
       repetition = 1;
 
-    shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate, repetition );
+    int nb_mvt_step;
+    if( !nh_tilde.getParam("nb_step", nb_mvt_step) )
+      nb_mvt_step = 1000;
+
+    std::string controller_type;
+    if( !nh_tilde.getParam("msg_type", controller_type) )
+      controller_type = "";
+
+    shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate, static_cast<unsigned int>(repetition),
+                                            static_cast<unsigned int>(nb_mvt_step), controller_type);
     mvt_pub.add_movement( mvt_im );
 
     mvt_pub.start();
@@ -65,6 +76,7 @@ int main(int argc, char *argv[])
   }
   return 0;
 }
+
 
 
 /* For the emacs weenies in the crowd.

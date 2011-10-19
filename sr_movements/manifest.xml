@@ -9,6 +9,7 @@
   <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_movements</url>
+  <depend package="pr2_controllers_msgs"/>
   <depend package="sr_robot_msgs"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
