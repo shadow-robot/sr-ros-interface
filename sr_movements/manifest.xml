@@ -13,6 +13,7 @@
   <depend package="sr_robot_msgs"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
+  <depend package="sr_utilities"/>
   <depend package="roscpp"/>
 
   <rosdep name="libpng++-dev"/>
