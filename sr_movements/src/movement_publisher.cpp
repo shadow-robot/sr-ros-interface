@@ -25,6 +25,9 @@
 
 #include "sr_movements/movement_publisher.hpp"
 
+#include <math.h>
+#include <sr_utilities/sr_math_utils.hpp>
+
 namespace shadowrobot
 {
   MovementPublisher::MovementPublisher(double min_value, double max_value,
@@ -89,7 +92,7 @@ namespace shadowrobot
         }
       }
       //print the error information
-      ROS_INFO_STREAM("MSE: " << MSError_);
+      ROS_INFO_STREAM("MSE: " << MSError_ << " Error(deg): " << sr_math_utils::to_degrees( sqrt(MSError_) ) );
 
       //publish the error information
       msg.data = MSError_;
