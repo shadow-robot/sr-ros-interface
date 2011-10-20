@@ -39,6 +39,7 @@ namespace sr_actuator
       strain_gauge_left_(0),
       strain_gauge_right_(0),
       temperature_(0),
+      pwm_(0),
       can_msgs_received_(0),
       can_msgs_transmitted_(0),
       pic_firmware_svn_revision_(0),
@@ -78,6 +79,8 @@ namespace sr_actuator
     std::vector<std::pair<std::string, bool> > flags_;
 
     double temperature_;
+
+    int pwm_;
 
     unsigned int can_msgs_received_;
     unsigned int can_msgs_transmitted_;
