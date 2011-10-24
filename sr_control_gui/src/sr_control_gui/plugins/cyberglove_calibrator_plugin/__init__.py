@@ -332,7 +332,7 @@ class CybergloveCalibratorPlugin(CybergloveGenericPlugin):
 
         for name in self.joint_names:
             if self.calibrer.is_step_done(name) == 0.5:
-                self.glove_calbrating_widget.set_half_calibrated([name])
+                self.glove_calibrating_widget.set_half_calibrated([name])
             elif self.calibrer.is_step_done(name) == 1.0:
                 self.glove_calibrating_widget.set_calibrated([name])
 
