@@ -133,7 +133,7 @@ namespace sr_mechanism_model
     {
       if( size == 2 )
       {
-        ROS_ERROR_STREAM( "READING pos " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_
+        ROS_DEBUG_STREAM( "READING pos " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_
                           << " J1 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0]
                           << " J2 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1] );
 
