@@ -133,7 +133,7 @@ namespace sr_mechanism_model
     {
       if( size == 2 )
       {
-        ROS_DEBUG_STREAM( "READING pos " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_
+        ROS_ERROR_STREAM( "READING pos " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_
                           << " J1 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[0]
                           << " J2 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.calibrated_sensor_values_[1] );
 
@@ -147,6 +147,23 @@ namespace sr_mechanism_model
         js[1]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_;
       }
     }
+    else
+    {
+      ROS_DEBUG_STREAM( "READING pos from Gazebo " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_
+                        << " J1 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ / 2.0
+                        << " J2 " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ / 2.0 );
+
+      //TODO: use a real formula for the coupling??
+      //GAZEBO
+      js[0]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ / 2.0;
+      js[1]->position_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ / 2.0;
+
+      js[0]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / 2.0;
+      js[1]->velocity_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ / 2.0;
+
+      js[0]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ / 2.0;
+      js[1]->measured_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ / 2.0;
+    }
 
     ROS_DEBUG("end propagate position for j0");
   }
@@ -158,10 +175,10 @@ namespace sr_mechanism_model
 
     assert(as.size() == 1);
     assert(js.size() == 2);
-/*
-  as[0]->state_.position_ = (js[0]->position_ - js[0]->reference_position_) * mechanical_reduction_;
-  as[0]->state_.velocity_ = js[0]->velocity_ * mechanical_reduction_;
-*/
+
+    ROS_DEBUG_STREAM("  pos = " << js[0]->position_ << " + " << js[1]->position_ << " = " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_);
+    static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ = js[0]->position_ + js[1]->position_;
+    static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ = js[0]->velocity_ + js[1]->velocity_;
     static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ = js[0]->measured_effort_ + js[1]->measured_effort_;
 
     // Update the timing (making sure it's initialized).
