@@ -1,5 +1,5 @@
 <launch>
-  <param name="hand_description" textfile="$(find sr_hand)/model/robots/shadowhand_motor.urdf"/>
+  <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_motor.urdf.xacro'" />
 
   <!-- shadowhand -->
   <node pkg="sr_hand" name="shadowhand"

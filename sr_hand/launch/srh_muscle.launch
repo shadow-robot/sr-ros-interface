@@ -1,6 +1,6 @@
 <launch>
-  <param name="hand_description" textfile="$(find sr_hand)/model/robots/shadowhand_muscle.urdf"/>
-  
+  <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_muscle.urdf.xacro'" />
+
   <!-- shadowhand -->
   <node pkg="sr_hand" name="shadowhand"
 	type="shadowhand_virtual" >
@@ -11,34 +11,34 @@
     <param name="publish_frequency" type="double" value="20.0" />
   </node>
 
-  <!-- Robot state publisher: publishes tf information regarding the 
+  <!-- Robot state publisher: publishes tf information regarding the
        position of the hand -->
   <node pkg="robot_state_publisher" type="state_publisher"
-	name="srh_robot_state_publisher_pos">      
+	name="srh_robot_state_publisher_pos">
     <remap from="robot_description" to="hand_description"/>
     <remap from="joint_states" to="srh/position/joint_states" />
     <param name="publish_frequency" type="double" value="10.0" />
     <param name="tf_prefix" type="string" value="srh/position" />
   </node>
 
-  <!-- Robot state publisher: publishes tf information regarding the 
+  <!-- Robot state publisher: publishes tf information regarding the
        targets of the hand -->
   <node pkg="robot_state_publisher" type="state_publisher"
-	name="srh_robot_state_publisher_target">      
+	name="srh_robot_state_publisher_target">
     <remap from="robot_description" to="hand_description"/>
     <remap from="joint_states" to="srh/target/joint_states" />
     <param name="publish_frequency" type="double" value="1.0" />
     <param name="tf_prefix" type="string" value="srh/target" />
   </node>
-  
+
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub" args="0 0 0 0 0 0 /srh/position/forearm_muscle fixed 100" />
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub" args="0 0 0 0 0 0 fixed /srh/target/forearm_muscle 100" />
-  
-  
+
+
   <node pkg="diagnostic_aggregator" type="aggregator_node"
         name="diagnostic_aggregator" >
     <!-- Load the file you made above -->
-    <rosparam command="load" 
+    <rosparam command="load"
               file="$(find sr_hand)/shadowhand_analyzer.yaml" />
   </node>
 </launch>
