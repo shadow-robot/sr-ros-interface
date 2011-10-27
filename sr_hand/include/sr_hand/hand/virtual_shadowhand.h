@@ -2,7 +2,7 @@
  * @file   virtual_shadowhand.h
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:51:10 2010
- * 
+ *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -22,8 +22,8 @@
  * @brief  The Virtual Shadowhand can be used as a simulator. As both the real hand and the virtual hand are children
  * from the shadowhand class, using a virtual or a real hand doesn't change anything in the way you call them in your
  * programs.
- * 
- * 
+ *
+ *
  */
 
 #ifndef   	VIRTUAL_SHADOWHAND_H_
@@ -86,13 +86,16 @@ public:
      */
     virtual std::vector<DiagnosticData> getDiagnostics();
 protected:
-#ifdef GAZEBO
-    /**
-     * If we're building the Gazebo interface, we need a ROS node to
-     * publish / subscribe to the Gazebo model.
-     */
+    ///ROS Node handles
     ros::NodeHandle node, n_tilde;
 
+#ifdef GAZEBO
+    /**
+     * Updates the internal map with the current positions / etc...
+     * from Gazebo.
+     *
+     * @param msg the joint_state message coming from Gazebo
+     */
     void gazeboCallback(const sensor_msgs::JointStateConstPtr& msg);
 #endif
 

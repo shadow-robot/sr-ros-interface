@@ -29,21 +29,25 @@
 #include <time.h>
 #include <ros/ros.h>
 
+#include <boost/algorithm/string.hpp>
+
 #ifdef GAZEBO
 #include <std_msgs/Float64.h>
 #endif
 
+#include <urdf/model.h>
+#include <sr_utilities/sr_math_utils.hpp>
+
 namespace shadowrobot
 {
   VirtualShadowhand::VirtualShadowhand() :
-    SRArticulatedRobot()
+    SRArticulatedRobot(), n_tilde("~")
   {
 #ifdef GAZEBO
     ROS_INFO("This ROS interface is built for Gazebo.");
     //initialises the subscriber to the Gazebo joint_states messages
     std::string prefix;
     std::string searched_param;
-    n_tilde = ros::NodeHandle("~");
 
     n_tilde.searchParam("gazebo_joint_states_prefix", searched_param);
     n_tilde.param(searched_param, prefix, std::string());
@@ -67,6 +71,7 @@ namespace shadowrobot
     parameters_map_mutex.lock();
     controllers_map_mutex.lock();
 
+
     JointData tmpData;
     JointData tmpDataZero;
     JointControllerData tmpController;
@@ -79,234 +84,62 @@ namespace shadowrobot
     std::string full_topic = "";
 #endif
 
+    //Get the urdf model from the parameter server
+    std::string robot_desc_string;
+    node.param("hand_description", robot_desc_string, std::string());
+    urdf::Model robot_model;
+    if (!robot_model.initString(robot_desc_string)){
+      ROS_ERROR("Failed to parse urdf file");
+      return;
+    }
+
+    std::map<std::string, boost::shared_ptr<urdf::Joint> > all_joints = robot_model.joints_;
+    std::map<std::string, boost::shared_ptr<urdf::Joint> >::const_iterator iter = all_joints.begin();
+    ROS_DEBUG("All the Hand joints: ");
+    for (; iter != all_joints.end(); ++iter )
+    {
+      if( iter->second->type == urdf::Joint::REVOLUTE)
+      {
+        std::string current_joint_name = iter->first;
+
+        ROS_DEBUG_STREAM(" joint: " << current_joint_name << '\t' << iter->second );
+
+        bool is_joint_zero = false;
+        if( is_joint_zero )
+        {
+          /* TODO: implement joint 0
+            #ifdef GAZEBO
+            full_topic = topic_prefix + "ffj0" + topic_suffix;
+            gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
+            int tmp_index = 0;
+            tmpData.publisher_index = tmp_index;
+            #endif
+            joints_map["FFJ0"] = tmpDataZero;
+            controllers_map["FFJ0"] = tmpController;
+
+            joints_map["FFJ1"] = tmpDataZero;
+            controllers_map["FFJ1"] = tmpController;
+            joints_map["FFJ2"] = tmpDataZero;
+            controllers_map["FFJ2"] = tmpController;
+          */
+        }
+        else
+        {
 #ifdef GAZEBO
-    full_topic = topic_prefix + "ffj0" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    int tmp_index = 0;
-    tmpData.publisher_index = tmp_index;
+          boost::algorithm::to_lower(current_joint_name);
+          full_topic = topic_prefix + current_joint_name + topic_suffix;
+          gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
+          tmp_index ++;
+          tmpData.publisher_index = tmp_index;
 #endif
-    joints_map["FFJ0"] = tmpDataZero;
-    controllers_map["FFJ0"] = tmpController;
-
-    joints_map["FFJ1"] = tmpData;
-    controllers_map["FFJ1"] = tmpController;
-
-    joints_map["FFJ2"] = tmpData;
-    controllers_map["FFJ2"] = tmpController;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "ffj3" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["FFJ3"] = tmpData;
-    controllers_map["FFJ3"] = tmpController;
-    tmpData.min = -25.0;
-    tmpData.max = 25.0;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "ffknuckle_controller" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["FFJ4"] = tmpData;
-    controllers_map["FFJ4"] = tmpController;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "mfj0" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["MFJ0"] = tmpDataZero;
-    controllers_map["MFJ0"] = tmpController;
-    tmpData.min = 0.0;
-    tmpData.max = 90.0;
-
-    joints_map["MFJ1"] = tmpData;
-    controllers_map["MFJ1"] = tmpController;
-
-    joints_map["MFJ2"] = tmpData;
-    controllers_map["MFJ2"] = tmpController;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "mfj3" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["MFJ3"] = tmpData;
-    controllers_map["MFJ3"] = tmpController;
-    tmpData.min = -25.0;
-    tmpData.max = 25.0;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "mfj4" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["MFJ4"] = tmpData;
-    controllers_map["MFJ4"] = tmpController;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "rfj0" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["RFJ0"] = tmpDataZero;
-    controllers_map["RFJ0"] = tmpController;
-    tmpData.min = 0.0;
-    tmpData.max = 90.0;
-
-    joints_map["RFJ1"] = tmpData;
-    controllers_map["RFJ1"] = tmpController;
-
-    joints_map["RFJ2"] = tmpData;
-    controllers_map["RFJ2"] = tmpController;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "rfj3" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["RFJ3"] = tmpData;
-    controllers_map["RFJ3"] = tmpController;
-    tmpData.min = -25.0;
-    tmpData.max = 25.0;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "rfj4" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["RFJ4"] = tmpData;
-    controllers_map["RFJ4"] = tmpController;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "lfj0" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["LFJ0"] = tmpDataZero;
-    controllers_map["LFJ0"] = tmpController;
-    tmpData.min = 0.0;
-    tmpData.max = 90.0;
-
-    joints_map["LFJ1"] = tmpData;
-    controllers_map["LFJ1"] = tmpController;
-
-    joints_map["LFJ2"] = tmpData;
-    controllers_map["LFJ2"] = tmpController;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "lfj3" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["LFJ3"] = tmpData;
-    controllers_map["LFJ3"] = tmpController;
-    tmpData.min = -25.0;
-    tmpData.max = 25.0;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "lfj4" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["LFJ4"] = tmpData;
-    controllers_map["LFJ4"] = tmpController;
-    tmpData.min = 0.0;
-    tmpData.max = 45.0;
-
-#ifdef GAZEBO
-    full_topic = topic_prefix + "lfj5" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["LFJ5"] = tmpData;
-    controllers_map["LFJ5"] = tmpController;
-
-    tmpData.min = 0.0;
-    tmpData.max = 90.0;
-#ifdef GAZEBO
-    full_topic = topic_prefix + "thj1" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["THJ1"] = tmpData;
-    controllers_map["THJ1"] = tmpController;
-    tmpData.min = -30.0;
-    tmpData.max = 30.0;
-#ifdef GAZEBO
-    full_topic = topic_prefix + "thj2" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["THJ2"] = tmpData;
-    controllers_map["THJ2"] = tmpController;
-    tmpData.min = -15.0;
-    tmpData.max = 15.0;
-#ifdef GAZEBO
-    full_topic = topic_prefix + "thj3" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["THJ3"] = tmpData;
-    controllers_map["THJ3"] = tmpController;
-    tmpData.min = 0.0;
-    tmpData.max = 75.0;
-#ifdef GAZEBO
-    full_topic = topic_prefix + "thj4" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["THJ4"] = tmpData;
-    controllers_map["THJ4"] = tmpController;
-    tmpData.min = -60.0;
-    tmpData.max = 60.0;
-#ifdef GAZEBO
-    full_topic = topic_prefix + "thj5" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["THJ5"] = tmpData;
-    controllers_map["THJ5"] = tmpController;
-
-    tmpData.min = -30.0;
-    tmpData.max = 40.0;
-#ifdef GAZEBO
-    full_topic = topic_prefix + "wrj1" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["WRJ1"] = tmpData;
-    controllers_map["WRJ1"] = tmpController;
-    tmpData.min = -30.0;
-    tmpData.max = 10.0;
-#ifdef GAZEBO
-    full_topic = topic_prefix + "wrj2" + topic_suffix;
-    gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-    tmp_index ++;
-    tmpData.publisher_index = tmp_index;
-#endif
-    joints_map["WRJ2"] = tmpData;
-    controllers_map["WRJ2"] = tmpController;
+          tmpData.min = sr_math_utils::to_degrees(iter->second->limits->lower);
+          tmpData.max = sr_math_utils::to_degrees(iter->second->limits->upper);
+          boost::algorithm::to_upper(current_joint_name);
+          joints_map[ current_joint_name ] = tmpData;
+          controllers_map[ current_joint_name ] = tmpController;
+        }
+      }
+    }
 
     parameters_map["d"] = PARAM_d;
     parameters_map["i"] = PARAM_i;

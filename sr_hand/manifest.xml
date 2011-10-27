@@ -18,8 +18,8 @@
   <depend package="std_srvs"/>
   <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
+  <depend package="sr_utilities"/>
   <depend package="diagnostic_msgs"/>
-<!--  <depend package="kdl_parser"/> -->
   <depend package="dynamic_reconfigure"/>
   <depend package="self_test"/>
 
