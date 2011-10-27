@@ -104,33 +104,57 @@ namespace shadowrobot
 
         ROS_DEBUG_STREAM(" joint: " << current_joint_name << '\t' << iter->second );
 
-        bool is_joint_zero = false;
-        if( is_joint_zero )
+        //check if we need to create a joint 0
+        // create them when we have the joint 2
+        bool create_joint_zero = false;
+        boost::algorithm::to_lower(current_joint_name);
+        if( current_joint_name == "ffj2" || current_joint_name == "mfj2"
+            || current_joint_name == "rfj2" || current_joint_name == "lfj2" )
         {
-          /* TODO: implement joint 0
-            #ifdef GAZEBO
-            full_topic = topic_prefix + "ffj0" + topic_suffix;
-            gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-            int tmp_index = 0;
-            tmpData.publisher_index = tmp_index;
-            #endif
-            joints_map["FFJ0"] = tmpDataZero;
-            controllers_map["FFJ0"] = tmpController;
+          create_joint_zero = true;
+        }
 
-            joints_map["FFJ1"] = tmpDataZero;
-            controllers_map["FFJ1"] = tmpController;
-            joints_map["FFJ2"] = tmpDataZero;
-            controllers_map["FFJ2"] = tmpController;
-          */
+#ifdef GAZEBO
+        //index of the publisher to the Gazebo controller
+        int tmp_index = 0;
+
+        //The joint 1 is not controlled directly in Gazebo (the controller
+        // controls joint 0)
+        bool no_controller = false;
+        if( current_joint_name == "ffj1" || current_joint_name == "mfj1"
+            || current_joint_name == "rfj1" || current_joint_name == "lfj1" )
+        {
+          no_controller = true;
+        }
+#endif
+
+        if( create_joint_zero )
+        {
+#ifdef GAZEBO
+          full_topic = topic_prefix + std::string(1, current_joint_name[0]) + "fj0" + topic_suffix;
+          gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
+          tmpData.publisher_index = tmp_index;
+#endif
+          boost::algorithm::to_upper(current_joint_name);
+          joints_map[std::string(1, current_joint_name[0]) + "FJ0"] = tmpDataZero;
+          controllers_map[std::string(1, current_joint_name[0]) + "FJ0"] = tmpController;
+
+          tmpData.min = sr_math_utils::to_degrees(iter->second->limits->lower);
+          tmpData.max = sr_math_utils::to_degrees(iter->second->limits->upper);
+          joints_map[current_joint_name] = tmpData;
+          controllers_map[current_joint_name] = tmpController;
         }
         else
         {
 #ifdef GAZEBO
-          boost::algorithm::to_lower(current_joint_name);
-          full_topic = topic_prefix + current_joint_name + topic_suffix;
-          gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
-          tmp_index ++;
-          tmpData.publisher_index = tmp_index;
+          if( !no_controller )
+          {
+            boost::algorithm::to_lower(current_joint_name);
+            full_topic = topic_prefix + current_joint_name + topic_suffix;
+            gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
+            tmp_index ++;
+            tmpData.publisher_index = tmp_index;
+          }
 #endif
           tmpData.min = sr_math_utils::to_degrees(iter->second->limits->lower);
           tmpData.max = sr_math_utils::to_degrees(iter->second->limits->upper);
