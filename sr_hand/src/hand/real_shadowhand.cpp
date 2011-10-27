@@ -28,9 +28,16 @@
 
 #include "sr_hand/hand/real_shadowhand.h"
 //our robot code
+#include <robot/config.h>
 #include <robot/robot.h>
-#include <robot/hand.h>
 #include <robot/hand_protocol.h>
+#ifdef FINGER
+#include <robot/finger.h>
+#define LAST_HAND_JOINT NUM_FINGER_JOINTS
+#else
+#include <robot/hand.h>
+#define LAST_HAND_JOINT START_OF_ARM
+#endif
 
 namespace shadowrobot
 {
@@ -78,9 +85,7 @@ namespace shadowrobot
     tmpData.force = 0.0;
     tmpData.flags = "";
 
-    ROS_DEBUG_STREAM("START OF ARM "<< START_OF_ARM);
-
-    for( unsigned int i = 0; i < START_OF_ARM; i++ )
+    for( unsigned int i = 0; i < LAST_HAND_JOINT; i++ )
     {
       std::string name = hand_joints[i].joint_name;
       tmpData.jointIndex = i;
