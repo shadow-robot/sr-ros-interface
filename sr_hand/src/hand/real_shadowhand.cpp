@@ -31,11 +31,10 @@
 #include <robot/config.h>
 #include <robot/robot.h>
 #include <robot/hand_protocol.h>
+#include <robot/hand.h>
 #ifdef FINGER
-#include <robot/finger.h>
 #define LAST_HAND_JOINT NUM_FINGER_JOINTS
 #else
-#include <robot/hand.h>
 #define LAST_HAND_JOINT START_OF_ARM
 #endif
 
