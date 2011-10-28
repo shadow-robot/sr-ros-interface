@@ -82,7 +82,7 @@ namespace shadowrobot
   {
     std::vector<std::vector<std::string> > all_names = get_all_names();
 
-    for( unsigned int i=0; i<5; ++i)
+    for( unsigned int i=0; i< all_names[0].size() ; ++i)
     {
       tactile_sensors.push_back(
         boost::shared_ptr<SrGazeboVirtualTactileSensor>(
