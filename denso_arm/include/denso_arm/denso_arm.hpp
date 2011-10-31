@@ -28,8 +28,8 @@
 
 #include "denso_arm/denso_joints.hpp"
 #include <boost/smart_ptr.hpp>
-#include "bcap.h" /// Where should this file go?
-#include <cstdlib>'
+#include "b-Cap/b-Cap.hpp"
+#include <cstdlib>
 
 namespace denso
 {
@@ -74,6 +74,17 @@ namespace denso
     u_long lhRobot;
     u_long lhSlaveTask;
     u_long lhPosition;
+
+
+    void StartBCAP (const * char pStrIP, int iPort);
+    void StartController(void);
+    void TakeRobot(void);
+    void SetPower(int iPower);
+    void SetSpeed(float fSpeed);
+    void InitialisePositionHandle (void);
+    void DensoArm::StartController(void);
+
+
 
   protected:
     static const unsigned short nb_joints_;

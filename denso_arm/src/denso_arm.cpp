@@ -95,18 +95,18 @@ namespace denso
     BCAP_HRESULT hr = BCAP_S_OK;
 	if FAILED(hr = bCap_Open(pStrIP, iPort, &ihSocket)) {	/* Init socket  */
 		fprintf(stderr, "Failed to init sockets - %i\n", hr);
-		std::exit((int) hr)
+		std::exit((int) hr);
 	}
 	if FAILED(hr = bCap_ServiceStart(ihSocket)) {    /* Start b-CAP service */
 		fprintf(stderr, "Failed to start b-Cap - %i\n", hr);
-		std::exit((int) hr)
+		std::exit((int) hr);
 	}
   }
   void DensoArm::StartController(void) {
     BCAP_HRESULT hr = BCAP_S_OK;
     if FAILED(hr = bCap_ControllerConnect(ihSocket, "", "", "", "", &lhController) ){
 		fprintf(stderr, "Failed to start controller - %i\n", hr);
-		std::exit((int) hr)
+		std::exit((int) hr);
 	}
   }
   void DensoArm::TakeRobot(void){
@@ -114,7 +114,7 @@ namespace denso
 	BCAP_HRESULT hr = bCap_ControllerGetRobot(ihSocket, lhController, "", "", &lhRobot);
 	if FAILED(hr) {
 		fprintf(stderr, "Coudlnt take robot - %i\n", hr);
-		exit ((int) hr)
+		exit ((int) hr);
 	}
   }
   void DensoArm::SetPower(int iPower) {
@@ -124,7 +124,7 @@ namespace denso
 
 	if FAILED(hr) {
 		fprintf(stderr, "Couldn't switch power- %i\n", hr);
-		exit ((int) hr)
+		exit ((int) hr);
     }
   }
   void DensoArm::SetSpeed(float fSpeed) {
@@ -136,18 +136,27 @@ namespace denso
 	BCAP_HRESULT hr = bCap_RobotExecute(ihSocket, lhRobot, "ExtSpeed", VT_R4 | VT_ARRAY, 1 , in, temp);
     if FAILED(hr) {
         printf("Couldn't set speed - %x\n", hr);
-        exit ((int) hr)
+        exit ((int) hr);
     }
   }
 
   void DensoArm::InitialisePositionHandle (void){
-    BCAP_HRESULT hr = bCap_ControllerGetVariable(iSockFD, lhController, sVarName, "", &lhPosition);	/* Get var handle  */
+    BCAP_HRESULT hr = bCap_ControllerGetVariable(ihSocket, lhController, "@CURRENT_POSITION", "", &lhPosition);	/* Get var handle  */
 	if FAILED(hr) {
 		fprintf(stderr, "Couldn't get variable handle - %i\n", hr);
-		return hr;
+		exit ((int) hr);
 	}
   }
+  void DensoArm::StartController(void) {
+    BCAP_HRESULT hr = bCap_ControllerGetTask(ihSocket, lhController, sName, "", &lhSlaveTask);
+	if SUCCEEDED(hr) hr = bCap_TaskStop(ihSocket, lhSlaveTask, 4 ,"");	/* Stop */
+	if SUCCEEDED(hr) hr = bCap_TaskStart(ihSocket, lhSlaveTask, 1 ,""); /*Start Again*/
 
+	if FAILED(hr) {
+		fprintf(stderr, "Couldn't get variable handle - %i\n", hr);
+		exit ((int) hr);
+	}
+  }
 }
 
 
