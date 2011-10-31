@@ -28,24 +28,66 @@
 namespace denso
 {
   DensoArmNode::DensoArmNode()
+    : node_("~")
   {
     denso_arm_ = boost::shared_ptr<DensoArm> ( new DensoArm() );
+
+    init_joints();
 
     //TODO: read from param
     ros::Rate rate(100);
 
-    //timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &MotorDataChecker::timer_callback, this);
+    //init what's needed for the joint states publishing
+    publisher_js_ = node_.advertise<sensor_msgs::JointState>("joint_states", 5);
+    timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
   }
 
   DensoArmNode::~DensoArmNode()
   {}
 
+  void DensoArmNode::update_joint_states_callback(const ros::TimerEvent& e)
+  {
+    denso_arm_->update_state( denso_joints_ );
+
+    for( unsigned short index_joint = 0; index_joint < denso_arm_->get_nb_joints() ; ++index_joint)
+    {
+      joint_state_msg_.position[index_joint] = denso_joints_->at(index_joint).position;
+      joint_state_msg_.velocity[index_joint] = denso_joints_->at(index_joint).velocity;
+      joint_state_msg_.effort[index_joint] = denso_joints_->at(index_joint).effort;
+    }
+
+    publisher_js_.publish( joint_state_msg_ );
+  }
+
+  void DensoArmNode::init_joints()
+  {
+    const unsigned short nb_joints = denso_arm_->get_nb_joints();
+    denso_joints_ = boost::shared_ptr<DensoJointsVector>( new DensoJointsVector( nb_joints ) );
+
+    for( unsigned short i=0; i < nb_joints; ++i )
+    {
+      std::stringstream ss;
+      ss << "denso_J" << i;
+      denso_joints_->at(i).name = ss.str();
+
+      joint_state_msg_.name.push_back( ss.str() );
+
+      joint_state_msg_.position.push_back( 0.0 );
+      joint_state_msg_.velocity.push_back( 0.0 );
+      joint_state_msg_.effort.push_back( 0.0 );
+    }
+  }
 }
 
 int main(int argc, char *argv[])
 {
+  ros::init( argc, argv, "denso_arm" );
+
   boost::shared_ptr<denso::DensoArmNode> denso_node;
   denso_node = boost::shared_ptr<denso::DensoArmNode> ( new denso::DensoArmNode() );
+
+  ros::spin();
+
   return 0;
 }
 

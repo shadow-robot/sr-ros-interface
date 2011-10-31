@@ -27,9 +27,10 @@
 #define _DENSO_ARM_NODE_HPP_
 
 #include <ros/ros.h>
+#include <boost/smart_ptr.hpp>
+
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float64.h>
-#include <boost/smart_ptr.hpp>
 
 #include "denso_arm/denso_arm.hpp"
 #include "denso_arm/denso_joints.hpp"
@@ -42,6 +43,8 @@ namespace denso
     DensoArmNode();
     virtual ~DensoArmNode();
 
+    void update_joint_states_callback(const ros::TimerEvent& e);
+
   protected:
     ros::NodeHandle node_;
     boost::shared_ptr<DensoJointsVector> denso_joints_;
@@ -49,6 +52,11 @@ namespace denso
     boost::shared_ptr<DensoArm> denso_arm_;
 
     ros::Timer timer_joint_states_;
+    ros::Publisher publisher_js_;
+
+    sensor_msgs::JointState joint_state_msg_;
+
+    void init_joints();
   };
 }
 
