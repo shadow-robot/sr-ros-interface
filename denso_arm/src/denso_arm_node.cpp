@@ -28,7 +28,14 @@
 namespace denso
 {
   DensoArmNode::DensoArmNode()
-  {}
+  {
+    denso_arm_ = boost::shared_ptr<DensoArm> ( new DensoArm() );
+
+    //TODO: read from param
+    ros::Rate rate(100);
+
+    timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &MotorDataChecker::timer_callback, this);
+  }
 
   DensoArmNode::~DensoArmNode()
   {}

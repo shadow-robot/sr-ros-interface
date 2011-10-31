@@ -40,8 +40,13 @@ namespace denso
     void get_positions(boost::shared_ptr<DensoJointsVector> denso_joints);
     void sendupdate( double target, int index_joint );
 
+    unsigned short get_nb_joints()
+    {
+      return nb_joints_;
+    };
+
   protected:
-    static const unsigned short nb_joints;
+    static const unsigned short nb_joints_;
   };
 }
 

@@ -34,6 +34,8 @@ namespace denso
   {
     std::string name;
     double position;
+    double effort;
+    double velocity;
   };
 
   typedef std::vector<Joint> DensoJointsVector;

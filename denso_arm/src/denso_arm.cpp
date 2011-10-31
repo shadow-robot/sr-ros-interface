@@ -27,7 +27,7 @@
 
 namespace denso
 {
-  const unsigned short nb_joints = 7; // TODO: I don't know how many joints we have
+  const unsigned short nb_joints_ = 7; // TODO: I don't know how many joints we have
 
   DensoArm::DensoArm()//Dan: You can get whatever you want in this constructor
   {}
@@ -37,10 +37,13 @@ namespace denso
 
   void get_positions(boost::shared_ptr<DensoJointsVector> denso_joints)
   {
-    for (unsigned short index_joint = 0; index_joint < nb_joints; ++index_joint)
+    for (unsigned short index_joint = 0; index_joint < nb_joints_; ++index_joint)
     {
-      //TODO: update the vector of position: read the real values
+      //TODO: update the vector: read the real values
       denso_joints->at(index_joint).position = 0.0;
+      denso_joints->at(index_joint).effort = 0.0;
+      //do you have access to this?
+      denso_joints->at(index_joint).velocity = 0.0;
     }
   }
 
