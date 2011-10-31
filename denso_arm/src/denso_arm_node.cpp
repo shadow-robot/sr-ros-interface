@@ -87,15 +87,53 @@ namespace denso
 
   void DensoArmNode::go_to_arm_pose(const denso_msgs::MoveArmPoseGoalConstPtr& goal)
   {
+    int success = denso_msgs::MoveArmPoseResult::SUCCESS;
+
+    //rate at which we'll send the demands to the arm
     ros::Rate move_arm_rate( goal->rate );
+
+    //for checking the time out
+    ros::Duration time_left( goal->time_out );
+    ros::Time start_time = ros::Time::now();
+
     while( node_.ok() )
     {
-      if( move_arm_pose_server_->isPreemptRequested() )
+      if( move_arm_pose_server_->isPreemptRequested() || !ros::ok() )
       {
-
+        ROS_INFO("Move Denso arm to pose preempted.");
+        move_arm_pose_server_->setPreempted();
+        success = denso_msgs::MoveArmPoseResult::PREEMPTED;
+        break;
       }
+
       //TODO: implement me
-      move_arm_pose_server_->setSucceeded();
+      Pose pose_goal; //Compute pose from goal
+      if( denso_arm_->send_cartesian_position( pose_goal ) )
+        break; //We reached the target -> SUCCESS
+
+      //publish feedback
+      time_left -= (ros::Time::now() - start_time);
+      move_arm_pose_feedback_.time_left = time_left;
+
+      //check if timedout
+      if( time_left.toSec() <= 0.0 )
+      {
+        success = denso_msgs::MoveArmPoseResult::TIMED_OUT;
+        break;
+      }
+      move_arm_rate.sleep();
+    }
+
+    if( success == denso_msgs::MoveArmPoseResult::SUCCESS)
+    {
+      move_arm_pose_result_.val = denso_msgs::MoveArmPoseResult::SUCCESS;
+      move_arm_pose_server_->setSucceeded( move_arm_pose_result_ );
+    }
+    else
+    {
+      //failed
+      move_arm_pose_result_.val = success;
+      move_arm_pose_server_->setAborted( move_arm_pose_result_ );
     }
   }
 }

@@ -72,6 +72,11 @@ namespace denso
     ///An action server for the MoveArmPose actions.
     boost::shared_ptr<MoveArmPoseServer> move_arm_pose_server_;
 
+    ///The result to a MoveArmPoseGoal
+    denso_msgs::MoveArmPoseResult move_arm_pose_result_;
+    ///The feedback: published while waiting for the action to be finished
+    denso_msgs::MoveArmPoseFeedback move_arm_pose_feedback_;
+
     ///Initialize the denso_joints_ vector.
     void init_joints();
   };
