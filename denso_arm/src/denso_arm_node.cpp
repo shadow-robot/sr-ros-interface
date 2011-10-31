@@ -114,6 +114,7 @@ namespace denso
       //publish feedback
       time_left -= (ros::Time::now() - start_time);
       move_arm_pose_feedback_.time_left = time_left;
+      move_arm_pose_server_->publishFeedback( move_arm_pose_feedback_ );
 
       //check if timedout
       if( time_left.toSec() <= 0.0 )
