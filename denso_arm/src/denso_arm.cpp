@@ -28,17 +28,19 @@
 namespace denso
 {
   const unsigned short DensoArm::nb_joints_ = 6; // TODO: I don't know how many joints we have
-  DensoArm::DensoArm(){}
-  DensoArm::DensoArm(const char * pStrIP, int iPort, float fInitialSpeed)//Dan: You can get whatever you want in this constructor
-  {
-    StartBCAP(pStrIP, iPort);
-    StartController();
-    StartRobSlave();
-    TakeRobot();
-    SetSpeed(fInitialSpeed);
-    InitialisePositionHandle();
-    SetPower(1);
 
+  DensoArm::DensoArm()
+  {}
+
+  DensoArm::DensoArm(string robot_ip, int robot_port, float initial_speed)
+  {
+    start_bcap(robot_ip, robot_port);
+    start_controller();
+    start_slave_task();
+    take_robot();
+    set_speed(initial_speed);
+    initialise_position_handles();
+    set_power(1);
   }
 
   DensoArm::~DensoArm()
@@ -60,9 +62,13 @@ namespace denso
     }
   }
 
-  void DensoArm::sendupdate( int index_joint, double target )
+  bool DensoArm::sendupdate( const std::vector<double>& joint_targets )
   {
-    //TODO: send the target to the correct joint.
+    sprintf(command_buffer, "J(%f,%f,%f,%f,%f,%f)",joint_targets[0], joint_targets[1], joint_targets[2], joint_targets[3], joint_targets[4], joint_targets[5] );
+
+    BCAP_HRESULT hr = bCap_RobotMove(socket_handle, robot_handle, 2 ,command_buffer, (char * ) "");
+
+    return (hr != BCAP_E_ROBOTISBUSY);
   }
 
   ////////
@@ -72,13 +78,9 @@ namespace denso
 
   bool DensoArm::send_cartesian_position( const Pose& pose )
   {
-    //TODO: send those coordinates to the arm
-    // pose.x, pose.y, pose.z, pose.roll, pose.pitch, pose.yaw
+    sprintf(command_buffer, "P(%f,%f,%f,%f,%f,%f,1)", pose.x, pose.y, pose.z, pose.roll, pose.pitch, pose.yaw);
 
-    char command[200];
-    sprintf(command, "P(%f,%f,%f,%f,%f,%f,1)", pose.x, pose.y, pose.z, pose.roll, pose.pitch, pose.yaw);
-
-    BCAP_HRESULT hr = bCap_RobotMove(ihSocket, lhRobot, 2 ,command, (char * ) "");
+    BCAP_HRESULT hr = bCap_RobotMove(socket_handle, robot_handle, 2 ,command_buffer, (char * ) "");
 
     return (hr != BCAP_E_ROBOTISBUSY);
   }
@@ -89,11 +91,14 @@ namespace denso
     //TODO: read the current tip coordinates
 
     float position[7];
-    BCAP_HRESULT hr = bCap_VariableGetValue(ihSocket, lhPosition, position);			/* Get Value */
-	if FAILED(hr) {
-        fprintf (stderr, "Couldn't read position - %i", (int) hr);
-        std::exit((int) hr);
-	}
+
+    BCAP_HRESULT hr = bCap_VariableGetValue(socket_handle, cartesian_position_handle, position);			/* Get Value */
+    
+    if FAILED(hr)
+    {
+      fprintf (stderr, "Couldn't read position - %i", (int) hr);
+      std::exit((int) hr);
+    }
 
     pose->x = position[0];
     pose->y = position[1];
@@ -104,70 +109,98 @@ namespace denso
   }
   ////////
 
-  void DensoArm::StartBCAP (const char * pStrIP, int iPort) {
+  void DensoArm::start_bcap (string robot_ip, int robot_port)
+  {
     BCAP_HRESULT hr = BCAP_S_OK;
-	if FAILED(hr = bCap_Open(pStrIP, iPort, &ihSocket)) {	/* Init socket  */
-		fprintf(stderr, "Failed to init sockets - %i\n", hr);
-		std::exit((int) hr);
-	}
-	if FAILED(hr = bCap_ServiceStart(ihSocket)) {    /* Start b-CAP service */
-		fprintf(stderr, "Failed to start b-Cap - %i\n", hr);
-		std::exit((int) hr);
-	}
-  }
-  void DensoArm::StartController(void) {
-    BCAP_HRESULT hr = BCAP_S_OK;
-        if FAILED(hr = bCap_ControllerConnect(ihSocket, (char*)"", (char*)"", (char*)"", (char*)"", &lhController) ){
-		fprintf(stderr, "Failed to start controller - %i\n", hr);
-		std::exit((int) hr);
-	}
-  }
+    if FAILED(hr = bCap_Open(robot_ip.c_str(), robot_port, &socket_handle))
+    {	/* Init socket  */
+      fprintf(stderr, "Failed to init sockets - %i\n", hr);
+      std::exit((int) hr);
+    }
 
-  void DensoArm::TakeRobot(void){
-    lhRobot = -1;
-	BCAP_HRESULT hr = bCap_ControllerGetRobot(ihSocket, lhController, (char*)"", (char*)"", &lhRobot);
-	if FAILED(hr) {
-		fprintf(stderr, "Coudlnt take robot - %i\n", hr);
-		exit ((int) hr);
-	}
-  }
-  void DensoArm::SetPower(int iPower) {
-    BCAP_HRESULT hr;
-	void * result;
-	hr = bCap_RobotExecute(ihSocket, lhRobot, (char*)"MOTOR", VT_I2, 0, &iPower, result);
-
-	if FAILED(hr) {
-		fprintf(stderr, "Couldn't switch power- %i\n", hr);
-		exit ((int) hr);
+    if FAILED(hr = bCap_ServiceStart(socket_handle)) {    /* Start b-CAP service */
+      fprintf(stderr, "Failed to start b-Cap - %i\n", hr);
+      std::exit((int) hr);
     }
   }
-  void DensoArm::SetSpeed(float fSpeed) {
+  
+  void DensoArm::start_controller(void)
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+
+    if FAILED(hr = bCap_ControllerConnect(socket_handle, (char*)"", (char*)"", (char*)"", (char*)"", &controller_handle) )
+    {
+      fprintf(stderr, "Failed to start controller - %i\n", hr);
+      std::exit((int) hr);
+    }
+
+  }
+
+  void DensoArm::take_robot(void)
+  {
+    BCAP_HRESULT hr = bCap_ControllerGetRobot(socket_handle, controller_handle, (char*)"", (char*)"", &robot_handle);
+    if FAILED(hr)
+    {
+      fprintf(stderr, "Coudlnt take robot - %i\n", hr);
+      exit ((int) hr);
+    }
+  }
+
+  void DensoArm::set_power(int power_state)
+  {
+    BCAP_HRESULT hr;
+    void * result;
+
+    hr = bCap_RobotExecute(socket_handle, robot_handle, (char*)"MOTOR", VT_I2, 0, &power_state, result);
+
+    if FAILED(hr)
+    {
+      fprintf(stderr, "Couldn't switch power- %i\n", hr);
+      exit ((int) hr);
+    }
+  }
+
+  void DensoArm::set_speed(float speed)
+  {
     float in[3];
-    in[0] = fSpeed;
+    in[0] = speed;
     in[1] = 10;
     in[2] = 10;
-	void * result;
-	BCAP_HRESULT hr = bCap_RobotExecute(ihSocket, lhRobot, (char*)"ExtSpeed", VT_R4 | VT_ARRAY, 1 , in, result);
-    if FAILED(hr) {
-        printf("Couldn't set speed - %x\n", hr);
-        exit ((int) hr);
+    void * result;
+    BCAP_HRESULT hr = bCap_RobotExecute(socket_handle, robot_handle, (char*)"ExtSpeed", VT_R4 | VT_ARRAY, 1 , in, result);
+
+    if FAILED(hr)
+    {
+      printf("Couldn't set speed - %x\n", hr);
+      exit ((int) hr);
     }
   }
 
-  void DensoArm::InitialisePositionHandle (void){
-    BCAP_HRESULT hr = bCap_ControllerGetVariable(ihSocket, lhController, (char*)"@CURRENT_POSITION", (char*)"", &lhPosition);	/* Get var handle  */
-	if FAILED(hr) {
-		fprintf(stderr, "Couldn't get variable handle - %i\n", hr);
-		exit ((int) hr);
-	}
+  void DensoArm::initialise_position_handles (void)
+  {
+    BCAP_HRESULT hr = bCap_ControllerGetVariable(socket_handle, controller_handle, (char*)"@CURRENT_POSITION", (char*)"", &cartesian_position_handle);	/* Get var handle  */
+
+    if SUCCEEDED(hr)
+      BCAP_HRESULT hr = bCap_ControllerGetVariable(socket_handle, controller_handle, (char*)"@CURRENT_ANGLE", (char*)"", &angle_position_handle);	/* Get var handle  */
+    
+    if FAILED(hr)
+    {
+      fprintf(stderr, "Couldn't get variable handle - %i\n", hr);
+      exit ((int) hr);
+    }
   }
 
-  void DensoArm::StartRobSlave (void) {
-    BCAP_HRESULT hr = bCap_ControllerGetTask(ihSocket, lhController,(char*) "RobSlave", (char*)"", &lhSlaveTask);
-	if SUCCEEDED(hr) hr = bCap_TaskStop(ihSocket, lhSlaveTask, 4, (char*)"");	/* Stop */
-	if SUCCEEDED(hr) hr = bCap_TaskStart(ihSocket, lhSlaveTask, 1 ,(char*)""); /*Start Again*/
-	if FAILED(hr) std::exit ((int) hr);
+  void DensoArm::start_slave_task (void)
+  {
+    BCAP_HRESULT hr = bCap_ControllerGetTask(socket_handle, controller_handle,(char*) "RobSlave", (char*)"", &slave_task_handle);
+    if SUCCEEDED(hr)
+      hr = bCap_TaskStop(socket_handle, slave_task_handle, 4, (char*)"");
 
+    if SUCCEEDED(hr)
+      hr = bCap_TaskStart(socket_handle, slave_task_handle, 1 ,(char*)"");
+
+    if FAILED(hr)
+      std::exit ((int) hr);
   }
 
 }

@@ -30,6 +30,9 @@
 #include <boost/smart_ptr.hpp>
 #include "b-Cap/b-Cap.hpp"
 #include <cstdlib>
+#include <string>
+
+using std::string;
 
 namespace denso
 {
@@ -47,11 +50,12 @@ namespace denso
   {
   public:
     DensoArm();
-    DensoArm(const char * pStrIP, int iPort, float fInitialSpeed);//Dan: You can get whatever you want in this constructor
+    DensoArm(string robot_ip, int robot_port, float intial_speed);//Dan: You can get whatever you want in this constructor
     virtual ~DensoArm();
 
     void update_state(boost::shared_ptr<DensoJointsVector> denso_joints);
-    void sendupdate( int index_joint, double target );
+
+    bool sendupdate( const std::vector<double>& joint_targets );
 
     /**
      * Send a cartesian demand to the Denso arm.
@@ -70,20 +74,21 @@ namespace denso
     };
 
   private:
-    int ihSocket;
-    u_long lhController;
-    u_long lhRobot;
-    u_long lhSlaveTask;
-    u_long lhPosition;
+    int socket_handle;
+    u_long controller_handle;
+    u_long robot_handle;
+    u_long slave_task_handle;
+    u_long cartesian_position_handle;
+    u_long angle_position_handle;
+    char command_buffer[200];
 
-
-    void StartBCAP (const char * pStrIP, int iPort);
-    void StartController(void);
-    void TakeRobot(void);
-    void SetPower(int iPower);
-    void SetSpeed(float fSpeed);
-    void InitialisePositionHandle (void);
-    void StartRobSlave(void);
+    void start_bcap (string robot_ip, int robot_port);
+    void start_controller(void);
+    void take_robot(void);
+    void set_power(int power_state);
+    void set_speed(float speed);
+    void initialise_position_handles (void);
+    void start_slave_task(void);
 
 
 
