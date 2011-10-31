@@ -28,6 +28,8 @@
 
 #include "denso_arm/denso_joints.hpp"
 #include <boost/smart_ptr.hpp>
+#include "bcap.h" /// Where should this file go?
+#include <cstdlib>'
 
 namespace denso
 {
@@ -65,6 +67,13 @@ namespace denso
     {
       return nb_joints_;
     };
+
+  private:
+    int ihSocket;
+    u_long lhController;
+    u_long lhRobot;
+    u_long lhSlaveTask;
+    u_long lhPosition;
 
   protected:
     static const unsigned short nb_joints_;
