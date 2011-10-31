@@ -24,10 +24,10 @@
  */
 
 #include "denso_arm/denso_arm_node.hpp"
-
+#include "b-Cap/b-Cap.hpp"
 namespace denso
 {
-  const unsigned short DensoArm::nb_joints_ = 7; // TODO: I don't know how many joints we have
+  const unsigned short DensoArm::nb_joints_ = 6; // TODO: I don't know how many joints we have
   DensoArm::DensoArm(){}
   DensoArm::DensoArm(const char * pStrIP, int iPort, float fInitialSpeed)//Dan: You can get whatever you want in this constructor
   {
@@ -75,19 +75,32 @@ namespace denso
     //TODO: send those coordinates to the arm
     // pose.x, pose.y, pose.z, pose.roll, pose.pitch, pose.yaw
 
-    return true;
+    char command[200];
+    sprintf(command, "P(%f,%f,%f,%f,%f,%f,1)", pose.x, pose.y, pose.z, pose.roll, pose.pitch, pose.yaw);
+
+    BCAP_HRESULT hr = bCap_RobotMove(ihSocket, lhRobot, 2 ,command, (char * ) "");
+
+    return (hr != BCAP_E_ROBOTISBUSY);
   }
 
 
   void DensoArm::get_cartesian_position( boost::shared_ptr<Pose> pose )
   {
     //TODO: read the current tip coordinates
-    pose->x = 0.0;
-    pose->y = 0.0;
-    pose->z = 0.0;
-    pose->roll = 0.0;
-    pose->yaw = 0.0;
-    pose->pitch = 0.0;
+
+    float position[7];
+    BCAP_HRESULT hr = bCap_VariableGetValue(ihSocket, lhPosition, position);			/* Get Value */
+	if FAILED(hr) {
+        fprintf (stderr, "Couldn't read position - %i", (int) hr);
+        std::exit((int) hr);
+	}
+
+    pose->x = position[0];
+    pose->y = position[1];
+    pose->z = position[2];
+    pose->roll = position[3];
+    pose->pitch = position[4];
+    pose->yaw = position[5];
   }
   ////////
 
