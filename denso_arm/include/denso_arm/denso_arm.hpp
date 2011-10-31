@@ -31,14 +31,28 @@
 
 namespace denso
 {
+  struct Pose
+  {
+    double x;
+    double y;
+    double z;
+    double roll;
+    double pitch;
+    double yaw;
+  };
+
   class DensoArm
   {
   public:
     DensoArm();//Dan: You can get whatever you want in this constructor
     virtual ~DensoArm();
 
-    void get_positions(boost::shared_ptr<DensoJointsVector> denso_joints);
-    void sendupdate( double target, int index_joint );
+    void update_state(boost::shared_ptr<DensoJointsVector> denso_joints);
+    void sendupdate( int index_joint, double target );
+
+    void send_cartesian_position( const Pose& pose );
+
+    void get_cartesian_position( boost::shared_ptr<Pose> pose);
 
     unsigned short get_nb_joints()
     {

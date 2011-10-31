@@ -34,7 +34,7 @@ namespace denso
     //TODO: read from param
     ros::Rate rate(100);
 
-    timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &MotorDataChecker::timer_callback, this);
+    //timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &MotorDataChecker::timer_callback, this);
   }
 
   DensoArmNode::~DensoArmNode()

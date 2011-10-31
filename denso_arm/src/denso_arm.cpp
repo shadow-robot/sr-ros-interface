@@ -27,7 +27,7 @@
 
 namespace denso
 {
-  const unsigned short nb_joints_ = 7; // TODO: I don't know how many joints we have
+  const unsigned short DensoArm::nb_joints_ = 7; // TODO: I don't know how many joints we have
 
   DensoArm::DensoArm()//Dan: You can get whatever you want in this constructor
   {}
@@ -35,7 +35,11 @@ namespace denso
   DensoArm::~DensoArm()
   {}
 
-  void get_positions(boost::shared_ptr<DensoJointsVector> denso_joints)
+
+  ///////
+  // IN JOINT SPACE
+
+  void DensoArm::update_state(boost::shared_ptr<DensoJointsVector> denso_joints)
   {
     for (unsigned short index_joint = 0; index_joint < nb_joints_; ++index_joint)
     {
@@ -47,10 +51,34 @@ namespace denso
     }
   }
 
-  void sendupdate( int index_joint, double target )
+  void DensoArm::sendupdate( int index_joint, double target )
   {
     //TODO: send the target to the correct joint.
   }
+
+  ////////
+
+  ///////
+  // IN CARTESIAN SPACE
+
+  void DensoArm::send_cartesian_position( const Pose& pose )
+  {
+    //TODO: send those coordinates to the arm
+    // pose.x, pose.y, pose.z, pose.roll, pose.pitch, pose.yaw
+  }
+
+
+  void DensoArm::get_cartesian_position( boost::shared_ptr<Pose> pose )
+  {
+    //TODO: read the current tip coordinates
+    pose->x = 0.0;
+    pose->y = 0.0;
+    pose->z = 0.0;
+    pose->roll = 0.0;
+    pose->yaw = 0.0;
+    pose->pitch = 0.0;
+  }
+  ////////
 
 }
 
