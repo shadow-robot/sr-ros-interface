@@ -1,6 +1,6 @@
 /**
- * @file   denso_arm.hpp
- * @author Ugo Cupcic <ugo@shadowrobot.com>, Dan Greenwald <dg@shadowrobot.com>
+ * @file   denso_arm_node.hpp
+ * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Mon Oct 31 09:26:15 2011
  *
 * Copyright 2011 Shadow Robot Company Ltd.
@@ -18,38 +18,42 @@
 * You should have received a copy of the GNU General Public License along
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
- * @brief A standard interface to the DENSO arm.
+ * @brief A ROS interface to the DENSO arm.
  *
  *
  */
 
-#ifndef _DENSO_ARM_HPP_
-#define _DENSO_ARM_HPP_
+#ifndef _DENSO_ARM_NODE_HPP_
+#define _DENSO_ARM_NODE_HPP_
 
-#include "denso_arm/denso_joints.hpp"
+#include <ros/ros.h>
+#include <std_msgs/Float64.h>
 #include <boost/smart_ptr.hpp>
+
+#include "denso_arm/denso_arm.hpp"
+#include "denso_arm/denso_joints.hpp"
 
 namespace denso
 {
-  class DensoArm
+  class DensoArmNode
   {
   public:
-    DensoArm();//Dan: You can get whatever you want in this constructor
-    virtual ~DensoArm();
-
-    void get_positions(boost::shared_ptr<DensoJointsVector> denso_joints);
-    void sendupdate( double target, int index_joint );
+    DensoArmNode();
+    virtual ~DensoArmNode();
 
   protected:
-    static const unsigned short nb_joints;
+    ros::NodeHandle node_;
+    boost::shared_ptr<DensoJointsVector> denso_joints;
+
+    boost::shared_ptr<DensoArm> denso_arm;
   };
 }
 
 
-  /* For the emacs weenies in the crowd.
-     Local Variables:
-     c-basic-offset: 2
-     End:
-  */
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
 
 #endif

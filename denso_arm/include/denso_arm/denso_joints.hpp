@@ -18,38 +18,32 @@
 * You should have received a copy of the GNU General Public License along
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
- * @brief A standard interface to the DENSO arm.
+ * @brief Contains the different structures to store the data for the denso arm.
  *
  *
  */
 
-#ifndef _DENSO_ARM_HPP_
-#define _DENSO_ARM_HPP_
+#ifndef _DENSO_JOINTS_HPP_
+#define _DENSO_JOINTS_HPP_
 
-#include "denso_arm/denso_joints.hpp"
-#include <boost/smart_ptr.hpp>
+#include <vector>
 
 namespace denso
 {
-  class DensoArm
+  struct Joint
   {
-  public:
-    DensoArm();//Dan: You can get whatever you want in this constructor
-    virtual ~DensoArm();
-
-    void get_positions(boost::shared_ptr<DensoJointsVector> denso_joints);
-    void sendupdate( double target, int index_joint );
-
-  protected:
-    static const unsigned short nb_joints;
+    std::string name;
+    double position;
   };
+
+  typedef std::vector<Joint> DensoJointsVector;
 }
 
 
-  /* For the emacs weenies in the crowd.
-     Local Variables:
-     c-basic-offset: 2
-     End:
-  */
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
 
 #endif

@@ -1,5 +1,5 @@
 /**
- * @file   denso_arm.hpp
+ * @file   denso_arm.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Dan Greenwald <dg@shadowrobot.com>
  * @date   Mon Oct 31 09:26:15 2011
  *
@@ -23,33 +23,37 @@
  *
  */
 
-#ifndef _DENSO_ARM_HPP_
-#define _DENSO_ARM_HPP_
-
-#include "denso_arm/denso_joints.hpp"
-#include <boost/smart_ptr.hpp>
+#include "denso_arm/denso_arm_node.hpp"
 
 namespace denso
 {
-  class DensoArm
+  const unsigned short nb_joints = 7; // TODO: I don't know how many joints we have
+
+  DensoArm::DensoArm()//Dan: You can get whatever you want in this constructor
+  {}
+
+  DensoArm::~DensoArm()
+  {}
+
+  void get_positions(boost::shared_ptr<DensoJointsVector> denso_joints)
   {
-  public:
-    DensoArm();//Dan: You can get whatever you want in this constructor
-    virtual ~DensoArm();
+    for (unsigned short index_joint = 0; index_joint < nb_joints; ++index_joint)
+    {
+      //TODO: update the vector of position: read the real values
+      denso_joints->at(index_joint).position = 0.0;
+    }
+  }
 
-    void get_positions(boost::shared_ptr<DensoJointsVector> denso_joints);
-    void sendupdate( double target, int index_joint );
+  void sendupdate( int index_joint, double target )
+  {
+    //TODO: send the target to the correct joint.
+  }
 
-  protected:
-    static const unsigned short nb_joints;
-  };
 }
 
 
-  /* For the emacs weenies in the crowd.
-     Local Variables:
-     c-basic-offset: 2
-     End:
-  */
-
-#endif
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/
