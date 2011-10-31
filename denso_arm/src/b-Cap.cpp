@@ -28,7 +28,7 @@
 #endif
 
 
-#include "b-Cap.h"
+#include "b-Cap/b-Cap.hpp"
 
 
 /* ENDIAN switching */

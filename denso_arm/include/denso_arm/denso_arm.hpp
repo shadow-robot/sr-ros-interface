@@ -46,7 +46,8 @@ namespace denso
   class DensoArm
   {
   public:
-    DensoArm();//Dan: You can get whatever you want in this constructor
+    DensoArm();
+    DensoArm(const char * pStrIP, int iPort, float fInitialSpeed);//Dan: You can get whatever you want in this constructor
     virtual ~DensoArm();
 
     void update_state(boost::shared_ptr<DensoJointsVector> denso_joints);
@@ -76,13 +77,13 @@ namespace denso
     u_long lhPosition;
 
 
-    void StartBCAP (const * char pStrIP, int iPort);
+    void StartBCAP (const char * pStrIP, int iPort);
     void StartController(void);
     void TakeRobot(void);
     void SetPower(int iPower);
     void SetSpeed(float fSpeed);
     void InitialisePositionHandle (void);
-    void DensoArm::StartController(void);
+    void StartRobSlave(void);
 
 
 
