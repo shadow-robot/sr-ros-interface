@@ -61,10 +61,12 @@ namespace denso
   ///////
   // IN CARTESIAN SPACE
 
-  void DensoArm::send_cartesian_position( const Pose& pose )
+  bool DensoArm::send_cartesian_position( const Pose& pose )
   {
     //TODO: send those coordinates to the arm
     // pose.x, pose.y, pose.z, pose.roll, pose.pitch, pose.yaw
+
+    return true;
   }
 
 

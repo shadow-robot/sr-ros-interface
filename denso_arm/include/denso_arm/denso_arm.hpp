@@ -50,7 +50,14 @@ namespace denso
     void update_state(boost::shared_ptr<DensoJointsVector> denso_joints);
     void sendupdate( int index_joint, double target );
 
-    void send_cartesian_position( const Pose& pose );
+    /**
+     * Send a cartesian demand to the Denso arm.
+     *
+     * @param pose the target in the robot frame
+     *
+     * @return true if target reached
+     */
+    bool send_cartesian_position( const Pose& pose );
 
     void get_cartesian_position( boost::shared_ptr<Pose> pose);
 
