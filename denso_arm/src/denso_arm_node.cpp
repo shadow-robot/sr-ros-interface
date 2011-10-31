@@ -28,7 +28,7 @@
 namespace denso
 {
   DensoArmNode::DensoArmNode()
-    : node_("~"), move_arm_pose_rate_(50)
+    : node_("~")
   {
     denso_arm_ = boost::shared_ptr<DensoArm> ( new DensoArm() );
 
@@ -42,9 +42,9 @@ namespace denso
     timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
 
     //init the actionlib server
-    move_arm_pose_server_.reset(new MoveArmPoseServer(node_, "move_arm_pose", false));
-    move_arm_pose_server_->registerGoalCallback(boost::bind(&DensoArmNode::new_arm_pose_goal, this));
-    move_arm_pose_server_->registerPreemptCallback(boost::bind(&DensoArmNode::new_arm_pose_preempt, this));
+    move_arm_pose_server_.reset(new MoveArmPoseServer(node_, "move_arm_pose",
+                                                      boost::bind(&DensoArmNode::go_to_arm_pose, this, _1),
+                                                      false));
 
     move_arm_pose_server_->start();
   }
@@ -85,19 +85,19 @@ namespace denso
     }
   }
 
-  void DensoArmNode::new_arm_pose_goal()
+  void DensoArmNode::go_to_arm_pose(const denso_msgs::MoveArmPoseGoalConstPtr& goal)
   {
-    move_arm_pose_goal_ = move_arm_pose_server_->acceptNewGoal()->goal;
-    move_arm_pose_rate_ = ros::Rate( move_arm_pose_server_->acceptNewGoal()->rate );
+    ros::Rate move_arm_rate( goal->rate );
+    while( node_.ok() )
+    {
+      if( move_arm_pose_server_->isPreemptRequested() )
+      {
+
+      }
+      //TODO: implement me
+      move_arm_pose_server_->setSucceeded();
+    }
   }
-
-  void DensoArmNode::new_arm_pose_preempt()
-  {
-    ROS_INFO("Move arm pose preempted");
-
-    move_arm_pose_server_->setPreempted();
-  }
-
 }
 
 int main(int argc, char *argv[])

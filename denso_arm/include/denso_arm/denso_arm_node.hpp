@@ -30,7 +30,6 @@
 #include <boost/smart_ptr.hpp>
 
 #include <sensor_msgs/JointState.h>
-#include <geometry_msgs/Pose.h>
 #include <std_msgs/Float64.h>
 
 #include <denso_msgs/MoveArmPoseAction.h>
@@ -51,8 +50,7 @@ namespace denso
 
     typedef actionlib::SimpleActionServer<denso_msgs::MoveArmPoseAction> MoveArmPoseServer;
 
-    void new_arm_pose_goal();
-    void new_arm_pose_preempt();
+    void go_to_arm_pose(const denso_msgs::MoveArmPoseGoalConstPtr& goal);
 
   protected:
     ros::NodeHandle node_;
@@ -73,9 +71,6 @@ namespace denso
     //Action lib server for moving the arm in cartesian space.
     ///An action server for the MoveArmPose actions.
     boost::shared_ptr<MoveArmPoseServer> move_arm_pose_server_;
-
-    geometry_msgs::Pose move_arm_pose_goal_;
-    ros::Rate move_arm_pose_rate_;
 
     ///Initialize the denso_joints_ vector.
     void init_joints();
