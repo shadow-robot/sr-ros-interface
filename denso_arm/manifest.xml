@@ -1,13 +1,13 @@
 <package>
-  <description brief="denzo_arm">
+  <description brief="denso_arm">
 
-     This is a package to control the Denzo arm through ROS.
+     This is a package to control the Denso arm through ROS (http://www.densorobotics.com).
 
   </description>
   <author>Ugo Cupcic / Dan Greenwald / ugo@shadowrobot.com</author>
   <license>GPL</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/denzo_arm</url>
+  <url>http://ros.org/wiki/denso_arm</url>
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
