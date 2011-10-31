@@ -28,7 +28,7 @@
 namespace denso
 {
   DensoArmNode::DensoArmNode()
-    : node_("~")
+    : node_("~"), move_arm_pose_rate_(50)
   {
     denso_arm_ = boost::shared_ptr<DensoArm> ( new DensoArm() );
 
@@ -40,6 +40,13 @@ namespace denso
     //init what's needed for the joint states publishing
     publisher_js_ = node_.advertise<sensor_msgs::JointState>("joint_states", 5);
     timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
+
+    //init the actionlib server
+    move_arm_pose_server_.reset(new MoveArmPoseServer(node_, "move_arm_pose", false));
+    move_arm_pose_server_->registerGoalCallback(boost::bind(&DensoArmNode::new_arm_pose_goal, this));
+    move_arm_pose_server_->registerPreemptCallback(boost::bind(&DensoArmNode::new_arm_pose_preempt, this));
+
+    move_arm_pose_server_->start();
   }
 
   DensoArmNode::~DensoArmNode()
@@ -77,6 +84,20 @@ namespace denso
       joint_state_msg_.effort.push_back( 0.0 );
     }
   }
+
+  void DensoArmNode::new_arm_pose_goal()
+  {
+    move_arm_pose_goal_ = move_arm_pose_server_->acceptNewGoal()->goal;
+    move_arm_pose_rate_ = ros::Rate( move_arm_pose_server_->acceptNewGoal()->rate );
+  }
+
+  void DensoArmNode::new_arm_pose_preempt()
+  {
+    ROS_INFO("Move arm pose preempted");
+
+    move_arm_pose_server_->setPreempted();
+  }
+
 }
 
 int main(int argc, char *argv[])

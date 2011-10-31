@@ -1,4 +1,5 @@
 geometry_msgs/Pose goal
+int32 rate
 ---
 
 int32 val

@@ -30,7 +30,11 @@
 #include <boost/smart_ptr.hpp>
 
 #include <sensor_msgs/JointState.h>
+#include <geometry_msgs/Pose.h>
 #include <std_msgs/Float64.h>
+
+#include <denso_msgs/MoveArmPoseAction.h>
+#include <actionlib/server/simple_action_server.h>
 
 #include "denso_arm/denso_arm.hpp"
 #include "denso_arm/denso_joints.hpp"
@@ -45,17 +49,35 @@ namespace denso
 
     void update_joint_states_callback(const ros::TimerEvent& e);
 
+    typedef actionlib::SimpleActionServer<denso_msgs::MoveArmPoseAction> MoveArmPoseServer;
+
+    void new_arm_pose_goal();
+    void new_arm_pose_preempt();
+
   protected:
     ros::NodeHandle node_;
     boost::shared_ptr<DensoJointsVector> denso_joints_;
 
     boost::shared_ptr<DensoArm> denso_arm_;
 
+    ////////
+    //Publishing joint states
+    /// A timer to publish the joint states at a given frequency.
     ros::Timer timer_joint_states_;
+    /// The publisher used to publish joint states for the arm.
     ros::Publisher publisher_js_;
-
+    ///The message published
     sensor_msgs::JointState joint_state_msg_;
 
+    ///////
+    //Action lib server for moving the arm in cartesian space.
+    ///An action server for the MoveArmPose actions.
+    boost::shared_ptr<MoveArmPoseServer> move_arm_pose_server_;
+
+    geometry_msgs::Pose move_arm_pose_goal_;
+    ros::Rate move_arm_pose_rate_;
+
+    ///Initialize the denso_joints_ vector.
     void init_joints();
   };
 }
