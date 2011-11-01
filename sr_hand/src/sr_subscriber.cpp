@@ -2,7 +2,7 @@
  * @file   sr_subscriber.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Mar 25 15:34:37 2010
- * 
+ *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -21,9 +21,9 @@
 *
  * @brief  The role of this ROS subscriber is to receive commands
  * messages (sent by a publisher) and pass them to the hand after
- * translating them to the correct format. 
- * 
- * 
+ * translating them to the correct format.
+ *
+ *
  */
 
 #include <iostream>
@@ -41,10 +41,9 @@ namespace shadowrobot
 /////////////////////////////////
 
 SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot ) :
-    n_tilde("~") 
+    n_tilde("~")
 {
     sr_articulated_robot = sr_art_robot;
-
     ///////
     // Initialize the subscribers
     //////
@@ -53,8 +52,6 @@ SRSubscriber::SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot )
 
 SRSubscriber::~SRSubscriber()
 {
-    //    if( shadowhand != NULL )
-    //      delete shadowhand;
 }
 
 void SRSubscriber::init()
@@ -86,7 +83,7 @@ void SRSubscriber::sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& 
     int sendupdate_length = msg->sendupdate_length;
     if( sendupdate_length == 0 )
     {
-        ROS_WARN("Received empty sendupdate command.");
+        ROS_DEBUG("Received empty sendupdate command.");
         return;
     }
     //OK, not empty => loop to process all the sendupdate messages
@@ -131,3 +128,4 @@ void SRSubscriber::configCallback( const sr_robot_msgs::configConstPtr& msg )
 }
 
 } // end namespace
+

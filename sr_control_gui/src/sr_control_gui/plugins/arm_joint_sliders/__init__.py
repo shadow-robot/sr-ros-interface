@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
 import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
@@ -42,3 +41,5 @@ class ArmJointSlider(JointSlider):
         self.parent.parent.libraries["sr_library"].sendupdate_arm_from_dict(dict)
         self.set_icon(self.parent.parent.rootPath + '/images/icons/iconArm.png')
 
+    def depends(self):
+        return Config.shadow_arm_plugin_config.dependencies

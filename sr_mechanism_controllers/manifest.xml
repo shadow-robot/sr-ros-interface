@@ -14,7 +14,8 @@
   <depend package="std_msgs" />
   <depend package="std_srvs" />
   <depend package="roscpp" />
-
+  <depend package="actionlib"/>
+  <depend package="pr2_controllers_msgs"/>
   <depend package="sr_robot_msgs" />
   <depend package="sr_utilities" />
   <depend package="pr2_controller_interface" />

@@ -23,7 +23,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_boost_directories()
 
-
 ###################
 #  CONFIGURATION  #
 ###################
@@ -83,6 +82,14 @@ rosbuild_link_boost(shadowarm_virtual thread)
 #  VIRTUAL HAND  #
 ##################
 rosbuild_add_executable(shadowhand_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp)
+rosbuild_link_boost(shadowhand_virtual thread)
+
+
+###########################
+#  VIRTUAL HAND  LIBRARY  #
+###########################
+
+rosbuild_add_library(SrVirtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand_library.cpp)
 rosbuild_link_boost(shadowhand_virtual thread)
 
 ##################

@@ -1,0 +1,10 @@
+default_robot_padding: 0.01
+link_padding:
+  - link: right_arm
+    padding: 0.01
+  - link: r_end_effector
+    padding: 0.01
+  - link: attached
+    padding: 0.0
+  - link: palm
+    padding: 0.01

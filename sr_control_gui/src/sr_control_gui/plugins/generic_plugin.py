@@ -74,3 +74,6 @@ class GenericPlugin(Plugin):
     def on_close(self):
         self.is_window_opened = False
         self.window.close()
+
+    def depends(self):
+        return Config.generic_plugin_config.dependencies

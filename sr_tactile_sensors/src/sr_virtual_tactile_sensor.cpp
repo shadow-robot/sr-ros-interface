@@ -122,7 +122,6 @@ namespace shadowrobot
   {}
 }
 
-
 /**
  * Initializes a set of virtual tactile sensors and publish.
  *
@@ -145,7 +144,7 @@ int main(int argc, char** argv)
 }
 
 /* For the emacs weenies in the crowd.
-Local Variables:
+   Local Variables:
    c-basic-offset: 2
-End:
+   End:
 */

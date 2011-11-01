@@ -1,0 +1,87 @@
+# the list of groups for which motion planning can be performed
+groups: 
+  - right_arm 
+
+## the planner configurations; each config must have a type, which specifies
+## the planner to be used; other parameters can be specified as well, depending 
+## on the planner
+
+right_arm:
+  planner_type: JointPlanner
+  planner_configs:
+    - RRTkConfig2
+    - SBLkConfig1 
+    - SBLkConfig2
+    - KPIECEkConfig1
+    - KPIECEkConfig2l
+    - LBKPIECEkConfig2l
+  kinematics_solver: arm_kinematics_constraint_aware/KDLArmKinematicsPlugin
+  tip_name: palm
+  root_name: shadowarm_base
+  projection_evaluator: joint_state
+  
+planner_configs:  
+  pRRTkConfig1:
+    type: kinematic::pRRT
+    range: 0.75
+    thread_count: 2
+    
+  RRTkConfig1:
+    type: kinematic::RRT
+    range: 0.75
+
+  RRTdConfig1:
+    type: dynamic::RRT
+
+  LazyRRTkConfig1:
+    type: kinematic::LazyRRT
+    range: 0.75
+
+  SBLkConfig1:
+    type: kinematic::SBL
+    projection: 0 1
+    celldim: 1 1
+    range: 0.5
+    
+  pSBLkConfig1:
+    type: kinematic::pSBL
+    projection: 0 1
+    celldim: 1 1
+    range: 0.5
+    
+  KPIECEkConfig1:
+    type: kinematic::KPIECE
+    projection: 0 1
+    celldim: 1 1
+    range: 0.5
+
+  KPIECEdConfig1:
+    type: dynamic::KPIECE
+    projection: 0 1
+    celldim: 0.5 0.5
+
+  RRTkConfig2:
+    type: kinematic::RRT
+    range: 0.75
+
+  SBLkConfig2:
+    type: kinematic::SBL
+    projection: 5 6
+    celldim: 0.1 0.1
+  
+  KPIECEkConfig2l:
+    type: kinematic::KPIECE
+    projection: link palm
+    celldim: 0.1 0.1 0.1
+
+  LBKPIECEkConfig1:
+    type: kinematic::LBKPIECE
+    projection: 5 6
+    celldim: 0.1 0.1
+
+  LBKPIECEkConfig2l:
+    type: kinematic::LBKPIECE
+    projection: link palm
+    celldim: 0.1 0.1 0.1
+    
+publish_diagnostics: true

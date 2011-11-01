@@ -214,6 +214,41 @@ namespace shadowrobot
     for( JointsMap::const_iterator it = joints_map.begin(); it != joints_map.end(); ++it )
       getJointData(it->first);
 
+    //hack for C6M2 with 4 fingers with coupling J1+J2=J0
+    //copy J0/2 to J1 and J2 for FF MF RF LF
+    joints_map_mutex.lock();
+    
+    std::string fingername("FF");
+    
+    JointsMap::iterator it_j0 = joints_map.find(fingername+"J0");
+    JointsMap::iterator it_j1 = joints_map.find(fingername+"J1");
+    JointsMap::iterator it_j2 = joints_map.find(fingername+"J2");
+    it_j1->second.target = it_j0->second.target/2.0;
+    it_j2->second.target = it_j0->second.target/2.0;
+
+    fingername.assign("MF");
+    it_j0 = joints_map.find(fingername+"J0");
+    it_j1 = joints_map.find(fingername+"J1");
+    it_j2 = joints_map.find(fingername+"J2");
+    it_j1->second.target = it_j0->second.target/2.0;
+    it_j2->second.target = it_j0->second.target/2.0;
+
+    fingername.assign("RF");
+    it_j0 = joints_map.find(fingername+"J0");
+    it_j1 = joints_map.find(fingername+"J1");
+    it_j2 = joints_map.find(fingername+"J2");
+    it_j1->second.target = it_j0->second.target/2.0;
+    it_j2->second.target = it_j0->second.target/2.0;
+
+    fingername.assign("LF");
+    it_j0 = joints_map.find(fingername+"J0");
+    it_j1 = joints_map.find(fingername+"J1");
+    it_j2 = joints_map.find(fingername+"J2");
+    it_j1->second.target = it_j0->second.target/2.0;
+    it_j2->second.target = it_j0->second.target/2.0;
+    
+    joints_map_mutex.unlock();
+
     JointsMap tmp = JointsMap(joints_map);
 
     //return the map

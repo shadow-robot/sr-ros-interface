@@ -57,7 +57,6 @@ namespace shadowrobot
     SrVirtualTactileSensor(std::string name, std::string touch_name);
     ~SrVirtualTactileSensor();
 
-  protected:
     /**
      * Generates a value for the sensor
      *

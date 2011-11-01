@@ -1,0 +1,5 @@
+## This file should be loaded under ik_start_angles.yaml
+# ['ShoulderJRotate', 'ShoulderJSwing', 'ElbowJSwing', 'ElbowJRotate'
+#  'arm_link', 'WRJ2', 'WRJ1']
+
+right_arm_ik_start_angles: [[0.0,0.0,0.0,0.0,2.0,1.57,0.0],[0.0,0.0,0.0,0.0,0.0,0.0,0.0]]

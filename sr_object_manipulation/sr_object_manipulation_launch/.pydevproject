@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse-pydev version="1.0"?>
+
+<pydev_project>
+<pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
+<pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.6</pydev_property>
+<pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
+<path>/opt/ros/cturtle/ros/core/mk</path>
+<path>/usr/local/lib/python2.6/dist-packages/Yapsy-1.8-py2.6.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/rosinstall-0.5.9-py2.6.egg</path>
+<path>/opt/ros/cturtle/ros/core/roslib/src</path>
+<path>/home/ugo/Projects/ROS_interfaces/sr-ros-interface/manipulation/shadow_robot/sr_object_manipulation/sr_object_manipulation_launch</path>
+<path>/usr/lib/python2.6</path>
+<path>/usr/lib/python2.6/plat-linux2</path>
+<path>/usr/lib/python2.6/lib-tk</path>
+<path>/usr/lib/python2.6/lib-dynload</path>
+<path>/usr/local/lib/python2.6/dist-packages</path>
+<path>/usr/lib/python2.6/dist-packages</path>
+<path>/usr/lib/python2.6/dist-packages/PIL</path>
+<path>/usr/lib/python2.6/dist-packages/gst-0.10</path>
+<path>/usr/lib/pymodules/python2.6</path>
+<path>/usr/lib/python2.6/dist-packages/gtk-2.0</path>
+<path>/usr/lib/pymodules/python2.6/gtk-2.0</path>
+<path>/usr/lib/python2.6/dist-packages/wx-2.8-gtk2-unicode</path>
+</pydev_pathproperty>
+</pydev_project>

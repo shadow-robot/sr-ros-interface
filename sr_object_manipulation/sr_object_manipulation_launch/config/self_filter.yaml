@@ -1,0 +1,70 @@
+min_sensor_dist: .05
+self_see_default_padding: .01
+self_see_default_scale: 1.0
+self_see_links:
+  - name: ffdistal
+    padding: .02
+  - name: ffknuckle
+    padding: .02
+  - name: ffmiddle
+    padding: .02
+  - name: ffproximal
+    padding: .02
+  - name: forearm_motor
+    padding: .02
+  - name: lfdistal
+    padding: .02
+  - name: lfknuckle
+    padding: .02
+  - name: lfmetacarpal
+    padding: .02
+  - name: lfmiddle
+    padding: .02
+  - name: lfproximal
+    padding: .02
+  - name: mfdistal
+    padding: .02
+  - name: mfknuckle
+    padding: .02
+  - name: mfmiddle
+    padding: .02
+  - name: mfproximal
+    padding: .02
+  - name: palm
+    padding: .02
+  - name: rfdistal
+    padding: .02
+  - name: rfknuckle
+    padding: .02
+  - name: rfmiddle
+    padding: .02
+  - name: rfproximal
+    padding: .02
+  - name: shadowarm_base
+    padding: .02
+  - name: shadowarm_hansupport_motor
+    padding: .02
+  - name: shadowarm_lowerarm
+    padding: .02
+  - name: shadowarm_trunk
+    padding: .02
+  - name: shadowarm_upperarm
+    padding: .02
+  - name: thbase
+    padding: .02
+  - name: thdistal
+    padding: .02
+  - name: thhub
+    padding: .02
+  - name: thmiddle
+    padding: .02
+  - name: thproximal
+    padding: .02
+  - name: wrist
+    padding: .02
+  - name: /base_link
+    padding: .02
+
+
+
+

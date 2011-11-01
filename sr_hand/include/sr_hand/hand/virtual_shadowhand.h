@@ -39,6 +39,7 @@ namespace shadowrobot
  * programs.
  *
  */
+
 class VirtualShadowhand : public SRArticulatedRobot
 {
 public:
