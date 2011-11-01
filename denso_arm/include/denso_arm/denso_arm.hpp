@@ -28,6 +28,9 @@
 
 #include "denso_arm/denso_joints.hpp"
 #include <boost/smart_ptr.hpp>
+#include "b-Cap/b-Cap.hpp"
+#include <cstdlib>
+#include <string>
 
 namespace denso
 {
@@ -44,11 +47,14 @@ namespace denso
   class DensoArm
   {
   public:
-    DensoArm();//Dan: You can get whatever you want in this constructor
+    DensoArm();
+    DensoArm(std::string robot_ip, int robot_port, float intial_speed);
+
     virtual ~DensoArm();
 
     void update_state(boost::shared_ptr<DensoJointsVector> denso_joints);
-    void sendupdate( int index_joint, double target );
+
+    bool sendupdate( const std::vector<double>& joint_targets );
 
     /**
      * Send a cartesian demand to the Denso arm.
@@ -68,6 +74,25 @@ namespace denso
 
   protected:
     static const unsigned short nb_joints_;
+
+    int socket_handle;
+    u_long controller_handle;
+    u_long robot_handle;
+    u_long slave_task_handle;
+    u_long cartesian_position_handle;
+    u_long joint_position_handle;
+
+    void init(std::string robot_ip, int robot_port, float initial_speed);
+
+    void start_bcap (std::string robot_ip, int robot_port);
+    void start_controller(void);
+    void take_robot(void);
+    void set_power(int power_state);
+    void set_speed(float speed);
+    void initialise_position_handles (void);
+    void start_slave_task(void);
+    void stop_slave_task(void);
+    void release_position_handles(void);
   };
 }
 

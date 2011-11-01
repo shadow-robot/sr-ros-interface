@@ -16,5 +16,5 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-rosbuild_add_executable(denso_arm src/denso_arm.cpp src/denso_arm_node.cpp)
+rosbuild_add_executable(denso_arm src/b-Cap.cpp src/denso_arm.cpp src/denso_arm_node.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
