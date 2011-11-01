@@ -79,8 +79,8 @@ namespace denso
     u_long robot_handle;
     u_long slave_task_handle;
     u_long cartesian_position_handle;
-    u_long angle_position_handle;
-    char command_buffer[200];
+    u_long joint_position_handle;
+
 
     void start_bcap (string robot_ip, int robot_port);
     void start_controller(void);
@@ -89,7 +89,8 @@ namespace denso
     void set_speed(float speed);
     void initialise_position_handles (void);
     void start_slave_task(void);
-
+    void stop_slave_task(void);
+    void release_position_handles(void);
 
 
   protected:
