@@ -8,7 +8,7 @@
            shadowarm 
                         -->
   <node pkg="sr_hand" name="shadowarm"
-	type="shadowarm_virtual" >
+	type="shadowarm_real" >
     <remap from="robot_description" to="arm_description"/>
     <param name="shadowhand_prefix" type="string" value="sr_arm/" />
     <param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
@@ -40,9 +40,8 @@
   <!--
            shadowhand 
                          -->
-
   <node pkg="sr_hand" name="shadowhand"
-	type="shadowhand_virtual" >
+	type="shadowhand_real" >
     <remap from="robot_description" to="hand_description"/>
     <param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
     <param name="shadowhand_prefix" type="string" value="srh/" />
@@ -83,10 +82,8 @@
   <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100" />
   <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100" />
 
- <!-- Joint States positions merger to get one single vector for both arm and hand -->
+ <!-- Joint States merger to get one single vector for both arm and hand -->
    <node pkg="sr_utilities" type="ordered_position_joint_states_merger.py" name="ordered_position_joint_states_merger"/>
-<!-- Joint States targets merger to get one single vector for both arm and hand -->
-   <node pkg="sr_utilities" type="ordered_target_joint_states_merger.py" name="ordered_target_joint_states_merger"/>
   
   
   <!--

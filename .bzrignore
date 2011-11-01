@@ -84,6 +84,7 @@ shadow_robot/sr_control_gui/images/glove_calibration/tmp
 shadow_robot/sr_convenient_dependencies/bin
 shadow_robot/sr_convenient_dependencies/build
 shadow_robot/sr_convenient_dependencies/src
+shadow_robot/sr_hand/CMakeLists.txt
 shadow_robot/dataglove/doc
 shadow_robot/sr_object_manipulation/sr_object_manipulation_launch/bin
 shadow_robot/sr_object_manipulation/sr_object_manipulation_launch/build
@@ -151,8 +152,13 @@ shadow_robot/sr_utilities/bin
 shadow_robot/sr_robot_msgs/srv_gen
 shadow_robot/sr_tactile_sensors/bin
 shadow_robot/sr_tactile_sensors/build
-bin
-build
-shadow_robot/cyberglove/bin/test/test_calibration
-test_serial
-shadow_robot/cyberglove/tmp
+shadow_robot/sr_robot_msgs/msg/lisp
+shadow_robot/sr_hand/model/hand_urdf/shadowhand_motor.gv
+shadow_robot/sr_hand/model/hand_urdf/shadowhand_motor.pdf
+shadow_robot/sr_hand/model/hand_urdf/shadowhand_motor_old.pdf
+sr_arm_motor_org.pdf
+sr_arm_motor.pdf
+sr_arm_motor.gv
+shadow_robot/sr_hand/CMakeLists.txt
+shadow_robot/sr_tactile_sensors/CMakeLists.txt
+
