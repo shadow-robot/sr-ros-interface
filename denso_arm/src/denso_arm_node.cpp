@@ -106,8 +106,10 @@ namespace denso
         break;
       }
 
-      //TODO: implement me
-      Pose pose_goal; //Compute pose from goal
+      //Compute pose from goal
+      geometry_msgs::Pose pose_tmp( goal->goal );
+      Pose pose_goal = geometry_pose_to_denso_pose( pose_tmp );
+
       if( denso_arm_->send_cartesian_position( pose_goal ) )
         break; //We reached the target -> SUCCESS
 
@@ -122,6 +124,8 @@ namespace denso
         success = denso_msgs::MoveArmPoseResult::TIMED_OUT;
         break;
       }
+
+      //loop at the rate the user asked for
       move_arm_rate.sleep();
     }
 

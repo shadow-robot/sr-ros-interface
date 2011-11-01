@@ -38,6 +38,8 @@
 #include "denso_arm/denso_arm.hpp"
 #include "denso_arm/denso_joints.hpp"
 
+#include <math.h>
+
 namespace denso
 {
   class DensoArmNode
@@ -79,6 +81,32 @@ namespace denso
 
     ///Initialize the denso_joints_ vector.
     void init_joints();
+
+    /**
+     * Transform an incoming geometry_msgs::Pose message
+     * to a pose for the denso arm.
+     *
+     * @param geom_pose the incoming pose demand
+     *
+     * @return the pose for the denzo arm.
+     */
+    Pose geometry_pose_to_denso_pose(geometry_msgs::Pose geom_pose)
+    {
+      Pose pose_denso;
+      pose_denso.x = geom_pose.position.x;
+      pose_denso.y = geom_pose.position.y;
+      pose_denso.z = geom_pose.position.z;
+
+      //compute rpy from quaternion (cf http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles)
+      pose_denso.roll = atan( (2*(geom_pose.orientation.x*geom_pose.orientation.y + geom_pose.orientation.z*geom_pose.orientation.w))
+                              / ( 1 - 2*(geom_pose.orientation.y*geom_pose.orientation.y + geom_pose.orientation.z*geom_pose.orientation.z))  );
+      pose_denso.pitch = asin( 2*(geom_pose.orientation.x*geom_pose.orientation.z - geom_pose.orientation.w*geom_pose.orientation.y) );
+      pose_denso.yaw = atan( (2*(geom_pose.orientation.x*geom_pose.orientation.w + geom_pose.orientation.y*geom_pose.orientation.z))
+                             / ( 1 - 2*(geom_pose.orientation.z*geom_pose.orientation.z + geom_pose.orientation.w*geom_pose.orientation.w))  );
+
+      return pose_denso;
+    };
+
   };
 }
 
