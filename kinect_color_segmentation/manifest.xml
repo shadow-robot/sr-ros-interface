@@ -1,0 +1,14 @@
+<package>
+  <description brief="kinect_color_segmentation">
+
+    Segments the output of the kinect based on a color.
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/kinect_color_segmentation</url>
+
+</package>
+
+
