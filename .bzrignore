@@ -194,3 +194,9 @@ sr_movements/.project
 sr_movements/.pydevproject
 ￼
 sr_movements/cmake_install.cmake
+￼
+denso_msgs/msg
+￼
+denso_msgs/msg_gen
+￼
+denso_msgs/src

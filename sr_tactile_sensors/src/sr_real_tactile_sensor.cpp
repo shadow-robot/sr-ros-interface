@@ -76,8 +76,7 @@ namespace shadowrobot
       tactile_sensors.push_back(
         boost::shared_ptr<SrRealTactileSensor>(
           new SrRealTactileSensor(all_names[0][i],
-                                  all_names[1][i],
-                                  all_names[2][i]) ));
+                                  all_names[1][i]) ));
     }
   }
 
