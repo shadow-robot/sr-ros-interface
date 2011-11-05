@@ -247,3 +247,5 @@ sr_arm_motor.pdf
 sr_arm_motor.gv
 shadow_robot/sr_hand/CMakeLists.txt
 shadow_robot/sr_tactile_sensors/CMakeLists.txt
+￼
+sr_mechanism_controllers/bin/joint_trajectory_action_controller

@@ -4,6 +4,7 @@ pyqt4:
 
 python-qt4-gl:
   debian: python-qt4-gl
+  ubuntu: python-qt4-gl
 
 yaml:
   debian: libyaml-0-2 libyaml-dev

@@ -29,7 +29,7 @@
 #ifndef _JOINT_0_TRANSMISSION_HPP_
 #define _JOINT_0_TRANSMISSION_HPP_
 
-#include <tinyxml/tinyxml.h>
+#include <tinyxml.h>
 #include "pr2_mechanism_model/transmission.h"
 #include "pr2_mechanism_model/joint.h"
 #include "pr2_hardware_interface/hardware_interface.h"
