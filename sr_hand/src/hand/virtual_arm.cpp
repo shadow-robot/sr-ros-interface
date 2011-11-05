@@ -111,6 +111,10 @@ void VirtualArm::initializeMap()
 #endif
     joints_map["ElbowJRotate"] = tmpData;
 
+    tmpData.min = 0.0;
+    tmpData.max = 0.0;
+    joints_map["arm_link"] = tmpData;
+
     joints_map_mutex.unlock();
 
 

@@ -1,6 +1,7 @@
 <launch>
-  <node pkg="threeD_mouse" name="threedmouse" type="threedmouse">
-    <param name="threedmouse_prefix" type="string" value="/threedmouse" />
-    <param name="publish_frequency" type="double" value="20.0" />
+  <node pkg="threeD_mouse" name="threedmouse_ff" type="threedmouse">
+    <param name="published_tf_name" type="string" value="threedmouse_ff" />
+    <param name="reference_joint" type="string" value="srh/position/ffdistal"/>
+    <param name="publish_frequency" type="double" value="5.0" />
   </node>
 </launch>

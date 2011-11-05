@@ -1,0 +1,12 @@
+--
+-- PostgreSQL database cluster dump
+--
+
+-- Started on 2011-03-21 13:22:23 GMT
+
+\connect postgres
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = off;
+SET escape_string_warning = off;
+

@@ -43,6 +43,7 @@ def callback(data):
     # publish the message to the /srh/sendupdate topic.
     pub = rospy.Publisher('srh/sendupdate', sendupdate) 
     pub.publish(sendupdate(len(message), message))
+    
 
 def listener():
     """

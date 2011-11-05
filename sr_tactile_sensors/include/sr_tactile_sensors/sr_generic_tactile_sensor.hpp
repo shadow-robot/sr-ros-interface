@@ -34,6 +34,8 @@
 
 #include <boost/smart_ptr.hpp>
 #include <std_msgs/Float64.h>
+#include <sr_robot_msgs/is_hand_occupied.h>
+#include <sr_robot_msgs/which_fingers_are_touching.h>
 
 namespace shadowrobot
 {
@@ -49,7 +51,6 @@ namespace shadowrobot
      */
     void publish_current_values();
 
-  protected:
     /**
      * Needs to be implemented in the inheriting class
      *
@@ -80,6 +81,37 @@ namespace shadowrobot
     std::vector<boost::shared_ptr<SrGenericTactileSensor> > tactile_sensors;
     ros::NodeHandle n_tilde;
     ros::Rate publish_rate;
+
+    ros::ServiceServer is_hand_occupied_server;
+    std::vector<double> is_hand_occupied_thresholds;
+    /**
+     * Callback for the service to check if the hand is occupied. This is were
+     * we actually check if the hand is holding something or not.
+     *
+     * For the time being, we simply check if the sensors have a bigger value
+     * than a list of thresholds.
+     *
+     * @param req empty request.
+     * @param res true if the hand contains something.
+     *
+     * @return
+     */
+    bool is_hand_occupied_cb(sr_robot_msgs::is_hand_occupied::Request  &req,
+                             sr_robot_msgs::is_hand_occupied::Response &res );
+
+    ros::ServiceServer which_fingers_are_touching_server;
+    /**
+     * Callback for the service to check which fingers are touching, with a
+     * given force.
+     *
+     * @param req contains the forces thresholds for each finger.
+     * @param res a vector of 5 doubles representing the contact forces.
+     *            If 0.0 -> not touching, if > 0.0 -> current force.
+     *
+     * @return
+     */
+    bool which_fingers_are_touching_cb(sr_robot_msgs::which_fingers_are_touching::Request  &req,
+                                       sr_robot_msgs::which_fingers_are_touching::Response &res );
 
     /**
      * Get all the necessary names for the tactile sensors:

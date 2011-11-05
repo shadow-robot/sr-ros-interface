@@ -41,6 +41,7 @@
 
 #include <boost/smart_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/assign.hpp>
 
 #ifdef GAZEBO
@@ -251,7 +252,7 @@ namespace shadowrobot
  * One (or more) ROS subscriber and publisher can then share the same instance
  * of a Shadowhand object to update the information contained in this object.
  */
-  class SRArticulatedRobot
+  class SRArticulatedRobot : boost::noncopyable
   {
   public:
     /**

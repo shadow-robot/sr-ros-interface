@@ -10,9 +10,12 @@
   <depend package="sr_hand"/>
   <depend package="sr_robot_lib"/>
   <depend package="std_msgs"/>
+  <depend package="tabletop_object_detector"/>
+  <depend package="tabletop_collision_map_processing"/>
   <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
   <depend package="pr2_mechanism_msgs"/>
+  <depend package="object_manipulator"/>
   <depend package="cyberglove"/>
   <depend package="control_toolbox"/>
   <depend package="sr_automatic_pid_tuning"/>

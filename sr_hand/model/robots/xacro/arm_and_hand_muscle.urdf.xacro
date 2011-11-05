@@ -4,6 +4,7 @@
   <include filename="$(find sr_hand)/model/arm_urdf/full_arm_muscle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/full_hand_muscle.urdf.xacro" />
   <include filename="$(find sr_hand)/model/gazebo/gazebo.urdf.xacro" />
+<<<<<<< TREE
   <include filename="$(find sr_hand)/model/desk/desk.urdf.xacro" />
 
   <xacro:desk/>
@@ -18,6 +19,8 @@
     <child link="desk_support"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
+=======
+>>>>>>> MERGE-SOURCE
 
   <xacro:sr_arm_muscle>
   </xacro:sr_arm_muscle>
