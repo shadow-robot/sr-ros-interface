@@ -1,9 +1,0 @@
-cloud_sources:
-  - name: full_cloud_filtered
-    frame_subsample: 4
-    point_subsample: 1
-    sensor_frame: /openni_rgb_depth_frame
-    dynamic_publish: false
-    static_publish: true
-    dynamic_until_static_publish: true
-    dynamic_buffer_size: 10

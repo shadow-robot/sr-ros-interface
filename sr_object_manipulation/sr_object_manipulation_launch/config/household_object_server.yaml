@@ -1,6 +1,0 @@
-household_objects_database:
-  database_host: poseidon
-  database_port: 5432
-  database_user: willow
-  database_pass: willow
-  database_name: household_objects-0.2

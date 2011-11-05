@@ -1,7 +1,0 @@
-- bzr: {local-name: shadow_robot, uri: 'lp:~ugocupcic/sr-ros-interface/manipulation'}
-- svn: {local-name: sql_database, uri: 'https://code.ros.org/svn/wg-ros-pkg/stacks/sql_database/trunk'}
-- svn: {local-name: object_manipulation, uri: 'https://code.ros.org/svn/wg-ros-pkg/stacks/object_manipulation/trunk'}
-- svn: {local-name: pr2_object_manipulation, uri: 'https://code.ros.org/svn/wg-ros-pkg/stacks/pr2_object_manipulation/trunk'}
-- svn: {local-name: tabletop_object_perception, uri: 'https://code.ros.org/svn/wg-ros-pkg/stacks/tabletop_object_perception/trunk'}
-- svn: {local-name: pr2_tabletop_manipulation_apps, uri: 'https://code.ros.org/svn/wg-ros-pkg/stacks/pr2_tabletop_manipulation_apps/trunk'}
-- svn: {local-name: graspit_simulator, uri: 'https://code.ros.org/svn/wg-ros-pkg/branches/trunk_diamondback/stacks/graspit_simulator'}

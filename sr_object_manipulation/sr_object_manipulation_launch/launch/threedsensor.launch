@@ -1,5 +1,0 @@
-<launch>
-  <include file="$(find sr_object_manipulation_launch)/machines/threedsensor.machine"/>
-
-  <include file="$(find sr_object_manipulation_launch)/launch/point_cloud_filter.launch"/>
-</launch>
