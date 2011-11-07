@@ -1,0 +1,7 @@
+<library path="lib/libsr_kinect">
+  <class name = "sr_kinect/KinectColorSegmentation" type ="sr_kinect::KinectColorSegmentation" base_class_type = "nodelet::Nodelet" >
+    <description>
+      This is my Nodelet
+    </description>
+  </class>
+</library>

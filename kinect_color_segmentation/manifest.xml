@@ -5,10 +5,17 @@
 
   </description>
   <author>Ugo Cupcic</author>
-  <license>BSD</license>
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/kinect_color_segmentation</url>
+  <depend package="roscpp"/>
+  <depend package="nodelet"/>
+  <depend package="pcl"/>
+  <depend package="pcl_visualization"/>
 
+  <export>
+    <nodelet plugin="${prefix}/nodelets.xml"/>
+  </export>
 </package>
 
 

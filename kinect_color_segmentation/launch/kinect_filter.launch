@@ -1,40 +1,6 @@
 <launch>
 
-  <group ns="/pcl_filters">
-    <!-- PCL Manager -->
-    <node pkg="nodelet" type="nodelet" name="box_filter_pcl_manager" args="manager" output="screen"/>
-
-    <node pkg="nodelet" type="nodelet" name="psx" args="load pcl/PassThrough box_filter_pcl_manager" output="screen">
-      <remap from="~input" to="/camera/depth_registered/points" />
-      <rosparam>
-        filter_field_name: x
-        filter_limit_min: -.8
-        filter_limit_max: 0.5
-      </rosparam>
-    </node>
-
-    <!-- Run a passthrough filter to delimit in x direction -->
-    <!--
-    <node pkg="nodelet" type="nodelet" name="psx" args="load pcl/PassThrough box_filter_pcl_manager" output="screen">
-      <remap from="~input" to="/camera/depth/points" />
-      <rosparam>
-        filter_field_name: x
-        filter_limit_min: -.8
-        filter_limit_max: 0.5
-      </rosparam>
-    </node>
-    -->
-    <!-- removes the outliers -->
-    <!--
-    <node pkg="nodelet" type="nodelet" name="rm_outliers" args="load pcl/StatisticalOutlierRemoval box_filter_pcl_manager" output="screen">
-      <remap from="~input" to="/camera/depth_registered/points" />
-      <remap from="~output" to="/camera/depth_registered/filtered_outliers" />
-      <rosparam>
-        mean_k: 5
-        stddev: 1.0
-        negative: False
-      </rosparam>
-    </node>
-    -->
-  </group>
+  <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
+    <remap from="cloud_in" to="/camera/depth_registered/points"/>
+  </node>
 </launch>
