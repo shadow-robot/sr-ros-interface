@@ -39,15 +39,12 @@ namespace sr_kinect
     viewer = new pcl_visualization::CloudViewer("Cloud 3D");
     ros::NodeHandle & nh = getNodeHandle();
     sub_ = nh.subscribe<PointCloud >("cloud_in",2, &KinectColorSegmentation::callback, this);
+
+    segmented_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
   }
 
   void KinectColorSegmentation::callback(const PointCloud::ConstPtr &cloud)
   {
-    if( segmented_pcl == NULL )
-    {
-      segmented_pcl = boost::shared_ptr<PointCloud>( new PointCloud( *cloud.get() ) );
-    }
-
     segmented_pcl->clear();
 
     for(unsigned int i=0; i < cloud->width; ++i)
@@ -55,19 +52,20 @@ namespace sr_kinect
       for(unsigned int j=0; j < cloud->height; ++j)
       {
         if( i < j)
-          segmented_pcl->at(i,j) = cloud->at(i,j);
+          segmented_pcl->push_back( cloud->at(i,j) );
       }
     }
 
     if(!viewer->wasStopped())
     {
-      viewer->showCloud(*cloud);
+      viewer->showCloud( *(segmented_pcl.get()) );
     }
   }
 
   KinectColorSegmentation::~KinectColorSegmentation()
   {
-    if(viewer != NULL) delete viewer;
+    if(viewer != NULL)
+      delete viewer;
   }
 }
 
