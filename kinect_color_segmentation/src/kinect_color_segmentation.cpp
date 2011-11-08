@@ -31,7 +31,8 @@ namespace sr_kinect
   PLUGINLIB_DECLARE_CLASS(sr_kinect, KinectColorSegmentation, sr_kinect::KinectColorSegmentation, nodelet::Nodelet);
 
   KinectColorSegmentation::KinectColorSegmentation()
-    : nodelet::Nodelet(), filter_max_r_(255), filter_min_r_(0), filter_max_g_(255), filter_min_g_(0), filter_max_b_(255), filter_min_b_(0)
+    : nodelet::Nodelet(), filter_max_r_(255), filter_min_r_(0), filter_max_g_(255), filter_min_g_(0), filter_max_b_(255), filter_min_b_(0),
+      filter_max_x_(1000.0), filter_min_x_(-1000.0), filter_max_y_(1000.0), filter_min_y_(-1000.0), filter_max_z_(1000.0), filter_min_z_(-1000.0)
   {}
 
   void KinectColorSegmentation::onInit()
@@ -41,39 +42,7 @@ namespace sr_kinect
     pub_ = nh.advertise<PointCloud>("seg_output", 1000);
     segmented_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
     
-    //Parameter reading
-    std::string base_name = nh.resolveName(this->getName(), true);
-    int param_read = 0;
-	if (nh.getParam(base_name + "/filter_max_r", param_read))
-	{
-		filter_max_r_ = static_cast<unsigned int>(param_read);
-		NODELET_INFO_STREAM("Read max r: " << filter_max_r_);
-	}
-	if (nh.getParam(base_name + "/filter_min_r", param_read))
-	{
-		filter_min_r_ = static_cast<unsigned int>(param_read);
-		NODELET_INFO_STREAM("Read min r: " << filter_min_r_);
-	}
-	if (nh.getParam(base_name + "/filter_max_g", param_read))
-	{
-		filter_max_g_ = static_cast<unsigned int>(param_read);
-		NODELET_INFO_STREAM("Read max g: " << filter_max_g_);
-	}
-	if (nh.getParam(base_name + "/filter_min_g", param_read))
-	{
-		filter_min_g_ = static_cast<unsigned int>(param_read);
-		NODELET_INFO_STREAM("Read min g: " << filter_min_g_);
-	}
-	if (nh.getParam(base_name + "/filter_max_b", param_read))
-	{
-		filter_max_b_ = static_cast<unsigned int>(param_read);
-		NODELET_INFO_STREAM("Read max b: " << filter_max_b_);
-	}
-	if (nh.getParam(base_name + "/filter_min_b", param_read))
-	{
-		filter_min_b_ = static_cast<unsigned int>(param_read);
-		NODELET_INFO_STREAM("Read min b: " << filter_min_b_);
-	}    
+    read_parameters(nh);
   }
 
   void KinectColorSegmentation::callback(const PointCloud::ConstPtr &cloud)
@@ -89,7 +58,13 @@ namespace sr_kinect
           &&(( cloud->at(i,j).g) > filter_min_g_)
           &&(( cloud->at(i,j).g) < filter_max_g_)
           &&(( cloud->at(i,j).b) > filter_min_b_)
-          &&(( cloud->at(i,j).b) < filter_max_b_)        		
+          &&(( cloud->at(i,j).b) < filter_max_b_)  
+          &&(( cloud->at(i,j).x) > filter_min_x_)
+          &&(( cloud->at(i,j).x) < filter_max_x_)
+          &&(( cloud->at(i,j).y) > filter_min_y_)
+          &&(( cloud->at(i,j).y) < filter_max_y_)
+          &&(( cloud->at(i,j).z) > filter_min_z_)
+          &&(( cloud->at(i,j).z) < filter_max_z_)  
           )
           segmented_pcl->push_back( cloud->at(i,j) );
       }
@@ -97,8 +72,78 @@ namespace sr_kinect
     segmented_pcl->header.frame_id = cloud->header.frame_id;
     
     pub_.publish(segmented_pcl);
+  }  
+
+  void KinectColorSegmentation::read_parameters(ros::NodeHandle & nh)
+  {
+  	//Parameter reading
+  	std::string base_name = nh.resolveName(this->getName(), true);
+  	int param_read = 0;
+  	if (nh.getParam(base_name + "/filter_max_r", param_read))
+  	{
+  		filter_max_r_ = static_cast<unsigned int>(param_read);
+  		NODELET_INFO_STREAM("Read max r: " << filter_max_r_);
+  	}
+  	if (nh.getParam(base_name + "/filter_min_r", param_read))
+  	{
+  		filter_min_r_ = static_cast<unsigned int>(param_read);
+  		NODELET_INFO_STREAM("Read min r: " << filter_min_r_);
+  	}
+  	if (nh.getParam(base_name + "/filter_max_g", param_read))
+  	{
+  		filter_max_g_ = static_cast<unsigned int>(param_read);
+  		NODELET_INFO_STREAM("Read max g: " << filter_max_g_);
+  	}
+  	if (nh.getParam(base_name + "/filter_min_g", param_read))
+  	{
+  		filter_min_g_ = static_cast<unsigned int>(param_read);
+  		NODELET_INFO_STREAM("Read min g: " << filter_min_g_);
+  	}
+  	if (nh.getParam(base_name + "/filter_max_b", param_read))
+  	{
+  		filter_max_b_ = static_cast<unsigned int>(param_read);
+  		NODELET_INFO_STREAM("Read max b: " << filter_max_b_);
+  	}
+  	if (nh.getParam(base_name + "/filter_min_b", param_read))
+  	{
+  		filter_min_b_ = static_cast<unsigned int>(param_read);
+  		NODELET_INFO_STREAM("Read min b: " << filter_min_b_);
+  	}   
+  	
+  	double param_read2 = 0;
+	if (nh.getParam(base_name + "/filter_max_x", param_read2))
+	{
+		filter_max_x_ = param_read2;
+		NODELET_INFO_STREAM("Read max x: " << filter_max_x_);
+	}
+	if (nh.getParam(base_name + "/filter_min_x", param_read2))
+	{
+		filter_min_x_ = param_read2;
+		NODELET_INFO_STREAM("Read min x: " << filter_min_x_);
+	}
+	if (nh.getParam(base_name + "/filter_max_y", param_read2))
+	{
+		filter_max_y_ = param_read2;
+		NODELET_INFO_STREAM("Read max y: " << filter_max_y_);
+	}
+	if (nh.getParam(base_name + "/filter_min_y", param_read2))
+	{
+		filter_min_y_ = param_read2;
+		NODELET_INFO_STREAM("Read min y: " << filter_min_y_);
+	}
+	if (nh.getParam(base_name + "/filter_max_z", param_read2))
+	{
+		filter_max_z_ = param_read2;
+		NODELET_INFO_STREAM("Read max z: " << filter_max_z_);
+	}
+	if (nh.getParam(base_name + "/filter_min_z", param_read2))
+	{
+		filter_min_z_ = param_read2;
+		NODELET_INFO_STREAM("Read min z: " << filter_min_z_);
+	}
   }
 }
+
 
 /* For the emacs weenies in the crowd.
 Local Variables:

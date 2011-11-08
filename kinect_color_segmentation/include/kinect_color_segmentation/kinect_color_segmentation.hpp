@@ -51,6 +51,8 @@ namespace sr_kinect
     void callback(const PointCloud::ConstPtr &cloud);
 
   private:
+    void read_parameters(ros::NodeHandle & nh);
+    
     ros::Publisher pub_;
     ros::Subscriber sub_;
 //    pcl_visualization::CloudViewer *viewer;
@@ -63,6 +65,12 @@ namespace sr_kinect
     unsigned int filter_min_g_;
     unsigned int filter_max_b_;
     unsigned int filter_min_b_;
+    double filter_max_x_;
+    double filter_min_x_;
+    double filter_max_y_;
+    double filter_min_y_;
+    double filter_max_z_;
+    double filter_min_z_;
   };
 }
 
