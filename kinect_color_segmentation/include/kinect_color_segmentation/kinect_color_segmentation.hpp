@@ -44,7 +44,7 @@ namespace sr_kinect
   {
   public:
     KinectColorSegmentation();
-    ~KinectColorSegmentation();
+    ~KinectColorSegmentation(){};
 
     virtual void onInit();
 
@@ -53,9 +53,16 @@ namespace sr_kinect
   private:
     ros::Publisher pub_;
     ros::Subscriber sub_;
-    pcl_visualization::CloudViewer *viewer;
+//    pcl_visualization::CloudViewer *viewer;
 
     boost::shared_ptr<PointCloud> segmented_pcl;
+    
+    unsigned int filter_max_r_;
+    unsigned int filter_min_r_;
+    unsigned int filter_max_g_;
+    unsigned int filter_min_g_;
+    unsigned int filter_max_b_;
+    unsigned int filter_min_b_;
   };
 }
 

@@ -31,16 +31,49 @@ namespace sr_kinect
   PLUGINLIB_DECLARE_CLASS(sr_kinect, KinectColorSegmentation, sr_kinect::KinectColorSegmentation, nodelet::Nodelet);
 
   KinectColorSegmentation::KinectColorSegmentation()
-    : nodelet::Nodelet()
+    : nodelet::Nodelet(), filter_max_r_(255), filter_min_r_(0), filter_max_g_(255), filter_min_g_(0), filter_max_b_(255), filter_min_b_(0)
   {}
 
   void KinectColorSegmentation::onInit()
   {
-    viewer = new pcl_visualization::CloudViewer("Cloud 3D");
     ros::NodeHandle & nh = getNodeHandle();
     sub_ = nh.subscribe<PointCloud >("cloud_in",2, &KinectColorSegmentation::callback, this);
     pub_ = nh.advertise<PointCloud>("seg_output", 1000);
     segmented_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
+    
+    //Parameter reading
+    std::string base_name = nh.resolveName(this->getName(), true);
+    int param_read = 0;
+	if (nh.getParam(base_name + "/filter_max_r", param_read))
+	{
+		filter_max_r_ = static_cast<unsigned int>(param_read);
+		NODELET_INFO_STREAM("Read max r: " << filter_max_r_);
+	}
+	if (nh.getParam(base_name + "/filter_min_r", param_read))
+	{
+		filter_min_r_ = static_cast<unsigned int>(param_read);
+		NODELET_INFO_STREAM("Read min r: " << filter_min_r_);
+	}
+	if (nh.getParam(base_name + "/filter_max_g", param_read))
+	{
+		filter_max_g_ = static_cast<unsigned int>(param_read);
+		NODELET_INFO_STREAM("Read max g: " << filter_max_g_);
+	}
+	if (nh.getParam(base_name + "/filter_min_g", param_read))
+	{
+		filter_min_g_ = static_cast<unsigned int>(param_read);
+		NODELET_INFO_STREAM("Read min g: " << filter_min_g_);
+	}
+	if (nh.getParam(base_name + "/filter_max_b", param_read))
+	{
+		filter_max_b_ = static_cast<unsigned int>(param_read);
+		NODELET_INFO_STREAM("Read max b: " << filter_max_b_);
+	}
+	if (nh.getParam(base_name + "/filter_min_b", param_read))
+	{
+		filter_min_b_ = static_cast<unsigned int>(param_read);
+		NODELET_INFO_STREAM("Read min b: " << filter_min_b_);
+	}    
   }
 
   void KinectColorSegmentation::callback(const PointCloud::ConstPtr &cloud)
@@ -51,39 +84,19 @@ namespace sr_kinect
     {
       for(unsigned int j=0; j < cloud->height; ++j)
       {
-//        if((( cloud->at(i,j).rgb & 0xFF0000) > 0x700000)
-//          && (( cloud->at(i,j).rgb & 0xFF0000) < 0xF00000)
-//          &&(( cloud->at(i,j).rgb & 0x00FF00) > 0x007000)
-//          &&(( cloud->at(i,j).rgb & 0x00FF00) < 0x00F000)
-//          &&(( cloud->at(i,j).rgb & 0x0000FF) > 0x000070)
-//          &&(( cloud->at(i,j).rgb & 0x0000FF) < 0x0000F0)        		
-//          )
-		if((( cloud->at(i,j).r) > 0x70)
-				  && (( cloud->at(i,j).r) < 0xC0)
-				  &&(( cloud->at(i,j).g) > 0x70)
-				  &&(( cloud->at(i,j).g) < 0xC0)
-				  &&(( cloud->at(i,j).b) > 0x70)
-				  &&(( cloud->at(i,j).b) < 0xC0)        		
-				  )
+		if((( cloud->at(i,j).r) > filter_min_r_)
+          && (( cloud->at(i,j).r) < filter_max_r_)
+          &&(( cloud->at(i,j).g) > filter_min_g_)
+          &&(( cloud->at(i,j).g) < filter_max_g_)
+          &&(( cloud->at(i,j).b) > filter_min_b_)
+          &&(( cloud->at(i,j).b) < filter_max_b_)        		
+          )
           segmented_pcl->push_back( cloud->at(i,j) );
       }
     }
     segmented_pcl->header.frame_id = cloud->header.frame_id;
     
     pub_.publish(segmented_pcl);
-    
-    ros::spinOnce();
-
-    if(!viewer->wasStopped())
-    {
-      viewer->showCloud( *(segmented_pcl.get()) );
-    }
-  }
-
-  KinectColorSegmentation::~KinectColorSegmentation()
-  {
-    if(viewer != NULL)
-      delete viewer;
   }
 }
 

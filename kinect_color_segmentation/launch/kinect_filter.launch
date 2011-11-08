@@ -3,11 +3,17 @@
     <!-- PCL Manager -->
     <node pkg="nodelet" type="nodelet" name="camera_nodelet_manager" args="manager" output="screen"/>
 
-  <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
-
-    <remap from="cloud_in" to="/camera/depth_registered/points"/>
-
-  </node>
+    <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
+        <remap from="cloud_in" to="/camera/depth_registered/points"/>
+        <rosparam>
+            filter_max_r: 255
+            filter_min_r: 100
+            filter_max_g: 70
+            filter_min_g: 0
+            filter_max_b: 70
+            filter_min_b: 0
+        </rosparam>
+    </node>
 </group>
 
 </launch>
