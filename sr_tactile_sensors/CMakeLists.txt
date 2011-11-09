@@ -22,24 +22,45 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 
+#Gazebo
+SET(gazebo_support $ENV{GAZEBO})
+MESSAGE("--------- Shadow Robot Tactiles Package Configuration:")
+IF(DEFINED gazebo_support)
+  SET( CMAKE_CXX_FLAGS "-D GAZEBO")
+  MESSAGE(" [x] Gazebo support")
+ELSE(DEFINED gazebo_support)
+  MESSAGE(" [ ] Gazebo support")
+ENDIF(DEFINED gazebo_support)
+
+# Real Hand
+SET(real_hand $ENV{REAL_HAND})
+IF(DEFINED real_hand)
+  MESSAGE(" [x] Real Hand.")
+ELSE(DEFINED real_hand)
+  MESSAGE(" [ ] Real Hand.")
+ENDIF(DEFINED real_hand)
 
 #############################
 #  VIRTUAL TACTILE SENSORS  #
 #############################
 rosbuild_add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
-rosbuild_add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+IF(DEFINED gazebo_support)
+  rosbuild_add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+ENDIF(DEFINED gazebo_support)
 
 
 #############################
 #   REAL TACTILE SENSORS    #
 #############################
 # Uncomment the following lines if you want access to the real tactile sensors
-include_directories(/usr/realtime/include/)
-LINK_LIBRARIES(pthread)
-add_library(robot STATIC IMPORTED)
-set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
-rosbuild_add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
-target_link_libraries(sr_tactile_real robot)
+IF(DEFINED real_hand)
+  include_directories(/usr/realtime/include/)
+  LINK_LIBRARIES(pthread)
+  add_library(robot STATIC IMPORTED)
+  set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
+  rosbuild_add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+  target_link_libraries(sr_tactile_real robot)
+ENDIF(DEFINED real_hand)
 
 #############################
 #  RVIZ MARKER FOR TACTILES #
