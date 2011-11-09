@@ -53,28 +53,7 @@ namespace shadowrobot
       return false;
     }
 
-    tf::StampedTransform transform;
-    try
-    {
-      tf_listener.lookupTransform("/base_link", "/palm",
-                                  ros::Time(0), transform);
-    }
-    catch (tf::TransformException ex)
-    {
-      ROS_ERROR("Listen for transform error: %s",ex.what());
-      response.error_code.value = response.error_code.OTHER_ERROR;
-      return false;
-    }
-    geometry_msgs::Pose current_pose;
-    current_pose.position.x = transform.getOrigin().getX();
-    current_pose.position.y = transform.getOrigin().getY();
-    current_pose.position.z = transform.getOrigin().getZ();
-    current_pose.orientation.x = transform.getRotation().getX();
-    current_pose.orientation.y = transform.getRotation().getY();
-    current_pose.orientation.z = transform.getRotation().getZ();
-    current_pose.orientation.w = transform.getRotation().getW();
-
-    response.grasps = grasp_planner->compute_list_of_grasps(bounding_box, current_pose);
+    response.grasps = grasp_planner->compute_list_of_grasps(bounding_box);
 
     if( response.grasps.size() != 0)
     {

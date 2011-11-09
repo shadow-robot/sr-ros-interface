@@ -27,7 +27,7 @@ namespace shadowrobot
   SrGraspPlanner::~SrGraspPlanner()
   {}
 
-  std::vector<object_manipulation_msgs::Grasp> SrGraspPlanner::compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box, geometry_msgs::Pose current_pose)
+  std::vector<object_manipulation_msgs::Grasp> SrGraspPlanner::compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box)
   {
     //get the main axis
     Eigen::Vector3d main_axis = get_main_axis(bounding_box);

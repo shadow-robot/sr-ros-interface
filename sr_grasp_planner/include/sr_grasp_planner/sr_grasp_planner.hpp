@@ -32,7 +32,7 @@ namespace shadowrobot
     SrGraspPlanner();
     ~SrGraspPlanner();
 
-    std::vector<object_manipulation_msgs::Grasp> compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box, geometry_msgs::Pose current_pose);
+    std::vector<object_manipulation_msgs::Grasp> compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box);
 
   protected:
     sensor_msgs::JointState pregrasp, grasp;
