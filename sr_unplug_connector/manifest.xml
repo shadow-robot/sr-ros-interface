@@ -1,0 +1,22 @@
+<package>
+  <description brief="sr_unplug_connector">
+
+     Unplugs different kinds of connector with the Shadow Hand attached to
+     a Denso Arm.
+
+  </description>
+  <author>Ugo Cupcic / ugo@shadowrobot.com</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_unplug_connector</url>
+  <depend package="smach_msgs"/>
+  <depend package="smach_ros"/>
+  <depend package="smach"/>
+  <depend package="rospy"/>
+  <depend package="object_manipulation_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="std_srvs"/>
+
+</package>
+
+
