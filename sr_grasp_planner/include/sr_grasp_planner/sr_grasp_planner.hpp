@@ -35,9 +35,13 @@ namespace shadowrobot
     std::vector<object_manipulation_msgs::Grasp> compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box);
 
   protected:
-    sensor_msgs::JointState pregrasp, grasp;
+    void compute_pose(unsigned int index_pose, bool is_vertical,
+                      object_manipulation_msgs::ClusterBoundingBox bounding_box,
+                      tf::Quaternion object_rotation);
 
     Eigen::Vector3d get_main_axis(object_manipulation_msgs::ClusterBoundingBox bbox);
+
+    sensor_msgs::JointState pregrasp, grasp;
 
     static const double default_approach_distance;
     static const unsigned short default_number_of_computed_grasps;
