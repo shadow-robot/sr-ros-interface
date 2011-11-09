@@ -40,8 +40,8 @@ namespace shadowrobot
 
     if( find_cluster_bounding_box_client.call(srv) == 1)
     {
-      ROS_DEBUG_STREAM("Response Pose "<<srv.response.pose
-                       << "Response Box Dims "<<srv.response.box_dims);
+      ROS_DEBUG_STREAM("Response Pose " << srv.response.pose <<
+                       "Response Box Dims " << srv.response.box_dims);
 
       bounding_box.pose_stamped = srv.response.pose;
       bounding_box.dimensions = srv.response.box_dims;
