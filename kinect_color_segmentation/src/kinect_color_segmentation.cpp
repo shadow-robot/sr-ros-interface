@@ -39,7 +39,7 @@ namespace sr_kinect
   {
     ros::NodeHandle & nh = getNodeHandle();
     sub_ = nh.subscribe<PointCloud >("cloud_in",2, &KinectColorSegmentation::callback, this);
-    pub_ = nh.advertise<PointCloud>("seg_output", 1000);
+    pub_ = nh.advertise<PointCloud>(this->getName() + "/output", 1000);
     segmented_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
     
     read_parameters(nh);

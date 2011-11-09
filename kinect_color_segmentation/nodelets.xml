@@ -4,4 +4,9 @@
       This is my Nodelet
     </description>
   </class>
+  <class name = "sr_kinect/PointSequenceDetection" type ="sr_kinect::PointSequenceDetection" base_class_type = "nodelet::Nodelet" >
+    <description>
+      This is my Nodelet
+    </description>
+  </class>
 </library>
