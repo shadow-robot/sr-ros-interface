@@ -35,13 +35,16 @@
 #include <pcl_visualization/cloud_viewer.h>
 #include <pcl_ros/point_cloud.h>
 #include "pcl/octree/octree.h"
-//#include "pcl/octree/octree_search.h"
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/filters/extract_indices.h>
+#include <kinect_color_segmentation/GetSegmentedLine.h>
 
 namespace sr_kinect
 {
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
   typedef pcl::octree::OctreePointCloudChangeDetector<pcl::PointXYZRGB> OctreePointCloudChangeDetector;
-//  typedef pcl::octree::OctreePointCloudSearch<pcl::PointXYZRGB> OctreePointCloudSearch;
+  typedef pcl::KdTreeFLANN<pcl::PointXYZRGB> KdTreeFLANN;
+  typedef pcl::ExtractIndices<pcl::PointXYZRGB> ExtractIndices;
 
   class PointSequenceDetection
     : public nodelet::Nodelet
@@ -53,15 +56,19 @@ namespace sr_kinect
     virtual void onInit();
 
     void callback(const PointCloud::ConstPtr &cloud);
+    bool srv_callback(kinect_color_segmentation::GetSegmentedLine::Request& request, kinect_color_segmentation::GetSegmentedLine::Response& response);
 
   private:
     void read_parameters(ros::NodeHandle & nh);
-    pcl::PointXYZRGB find_search_point(boost::shared_ptr<PointCloud> cloud);
+    unsigned int find_search_point(boost::shared_ptr<PointCloud> cloud);
+    unsigned int find_point_index(boost::shared_ptr<PointCloud> cloud, pcl::PointXYZRGB searchPoint); 
     
     ros::Publisher pub_;
     ros::Subscriber sub_;
+    ros::ServiceServer service_;
 
-    boost::shared_ptr<PointCloud> segmented_pcl;
+    boost::shared_ptr<PointCloud> output_pcl;
+    boost::shared_ptr<PointCloud> srv_output_pcl;
     boost::shared_ptr<PointCloud> previous_pcl;
     
     bool first_time;
