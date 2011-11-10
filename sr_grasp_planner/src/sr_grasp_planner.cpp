@@ -59,8 +59,7 @@ namespace shadowrobot
       }
       else
       {
-        compute_pose(i, true, bounding_box, object_rotation);
-        //tmp_grasp.grasp_pose.position.z += default_approach_distance;
+        compute_pose(i, false, bounding_box, object_rotation);
       }
 
       //     tmp_grasp.grasp_pose.orientation = pickup_pose_in_base_link_frame.getOrientation();
@@ -122,12 +121,26 @@ namespace shadowrobot
     //but we don't want to translate to the base_link, just to rotate:
     bottom_middle_to_base_orientation_tf.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
 
+
+    //if it's an horizontal object, we need to grasp around the long axis
+    // so we need one more rotation, to set the z axis of the frame
+    // so we rotate from 90 degrees around y
+    if( !is_vertical )
+    {
+      tmp_quat.setRPY( 0.0, 1.57079633, 0.0 );
+      tf::Quaternion current_quat = bottom_middle_to_base_orientation_tf.getRotation();
+
+      tmp_quat += current_quat;
+      bottom_middle_to_base_orientation_tf.setRotation( tmp_quat );
+    }
+
     std::stringstream tf_name_bot_mid_to_base_or;
     tf_name_bot_mid_to_base_or << "bot_mid_obj_base_or_" << index_pose;
     tf_broadcaster.sendTransform( tf::StampedTransform(bottom_middle_to_base_orientation_tf,
                                                        ros::Time::now(),
                                                        tf_name_base_to_bot_mid.str(),
                                                        tf_name_bot_mid_to_base_or.str()) );
+
 
     //Now we need to rotate of the correct angle
     tf::Transform bottom_middle_to_correct_orientation_tf;
