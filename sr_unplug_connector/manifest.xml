@@ -13,8 +13,10 @@
   <depend package="smach_ros"/>
   <depend package="smach"/>
   <depend package="rospy"/>
+  <depend package="actionlib"/>
   <depend package="object_manipulation_msgs"/>
   <depend package="sensor_msgs"/>
+  <depend package="denso_msgs"/>
   <depend package="std_srvs"/>
 
 </package>

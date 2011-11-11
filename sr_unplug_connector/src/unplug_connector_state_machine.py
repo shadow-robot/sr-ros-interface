@@ -24,11 +24,15 @@ import smach_ros
 
 import time
 
-from object_manipulation_msgs.msg import GraspableObject
+from object_manipulation_msgs.msg import GraspableObject, GraspHandPostureExecutionAction, GraspHandPostureExecutionGoal, ManipulationResult
 from object_manipulation_msgs.srv import GraspPlanning
+
+from denso_msgs.msg import MoveArmPoseGoal, MoveArmPoseResult, MoveArmPoseAction
 
 from sensor_msgs.msg import PointCloud
 from std_srvs.srv import Empty
+
+import actionlib
 
 class UnplugConnectorStateMachine(object):
     """
@@ -51,6 +55,12 @@ class UnplugConnectorStateMachine(object):
 
         self.start_service = rospy.Service('~start', Empty, self.run)
 
+        self.grasp_client = actionlib.SimpleActionClient('/right_arm/hand_posture_execution', GraspHandPostureExecutionAction)
+        self.grasp_client.wait_for_server()
+
+        self.denso_arm_client = actionlib.SimpleActionClient('/denso_arm/move_arm_pose', MoveArmPoseAction)
+        self.denso_arm_client.wait_for_server()
+
         rospy.spin()
 
     def run(self, req):
@@ -59,6 +69,8 @@ class UnplugConnectorStateMachine(object):
         if list_of_grasps != []:
             #we received a list of grasps. Select the best one
             best_grasp = self.select_best_grasp( list_of_grasps )
+
+            self.run_grasp( best_grasp )
 
         return []
 
@@ -94,4 +106,59 @@ class UnplugConnectorStateMachine(object):
 
     def select_best_grasp(self, list_of_grasps):
         best_grasp = list_of_grasps[0]
+
+        #TODO: select the best grasp based on the distance from the arm
+
         return best_grasp
+
+    def run_grasp(self, grasp):
+        #First we set the hand to the pregrasp position
+        grasp.pre_grasp_posture.header.frame_id = "/base_link"
+        grasp.pre_grasp_posture.header.stamp = rospy.get_rostime()
+
+        grasp.grasp_posture.header.frame_id = "/base_link"
+        grasp.grasp_posture.header.stamp = rospy.get_rostime()
+
+        goal = GraspHandPostureExecutionGoal()
+        goal.grasp = grasp
+        goal.goal = goal.PRE_GRASP
+
+        self.grasp_client.send_goal( goal )
+        self.grasp_client.wait_for_result()
+
+        res = self.grasp_client.get_result()
+        print "---"
+        print res , " / ", ManipulationResult.SUCCESS
+        print "---"
+        if res.result.value != ManipulationResult.SUCCESS:
+            rospy.logerr("Failed to go to Pregrasp")
+            return False
+
+        time.sleep(1)
+
+        #then we move the arm to the grasp pose
+        arm_goal = MoveArmPoseGoal()
+        arm_goal.goal = grasp.grasp_pose
+        arm_goal.rate = 100
+        arm_goal.time_out = rospy.Duration.from_sec(2.)
+
+        self.denso_arm_client.send_goal( arm_goal )
+        self.denso_arm_client.wait_for_result()
+
+        res =  self.grasp_client.get_result()
+        print "---"
+        print res, " / ", MoveArmPoseResult.SUCCESS
+        print "---"
+
+        if res.result.value != MoveArmPoseResult.SUCCESS:
+            rospy.logerr("Failed to move the arm to the given position.")
+            return False
+
+        #finally we grasp the object
+        rospy.loginfo("Going to grasp")
+        goal.goal = goal.GRASP
+
+        self.grasp_client.send_goal( goal )
+        self.grasp_client.wait_for_result()
+
+        return True
