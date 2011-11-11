@@ -261,9 +261,9 @@ namespace shadowrobot
     }
     if( !success )
     {
-      ROS_FATAL_STREAM("Couldn't get the transform from the base_link to the grasp.");
-      ROS_BREAK();
+      ROS_ERROR_STREAM("Couldn't get the transform from the base_link to the grasp.");
     }
+
     return grasp_pose_base_frame.pose;
   }
 

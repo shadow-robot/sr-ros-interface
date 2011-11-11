@@ -44,16 +44,23 @@ class UnplugConnectorStateMachine(object):
         self.grasp_planner_srv = None
         self.object_point_cloud = None
 
-    def run(self):
         self.point_cloud_subscriber = rospy.Subscriber("~object_pcl_input", PointCloud, self.object_pcl_callback)
 
         rospy.wait_for_service('/sr_grasp_planner/plan_point_cluster_grasp')
         self.grasp_planner_srv = rospy.ServiceProxy( '/sr_grasp_planner/plan_point_cluster_grasp', GraspPlanning )
 
-        self.start_service = rospy.Service('~start', Empty, self.plan_grasp)
-
+        self.start_service = rospy.Service('~start', Empty, self.run)
 
         rospy.spin()
+
+    def run(self, req):
+        list_of_grasps = self.plan_grasp()
+
+        if list_of_grasps != []:
+            #we received a list of grasps. Select the best one
+            best_grasp = self.select_best_grasp( list_of_grasps )
+
+        return []
 
     def object_pcl_callback(self, msg):
         if not self.object_point_cloud_received:
@@ -61,7 +68,12 @@ class UnplugConnectorStateMachine(object):
 
         self.object_point_cloud = msg
 
-    def plan_grasp(self, req):
+    def plan_grasp(self):
+        """
+        Plan the grasps.
+
+        @return a list containing all the possible grasps for the selected object.
+        """
         while self.object_point_cloud == None:
             rospy.loginfo("Waiting to identify the object")
             time.sleep(0.1)
@@ -78,8 +90,8 @@ class UnplugConnectorStateMachine(object):
             rospy.logerr( "Service did not process request: %s"%str(e) )
             return []
 
-        print resp1
+        return resp1.grasps
 
-        return []
-
-
+    def select_best_grasp(self, list_of_grasps):
+        best_grasp = list_of_grasps[0]
+        return best_grasp
