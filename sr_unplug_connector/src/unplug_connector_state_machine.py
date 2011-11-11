@@ -78,6 +78,8 @@ class UnplugConnectorStateMachine(object):
             rospy.logerr( "Service did not process request: %s"%str(e) )
             return []
 
+        print resp1
+
         return []
 
 

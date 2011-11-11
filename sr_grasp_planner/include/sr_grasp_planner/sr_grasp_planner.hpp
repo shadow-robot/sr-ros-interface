@@ -35,9 +35,9 @@ namespace shadowrobot
     std::vector<object_manipulation_msgs::Grasp> compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box);
 
   protected:
-    void compute_pose(unsigned int index_pose, bool is_vertical,
-                      object_manipulation_msgs::ClusterBoundingBox bounding_box,
-                      tf::Quaternion object_rotation);
+    geometry_msgs::Pose compute_pose(unsigned int index_pose, bool is_vertical,
+                                      object_manipulation_msgs::ClusterBoundingBox bounding_box,
+                                      tf::Quaternion object_rotation);
 
     Eigen::Vector3d get_main_axis(object_manipulation_msgs::ClusterBoundingBox bbox);
 

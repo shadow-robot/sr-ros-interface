@@ -13,6 +13,10 @@
 #include <tf/tf.h>
 #include <sstream>
 
+#include <boost/assign/std/vector.hpp>
+
+using namespace boost::assign;
+
 namespace shadowrobot
 {
   const double SrGraspPlanner::default_approach_distance = 0.2;
@@ -20,8 +24,37 @@ namespace shadowrobot
 
   SrGraspPlanner::SrGraspPlanner()
   {
-    pregrasp.name.push_back("FFJ3");
-    grasp.name.push_back("FFJ3");
+    std::vector<std::string> names;
+    names += "FFJ0", "FFJ3", "FFJ4",
+      "MFJ0", "MFJ3", "MFJ4",
+      "RFJ0", "RFJ3", "RFJ4",
+      "LFJ0", "LFJ3", "LFJ4", "LFJ5",
+      "THJ1", "THJ2", "THJ3", "THJ4", "THJ5",
+      "WRJ1", "WRJ2";
+
+    pregrasp.name = names;
+    grasp.name = names;
+
+    //TODO: change those for a proper grasp / pregrasp
+    std::vector<double> pregrasp_position;
+    pregrasp_position += 0.0, 0.0, 0.0,     //FF
+      0.0, 0.0, 0.0,                        //MF
+      0.0, 0.0, 0.0,                        //RF
+      0.0, 0.0, 0.0, 0.0,                   //LF
+      0.0, 0.0, 0.0, 0.0, 0.0,              //TH
+      0.0, 0.0;                             //WR
+
+    pregrasp.position = pregrasp_position;
+
+    std::vector<double> grasp_position;
+    grasp_position += 90.0, 90.0, 0.0,     //FF
+      90.0, 90.0, 0.0,                     //MF
+      90.0, 90.0, 0.0,                     //RF
+      90.0, 90.0, 0.0, 0.0,                //LF
+      0.0, 0.0, 0.0, 0.0, 0.0,             //TH
+      0.0, 0.0;                            //WR
+
+    grasp.position = grasp_position;
   }
 
   SrGraspPlanner::~SrGraspPlanner()
@@ -45,40 +78,31 @@ namespace shadowrobot
     {
       object_manipulation_msgs::Grasp tmp_grasp;
 
-      pregrasp.position.push_back(0.0);
-      grasp.position.push_back(90.0);
       tmp_grasp.pre_grasp_posture = pregrasp;
       tmp_grasp.grasp_posture = grasp;
 
-      tmp_grasp.grasp_pose = bounding_box.pose_stamped.pose;
-
+      geometry_msgs::Pose grasp_pose;
       //the default grasp comes from above the main axis
       if (main_axis[2] == 1)
       {
-        compute_pose(i, true, bounding_box, object_rotation);
+        tmp_grasp.grasp_pose = compute_pose(i, true, bounding_box, object_rotation);
       }
       else
       {
-        compute_pose(i, false, bounding_box, object_rotation);
+        tmp_grasp.grasp_pose = compute_pose(i, false, bounding_box, object_rotation);
       }
 
-      //     tmp_grasp.grasp_pose.orientation = pickup_pose_in_base_link_frame.getOrientation();
-      //tmp_grasp.grasp_pose = pickup_pose_in_base_link_frame.pose;
-/*
-  tmp_grasp.grasp_pose.orientation.x = current_rotation[0];
-  tmp_grasp.grasp_pose.orientation.y = current_rotation[1];
-  tmp_grasp.grasp_pose.orientation.z = current_rotation[2];
-  tmp_grasp.grasp_pose.orientation.w = current_rotation[3];
-*/
+      tmp_grasp.desired_approach_distance = static_cast<double>(i);
+
       possible_grasps.push_back(tmp_grasp);
     }
 
     return possible_grasps;
   }
 
-  void SrGraspPlanner::compute_pose(unsigned int index_pose, bool is_vertical,
-                                    object_manipulation_msgs::ClusterBoundingBox bounding_box,
-                                    tf::Quaternion object_rotation)
+  geometry_msgs::Pose SrGraspPlanner::compute_pose(unsigned int index_pose, bool is_vertical,
+                                                   object_manipulation_msgs::ClusterBoundingBox bounding_box,
+                                                   tf::Quaternion object_rotation)
   {
     if( index_pose == 0)
     {
@@ -169,6 +193,26 @@ namespace shadowrobot
                                                        tf_name_bot_mid_to_correct_or.str(),
                                                        tf_name_bot_mid_to_preg.str()) );
 
+    //Finally, we get a pose for the grasp in the base_link
+    // frame, and we return this.
+    geometry_msgs::PoseStamped grasp_pose_base_frame, grasp_pose_pose_frame;
+    grasp_pose_pose_frame.header.stamp = ros::Time::now();
+    grasp_pose_pose_frame.header.frame_id = tf_name_bot_mid_to_preg.str();
+    grasp_pose_pose_frame.pose.position.x = 0.0;
+    grasp_pose_pose_frame.pose.position.y = 0.0;
+    grasp_pose_pose_frame.pose.position.z = 0.0;
+
+    grasp_pose_pose_frame.pose.orientation.x = 0.0;
+    grasp_pose_pose_frame.pose.orientation.y = 0.0;
+    grasp_pose_pose_frame.pose.orientation.z = 0.0;
+    grasp_pose_pose_frame.pose.orientation.w = 1.0;
+
+    tf_listener.waitForTransform("/base_link", tf_name_bot_mid_to_preg.str(),
+                                 ros::Time(0), ros::Duration(0.1) );
+    tf_listener.transformPose("/base_link", grasp_pose_pose_frame,
+                              grasp_pose_base_frame);
+
+    return grasp_pose_base_frame.pose;
   }
 
   Eigen::Vector3d SrGraspPlanner::get_main_axis(object_manipulation_msgs::ClusterBoundingBox bbox)
