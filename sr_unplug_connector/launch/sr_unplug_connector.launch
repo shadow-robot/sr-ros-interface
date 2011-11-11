@@ -1,5 +1,7 @@
 <launch>
 
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_fixed" args="0.4 0.4 -1.2 0.0 0.0 0.0 /base_link /fixed 100" />
+
   <node pkg="tf" type="static_transform_publisher" name="base_to_kinect"
     args="0.0 .0 0.3 0.0 0.25 0.0 /base_link /camera_link 100"/>
 
@@ -31,6 +33,10 @@
   </node>
 
   <node pkg="sr_grasp_planner" type="sr_grasp_planner" name="sr_grasp_planner" output="screen" />
+
+  <node pkg="denso_arm" type="denso_arm" name="denso_arm" output="screen" />
+
+  <node pkg="sr_move_arm" type="hand_posture_execution" name="hand_posture_execution" output="screen" />
 
   <node pkg="sr_unplug_connector" name="sr_unplug_connector" type="sr_unplug_connector" output="screen">
     <remap from="~object_pcl_input" to="/re_kinect/feature_pcl/filtered/old"/>

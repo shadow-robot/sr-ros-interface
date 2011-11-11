@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 import roslib; roslib.load_manifest("sr_move_arm")
-import rospy 
+import rospy
 import actionlib
 
-from move_arm_msgs.msg import *
+from arm_navigation_msgs.msg import *
 
 if __name__ == '__main__':
     rospy.init_node('sr_move_arm_client')

@@ -144,7 +144,9 @@ namespace shadowrobot
     }
 
     //TODO: check the actual state of the hand and compare to sent targets?
-    action_server->setSucceeded();
+    object_manipulation_msgs::GraspHandPostureExecutionResult result;
+    result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
+    action_server->setSucceeded( result );
   }
 }
 

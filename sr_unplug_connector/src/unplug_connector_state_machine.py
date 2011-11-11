@@ -24,11 +24,15 @@ import smach_ros
 
 import time
 
-from object_manipulation_msgs.msg import GraspableObject
+from object_manipulation_msgs.msg import GraspableObject, GraspHandPostureExecutionAction, GraspHandPostureExecutionGoal, ManipulationResult
 from object_manipulation_msgs.srv import GraspPlanning
+
+from denso_msgs.msg import MoveArmPoseGoal, MoveArmPoseResult, MoveArmPoseAction
 
 from sensor_msgs.msg import PointCloud
 from std_srvs.srv import Empty
+
+import actionlib
 
 class UnplugConnectorStateMachine(object):
     """
@@ -44,16 +48,34 @@ class UnplugConnectorStateMachine(object):
         self.grasp_planner_srv = None
         self.object_point_cloud = None
 
-    def run(self):
         self.point_cloud_subscriber = rospy.Subscriber("~object_pcl_input", PointCloud, self.object_pcl_callback)
 
         rospy.wait_for_service('/sr_grasp_planner/plan_point_cluster_grasp')
         self.grasp_planner_srv = rospy.ServiceProxy( '/sr_grasp_planner/plan_point_cluster_grasp', GraspPlanning )
 
-        self.start_service = rospy.Service('~start', Empty, self.plan_grasp)
+        self.start_service = rospy.Service('~start', Empty, self.run)
 
+        self.grasp_client = actionlib.SimpleActionClient('/right_arm/hand_posture_execution', GraspHandPostureExecutionAction)
+        self.grasp_client.wait_for_server()
+
+        self.denso_arm_client = actionlib.SimpleActionClient('/denso_arm/move_arm_pose', MoveArmPoseAction)
+        self.denso_arm_client.wait_for_server()
 
         rospy.spin()
+
+    def run(self, req):
+        list_of_grasps = self.plan_grasp()
+
+        if list_of_grasps != []:
+            #we received a list of grasps. Select the best one
+            best_grasp = self.select_best_grasp( list_of_grasps )
+
+            result = self.grasp_connector( best_grasp )
+
+            if result:
+                self.unplug_connector( best_grasp )
+
+        return []
 
     def object_pcl_callback(self, msg):
         if not self.object_point_cloud_received:
@@ -61,7 +83,12 @@ class UnplugConnectorStateMachine(object):
 
         self.object_point_cloud = msg
 
-    def plan_grasp(self, req):
+    def plan_grasp(self):
+        """
+        Plan the grasps.
+
+        @return a list containing all the possible grasps for the selected object.
+        """
         while self.object_point_cloud == None:
             rospy.loginfo("Waiting to identify the object")
             time.sleep(0.1)
@@ -78,8 +105,76 @@ class UnplugConnectorStateMachine(object):
             rospy.logerr( "Service did not process request: %s"%str(e) )
             return []
 
-        print resp1
+        return resp1.grasps
 
-        return []
+    def select_best_grasp(self, list_of_grasps):
+        best_grasp = list_of_grasps[0]
 
+        #TODO: select the best grasp based on the distance from the arm
 
+        #then transform the grasp pose to be in the denso arm tf frame
+
+        return best_grasp
+
+    def grasp_connector(self, grasp):
+        #First we set the hand to the pregrasp position
+        goal = GraspHandPostureExecutionGoal()
+        goal.grasp = grasp
+        goal.goal = goal.PRE_GRASP
+
+        self.grasp_client.send_goal( goal )
+        self.grasp_client.wait_for_result()
+
+        res = self.grasp_client.get_result()
+        if res.result.value != ManipulationResult.SUCCESS:
+            rospy.logerr("Failed to go to Pregrasp")
+            return False
+
+        time.sleep(1)
+
+        #then we move the arm to the grasp pose
+        arm_goal = MoveArmPoseGoal()
+        arm_goal.goal = grasp.grasp_pose
+        arm_goal.rate = 100
+        arm_goal.time_out = rospy.Duration.from_sec(2.)
+
+        self.denso_arm_client.send_goal( arm_goal )
+        self.denso_arm_client.wait_for_result()
+
+        res =  self.grasp_client.get_result()
+        if res.result.value != MoveArmPoseResult.SUCCESS:
+            rospy.logerr("Failed to move the arm to the given position.")
+            return False
+
+        #finally we grasp the object
+        rospy.loginfo("Going to grasp")
+        goal.goal = goal.GRASP
+
+        self.grasp_client.send_goal( goal )
+        self.grasp_client.wait_for_result()
+
+        res = self.grasp_client.get_result()
+        if res.result.value != ManipulationResult.SUCCESS:
+            rospy.logerr("Failed to go to Grasp")
+            return False
+
+        return True
+
+    def unplug_connector(self, grasp):
+        #TODO: go up with the arm
+
+        #finally we release the object
+        goal = GraspHandPostureExecutionGoal()
+        goal.grasp = grasp
+        rospy.loginfo("Going to release the object")
+        goal.goal = goal.RELEASE
+
+        self.grasp_client.send_goal( goal )
+        self.grasp_client.wait_for_result()
+
+        res = self.grasp_client.get_result()
+        if res.result.value != ManipulationResult.SUCCESS:
+            rospy.logerr("Failed to go to Release")
+            return False
+
+        return True
