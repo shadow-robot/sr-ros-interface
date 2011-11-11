@@ -55,6 +55,10 @@ namespace shadowrobot
       0.0, 0.0;                            //WR
 
     grasp.position = grasp_position;
+
+    //initialize the tf listener and broadcaster
+    tf_listener = boost::shared_ptr<tf::TransformListener>( new tf::TransformListener() );
+    tf_broadcaster = boost::shared_ptr<tf::TransformBroadcaster>( new tf::TransformBroadcaster() );
   }
 
   SrGraspPlanner::~SrGraspPlanner()
@@ -66,11 +70,6 @@ namespace shadowrobot
     Eigen::Vector3d main_axis = get_main_axis(bounding_box);
 
     std::vector<object_manipulation_msgs::Grasp> possible_grasps;
-
-    tf::Quaternion object_rotation(bounding_box.pose_stamped.pose.orientation.x,
-                                   bounding_box.pose_stamped.pose.orientation.y,
-                                   bounding_box.pose_stamped.pose.orientation.z,
-                                   bounding_box.pose_stamped.pose.orientation.w);
 
     //compute the grasps: they're placed on a cylinder surounding the
     //biggest axis
@@ -85,11 +84,11 @@ namespace shadowrobot
       //the default grasp comes from above the main axis
       if (main_axis[2] == 1)
       {
-        tmp_grasp.grasp_pose = compute_pose(i, true, bounding_box, object_rotation);
+        tmp_grasp.grasp_pose = compute_pose(i, true, bounding_box);
       }
       else
       {
-        tmp_grasp.grasp_pose = compute_pose(i, false, bounding_box, object_rotation);
+        tmp_grasp.grasp_pose = compute_pose(i, false, bounding_box);
       }
 
       tmp_grasp.desired_approach_distance = static_cast<double>(i);
@@ -101,9 +100,15 @@ namespace shadowrobot
   }
 
   geometry_msgs::Pose SrGraspPlanner::compute_pose(unsigned int index_pose, bool is_vertical,
-                                                   object_manipulation_msgs::ClusterBoundingBox bounding_box,
-                                                   tf::Quaternion object_rotation)
+                                                   object_manipulation_msgs::ClusterBoundingBox bounding_box)
   {
+    /*
+      tf::Quaternion object_rotation(bounding_box.pose_stamped.pose.orientation.x,
+      bounding_box.pose_stamped.pose.orientation.y,
+      bounding_box.pose_stamped.pose.orientation.z,
+      bounding_box.pose_stamped.pose.orientation.w);
+    */
+
     if( index_pose == 0)
     {
       if( is_vertical )
@@ -126,21 +131,29 @@ namespace shadowrobot
 
     std::stringstream tf_name_base_to_bot_mid;
     tf_name_base_to_bot_mid << "bot_mid_obj_" << index_pose;
-    tf_broadcaster.sendTransform( tf::StampedTransform(base_to_bottom_middle_tf,
-                                                       ros::Time::now(),
-                                                       bounding_box.pose_stamped.header.frame_id,
-                                                       tf_name_base_to_bot_mid.str()) );
+    tf_broadcaster->sendTransform( tf::StampedTransform(base_to_bottom_middle_tf,
+                                                        ros::Time::now(),
+                                                        bounding_box.pose_stamped.header.frame_id,
+                                                        tf_name_base_to_bot_mid.str()) );
 
     //now rotate correctly depending on if we're trying to
     // grasp an horizontal or a vertical object.
     tf::StampedTransform bottom_middle_to_base_orientation_tf;
     //get correct rotation: we want to rotate to have the same
     // orientation as the base_link
-    tf_listener.waitForTransform(tf_name_base_to_bot_mid.str(), "/base_link",
-                                 ros::Time(), ros::Duration(1.0) );
-    tf_listener.lookupTransform(tf_name_base_to_bot_mid.str(), "/base_link",
-                                ros::Time(0),
-                                bottom_middle_to_base_orientation_tf);
+    if( tf_listener->waitForTransform(tf_name_base_to_bot_mid.str(), "/base_link",
+                                      ros::Time(), ros::Duration(1.0) ) )
+    {
+      tf_listener->lookupTransform(tf_name_base_to_bot_mid.str(), "/base_link",
+                                   ros::Time(0),
+                                   bottom_middle_to_base_orientation_tf);
+    }
+    else
+    {
+      ROS_FATAL_STREAM("Couldn't get the transform between /base_link and " << tf_name_base_to_bot_mid.str() );
+      ROS_BREAK();
+    }
+
 
     //but we don't want to translate to the base_link, just to rotate:
     bottom_middle_to_base_orientation_tf.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
@@ -160,10 +173,10 @@ namespace shadowrobot
 
     std::stringstream tf_name_bot_mid_to_base_or;
     tf_name_bot_mid_to_base_or << "bot_mid_obj_base_or_" << index_pose;
-    tf_broadcaster.sendTransform( tf::StampedTransform(bottom_middle_to_base_orientation_tf,
-                                                       ros::Time::now(),
-                                                       tf_name_base_to_bot_mid.str(),
-                                                       tf_name_bot_mid_to_base_or.str()) );
+    tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_base_orientation_tf,
+                                                        ros::Time::now(),
+                                                        tf_name_base_to_bot_mid.str(),
+                                                        tf_name_bot_mid_to_base_or.str()) );
 
 
     //Now we need to rotate of the correct angle
@@ -174,10 +187,10 @@ namespace shadowrobot
 
     std::stringstream tf_name_bot_mid_to_correct_or;
     tf_name_bot_mid_to_correct_or << "bot_mid_obj_correct_or_" << index_pose;
-    tf_broadcaster.sendTransform( tf::StampedTransform(bottom_middle_to_correct_orientation_tf,
-                                                       ros::Time::now(),
-                                                       tf_name_bot_mid_to_base_or.str(),
-                                                       tf_name_bot_mid_to_correct_or.str()) );
+    tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_correct_orientation_tf,
+                                                        ros::Time::now(),
+                                                        tf_name_bot_mid_to_base_or.str(),
+                                                        tf_name_bot_mid_to_correct_or.str()) );
 
     //then just translate a given value along X axis
     // to the default approach distance
@@ -188,10 +201,10 @@ namespace shadowrobot
 
     std::stringstream tf_name_bot_mid_to_preg;
     tf_name_bot_mid_to_preg << "mid_obj_preg_" << index_pose;
-    tf_broadcaster.sendTransform( tf::StampedTransform(bottom_middle_to_pregrasp_tf,
-                                                       ros::Time::now(),
-                                                       tf_name_bot_mid_to_correct_or.str(),
-                                                       tf_name_bot_mid_to_preg.str()) );
+    tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_pregrasp_tf,
+                                                        ros::Time::now(),
+                                                        tf_name_bot_mid_to_correct_or.str(),
+                                                        tf_name_bot_mid_to_preg.str()) );
 
     //Finally, we get a pose for the grasp in the base_link
     // frame, and we return this.
@@ -207,11 +220,50 @@ namespace shadowrobot
     grasp_pose_pose_frame.pose.orientation.z = 0.0;
     grasp_pose_pose_frame.pose.orientation.w = 1.0;
 
-    tf_listener.waitForTransform("/base_link", tf_name_bot_mid_to_preg.str(),
-                                 ros::Time(0), ros::Duration(0.1) );
-    tf_listener.transformPose("/base_link", grasp_pose_pose_frame,
-                              grasp_pose_base_frame);
 
+    bool success = false;
+    for(unsigned int i = 0; i < 1000; ++i)
+    {
+      tf_broadcaster->sendTransform( tf::StampedTransform(base_to_bottom_middle_tf,
+                                                          ros::Time::now(),
+                                                          bounding_box.pose_stamped.header.frame_id,
+                                                          tf_name_base_to_bot_mid.str()) );
+      ros::spinOnce();
+
+      tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_base_orientation_tf,
+                                                          ros::Time::now(),
+                                                          tf_name_base_to_bot_mid.str(),
+                                                          tf_name_bot_mid_to_base_or.str()) );
+      ros::spinOnce();
+      tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_correct_orientation_tf,
+                                                          ros::Time::now(),
+                                                          tf_name_bot_mid_to_base_or.str(),
+                                                          tf_name_bot_mid_to_correct_or.str()) );
+      ros::spinOnce();
+      tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_pregrasp_tf,
+                                                          ros::Time::now(),
+                                                          tf_name_bot_mid_to_correct_or.str(),
+                                                          tf_name_bot_mid_to_preg.str()) );
+      ros::spinOnce();
+
+
+      try
+      {
+        tf_listener->transformPose("/base_link", grasp_pose_pose_frame,
+                                   grasp_pose_base_frame);
+        success = true;
+        break;
+      }
+      catch(tf::TransformException exc)
+      {
+        continue;
+      }
+    }
+    if( !success )
+    {
+      ROS_FATAL_STREAM("Couldn't get the transform from the base_link to the grasp.");
+      ROS_BREAK();
+    }
     return grasp_pose_base_frame.pose;
   }
 
