@@ -22,6 +22,8 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/Pose.h>
 
+#include <boost/smart_ptr.hpp>
+
 #include <Eigen/Core>
 
 namespace shadowrobot
@@ -32,20 +34,23 @@ namespace shadowrobot
     SrGraspPlanner();
     ~SrGraspPlanner();
 
-    std::vector<object_manipulation_msgs::Grasp> compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box, geometry_msgs::Pose current_pose);
+    std::vector<object_manipulation_msgs::Grasp> compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box);
 
   protected:
-    sensor_msgs::JointState pregrasp, grasp;
+    geometry_msgs::Pose compute_pose(unsigned int index_pose, bool is_vertical,
+                                      object_manipulation_msgs::ClusterBoundingBox bounding_box);
 
     Eigen::Vector3d get_main_axis(object_manipulation_msgs::ClusterBoundingBox bbox);
+
+    sensor_msgs::JointState pregrasp, grasp;
 
     static const double default_approach_distance;
     static const unsigned short default_number_of_computed_grasps;
 
     /** A transform listener */
-    tf::TransformListener tf_listener;
+    boost::shared_ptr<tf::TransformListener> tf_listener;
     /** A transform broadcaster to broadcast the object pose*/
-    tf::TransformBroadcaster tf_broadcaster;
+    boost::shared_ptr<tf::TransformBroadcaster> tf_broadcaster;
   };
 }
 

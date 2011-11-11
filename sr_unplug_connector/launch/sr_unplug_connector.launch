@@ -1,0 +1,39 @@
+<launch>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_to_kinect"
+    args="0.0 .0 0.3 0.0 0.25 0.0 /base_link /camera_link 100"/>
+
+
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+  <!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
+  <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/re_kinect/feature_pcl" />
+    <remap from="~output" to="/re_kinect/feature_pcl/filtered" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.01
+      filter_limit_max: 1.5
+      filter_limit_negative: False
+      leaf_size: 0.01
+    </rosparam>
+  </node>
+
+  <node pkg="point_cloud_converter" name="point_cloud_converter" type="point_cloud_converter" respawn="false">
+  	<remap from="/points2_in" to="/re_kinect/feature_pcl/filtered" />
+  	<remap from="/points_out" to="/re_kinect/feature_pcl/filtered/old" />
+  </node>
+
+  <node name="cluster_bounding_box_finder" pkg="object_manipulator"
+	type="cluster_bounding_box_finder_server.py"
+	output="screen"
+	respawn="false">
+  </node>
+
+  <node pkg="sr_grasp_planner" type="sr_grasp_planner" name="sr_grasp_planner" output="screen" />
+
+  <node pkg="sr_unplug_connector" name="sr_unplug_connector" type="sr_unplug_connector" output="screen">
+    <remap from="~object_pcl_input" to="/re_kinect/feature_pcl/filtered/old"/>
+  </node>
+
+</launch>

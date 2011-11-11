@@ -13,31 +13,63 @@
 #include <tf/tf.h>
 #include <sstream>
 
+#include <boost/assign/std/vector.hpp>
+
+using namespace boost::assign;
+
 namespace shadowrobot
 {
-  const double SrGraspPlanner::default_approach_distance = 0.1;
+  const double SrGraspPlanner::default_approach_distance = 0.2;
   const unsigned short SrGraspPlanner::default_number_of_computed_grasps = 20;
 
   SrGraspPlanner::SrGraspPlanner()
   {
-    pregrasp.name.push_back("FFJ3");
-    grasp.name.push_back("FFJ3");
+    std::vector<std::string> names;
+    names += "FFJ0", "FFJ3", "FFJ4",
+      "MFJ0", "MFJ3", "MFJ4",
+      "RFJ0", "RFJ3", "RFJ4",
+      "LFJ0", "LFJ3", "LFJ4", "LFJ5",
+      "THJ1", "THJ2", "THJ3", "THJ4", "THJ5",
+      "WRJ1", "WRJ2";
+
+    pregrasp.name = names;
+    grasp.name = names;
+
+    //TODO: change those for a proper grasp / pregrasp
+    std::vector<double> pregrasp_position;
+    pregrasp_position += 0.0, 0.0, 0.0,     //FF
+      0.0, 0.0, 0.0,                        //MF
+      0.0, 0.0, 0.0,                        //RF
+      0.0, 0.0, 0.0, 0.0,                   //LF
+      0.0, 0.0, 0.0, 0.0, 0.0,              //TH
+      0.0, 0.0;                             //WR
+
+    pregrasp.position = pregrasp_position;
+
+    std::vector<double> grasp_position;
+    grasp_position += 90.0, 90.0, 0.0,     //FF
+      90.0, 90.0, 0.0,                     //MF
+      90.0, 90.0, 0.0,                     //RF
+      90.0, 90.0, 0.0, 0.0,                //LF
+      0.0, 0.0, 0.0, 0.0, 0.0,             //TH
+      0.0, 0.0;                            //WR
+
+    grasp.position = grasp_position;
+
+    //initialize the tf listener and broadcaster
+    tf_listener = boost::shared_ptr<tf::TransformListener>( new tf::TransformListener() );
+    tf_broadcaster = boost::shared_ptr<tf::TransformBroadcaster>( new tf::TransformBroadcaster() );
   }
 
   SrGraspPlanner::~SrGraspPlanner()
   {}
 
-  std::vector<object_manipulation_msgs::Grasp> SrGraspPlanner::compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box, geometry_msgs::Pose current_pose)
+  std::vector<object_manipulation_msgs::Grasp> SrGraspPlanner::compute_list_of_grasps(object_manipulation_msgs::ClusterBoundingBox bounding_box)
   {
     //get the main axis
     Eigen::Vector3d main_axis = get_main_axis(bounding_box);
 
     std::vector<object_manipulation_msgs::Grasp> possible_grasps;
-
-    tf::Quaternion object_rotation(bounding_box.pose_stamped.pose.orientation.x,
-                                   bounding_box.pose_stamped.pose.orientation.y,
-                                   bounding_box.pose_stamped.pose.orientation.z,
-                                   bounding_box.pose_stamped.pose.orientation.w);
 
     //compute the grasps: they're placed on a cylinder surounding the
     //biggest axis
@@ -45,149 +77,194 @@ namespace shadowrobot
     {
       object_manipulation_msgs::Grasp tmp_grasp;
 
-      pregrasp.position.push_back(0.0);
-      grasp.position.push_back(90.0);
       tmp_grasp.pre_grasp_posture = pregrasp;
       tmp_grasp.grasp_posture = grasp;
 
-      tmp_grasp.grasp_pose = bounding_box.pose_stamped.pose;
-
-      geometry_msgs::PoseStamped pickup_pose_in_object_frame, pickup_pose_in_base_link_frame;
+      geometry_msgs::Pose grasp_pose;
       //the default grasp comes from above the main axis
       if (main_axis[2] == 1)
       {
-        if( i == 0)
-          ROS_INFO("Computing grasps for a vertical object");
-
-        tf::Quaternion current_rotation;
-        if( i == 0 ) //no rotation
-        {
-          current_rotation[0] = 0.0;
-          current_rotation[1] = 0.0;
-          current_rotation[2] = 0.0;
-          current_rotation[3] = 1.0;
-        }
-        else
-          current_rotation.setRPY(0, 0, 2.0 * M_PI * double(i) / double(default_number_of_computed_grasps) );
-
-        std::string pose_to_pickup_object_name = "/pose_to_pickup_object_";
-        std::stringstream ss;
-        ss << pose_to_pickup_object_name << i;
-        pose_to_pickup_object_name = ss.str();
-
-        //broadcast the object transform
-        tf::Transform object_transform;
-        object_transform.setOrigin( tf::Vector3(bounding_box.pose_stamped.pose.position.x,
-                                                bounding_box.pose_stamped.pose.position.y,
-                                                bounding_box.pose_stamped.pose.position.z) );
-
-        current_rotation *= object_rotation;
-        current_rotation.normalize();
-
-        ROS_DEBUG_STREAM("ROT: "
-                         << current_rotation[0] << " "
-                         << current_rotation[1] << " "
-                         << current_rotation[2] << " "
-                         << current_rotation[3]  );
-
-        object_transform.setRotation( current_rotation );
-        tf::Transform pickup_tf_object_frame;
-        pickup_tf_object_frame.setOrigin( tf::Vector3(0.1,0,0) );
-        pickup_tf_object_frame.setRotation( tf::Quaternion(0,0,0,1) );
-
-        std::string object_tf_name = "/object_to_pickup_";
-        std::stringstream ss2;
-        ss2 << object_tf_name << i;
-        object_tf_name = ss2.str();
-
-        tf_broadcaster.sendTransform( tf::StampedTransform(object_transform,
-                                                           ros::Time::now(),
-                                                           "/base_link", object_tf_name) );
-        tf_listener.waitForTransform("/base_link", object_tf_name,
-                                     ros::Time(), ros::Duration(1.0) );
-        tf_broadcaster.sendTransform( tf::StampedTransform(pickup_tf_object_frame,
-                                                           ros::Time::now(),
-                                                           object_tf_name,
-                                                           pose_to_pickup_object_name));
-
-        tf::Vector3 v1 = pickup_tf_object_frame.getOrigin();
-        tf::Quaternion q1 = pickup_tf_object_frame.getRotation();
-        pickup_pose_in_object_frame.header.frame_id = pose_to_pickup_object_name;
-        pickup_pose_in_object_frame.pose.position.x = v1.getX();
-        pickup_pose_in_object_frame.pose.position.y = v1.getY();
-        pickup_pose_in_object_frame.pose.position.z = v1.getZ();
-
-        pickup_pose_in_object_frame.pose.orientation.x = q1.getX();
-        pickup_pose_in_object_frame.pose.orientation.y = q1.getY();
-        pickup_pose_in_object_frame.pose.orientation.z = q1.getZ();
-        pickup_pose_in_object_frame.pose.orientation.w = q1.getW();
-
-        //ros::Rate tmp_rate(10);
-        //tmp_rate.sleep();
-
-        //tf_listener.transformPose("base_link", pickup_pose_in_object_frame, pickup_pose_in_base_link_frame );
-        //tf_listener.transformPose(object_tf_name, pickup_pose_in_object_frame, pickup_pose_in_base_link_frame );
-
-
-        ROS_ERROR_STREAM("ROT: "
-                         << pickup_pose_in_base_link_frame.pose.orientation.x << " "
-                         << pickup_pose_in_base_link_frame.pose.orientation.y << " "
-                         << pickup_pose_in_base_link_frame.pose.orientation.z << " "
-                         << pickup_pose_in_base_link_frame.pose.orientation.w << " " );
-
-
-        //ros::Rate tmp_rate(10);
-        //tmp_rate.sleep();
-        continue;
-
-        tf::StampedTransform pickup_tf_in_base_link_frame;
-        ROS_INFO("Waiting for transform from base_link to /pose_to_pickup_object");
-        tf_listener.waitForTransform("/base_link", pose_to_pickup_object_name,
-                                     ros::Time(), ros::Duration(1.0) );
-        tf_listener.lookupTransform("/base_link",
-                                    pose_to_pickup_object_name,
-                                    ros::Time(), pickup_tf_in_base_link_frame);
-
-        tf::Vector3 v = pickup_tf_in_base_link_frame.getOrigin();
-        tf::Quaternion q = pickup_tf_in_base_link_frame.getRotation();
-        pickup_pose_in_base_link_frame.pose.position.x = v.getX();
-        pickup_pose_in_base_link_frame.pose.position.y = v.getY();
-        pickup_pose_in_base_link_frame.pose.position.z = v.getZ();
-
-        pickup_pose_in_base_link_frame.pose.orientation.x = q.getX();
-        pickup_pose_in_base_link_frame.pose.orientation.y = q.getY();
-        pickup_pose_in_base_link_frame.pose.orientation.z = q.getZ();
-        pickup_pose_in_base_link_frame.pose.orientation.w = q.getW();
-        /*
-          tf::Quaternion rot1(tf::Vector3(1,0,0), M_PI);
-          tf::Quaternion rot2(tf::Vector3(0,1,0), M_PI / 2.0);
-
-          current_rotation *= rot1;
-          current_rotation.normalize();
-          current_rotation *= rot2;
-          current_rotation.normalize();
-
-          tmp_grasp.grasp_pose.position.z += default_approach_distance;
-        */
+        tmp_grasp.grasp_pose = compute_pose(i, true, bounding_box);
       }
       else
       {
-        ROS_INFO("Computing grasps for an horizontal object");
-        tmp_grasp.grasp_pose.position.z += default_approach_distance;
+        tmp_grasp.grasp_pose = compute_pose(i, false, bounding_box);
       }
 
-      //     tmp_grasp.grasp_pose.orientation = pickup_pose_in_base_link_frame.getOrientation();
-      //tmp_grasp.grasp_pose = pickup_pose_in_base_link_frame.pose;
-/*
-  tmp_grasp.grasp_pose.orientation.x = current_rotation[0];
-  tmp_grasp.grasp_pose.orientation.y = current_rotation[1];
-  tmp_grasp.grasp_pose.orientation.z = current_rotation[2];
-  tmp_grasp.grasp_pose.orientation.w = current_rotation[3];
-*/
+      tmp_grasp.desired_approach_distance = static_cast<double>(i);
+
       possible_grasps.push_back(tmp_grasp);
     }
 
     return possible_grasps;
+  }
+
+  geometry_msgs::Pose SrGraspPlanner::compute_pose(unsigned int index_pose, bool is_vertical,
+                                                   object_manipulation_msgs::ClusterBoundingBox bounding_box)
+  {
+    /*
+      tf::Quaternion object_rotation(bounding_box.pose_stamped.pose.orientation.x,
+      bounding_box.pose_stamped.pose.orientation.y,
+      bounding_box.pose_stamped.pose.orientation.z,
+      bounding_box.pose_stamped.pose.orientation.w);
+    */
+
+    if( index_pose == 0)
+    {
+      if( is_vertical )
+        ROS_INFO("Computing grasps for a vertical object");
+      else
+        ROS_INFO("Computing grasps for an horizontal object");
+    }
+
+    //transform between base_link and the bottom-middle of the bounding box,
+    // with no rotation
+    tf::Quaternion tmp_quat;
+    tmp_quat.setRPY(0.0,0.0,0.0);
+
+    tf::Transform base_to_bottom_middle_tf;
+    base_to_bottom_middle_tf.setOrigin( tf::Vector3(bounding_box.pose_stamped.pose.position.x + bounding_box.dimensions.x / 2.0,
+                                                    bounding_box.pose_stamped.pose.position.y + bounding_box.dimensions.y / 2.0,
+                                                    bounding_box.pose_stamped.pose.position.z + bounding_box.dimensions.z / 2.0) );
+    base_to_bottom_middle_tf.setRotation( tmp_quat );
+
+
+    std::stringstream tf_name_base_to_bot_mid;
+    tf_name_base_to_bot_mid << "bot_mid_obj_" << index_pose;
+    tf_broadcaster->sendTransform( tf::StampedTransform(base_to_bottom_middle_tf,
+                                                        ros::Time::now(),
+                                                        bounding_box.pose_stamped.header.frame_id,
+                                                        tf_name_base_to_bot_mid.str()) );
+
+    //now rotate correctly depending on if we're trying to
+    // grasp an horizontal or a vertical object.
+    tf::StampedTransform bottom_middle_to_base_orientation_tf;
+    //get correct rotation: we want to rotate to have the same
+    // orientation as the base_link
+    if( tf_listener->waitForTransform(tf_name_base_to_bot_mid.str(), "/base_link",
+                                      ros::Time(), ros::Duration(1.0) ) )
+    {
+      tf_listener->lookupTransform(tf_name_base_to_bot_mid.str(), "/base_link",
+                                   ros::Time(0),
+                                   bottom_middle_to_base_orientation_tf);
+    }
+    else
+    {
+      ROS_FATAL_STREAM("Couldn't get the transform between /base_link and " << tf_name_base_to_bot_mid.str() );
+      ROS_BREAK();
+    }
+
+
+    //but we don't want to translate to the base_link, just to rotate:
+    bottom_middle_to_base_orientation_tf.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+
+
+    //if it's an horizontal object, we need to grasp around the long axis
+    // so we need one more rotation, to set the z axis of the frame
+    // so we rotate from 90 degrees around y
+    if( !is_vertical )
+    {
+      tmp_quat.setRPY( 0.0, 1.57079633, 0.0 );
+      tf::Quaternion current_quat = bottom_middle_to_base_orientation_tf.getRotation();
+
+      tmp_quat += current_quat;
+      bottom_middle_to_base_orientation_tf.setRotation( tmp_quat );
+    }
+
+    std::stringstream tf_name_bot_mid_to_base_or;
+    tf_name_bot_mid_to_base_or << "bot_mid_obj_base_or_" << index_pose;
+    tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_base_orientation_tf,
+                                                        ros::Time::now(),
+                                                        tf_name_base_to_bot_mid.str(),
+                                                        tf_name_bot_mid_to_base_or.str()) );
+
+
+    //Now we need to rotate of the correct angle
+    tf::Transform bottom_middle_to_correct_orientation_tf;
+    tmp_quat.setRPY(0, 0, 2.0 * M_PI * double(index_pose) / double(default_number_of_computed_grasps) );
+    bottom_middle_to_correct_orientation_tf.setRotation( tmp_quat );
+    bottom_middle_to_correct_orientation_tf.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+
+    std::stringstream tf_name_bot_mid_to_correct_or;
+    tf_name_bot_mid_to_correct_or << "bot_mid_obj_correct_or_" << index_pose;
+    tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_correct_orientation_tf,
+                                                        ros::Time::now(),
+                                                        tf_name_bot_mid_to_base_or.str(),
+                                                        tf_name_bot_mid_to_correct_or.str()) );
+
+    //then just translate a given value along X axis
+    // to the default approach distance
+    tf::Transform bottom_middle_to_pregrasp_tf;
+    bottom_middle_to_pregrasp_tf.setOrigin( tf::Vector3( default_approach_distance, 0.0, 0.0 ) );
+    tmp_quat.setRPY(0.0,0.0,0.0);
+    bottom_middle_to_pregrasp_tf.setRotation( tmp_quat );
+
+    std::stringstream tf_name_bot_mid_to_preg;
+    tf_name_bot_mid_to_preg << "mid_obj_preg_" << index_pose;
+    tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_pregrasp_tf,
+                                                        ros::Time::now(),
+                                                        tf_name_bot_mid_to_correct_or.str(),
+                                                        tf_name_bot_mid_to_preg.str()) );
+
+    //Finally, we get a pose for the grasp in the base_link
+    // frame, and we return this.
+    geometry_msgs::PoseStamped grasp_pose_base_frame, grasp_pose_pose_frame;
+    grasp_pose_pose_frame.header.stamp = ros::Time::now();
+    grasp_pose_pose_frame.header.frame_id = tf_name_bot_mid_to_preg.str();
+    grasp_pose_pose_frame.pose.position.x = 0.0;
+    grasp_pose_pose_frame.pose.position.y = 0.0;
+    grasp_pose_pose_frame.pose.position.z = 0.0;
+
+    grasp_pose_pose_frame.pose.orientation.x = 0.0;
+    grasp_pose_pose_frame.pose.orientation.y = 0.0;
+    grasp_pose_pose_frame.pose.orientation.z = 0.0;
+    grasp_pose_pose_frame.pose.orientation.w = 1.0;
+
+
+    bool success = false;
+    for(unsigned int i = 0; i < 1000; ++i)
+    {
+      tf_broadcaster->sendTransform( tf::StampedTransform(base_to_bottom_middle_tf,
+                                                          ros::Time::now(),
+                                                          bounding_box.pose_stamped.header.frame_id,
+                                                          tf_name_base_to_bot_mid.str()) );
+      ros::spinOnce();
+
+      tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_base_orientation_tf,
+                                                          ros::Time::now(),
+                                                          tf_name_base_to_bot_mid.str(),
+                                                          tf_name_bot_mid_to_base_or.str()) );
+      ros::spinOnce();
+      tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_correct_orientation_tf,
+                                                          ros::Time::now(),
+                                                          tf_name_bot_mid_to_base_or.str(),
+                                                          tf_name_bot_mid_to_correct_or.str()) );
+      ros::spinOnce();
+      tf_broadcaster->sendTransform( tf::StampedTransform(bottom_middle_to_pregrasp_tf,
+                                                          ros::Time::now(),
+                                                          tf_name_bot_mid_to_correct_or.str(),
+                                                          tf_name_bot_mid_to_preg.str()) );
+      ros::spinOnce();
+
+
+      try
+      {
+        tf_listener->transformPose("/base_link", grasp_pose_pose_frame,
+                                   grasp_pose_base_frame);
+        success = true;
+        break;
+      }
+      catch(tf::TransformException exc)
+      {
+        continue;
+      }
+    }
+    if( !success )
+    {
+      ROS_FATAL_STREAM("Couldn't get the transform from the base_link to the grasp.");
+      ROS_BREAK();
+    }
+    return grasp_pose_base_frame.pose;
   }
 
   Eigen::Vector3d SrGraspPlanner::get_main_axis(object_manipulation_msgs::ClusterBoundingBox bbox)
