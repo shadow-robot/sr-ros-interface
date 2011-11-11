@@ -161,4 +161,20 @@ class UnplugConnectorStateMachine(object):
         return True
 
     def unplug_connector(self, grasp):
-        print "TODO"
+        #TODO: go up with the arm
+
+        #finally we release the object
+        goal = GraspHandPostureExecutionGoal()
+        goal.grasp = grasp
+        rospy.loginfo("Going to release the object")
+        goal.goal = goal.RELEASE
+
+        self.grasp_client.send_goal( goal )
+        self.grasp_client.wait_for_result()
+
+        res = self.grasp_client.get_result()
+        if res.result.value != ManipulationResult.SUCCESS:
+            rospy.logerr("Failed to go to Release")
+            return False
+
+        return True
