@@ -70,7 +70,10 @@ class UnplugConnectorStateMachine(object):
             #we received a list of grasps. Select the best one
             best_grasp = self.select_best_grasp( list_of_grasps )
 
-            self.run_grasp( best_grasp )
+            result = self.grasp_connector( best_grasp )
+
+            if result:
+                self.unplug_connector( best_grasp )
 
         return []
 
@@ -109,16 +112,12 @@ class UnplugConnectorStateMachine(object):
 
         #TODO: select the best grasp based on the distance from the arm
 
+        #then transform the grasp pose to be in the denso arm tf frame
+
         return best_grasp
 
-    def run_grasp(self, grasp):
+    def grasp_connector(self, grasp):
         #First we set the hand to the pregrasp position
-        grasp.pre_grasp_posture.header.frame_id = "/base_link"
-        grasp.pre_grasp_posture.header.stamp = rospy.get_rostime()
-
-        grasp.grasp_posture.header.frame_id = "/base_link"
-        grasp.grasp_posture.header.stamp = rospy.get_rostime()
-
         goal = GraspHandPostureExecutionGoal()
         goal.grasp = grasp
         goal.goal = goal.PRE_GRASP
@@ -127,9 +126,6 @@ class UnplugConnectorStateMachine(object):
         self.grasp_client.wait_for_result()
 
         res = self.grasp_client.get_result()
-        print "---"
-        print res , " / ", ManipulationResult.SUCCESS
-        print "---"
         if res.result.value != ManipulationResult.SUCCESS:
             rospy.logerr("Failed to go to Pregrasp")
             return False
@@ -146,10 +142,6 @@ class UnplugConnectorStateMachine(object):
         self.denso_arm_client.wait_for_result()
 
         res =  self.grasp_client.get_result()
-        print "---"
-        print res, " / ", MoveArmPoseResult.SUCCESS
-        print "---"
-
         if res.result.value != MoveArmPoseResult.SUCCESS:
             rospy.logerr("Failed to move the arm to the given position.")
             return False
@@ -161,4 +153,12 @@ class UnplugConnectorStateMachine(object):
         self.grasp_client.send_goal( goal )
         self.grasp_client.wait_for_result()
 
+        res = self.grasp_client.get_result()
+        if res.result.value != ManipulationResult.SUCCESS:
+            rospy.logerr("Failed to go to Grasp")
+            return False
+
         return True
+
+    def unplug_connector(self, grasp):
+        print "TODO"
