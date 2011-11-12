@@ -55,7 +55,10 @@ int moveIK(float x, float y, float z)
       {
         ROS_DEBUG("Joint: %s %f",gpik_res.solution.joint_state.name[i].c_str(),gpik_res.solution.joint_state.position[i]);
         ROS_DEBUG("we publish to %s",pub[i].getTopic().c_str());
-        message.data= (double)gpik_res.solution.joint_state.position[i];
+        if(gpik_res.solution.joint_state.name[i].compare("FFJ1")==0 || gpik_res.solution.joint_state.name[i].compare("FFJ2")==0)
+        	message.data= (double)gpik_res.solution.joint_state.position[i]*2;
+        else
+	        message.data= (double)gpik_res.solution.joint_state.position[i];
         pub[jointPubIdxMap[gpik_res.solution.joint_state.name[i]]].publish(message);
       }
       ros::spinOnce();
@@ -93,10 +96,10 @@ int main(int argc, char **argv){
   // init treated joint (to be modified to get more generic behaviour)
   std::string controlled_joint_name;
   std::vector<std::string> joint_name;
-  joint_name.push_back("FFJ1");
-  joint_name.push_back("FFJ2");
+  joint_name.push_back("FFJ0");
   joint_name.push_back("FFJ3");
   joint_name.push_back("FFJ4");
+
 
   // init jointControllerMapping
   pr2_mechanism_msgs::ListControllers controller_list;
@@ -148,6 +151,9 @@ int main(int argc, char **argv){
     pub[i] = rh.advertise<std_msgs::Float64>("/"+jointControllerMap[joint_name[i]]+"/command", 2);
     jointPubIdxMap[joint_name[i]]=i;
   }
+  jointPubIdxMap["FFJ1"]=0;
+  jointPubIdxMap["FFJ2"]=0;
+
 
   ros::spinOnce();
   sleep(1); // this is required otherwise publishers are not ready for first messages to be sent
@@ -173,7 +179,7 @@ int main(int argc, char **argv){
       moveIK(curpos);
 
       //sleep(1.0);
-      usleep(10000);
+      usleep(100000);
     }
     // backward at faster speed.
     for(unsigned int i=0; i < 101; i ++)
@@ -186,7 +192,7 @@ int main(int argc, char **argv){
       moveIK(curpos);
 
       //sleep(1.0);
-      usleep(5000);
+      usleep(50000);
     }
   }
   //ros::shutdown();

@@ -9,9 +9,9 @@
 	<!-- send parameters needed for motion planning -->
 	<rosparam command="load" ns="robot_description_planning" file="$(find sr_object_manipulation_launch)/config/planning_groups.yaml" />
 
-	<param name="arm_description" textfile="$(find sr_hand)/model/robots/sr_arm_motor.urdf"/>
-	<param name="hand_description" textfile="$(find sr_hand)/model/robots/shadowhand_motor.urdf"/>
-	<param name="robot_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
+	<param name="arm_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
+	<param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_motor.urdf.xacro'" />
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'"/>
 
 	<!--
 	    Kinematics
@@ -40,42 +40,41 @@
 	</node>
 
 	<node pkg="sr_kinematics" name="ff_kinematics" type="sr_kinematics">
-		<param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
+		<param name="urdf_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'"/>
 		<param name="root_name" type="string" value="palm"/>
 		<param name="tip_name" type="string" value="ffdistal"/>
 		<param name="maxIterations" type="int" value="1000"/>
 		<param name="epsilon" type="double" value="0.001"/>
 	</node>
 	<node pkg="sr_kinematics" name="mf_kinematics" type="sr_kinematics">
-		<param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
+		<param name="urdf_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'"/>
 		<param name="root_name" type="string" value="palm"/>
 		<param name="tip_name" type="string" value="mfdistal"/>
 		<param name="maxIterations" type="int" value="1000"/>
 		<param name="epsilon" type="double" value="0.001"/>
 	</node>
 	<node pkg="sr_kinematics" name="rf_kinematics" type="sr_kinematics">
-		<param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
+		<param name="urdf_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'"/>
 		<param name="root_name" type="string" value="palm"/>
 		<param name="tip_name" type="string" value="rfdistal"/>
 		<param name="maxIterations" type="int" value="1000"/>
 		<param name="epsilon" type="double" value="0.001"/>
 	</node>
 	<node pkg="sr_kinematics" name="lf_kinematics" type="sr_kinematics">
-		<param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
+		<param name="urdf_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'"/>
 		<param name="root_name" type="string" value="palm"/>
 		<param name="tip_name" type="string" value="lfdistal"/>
 		<param name="maxIterations" type="int" value="1000"/>
 		<param name="epsilon" type="double" value="0.001"/>
 	</node>
-<!--	<node pkg="arm_kinematics" name="th_kinematics" type="sr_kinematics">
-		<param name="urdf_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
+<!--	<node pkg="arm_kinematics" name="th_kinematics" type="arm_kinematics">
+		<param name="urdf_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'"/>
 		<param name="root_name" type="string" value="palm"/>
 		<param name="tip_name" type="string" value="thdistal"/>
 		<param name="maxIterations" type="int" value="1000"/>
 		<param name="epsilon" type="double" value="0.5"/>
 	</node>
 -->
-
 
 
 	<node pkg="sr_hand" name="shadowarm"
