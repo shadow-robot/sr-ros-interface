@@ -8,8 +8,8 @@
       <inertial>
 	<!--<origin xyz="0 0.010 0.213" rpy="0 0 0" />-->
 	<insert_block name="origin" />
-	<mass value="0.3" />
-	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0" izz="0.0" /> 
+	<mass value="0.1" />
+	<inertia  ixx="0.120" ixy="0.0"  ixz="0.0"  iyy="0.148"  iyz="0.0" izz="0.0438" /> 
       </inertial>
       <visual>
 	<origin xyz="0 0 0" rpy="0 0 0" />
@@ -36,7 +36,7 @@
       <!--<origin xyz="0 -0.010 0.213" rpy="0 0 0" />-->
       <insert_block name="origin" />
       <axis xyz="0 1 0" />
-      <limit lower="-0.52359877559829882" upper="0.17453292519943295" effort="10" velocity="1.0"/>
+      <limit lower="-0.52359877559829882" upper="0.17453292519943295" effort="1" velocity="0.2"/>
       <dynamics damping="50.5"/>
     </joint>
 

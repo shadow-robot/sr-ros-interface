@@ -50,7 +50,7 @@
        </node>
   -->
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub"
-	args="0 -0.2 -0.01 1.55 0 0 base_link /srh/position/forearm_motor 100" />
+	args="0 -0.2 -0.01 1.5708 0 0 base_link /srh/position/forearm_motor 100" />
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub"
 	args="0 0 0 0 0 0 /srh/position/forearm_motor /srh/target/forearm_motor
 	      100" />
