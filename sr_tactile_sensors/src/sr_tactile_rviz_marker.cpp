@@ -14,7 +14,7 @@ ros::Subscriber sub[5];
 ros::Publisher marker_pub;
 std_msgs::Float64::_data_type data[5];
 boost::mutex update_mutex;
-
+float reduction_factor=10;
 // Set our initial shape type to be a cube
 uint32_t shape = visualization_msgs::Marker::ARROW;
 
@@ -77,44 +77,44 @@ void callback_ff(const std_msgs::Float64ConstPtr& msg)
 {
   update_mutex.lock();
   data[0] = msg->data;
-  publish_marker(0,"ffdistal", msg->data/(180.0));
+  publish_marker(0,"ffdistal", msg->data/reduction_factor);
   update_mutex.unlock();
 }
 void callback_mf(const std_msgs::Float64ConstPtr& msg)
 {
   update_mutex.lock();
   data[1] = msg->data;
-  publish_marker(1,"mfdistal", msg->data/(180.0));
+  publish_marker(1,"mfdistal", msg->data/reduction_factor);
   update_mutex.unlock();
 }
 void callback_rf(const std_msgs::Float64ConstPtr& msg)
 {
   update_mutex.lock();
   data[2] = msg->data;
-  publish_marker(2,"rfdistal", msg->data/(180.0));
+  publish_marker(2,"rfdistal", msg->data/reduction_factor);
   update_mutex.unlock();
 }
 void callback_lf(const std_msgs::Float64ConstPtr& msg)
 {
   update_mutex.lock();
   data[3] = msg->data;
-  publish_marker(3,"lfdistal", msg->data/(180.0));
+  publish_marker(3,"lfdistal", msg->data/reduction_factor);
   update_mutex.unlock();
 }
 void callback_th(const std_msgs::Float64ConstPtr& msg)
 {
   update_mutex.lock();
   data[4] = msg->data;
-  publish_marker(4,"thdistal", msg->data/(180.0));
+  publish_marker(4,"thdistal", msg->data/reduction_factor);
   update_mutex.unlock();
 }
 
 int main( int argc, char** argv )
 {
-  ros::init(argc, argv, "basic_shapes");
+  ros::init(argc, argv, "sr_tactile_rviz_marker");
   ros::NodeHandle n;
   ros::Rate r(10);
-  marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
+  marker_pub = n.advertise<visualization_msgs::Marker>("sr_tactile_markers", 1);
 
   sub[0] = n.subscribe("/sr_tactile/touch/ff", 2,  callback_ff);
   sub[1] = n.subscribe("/sr_tactile/touch/mf", 2,  callback_mf);

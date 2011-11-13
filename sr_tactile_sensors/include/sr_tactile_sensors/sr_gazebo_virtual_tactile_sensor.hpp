@@ -57,6 +57,7 @@ namespace shadowrobot
     ros::NodeHandle nh;
     boost::mutex touch_mutex;
     double touch_value;
+    bool touch_freshdata;
 
     ros::Subscriber sub;
     /**

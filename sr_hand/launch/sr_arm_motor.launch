@@ -8,6 +8,7 @@
 
   <param name="arm_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
 
+ <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'" />
 
   <!--
            shadowarm 
@@ -89,11 +90,17 @@
   <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100" />
 
  <!-- Joint States positions merger to get one single vector for both arm and hand -->
-   <node pkg="sr_utilities" type="ordered_position_joint_states_merger.py" name="ordered_position_joint_states_merger"/>
+   <node pkg="sr_utilities" type="ordered_position_joint_states_merger.py" name="ordered_position_joint_states_merger"/> 
 <!-- Joint States targets merger to get one single vector for both arm and hand -->
    <node pkg="sr_utilities" type="ordered_target_joint_states_merger.py" name="ordered_target_joint_states_merger"/>
   
   
+ <node pkg="robot_state_publisher" type="state_publisher"
+        name="robot_state_publisher_full_pos"
+               >
+                <param name="publish_frequency" type="double" value="20.0" />
+        </node>
+
   <!--
      Diagnostic Aggregator
                           -->

@@ -66,7 +66,7 @@ ENDIF(DEFINED real_hand)
 #  RVIZ MARKER FOR TACTILES #
 #############################
 rosbuild_add_executable(sr_tactile_rviz_marker src/sr_tactile_rviz_marker.cpp)
-
+rosbuild_add_executable(sr_bumper_rviz_marker src/sr_bumper_rviz_marker.cpp)
 ###############
 #   EXAMPLES  #
 ###############

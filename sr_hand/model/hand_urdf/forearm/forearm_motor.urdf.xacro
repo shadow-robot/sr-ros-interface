@@ -7,7 +7,7 @@
     <link name="forearm_motor">
       <inertial>
 	<origin xyz="0 0 0" /> 
-	<mass value="30.0" />
+	<mass value="15.0" />
 	<inertia  ixx="10.8" ixy="0.0"  ixz="0.0"  iyy="10.8"  iyz="0.0"  izz="5.4" />
       </inertial>
       <visual>
