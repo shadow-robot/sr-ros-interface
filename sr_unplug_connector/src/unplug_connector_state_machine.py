@@ -34,6 +34,7 @@ from std_srvs.srv import Empty
 
 from interactive_marker import InteractiveConnectorSelector
 
+#the distance at which the connector is going to be lifted.
 MAX_LIFT_DISTANCE = 0.2
 
 class UnplugConnectorStateMachine(object):
@@ -80,20 +81,23 @@ class UnplugConnectorStateMachine(object):
                 #we received a list of grasps. Select the best one
                 best_grasp = self.select_best_grasp( list_of_grasps )
 
+                #grasp using the selected grasp
                 result = self.grasp_connector( best_grasp )
 
                 if result:
+                    #unplug the grasped connector
                     self.unplug_connector( best_grasp )
             self.running = False
 
         return []
 
     def detection_callback(self, msg):
+        #called each time an object is detected.
+        #update the header and the detected_objects
         self.recognition_header = msg.Image.header
 
         for index, name in enumerate(msg.ObjectNames):
             self.detected_objects[ name ] = msg.Detections[index]
-
 
         self.interactive_markers = InteractiveConnectorSelector(msg.ObjectNames, self.run)
 
@@ -101,17 +105,19 @@ class UnplugConnectorStateMachine(object):
         """
         Plan the grasps.
 
+        @name name of the selected object
         @return a list containing all the possible grasps for the selected object.
         """
         while self.detected_objects == {}:
             rospy.loginfo("Waiting to identify the object")
             time.sleep(0.1)
 
+        #builds the graspable object to send to the grasp planner from the detected_objects,
+        # we compute the grasps for the selected object only
         graspable_object = GraspableObject()
-
         graspable_object.cluster = self.points3d_to_pcl( self.detected_objects[name].points3d )
 
-        rospy.loginfo("Detected object, trying to grasp it")
+        rospy.loginfo("Setected object: "+ name + ", trying to grasp it")
 
         try:
             resp1 = self.grasp_planner_srv( arm_name="", target=graspable_object, collision_object_name="",
@@ -132,7 +138,6 @@ class UnplugConnectorStateMachine(object):
 
         #Get the closest grasp.
         min_distance = self.distance(list_of_grasps[0].grasp_pose, palm_pose)
-
         tmp_index = 0
         for index, grasp in enumerate(list_of_grasps):
             grasp_pose = grasp.grasp_pose
@@ -157,6 +162,8 @@ class UnplugConnectorStateMachine(object):
         trans = None
         rot = None
 
+        #try to get the pose of the given link_name
+        # in the base_link frame.
         for i in range (0, 500):
             try:
                 (trans, rot) = self.tf_listener.lookupTransform( '/base_link', link_name,
@@ -179,6 +186,8 @@ class UnplugConnectorStateMachine(object):
 
 
     def distance(self, pose1, pose2):
+        #compute the distance between two poses.
+        # is this the correct method to compute the distance?
         pose_1_vec = numpy.array( [ pose1.position.x, pose1.position.y, pose1.position.z, pose1.orientation.x,
                                     pose1.orientation.y, pose1.orientation.z, pose1.orientation.w ] )
         pose_2_vec = numpy.array( [ pose2.position.x, pose2.position.y, pose2.position.z, pose2.orientation.x,
