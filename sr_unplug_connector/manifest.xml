@@ -18,6 +18,7 @@
   <depend package="sensor_msgs"/>
   <depend package="denso_msgs"/>
   <depend package="std_srvs"/>
+  <depend package="interactive_markers"/>
 
 </package>
 
