@@ -30,6 +30,9 @@ from geometry_msgs.msg import Pose
 from sensor_msgs.msg import PointCloud
 from std_srvs.srv import Empty
 
+
+MAX_LIFT_DISTANCE = 0.2
+
 class UnplugConnectorStateMachine(object):
     """
     """
@@ -194,8 +197,8 @@ class UnplugConnectorStateMachine(object):
         self.denso_arm_client.send_goal( arm_goal )
         self.denso_arm_client.wait_for_result()
 
-        res =  self.grasp_client.get_result()
-        if res.result.value != MoveArmPoseResult.SUCCESS:
+        res =  self.denso_arm_client.get_result()
+        if res.val != MoveArmPoseResult.SUCCESS:
             rospy.logerr("Failed to move the arm to the given position.")
             return False
 
@@ -214,7 +217,35 @@ class UnplugConnectorStateMachine(object):
         return True
 
     def unplug_connector(self, grasp):
-        #TODO: go up with the arm
+        #We compute a list of poses to send to
+        # the arm (going up from grasp)
+        list_poses = []
+        z = 0.0
+        lift_step = 0.01
+        pose_tmp = grasp.grasp_pose
+        while z <= MAX_LIFT_DISTANCE:
+            z += lift_step
+            pose_tmp.position.z += lift_step
+            list_poses.append( pose_tmp )
+
+        # We send one position after the other
+        # to the arm.
+        for pose_tmp in list_poses:
+            arm_goal = MoveArmPoseGoal()
+            arm_goal.goal = pose_tmp
+            arm_goal.rate = 100
+            arm_goal.time_out = rospy.Duration.from_sec(2.)
+
+            self.denso_arm_client.send_goal( arm_goal )
+            self.denso_arm_client.wait_for_result()
+
+            res =  self.denso_arm_client.get_result()
+            if res.val != MoveArmPoseResult.SUCCESS:
+                rospy.logerr("Failed to move the arm to the given position.")
+                return False
+
+
+        #TODO: delete this sleep
         time.sleep(1)
 
         #finally we release the object
