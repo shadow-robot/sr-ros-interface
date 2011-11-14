@@ -15,7 +15,7 @@
   <depend package="rospy"/>
   <depend package="actionlib"/>
   <depend package="object_manipulation_msgs"/>
-  <depend package="sensor_msgs"/>
+  <depend package="re_kinect_object_detector"/>
   <depend package="denso_msgs"/>
   <depend package="std_srvs"/>
   <depend package="interactive_markers"/>

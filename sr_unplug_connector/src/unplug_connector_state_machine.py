@@ -27,7 +27,7 @@ from object_manipulation_msgs.msg import GraspableObject, GraspHandPostureExecut
 from object_manipulation_msgs.srv import GraspPlanning
 from denso_msgs.msg import MoveArmPoseGoal, MoveArmPoseResult, MoveArmPoseAction
 from geometry_msgs.msg import Pose
-from sensor_msgs.msg import PointCloud
+from re_kinect_object_detector.msg import DetectionResult
 from std_srvs.srv import Empty
 
 from interactive_marker import InteractiveConnectorSelector
@@ -42,15 +42,14 @@ class UnplugConnectorStateMachine(object):
         """
         """
         rospy.init_node("unplug_connector")
-        self.object_point_cloud_received = False
 
         self.point_cloud_subscriber = None
         self.grasp_planner_srv = None
-        self.object_point_cloud = None
+        self.detected_objects = {}
 
         self.tf_listener = tf.TransformListener()
 
-        self.point_cloud_subscriber = rospy.Subscriber("~object_pcl_input", PointCloud, self.object_pcl_callback)
+        self.point_cloud_subscriber = rospy.Subscriber("~input", DetectionResult, self.detection_callback)
 
         rospy.wait_for_service('/sr_grasp_planner/plan_point_cluster_grasp')
         self.grasp_planner_srv = rospy.ServiceProxy( '/sr_grasp_planner/plan_point_cluster_grasp', GraspPlanning )
@@ -66,7 +65,7 @@ class UnplugConnectorStateMachine(object):
         rospy.spin()
 
     def run(self, req):
-        list_of_grasps = self.plan_grasp()
+        list_of_grasps = self.plan_grasp( req )
 
         if list_of_grasps != []:
             #we received a list of grasps. Select the best one
@@ -79,25 +78,25 @@ class UnplugConnectorStateMachine(object):
 
         return []
 
-    def object_pcl_callback(self, msg):
-        if not self.object_point_cloud_received:
-            self.object_point_cloud_received = True
+    def detection_callback(self, msg):
+        rospy.logerr( "received" )
+        for index, name in enumerate(msg.ObjectNames):
+            print name
+            self.detected_objects[ name ] = msg.Detections[index]
+        self.interactive_markers = InteractiveConnectorSelector(msg.ObjectNames, self.run)
 
-        self.object_point_cloud = msg
-        self.interactive_markers = InteractiveConnectorSelector(["Cup.RobotAreCoolCup"], self.run)
-
-    def plan_grasp(self):
+    def plan_grasp(self, name):
         """
         Plan the grasps.
 
         @return a list containing all the possible grasps for the selected object.
         """
-        while self.object_point_cloud == None:
+        while self.detected_objects == {}:
             rospy.loginfo("Waiting to identify the object")
             time.sleep(0.1)
 
         graspable_object = GraspableObject()
-        graspable_object.cluster = self.object_point_cloud
+        graspable_object.cluster = self.detected_objects[name].points3d
 
         rospy.loginfo("Detected object, trying to grasp it")
 

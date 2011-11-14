@@ -21,11 +21,6 @@
     </rosparam>
   </node>
 
-  <node pkg="point_cloud_converter" name="point_cloud_converter" type="point_cloud_converter" respawn="false">
-  	<remap from="/points2_in" to="/re_kinect/feature_pcl/filtered" />
-  	<remap from="/points_out" to="/re_kinect/feature_pcl/filtered/old" />
-  </node>
-
   <node name="cluster_bounding_box_finder" pkg="object_manipulator"
 	type="cluster_bounding_box_finder_server.py"
 	output="screen"
@@ -39,7 +34,7 @@
   <node pkg="sr_move_arm" type="hand_posture_execution" name="hand_posture_execution" output="screen" />
 
   <node pkg="sr_unplug_connector" name="sr_unplug_connector" type="sr_unplug_connector" output="screen">
-    <remap from="~object_pcl_input" to="/re_kinect/feature_pcl/filtered/old"/>
+    <remap from="~input" to="/re_kinect/detection_results"/>
   </node>
 
 </launch>
