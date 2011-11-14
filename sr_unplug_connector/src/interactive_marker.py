@@ -92,11 +92,20 @@ class InteractiveConnectorSelector(object):
         self.server.applyChanges()
 
     def processFeedback(self, feedback):
+        #One of the object has been selected.
+        # We'll update all the dynamic markers
+        # to make the selected one prominent.
+
+        #this is the name of the selected object.
         selected_name = feedback.marker_name
+
+        #we loop through all our interactive markers.
         for index, name in enumerate(self.object_controls):
             self.object_controls[name].markers.remove( self.object_markers[name] )
 
             if name == selected_name:
+                # the selected object marker is set
+                # higher, bigger and in green
                 self.object_markers[name].pose.position.z = 0.65
 
                 self.object_markers[name].scale.x = 0.15
@@ -106,6 +115,8 @@ class InteractiveConnectorSelector(object):
                 self.object_markers[name].color.g = 0.83
                 self.object_markers[name].color.b = 0.15
             else:
+                #the other objects are slightly lower,
+                # smaller and in purple
                 self.object_markers[name].pose.position.z = 0.6
 
                 self.object_markers[name].scale.x = 0.1
@@ -119,10 +130,12 @@ class InteractiveConnectorSelector(object):
 
             self.server.insert(self.int_markers[name])
 
+        #we update the interactive marker server
         self.server.applyChanges()
         self.callback_function( selected_name )
 
 
+#this is just used for debug
 if __name__=="__main__":
     rospy.init_node("simple_marker")
 
