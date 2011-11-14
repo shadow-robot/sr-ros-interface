@@ -24,7 +24,9 @@ import smach, smach_ros, tf, actionlib
 import time, numpy
 
 from object_manipulation_msgs.msg import GraspableObject, GraspHandPostureExecutionAction, GraspHandPostureExecutionGoal, ManipulationResult
+
 from object_manipulation_msgs.srv import GraspPlanning
+from sensor_msgs.msg import PointCloud
 from denso_msgs.msg import MoveArmPoseGoal, MoveArmPoseResult, MoveArmPoseAction
 from geometry_msgs.msg import Pose
 from re_kinect_object_detector.msg import DetectionResult
@@ -43,13 +45,18 @@ class UnplugConnectorStateMachine(object):
         """
         rospy.init_node("unplug_connector")
 
-        self.point_cloud_subscriber = None
+        self.running = False
+        self.recognition_header = None
+        self.detection_subscriber = None
         self.grasp_planner_srv = None
         self.detected_objects = {}
 
         self.tf_listener = tf.TransformListener()
 
-        self.point_cloud_subscriber = rospy.Subscriber("~input", DetectionResult, self.detection_callback)
+        self.detection_subscriber = rospy.Subscriber("~input", DetectionResult, self.detection_callback)
+
+
+        self.pub_pcl = rospy.Publisher("/test", PointCloud)
 
         rospy.wait_for_service('/sr_grasp_planner/plan_point_cluster_grasp')
         self.grasp_planner_srv = rospy.ServiceProxy( '/sr_grasp_planner/plan_point_cluster_grasp', GraspPlanning )
@@ -65,24 +72,29 @@ class UnplugConnectorStateMachine(object):
         rospy.spin()
 
     def run(self, req):
-        list_of_grasps = self.plan_grasp( req )
+        if not self.running:
+            self.running = True
+            list_of_grasps = self.plan_grasp( req )
 
-        if list_of_grasps != []:
-            #we received a list of grasps. Select the best one
-            best_grasp = self.select_best_grasp( list_of_grasps )
+            if list_of_grasps != []:
+                #we received a list of grasps. Select the best one
+                best_grasp = self.select_best_grasp( list_of_grasps )
 
-            result = self.grasp_connector( best_grasp )
+                result = self.grasp_connector( best_grasp )
 
-            if result:
-                self.unplug_connector( best_grasp )
+                if result:
+                    self.unplug_connector( best_grasp )
+            self.running = False
 
         return []
 
     def detection_callback(self, msg):
-        rospy.logerr( "received" )
+        self.recognition_header = msg.Image.header
+
         for index, name in enumerate(msg.ObjectNames):
-            print name
             self.detected_objects[ name ] = msg.Detections[index]
+
+
         self.interactive_markers = InteractiveConnectorSelector(msg.ObjectNames, self.run)
 
     def plan_grasp(self, name):
@@ -96,7 +108,8 @@ class UnplugConnectorStateMachine(object):
             time.sleep(0.1)
 
         graspable_object = GraspableObject()
-        graspable_object.cluster = self.detected_objects[name].points3d
+
+        graspable_object.cluster = self.points3d_to_pcl( self.detected_objects[name].points3d )
 
         rospy.loginfo("Detected object, trying to grasp it")
 
@@ -115,7 +128,7 @@ class UnplugConnectorStateMachine(object):
         #select the best grasp based on the distance from the palm
         # First, we read the pose for the palm.
         palm_pose = self.get_pose("/srh/position/palm")
-        print " PALM: ",palm_pose
+        #rospy.logdebug( " PALM: ", palm_pose )
 
         #Get the closest grasp.
         min_distance = self.distance(list_of_grasps[0].grasp_pose, palm_pose)
@@ -129,11 +142,11 @@ class UnplugConnectorStateMachine(object):
                 min_distance = distance
                 tmp_index = index
 
-        print "----"
-        print "BEST GRASP:"
-        print " distance = ", min_distance, " (", tmp_index,")"
-        print best_grasp
-        print "----"
+        #rospy.logdebug( "----" )
+        #rospy.logdebug( "BEST GRASP:" )
+        #rospy.logdebug( " distance = ", min_distance, " (", tmp_index,")" )
+        #rospy.logdebug( "", best_grasp )
+        #rospy.logdebug( "----" )
         #then transform the grasp pose to be in the denso arm tf frame
         #may be not necessary: base link is probably the base of the
         #denso arm
@@ -264,3 +277,15 @@ class UnplugConnectorStateMachine(object):
             return False
 
         return True
+
+    def points3d_to_pcl(self, points3d):
+        pcl = PointCloud()
+
+        #transforms the points3d list into a pointcloud
+        pcl.header = self.recognition_header
+
+        pcl.points = points3d
+
+        self.pub_pcl.publish(pcl)
+
+        return pcl

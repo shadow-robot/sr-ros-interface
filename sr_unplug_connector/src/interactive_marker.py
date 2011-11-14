@@ -37,8 +37,6 @@ class InteractiveConnectorSelector(object):
         for object_name in self.object_names:
             self.create_marker( object_name )
 
-        rospy.spin()
-
     def create_marker(self, object_name):
         # create an interactive marker for our server
         int_marker = InteractiveMarker()
@@ -129,4 +127,4 @@ if __name__=="__main__":
     rospy.init_node("simple_marker")
 
     int_mark = InteractiveConnectorSelector(["Cup.RobotAreCoolCup", "srh/position/forearm_motor"], None)
-
+    rospy.spin()
