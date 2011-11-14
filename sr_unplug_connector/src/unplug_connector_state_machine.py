@@ -19,20 +19,16 @@
 import roslib; roslib.load_manifest('sr_unplug_connector')
 import rospy
 
-import smach
-import smach_ros
+import smach, smach_ros, tf, actionlib
 
-import time
+import time, numpy
 
 from object_manipulation_msgs.msg import GraspableObject, GraspHandPostureExecutionAction, GraspHandPostureExecutionGoal, ManipulationResult
 from object_manipulation_msgs.srv import GraspPlanning
-
 from denso_msgs.msg import MoveArmPoseGoal, MoveArmPoseResult, MoveArmPoseAction
-
+from geometry_msgs.msg import Pose
 from sensor_msgs.msg import PointCloud
 from std_srvs.srv import Empty
-
-import actionlib
 
 class UnplugConnectorStateMachine(object):
     """
@@ -47,6 +43,8 @@ class UnplugConnectorStateMachine(object):
         self.point_cloud_subscriber = None
         self.grasp_planner_srv = None
         self.object_point_cloud = None
+
+        self.tf_listener = tf.TransformListener()
 
         self.point_cloud_subscriber = rospy.Subscriber("~object_pcl_input", PointCloud, self.object_pcl_callback)
 
@@ -110,11 +108,59 @@ class UnplugConnectorStateMachine(object):
     def select_best_grasp(self, list_of_grasps):
         best_grasp = list_of_grasps[0]
 
-        #TODO: select the best grasp based on the distance from the arm
+        #select the best grasp based on the distance from the palm
+        # First, we read the pose for the palm.
+        trans = None
+        rot = None
+        for i in range (0, 500):
+            try:
+                (trans, rot) = self.tf_listener.lookupTransform( '/base_link', '/srh/position/palm',
+                                                                 rospy.Time(0) )
+                break
+            except (tf.LookupException, tf.ConnectivityException):
+                continue
 
+        palm_pose = None
+        palm_pose = Pose()
+        palm_pose.position.x = trans[0]
+        palm_pose.position.y = trans[1]
+        palm_pose.position.z = trans[2]
+        palm_pose.orientation.x = rot[0]
+        palm_pose.orientation.y = rot[1]
+        palm_pose.orientation.z = rot[2]
+        palm_pose.orientation.w = rot[3]
+        print " PALM: ",palm_pose
+
+        #Get the closest grasp.
+        min_distance = self.distance(list_of_grasps[0].grasp_pose, palm_pose)
+
+        tmp_index = 0
+        for index, grasp in enumerate(list_of_grasps):
+            grasp_pose = grasp.grasp_pose
+            distance = self.distance(grasp_pose, palm_pose)
+            if distance < min_distance:
+                best_grasp = grasp
+                min_distance = distance
+                tmp_index = index
+
+        print "----"
+        print "BEST GRASP:"
+        print " distance = ", min_distance, " (", tmp_index,")"
+        print best_grasp
+        print "----"
         #then transform the grasp pose to be in the denso arm tf frame
+        #may be not necessary: base link is probably the base of the
+        #denso arm
 
         return best_grasp
+
+    def distance(self, pose1, pose2):
+        pose_1_vec = numpy.array( [ pose1.position.x, pose1.position.y, pose1.position.z, pose1.orientation.x,
+                                    pose1.orientation.y, pose1.orientation.z, pose1.orientation.w ] )
+        pose_2_vec = numpy.array( [ pose2.position.x, pose2.position.y, pose2.position.z, pose2.orientation.x,
+                                    pose2.orientation.y, pose2.orientation.z, pose2.orientation.w ] )
+        return numpy.linalg.norm( pose_1_vec - pose_2_vec )
+
 
     def grasp_connector(self, grasp):
         #First we set the hand to the pregrasp position
@@ -162,6 +208,7 @@ class UnplugConnectorStateMachine(object):
 
     def unplug_connector(self, grasp):
         #TODO: go up with the arm
+        time.sleep(1)
 
         #finally we release the object
         goal = GraspHandPostureExecutionGoal()
