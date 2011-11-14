@@ -30,6 +30,7 @@ from geometry_msgs.msg import Pose
 from sensor_msgs.msg import PointCloud
 from std_srvs.srv import Empty
 
+from interactive_marker import InteractiveConnectorSelector
 
 MAX_LIFT_DISTANCE = 0.2
 
@@ -83,6 +84,7 @@ class UnplugConnectorStateMachine(object):
             self.object_point_cloud_received = True
 
         self.object_point_cloud = msg
+        self.interactive_markers = InteractiveConnectorSelector(["Cup.RobotAreCoolCup"], self.run)
 
     def plan_grasp(self):
         """

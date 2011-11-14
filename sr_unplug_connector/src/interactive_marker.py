@@ -22,10 +22,11 @@ import rospy
 from interactive_markers.interactive_marker_server import *
 
 class InteractiveConnectorSelector(object):
-    def __init__(self, object_names):
+    def __init__(self, object_names, callback_fct):
         # create an interactive marker server on the topic namespace simple_marker
         self.server = InteractiveMarkerServer("select_connector")
 
+        self.callback_function = callback_fct
         self.object_names = object_names
 
         self.int_markers = {}
@@ -121,10 +122,11 @@ class InteractiveConnectorSelector(object):
             self.server.insert(self.int_markers[name])
 
         self.server.applyChanges()
+        self.callback_function( selected_name )
 
 
 if __name__=="__main__":
     rospy.init_node("simple_marker")
 
-    int_mark = InteractiveConnectorSelector(["Cup.RobotAreCoolCup", "srh/position/forearm_motor"])
+    int_mark = InteractiveConnectorSelector(["Cup.RobotAreCoolCup", "srh/position/forearm_motor"], None)
 
