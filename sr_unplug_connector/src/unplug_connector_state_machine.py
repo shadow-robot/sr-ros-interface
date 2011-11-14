@@ -110,25 +110,7 @@ class UnplugConnectorStateMachine(object):
 
         #select the best grasp based on the distance from the palm
         # First, we read the pose for the palm.
-        trans = None
-        rot = None
-        for i in range (0, 500):
-            try:
-                (trans, rot) = self.tf_listener.lookupTransform( '/base_link', '/srh/position/palm',
-                                                                 rospy.Time(0) )
-                break
-            except (tf.LookupException, tf.ConnectivityException):
-                continue
-
-        palm_pose = None
-        palm_pose = Pose()
-        palm_pose.position.x = trans[0]
-        palm_pose.position.y = trans[1]
-        palm_pose.position.z = trans[2]
-        palm_pose.orientation.x = rot[0]
-        palm_pose.orientation.y = rot[1]
-        palm_pose.orientation.z = rot[2]
-        palm_pose.orientation.w = rot[3]
+        palm_pose = self.get_pose("/srh/position/palm")
         print " PALM: ",palm_pose
 
         #Get the closest grasp.
@@ -153,6 +135,31 @@ class UnplugConnectorStateMachine(object):
         #denso arm
 
         return best_grasp
+
+    def get_pose(self, link_name):
+        trans = None
+        rot = None
+
+        for i in range (0, 500):
+            try:
+                (trans, rot) = self.tf_listener.lookupTransform( '/base_link', link_name,
+                                                                 rospy.Time(0) )
+                break
+            except (tf.LookupException, tf.ConnectivityException):
+                continue
+
+        pose = None
+        pose = Pose()
+        pose.position.x = trans[0]
+        pose.position.y = trans[1]
+        pose.position.z = trans[2]
+        pose.orientation.x = rot[0]
+        pose.orientation.y = rot[1]
+        pose.orientation.z = rot[2]
+        pose.orientation.w = rot[3]
+
+        return pose
+
 
     def distance(self, pose1, pose2):
         pose_1_vec = numpy.array( [ pose1.position.x, pose1.position.y, pose1.position.z, pose1.orientation.x,
