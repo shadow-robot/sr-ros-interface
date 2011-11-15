@@ -33,6 +33,7 @@
 #include <std_msgs/Float64.h>
 
 #include <denso_msgs/MoveArmPoseAction.h>
+#include <denso_msgs/SetTooltip.h>
 #include <actionlib/server/simple_action_server.h>
 
 #include "denso_arm/denso_arm.hpp"
@@ -53,6 +54,9 @@ namespace denso
     typedef actionlib::SimpleActionServer<denso_msgs::MoveArmPoseAction> MoveArmPoseServer;
 
     void go_to_arm_pose(const denso_msgs::MoveArmPoseGoalConstPtr& goal);
+
+    bool set_tooltip( denso_msgs::SetTooltip::Request& req,
+                      denso_msgs::SetTooltip::Response& resp );
 
   protected:
     ros::NodeHandle node_;
@@ -78,6 +82,9 @@ namespace denso
     denso_msgs::MoveArmPoseResult move_arm_pose_result_;
     ///The feedback: published while waiting for the action to be finished
     denso_msgs::MoveArmPoseFeedback move_arm_pose_feedback_;
+
+    ///A service server to be able to specify the tooltip pose (for IK)
+    ros::ServiceServer tooltip_server;
 
     ///Initialize the denso_joints_ vector.
     void init_joints();
