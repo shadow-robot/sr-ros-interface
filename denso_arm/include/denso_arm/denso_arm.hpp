@@ -67,6 +67,15 @@ namespace denso
 
     void get_cartesian_position( boost::shared_ptr<Pose> pose);
 
+    /**
+     * Sets the pose of the tooltip for the IK.
+     *
+     * @param pose the pose of the tooltip
+     *
+     * @return true if success
+     */
+    bool set_tooltip( Pose pose );
+
     unsigned short get_nb_joints()
     {
       return nb_joints_;

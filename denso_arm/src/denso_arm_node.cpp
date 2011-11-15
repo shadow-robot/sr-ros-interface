@@ -41,6 +41,9 @@ namespace denso
     publisher_js_ = node_.advertise<sensor_msgs::JointState>("joint_states", 5);
     timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
 
+    //init the tooltip server
+    tooltip_server = node_.advertiseService("set_tooltip", &DensoArmNode::set_tooltip, this);
+
     //init the actionlib server
     move_arm_pose_server_.reset(new MoveArmPoseServer(node_, "move_arm_pose",
                                                       boost::bind(&DensoArmNode::go_to_arm_pose, this, _1),
@@ -83,6 +86,14 @@ namespace denso
       joint_state_msg_.velocity.push_back( 0.0 );
       joint_state_msg_.effort.push_back( 0.0 );
     }
+  }
+
+
+  bool DensoArmNode::set_tooltip( denso_msgs::SetTooltip::Request& req,
+                                  denso_msgs::SetTooltip::Response& resp )
+  {
+    Pose pose = geometry_pose_to_denso_pose( req.tooltip_pose );
+    return denso_arm_->set_tooltip( pose );
   }
 
   void DensoArmNode::go_to_arm_pose(const denso_msgs::MoveArmPoseGoalConstPtr& goal)

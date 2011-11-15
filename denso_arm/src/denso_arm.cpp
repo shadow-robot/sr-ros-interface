@@ -109,6 +109,13 @@ namespace denso
   ///////
   // IN CARTESIAN SPACE
 
+  bool DensoArm::set_tooltip( Pose pose )
+  {
+    //TODO: set the tooltip pose.
+
+    return true;
+  }
+
   bool DensoArm::send_cartesian_position( const Pose& pose )
   {
     std::stringstream command;
