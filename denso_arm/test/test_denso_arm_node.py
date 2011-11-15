@@ -29,6 +29,15 @@ def denso_arm_client( rate, time_out ):
     client.wait_for_server()
 
     pose_goal = Pose()
+    pose_goal.position.x = 0.52013
+    pose_goal.position.y = 0.06585
+    pose_goal.position.z = 0.28740
+
+    pose_goal.orientation.x = 0.0
+    pose_goal.orientation.y = 0.7071067811865476
+    pose_goal.orientation.z = 0.0
+    pose_goal.orientation.w = 0.7071067811865476
+
     goal = denso_msgs.msg.MoveArmPoseGoal(pose_goal, rate, rospy.rostime.Duration(time_out) )
 
     client.send_goal(goal)

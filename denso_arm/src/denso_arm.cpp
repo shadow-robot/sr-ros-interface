@@ -33,7 +33,7 @@ namespace denso
 
   DensoArm::DensoArm()
   {
-    init("10.1.1.1", 1234, 0.5);
+    init("10.2.2.222", 5007, 10);
   }
 
   DensoArm::DensoArm(std::string robot_ip, int robot_port, float initial_speed)
@@ -109,10 +109,15 @@ namespace denso
   ///////
   // IN CARTESIAN SPACE
 
-  bool DensoArm::set_tooltip( Pose pose )
+  bool DensoArm::set_tooltip( int tool_number )
   {
-    //TODO: set the tooltip pose.
+      std::stringstream command;
+      command << "Tool="<<tool_number;
 
+      BCAP_HRESULT hr = bCap_RobotChange(socket_handle, robot_handle, (char *) command.str().c_str());
+
+      if( FAILED(hr) )
+        printf("Couldn't set tool number - %i\n", hr);
     return true;
   }
 
@@ -120,13 +125,14 @@ namespace denso
   {
     std::stringstream command;
     command << "P(" <<  pose.x << "," <<  pose.y << "," << pose.z << "," << pose.roll << "," << pose.pitch << "," << pose.yaw << ")";
+    ROS_DEBUG_STREAM(" moving to: " << command.str() );
 
     BCAP_HRESULT hr = bCap_RobotMove(socket_handle, robot_handle, 2 ,(char *) command.str().c_str(), (char * ) "");
 
     if (FAILED(hr) && (hr != BCAP_E_ROBOTISBUSY) )
-      ROS_ERROR("Couldn't move robot - %d", (int) hr);
+      ROS_ERROR("Couldn't move robot - %x", (int) hr);
 
-    return (hr != BCAP_E_ROBOTISBUSY);
+    return ( SUCCEEDED(hr) );
   }
 
 
@@ -205,12 +211,12 @@ namespace denso
 
   void DensoArm::initialise_position_handles (void)
   {
-    BCAP_HRESULT hr = bCap_ControllerGetVariable(socket_handle, controller_handle, (char*)"@CURRENT_POSITION", (char*)"", &cartesian_position_handle);	/* Get var handle  */
+    BCAP_HRESULT hr = bCap_RobotGetVariable(socket_handle, robot_handle, (char*)"@CURRENT_POSITION", (char*)"", &cartesian_position_handle);	/* Get var handle  */
 
     if( FAILED(hr) )
       ROS_ERROR("Couldn't get cartesian variable handle - %i\n", hr);
 
-    hr = bCap_ControllerGetVariable(socket_handle, controller_handle, (char*)"@CURRENT_ANGLE", (char*)"", &joint_position_handle);	/* Get var handle  */
+    hr = bCap_RobotGetVariable(socket_handle, robot_handle, (char*)"@CURRENT_ANGLE", (char*)"", &joint_position_handle);	/* Get var handle  */
 
     if( FAILED(hr) )
       ROS_ERROR("Couldn't get angle variable handle - %i\n", hr);

@@ -35,6 +35,8 @@
 #include <denso_msgs/MoveArmPoseAction.h>
 #include <denso_msgs/SetTooltip.h>
 #include <actionlib/server/simple_action_server.h>
+#include <tf/transform_broadcaster.h>
+#include <sr_utilities/sr_math_utils.hpp>
 
 #include "denso_arm/denso_arm.hpp"
 #include "denso_arm/denso_joints.hpp"
@@ -100,16 +102,20 @@ namespace denso
     Pose geometry_pose_to_denso_pose(geometry_msgs::Pose geom_pose)
     {
       Pose pose_denso;
-      pose_denso.x = geom_pose.position.x;
-      pose_denso.y = geom_pose.position.y;
-      pose_denso.z = geom_pose.position.z;
+      //the position needs to be sent in mm to the denso arm
+      pose_denso.x = geom_pose.position.x * 1000.0;
+      pose_denso.y = geom_pose.position.y * 1000.0;
+      pose_denso.z = geom_pose.position.z * 1000.0;
 
+      double roll, pitch, yaw;
+      btQuaternion q;
+      tf::quaternionMsgToTF(geom_pose.orientation, q);
+      btMatrix3x3(q).getRPY(roll, pitch, yaw);
       //compute rpy from quaternion (cf http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles)
-      pose_denso.roll = atan( (2*(geom_pose.orientation.x*geom_pose.orientation.y + geom_pose.orientation.z*geom_pose.orientation.w))
-                              / ( 1 - 2*(geom_pose.orientation.y*geom_pose.orientation.y + geom_pose.orientation.z*geom_pose.orientation.z))  );
-      pose_denso.pitch = asin( 2*(geom_pose.orientation.x*geom_pose.orientation.z - geom_pose.orientation.w*geom_pose.orientation.y) );
-      pose_denso.yaw = atan( (2*(geom_pose.orientation.x*geom_pose.orientation.w + geom_pose.orientation.y*geom_pose.orientation.z))
-                             / ( 1 - 2*(geom_pose.orientation.z*geom_pose.orientation.z + geom_pose.orientation.w*geom_pose.orientation.w))  );
+      // The rpy needs to be sent in degrees to the denso arm
+      pose_denso.roll = sr_math_utils::to_degrees(roll);
+      pose_denso.pitch = sr_math_utils::to_degrees(pitch);
+      pose_denso.yaw = sr_math_utils::to_degrees(yaw); 
 
       return pose_denso;
     };

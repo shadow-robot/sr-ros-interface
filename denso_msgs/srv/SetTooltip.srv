@@ -1,2 +1,2 @@
-geometry_msgs/Pose tooltip_pose
+int32 tool_number
 ---

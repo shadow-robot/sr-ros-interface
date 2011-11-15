@@ -939,7 +939,7 @@ BCAP_HRESULT bCap_RobotExecute(int iSockFd, u_long lhRobot, char *pStrCommand, u
 
 				hr = bCapSendAndRec(iSockFd, pSndPacket, pRecPacket);
 				if SUCCEEDED(hr){
-printf ("Hello");
+
 			/*		if (pRecPacket->iArgs >= 1){
 
 						copyValue(plResult, pRecPacket->pArg->data, 4);

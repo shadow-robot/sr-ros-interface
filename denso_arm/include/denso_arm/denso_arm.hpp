@@ -70,11 +70,11 @@ namespace denso
     /**
      * Sets the pose of the tooltip for the IK.
      *
-     * @param pose the pose of the tooltip
+     * @param tool_number the number of the tool in the denso arm.
      *
      * @return true if success
      */
-    bool set_tooltip( Pose pose );
+    bool set_tooltip( int tool_number );
 
     unsigned short get_nb_joints()
     {

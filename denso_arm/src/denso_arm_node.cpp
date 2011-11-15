@@ -39,7 +39,7 @@ namespace denso
 
     //init what's needed for the joint states publishing
     publisher_js_ = node_.advertise<sensor_msgs::JointState>("joint_states", 5);
-    timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
+    //timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
 
     //init the tooltip server
     tooltip_server = node_.advertiseService("set_tooltip", &DensoArmNode::set_tooltip, this);
@@ -92,8 +92,7 @@ namespace denso
   bool DensoArmNode::set_tooltip( denso_msgs::SetTooltip::Request& req,
                                   denso_msgs::SetTooltip::Response& resp )
   {
-    Pose pose = geometry_pose_to_denso_pose( req.tooltip_pose );
-    return denso_arm_->set_tooltip( pose );
+    return denso_arm_->set_tooltip( req.tool_number );
   }
 
   void DensoArmNode::go_to_arm_pose(const denso_msgs::MoveArmPoseGoalConstPtr& goal)
@@ -121,8 +120,12 @@ namespace denso
       geometry_msgs::Pose pose_tmp( goal->goal );
       Pose pose_goal = geometry_pose_to_denso_pose( pose_tmp );
 
+      ROS_DEBUG_STREAM(" RPY : " << pose_goal.roll << " / " << pose_goal.pitch << " / " << pose_goal.yaw);
+
       if( denso_arm_->send_cartesian_position( pose_goal ) )
+      {
         break; //We reached the target -> SUCCESS
+      }
 
       //publish feedback
       time_left -= (ros::Time::now() - start_time);
