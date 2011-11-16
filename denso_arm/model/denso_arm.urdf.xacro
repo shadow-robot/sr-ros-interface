@@ -1,0 +1,222 @@
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="denso_arm">
+
+  <include filename="$(find sr_hand)/model/materials.urdf.xacro" />
+
+  <link name="base">
+    <inertial>
+      <mass value="0.010" />
+      <origin xyz="0 0 0.025" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
+		izz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="base_visual">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+      <material name="Grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0" />
+      <geometry name="base_collision_geom">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_1">
+    <inertial>
+      <mass value="0.010" />
+      <origin xyz="0 0 0.025" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
+		izz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="link_1_visual">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+      <material name="Grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0" />
+      <geometry name="link_1_collision_geom">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="denso_J0" type="revolute">
+    <parent link="base"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-2.967" upper="2.967" effort="10"
+	   velocity="1.0" />
+    <dynamics damping="50.5"/>
+  </joint>
+
+  <link name="link_2">
+    <inertial>
+      <mass value="0.010" />
+      <origin xyz="0 0 0.025" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
+		izz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="link_2_visual">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+      <material name="Grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0" />
+      <geometry name="link_2_collision_geom">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="denso_J1" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.745" upper="2.356" effort="10"
+	   velocity="1.0" />
+    <dynamics damping="50.5"/>
+  </joint>
+
+  <link name="link_3">
+    <inertial>
+      <mass value="0.010" />
+      <origin xyz="0 0 0.025" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
+		izz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="link_3_visual">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+      <material name="Grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0" />
+      <geometry name="link_3_collision_geom">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="denso_J2" type="revolute">
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-2.094" upper="2.670" effort="10"
+	   velocity="1.0" />
+    <dynamics damping="50.5"/>
+  </joint>
+
+  <link name="link_4">
+    <inertial>
+      <mass value="0.010" />
+      <origin xyz="0 0 0.025" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
+		izz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="link_4_visual">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+      <material name="Grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0" />
+      <geometry name="link_4_collision_geom">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="denso_J3" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-4.712" upper="4.712" effort="10"
+	   velocity="1.0" />
+    <dynamics damping="50.5"/>
+  </joint>
+
+  <link name="link_5">
+    <inertial>
+      <mass value="0.010" />
+      <origin xyz="0 0 0.025" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
+		izz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="link_5_visual">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+      <material name="Grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0" />
+      <geometry name="link_5_collision_geom">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="denso_J4" type="revolute">
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-2.094" upper="2.094" effort="10"
+	   velocity="1.0" />
+    <dynamics damping="50.5"/>
+  </joint>
+
+  <link name="link_6">
+    <inertial>
+      <mass value="0.010" />
+      <origin xyz="0 0 0.025" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"
+		izz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry name="link_6_visual">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+      <material name="Grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0" />
+      <geometry name="link_6_collision_geom">
+	<box size="0.015 0.015 0.020" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="denso_J5" type="revolute">
+    <parent link="link_5"/>
+    <child link="link_6"/>
+    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-6.283" upper="6.283" effort="10"
+	   velocity="1.0" />
+    <dynamics damping="50.5"/>
+  </joint>
+</robot>
