@@ -35,11 +35,11 @@ namespace denso
     init_joints();
 
     //TODO: read from param
-    ros::Rate rate(100);
+    ros::Rate rate(50);
 
     //init what's needed for the joint states publishing
     publisher_js_ = node_.advertise<sensor_msgs::JointState>("joint_states", 5);
-    //timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
+    timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
 
     //init the tooltip server
     tooltip_server = node_.advertiseService("set_tooltip", &DensoArmNode::set_tooltip, this);
@@ -57,7 +57,12 @@ namespace denso
 
   void DensoArmNode::update_joint_states_callback(const ros::TimerEvent& e)
   {
+    if( !denso_mutex.try_lock() )
+      return;
+
     denso_arm_->update_state( denso_joints_ );
+
+    denso_mutex.unlock();
 
     for( unsigned short index_joint = 0; index_joint < denso_arm_->get_nb_joints() ; ++index_joint)
     {
@@ -122,9 +127,28 @@ namespace denso
 
       ROS_DEBUG_STREAM(" RPY : " << pose_goal.roll << " / " << pose_goal.pitch << " / " << pose_goal.yaw);
 
-      if( denso_arm_->send_cartesian_position( pose_goal ) )
+      bool locked = false;
+      for( unsigned int i=0; i < 1000; ++i)
       {
-        break; //We reached the target -> SUCCESS
+        if( denso_mutex.try_lock() )
+        {
+          locked = true;
+          break;
+        }
+        usleep(10000);
+      }
+
+      if( locked )
+      {
+        if( denso_arm_->send_cartesian_position( pose_goal ) )
+        {
+          denso_mutex.unlock();
+          break; //We reached the target -> SUCCESS
+        }
+      }
+      else
+      {
+        ROS_WARN("Couldn't send the target to the arm.");
       }
 
       //publish feedback

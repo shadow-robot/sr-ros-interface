@@ -1,4 +1,5 @@
 <launch>
+  <node pkg="dynamic_reconfigure" type="dynparam" name="dynparam" args="set /camera/driver depth_registration true" />
 
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_fixed" args="0.4 0.4 -1.2 0.0 0.0 0.0 /base_link /fixed 100" />
 
