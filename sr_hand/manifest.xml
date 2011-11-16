@@ -22,8 +22,8 @@
   <depend package="diagnostic_msgs"/>
   <depend package="dynamic_reconfigure"/>
   <depend package="self_test"/>
-
-  <depend package="gazebo"/>
+  <depend package="urdf"/>
+  <depend package="gazebo_msgs"/>
 
   <export>
 	<cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lSrVirtual"/>

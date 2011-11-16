@@ -32,7 +32,7 @@
 #include <std_msgs/Float64.h>
 #include <std_srvs/Empty.h>
 
-#include <gazebo/SetModelConfiguration.h>
+#include <gazebo_msgs/SetModelConfiguration.h>
 #endif
 
 namespace shadowrobot
@@ -127,10 +127,10 @@ void VirtualArm::initializeMap()
     gazebo_phys_client.call(empty_srv);
 
     //then we set the ElbowJSwing in the model pose (the model is called arm_and_hand)
-    ros::ServiceClient set_pos_client = node.serviceClient<gazebo::SetModelConfiguration>("/gazebo/set_model_configuration");
-    gazebo::SetModelConfiguration model_srv;
+    ros::ServiceClient set_pos_client = node.serviceClient<gazebo_msgs::SetModelConfiguration>("/gazebo/set_model_configuration");
+    gazebo_msgs::SetModelConfiguration model_srv;
     model_srv.request.model_name = "shadow_model";
-    model_srv.request.test_urdf_param_name = "robot_description";
+    model_srv.request.urdf_param_name = "robot_description";
     model_srv.request.joint_names.push_back("ElbowJSwing");
     model_srv.request.joint_positions.push_back(2.0);
 
