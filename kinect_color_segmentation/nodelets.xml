@@ -9,4 +9,9 @@
       This is my Nodelet
     </description>
   </class>
+  <class name = "sr_kinect/BoxSegmentation" type ="sr_kinect::BoxSegmentation" base_class_type = "nodelet::Nodelet" >
+    <description>
+      This is my Nodelet
+    </description>
+  </class>
 </library>
