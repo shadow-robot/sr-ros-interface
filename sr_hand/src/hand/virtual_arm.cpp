@@ -138,7 +138,7 @@ void VirtualArm::initializeMap()
     set_pos_client.call(model_srv);
 
     //sends the correct target to the controller
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 500; ++i)
     {
       sendupdate("ElbowJSwing", 120.0);
       sleep(.01);
