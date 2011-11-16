@@ -9,8 +9,8 @@
   <node pkg="robot_state_publisher" type="state_publisher"
 	name="denso_robot_state_publisher_pos">
     <remap from="robot_description" to="denso_description"/>
-    <remap from="joint_states" to="denso/joint_states" />
-    <param name="publish_frequency" type="double" value="10.0" />
+    <remap from="joint_states" to="denso_arm/joint_states" />
+    <param name="publish_frequency" type="double" value="40.0" />
     <param name="tf_prefix" type="string" value="denso_arm" />
   </node>
 

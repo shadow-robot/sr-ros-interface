@@ -64,6 +64,7 @@ namespace denso
 
     denso_mutex.unlock();
 
+    joint_state_msg_.header.stamp = ros::Time::now();
     for( unsigned short index_joint = 0; index_joint < denso_arm_->get_nb_joints() ; ++index_joint)
     {
       joint_state_msg_.position[index_joint] = denso_joints_->at(index_joint).position;
