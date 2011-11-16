@@ -257,7 +257,7 @@ namespace shadowrobot
     //the targets are in radians
     target_msg.data = sr_math_utils::to_rad( target );
 
-		//ROS_ERROR("Joint %s ,pub index %d", joint_name.c_str(),tmpData.publisher_index);
+	//	ROS_ERROR("Joint %s ,pub index %d, pub name %s", joint_name.c_str(),tmpData.publisher_index,etherCAT_publishers[tmpData.publisher_index].getTopic().c_str());
     etherCAT_publishers[tmpData.publisher_index].publish(target_msg);
     ros::spinOnce();
 
