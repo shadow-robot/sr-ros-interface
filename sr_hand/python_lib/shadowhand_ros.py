@@ -72,8 +72,8 @@ class ShadowHand_ROS():
                           Joint("ElbowJSwing", "", 0,120),
                           Joint("ElbowJRotate", "", -80,80)
                          ]
-        self.lastMsg = 0
-        self.lastArmMsg = 0
+        self.lastMsg = joints_data()
+        self.lastArmMsg = joints_data()
         self.cyberglove_pub = 0
         self.cyberglove_sub = 0
         self.cybergrasp_pub = 0

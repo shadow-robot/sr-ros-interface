@@ -38,7 +38,8 @@ namespace shadowrobot
   SrGazeboVirtualTactileSensor::SrGazeboVirtualTactileSensor(std::string name,
                                                              std::string gazebo_bumper_topic) :
     SrGenericTactileSensor(name, ""),
-    touch_value(0.0)
+    touch_value(0.0),
+    touch_freshdata(false)
   {
     sub = nh.subscribe(gazebo_bumper_topic, 2, &SrGazeboVirtualTactileSensor::callback, this);
   }
@@ -49,25 +50,45 @@ namespace shadowrobot
   void SrGazeboVirtualTactileSensor::callback(const gazebo_plugins::ContactsState& msg)
   {
     double tmp_value;
-    const ::geometry_msgs::Vector3& v = msg.states[0].wrenches[0].force;
+    ::geometry_msgs::Vector3 v;
+    v.x=0;
+    v.y=0;
+    v.z=0;
 
     ROS_INFO("Touch by %s", msg.header.frame_id.c_str());
     // Parse the message to retrieve the relevant touch pressure information
-    // Currently just taking the first contact.
+    // Currently the sum of all contacts.
     // More sophisticated analysis can be done to take the contact that is the most aligned with the distal link normal
+    unsigned int nb_wrench = msg.states[0].wrenches.size();
+    for (unsigned int i=0;i<nb_wrench;i++)
+    {
+        v.x=v.x+msg.states[0].wrenches[i].force.x;
+        v.y=v.y+msg.states[0].wrenches[i].force.y;
+        v.z=v.z+msg.states[0].wrenches[i].force.z;
+    }
+    v.x=v.x/nb_wrench;
+    v.y=v.y/nb_wrench;
+    v.z=v.z/nb_wrench;
     tmp_value = sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2));
-
     touch_mutex.lock();
     touch_value = tmp_value;
+    touch_freshdata =  true;
     touch_mutex.unlock();
   }
 
   double SrGazeboVirtualTactileSensor::get_touch_data()
   {
     double return_value;
-
     touch_mutex.lock();
-    return_value = touch_value;
+    if(touch_freshdata)
+    {
+        return_value = touch_value;
+        touch_freshdata=false;
+    }
+    else
+    {
+        return_value= 0.0;
+    }
     touch_mutex.unlock();
 
     return return_value;

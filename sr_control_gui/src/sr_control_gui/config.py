@@ -67,8 +67,19 @@ class ShadowArmHandConfig(GenericRosNodeConfig):
     stop_cmd = "rosnode kill " + " ".join(list_of_nodes)
     status_cmd = "rosnode list"
 
+class ShadowArmConfig(GenericRosNodeConfig):
+    name = "Shadow Arm"
+    list_of_nodes = ["/shadowarm",
+                     "/fixed_frame_pos_pub_arm",
+                      "/fixed_frame_target_pub_arm",
+                      "/robot_state_publisher_pos_arm",
+                      "/robot_state_publisher_target_arm"]
+    start_cmd = "roslaunch sr_hand real_arm_motor.launch"
+    stop_cmd = "rosnode kill " + " ".join(list_of_nodes)
+    status_cmd = "rosnode list"
+
 class ShadowArmPluginConfig(GenericPluginConfig):
-    dependencies = ["Shadow Hand and Arm"]
+    dependencies = ["Shadow Arm"]
 
 class SrObjectSelectionConfig(GenericPluginConfig):
     name = "Object Selection Plugin"
@@ -104,6 +115,7 @@ class Config(object):
     library_refresh_rate = 0.5
     library_timeout = 10
     library_shadowhand = ShadowHandConfig()
+    library_shadowarm = ShadowArmConfig()
     library_shadow_arm_hand = ShadowArmHandConfig()
     library_cyberglove = CybergloveConfig()
     library_cyberglove_remapper = CybergloveRemapperConfig()

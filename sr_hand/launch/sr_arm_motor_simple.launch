@@ -1,8 +1,16 @@
 <launch>
-	<param name="arm_description" textfile="$(find sr_hand)/model/robots/sr_arm_motor.urdf"/>
-	<param name="hand_description" textfile="$(find sr_hand)/model/robots/shadowhand_motor.urdf"/>
-	<param name="robot_description" textfile="$(find sr_hand)/model/robots/arm_and_hand_motor.urdf"/>
+	<group if="$(optenv ONE_FINGER 0)">
+    <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_one_finger_motor.urdf.xacro'" />
+  </group>
+  <group unless="$(optenv ONE_FINGER 0)">
+    <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_motor.urdf.xacro'" />
+  </group>
 
+  <param name="arm_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
+
+	<!--
+      	 	shadowarm 
+                       		 -->
 	<node pkg="sr_hand" name="shadowarm"
 	type="shadowarm_virtual">
 		<remap from="robot_description" to="arm_description"/>
@@ -11,11 +19,7 @@
 		<param name="publish_frequency_diagnostics" type="double" value="1.0" />
 		<param name="publish_frequency" type="double" value="20.0" />
 	</node>
-	<!-- Robot state publisher: publishes tf information regarding the positions
-		of
-		the
-		arm
-		-->
+	<!-- Robot state publisher: publishes tf information regarding the positions of the arm -->
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="robot_state_publisher_pos_arm">
 		<remap from="robot_description" to="arm_description"/>
@@ -24,11 +28,7 @@
 		<param name="tf_prefix" type="string" value="sr_arm/position" />
 	</node>
 
-	<!-- Robot state publisher: publishes tf information regarding the targets
-		of
-		the
-		arm
-		-->
+	<!-- Robot state publisher: publishes tf information regarding the targets of the arm -->
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="robot_state_publisher_target_arm">
 		<remap from="robot_description" to="arm_description"/>
@@ -50,11 +50,7 @@
 		<param name="publish_frequency" type="double" value="20.0" />
 	</node>
 
-	<!-- Robot state publisher: publishes tf information regarding the position
-		of
-		the
-		hand
-		-->
+	<!-- Robot state publisher: publishes tf information regarding the position of the hand -->
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="srh_robot_state_publisher_pos">
 		<remap from="robot_description" to="hand_description"/>
@@ -75,25 +71,29 @@
 	<!-- publishes fixed transform: to link the arm and the hand for both targets
 	     and positions + a fixed transform to a fixed point at 0 0 0, to remap the
 	     arm base for both positions and targets. -->
-	<node pkg="tf" type="static_transform_publisher" name="fixed_to_base_link"
-		args="-0.05 -0.75 1.0 1.57 0 0 /base_link /shadowarm_base 100" />
-	<node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm"
-		args="0.0 0.0 0.0 0 0 0 /shadowarm_base /sr_arm/position/shadowarm_base 100" />
-	<node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm"
-		args="0 0 0.0 0 0 0  /sr_arm/position/shadowarm_base /sr_arm/target/shadowarm_base 100" />
+	
+	 <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" /> 
 
 	<node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos"
-		args="0 0 0 2.36 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100"/>
+		args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100"/>
 	<node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target"
-		args="0 0 0 2.36 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100"/>
+		args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100"/>
 
-	<!-- merge the arm / hand joint_states topics to publish onto /joint_states -->
-	<node pkg="sr_utilities" type="joint_states_merger.py" name="joint_states_merger"/>
+	 <!-- Joint States positions merger to get one single vector for both arm and hand -->
+   <node pkg="sr_utilities" type="ordered_position_joint_states_merger.py" name="ordered_position_joint_states_merger"/>
+<!-- Joint States targets merger to get one single vector for both arm and hand -->
+   <node pkg="sr_utilities" type="ordered_target_joint_states_merger.py" name="ordered_target_joint_states_merger"/>
 
-	<node pkg="robot_state_publisher" type="state_publisher"
-	name="robot_state_publisher_full_pos">
-		<param name="publish_frequency" type="double" value="20.0" />
-	</node>
+ <!--
+     Diagnostic Aggregator
+                          -->
+  
+  <node pkg="diagnostic_aggregator" type="aggregator_node"
+        name="sr_diagnostic_aggregator" >
+    <rosparam command="load" 
+              file="$(find sr_hand)/shadowhand_analyzer.yaml" />
+  </node>
 
 	<node pkg="sr_tactile_sensors" name="sr_tactile_v" type="sr_tactile_virtual" respawn="false">
 	  <rosparam file="$(find sr_tactile_sensors)/params/sensor_names.yaml" command="load"/>

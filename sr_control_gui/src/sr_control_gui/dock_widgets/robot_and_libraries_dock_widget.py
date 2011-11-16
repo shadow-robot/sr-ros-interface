@@ -312,7 +312,14 @@ class LibrariesWidget(QtGui.QWidget):
                                                      status_cmd=Config.library_shadowhand.status_cmd,
                                                      root_path=self.parent().parent().rootPath)
 
-        self.robot_and_libraries_backend.add_library(Config.library_shadow_arm_hand.name,
+        self.robot_and_libraries_backend.add_library(Config.library_shadowarm.name,
+                                                     list_of_nodes=Config.library_shadowarm.list_of_nodes,
+                                                     start_cmd=Config.library_shadowarm.start_cmd,
+                                                     stop_cmd=Config.library_shadowarm.stop_cmd,
+                                                     status_cmd=Config.library_shadowarm.status_cmd,
+                                                     root_path=self.parent().parent().rootPath)
+
+	self.robot_and_libraries_backend.add_library(Config.library_shadow_arm_hand.name,
                                                      list_of_nodes=Config.library_shadow_arm_hand.list_of_nodes,
                                                      start_cmd=Config.library_shadow_arm_hand.start_cmd,
                                                      stop_cmd=Config.library_shadow_arm_hand.stop_cmd,

@@ -24,14 +24,10 @@
   <xacro:sr_arm_motor>
   </xacro:sr_arm_motor>
 
-  <joint name="arm_link" type="revolute">
+  <joint name="arm_link" type="fixed">
     <parent link="shadowarm_handsupport_motor"/>
     <child link="forearm_motor"/>
-    <origin xyz="0 0 0" rpy="0 0 ${2.36}" />
-    <axis xyz="0 -1 0" />
-    <limit lower="0" upper="0" effort="10"
-    velocity="1.0" />
-    <dynamics damping="3.5"/>
+    <origin xyz="0 0 0" rpy="0 0 ${2.35619449}" />
   </joint>
 
   <xacro:shadowhand_motor>
