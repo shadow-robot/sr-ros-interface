@@ -8,8 +8,8 @@
     <link name="shadowarm_trunk">
 	<inertial>
 	  <origin xyz="0 0 0.27025" rpy="0 0 0" />
-	  <mass value="5" />
-	  <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"  izz="0.0" />
+	  <mass value="10" />
+	  <inertia  ixx="1.47" ixy="0.0"  ixz="0.0"  iyy="1.47"  iyz="0.0"  izz="2.4" />
 	</inertial>
 	<visual>
 	  <origin xyz="0 0 0.0165" rpy="${M_PI/2} ${M_PI} ${M_PI/2}" />

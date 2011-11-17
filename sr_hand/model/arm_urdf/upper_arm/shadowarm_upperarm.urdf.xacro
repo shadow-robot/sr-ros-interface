@@ -8,7 +8,7 @@
       <inertial>
 	<origin xyz="0 -0.067 -0.1845" rpy="0 0 0" />
 	<mass value="2" />
-	<inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="0.0"  iyz="0.0"  izz="0.0" />
+	<inertia  ixx="0.5" ixy="0.0"  ixz="0.0"  iyy="0.5"  iyz="0.0"  izz="0.1" />
       </inertial>
       <visual>
 	<origin xyz="0 0.067 0" rpy="0 0 -${M_PI/2}" />
