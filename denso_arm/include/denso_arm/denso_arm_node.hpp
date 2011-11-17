@@ -99,6 +99,9 @@ namespace denso
      */
     boost::mutex denso_mutex;
 
+    ///Controls whether we're instantiating the driver or not.
+    static const bool simulated;
+
     /**
      * Transform an incoming geometry_msgs::Pose message
      * to a pose for the denso arm.

@@ -1,0 +1,13 @@
+geometry_msgs/Pose[] trajectory
+---
+int32 val
+
+#different possibilities
+int32 SUCCESS=1
+int32 FAILED=0
+int32 TIMED_OUT=-1
+int32 PREEMPTED=-2
+
+---
+int32 step_index
+duration total_time_left
