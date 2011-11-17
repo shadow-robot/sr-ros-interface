@@ -7,12 +7,15 @@
   <material name="Grey">
     <color rgba="0.2 0.2 0.2 1.0"/>
   </material>
+  <material name="LightGrey">
+    <color rgba="0.6 0.6 0.6 1.0"/>
+  </material>
 
   <link name="base">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0.0975" rpy="0 0 0" />
       <geometry name="base_visual">
-	<box size="0.015 0.015 0.020" />
+	<box size="0.195 0.195 0.195" />
       </geometry>
       <material name="Grey" />
     </visual>
@@ -20,9 +23,9 @@
 
   <link name="link_1">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0.06" rpy="0 0 0" />
       <geometry name="link_1_visual">
-	<box size="0.015 0.015 0.020" />
+	<box size="0.100 0.100 0.120" />
       </geometry>
       <material name="Grey" />
     </visual>
@@ -31,17 +34,17 @@
   <joint name="denso_J0" type="revolute">
     <parent link="base"/>
     <child link="link_1"/>
-    <origin xyz="0 0 0.025" rpy="0 0 0" />
-    <axis xyz="1 0 0" />
+    <origin xyz="0 0 0.198" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
     <limit lower="-2.967" upper="2.967" effort="10"
 	   velocity="1.0" />
   </joint>
 
   <link name="link_2">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0.225" rpy="0 0 0" />
       <geometry name="link_2_visual">
-	<box size="0.015 0.015 0.020" />
+	<box size="0.05 0.05 0.400" />
       </geometry>
       <material name="Grey" />
     </visual>
@@ -50,7 +53,7 @@
   <joint name="denso_J1" type="revolute">
     <parent link="link_1"/>
     <child link="link_2"/>
-    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <origin xyz="0 0 0.190" rpy="0 0 0" />
     <axis xyz="1 0 0" />
     <limit lower="-1.745" upper="2.356" effort="10"
 	   velocity="1.0" />
@@ -58,9 +61,9 @@
 
   <link name="link_3">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0.1425" rpy="0 0 0" />
       <geometry name="link_3_visual">
-	<box size="0.015 0.015 0.020" />
+	<box size="0.05 0.05 0.20" />
       </geometry>
       <material name="Grey" />
     </visual>
@@ -69,7 +72,7 @@
   <joint name="denso_J2" type="revolute">
     <parent link="link_2"/>
     <child link="link_3"/>
-    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <origin xyz="0 0 0.450" rpy="0 0 0" />
     <axis xyz="1 0 0" />
     <limit lower="-2.094" upper="2.670" effort="10"
 	   velocity="1.0" />
@@ -77,9 +80,9 @@
 
   <link name="link_4">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0.0675" rpy="0 0 0" />
       <geometry name="link_4_visual">
-	<box size="0.015 0.015 0.020" />
+	<box size="0.05 0.05 0.10" />
       </geometry>
       <material name="Grey" />
     </visual>
@@ -88,17 +91,17 @@
   <joint name="denso_J3" type="revolute">
     <parent link="link_3"/>
     <child link="link_4"/>
-    <origin xyz="0 0 0.025" rpy="0 0 0" />
-    <axis xyz="1 0 0" />
+    <origin xyz="0 0 0.285" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
     <limit lower="-4.712" upper="4.712" effort="10"
 	   velocity="1.0" />
   </joint>
 
   <link name="link_5">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0.45" rpy="0 0 0" />
       <geometry name="link_5_visual">
-	<box size="0.015 0.015 0.020" />
+	<box size="0.03 0.03 0.80" />
       </geometry>
       <material name="Grey" />
     </visual>
@@ -107,7 +110,7 @@
   <joint name="denso_J4" type="revolute">
     <parent link="link_4"/>
     <child link="link_5"/>
-    <origin xyz="0 0 0.025" rpy="0 0 0" />
+    <origin xyz="0 0 0.135" rpy="0 0 0" />
     <axis xyz="1 0 0" />
     <limit lower="-2.094" upper="2.094" effort="10"
 	   velocity="1.0" />
@@ -115,19 +118,19 @@
 
   <link name="link_6">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0.0005" rpy="0 0 0" />
       <geometry name="link_6_visual">
-	<box size="0.015 0.015 0.020" />
+	<box size="0.04 0.04 0.001" />
       </geometry>
-      <material name="Grey" />
+      <material name="LightGrey" />
     </visual>
   </link>
 
   <joint name="denso_J5" type="revolute">
     <parent link="link_5"/>
     <child link="link_6"/>
-    <origin xyz="0 0 0.025" rpy="0 0 0" />
-    <axis xyz="1 0 0" />
+    <origin xyz="0 0 0.90" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
     <limit lower="-6.283" upper="6.283" effort="10"
 	   velocity="1.0" />
   </joint>
