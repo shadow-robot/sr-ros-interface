@@ -1,4 +1,11 @@
 <launch>
+
+  <node name="cluster_bounding_box_finder" pkg="object_manipulator"
+	type="cluster_bounding_box_finder_server.py"
+	output="screen"
+	respawn="false">
+  </node>
+
 <group ns="/kinect_segmentation">
     <!-- PCL Manager -->
     <node pkg="nodelet" type="nodelet" name="camera_nodelet_manager" args="manager" output="screen"/>

@@ -35,6 +35,9 @@
 #include <pcl_visualization/cloud_viewer.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/filters/extract_indices.h>
+#include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
+#include <object_manipulation_msgs/FindClusterBoundingBox.h>
 
 namespace sr_kinect
 {
@@ -52,6 +55,7 @@ namespace sr_kinect
 
     void callback(const PointCloud::ConstPtr &cloud);
     void callback2(const PointCloud::ConstPtr &cloud);
+    void callback3(const pcl::ModelCoefficients::ConstPtr &coeff);
 
   private:
     void read_parameters(ros::NodeHandle & nh);
@@ -59,9 +63,19 @@ namespace sr_kinect
     ros::Publisher pub_;
     ros::Subscriber sub_;
     ros::Subscriber sub2_;
+    ros::Subscriber sub3_;
 //    pcl_visualization::CloudViewer *viewer;
+    
+    /** A client used to get the bounding box for the cluster */
+    ros::ServiceClient find_cluster_bounding_box_client;
+    
+    /** A transform listener */
+    boost::shared_ptr<tf::TransformListener> tf_listener;
+    /** A transform broadcaster to broadcast the object pose*/
+    boost::shared_ptr<tf::TransformBroadcaster> tf_broadcaster;
 
     boost::shared_ptr<PointCloud> segmented_pcl;
+    boost::shared_ptr<pcl::ModelCoefficients> plane_coefficients;
 
     Eigen::Vector4f min_pt_;
     Eigen::Vector4f max_pt_;
