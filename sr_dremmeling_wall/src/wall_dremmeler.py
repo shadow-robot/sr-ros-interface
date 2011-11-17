@@ -21,7 +21,7 @@ import rospy
 import actionlib
 
 import denso_msgs.msg
-from geometry_msgs.msg import Point, Quaternion, Pose
+from geometry_msgs.msg import Pose, Quaternion
 
 class WallDremmeler(object):
     """
@@ -42,15 +42,15 @@ class WallDremmeler(object):
         """
         #First we get the segmented points.
         segmented_points = []
-        print "TODO: get a list of segmented points - call your service"
+        print "TODO: get a list of segmented points - call your service of the type kinect_color_segmentation.srv.SurfaceToDremmel"
 
         #Then we get the normal for the wall
-        quaternion = Quaternion()
-        wall_frame = ""
-        print "TODO: retrieve the normal for the wall and the rotation link - call your service"
+        wall_normal = Quaternion()
+        wall_link = ""
+        print "TODO: retrieve the Pose for the wall normal - call your service of the type kinect_color_segmentation.srv.WallOrientation.srv"
 
         #We build a list of poses to send to the hand.
-        list_of_poses = self.build_poses( segmented_points, quaternion, wall_frame )
+        list_of_poses = self.build_poses( segmented_points, wall_normal, wall_link )
 
         #now we send this to the arm
         goal = denso_msgs.msg.TrajectoryGoal
