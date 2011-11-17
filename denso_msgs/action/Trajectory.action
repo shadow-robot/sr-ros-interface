@@ -10,5 +10,4 @@ int32 PREEMPTED=-2
 
 ---
 int32 step_index
-duration time_left_in_step
 duration total_time_left
