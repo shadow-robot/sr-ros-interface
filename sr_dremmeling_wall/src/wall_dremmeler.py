@@ -21,7 +21,7 @@ import rospy
 import actionlib
 
 import denso_msgs.msg
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Point, Quaternion, Pose
 
 class WallDremmeler(object):
     """
@@ -40,9 +40,36 @@ class WallDremmeler(object):
     def run(self):
         """
         """
-        print "TODO: implement this"
+        #First we get the segmented points.
+        segmented_points = []
+        print "TODO: get a list of segmented points - call your service"
+
+        #Then we get the normal for the wall
+        quaternion = Quaternion()
+        print "TODO: retrieve the normal for the wall - call your service"
+
+        #We build a list of poses to send to the hand.
+        list_of_poses = self.build_poses( segmented_points, quaternion )
+
+        #now we send this to the arm
+        goal = denso_msgs.msg.TrajectoryGoal
+        goal.trajectory = list_of_poses
+
+        self.trajectory_client.send_goal( goal )
+        self.trajectory_client.wait_for_result()
+
+        rospy.loginfo( "Finished Dremmeling the surface: " + str( self.trajectory_client.get_result() ) )
 
 
+    def build_poses(self, segmented_points, quaternion ):
+        list_of_poses = []
 
+        for point in segmented_points:
+            pose = Pose()
+            pose.position = point
+            pose.orientation = quaternion
+            list_of_poses.append( pose )
+
+        return list_of_poses
 
 
