@@ -54,7 +54,7 @@ class DensoTrajectoryFollower( object ):
 
         success = TrajectoryResult.SUCCESS
         start_time = rospy.Time.now()
-        total_available_time = len(goal.trajectory) * rospy.Duration.from_sec(DEFAULT_TIMEOUT)
+        total_available_time = rospy.Duration.from_sec(len(goal.trajectory) * DEFAULT_TIMEOUT)
         for step_index, pose in enumerate(goal.trajectory):
             if self.trajectory_server.is_preempt_requested():
                 rospy.loginfo("Denso Trajectory preempted.")
@@ -63,12 +63,12 @@ class DensoTrajectoryFollower( object ):
             arm_goal = MoveArmPoseGoal()
             arm_goal.goal = pose
             arm_goal.rate = DEFAULT_RATE
-            #compute the time we have left
-            arm_goal.time_out = total_available_time - (rospy.Time.now() - start_time)
+            arm_goal.time_out = rospy.Duration.from_sec(DEFAULT_TIMEOUT)
 
             #publish feedback
             self.trajectory_feedback.step_index = step_index
-            self.trajectory_feedback.total_time_left =
+            #compute the time we have left
+            self.trajectory_feedback.total_time_left = total_available_time - (rospy.Time.now() - start_time)
 
             self.denso_arm_client.send_goal( arm_goal )
             self.denso_arm_client.wait_for_result()
