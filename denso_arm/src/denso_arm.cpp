@@ -27,13 +27,15 @@
 #include "b-Cap/b-Cap.hpp"
 #include <sstream>
 
+#include <sr_utilities/sr_math_utils.hpp>
+
 namespace denso
 {
   const unsigned short DensoArm::nb_joints_ = 6;
 
   DensoArm::DensoArm()
   {
-    init("10.2.2.222", 5007, 10);
+    init("10.2.2.222", 5007, 5);
   }
 
   DensoArm::DensoArm(std::string robot_ip, int robot_port, float initial_speed)
@@ -78,7 +80,7 @@ namespace denso
 
     for (unsigned short index_joint = 0; index_joint < nb_joints_; ++index_joint)
     {
-      denso_joints->at(index_joint).position = position[index_joint];
+      denso_joints->at(index_joint).position = sr_math_utils::to_rad( position[index_joint] );
 
       //We don't seem to have access to those
       denso_joints->at(index_joint).effort = 0.0;

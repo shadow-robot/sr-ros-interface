@@ -54,6 +54,7 @@ namespace denso
     virtual ~DensoArmNode();
 
     void update_joint_states_callback(const ros::TimerEvent& e);
+    void update_tip_pose_callback(const ros::TimerEvent& e);
 
     typedef actionlib::SimpleActionServer<denso_msgs::MoveArmPoseAction> MoveArmPoseServer;
 
@@ -64,9 +65,14 @@ namespace denso
 
   protected:
     ros::NodeHandle node_;
+    /// a vector containing the joint positions for the denso arm
     boost::shared_ptr<DensoJointsVector> denso_joints_;
 
+    ///a pointer to the denso arm driver
     boost::shared_ptr<DensoArm> denso_arm_;
+
+    ///the cartesian pose of the tip of the arm.
+    boost::shared_ptr<Pose> tip_pose_;
 
     ////////
     //Publishing joint states
@@ -76,6 +82,13 @@ namespace denso
     ros::Publisher publisher_js_;
     ///The message published
     sensor_msgs::JointState joint_state_msg_;
+
+    ////////
+    //Publishing tip pose
+    /// A timer to publish the cartesian pose of the tip of the arm at a given frequency.
+    ros::Timer timer_tip_pose_;
+    /// A transform broadcaster used to publish the tip pose
+    boost::shared_ptr<tf::TransformBroadcaster> tf_tip_broadcaster_;
 
     ///////
     //Action lib server for moving the arm in cartesian space.
@@ -110,7 +123,7 @@ namespace denso
      *
      * @return the pose for the denzo arm.
      */
-    Pose geometry_pose_to_denso_pose(geometry_msgs::Pose geom_pose)
+    Pose geometry_pose_to_denso_pose(const geometry_msgs::Pose& geom_pose)
     {
       Pose pose_denso;
       //the position needs to be sent in mm to the denso arm
@@ -130,6 +143,25 @@ namespace denso
 
       return pose_denso;
     };
+
+    /**
+     * Transforms a denso Pose to a tf::Transform.
+     *
+     * @param pose The pose we want to transform.
+     *
+     * @return The equivalent pose as a tf.
+     */
+    tf::Transform denso_pose_to_tf_transform(boost::shared_ptr<Pose> pose)
+    {
+      tf::Transform tf;
+      tf::Quaternion quat;
+
+      quat.setRPY( pose->roll, pose->pitch, pose->yaw );
+      tf.setOrigin( tf::Vector3(pose->x, pose->y, pose->z) );
+      tf.setRotation( quat );
+
+      return tf;
+    }
 
   };
 }
