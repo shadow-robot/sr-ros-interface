@@ -29,7 +29,7 @@ def denso_arm_client( rate, time_out ):
     client.wait_for_server()
 
     pose_goal = Pose()
-    pose_goal.position.x = 0.52013
+    pose_goal.position.x = 0.72013
     pose_goal.position.y = 0.06585
     pose_goal.position.z = 0.28740
 

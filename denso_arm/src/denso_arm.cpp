@@ -26,6 +26,7 @@
 #include "denso_arm/denso_arm_node.hpp"
 #include "b-Cap/b-Cap.hpp"
 #include <sstream>
+#define  PI  3.14159265
 
 namespace denso
 {
@@ -33,7 +34,7 @@ namespace denso
 
   DensoArm::DensoArm()
   {
-    init("10.2.2.222", 5007, 10);
+    init("10.2.2.222", 5007, 5);
   }
 
   DensoArm::DensoArm(std::string robot_ip, int robot_port, float initial_speed)
@@ -78,7 +79,7 @@ namespace denso
 
     for (unsigned short index_joint = 0; index_joint < nb_joints_; ++index_joint)
     {
-      denso_joints->at(index_joint).position = position[index_joint];
+      denso_joints->at(index_joint).position = position[index_joint] / 180 * PI;
 
       //We don't seem to have access to those
       denso_joints->at(index_joint).effort = 0.0;
