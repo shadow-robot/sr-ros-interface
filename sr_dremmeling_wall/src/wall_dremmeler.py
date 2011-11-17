@@ -46,10 +46,11 @@ class WallDremmeler(object):
 
         #Then we get the normal for the wall
         quaternion = Quaternion()
-        print "TODO: retrieve the normal for the wall - call your service"
+        wall_frame = ""
+        print "TODO: retrieve the normal for the wall and the rotation link - call your service"
 
         #We build a list of poses to send to the hand.
-        list_of_poses = self.build_poses( segmented_points, quaternion )
+        list_of_poses = self.build_poses( segmented_points, quaternion, wall_frame )
 
         #now we send this to the arm
         goal = denso_msgs.msg.TrajectoryGoal
@@ -61,14 +62,28 @@ class WallDremmeler(object):
         rospy.loginfo( "Finished Dremmeling the surface: " + str( self.trajectory_client.get_result() ) )
 
 
-    def build_poses(self, segmented_points, quaternion ):
+    def build_poses(self, segmented_points, quaternion, rotation_link):
         list_of_poses = []
 
         for point in segmented_points:
-            pose = Pose()
-            pose.position = point
-            pose.orientation = quaternion
-            list_of_poses.append( pose )
+            #create a pose above the point (in the wall frame)
+            pose_above = Pose()
+            pose_above.position = point
+            pose_above.position.z += 0.05
+            pose_above.orientation = quaternion
+
+            #then create a pose below the point (inside the wall)
+            pose_inside = Pose()
+            pose_inside.position = point
+            pose_inside.position.z -= 0.005
+            pose_inside.orientation = quaternion
+
+            #then transform those two poses in the base_link frame
+            print "TODO: transform from ", rotation_link, " to /base_link"
+
+            #add those two poses to the list of poses sent to the arm
+            list_of_poses.append( pose_above )
+            list_of_poses.append( pose_inside )
 
         return list_of_poses
 
