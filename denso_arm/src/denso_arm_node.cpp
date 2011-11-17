@@ -35,11 +35,16 @@ namespace denso
     init_joints();
 
     //TODO: read from param
-    ros::Rate rate(50);
+    ros::Rate rate_js(50);
+    ros::Rate rate_tip(35);
 
     //init what's needed for the joint states publishing
     publisher_js_ = node_.advertise<sensor_msgs::JointState>("joint_states", 5);
-    timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
+    timer_joint_states_ = node_.createTimer( rate_js.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
+
+    //init the publishing of the tip pose
+    timer_tip_pose_ = node_.createTimer( rate_tip.expectedCycleTime(), &DensoArmNode::update_tip_pose_callback, this);
+    tf_tip_broadcaster_ = boost::shared_ptr<tf::TransformBroadcaster>( new tf::TransformBroadcaster() );
 
     //init the tooltip server
     tooltip_server = node_.advertiseService("set_tooltip", &DensoArmNode::set_tooltip, this);
@@ -54,6 +59,21 @@ namespace denso
 
   DensoArmNode::~DensoArmNode()
   {}
+
+  void DensoArmNode::update_tip_pose_callback(const ros::TimerEvent& e)
+  {
+    if( !denso_mutex.try_lock() )
+      return;
+
+    denso_arm_->get_cartesian_position( tip_pose_ );
+
+    denso_mutex.unlock();
+
+    tf_tip_broadcaster_->sendTransform( tf::StampedTransform( denso_pose_to_tf_transform(tip_pose_),
+                                                              ros::Time::now(),
+                                                              "/denso_arm/base",
+                                                              "/denso_arm/base_to_shadowhand"));
+  }
 
   void DensoArmNode::update_joint_states_callback(const ros::TimerEvent& e)
   {
