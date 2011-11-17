@@ -27,10 +27,13 @@
 
 namespace denso
 {
+  const bool DensoArmNode::simulated = false;
+
   DensoArmNode::DensoArmNode()
     : node_("~")
   {
-    denso_arm_ = boost::shared_ptr<DensoArm> ( new DensoArm() );
+    if( !simulated )
+      denso_arm_ = boost::shared_ptr<DensoArm> ( new DensoArm() );
 
     init_joints();
 
@@ -60,15 +63,19 @@ namespace denso
     if( !denso_mutex.try_lock() )
       return;
 
-    denso_arm_->update_state( denso_joints_ );
+    if( !simulated )
+      denso_arm_->update_state( denso_joints_ );
 
     denso_mutex.unlock();
 
-    for( unsigned short index_joint = 0; index_joint < denso_arm_->get_nb_joints() ; ++index_joint)
+    if( !simulated )
     {
-      joint_state_msg_.position[index_joint] = denso_joints_->at(index_joint).position;
-      joint_state_msg_.velocity[index_joint] = denso_joints_->at(index_joint).velocity;
-      joint_state_msg_.effort[index_joint] = denso_joints_->at(index_joint).effort;
+      for( unsigned short index_joint = 0; index_joint < denso_arm_->get_nb_joints() ; ++index_joint)
+      {
+        joint_state_msg_.position[index_joint] = denso_joints_->at(index_joint).position;
+        joint_state_msg_.velocity[index_joint] = denso_joints_->at(index_joint).velocity;
+        joint_state_msg_.effort[index_joint] = denso_joints_->at(index_joint).effort;
+      }
     }
 
     publisher_js_.publish( joint_state_msg_ );
@@ -76,7 +83,9 @@ namespace denso
 
   void DensoArmNode::init_joints()
   {
-    const unsigned short nb_joints = denso_arm_->get_nb_joints();
+    unsigned short nb_joints = 6;
+    if( !simulated )
+      nb_joints = denso_arm_->get_nb_joints();
     denso_joints_ = boost::shared_ptr<DensoJointsVector>( new DensoJointsVector( nb_joints ) );
 
     for( unsigned short i=0; i < nb_joints; ++i )
@@ -140,10 +149,19 @@ namespace denso
 
       if( locked )
       {
-        if( denso_arm_->send_cartesian_position( pose_goal ) )
+        if( !simulated )
         {
+          if( denso_arm_->send_cartesian_position( pose_goal ) )
+          {
+            denso_mutex.unlock();
+            break; //We reached the target -> SUCCESS
+          }
+        }
+        else
+        {
+          usleep( 500000 );
           denso_mutex.unlock();
-          break; //We reached the target -> SUCCESS
+          break;
         }
       }
       else
