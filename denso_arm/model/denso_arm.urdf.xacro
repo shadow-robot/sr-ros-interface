@@ -99,7 +99,7 @@
 
   <link name="link_5">
     <visual>
-      <origin xyz="0 0 0.45" rpy="0 0 0" />
+      <origin xyz="0 0 0.045" rpy="0 0 0" />
       <geometry name="link_5_visual">
 	<box size="0.03 0.03 0.80" />
       </geometry>
@@ -129,7 +129,7 @@
   <joint name="denso_J5" type="revolute">
     <parent link="link_5"/>
     <child link="link_6"/>
-    <origin xyz="0 0 0.90" rpy="0 0 0" />
+    <origin xyz="0 0 0.090" rpy="0 0 0" />
     <axis xyz="0 0 1" />
     <limit lower="-6.283" upper="6.283" effort="10"
 	   velocity="1.0" />
