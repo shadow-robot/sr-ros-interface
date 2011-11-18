@@ -156,8 +156,8 @@ namespace denso
       tf::Transform tf;
       tf::Quaternion quat;
 
-      quat.setRPY( pose->roll, pose->pitch, pose->yaw );
-      tf.setOrigin( tf::Vector3(pose->x, pose->y, pose->z) );
+      quat.setRPY( sr_math_utils::to_rad(pose->roll), sr_math_utils::to_rad(pose->pitch), sr_math_utils::to_rad(pose->yaw) );
+      tf.setOrigin( tf::Vector3(pose->x / 1000.0, pose->y / 1000.0 , pose->z / 1000.0) );
       tf.setRotation( quat );
 
       return tf;
