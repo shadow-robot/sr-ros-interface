@@ -64,33 +64,23 @@ namespace sr_kinect
     ros::Subscriber sub_;
     ros::Subscriber sub2_;
     ros::Subscriber sub3_;
-//    pcl_visualization::CloudViewer *viewer;
     
     /** A client used to get the bounding box for the cluster */
-    ros::ServiceClient find_cluster_bounding_box_client;
+ //   ros::ServiceClient find_cluster_bounding_box_client;
     
-    /** A transform listener */
-    boost::shared_ptr<tf::TransformListener> tf_listener;
-    /** A transform broadcaster to broadcast the object pose*/
-    boost::shared_ptr<tf::TransformBroadcaster> tf_broadcaster;
+//    /** A transform listener */
+//    boost::shared_ptr<tf::TransformListener> tf_listener;
+//    /** A transform broadcaster to broadcast the object pose*/
+//    boost::shared_ptr<tf::TransformBroadcaster> tf_broadcaster;
 
     boost::shared_ptr<PointCloud> segmented_pcl;
     boost::shared_ptr<pcl::ModelCoefficients> plane_coefficients;
 
     Eigen::Vector4f min_pt_;
     Eigen::Vector4f max_pt_;
-    unsigned int filter_max_r_;
-    unsigned int filter_min_r_;
-    unsigned int filter_max_g_;
-    unsigned int filter_min_g_;
-    unsigned int filter_max_b_;
-    unsigned int filter_min_b_;
-    double filter_max_x_;
-    double filter_min_x_;
-    double filter_max_y_;
-    double filter_min_y_;
-    double filter_max_z_;
-    double filter_min_z_;
+    
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
 

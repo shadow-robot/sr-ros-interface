@@ -32,15 +32,15 @@
 #include <tf/tf.h>
 #include <tf/transform_datatypes.h>
 #include <sstream>
+#include <pcl_ros/transforms.h>
+//#include <pcl/exceptions.h>
 
 namespace sr_kinect
 {
 PLUGINLIB_DECLARE_CLASS(sr_kinect, BoxSegmentation, sr_kinect::BoxSegmentation, nodelet::Nodelet);
 
 BoxSegmentation::BoxSegmentation() :
-    nodelet::Nodelet(), filter_max_r_(255), filter_min_r_(0), filter_max_g_(255), filter_min_g_(0), filter_max_b_(255), filter_min_b_(
-        0), filter_max_x_(1000.0), filter_min_x_(-1000.0), filter_max_y_(1000.0), filter_min_y_(-1000.0), filter_max_z_(
-        1000.0), filter_min_z_(-1000.0)
+    nodelet::Nodelet()
 {
 }
 
@@ -54,145 +54,200 @@ void BoxSegmentation::onInit()
   segmented_pcl = boost::shared_ptr < PointCloud > (new PointCloud());
   plane_coefficients = boost::shared_ptr < pcl::ModelCoefficients > (new pcl::ModelCoefficients());
 
-  find_cluster_bounding_box_client = nh.serviceClient < object_manipulation_msgs::FindClusterBoundingBox
-      > ("/find_cluster_bounding_box");
+//  find_cluster_bounding_box_client = nh.serviceClient < object_manipulation_msgs::FindClusterBoundingBox
+//      > ("/find_cluster_bounding_box2");
+  
+  //Initialize plane coefficients to coincide with z=0 plane
+//  plane_coefficients->values.clear();
+//  plane_coefficients->values.push_back(0.0);
+//  plane_coefficients->values.push_back(0.0);
+//  plane_coefficients->values.push_back(1.0);
+//  plane_coefficients->values.push_back(0.0);
+  
+  min_pt_[0] = 0.0;
+  min_pt_[1] = 0.0;
+  min_pt_[2] = 0.0;
+  min_pt_[3] = 0.0;
+  max_pt_[0] = 1.0;
+  max_pt_[1] = 1.0;
+  max_pt_[2] = 1.0;
+  max_pt_[3] = 0.0;
+  
 
   //initialize the tf listener and broadcaster
-  tf_listener = boost::shared_ptr < tf::TransformListener > (new tf::TransformListener());
-  tf_broadcaster = boost::shared_ptr < tf::TransformBroadcaster > (new tf::TransformBroadcaster());
+//  tf_listener = boost::shared_ptr < tf::TransformListener > (new tf::TransformListener());
+//  tf_broadcaster = boost::shared_ptr < tf::TransformBroadcaster > (new tf::TransformBroadcaster());
 
   read_parameters(nh);
 }
 
 void BoxSegmentation::callback(const PointCloud::ConstPtr &cloud)
 {
-//  segmented_pcl->clear();
-//  
-//  pcl::PointIndices::Ptr inliers (new pcl::PointIndices ());
-//  
-//  pcl::getPointsInBox(*cloud, min_pt_, max_pt_, inliers->indices);       
-//  
-//  ExtractIndices extract;
-//  
-//  extract.setInputCloud (cloud);
-//  extract.setIndices (inliers);
-//  extract.setNegative (false);
-//  extract.filter (*segmented_pcl);
-//      
-//  segmented_pcl->header.frame_id = cloud->header.frame_id;
-//
-//  pub_.publish(segmented_pcl);
+  segmented_pcl->clear();
+  
+  pcl::PointIndices::Ptr inliers (new pcl::PointIndices ());
+  
+  try
+  {
+    pcl::getPointsInBox(*cloud, min_pt_, max_pt_, inliers->indices);    
+  }
+  catch(pcl::IsNotDenseException exc)
+  {
+    ROS_ERROR("getPointsInBox Is Not Dense exception");
+  }
+  
+  pcl::ExtractIndices<pcl::PointXYZRGB> extract;
+  
+  extract.setInputCloud (cloud);
+  extract.setIndices (inliers);
+  extract.setNegative (false);
+  extract.filter (*segmented_pcl);
+      
+  segmented_pcl->header.frame_id = cloud->header.frame_id;
+
+  if(segmented_pcl->size() > 0)
+  {
+    pub_.publish(segmented_pcl);
+  }
 }
 
 void BoxSegmentation::callback2(const PointCloud::ConstPtr &cloud)
 {
-  sensor_msgs::PointCloud2 cloud2;
-  pcl::toROSMsg(*cloud, cloud2);
-  sensor_msgs::PointCloud cloud3;
-  sensor_msgs::convertPointCloud2ToPointCloud(cloud2, cloud3);
+//  sensor_msgs::PointCloud2 cloud2;
+//  pcl::toROSMsg(*cloud, cloud2);
+//  sensor_msgs::PointCloud cloud3;
+//  sensor_msgs::convertPointCloud2ToPointCloud(cloud2, cloud3);
+//
+//  object_manipulation_msgs::FindClusterBoundingBox srv;
+//  object_manipulation_msgs::ClusterBoundingBox bounding_box;
+//  srv.request.cluster = cloud3;
+//  ROS_DEBUG_STREAM("Cluster for the unknown object" << srv.request.cluster);
+//
+//  if (find_cluster_bounding_box_client.call(srv) == 1)
+//  {
+//    ROS_DEBUG_STREAM("Response Pose " << srv.response.pose << "Response Box Dims " << srv.response.box_dims);
+//
+//    bounding_box.pose_stamped = srv.response.pose;
+//    bounding_box.dimensions = srv.response.box_dims;
+//  }
+//  else
+//  {
+//    ROS_ERROR("Failed to get the bounding box for the unknown object");
+//  }
+//
+//  //Publish transformation to the bounding box frame
+//  tf::Quaternion tmp_quat;
+////      tmp_quat.x = bounding_box.pose_stamped.pose.orientation.x;
+////      tmp_quat.y = bounding_box.pose_stamped.pose.orientation.y;
+////      tmp_quat.z = bounding_box.pose_stamped.pose.orientation.z;
+////      tmp_quat.w = bounding_box.pose_stamped.pose.orientation.w;
+//  tf::quaternionMsgToTF(bounding_box.pose_stamped.pose.orientation, tmp_quat);
+//
+//  tf::Transform base_to_bounding_box_tf;
+//  base_to_bounding_box_tf.setOrigin(
+//      tf::Vector3(bounding_box.pose_stamped.pose.position.x, bounding_box.pose_stamped.pose.position.y,
+//                  bounding_box.pose_stamped.pose.position.z));
+//  base_to_bounding_box_tf.setRotation(tmp_quat);
+//
+//  std::stringstream tf_name_base_to_bounding_box;
+//  tf_name_base_to_bounding_box << "base_to_plane_bounding_box";
+//  
+//
+//  tf::StampedTransform bounding_box_to_base_tf;
+//  
+//  bool success = false;
+//  for(unsigned int i = 0; i < 1000; ++i)
+//  {
+//    //Publish the transform
+//    tf_broadcaster->sendTransform(
+//          tf::StampedTransform(base_to_bounding_box_tf, ros::Time::now(), bounding_box.pose_stamped.header.frame_id,
+//                               tf_name_base_to_bounding_box.str()));
+//    
+//    
+//    try
+//    {
+//      //get correct rotation: we want to rotate to have the same
+//      // orientation as the base_link
+//      if (tf_listener->waitForTransform(tf_name_base_to_bounding_box.str(), "/camera_depth_optical_frame", ros::Time(), ros::Duration(1.0)))
+//      {
+//        tf_listener->lookupTransform(tf_name_base_to_bounding_box.str(), "/camera_depth_optical_frame", ros::Time(0),
+//                                     bounding_box_to_base_tf);
+//      }
+//      else
+//      {
+//        ROS_FATAL_STREAM("(1) Couldn't get the transform between /camera_depth_optical_frame and " << tf_name_base_to_bounding_box.str());
+//        ROS_BREAK();
+//      }
+//      success = true;
+//      break;
+//    }
+//    catch(tf::TransformException exc)
+//    {
+//      continue;
+//    }
+//  }
+//  
+//  if( !success )
+//  {
+//    ROS_FATAL_STREAM("Couldn't get the transform between /camera_depth_optical_frame and " << tf_name_base_to_bounding_box.str());
+//    ROS_BREAK();
+//  }
 
-  object_manipulation_msgs::FindClusterBoundingBox srv;
-  object_manipulation_msgs::ClusterBoundingBox bounding_box;
-  srv.request.cluster = cloud3;
-  ROS_DEBUG_STREAM("Cluster for the unknown object" << srv.request.cluster);
-
-  if (find_cluster_bounding_box_client.call(srv) == 1)
-  {
-    ROS_DEBUG_STREAM("Response Pose " << srv.response.pose << "Response Box Dims " << srv.response.box_dims);
-
-    bounding_box.pose_stamped = srv.response.pose;
-    bounding_box.dimensions = srv.response.box_dims;
-  }
-  else
-  {
-    ROS_ERROR("Failed to get the bounding box for the unknown object");
-  }
-
-  //Publish transformation to the bounding box frame
-  tf::Quaternion tmp_quat;
-//      tmp_quat.x = bounding_box.pose_stamped.pose.orientation.x;
-//      tmp_quat.y = bounding_box.pose_stamped.pose.orientation.y;
-//      tmp_quat.z = bounding_box.pose_stamped.pose.orientation.z;
-//      tmp_quat.w = bounding_box.pose_stamped.pose.orientation.w;
-  tf::quaternionMsgToTF(bounding_box.pose_stamped.pose.orientation, tmp_quat);
-
-  tf::Transform base_to_bounding_box_tf;
-  base_to_bounding_box_tf.setOrigin(
-      tf::Vector3(bounding_box.pose_stamped.pose.position.x, bounding_box.pose_stamped.pose.position.y,
-                  bounding_box.pose_stamped.pose.position.z));
-  base_to_bounding_box_tf.setRotation(tmp_quat);
-
-  std::stringstream tf_name_base_to_bounding_box;
-  tf_name_base_to_bounding_box << "base_to_plane_bounding_box";
-  tf_broadcaster->sendTransform(
-      tf::StampedTransform(base_to_bounding_box_tf, ros::Time::now(), bounding_box.pose_stamped.header.frame_id,
-                           tf_name_base_to_bounding_box.str()));
-
-  tf::StampedTransform bounding_box_to_base_tf;
-  //get correct rotation: we want to rotate to have the same
-  // orientation as the base_link
-  if (tf_listener->waitForTransform(tf_name_base_to_bounding_box.str(), "/camera_depth_optical_frame", ros::Time(), ros::Duration(1.0)))
-  {
-    tf_listener->lookupTransform(tf_name_base_to_bounding_box.str(), "/camera_depth_optical_frame", ros::Time(0),
-                                 bounding_box_to_base_tf);
-  }
-  else
-  {
-    ROS_FATAL_STREAM("Couldn't get the transform between /camera_depth_optical_frame and " << tf_name_base_to_bounding_box.str());
-    ROS_BREAK();
-  }
-
-  //We get a normal vector of the plane
-  tf::Stamped < tf::Vector3> stamped_normal(
-          tf::Vector3(plane_coefficients->values[0], plane_coefficients->values[1], plane_coefficients->values[2]),
-          ros::Time::now(), cloud->header.frame_id);
-
-  tf::Stamped < tf::Vector3 > stamped_normal_in_box_frame;
-  tf::Transformer aux_transformer;
-  aux_transformer.transformVector(tf_name_base_to_bounding_box.str(), stamped_normal, stamped_normal_in_box_frame);
-
-  Eigen::Vector4f z_axis_in_box_frame;
-  z_axis_in_box_frame[0] = 0.0;
-  z_axis_in_box_frame[1] = 0.0;
-  z_axis_in_box_frame[2] = 1.0;
-  z_axis_in_box_frame[3] = 0.0;
-
-  Eigen::Vector4f eigen_normal_in_box_frame;
-  eigen_normal_in_box_frame[0] = stamped_normal_in_box_frame[0];
-  eigen_normal_in_box_frame[1] = stamped_normal_in_box_frame[1];
-  eigen_normal_in_box_frame[2] = stamped_normal_in_box_frame[2];
-  eigen_normal_in_box_frame[3] = 0.0;
-
-  double angle = pcl::getAngle3D(z_axis_in_box_frame, eigen_normal_in_box_frame);
-  //Assuming that x is on the plane (which normally is almost true)
-
-  //but we don't want to translate to the base_link, just to rotate:
-  bounding_box_to_base_tf.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
-
-  //we want to rotate around y to make the z axis almost coinncide woth the normal
-  // so we need one more rotation, to set the z axis of the frame
-  // so we rotate  around y
-
-  tmp_quat.setRPY(0.0, angle, 0.0);
-  tf::Quaternion current_quat = bounding_box_to_base_tf.getRotation();
-
-  tmp_quat += current_quat;
-  bounding_box_to_base_tf.setRotation(tmp_quat);
-
-  std::stringstream tf_name_box_to_base_or;
-  tf_name_box_to_base_or << "box_to_base_or";
-  tf_broadcaster->sendTransform(
-      tf::StampedTransform(bounding_box_to_base_tf, ros::Time::now(), tf_name_base_to_bounding_box.str(),
-                           tf_name_box_to_base_or.str()));
+//  //We get a normal vector of the plane
+//  tf::Stamped < tf::Vector3> stamped_normal(
+//          tf::Vector3(plane_coefficients->values[0], plane_coefficients->values[1], plane_coefficients->values[2]),
+//          ros::Time::now(), cloud->header.frame_id);
+//
+//  tf::Stamped < tf::Vector3 > stamped_normal_in_box_frame;
+//  tf::Transformer aux_transformer;
+//  aux_transformer.transformVector(tf_name_base_to_bounding_box.str(), stamped_normal, stamped_normal_in_box_frame);
+//
+//  Eigen::Vector4f z_axis_in_box_frame;
+//  z_axis_in_box_frame[0] = 0.0;
+//  z_axis_in_box_frame[1] = 0.0;
+//  z_axis_in_box_frame[2] = 1.0;
+//  z_axis_in_box_frame[3] = 0.0;
+//
+//  Eigen::Vector4f eigen_normal_in_box_frame;
+//  eigen_normal_in_box_frame[0] = stamped_normal_in_box_frame[0];
+//  eigen_normal_in_box_frame[1] = stamped_normal_in_box_frame[1];
+//  eigen_normal_in_box_frame[2] = stamped_normal_in_box_frame[2];
+//  eigen_normal_in_box_frame[3] = 0.0;
+//pcl::IsNotDenseException
+//  double angle = pcl::getAngle3D(z_axis_in_box_frame, eigen_normal_in_box_frame);
+//  //Assuming that x is on the plane (which normally is almost true)
+//
+//  //but we don't want to translate to the base_link, just to rotate:
+//  bounding_box_to_base_tf.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
+//
+//  //we want to rotate around y to make the z axis almost coinncide woth the normal
+//  // so we need one more rotation, to set the z axis of the frame
+//  // so we rotate  around y
+//
+//  tmp_quat.setRPY(0.0, angle, 0.0);
+//  tf::Quaternion current_quat = bounding_box_to_base_tf.getRotation();
+//
+//  tmp_quat += current_quat;
+//  bounding_box_to_base_tf.setRotation(tmp_quat);
+//
+//  std::stringstream tf_name_box_to_base_or;
+//  tf_name_box_to_base_or << "box_to_base_or";
+//  tf_broadcaster->sendTransform(
+//      tf::StampedTransform(bounding_box_to_base_tf, ros::Time::now(), tf_name_base_to_bounding_box.str(),
+//                           tf_name_box_to_base_or.str()));
 
   
-  //tf_listener->transformPointCloud(tf_name_box_to_base_or.str(), );
-  //pcl::getMinMax3D(*cloud, min_pt_, max_pt_);
+  //PointCloud::ConstPtr transformed_cloud;
+  //pcl:transformPointCloud(tf_name_box_to_base_or.str(), *cloud, *transformed_cloud, tf_listener);
+  //pcl::getMinMax3D(*transformed_cloud, min_pt_, max_pt_);
+  
+  
+  pcl::getMinMax3D(*cloud, min_pt_, max_pt_);
 }
 
 void BoxSegmentation::callback3(const pcl::ModelCoefficients::ConstPtr &coeff)
 {
-  *plane_coefficients = *coeff;
+  //*plane_coefficients = *coeff;
 }
 
 void BoxSegmentation::read_parameters(ros::NodeHandle & nh)

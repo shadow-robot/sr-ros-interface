@@ -1,9 +1,10 @@
 <launch>
 
-  <node name="cluster_bounding_box_finder" pkg="object_manipulator"
+  <node name="cluster_bounding_box_finder_2" pkg="object_manipulator"
 	type="cluster_bounding_box_finder_server.py"
 	output="screen"
 	respawn="false">
+    <remap from="/find_cluster_bounding_box" to="/find_cluster_bounding_box2" />
   </node>
 
 <group ns="/kinect_segmentation">
@@ -131,7 +132,67 @@
   <node pkg="nodelet" type="nodelet" name="BoxSegmentation" args="load sr_kinect/BoxSegmentation camera_nodelet_manager" output="screen">
     <remap from="cloud_in" to="/kinect_segmentation/passthroughZ/output"/>
     <remap from="plane" to="/kinect_segmentation/statistical_outlier_removal_1/output"/>
+    <remap from="plane_coeff" to="/kinect_segmentation/planar_segmentation/model"/>
   </node>
+
+
+
+<!-- Dark patch on green "foam" (daytime light)     -->
+    <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
+        <remap from="cloud_in" to="/kinect_segmentation/BoxSegmentation/output"/>
+        <rosparam>
+            filter_max_r: 220
+            filter_min_r: 90
+            filter_max_g: 220
+            filter_min_g: 90
+            filter_max_b: 220
+            filter_min_b: 90       
+        </rosparam>
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="statistical_outlier_removal" args="load pcl/StatisticalOutlierRemoval camera_nodelet_manager" output="screen">
+      <remap from="~input" to="/kinect_segmentation/KinectColorSegmentation/output" />
+      <rosparam>
+        mean_k: 100 
+        stddev: 20.0 
+        negative: False 
+      </rosparam>
+    </node>
+
+   <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid camera_nodelet_manager" output="screen">
+    <remap from="~input" to="/kinect_segmentation/statistical_outlier_removal/output" />
+    <rosparam>
+      filter_limit_min: 0.01
+      filter_limit_max: 1.5
+      filter_limit_negative: False
+      leaf_size: 0.018
+    </rosparam>
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="PointSequenceDetection" args="load sr_kinect/PointSequenceDetection camera_nodelet_manager" output="screen">
+        <remap from="cloud_in" to="/kinect_segmentation/voxel_grid/output"/>
+      <rosparam>
+      </rosparam>
+    </node>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <!-- Segment the table plane 
   <node pkg="nodelet" type="nodelet" name="planar_segmentation" args="load pcl/SACSegmentation camera_nodelet_manager" output="screen">
