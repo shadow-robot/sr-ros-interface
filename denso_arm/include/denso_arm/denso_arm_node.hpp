@@ -41,6 +41,8 @@
 #include "denso_arm/denso_arm.hpp"
 #include "denso_arm/denso_joints.hpp"
 
+#include <boost/thread.hpp>
+
 #include <math.h>
 
 namespace denso
@@ -92,6 +94,15 @@ namespace denso
     void init_joints();
 
     /**
+     * mutex to make sure we don't send two commands at the same time
+     *  to the denso arm
+     */
+    boost::mutex denso_mutex;
+
+    ///Controls whether we're instantiating the driver or not.
+    static const bool simulated;
+
+    /**
      * Transform an incoming geometry_msgs::Pose message
      * to a pose for the denso arm.
      *
@@ -115,7 +126,7 @@ namespace denso
       // The rpy needs to be sent in degrees to the denso arm
       pose_denso.roll = sr_math_utils::to_degrees(roll);
       pose_denso.pitch = sr_math_utils::to_degrees(pitch);
-      pose_denso.yaw = sr_math_utils::to_degrees(yaw); 
+      pose_denso.yaw = sr_math_utils::to_degrees(yaw);
 
       return pose_denso;
     };

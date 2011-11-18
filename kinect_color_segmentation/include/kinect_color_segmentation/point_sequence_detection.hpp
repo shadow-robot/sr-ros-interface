@@ -37,11 +37,13 @@
 #include "pcl/octree/octree.h"
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/filters/extract_indices.h>
-#include <sr_robot_msgs/GetSegmentedLine.h>
+#include <kinect_color_segmentation/SurfaceToDremmel.h>
+#include <kinect_color_segmentation/WallNormale.h>
 
 namespace sr_kinect
 {
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
+  typedef pcl::PointCloud<pcl::Normal> PointCloudNormal;
   typedef pcl::octree::OctreePointCloudChangeDetector<pcl::PointXYZRGB> OctreePointCloudChangeDetector;
   typedef pcl::KdTreeFLANN<pcl::PointXYZRGB> KdTreeFLANN;
   typedef pcl::ExtractIndices<pcl::PointXYZRGB> ExtractIndices;
@@ -56,7 +58,9 @@ namespace sr_kinect
     virtual void onInit();
 
     void callback(const PointCloud::ConstPtr &cloud);
-    bool srv_callback(sr_robot_msgs::GetSegmentedLine::Request& request, sr_robot_msgs::GetSegmentedLine::Response& response);
+    void callback_2(const PointCloudNormal::ConstPtr &cloud);
+    bool srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response);
+    bool srv_callback_2(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response);
 
   private:
     void read_parameters(ros::NodeHandle & nh);
@@ -65,11 +69,14 @@ namespace sr_kinect
 
     ros::Publisher pub_;
     ros::Subscriber sub_;
+    ros::Subscriber sub2_;
     ros::ServiceServer service_;
 
     boost::shared_ptr<PointCloud> output_pcl;
     boost::shared_ptr<PointCloud> srv_output_pcl;
     boost::shared_ptr<PointCloud> previous_pcl;
+    
+    boost::shared_ptr<PointCloudNormal> srv_output_normals;
 
     bool first_time;
     std::string line_axis;

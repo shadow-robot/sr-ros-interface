@@ -40,20 +40,39 @@ namespace sr_kinect
   {
     ros::NodeHandle & nh = getNodeHandle();
     sub_ = nh.subscribe<PointCloud >("cloud_in",2, &PointSequenceDetection::callback, this);
+    sub2_ = nh.subscribe<PointCloudNormal >("cloud_normals_in",2, &PointSequenceDetection::callback_2, this);
     pub_ = nh.advertise<PointCloud>(this->getName() + "/output", 1000);
-    service_ = nh.advertiseService(this->getName() + "/line_sequence", &PointSequenceDetection::srv_callback, this);
+    service_ = nh.advertiseService(this->getName() + "/segment", &PointSequenceDetection::srv_callback, this);
     previous_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
     output_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
 
     read_parameters(nh);
   }
 
-  bool PointSequenceDetection::srv_callback(sr_robot_msgs::GetSegmentedLine::Request& request, sr_robot_msgs::GetSegmentedLine::Response& response)
+  bool PointSequenceDetection::srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response)
   {
-    pcl::toROSMsg(*srv_output_pcl, response.line_cloud);
+    response.points.clear();
+    for(unsigned int i=0; i < srv_output_pcl->size(); i++)
+    {
+      geometry_msgs::Point aux_point;
+      aux_point.x = srv_output_pcl->at(i).x;
+      aux_point.y = srv_output_pcl->at(i).y;
+      aux_point.z = srv_output_pcl->at(i).z;
+      response.points.push_back(aux_point);
+    }
+    return true;
+  }
+  
+  bool PointSequenceDetection::srv_callback_2(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response)
+  {
     return true;
   }
 
+  void PointSequenceDetection::callback_2(const PointCloudNormal::ConstPtr &cloud)
+  {
+    srv_output_normals = boost::shared_ptr<PointCloudNormal>(new PointCloudNormal(*cloud)) ;
+  }
+  
   void PointSequenceDetection::callback(const PointCloud::ConstPtr &cloud)
   {
     // Octree resolution - side length of octree voxels
@@ -162,7 +181,7 @@ namespace sr_kinect
       output_pcl->at(j).b = 0;
     }
 
-    output_pcl->header.frame_id = aux_pcl->header.frame_id;
+    output_pcl->header = aux_pcl->header;
     pub_.publish(output_pcl);
 
     //save the result for the server

@@ -117,7 +117,7 @@ class UnplugConnectorStateMachine(object):
         graspable_object = GraspableObject()
         graspable_object.cluster = self.points3d_to_pcl( self.detected_objects[name].points3d )
 
-        rospy.loginfo("Setected object: "+ name + ", trying to grasp it")
+        rospy.loginfo("Detected object: "+ name + ", trying to grasp it")
 
         try:
             resp1 = self.grasp_planner_srv( arm_name="", target=graspable_object, collision_object_name="",
