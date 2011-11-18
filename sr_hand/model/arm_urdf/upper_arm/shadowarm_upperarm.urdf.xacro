@@ -11,7 +11,7 @@
 	<inertia  ixx="0.5" ixy="0.0"  ixz="0.0"  iyy="0.5"  iyz="0.0"  izz="0.1" />
       </inertial>
       <visual>
-	<origin xyz="0 0.067 0" rpy="0 0 -${M_PI/2}" />
+	<origin xyz="0 0.067 0" rpy="0 0 0" />
 	<geometry name="shadowarm_upperarm_visual">
 	  <mesh filename="package://sr_hand/model/meshes/arm/upper_arm.mesh" scale="0.001 0.001 0.001" />
 	</geometry>
