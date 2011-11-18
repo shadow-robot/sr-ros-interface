@@ -30,7 +30,7 @@
 
   <node pkg="sr_grasp_planner" type="sr_grasp_planner" name="sr_grasp_planner" output="screen" />
 
-  <node pkg="denso_arm" type="denso_arm" name="denso_arm" output="screen" />
+  <include file="$(find denso_arm)/launch/denso_arm.launch"/>
 
   <node pkg="sr_move_arm" type="hand_posture_execution" name="hand_posture_execution" output="screen" />
 
