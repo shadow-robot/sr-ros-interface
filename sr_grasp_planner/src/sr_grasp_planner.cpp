@@ -88,7 +88,7 @@ namespace shadowrobot
       }
       else
       {
-        tmp_grasp.grasp_pose = compute_pose(i, false, bounding_box);
+        tmp_grasp.grasp_pose = compute_pose(i, true, bounding_box);
       }
 
       tmp_grasp.desired_approach_distance = static_cast<double>(i);

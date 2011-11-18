@@ -76,7 +76,7 @@ namespace denso
     tf_tip_broadcaster_->sendTransform( tf::StampedTransform( denso_pose_to_tf_transform(tip_pose_),
                                                               ros::Time::now(),
                                                               "/denso_arm/base",
-                                                              "/denso_arm/base_to_shadowhand"));
+                                                              "/denso_arm/tooltip"));
   }
 
   void DensoArmNode::update_joint_states_callback(const ros::TimerEvent& e)
