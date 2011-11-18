@@ -33,8 +33,7 @@ namespace sr_kinect
   PLUGINLIB_DECLARE_CLASS(sr_kinect, PointSequenceDetection, sr_kinect::PointSequenceDetection, nodelet::Nodelet);
 
   PointSequenceDetection::PointSequenceDetection()
-    : nodelet::Nodelet(), first_time(true), line_axis("x"), filter_max_r_(255), filter_min_r_(0), filter_max_g_(255), filter_min_g_(0), filter_max_b_(255), filter_min_b_(0),
-      filter_max_x_(1000.0), filter_min_x_(-1000.0), filter_max_y_(1000.0), filter_min_y_(-1000.0), filter_max_z_(1000.0), filter_min_z_(-1000.0)
+    : nodelet::Nodelet(), first_time(true), line_axis("x"), K(2)
   {}
 
   void PointSequenceDetection::onInit()
@@ -103,7 +102,6 @@ namespace sr_kinect
 
 
 
-    int K = 4;
     std::vector<int> pointIdxNKNSearch(K);
     std::vector<float> pointNKNSquaredDistance(K);
 
@@ -159,7 +157,7 @@ namespace sr_kinect
     //only to visualize
     for (unsigned int j = 0; j < output_pcl->size (); ++j)
     {
-      output_pcl->at(j).r = j * 7;
+      output_pcl->at(j).r = static_cast<unsigned int>(256.0 * (static_cast<double>(j)/static_cast<double>(output_pcl->size())));
       output_pcl->at(j).g = 0;
       output_pcl->at(j).b = 0;
     }
@@ -207,68 +205,17 @@ namespace sr_kinect
     //Parameter reading
     std::string base_name = nh.resolveName(this->getName(), true);
     int param_read = 0;
-    if (nh.getParam(base_name + "/filter_max_r", param_read))
+    if (nh.getParam(base_name + "/K", param_read))
     {
-      filter_max_r_ = static_cast<unsigned int>(param_read);
-      NODELET_INFO_STREAM("Read max r: " << filter_max_r_);
+      K = param_read;
+      NODELET_INFO_STREAM("Read K: " << K);
     }
-    if (nh.getParam(base_name + "/filter_min_r", param_read))
-    {
-      filter_min_r_ = static_cast<unsigned int>(param_read);
-      NODELET_INFO_STREAM("Read min r: " << filter_min_r_);
-    }
-    if (nh.getParam(base_name + "/filter_max_g", param_read))
-    {
-      filter_max_g_ = static_cast<unsigned int>(param_read);
-      NODELET_INFO_STREAM("Read max g: " << filter_max_g_);
-    }
-    if (nh.getParam(base_name + "/filter_min_g", param_read))
-    {
-      filter_min_g_ = static_cast<unsigned int>(param_read);
-      NODELET_INFO_STREAM("Read min g: " << filter_min_g_);
-    }
-    if (nh.getParam(base_name + "/filter_max_b", param_read))
-    {
-      filter_max_b_ = static_cast<unsigned int>(param_read);
-      NODELET_INFO_STREAM("Read max b: " << filter_max_b_);
-    }
-    if (nh.getParam(base_name + "/filter_min_b", param_read))
-    {
-      filter_min_b_ = static_cast<unsigned int>(param_read);
-      NODELET_INFO_STREAM("Read min b: " << filter_min_b_);
-    }
-
-    double param_read2 = 0;
-    if (nh.getParam(base_name + "/filter_max_x", param_read2))
-    {
-      filter_max_x_ = param_read2;
-      NODELET_INFO_STREAM("Read max x: " << filter_max_x_);
-    }
-    if (nh.getParam(base_name + "/filter_min_x", param_read2))
-    {
-      filter_min_x_ = param_read2;
-      NODELET_INFO_STREAM("Read min x: " << filter_min_x_);
-    }
-    if (nh.getParam(base_name + "/filter_max_y", param_read2))
-    {
-      filter_max_y_ = param_read2;
-      NODELET_INFO_STREAM("Read max y: " << filter_max_y_);
-    }
-    if (nh.getParam(base_name + "/filter_min_y", param_read2))
-    {
-      filter_min_y_ = param_read2;
-      NODELET_INFO_STREAM("Read min y: " << filter_min_y_);
-    }
-    if (nh.getParam(base_name + "/filter_max_z", param_read2))
-    {
-      filter_max_z_ = param_read2;
-      NODELET_INFO_STREAM("Read max z: " << filter_max_z_);
-    }
-    if (nh.getParam(base_name + "/filter_min_z", param_read2))
-    {
-      filter_min_z_ = param_read2;
-      NODELET_INFO_STREAM("Read min z: " << filter_min_z_);
-    }
+//    std::string param_read_2 = "";
+//    if (nh.getParam(base_name + "/axis", param_read_2))
+//    {
+//      line_axis = param_read;
+//      NODELET_INFO_STREAM("Read axis: " << line_axis);
+//    }
   }
 
   unsigned int PointSequenceDetection::find_search_point(boost::shared_ptr<PointCloud> cloud)

@@ -73,6 +73,7 @@ namespace sr_kinect
 
     bool first_time;
     std::string line_axis;
+    int K;
 
     unsigned int filter_max_r_;
     unsigned int filter_min_r_;

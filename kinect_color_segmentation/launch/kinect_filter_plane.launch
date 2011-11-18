@@ -141,14 +141,15 @@
     <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
         <remap from="cloud_in" to="/kinect_segmentation/BoxSegmentation/output"/>
         <rosparam>
-            filter_max_r: 220
-            filter_min_r: 90
-            filter_max_g: 220
-            filter_min_g: 90
-            filter_max_b: 220
-            filter_min_b: 90       
+            filter_max_r: 75
+            filter_min_r: 0
+            filter_max_g: 75
+            filter_min_g: 0
+            filter_max_b: 75
+            filter_min_b: 0       
         </rosparam>
     </node>
+
 
     <node pkg="nodelet" type="nodelet" name="statistical_outlier_removal" args="load pcl/StatisticalOutlierRemoval camera_nodelet_manager" output="screen">
       <remap from="~input" to="/kinect_segmentation/KinectColorSegmentation/output" />
@@ -165,13 +166,15 @@
       filter_limit_min: 0.01
       filter_limit_max: 1.5
       filter_limit_negative: False
-      leaf_size: 0.018
+      leaf_size: 0.01
     </rosparam>
     </node>
 
     <node pkg="nodelet" type="nodelet" name="PointSequenceDetection" args="load sr_kinect/PointSequenceDetection camera_nodelet_manager" output="screen">
         <remap from="cloud_in" to="/kinect_segmentation/voxel_grid/output"/>
       <rosparam>
+        K: 4
+        axis: x
       </rosparam>
     </node>
 

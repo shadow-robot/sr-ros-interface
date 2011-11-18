@@ -49,16 +49,14 @@ namespace sr_kinect
   {
     segmented_pcl->clear();
 
-    for(unsigned int i=0; i < cloud->width; ++i)
+    for(unsigned int i=0; i < cloud->size(); ++i)
     {
-      for(unsigned int j=0; j < cloud->height; ++j)
-      {
-        if((( cloud->at(i,j).r) > filter_min_r_)
-           && (( cloud->at(i,j).r) < filter_max_r_)
-           &&(( cloud->at(i,j).g) > filter_min_g_)
-           &&(( cloud->at(i,j).g) < filter_max_g_)
-           &&(( cloud->at(i,j).b) > filter_min_b_)
-           &&(( cloud->at(i,j).b) < filter_max_b_)
+        if((( cloud->at(i).r) > filter_min_r_)
+           && (( cloud->at(i).r) < filter_max_r_)
+           &&(( cloud->at(i).g) > filter_min_g_)
+           &&(( cloud->at(i).g) < filter_max_g_)
+           &&(( cloud->at(i).b) > filter_min_b_)
+           &&(( cloud->at(i).b) < filter_max_b_)
 //           &&(( cloud->at(i,j).x) > filter_min_x_)
 //           &&(( cloud->at(i,j).x) < filter_max_x_)
 //           &&(( cloud->at(i,j).y) > filter_min_y_)
@@ -66,10 +64,9 @@ namespace sr_kinect
 //           &&(( cloud->at(i,j).z) > filter_min_z_)
 //           &&(( cloud->at(i,j).z) < filter_max_z_)
           )
-          segmented_pcl->push_back( cloud->at(i,j) );
-      }
+          segmented_pcl->push_back( cloud->at(i) );
     }
-    segmented_pcl->header.frame_id = cloud->header.frame_id;
+    segmented_pcl->header = cloud->header;
 
     pub_.publish(segmented_pcl);
   }

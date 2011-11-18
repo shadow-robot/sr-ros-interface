@@ -103,7 +103,8 @@ void BoxSegmentation::callback(const PointCloud::ConstPtr &cloud)
   extract.setNegative (false);
   extract.filter (*segmented_pcl);
       
-  segmented_pcl->header.frame_id = cloud->header.frame_id;
+  segmented_pcl->header = cloud->header;
+  segmented_pcl->is_dense = cloud->is_dense;
 
   if(segmented_pcl->size() > 0)
   {
