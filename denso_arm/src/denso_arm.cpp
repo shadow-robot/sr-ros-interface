@@ -49,6 +49,7 @@ namespace denso
     start_controller();
     start_slave_task();
     take_robot();
+    set_tooltip(2);
     set_speed(initial_speed);
     initialise_position_handles();
     set_power(1);

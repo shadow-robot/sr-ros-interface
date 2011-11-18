@@ -27,15 +27,13 @@ from object_manipulation_msgs.msg import GraspableObject, GraspHandPostureExecut
 
 from object_manipulation_msgs.srv import GraspPlanning
 from sensor_msgs.msg import PointCloud
-from denso_msgs.msg import MoveArmPoseGoal, MoveArmPoseResult, MoveArmPoseAction
+from denso_msgs.msg import MoveArmPoseGoal, MoveArmPoseResult, MoveArmPoseAction, TrajectoryAction, TrajectoryGoal, TrajectoryResult
 from geometry_msgs.msg import Pose
 from re_kinect_object_detector.msg import DetectionResult
 from std_srvs.srv import Empty
 
 from interactive_marker import InteractiveConnectorSelector
-
-#the distance at which the connector is going to be lifted.
-MAX_LIFT_DISTANCE = 0.2
+from visualization_msgs.msg import Marker, MarkerArray
 
 class UnplugConnectorStateMachine(object):
     """
@@ -51,13 +49,13 @@ class UnplugConnectorStateMachine(object):
         self.detection_subscriber = None
         self.grasp_planner_srv = None
         self.detected_objects = {}
+        self.ran_once = False
 
         self.tf_listener = tf.TransformListener()
 
         self.detection_subscriber = rospy.Subscriber("~input", DetectionResult, self.detection_callback)
-
-
-        self.pub_pcl = rospy.Publisher("/test", PointCloud)
+        
+        self.publisher_marker_best_pose = rospy.Publisher("~best_pose", MarkerArray)
 
         rospy.wait_for_service('/sr_grasp_planner/plan_point_cluster_grasp')
         self.grasp_planner_srv = rospy.ServiceProxy( '/sr_grasp_planner/plan_point_cluster_grasp', GraspPlanning )
@@ -66,6 +64,9 @@ class UnplugConnectorStateMachine(object):
 
         self.grasp_client = actionlib.SimpleActionClient('/right_arm/hand_posture_execution', GraspHandPostureExecutionAction)
         self.grasp_client.wait_for_server()
+        
+        self.denso_trajectory_client = actionlib.SimpleActionClient('/denso_arm/trajectory', TrajectoryAction)
+        self.denso_trajectory_client.wait_for_server()
 
         self.denso_arm_client = actionlib.SimpleActionClient('/denso_arm/move_arm_pose', MoveArmPoseAction)
         self.denso_arm_client.wait_for_server()
@@ -73,21 +74,23 @@ class UnplugConnectorStateMachine(object):
         rospy.spin()
 
     def run(self, req):
-        if not self.running:
-            self.running = True
-            list_of_grasps = self.plan_grasp( req )
+        if not self.ran_once:
+            self.ran_once = True
+            if not self.running:
+                self.running = True
+                list_of_grasps = self.plan_grasp( req )
+                
+                if list_of_grasps != []:
+                    #we received a list of grasps. Select the best one
+                    best_grasp = self.select_best_grasp( list_of_grasps )
 
-            if list_of_grasps != []:
-                #we received a list of grasps. Select the best one
-                best_grasp = self.select_best_grasp( list_of_grasps )
+                    #grasp using the selected grasp
+                    result = self.grasp_connector( best_grasp )
 
-                #grasp using the selected grasp
-                result = self.grasp_connector( best_grasp )
-
-                if result:
-                    #unplug the grasped connector
-                    self.unplug_connector( best_grasp )
-            self.running = False
+                    if result:
+                        #unplug the grasped connector
+                        self.unplug_connector( best_grasp )
+                    self.running = False
 
         return []
 
@@ -139,6 +142,7 @@ class UnplugConnectorStateMachine(object):
         #Get the closest grasp.
         min_distance = self.distance(list_of_grasps[0].grasp_pose, palm_pose)
         tmp_index = 0
+
         for index, grasp in enumerate(list_of_grasps):
             grasp_pose = grasp.grasp_pose
             distance = self.distance(grasp_pose, palm_pose)
@@ -147,6 +151,8 @@ class UnplugConnectorStateMachine(object):
                 min_distance = distance
                 tmp_index = index
 
+        pose_tip = self.get_pose("/denso_arm/tooltip")
+        best_grasp.grasp_pose.orientation = pose_tip.orientation
         #rospy.logdebug( "----" )
         #rospy.logdebug( "BEST GRASP:" )
         #rospy.logdebug( " distance = ", min_distance, " (", tmp_index,")" )
@@ -155,6 +161,28 @@ class UnplugConnectorStateMachine(object):
         #then transform the grasp pose to be in the denso arm tf frame
         #may be not necessary: base link is probably the base of the
         #denso arm
+
+        #display the best grasp in rviz
+        markerArray = MarkerArray()
+        marker_X = Marker()
+        marker_X.header.frame_id = "/base_link"
+        marker_X.type = marker_X.SPHERE
+        marker_X.action = marker_X.ADD
+        marker_X.scale.x = 0.01
+        marker_X.scale.y = 0.01
+        marker_X.scale.z = 0.01
+        marker_X.color.a = 1.0
+        marker_X.color.r = 1.0
+        marker_X.color.g = 0.0
+        marker_X.color.b = 0.0
+        marker_X.pose.orientation.w = 1.0
+        marker_X.pose.position.x = best_grasp.grasp_pose.position.x
+        marker_X.pose.position.y = best_grasp.grasp_pose.position.y
+        marker_X.pose.position.z = best_grasp.grasp_pose.position.z
+        markerArray.markers.append(marker_X)
+
+        # Publish the MarkerArray
+        self.publisher_marker_best_pose.publish(markerArray)
 
         return best_grasp
 
@@ -188,10 +216,8 @@ class UnplugConnectorStateMachine(object):
     def distance(self, pose1, pose2):
         #compute the distance between two poses.
         # is this the correct method to compute the distance?
-        pose_1_vec = numpy.array( [ pose1.position.x, pose1.position.y, pose1.position.z, pose1.orientation.x,
-                                    pose1.orientation.y, pose1.orientation.z, pose1.orientation.w ] )
-        pose_2_vec = numpy.array( [ pose2.position.x, pose2.position.y, pose2.position.z, pose2.orientation.x,
-                                    pose2.orientation.y, pose2.orientation.z, pose2.orientation.w ] )
+        pose_1_vec = numpy.array( [ pose1.position.x, pose1.position.y, pose1.position.z ] )
+        pose_2_vec = numpy.array( [ pose2.position.x, pose2.position.y, pose2.position.z ] )
         return numpy.linalg.norm( pose_1_vec - pose_2_vec )
 
 
@@ -212,20 +238,39 @@ class UnplugConnectorStateMachine(object):
         time.sleep(1)
 
         #then we move the arm to the grasp pose
-        arm_goal = MoveArmPoseGoal()
-        arm_goal.goal = grasp.grasp_pose
-        arm_goal.rate = 100
-        arm_goal.time_out = rospy.Duration.from_sec(2.)
+        # we interpolate to give a trajectory to 
+        # the arm. 
+        goal = TrajectoryGoal()
+        traj = []
+        pose_tip = self.get_pose("/denso_arm/tooltip")
+        interpolation_steps = 100
+        for i in range( 0, interpolation_steps ):
+            pose_tmp = Pose()
+            
+            pose_tmp.position.x = pose_tip.position.x + (grasp.grasp_pose.position.x - pose_tip.position.x) * float(i) / float(interpolation_steps)
+            pose_tmp.position.y = pose_tip.position.y + (grasp.grasp_pose.position.y - pose_tip.position.y) * float(i) / float(interpolation_steps)
+            pose_tmp.position.z = pose_tip.position.z + (grasp.grasp_pose.position.z - pose_tip.position.z) * float(i) / float(interpolation_steps)
 
-        self.denso_arm_client.send_goal( arm_goal )
-        self.denso_arm_client.wait_for_result()
+            pose_tmp.orientation.x = pose_tip.orientation.x# + (grasp.grasp_pose.orientation.x - pose_tip.orientation.x) * float(i) / float(interpolation_steps)
+            pose_tmp.orientation.y = pose_tip.orientation.y# + (grasp.grasp_pose.orientation.y - pose_tip.orientation.y) * float(i) / float(interpolation_steps)
+            pose_tmp.orientation.z = pose_tip.orientation.z# + (grasp.grasp_pose.orientation.z - pose_tip.orientation.z) * float(i) / float(interpolation_steps)
+            pose_tmp.orientation.w = pose_tip.orientation.w# + (grasp.grasp_pose.orientation.w - pose_tip.orientation.w) * float(i) / float(interpolation_steps)
 
-        res =  self.denso_arm_client.get_result()
-        if res.val != MoveArmPoseResult.SUCCESS:
+            traj.append( pose_tmp )
+        goal.trajectory = traj
+
+        self.denso_trajectory_client.send_goal( goal )
+        self.denso_trajectory_client.wait_for_result()
+        res =  self.denso_trajectory_client.get_result()
+        if res.val != TrajectoryResult.SUCCESS:
             rospy.logerr("Failed to move the arm to the given position.")
             return False
 
         #finally we grasp the object
+        goal = GraspHandPostureExecutionGoal()
+        goal.grasp = grasp
+        goal.goal = goal.PRE_GRASP
+
         rospy.loginfo("Going to grasp")
         goal.goal = goal.GRASP
 
@@ -237,36 +282,36 @@ class UnplugConnectorStateMachine(object):
             rospy.logerr("Failed to go to Grasp")
             return False
 
+        #TODO: delete this sleep
+        time.sleep(1)
+
         return True
 
     def unplug_connector(self, grasp):
         #We compute a list of poses to send to
         # the arm (going up from grasp)
+        goal = TrajectoryGoal()
+        traj = []
+        pose_tip = self.get_pose("/denso_arm/tooltip")
+        interpolation_steps = 100
         list_poses = []
         z = 0.0
         lift_step = 0.01
+        max_lift = 20
         pose_tmp = grasp.grasp_pose
-        while z <= MAX_LIFT_DISTANCE:
+        for z in range(0, max_lift):
             z += lift_step
             pose_tmp.position.z += lift_step
-            list_poses.append( pose_tmp )
 
-        # We send one position after the other
-        # to the arm.
-        for pose_tmp in list_poses:
-            arm_goal = MoveArmPoseGoal()
-            arm_goal.goal = pose_tmp
-            arm_goal.rate = 100
-            arm_goal.time_out = rospy.Duration.from_sec(2.)
+            traj.append( pose_tmp )
+        goal.trajectory = traj
 
-            self.denso_arm_client.send_goal( arm_goal )
-            self.denso_arm_client.wait_for_result()
-
-            res =  self.denso_arm_client.get_result()
-            if res.val != MoveArmPoseResult.SUCCESS:
-                rospy.logerr("Failed to move the arm to the given position.")
-                return False
-
+        self.denso_trajectory_client.send_goal( goal )
+        self.denso_trajectory_client.wait_for_result()
+        res =  self.denso_trajectory_client.get_result()
+        if res.val != TrajectoryResult.SUCCESS:
+            rospy.logerr("Failed to move the arm to the given position.")
+            return False
 
         #TODO: delete this sleep
         time.sleep(1)
@@ -294,7 +339,4 @@ class UnplugConnectorStateMachine(object):
         pcl.header = self.recognition_header
 
         pcl.points = points3d
-
-        self.pub_pcl.publish(pcl)
-
         return pcl
