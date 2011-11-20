@@ -77,7 +77,7 @@ void VirtualArm::initializeMap()
     tmpData.min = -45.0;
     tmpData.max = 90.0;
 #ifdef GAZEBO
-    full_topic = topic_prefix + "trunk_rotation_controller" + topic_suffix;
+    full_topic = topic_prefix + "sa_sr_position_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     int tmp_index = 0;
     tmpData.publisher_index = tmp_index;
@@ -86,7 +86,7 @@ void VirtualArm::initializeMap()
     tmpData.min = 0.0;
     tmpData.max = 90.0;
 #ifdef GAZEBO
-    full_topic = topic_prefix + "shoulder_rotation_controller" + topic_suffix;
+    full_topic = topic_prefix + "sa_ss_position_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -95,7 +95,7 @@ void VirtualArm::initializeMap()
     tmpData.min = 0.0;
     tmpData.max = 120.0;
 #ifdef GAZEBO
-    full_topic = topic_prefix + "elbow_abduction_controller" + topic_suffix;
+    full_topic = topic_prefix + "sa_es_position_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -104,7 +104,7 @@ void VirtualArm::initializeMap()
     tmpData.min = -90.0;
     tmpData.max = 90.0;
 #ifdef GAZEBO
-    full_topic = topic_prefix + "forearm_rotation_controller" + topic_suffix;
+    full_topic = topic_prefix + "sa_er_position_controller" + topic_suffix;
     gazebo_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;

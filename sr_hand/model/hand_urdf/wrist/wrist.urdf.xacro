@@ -36,8 +36,8 @@
       <!--<origin xyz="0 -0.010 0.213" rpy="0 0 0" />-->
       <insert_block name="origin" />
       <axis xyz="0 1 0" />
-      <limit lower="-0.52359877559829882" upper="0.17453292519943295" effort="1" velocity="0.2"/>
-      <dynamics damping="200.5"/>
+      <limit lower="-0.52359877559829882" upper="0.17453292519943295" effort="5" velocity="1.0"/>
+      <dynamics damping="100.5"/>
     </joint>
 
     <xacro:shadowhand_wrist_transmission />

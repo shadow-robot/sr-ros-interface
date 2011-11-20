@@ -1,0 +1,36 @@
+<launch>
+ <param name="arm_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
+
+  <!--
+           shadowarm 
+                        -->
+  <node pkg="sr_hand" name="shadowarm"
+        type="shadowarm_can" >
+    <remap from="robot_description" to="arm_description"/>
+    <param name="shadowarm_prefix" type="string" value="sr_arm/" />
+    <param name="controller_suffix" type="string" value="position_controller" />
+    <param name="publish_frequency_diagnostics" type="double" value="1.0" />
+    <param name="publish_frequency" type="double" value="100.0" />
+  </node> 
+ <!-- Robot state publisher: publishes tf information regarding the 
+       positions of the arm -->
+  <node pkg="robot_state_publisher" type="state_publisher"
+        name="robot_state_publisher_pos_arm">      
+    <remap from="robot_description" to="arm_description"/>
+    <remap from="joint_states" to="sr_arm/position/joint_states" />
+    <param name="publish_frequency" type="double" value="10.0" />
+    <param name="tf_prefix" type="string" value="sr_arm/position" />
+  </node>
+ <!-- Robot state publisher: publishes tf information regarding the 
+       targets of the arm -->
+  <node pkg="robot_state_publisher" type="state_publisher"
+        name="robot_state_publisher_target_arm">      
+    <remap from="robot_description" to="arm_description"/>
+    <remap from="joint_states" to="sr_arm/target/joint_states" />
+    <param name="publish_frequency" type="double" value="1.0" />
+    <param name="tf_prefix" type="string" value="sr_arm/target" />
+  </node>
+
+</launch>
+
+

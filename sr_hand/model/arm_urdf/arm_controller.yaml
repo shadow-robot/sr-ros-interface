@@ -1,4 +1,4 @@
-trunk_rotation_controller:
+sa_sr_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ShoulderJRotate
   pid:
@@ -7,7 +7,7 @@ trunk_rotation_controller:
     d: 8.0
     i_clamp: 1
 
-shoulder_rotation_controller:
+sa_ss_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ShoulderJSwing
   pid:
@@ -16,7 +16,7 @@ shoulder_rotation_controller:
     d: 400.0
     i_clamp: 20.0
 
-elbow_abduction_controller:
+sa_es_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ElbowJSwing
   pid:
@@ -25,7 +25,7 @@ elbow_abduction_controller:
     d: 150.0
     i_clamp: 10.0
 
-forearm_rotation_controller:
+sa_er_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ElbowJRotate
   pid:
