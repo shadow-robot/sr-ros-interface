@@ -39,11 +39,11 @@ namespace sr_kinect
   void PointSequenceDetection::onInit()
   {
     ros::NodeHandle & nh = getNodeHandle();
-    sub_ = nh.subscribe<PointCloud >("cloud_in",2, &PointSequenceDetection::callback, this);
-    sub2_ = nh.subscribe<PointCloudNormal >("cloud_normals_in",2, &PointSequenceDetection::callback_2, this);
+    points_sub_ = nh.subscribe<PointCloud >("cloud_in",2, &PointSequenceDetection::points_callback, this);
+    normals_sub_ = nh.subscribe<PointCloudNormal >("cloud_normals_in",2, &PointSequenceDetection::normals_callback, this);
     pub_ = nh.advertise<PointCloud>(this->getName() + "/output", 1000);
-    service_ = nh.advertiseService(this->getName() + "/segment", &PointSequenceDetection::srv_callback, this);
-    service2_ = nh.advertiseService(this->getName() + "/get_wall_normale", &PointSequenceDetection::srv_callback_2, this);
+    point_sequence_service_ = nh.advertiseService(this->getName() + "/segment", &PointSequenceDetection::point_sequence_srv_callback, this);
+    surface_normal_service_ = nh.advertiseService(this->getName() + "/get_wall_normale", &PointSequenceDetection::surface_normal_srv_callback, this);
     
     previous_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
     output_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
@@ -53,7 +53,7 @@ namespace sr_kinect
     read_parameters(nh);
   }
 
-  bool PointSequenceDetection::srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response)
+  bool PointSequenceDetection::point_sequence_srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response)
   {
     boost::mutex::scoped_lock lock (mutex_);
     
@@ -69,7 +69,7 @@ namespace sr_kinect
     return true;
   }
   
-  bool PointSequenceDetection::srv_callback_2(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response)
+  bool PointSequenceDetection::surface_normal_srv_callback(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response)
   {
     boost::mutex::scoped_lock lock (mutex_normals_);
     
@@ -91,7 +91,7 @@ namespace sr_kinect
     }
   }
 
-  void PointSequenceDetection::callback_2(const PointCloudNormal::ConstPtr &cloud)
+  void PointSequenceDetection::normals_callback(const PointCloudNormal::ConstPtr &cloud)
   {
     boost::mutex::scoped_lock lock (mutex_normals_);
     
@@ -105,7 +105,7 @@ namespace sr_kinect
     }
   }
   
-  void PointSequenceDetection::callback(const PointCloud::ConstPtr &cloud)
+  void PointSequenceDetection::points_callback(const PointCloud::ConstPtr &cloud)
   {
     boost::mutex::scoped_lock lock (mutex_);
     

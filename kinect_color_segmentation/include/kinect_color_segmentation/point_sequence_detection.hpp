@@ -57,10 +57,10 @@ namespace sr_kinect
 
     virtual void onInit();
 
-    void callback(const PointCloud::ConstPtr &cloud);
-    void callback_2(const PointCloudNormal::ConstPtr &cloud);
-    bool srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response);
-    bool srv_callback_2(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response);
+    void points_callback(const PointCloud::ConstPtr &cloud);
+    void normals_callback(const PointCloudNormal::ConstPtr &cloud);
+    bool point_sequence_srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response);
+    bool surface_normal_srv_callback(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response);
 
   private:
     void read_parameters(ros::NodeHandle & nh);
@@ -68,10 +68,10 @@ namespace sr_kinect
     unsigned int find_point_index(boost::shared_ptr<PointCloud> cloud, pcl::PointXYZRGB searchPoint);
 
     ros::Publisher pub_;
-    ros::Subscriber sub_;
-    ros::Subscriber sub2_;
-    ros::ServiceServer service_;
-    ros::ServiceServer service2_;
+    ros::Subscriber points_sub_;
+    ros::Subscriber normals_sub_;
+    ros::ServiceServer point_sequence_service_;
+    ros::ServiceServer surface_normal_service_;
 
     boost::shared_ptr<PointCloud> output_pcl;
     boost::shared_ptr<PointCloud> srv_output_pcl;
