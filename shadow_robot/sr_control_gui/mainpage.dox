@@ -1,0 +1,21 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\b sr_control_gui is a graphical application which integrates most of the tools needed by the end-user to control Shadow Robot's Hardware. 
+
+\section howtouse How to use the GUI.
+To start the GUI, run:
+\verbatim
+rosrun sr_control_gui sr_control_gui
+\endverbatim
+
+The Shadow Robot GUI is a modular app, used to control the Shadow Robot Dextrous Hand, the Arm and some accessories such as the cyberglove. It has been designed so that the user can easily create a new plugin if needed. 
+
+You can start/stop different ROS nodes and the robot code from the top panel. The available plugins will be enabled once the correct node is started (e.g. Hand Slider is available only if the Hand ROS node is started). Then to start the plugins go to the plugins menu and select the one you want to start.
+
+\section codeapi Code API
+
+It is based on shadowhand_ros.py (see in sr_hand package) library to connect to the hand. Refer to it to see what you can control with that GUI.
+
+*/

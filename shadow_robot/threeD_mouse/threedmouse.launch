@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="threeD_mouse" name="threedmouse" type="threedmouse">
+    <param name="threedmouse_prefix" type="string" value="/threedmouse" />
+    <param name="publish_frequency" type="double" value="20.0" />
+  </node>
+</launch>

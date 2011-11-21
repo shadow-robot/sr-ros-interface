@@ -1,0 +1,17 @@
+<launch>
+
+  <!-- start gazebo with an empty plane -->
+  <param name="/use_sim_time" value="true" />
+
+  <group if="$(optenv GAZEBO_NO_X 0)">
+    <node name="gazebo" pkg="gazebo" type="gazebo" args="-r $(find sr_hand)/launch/gazebo/empty.world" respawn="false" output="screen">
+      <remap from="joint_states" to="gazebo/joint_states"/>
+    </node>
+  </group>
+  <group unless="$(optenv GAZEBO_NO_X 0)">
+    <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find sr_hand)/launch/gazebo/empty.world" respawn="false" output="screen">
+      <remap from="joint_states" to="gazebo/joint_states"/>
+    </node>
+  </group>
+
+</launch>

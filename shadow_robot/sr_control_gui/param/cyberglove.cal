@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<Cyberglove_calibration>
+<Joint name="G_PinkieRingAb">
+<calib raw_value="0.208661422133" calibrated_value="50"/>
+<calib raw_value="0.515748023987" calibrated_value="0"/>
+</Joint>
+<Joint name="G_IndexDIJ">
+<calib raw_value="0.185039371252" calibrated_value="0"/>
+<calib raw_value="0.468503922224" calibrated_value="90"/>
+</Joint>
+<Joint name="G_RingDIJ">
+<calib raw_value="0.177165359259" calibrated_value="0"/>
+<calib raw_value="0.389763772488" calibrated_value="90"/>
+</Joint>
+<Joint name="G_ThumbMPJ">
+<calib raw_value="0.311023622751" calibrated_value="-30"/>
+<calib raw_value="0.736220479012" calibrated_value="30"/>
+</Joint>
+<Joint name="G_RingMiddleAb">
+<calib raw_value="0.283464580774" calibrated_value="50"/>
+<calib raw_value="0.610236227512" calibrated_value="0"/>
+</Joint>
+<Joint name="G_PalmArch">
+<calib raw_value="0.356614176631" calibrated_value="0"/>
+<calib raw_value="0.64960628748" calibrated_value="40"/>
+</Joint>
+<Joint name="G_PinkiePIJ">
+<calib raw_value="0.153543308377" calibrated_value="0"/>
+<calib raw_value="0.602362215519" calibrated_value="90"/>
+</Joint>
+<Joint name="G_RingMPJ">
+<calib raw_value="0.322834640741" calibrated_value="0"/>
+<calib raw_value="0.570866167545" calibrated_value="90"/>
+</Joint>
+<Joint name="G_MiddlePIJ">
+<calib raw_value="0.267716526985" calibrated_value="0"/>
+<calib raw_value="0.590551197529" calibrated_value="90"/>
+</Joint>
+<Joint name="G_MiddleDIJ">
+<calib raw_value="0.0" calibrated_value="0"/>
+<calib raw_value="0.322834640741" calibrated_value="90"/>
+</Joint>
+<Joint name="G_ThumbAb">
+<calib raw_value="0.350393712521" calibrated_value="50"/>
+<calib raw_value="0.791338562965" calibrated_value="0"/>
+</Joint>
+<Joint name="G_IndexMPJ">
+<calib raw_value="0.429133862257" calibrated_value="0"/>
+<calib raw_value="0.653543293476" calibrated_value="90"/>
+</Joint>
+<Joint name="G_PinkieDIJ">
+<calib raw_value="0.318897634745" calibrated_value="0"/>
+<calib raw_value="0.578740179539" calibrated_value="90"/>
+</Joint>
+<Joint name="G_IndexPIJ">
+<calib raw_value="0.181102365255" calibrated_value="0"/>
+<calib raw_value="0.653543293476" calibrated_value="90"/>
+</Joint>
+<Joint name="G_ThumbRotate">
+<calib raw_value="0.334645658731" calibrated_value="-60"/>
+<calib raw_value="0.696850419044" calibrated_value="60"/>
+</Joint>
+<Joint name="G_ThumbIJ">
+<calib raw_value="0.460629910231" calibrated_value="0"/>
+<calib raw_value="0.909448802471" calibrated_value="90"/>
+</Joint>
+<Joint name="G_MiddleIndexAb">
+<calib raw_value="0.389763772488" calibrated_value="50"/>
+<calib raw_value="0.468503922224" calibrated_value="0"/>
+</Joint>
+<Joint name="G_RingPIJ">
+<calib raw_value="0.240157485008" calibrated_value="0"/>
+<calib raw_value="0.618110239506" calibrated_value="90"/>
+</Joint>
+<Joint name="G_PinkieMPJ">
+<calib raw_value="0.354330718517" calibrated_value="0"/>
+<calib raw_value="0.590551197529" calibrated_value="90"/>
+</Joint>
+<Joint name="G_WristPitch">
+<calib raw_value="0.153543308377" calibrated_value="-30"/>
+<calib raw_value="0.622047245502" calibrated_value="40"/>
+</Joint>
+<Joint name="G_WristYaw">
+<calib raw_value="0.236220479012" calibrated_value="10"/>
+<calib raw_value="0.925196826458" calibrated_value="-30"/>
+</Joint>
+<Joint name="G_MiddleMPJ">
+<calib raw_value="0.417322844267" calibrated_value="0"/>
+<calib raw_value="0.629921257496" calibrated_value="90"/>
+</Joint>
+</Cyberglove_calibration>

@@ -1,0 +1,9 @@
+[Core]
+Name = arm_joint_sliders
+Module = ArmJointSlider
+
+[Documentation]
+Author = Ugo Cupcic
+Version = 0.1
+Website = http://www.shadowrobot.com
+Description = ShadowArm.

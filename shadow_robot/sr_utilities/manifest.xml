@@ -1,0 +1,16 @@
+<package>
+  <description brief="sr_utilities">
+
+     sr_utilities
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_utilities</url>
+  <depend package="sensor_msgs"/>
+  <depend package="rospy"/>
+
+</package>
+
+

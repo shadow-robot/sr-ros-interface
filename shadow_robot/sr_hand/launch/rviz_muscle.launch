@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="rviz" name="rviz_visualizer" type="rviz"/>
+  <param name="hand_description" textfile="$(find sr_hand)/model/robots/shadowhand_muscle.urdf" />
+  <param name="arm_description" textfile="$(find sr_hand)/model/robots/sr_arm_muscle.urdf" />
+</launch>

@@ -1,0 +1,17 @@
+pyqt4:
+  ubuntu: python-qt4-dev python-qt4
+  debian: python-qt4-dev python-qt4
+
+yaml:
+  debian: libyaml-0-2 libyaml-dev
+
+libdc1394-dev:
+  debian: libdc1394-22-dev
+
+libspnav0:
+  ubuntu: libspnav0
+  debian: libspnav0
+
+libspnav-dev:
+  ubuntu: libspnav-dev
+  debian: libspnav-dev
