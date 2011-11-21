@@ -49,7 +49,7 @@ namespace denso
     tip_pose_ = boost::shared_ptr<Pose>( new Pose() );
     timer_tip_pose_ = node_.createTimer( rate_tip.expectedCycleTime(), &DensoArmNode::update_tip_pose_callback, this);
     tf_tip_broadcaster_ = boost::shared_ptr<tf::TransformBroadcaster>( new tf::TransformBroadcaster() );
-    
+
     //init the tooltip server
     tooltip_server = node_.advertiseService("set_tooltip", &DensoArmNode::set_tooltip, this);
 
