@@ -63,6 +63,7 @@ class InteractiveConnectorSelector(object):
 
         # create a non-interactive control which contains the box
         object_control = InteractiveMarkerControl()
+        object_control.interaction_mode = InteractiveMarkerControl.BUTTON
         object_control.always_visible = True
         object_control.markers.append( object_marker )
 
@@ -70,19 +71,6 @@ class InteractiveConnectorSelector(object):
 
         # add the control to the interactive marker
         self.int_markers[object_name].controls.append( object_control )
-
-        # create a control which will move the box
-        # this control does not contain any markers,
-        # which will cause RViz to insert two arrows
-        select_control = InteractiveMarkerControl()
-        select_control.name = "select_"+object_name
-        select_control.description = "______\n|CLICK|"
-        select_control.interaction_mode = InteractiveMarkerControl.MENU
-        #select_control.menu_entries.push_back()
-        self.select_controls[object_name] = select_control
-
-        # add the control to the interactive marker
-        self.int_markers[object_name].controls.append(select_control);
 
         # add the interactive marker to our collection &
         # tell the server to call processFeedback() when feedback arrives for it
@@ -92,6 +80,9 @@ class InteractiveConnectorSelector(object):
         self.server.applyChanges()
 
     def processFeedback(self, feedback):
+        #this was not a click on the sphere
+        if feedback.event_type != InteractiveMarkerFeedback.BUTTON_CLICK:
+            return
         #One of the object has been selected.
         # We'll update all the dynamic markers
         # to make the selected one prominent.
@@ -139,5 +130,5 @@ class InteractiveConnectorSelector(object):
 if __name__=="__main__":
     rospy.init_node("simple_marker")
 
-    int_mark = InteractiveConnectorSelector(["Cup.RobotAreCoolCup", "srh/position/forearm_motor"], None)
+    int_mark = InteractiveConnectorSelector(["srh/position/palm"], None)
     rospy.spin()
