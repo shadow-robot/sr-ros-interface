@@ -8,7 +8,7 @@
   <include filename="$(find sr_hand)/model/hand_urdf/palm/palm.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/classic_finger_ellipsoid.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/little_finger_ellipsoid.urdf.xacro" />
-  <include filename="$(find sr_hand)/model/hand_urdf/thumb/thumb.urdf.xacro" />
+  <include filename="$(find sr_hand)/model/hand_urdf/thumb/thumb_ellipsoid.urdf.xacro" />
 
   <xacro:macro name="shadowhand_motor">
 
