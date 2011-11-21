@@ -1,0 +1,15 @@
+geometry_msgs/Pose goal
+int32 rate
+duration time_out
+---
+
+int32 val
+
+#Different possibilities:
+int32 SUCCESS=1
+int32 FAILED=0
+int32 TIMED_OUT=-1
+int32 PREEMPTED=-2
+
+---
+duration time_left

@@ -1,0 +1,32 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\b cyberglove is a generic ROS interface to Immersion's Cyberglove dataglove. 
+It reads the data from the Cyberglove, calibrate them using a calibration file and stream them to 2 different 
+/joint_states topics: one for the raw data the other one for the calibrated data. There's a utility in sr_control_gui
+which can be used to generate a calibration file for a specific user in a few steps.
+
+If the button on the wrist is off, the glove won't publish any data.
+
+The calibration file can't be dynamically loaded for the time being, so if you \b change \b the \b calibration then 
+don't forget to \b restart \b the \b cyberglove \b node. 
+
+\section howtouse How To Use
+To run the cyberglove node, just run:
+\verbatim roslaunch cyberglove cyberglove.launch \endverbatim
+
+You can specify some parameters in the launch file:
+\li cyberglove_prefix The prefix to put in front of the joint_states published by the glove.
+\li publish_frequency The frequency at which you want to publish the data.
+\li path_to_glove The path to the port on which the Cyberglove is connected (usually /dev/ttyS0)
+\li path_to_calibration The path to the calibration file for the Cyberglove
+
+
+\section codeapi Code API
+\li serial_glove.h The C interface to interact with the cyberglove
+\li xml_calibration_parser::XmlCalibrationParser The calibration file parser.
+\li cyberglove_service::CybergloveService A service which can stop / start the Cyberglove publisher.
+\li cyberglove_publisher::CyberglovePublisher The actual publisher streaming the data from the cyberglove.
+
+*/

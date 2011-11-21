@@ -1,0 +1,30 @@
+<stack>
+  <description brief="shadow_robot">
+
+  This stack regroups the different ros interfaces developped for Shadow Robot's
+  Hardware. It provides an interface to both simulated and real hardware.
+
+  </description>
+  <author>Maintained by Ugo Cupcic: ugo@shadowrobot.com, contact@shadowrobot.com</author>
+  <license>BSD,GPL</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/shadow_robot</url>
+  <depend stack="common" /> <!-- tinyxml, pluginlib -->
+  <depend stack="common_msgs" /> <!-- sensor_msgs, geometry_msgs, diagnostic_msgs -->
+  <depend stack="diagnostics" /> <!-- self_test, diagnostic_aggregator -->
+  <depend stack="diagnostics_monitors" /> <!-- robot_monitor -->
+  <depend stack="driver_common" /> <!-- dynamic_reconfigure -->
+  <depend stack="executive_smach" /> <!-- smach_ros, smach -->
+  <depend stack="geometry" /> <!-- tf, tf_conversions, angles -->
+  <depend stack="kinematics" /> <!-- kinematics_msgs -->
+  <depend stack="pr2_controllers" /> <!-- pr2_mechanism_controllers, control_toolbox, robot_mechanism_controllers -->
+  <depend stack="pr2_mechanism" /> <!-- pr2_mechanism_msgs, pr2_hardware_interface, pr2_mechanism_model, realtime_tools, pr2_controller_interface -->
+  <depend stack="pr2_simulator" /> <!-- pr2_gazebo_plugins -->
+  <depend stack="robot_model" /> <!-- robot_state_publisher, urdf, kdl_parser -->
+  <depend stack="ros" /> <!-- roslib -->
+  <depend stack="ros_comm" /> <!-- rosconsole, std_srvs, roscpp, xmlrpcpp, std_msgs, rospy -->
+  <depend stack="shadow_robot_ethercat" /> <!-- sr_robot_lib -->
+  <depend stack="simulator_gazebo" /> <!-- gazebo, gazebo_plugins, gazebo_worlds -->
+  <depend stack="visualization" /> <!-- rviz -->
+
+</stack>

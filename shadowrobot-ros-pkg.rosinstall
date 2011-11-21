@@ -1,0 +1,9 @@
+- bzr:
+    uri: 'lp:sr-ros-interface'
+    local-name: shadow_robot
+- bzr:
+    uri: 'lp:sr-ros-interface-ethercat'
+    local-name: shadow_robot_etherCAT
+- bzr:
+    uri: 'lp:sr-manipulation'
+    local-name: sr_object_manipulation

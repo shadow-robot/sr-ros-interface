@@ -1,0 +1,30 @@
+<movement>
+  <step>
+    <grasp name="opened" />
+    <pause_time>0.0</pause_time>
+    <interpolation_time>1.0</interpolation_time>
+    <loop_to_step>-1</loop_to_step>
+    <number_loops>0</number_loops>
+  </step>
+  <step>
+    <grasp name="grab" />
+    <pause_time>0.0</pause_time>
+    <interpolation_time>2.0</interpolation_time>
+    <loop_to_step>-1</loop_to_step>
+    <number_loops>0</number_loops>
+  </step>
+  <step>
+    <grasp name="opened" />
+    <pause_time>0.0</pause_time>
+    <interpolation_time>3.0</interpolation_time>
+    <loop_to_step>-1</loop_to_step>
+    <number_loops>0</number_loops>
+  </step>
+  <step>
+    <grasp name="tripod_variation" />
+    <pause_time>1.0</pause_time>
+    <interpolation_time>4.0</interpolation_time>
+    <loop_to_step>0</loop_to_step>
+    <number_loops>1</number_loops>
+  </step>
+</movement>

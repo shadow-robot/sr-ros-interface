@@ -1,0 +1,419 @@
+17:43:00: Creating resource group General
+17:43:00: Creating resource group Internal
+17:43:00: Creating resource group Autodetect
+17:43:00: SceneManagerFactory for type 'DefaultSceneManager' registered.
+17:43:00: Registering ResourceManager for type Material
+17:43:00: Registering ResourceManager for type Mesh
+17:43:00: Registering ResourceManager for type Skeleton
+17:43:00: MovableObjectFactory for type 'ParticleSystem' registered.
+17:43:00: OverlayElementFactory for type Panel registered.
+17:43:00: OverlayElementFactory for type BorderPanel registered.
+17:43:00: OverlayElementFactory for type TextArea registered.
+17:43:00: Registering ResourceManager for type Font
+17:43:00: ArchiveFactory for archive type FileSystem registered.
+17:43:00: ArchiveFactory for archive type Zip registered.
+17:43:00: DDS codec registering
+17:43:00: FreeImage version: 3.13.0
+17:43:00: This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+17:43:00: Supported formats: bmp,ico,jpg,jif,jpeg,jpe,jng,koa,iff,lbm,mng,pbm,pbm,pcd,pcx,pgm,pgm,png,ppm,ppm,ras,tga,targa,tif,tiff,wap,wbmp,wbm,psd,cut,xbm,xpm,gif,hdr,g3,sgi,exr,j2k,j2c,jp2,pfm,pct,pict,pic,bay,bmq,cr2,crw,cs1,dc2,dcr,dng,erf,fff,hdr,k25,kdc,mdc,mos,mrw,nef,orf,pef,pxn,raf,raw,rdc,sr2,srf,arw,3fr,cine,ia,kc2,mef,nrw,qtk,rw2,sti,drf,dsc,ptx,cap,iiq,rwz
+17:43:00: Registering ResourceManager for type HighLevelGpuProgram
+17:43:00: Registering ResourceManager for type Compositor
+17:43:00: MovableObjectFactory for type 'Entity' registered.
+17:43:00: MovableObjectFactory for type 'Light' registered.
+17:43:00: MovableObjectFactory for type 'BillboardSet' registered.
+17:43:00: MovableObjectFactory for type 'ManualObject' registered.
+17:43:00: MovableObjectFactory for type 'BillboardChain' registered.
+17:43:00: MovableObjectFactory for type 'RibbonTrail' registered.
+17:43:00: OGRE EXCEPTION(6:FileNotFoundException): 'plugins.cfg' file not found! in ConfigFile::load at /home/ugo/ros_latest/stacks/visualization_common/ogre/build/ogre_src_v1-7-1/OgreMain/src/OgreConfigFile.cpp (line 83)
+17:43:00: plugins.cfg not found, automatic plugin loading disabled.
+17:43:00: *-*-* OGRE Initialising
+17:43:00: *-*-* Version 1.7.1 (Cthugha)
+17:43:00: Loading library RenderSystem_GL
+17:43:00: Installing plugin: GL RenderSystem
+17:43:00: OpenGL Rendering Subsystem created.
+17:43:00: Plugin successfully installed
+17:43:00: Loading library Plugin_OctreeSceneManager
+17:43:00: Installing plugin: Octree & Terrain Scene Manager
+17:43:00: Plugin successfully installed
+17:43:00: Loading library Plugin_ParticleFX
+17:43:00: Installing plugin: ParticleFX
+17:43:00: Particle Emitter Type 'Point' registered
+17:43:00: Particle Emitter Type 'Box' registered
+17:43:00: Particle Emitter Type 'Ellipsoid' registered
+17:43:00: Particle Emitter Type 'Cylinder' registered
+17:43:00: Particle Emitter Type 'Ring' registered
+17:43:00: Particle Emitter Type 'HollowEllipsoid' registered
+17:43:00: Particle Affector Type 'LinearForce' registered
+17:43:00: Particle Affector Type 'ColourFader' registered
+17:43:00: Particle Affector Type 'ColourFader2' registered
+17:43:00: Particle Affector Type 'ColourImage' registered
+17:43:00: Particle Affector Type 'ColourInterpolator' registered
+17:43:00: Particle Affector Type 'Scaler' registered
+17:43:00: Particle Affector Type 'Rotator' registered
+17:43:00: Particle Affector Type 'DirectionRandomiser' registered
+17:43:00: Particle Affector Type 'DeflectorPlane' registered
+17:43:00: Plugin successfully installed
+17:43:00: Loading library Plugin_CgProgramManager
+17:43:00: Installing plugin: Cg Program Manager
+17:43:00: Plugin successfully installed
+17:43:00: CPU Identifier & Features
+17:43:00: -------------------------
+17:43:00:  *   CPU ID: AuthenticAMD: AMD Athlon(tm) Processor LE-1640
+17:43:00:  *      SSE: yes
+17:43:00:  *     SSE2: yes
+17:43:00:  *     SSE3: yes
+17:43:00:  *      MMX: yes
+17:43:00:  *   MMXEXT: yes
+17:43:00:  *    3DNOW: yes
+17:43:00:  * 3DNOWEXT: yes
+17:43:00:  *     CMOV: yes
+17:43:00:  *      TSC: yes
+17:43:00:  *      FPU: yes
+17:43:00:  *      PRO: yes
+17:43:00:  *       HT: no
+17:43:00: -------------------------
+17:43:00: ******************************
+*** Starting GLX Subsystem ***
+******************************
+17:43:00: Creating resource group ogre_tools
+17:43:00: Added resource location '/home/ugo/ros_latest/stacks/visualization_common/ogre_tools/media' of type 'FileSystem' to resource group 'ogre_tools'
+17:43:00: Added resource location '/home/ugo/ros_latest/stacks/visualization_common/ogre_tools/media/fonts' of type 'FileSystem' to resource group 'ogre_tools'
+17:43:00: Added resource location '/home/ugo/ros_latest/stacks/visualization_common/ogre_tools/media/models' of type 'FileSystem' to resource group 'ogre_tools'
+17:43:00: Added resource location '/home/ugo/ros_latest/stacks/visualization_common/ogre_tools/media/materials' of type 'FileSystem' to resource group 'ogre_tools'
+17:43:00: Added resource location '/home/ugo/ros_latest/stacks/visualization_common/ogre_tools/media/materials/scripts' of type 'FileSystem' to resource group 'ogre_tools'
+17:43:00: Added resource location '/home/ugo/ros_latest/stacks/visualization_common/ogre_tools/media/materials/programs' of type 'FileSystem' to resource group 'ogre_tools'
+17:43:00: GLRenderSystem::_createRenderWindow "OgreRenderWindow1", 1517x1000 windowed  miscParams: parentWindowHandle=71303241 
+17:43:00: GLXWindow::create used FBConfigID = 117
+17:43:00: GL_VERSION = 3.0.0 NVIDIA 185.18.36
+17:43:00: GL_VENDOR = NVIDIA Corporation
+17:43:00: GL_RENDERER = GeForce 9500 GT/PCI/SSE2/3DNOW!
+17:43:00: GL_EXTENSIONS = GL_ARB_color_buffer_float GL_ARB_depth_buffer_float GL_ARB_depth_texture GL_ARB_draw_buffers GL_ARB_draw_instanced GL_ARB_fragment_program GL_ARB_fragment_program_shadow GL_ARB_fragment_shader GL_ARB_half_float_pixel GL_ARB_half_float_vertex GL_ARB_framebuffer_object GL_ARB_geometry_shader4 GL_ARB_imaging GL_ARB_map_buffer_range GL_ARB_multisample GL_ARB_multitexture GL_ARB_occlusion_query GL_ARB_pixel_buffer_object GL_ARB_point_parameters GL_ARB_point_sprite GL_ARB_shadow GL_ARB_shader_objects GL_ARB_shading_language_100 GL_ARB_texture_border_clamp GL_ARB_texture_buffer_object GL_ARB_texture_compression GL_ARB_texture_cube_map GL_ARB_texture_env_add GL_ARB_texture_env_combine GL_ARB_texture_env_dot3 GL_ARB_texture_float GL_ARB_texture_mirrored_repeat GL_ARB_texture_non_power_of_two GL_ARB_texture_rectangle GL_ARB_texture_rg GL_ARB_transpose_matrix GL_ARB_vertex_array_object GL_ARB_vertex_buffer_object GL_ARB_vertex_program GL_ARB_vertex_shader GL_ARB_window_pos GL_ATI_draw_buffers GL_ATI_texture_float GL_ATI_texture_mirror_once GL_S3_s3tc GL_EXT_texture_env_add GL_EXT_abgr GL_EXT_bgra GL_EXT_blend_color GL_EXT_blend_equation_separate GL_EXT_blend_func_separate GL_EXT_blend_minmax GL_EXT_blend_subtract GL_EXT_compiled_vertex_array GL_EXT_Cg_shader GL_EXT_bindable_uniform GL_EXT_depth_bounds_test GL_EXT_direct_state_access GL_EXT_draw_buffers2 GL_EXT_draw_instanced GL_EXT_draw_range_elements GL_EXT_fog_coord GL_EXT_framebuffer_blit GL_EXT_framebuffer_multisample GL_EXT_framebuffer_object GL_EXTX_framebuffer_mixed_formats GL_EXT_framebuffer_sRGB GL_EXT_geometry_shader4 GL_EXT_gpu_program_parameters GL_EXT_gpu_shader4 GL_EXT_multi_draw_arrays GL_EXT_packed_depth_stencil GL_EXT_packed_float GL_EXT_packed_pixels GL_EXT_pixel_buffer_object GL_EXT_point_parameters GL_EXT_provoking_vertex GL_EXT_rescale_normal GL_EXT_secondary_color GL_EXT_separate_specular_color GL_EXT_shadow_funcs GL_EXT_stencil_two_side GL_EXT_stencil_wrap GL_EXT_texture3D GL_EXT_texture_array GL_EXT_texture_buffer_object GL_EXT_texture_compression_latc GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc GL_EXT_texture_cube_map GL_EXT_texture_edge_clamp GL_EXT_texture_env_combine GL_EXT_texture_env_dot3 GL_EXT_texture_filter_anisotropic GL_EXT_texture_integer GL_EXT_texture_lod GL_EXT_texture_lod_bias GL_EXT_texture_mirror_clamp GL_EXT_texture_object GL_EXT_texture_sRGB GL_EXT_texture_swizzle GL_EXT_texture_shared_exponent GL_EXT_timer_query GL_EXT_vertex_array GL_EXT_vertex_array_bgra GL_IBM_rasterpos_clip GL_IBM_texture_mirrored_repeat GL_KTX_buffer_region GL_NV_blend_square GL_NV_copy_depth_to_color GL_NV_depth_buffer_float GL_NV_conditional_render GL_NV_depth_clamp GL_NV_explicit_multisample GL_NV_fence GL_NV_float_buffer GL_NV_fog_distance GL_NV_fragment_program GL_NV_fragment_program_option GL_NV_fragment_program2 GL_NV_framebuffer_multisample_coverage GL_NV_geometry_shader4 GL_NV_gpu_program4 GL_NV_half_float GL_NV_light_max_exponent GL_NV_multisample_coverage GL_NV_multisample_filter_hint GL_NV_occlusion_query GL_NV_packed_depth_stencil GL_NV_parameter_buffer_object GL_NV_pixel_data_range GL_NV_point_sprite GL_NV_primitive_restart GL_NV_register_combiners GL_NV_register_combiners2 GL_NV_texgen_reflection GL_NV_texture_compression_vtc GL_NV_texture_env_combine4 GL_NV_texture_expand_normal GL_NV_texture_rectangle GL_NV_texture_shader GL_NV_texture_shader2 GL_NV_texture_shader3 GL_NV_transform_feedback GL_NV_vertex_array_range GL_NV_vertex_array_range2 GL_NV_vertex_program GL_NV_vertex_program1_1 GL_NV_vertex_program2 GL_NV_vertex_program2_option GL_NV_vertex_program3 GL_NVX_conditional_render GL_NV_vertex_buffer_unified_memory GL_NV_shader_buffer_load GL_SGIS_generate_mipmap GL_SGIS_texture_lod GL_SGIX_depth_texture GL_SGIX_shadow GL_SUN_slice_accum 
+17:43:00: Supported GLX extensions: GLX_EXT_visual_info GLX_EXT_visual_rating GLX_SGIX_fbconfig GLX_SGIX_pbuffer GLX_SGI_video_sync GLX_SGI_swap_control GLX_EXT_texture_from_pixmap GLX_ARB_create_context GLX_ARB_multisample GLX_NV_float_buffer GLX_ARB_fbconfig_float GLX_EXT_framebuffer_sRGB GLX_ARB_get_proc_address 
+17:43:00: ***************************
+17:43:00: *** GL Renderer Started ***
+17:43:00: ***************************
+17:43:00: Registering ResourceManager for type GpuProgram
+17:43:00: GLSL support detected
+17:43:00: GL: Using GL_EXT_framebuffer_object for rendering to textures (best)
+17:43:00: FBO PF_UNKNOWN depth/stencil support: D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:00: FBO PF_L8 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:00: FBO PF_A8 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:00: FBO PF_A4L4 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:00: FBO PF_BYTE_LA depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_R5G6B5 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_B5G6R5 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_A1R5G5B5 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_R8G8B8 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_B8G8R8 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_A8R8G8B8 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_B8G8R8A8 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_A2R10G10B10 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_A2B10G10R10 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_FLOAT16_RGB depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:01: FBO PF_FLOAT16_RGBA depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_FLOAT32_RGB depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_FLOAT32_RGBA depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_X8R8G8B8 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_X8B8G8R8 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_SHORT_RGBA depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_R3G3B2 depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_FLOAT16_R depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_FLOAT32_R depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_FLOAT16_GR depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_FLOAT32_GR depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: FBO PF_SHORT_RGB depth/stencil support: D0S0 D16S0 D24S0 D32S0 Packed-D24S8 
+17:43:02: [GL] : Valid FBO targets PF_UNKNOWN PF_L8 PF_A8 PF_A4L4 PF_BYTE_LA PF_R5G6B5 PF_B5G6R5 PF_A1R5G5B5 PF_R8G8B8 PF_B8G8R8 PF_A8R8G8B8 PF_B8G8R8A8 PF_A2R10G10B10 PF_A2B10G10R10 PF_FLOAT16_RGB PF_FLOAT16_RGBA PF_FLOAT32_RGB PF_FLOAT32_RGBA PF_X8R8G8B8 PF_X8B8G8R8 PF_SHORT_RGBA PF_R3G3B2 PF_FLOAT16_R PF_FLOAT32_R PF_FLOAT16_GR PF_FLOAT32_GR PF_SHORT_RGB 
+17:43:02: RenderSystem capabilities
+17:43:02: -------------------------
+17:43:02: RenderSystem Name: OpenGL Rendering Subsystem
+17:43:02: GPU Vendor: nvidia
+17:43:02: Device Name: GeForce 9500 GT/PCI/SSE2/3DNOW!
+17:43:02: Driver Version: 3.0.0.0
+17:43:02:  * Fixed function pipeline: yes
+17:43:02:  * Hardware generation of mipmaps: yes
+17:43:02:  * Texture blending: yes
+17:43:02:  * Anisotropic texture filtering: yes
+17:43:02:  * Dot product texture operation: yes
+17:43:02:  * Cube mapping: yes
+17:43:02:  * Hardware stencil buffer: yes
+17:43:02:    - Stencil depth: 8
+17:43:02:    - Two sided stencil support: yes
+17:43:02:    - Wrap stencil values: yes
+17:43:02:  * Hardware vertex / index buffers: yes
+17:43:02:  * Vertex programs: yes
+17:43:02:  * Number of floating-point constants for vertex programs: 1024
+17:43:02:  * Number of integer constants for vertex programs: 0
+17:43:02:  * Number of boolean constants for vertex programs: 0
+17:43:02:  * Fragment programs: yes
+17:43:02:  * Number of floating-point constants for fragment programs: 512
+17:43:02:  * Number of integer constants for fragment programs: 0
+17:43:02:  * Number of boolean constants for fragment programs: 0
+17:43:02:  * Geometry programs: yes
+17:43:02:  * Number of floating-point constants for geometry programs: 512
+17:43:02:  * Number of integer constants for geometry programs: 0
+17:43:02:  * Number of boolean constants for geometry programs: 0
+17:43:02:  * Supported Shader Profiles: arbfp1 arbvp1 fp20 fp30 fp40 glsl gp4gp gpu_gp nvgp4 vp30 vp40
+17:43:02:  * Texture Compression: yes
+17:43:02:    - DXT: yes
+17:43:02:    - VTC: yes
+17:43:02:    - PVRTC: no
+17:43:02:  * Scissor Rectangle: yes
+17:43:02:  * Hardware Occlusion Query: yes
+17:43:02:  * User clip planes: yes
+17:43:02:  * VET_UBYTE4 vertex element type: yes
+17:43:02:  * Infinite far plane projection: yes
+17:43:02:  * Hardware render-to-texture: yes
+17:43:02:  * Floating point textures: yes
+17:43:02:  * Non-power-of-two textures: yes
+17:43:02:  * Volume textures: yes
+17:43:02:  * Multiple Render Targets: 8
+17:43:02:    - With different bit depths: yes
+17:43:02:  * Point Sprites: yes
+17:43:02:  * Extended point parameters: yes
+17:43:02:  * Max Point Size: 63.375
+17:43:02:  * Vertex texture fetch: yes
+17:43:02:  * Number of world matrices: 0
+17:43:02:  * Number of texture units: 32
+17:43:02:  * Stencil buffer depth: 8
+17:43:02:  * Number of vertex blend matrices: 0
+17:43:02:    - Max vertex textures: 32
+17:43:02:    - Vertex textures shared: yes
+17:43:02:  * Render to Vertex Buffer : yes
+17:43:02:  * GL 1.5 without VBO workaround: no
+17:43:02:  * Frame Buffer objects: yes
+17:43:02:  * Frame Buffer objects (ARB extension): no
+17:43:02:  * Frame Buffer objects (ATI extension): no
+17:43:02:  * PBuffer support: no
+17:43:02:  * GL 1.5 without HW-occlusion workaround: no
+17:43:02: Registering ResourceManager for type Texture
+17:43:02: DefaultWorkQueue('Root') initialising on thread 0x9365da8.
+17:43:02: DefaultWorkQueue('Root')::WorkerFunc - thread 0x96397c8 starting.
+17:43:02: Particle Renderer Type 'billboard' registered
+17:43:02: SceneManagerFactory for type 'OctreeSceneManager' registered.
+17:43:02: SceneManagerFactory for type 'TerrainSceneManager' registered.
+17:43:03: Added resource location '/home/ugo/ros_latest/stacks/visualization/rviz/ogre_media/textures' of type 'FileSystem' to resource group 'General'
+17:43:03: Parsing scripts for resource group Autodetect
+17:43:03: Finished parsing scripts for resource group Autodetect
+17:43:03: Parsing scripts for resource group General
+17:43:03: Finished parsing scripts for resource group General
+17:43:03: Parsing scripts for resource group Internal
+17:43:03: Finished parsing scripts for resource group Internal
+17:43:03: Parsing scripts for resource group ogre_tools
+17:43:03: Parsing script point_cloud_billboard.program
+17:43:03: Parsing script point_cloud_box.program
+17:43:03: Parsing script passthrough.program
+17:43:03: Parsing script point_cloud_point.program
+17:43:03: Parsing script point_cloud_box.material
+17:43:03: Parsing script point_cloud_billboard.material
+17:43:03: Parsing script point_cloud_point.material
+17:43:03: Parsing script arial.fontdef
+17:43:03: Finished parsing scripts for resource group ogre_tools
+17:43:03: Creating resource group rviz
+17:43:04: Mesh: Loading ogre_tools_sphere.mesh.
+17:43:04: WARNING: ogre_tools_sphere.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:04: Mesh: Loading ogre_tools_cylinder.mesh.
+17:43:04: WARNING: ogre_tools_cylinder.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:04: Mesh: Loading ogre_tools_cone.mesh.
+17:43:04: WARNING: ogre_tools_cone.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:04: Texture: SelectionRect0Texture: Loading 1 faces(PF_R8G8B8A8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_A8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/F1.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material osg13mat0 to SubEntity of Robot Link0 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Mesh: Loading ogre_tools_cube.mesh.
+17:43:05: WARNING: ogre_tools_cube.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Texture: Robot Link Material00RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material00RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/knuckle.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material osg2mat0 to SubEntity of Robot Link2 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material01RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material01RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/F2.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material osg16mat0 to SubEntity of Robot Link4 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material02RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material02RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/F3.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material osg11mat0 to SubEntity of Robot Link6 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material03RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material03RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg13mat0 to SubEntity of Robot Link8 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material04RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material04RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg2mat0 to SubEntity of Robot Link10 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material05RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material05RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/lfmetacarpal.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material Material.001 to SubEntity of Robot Link12 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material06RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material06RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg16mat0 to SubEntity of Robot Link14 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material07RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material07RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg11mat0 to SubEntity of Robot Link16 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material08RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material08RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg13mat0 to SubEntity of Robot Link18 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material09RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material09RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg2mat0 to SubEntity of Robot Link20 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material010RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material010RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg16mat0 to SubEntity of Robot Link22 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material011RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material011RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg11mat0 to SubEntity of Robot Link24 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material012RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material012RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/palm.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material Material.001 to SubEntity of Robot Link26 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material013RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material013RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg13mat0 to SubEntity of Robot Link28 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material014RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material014RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg2mat0 to SubEntity of Robot Link30 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material015RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material015RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg16mat0 to SubEntity of Robot Link32 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material016RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material016RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg11mat0 to SubEntity of Robot Link34 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material017RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material017RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/forearm.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material Material.011 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.010 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.009 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.008 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.007 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.006 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.005 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.004 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.003 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.002 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.001 to SubEntity of Robot Link36 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material018RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material019RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material019RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/TH1_z.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material osg20mat0 to SubEntity of Robot Link40 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material020RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material020RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material021RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material021RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/TH2_z.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material osg19mat0 to SubEntity of Robot Link44 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material022RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material022RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/TH3_z.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Can't assign material osg18mat0 to SubEntity of Robot Link46 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material023RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material023RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: WARNING: package://sr_hand/model/meshes/wrist.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+17:43:05: Texture: Robot Link Material024RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material024RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg13mat0 to SubEntity of Robot Link50 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material025RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material025RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg2mat0 to SubEntity of Robot Link52 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material026RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material026RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg16mat0 to SubEntity of Robot Link54 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material027RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material027RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg11mat0 to SubEntity of Robot Link56 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material028RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material028RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg13mat0 to SubEntity of Robot Link58 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material029RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material029RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg2mat0 to SubEntity of Robot Link60 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material030RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material030RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material Material.001 to SubEntity of Robot Link62 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material031RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material031RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg16mat0 to SubEntity of Robot Link64 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material032RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material032RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg11mat0 to SubEntity of Robot Link66 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material033RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material033RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg13mat0 to SubEntity of Robot Link68 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material034RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material034RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg2mat0 to SubEntity of Robot Link70 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material035RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material035RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg16mat0 to SubEntity of Robot Link72 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material036RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material036RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg11mat0 to SubEntity of Robot Link74 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material037RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material037RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material Material.001 to SubEntity of Robot Link76 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material038RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material038RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg13mat0 to SubEntity of Robot Link78 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material039RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material039RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg2mat0 to SubEntity of Robot Link80 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material040RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material040RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg16mat0 to SubEntity of Robot Link82 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material041RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material041RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg11mat0 to SubEntity of Robot Link84 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material042RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material042RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material Material.011 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.010 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.009 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.008 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.007 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.006 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.005 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.004 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.003 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.002 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Can't assign material Material.001 to SubEntity of Robot Link86 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material043RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material044RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material044RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg20mat0 to SubEntity of Robot Link90 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material045RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material045RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material046RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material046RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg19mat0 to SubEntity of Robot Link94 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material047RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material047RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Can't assign material osg18mat0 to SubEntity of Robot Link96 because this Material does not exist. Have you forgotten to define it in a .material script?
+17:43:05: Texture: Robot Link Material048RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material048RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material049RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:05: Texture: Robot Link Material049RobotPickTexture: Loading 1 faces(PF_R8G8B8,1x1x1) with 0 generated mipmaps from Image. Internal format is PF_X8R8G8B8,1x1x1.
+17:43:16: Font Arialusing texture size 512x512
+17:43:16: Info: Freetype returned null for character 160 in font Arial
+17:43:16: Texture: ArialTexture: Loading 1 faces(PF_BYTE_LA,512x512x1) with 0 generated mipmaps from Image. Internal format is PF_BYTE_LA,512x512x1.
+17:43:16: OGRE EXCEPTION(7:InternalErrorException): Vertex Buffer: Out of memory in GLHardwareVertexBuffer::lock at /home/ugo/ros_latest/stacks/visualization_common/ogre/build/ogre_src_v1-7-1/RenderSystems/GL/src/OgreGLHardwareVertexBuffer.cpp (line 126)

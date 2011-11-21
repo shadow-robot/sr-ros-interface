@@ -1,0 +1,32 @@
+pyqt4:
+  ubuntu: python-qt4-dev python-qt4
+  debian: python-qt4-dev python-qt4
+
+python-qt4-gl:
+  debian: python-qt4-gl
+  ubuntu: python-qt4-gl
+
+yaml:
+  debian: libyaml-0-2 libyaml-dev
+
+tinyxml:
+  ubuntu: libtinyxml2.6.2 libtinyxml-dev
+  debian: libtinyxml2.5.3 libtinyxml-dev
+libdc1394-dev:
+  debian: libdc1394-22-dev
+
+libspnav0:
+  ubuntu: libspnav0
+  debian: libspnav0
+
+libspnav-dev:
+  ubuntu: libspnav-dev
+  debian: libspnav-dev
+
+libpng++-dev:
+  ubuntu: libpng++-dev
+  debian: libpng++-dev
+
+tinyxml:
+  ubuntu: libtinyxml-dev
+  debian: libtinyxml-dev libtinyxml2.5.3

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-cd $(dirname $0)
-mv Makefile Makefile.ros
-cmake -G"Eclipse CDT4 - Unix Makefiles" -Wno-dev .
-rm Makefile
-rm CMakeCache.txt
-rm -rf CMakeFiles
-mv Makefile.ros Makefile

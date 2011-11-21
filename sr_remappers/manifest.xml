@@ -1,0 +1,25 @@
+<package>
+  <description brief="Remaps data from and to the Shadow Robot hardware">
+
+     Contains different remappers to remap data coming from an
+     actuator such as the cyberglove (Immersion) to Shadow Robot's
+     hand. It also contains remapper to remap data coming from the
+     Shadow hand to an other mechanism such as the cybergrasp
+     (Immersion).
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_remappers</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="sr_robot_msgs"/>
+<!--  <depend package="cybergrasp"/> -->
+  <depend package="cyberglove"/>
+
+</package>
+
+

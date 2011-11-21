@@ -1,5 +1,0 @@
-<launch>
-  <node pkg="sr_tactile_sensors" name="sr_tactile" type="sr_tactile_virtual">
-    <rosparam file="$(find sr_tactile_sensors)/params/sensor_names.yaml" command="load"/>
-  </node>
-</launch>
