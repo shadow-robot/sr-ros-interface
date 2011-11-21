@@ -42,17 +42,17 @@ namespace shadowrobot
       0.0, 0.0, 0.0,                        //RF
       0.0, 0.0, 0.0, 0.0,                   //LF
       0.0, 0.0, 0.0, 0.0, 0.0,              //TH
-      0.0, 0.0;                             //WR
+      -20.0, 10.0;                             //WR
 
     pregrasp.position = pregrasp_position;
 
     std::vector<double> grasp_position;
-    grasp_position += 90.0, 90.0, 0.0,     //FF
-      90.0, 90.0, 0.0,                     //MF
-      90.0, 90.0, 0.0,                     //RF
-      90.0, 90.0, 0.0, 0.0,                //LF
-      0.0, 0.0, 0.0, 0.0, 0.0,             //TH
-      0.0, 0.0;                            //WR
+    grasp_position += 108.0, 21.0, 0.0,     //FF
+      111.0, 20.0, 0.0,                     //MF
+      108.0, 37.0, 0.0,                     //RF
+      108.0, 37.0, 1.0, 0.0,                //LF
+      3.0, 23.0, 4.0, 48.0, 35.0,             //TH
+      -20.0, 10.0;                            //WR
 
     grasp.position = grasp_position;
 
