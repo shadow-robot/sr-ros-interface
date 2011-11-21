@@ -71,6 +71,7 @@ namespace sr_kinect
     ros::Subscriber sub_;
     ros::Subscriber sub2_;
     ros::ServiceServer service_;
+    ros::ServiceServer service2_;
 
     boost::shared_ptr<PointCloud> output_pcl;
     boost::shared_ptr<PointCloud> srv_output_pcl;
@@ -81,19 +82,12 @@ namespace sr_kinect
     bool first_time;
     std::string line_axis;
     int K;
-
-    unsigned int filter_max_r_;
-    unsigned int filter_min_r_;
-    unsigned int filter_max_g_;
-    unsigned int filter_min_g_;
-    unsigned int filter_max_b_;
-    unsigned int filter_min_b_;
-    double filter_max_x_;
-    double filter_min_x_;
-    double filter_max_y_;
-    double filter_min_y_;
-    double filter_max_z_;
-    double filter_min_z_;
+    
+    /** \brief Internal mutex for the point cloud */
+    boost::mutex mutex_;
+    
+    /** \brief Internal mutexfor the normals point cloud */
+    boost::mutex mutex_normals_;
   };
 }
 

@@ -43,14 +43,20 @@ namespace sr_kinect
     sub2_ = nh.subscribe<PointCloudNormal >("cloud_normals_in",2, &PointSequenceDetection::callback_2, this);
     pub_ = nh.advertise<PointCloud>(this->getName() + "/output", 1000);
     service_ = nh.advertiseService(this->getName() + "/segment", &PointSequenceDetection::srv_callback, this);
+    service2_ = nh.advertiseService(this->getName() + "/get_wall_normale", &PointSequenceDetection::srv_callback_2, this);
+    
     previous_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
     output_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
+    srv_output_normals = boost::shared_ptr<PointCloudNormal>(new PointCloudNormal()) ;
+    srv_output_pcl = boost::shared_ptr<PointCloud>(new PointCloud() );
 
     read_parameters(nh);
   }
 
   bool PointSequenceDetection::srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response)
   {
+    boost::mutex::scoped_lock lock (mutex_);
+    
     response.points.clear();
     for(unsigned int i=0; i < srv_output_pcl->size(); i++)
     {
@@ -65,158 +71,163 @@ namespace sr_kinect
   
   bool PointSequenceDetection::srv_callback_2(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response)
   {
-    return true;
+    boost::mutex::scoped_lock lock (mutex_normals_);
+    
+    if (srv_output_normals->size() > 0)
+    {
+      //As an initial approach we take the normal of the first point in the cloud 
+      //(all of them are supposed to be on the same plane)
+      response.normale.x = srv_output_normals->at(0).data_n[0];
+      response.normale.y = srv_output_normals->at(0).data_n[1];
+      response.normale.z = srv_output_normals->at(0).data_n[2];
+      response.normale.w = srv_output_normals->at(0).data_n[3];
+      
+      return true;
+    }
+    else
+    {
+      NODELET_WARN_STREAM(this->getName() << ": Empty normals cloud");
+      return false;
+    }
   }
 
   void PointSequenceDetection::callback_2(const PointCloudNormal::ConstPtr &cloud)
   {
-    srv_output_normals = boost::shared_ptr<PointCloudNormal>(new PointCloudNormal(*cloud)) ;
+    boost::mutex::scoped_lock lock (mutex_normals_);
+    
+    if (cloud->size() > 0)
+    {    
+      srv_output_normals = boost::shared_ptr<PointCloudNormal>(new PointCloudNormal(*cloud)) ;
+    }
+    else
+    {
+      NODELET_WARN_STREAM(this->getName() << ": Empty normals cloud received");
+    }
   }
   
   void PointSequenceDetection::callback(const PointCloud::ConstPtr &cloud)
   {
-    // Octree resolution - side length of octree voxels
-    float resolution = 64.0f;
-    // Instantiate octree-based point cloud change detection class
-    OctreePointCloudChangeDetector octree (resolution);
-
-    // Add points from cloudA to octree
-    octree.setInputCloud (cloud);
-    octree.addPointsFromInputCloud ();
-
-    // Switch octree buffers: This resets octree but keeps previous tree structure in memory.
-    octree.switchBuffers ();
-
-    if(first_time)
+    boost::mutex::scoped_lock lock (mutex_);
+    
+    if (cloud->size() > 0)
     {
-      previous_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*cloud) );
-      first_time = false;
-    }
-
-    // Add points from cloudB to octree
-    octree.setInputCloud (previous_pcl);
-    octree.addPointsFromInputCloud ();
-
-    std::vector<int> newPointIdxVector;
-
-    // Get vector of point indices from octree voxels which did not exist in previous buffer
-    octree.getPointIndicesFromNewVoxels (newPointIdxVector);
-
-    if(newPointIdxVector.size() > 0) //If there are significant changes
-    {
-      //We'll work with the new cloud
-      previous_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*cloud) );
-    }
-
-
-
-
-    boost::shared_ptr<PointCloud> aux_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*previous_pcl) );
-
-    KdTreeFLANN kdtree;
-
-    kdtree.setInputCloud (aux_pcl);
-    unsigned int search_point_index = find_search_point(aux_pcl);
-    pcl::PointXYZRGB searchPoint = aux_pcl->at(search_point_index);
-
-
-
-    std::vector<int> pointIdxNKNSearch(K);
-    std::vector<float> pointNKNSquaredDistance(K);
-
-    // Create the filtering object
-    ExtractIndices extract;
-    pcl::PointIndices::Ptr used_points (new pcl::PointIndices ());
-    output_pcl->clear();
-
-    while(aux_pcl->size() > 0)
-    {
+      // Octree resolution - side length of octree voxels
+      float resolution = 64.0f;
+      // Instantiate octree-based point cloud change detection class
+      OctreePointCloudChangeDetector octree (resolution);
+  
+      // Add points from cloudA to octree
+      octree.setInputCloud (cloud);
+      octree.addPointsFromInputCloud ();
+  
+      // Switch octree buffers: This resets octree but keeps previous tree structure in memory.
+      octree.switchBuffers ();
+  
+      if(first_time)
+      {
+        previous_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*cloud) );
+        first_time = false;
+      }
+  
+      // Add points from cloudB to octree
+      octree.setInputCloud (previous_pcl);
+      octree.addPointsFromInputCloud ();
+  
+      std::vector<int> newPointIdxVector;
+  
+      // Get vector of point indices from octree voxels which did not exist in previous buffer
+      octree.getPointIndicesFromNewVoxels (newPointIdxVector);
+  
+      if(newPointIdxVector.size() > 0) //If there are significant changes
+      {
+        //We'll work with the new cloud
+        previous_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*cloud) );
+      }
+  
+  
+  
+  
+      boost::shared_ptr<PointCloud> aux_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*previous_pcl) );
+  
+      KdTreeFLANN kdtree;
+  
       kdtree.setInputCloud (aux_pcl);
-      // K nearest neighbor search
-      pointIdxNKNSearch.resize(K);
-      pointNKNSquaredDistance.resize(K);
-
-      if ((aux_pcl->size() > 1)
-          && ( kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0 )
-        )
+      unsigned int search_point_index = find_search_point(aux_pcl);
+      pcl::PointXYZRGB searchPoint = aux_pcl->at(search_point_index);
+  
+  
+  
+      std::vector<int> pointIdxNKNSearch(K);
+      std::vector<float> pointNKNSquaredDistance(K);
+  
+      // Create the filtering object
+      ExtractIndices extract;
+      pcl::PointIndices::Ptr used_points (new pcl::PointIndices ());
+      output_pcl->clear();
+  
+      while(aux_pcl->size() > 0)
       {
-        used_points->indices.clear();
-
-        unsigned int found_points_size = pointIdxNKNSearch.size ();
-
-        if(pointIdxNKNSearch.size () > aux_pcl->size())
+        kdtree.setInputCloud (aux_pcl);
+        // K nearest neighbor search
+        pointIdxNKNSearch.resize(K);
+        pointNKNSquaredDistance.resize(K);
+  
+        if ((aux_pcl->size() > 1)
+            && ( kdtree.nearestKSearch (searchPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0 )
+          )
         {
-          found_points_size = aux_pcl->size();
+          used_points->indices.clear();
+  
+          unsigned int found_points_size = pointIdxNKNSearch.size ();
+  
+          if(pointIdxNKNSearch.size () > aux_pcl->size())
+          {
+            found_points_size = aux_pcl->size();
+          }
+  
+          searchPoint = aux_pcl->at(pointIdxNKNSearch[found_points_size - 1]);
+  
+          for (size_t i = 0; i < (found_points_size - 1); ++i)
+          {
+            output_pcl->push_back(aux_pcl->at(pointIdxNKNSearch[i]));
+            //save the current searchpoint index to delete the point
+            used_points->indices.push_back(pointIdxNKNSearch[i]);
+          }
+  
+          // Extract the used_points
+          extract.setInputCloud (aux_pcl);
+          extract.setIndices (used_points);
+          extract.setNegative (true);
+          extract.filter (*aux_pcl);
         }
-
-        searchPoint = aux_pcl->at(pointIdxNKNSearch[found_points_size - 1]);
-
-        for (size_t i = 0; i < (found_points_size - 1); ++i)
+        else
         {
-          output_pcl->push_back(aux_pcl->at(pointIdxNKNSearch[i]));
-          //save the current searchpoint index to delete the point
-          used_points->indices.push_back(pointIdxNKNSearch[i]);
+          //save the current searchpoint
+          output_pcl->push_back(aux_pcl->at(find_point_index(aux_pcl, searchPoint)));
+          break;
         }
-
-        // Extract the used_points
-        extract.setInputCloud (aux_pcl);
-        extract.setIndices (used_points);
-        extract.setNegative (true);
-        extract.filter (*aux_pcl);
+  
       }
-      else
+  
+      //only to visualize
+      for (unsigned int j = 0; j < output_pcl->size (); ++j)
       {
-        //save the current searchpoint
-        output_pcl->push_back(aux_pcl->at(find_point_index(aux_pcl, searchPoint)));
-        break;
+        output_pcl->at(j).r = static_cast<unsigned int>(256.0 * (static_cast<double>(j)/static_cast<double>(output_pcl->size())));
+        output_pcl->at(j).g = 0;
+        output_pcl->at(j).b = 0;
       }
-
+  
+      output_pcl->header = aux_pcl->header;
+      pub_.publish(output_pcl);
+  
+      //save the result for the server
+      srv_output_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*output_pcl) );
     }
-
-    //only to visualize
-    for (unsigned int j = 0; j < output_pcl->size (); ++j)
+    else
     {
-      output_pcl->at(j).r = static_cast<unsigned int>(256.0 * (static_cast<double>(j)/static_cast<double>(output_pcl->size())));
-      output_pcl->at(j).g = 0;
-      output_pcl->at(j).b = 0;
+      NODELET_WARN_STREAM(this->getName() << ": Empty point cloud received");
     }
 
-    output_pcl->header = aux_pcl->header;
-    pub_.publish(output_pcl);
-
-    //save the result for the server
-    srv_output_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*output_pcl) );
-
-
-
-
-
-
-//    segmented_pcl->clear();
-//
-//    for(unsigned int i=0; i < cloud->width; ++i)
-//    {
-//      for(unsigned int j=0; j < cloud->height; ++j)
-//      {
-//		if((( cloud->at(i,j).r) > filter_min_r_)
-//          && (( cloud->at(i,j).r) < filter_max_r_)
-//          &&(( cloud->at(i,j).g) > filter_min_g_)
-//          &&(( cloud->at(i,j).g) < filter_max_g_)
-//          &&(( cloud->at(i,j).b) > filter_min_b_)
-//          &&(( cloud->at(i,j).b) < filter_max_b_)
-//          &&(( cloud->at(i,j).x) > filter_min_x_)
-//          &&(( cloud->at(i,j).x) < filter_max_x_)
-//          &&(( cloud->at(i,j).y) > filter_min_y_)
-//          &&(( cloud->at(i,j).y) < filter_max_y_)
-//          &&(( cloud->at(i,j).z) > filter_min_z_)
-//          &&(( cloud->at(i,j).z) < filter_max_z_)
-//          )
-//          segmented_pcl->push_back( cloud->at(i,j) );
-//      }
-//    }
-//    segmented_pcl->header.frame_id = cloud->header.frame_id;
-//
-//    pub_.publish(segmented_pcl);
   }
 
   void PointSequenceDetection::read_parameters(ros::NodeHandle & nh)
