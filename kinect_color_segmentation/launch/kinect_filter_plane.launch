@@ -1,0 +1,162 @@
+<launch>
+<!--
+  <node name="cluster_bounding_box_finder_2" pkg="object_manipulator"
+	type="cluster_bounding_box_finder_server.py"
+	output="screen"
+	respawn="false">
+    <remap from="/find_cluster_bounding_box" to="/find_cluster_bounding_box2" />
+  </node>
+-->
+
+<group ns="/kinect_segmentation">
+    <!-- PCL Manager -->
+    <node pkg="nodelet" type="nodelet" name="camera_nodelet_manager" args="manager" output="screen"/>
+
+<node pkg="nodelet" type="nodelet" name="passthroughX" args="load pcl/PassThrough camera_nodelet_manager" output="screen">
+    <remap from="~input" to="/camera/depth_registered/points" />
+    <rosparam>
+      filter_field_name: x
+      filter_limit_min: -0.3
+      filter_limit_max: 0.05
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="passthroughY" args="load pcl/PassThrough camera_nodelet_manager" output="screen">
+    <remap from="~input" to="/kinect_segmentation/passthroughX/output" />
+    <rosparam>
+      filter_field_name: y
+      filter_limit_min: -0.15
+      filter_limit_max: 0.00
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="passthroughZ" args="load pcl/PassThrough camera_nodelet_manager" output="screen">
+    <remap from="~input" to="/kinect_segmentation/passthroughY/output" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.55
+      filter_limit_max: 0.70
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+
+<node pkg="nodelet" type="nodelet" name="voxel_grid_1" args="load pcl/VoxelGrid camera_nodelet_manager" output="screen">
+    <remap from="~input" to="/kinect_segmentation/passthroughZ/output" />
+    <rosparam>
+      filter_limit_min: 0.01
+      filter_limit_max: 1.5
+      filter_limit_negative: False
+      leaf_size: 0.01
+    </rosparam>
+    </node>
+
+  <!-- Smooth normals -->
+  <node pkg="nodelet" type="nodelet" name="mls_smoothing" args="load pcl/MovingLeastSquares camera_nodelet_manager" output="screen">
+    <remap from="~input" to="/kinect_segmentation/voxel_grid_1/output" />
+    <rosparam>
+      search_radius: 0.02
+      spatial_locator: 0
+      gaussian_parameter: 0.02
+    </rosparam>
+  </node>
+
+  <!-- Segment the table plane -->
+  <node pkg="nodelet" type="nodelet" name="planar_segmentation" args="load pcl/SACSegmentationFromNormals camera_nodelet_manager" output="screen">
+    <remap from="~input"   to="/kinect_segmentation/mls_smoothing/output" />
+    <remap from="~normals" to="/kinect_segmentation/mls_smoothing/normals" />
+<!--    <remap from="~input"   to="/kinect_segmentation/voxel_grid_1/output" />
+    <remap from="~normals" to="/kinect_segmentation/normal_estimation/output" />
+-->
+    <rosparam>
+      # -[ Mandatory parameters
+      model_type: 11
+      distance_threshold: 0.02
+      max_iterations: 100
+      method_type: 0
+      optimize_coefficients: true
+      normal_distance_weight: 0.1
+      eps_angle: 0.09
+      axis: 0.0, 0.0, 1.0
+   </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="extract_plane_indices" args="load pcl/ExtractIndices camera_nodelet_manager" output="screen">
+    <remap from="~input"   to="/kinect_segmentation/mls_smoothing/output" />
+    <remap from="~indices" to="/kinect_segmentation/planar_segmentation/inliers" />
+    <rosparam>
+      negative: false
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="extract_plane_normal_indices" args="load pcl/ExtractIndices camera_nodelet_manager" output="screen">
+    <remap from="~input"   to="/kinect_segmentation/mls_smoothing/normals" />
+    <remap from="~indices" to="/kinect_segmentation/planar_segmentation/inliers" />
+    <rosparam>
+      negative: false
+    </rosparam>
+  </node>
+
+    <node pkg="nodelet" type="nodelet" name="statistical_outlier_removal_1" args="load pcl/StatisticalOutlierRemoval camera_nodelet_manager" output="screen">
+      <remap from="~input" to="/kinect_segmentation/extract_plane_indices/output" />
+      <rosparam>
+        mean_k: 15 
+        stddev: 1.75 
+        negative: False 
+      </rosparam>
+    </node>
+
+  <node pkg="nodelet" type="nodelet" name="BoxSegmentation" args="load sr_kinect/BoxSegmentation camera_nodelet_manager" output="screen">
+    <remap from="cloud_in" to="/kinect_segmentation/passthroughZ/output"/>
+    <remap from="plane" to="/kinect_segmentation/statistical_outlier_removal_1/output"/>
+    <remap from="plane_coeff" to="/kinect_segmentation/planar_segmentation/model"/>
+  </node>
+
+
+
+<!-- Dark patch on green "foam" (daytime light)     -->
+    <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
+        <remap from="cloud_in" to="/kinect_segmentation/BoxSegmentation/output"/>
+        <rosparam>
+            filter_max_r: 70
+            filter_min_r: 0
+            filter_max_g: 70
+            filter_min_g: 0
+            filter_max_b: 70
+            filter_min_b: 0       
+        </rosparam>
+    </node>
+
+<!--
+    <node pkg="nodelet" type="nodelet" name="statistical_outlier_removal" args="load pcl/StatisticalOutlierRemoval test_manager" output="screen">
+      <remap from="~input" to="/kinect_segmentation/KinectColorSegmentation/output" />
+      <rosparam>
+        mean_k: 15 
+        stddev: 1.75 
+        negative: False 
+      </rosparam>
+    </node>
+-->
+   <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid camera_nodelet_manager" output="screen">
+    <remap from="~input" to="/kinect_segmentation/KinectColorSegmentation/output" />
+    <rosparam>
+      filter_limit_min: 0.01
+      filter_limit_max: 1.5
+      filter_limit_negative: False
+      leaf_size: 0.01
+    </rosparam>
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="PointSequenceDetection" args="load sr_kinect/PointSequenceDetection camera_nodelet_manager" output="screen">
+        <remap from="cloud_in" to="/kinect_segmentation/voxel_grid/output"/>
+        <remap from="cloud_normals_in" to="/kinect_segmentation/extract_plane_normal_indices/output" />
+      <rosparam>
+        K: 4
+        axis: x
+      </rosparam>
+    </node>
+
+</group>
+
+</launch>

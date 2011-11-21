@@ -31,8 +31,8 @@ namespace sr_kinect
   PLUGINLIB_DECLARE_CLASS(sr_kinect, KinectColorSegmentation, sr_kinect::KinectColorSegmentation, nodelet::Nodelet);
 
   KinectColorSegmentation::KinectColorSegmentation()
-    : nodelet::Nodelet(), filter_max_r_(255), filter_min_r_(0), filter_max_g_(255), filter_min_g_(0), filter_max_b_(255), filter_min_b_(0),
-      filter_max_x_(1000.0), filter_min_x_(-1000.0), filter_max_y_(1000.0), filter_min_y_(-1000.0), filter_max_z_(1000.0), filter_min_z_(-1000.0)
+    : nodelet::Nodelet(), filter_max_r_(255), filter_min_r_(0), filter_max_g_(255), filter_min_g_(0), filter_max_b_(255), filter_min_b_(0)
+    //,filter_max_x_(1000.0), filter_min_x_(-1000.0), filter_max_y_(1000.0), filter_min_y_(-1000.0), filter_max_z_(1000.0), filter_min_z_(-1000.0)
   {}
 
   void KinectColorSegmentation::onInit()
@@ -49,27 +49,24 @@ namespace sr_kinect
   {
     segmented_pcl->clear();
 
-    for(unsigned int i=0; i < cloud->width; ++i)
+    for(unsigned int i=0; i < cloud->size(); ++i)
     {
-      for(unsigned int j=0; j < cloud->height; ++j)
-      {
-        if((( cloud->at(i,j).r) > filter_min_r_)
-           && (( cloud->at(i,j).r) < filter_max_r_)
-           &&(( cloud->at(i,j).g) > filter_min_g_)
-           &&(( cloud->at(i,j).g) < filter_max_g_)
-           &&(( cloud->at(i,j).b) > filter_min_b_)
-           &&(( cloud->at(i,j).b) < filter_max_b_)
-           &&(( cloud->at(i,j).x) > filter_min_x_)
-           &&(( cloud->at(i,j).x) < filter_max_x_)
-           &&(( cloud->at(i,j).y) > filter_min_y_)
-           &&(( cloud->at(i,j).y) < filter_max_y_)
-           &&(( cloud->at(i,j).z) > filter_min_z_)
-           &&(( cloud->at(i,j).z) < filter_max_z_)
+        if((( cloud->at(i).r) > filter_min_r_)
+           && (( cloud->at(i).r) < filter_max_r_)
+           &&(( cloud->at(i).g) > filter_min_g_)
+           &&(( cloud->at(i).g) < filter_max_g_)
+           &&(( cloud->at(i).b) > filter_min_b_)
+           &&(( cloud->at(i).b) < filter_max_b_)
+//           &&(( cloud->at(i,j).x) > filter_min_x_)
+//           &&(( cloud->at(i,j).x) < filter_max_x_)
+//           &&(( cloud->at(i,j).y) > filter_min_y_)
+//           &&(( cloud->at(i,j).y) < filter_max_y_)
+//           &&(( cloud->at(i,j).z) > filter_min_z_)
+//           &&(( cloud->at(i,j).z) < filter_max_z_)
           )
-          segmented_pcl->push_back( cloud->at(i,j) );
-      }
+          segmented_pcl->push_back( cloud->at(i) );
     }
-    segmented_pcl->header.frame_id = cloud->header.frame_id;
+    segmented_pcl->header = cloud->header;
 
     pub_.publish(segmented_pcl);
   }
@@ -110,37 +107,37 @@ namespace sr_kinect
       NODELET_INFO_STREAM("Read min b: " << filter_min_b_);
     }
 
-    double param_read2 = 0;
-    if (nh.getParam(base_name + "/filter_max_x", param_read2))
-    {
-      filter_max_x_ = param_read2;
-      NODELET_INFO_STREAM("Read max x: " << filter_max_x_);
-    }
-    if (nh.getParam(base_name + "/filter_min_x", param_read2))
-    {
-      filter_min_x_ = param_read2;
-      NODELET_INFO_STREAM("Read min x: " << filter_min_x_);
-    }
-    if (nh.getParam(base_name + "/filter_max_y", param_read2))
-    {
-      filter_max_y_ = param_read2;
-      NODELET_INFO_STREAM("Read max y: " << filter_max_y_);
-    }
-    if (nh.getParam(base_name + "/filter_min_y", param_read2))
-    {
-      filter_min_y_ = param_read2;
-      NODELET_INFO_STREAM("Read min y: " << filter_min_y_);
-    }
-    if (nh.getParam(base_name + "/filter_max_z", param_read2))
-    {
-      filter_max_z_ = param_read2;
-      NODELET_INFO_STREAM("Read max z: " << filter_max_z_);
-    }
-    if (nh.getParam(base_name + "/filter_min_z", param_read2))
-    {
-      filter_min_z_ = param_read2;
-      NODELET_INFO_STREAM("Read min z: " << filter_min_z_);
-    }
+//    double param_read2 = 0;
+//    if (nh.getParam(base_name + "/filter_max_x", param_read2))
+//    {
+//      filter_max_x_ = param_read2;
+//      NODELET_INFO_STREAM("Read max x: " << filter_max_x_);
+//    }
+//    if (nh.getParam(base_name + "/filter_min_x", param_read2))
+//    {
+//      filter_min_x_ = param_read2;
+//      NODELET_INFO_STREAM("Read min x: " << filter_min_x_);
+//    }
+//    if (nh.getParam(base_name + "/filter_max_y", param_read2))
+//    {
+//      filter_max_y_ = param_read2;
+//      NODELET_INFO_STREAM("Read max y: " << filter_max_y_);
+//    }
+//    if (nh.getParam(base_name + "/filter_min_y", param_read2))
+//    {
+//      filter_min_y_ = param_read2;
+//      NODELET_INFO_STREAM("Read min y: " << filter_min_y_);
+//    }
+//    if (nh.getParam(base_name + "/filter_max_z", param_read2))
+//    {
+//      filter_max_z_ = param_read2;
+//      NODELET_INFO_STREAM("Read max z: " << filter_max_z_);
+//    }
+//    if (nh.getParam(base_name + "/filter_min_z", param_read2))
+//    {
+//      filter_min_z_ = param_read2;
+//      NODELET_INFO_STREAM("Read min z: " << filter_min_z_);
+//    }
   }
 }
 

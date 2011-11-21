@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _KINECT_COLOR_SEGMENTATION_HPP_
-#define _KINECT_COLOR_SEGMENTATION_HPP_
+#ifndef _BOX_SEGMENTATION_HPP_
+#define _BOX_SEGMENTATION_HPP_
 
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
@@ -34,43 +34,53 @@
 #include <pcl/point_types.h>
 #include <pcl_visualization/cloud_viewer.h>
 #include <pcl_ros/point_cloud.h>
+#include <pcl/filters/extract_indices.h>
+#include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
+#include <object_manipulation_msgs/FindClusterBoundingBox.h>
 
 namespace sr_kinect
 {
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
+  typedef pcl::ExtractIndices<pcl::PointXYZRGB> ExtractIndices;
 
-  class KinectColorSegmentation
+  class BoxSegmentation
     : public nodelet::Nodelet
   {
   public:
-    KinectColorSegmentation();
-    ~KinectColorSegmentation(){};
+    BoxSegmentation();
+    ~BoxSegmentation(){};
 
     virtual void onInit();
 
     void callback(const PointCloud::ConstPtr &cloud);
+    void callback2(const PointCloud::ConstPtr &cloud);
+    void callback3(const pcl::ModelCoefficients::ConstPtr &coeff);
 
   private:
     void read_parameters(ros::NodeHandle & nh);
 
     ros::Publisher pub_;
     ros::Subscriber sub_;
-//    pcl_visualization::CloudViewer *viewer;
+    ros::Subscriber sub2_;
+    ros::Subscriber sub3_;
+    
+    /** A client used to get the bounding box for the cluster */
+ //   ros::ServiceClient find_cluster_bounding_box_client;
+    
+//    /** A transform listener */
+//    boost::shared_ptr<tf::TransformListener> tf_listener;
+//    /** A transform broadcaster to broadcast the object pose*/
+//    boost::shared_ptr<tf::TransformBroadcaster> tf_broadcaster;
 
     boost::shared_ptr<PointCloud> segmented_pcl;
+    boost::shared_ptr<pcl::ModelCoefficients> plane_coefficients;
 
-    unsigned int filter_max_r_;
-    unsigned int filter_min_r_;
-    unsigned int filter_max_g_;
-    unsigned int filter_min_g_;
-    unsigned int filter_max_b_;
-    unsigned int filter_min_b_;
-//    double filter_max_x_;
-//    double filter_min_x_;
-//    double filter_max_y_;
-//    double filter_min_y_;
-//    double filter_max_z_;
-//    double filter_min_z_;
+    Eigen::Vector4f min_pt_;
+    Eigen::Vector4f max_pt_;
+    
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
 

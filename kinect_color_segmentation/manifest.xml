@@ -11,7 +11,12 @@
   <depend package="roscpp"/>
   <depend package="nodelet"/>
   <depend package="pcl"/>
+  <depend package="pcl_ros"/>
   <depend package="pcl_visualization"/>
+  <depend package="tf"/>
+  <depend package="eigen"/>
+  <depend package="object_manipulation_msgs"/>
+  <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
 
   <export>

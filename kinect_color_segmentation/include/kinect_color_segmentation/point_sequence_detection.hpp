@@ -37,11 +37,13 @@
 #include "pcl/octree/octree.h"
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/filters/extract_indices.h>
-#include <sr_robot_msgs/GetSegmentedLine.h>
+#include <kinect_color_segmentation/SurfaceToDremmel.h>
+#include <kinect_color_segmentation/WallNormale.h>
 
 namespace sr_kinect
 {
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
+  typedef pcl::PointCloud<pcl::Normal> PointCloudNormal;
   typedef pcl::octree::OctreePointCloudChangeDetector<pcl::PointXYZRGB> OctreePointCloudChangeDetector;
   typedef pcl::KdTreeFLANN<pcl::PointXYZRGB> KdTreeFLANN;
   typedef pcl::ExtractIndices<pcl::PointXYZRGB> ExtractIndices;
@@ -55,8 +57,10 @@ namespace sr_kinect
 
     virtual void onInit();
 
-    void callback(const PointCloud::ConstPtr &cloud);
-    bool srv_callback(sr_robot_msgs::GetSegmentedLine::Request& request, sr_robot_msgs::GetSegmentedLine::Response& response);
+    void points_callback(const PointCloud::ConstPtr &cloud);
+    void normals_callback(const PointCloudNormal::ConstPtr &cloud);
+    bool point_sequence_srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response);
+    bool surface_normal_srv_callback(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response);
 
   private:
     void read_parameters(ros::NodeHandle & nh);
@@ -64,28 +68,26 @@ namespace sr_kinect
     unsigned int find_point_index(boost::shared_ptr<PointCloud> cloud, pcl::PointXYZRGB searchPoint);
 
     ros::Publisher pub_;
-    ros::Subscriber sub_;
-    ros::ServiceServer service_;
+    ros::Subscriber points_sub_;
+    ros::Subscriber normals_sub_;
+    ros::ServiceServer point_sequence_service_;
+    ros::ServiceServer surface_normal_service_;
 
     boost::shared_ptr<PointCloud> output_pcl;
     boost::shared_ptr<PointCloud> srv_output_pcl;
     boost::shared_ptr<PointCloud> previous_pcl;
+    
+    boost::shared_ptr<PointCloudNormal> srv_output_normals;
 
     bool first_time;
     std::string line_axis;
-
-    unsigned int filter_max_r_;
-    unsigned int filter_min_r_;
-    unsigned int filter_max_g_;
-    unsigned int filter_min_g_;
-    unsigned int filter_max_b_;
-    unsigned int filter_min_b_;
-    double filter_max_x_;
-    double filter_min_x_;
-    double filter_max_y_;
-    double filter_min_y_;
-    double filter_max_z_;
-    double filter_min_z_;
+    int K;
+    
+    /** \brief Internal mutex for the point cloud */
+    boost::mutex mutex_;
+    
+    /** \brief Internal mutexfor the normals point cloud */
+    boost::mutex mutex_normals_;
   };
 }
 
