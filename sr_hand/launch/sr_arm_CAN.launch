@@ -7,7 +7,7 @@
   <node pkg="sr_hand" name="shadowarm"
         type="shadowarm_can" >
     <remap from="robot_description" to="arm_description"/>
-    <param name="shadowarm_prefix" type="string" value="sr_arm/" />
+    <param name="shadowhand_prefix" type="string" value="sr_arm/" />
     <param name="controller_suffix" type="string" value="position_controller" />
     <param name="publish_frequency_diagnostics" type="double" value="1.0" />
     <param name="publish_frequency" type="double" value="100.0" />
@@ -30,6 +30,8 @@
     <param name="publish_frequency" type="double" value="1.0" />
     <param name="tf_prefix" type="string" value="sr_arm/target" />
   </node>
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
 
 </launch>
 

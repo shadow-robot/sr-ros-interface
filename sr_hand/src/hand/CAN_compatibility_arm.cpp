@@ -41,7 +41,7 @@ namespace shadowrobot
 
     initializeMap();
 
-    joint_state_subscriber = node.subscribe("/arm/joint_states", 2, &CANCompatibilityArm::joint_states_callback, this);
+    joint_state_subscriber = node.subscribe("/sr_controller_manager/joint_states", 2, &CANCompatibilityArm::joint_states_callback, this);
 
   }
 
@@ -88,8 +88,8 @@ namespace shadowrobot
     tmpData.publisher_index = tmp_index;
     joints_map["ElbowJSwing"] = tmpData;
 
-    tmpData.min = 20.0;
-    tmpData.max = 120.0;
+    tmpData.min = -80.0;
+    tmpData.max = 80.0;
 
     full_topic = topic_prefix + "er" + topic_suffix;
     CAN_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
