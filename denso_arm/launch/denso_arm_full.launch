@@ -4,7 +4,7 @@
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_fixed" args="0.4 0.4 -1.2 0.0 0.0 0.0 /base_link /fixed 100" />
 
   <node pkg="tf" type="static_transform_publisher" name="base_to_kinect"
-    args="0.125 -0.415 0.332 1.12 0.295 0.05 /base_link /camera_link 100"/>
+    args="0.125 -0.415 0.332 1.12 0.515 0.05 /base_link /camera_link 100"/>
 
 
   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
