@@ -45,12 +45,12 @@ class WallDremmeler(object):
         """
         """
         #First we get the segmented points.
-        rospy.logerr("segmenting the point cloud")
+        rospy.loginfo("segmenting the point cloud")
         segmented_points = []
         try:
             res = self.surface_to_dremmel_server()
             segmented_points = res.points
-            rospy.logerr("cloud length:" + str(len(segmented_points)))
+            rospy.loginfo("cloud length:" + str(len(segmented_points)))
         except:
             rospy.logerr("Couldn't segment the point cloud")
             return
@@ -83,82 +83,92 @@ class WallDremmeler(object):
     def build_poses(self, segmented_points, quaternion, rotation_link):
         list_of_poses = []
         
-        
-        #for point in segmented_points:
-        #create a pose above the point (in the wall frame)
-        pose_above = Pose()
-        #pose_above.position = point
-        pose_above.position.x = segmented_points[0].x
-        pose_above.position.y = segmented_points[0].y
-        pose_above.position.z = segmented_points[0].z
-        pose_above.position.z -= 0.05
-        pose_above.orientation = quaternion
-        pose_above_name = "/pose_above"
-
-        #then create a pose below the point (inside the wall)
-        pose_inside = Pose()
-        pose_inside.position.x = segmented_points[0].x
-        pose_inside.position.y = segmented_points[0].y
-        pose_inside.position.z = segmented_points[0].z
-        pose_inside.position.z += 0.005
-        pose_inside.orientation = quaternion
-        pose_inside_name = "/pose_inside"
-
-        #then transform those two poses in the base_link frame
-        #print "TODO: transform from ", rotation_link, " to /base_link"
-        
         br = tf.TransformBroadcaster()
         listener = tf.TransformListener()
-        pose_above_base_frame = None
-        pose_inside_base_frame = None
-        success = False
-        rate = rospy.Rate(100.0)
-       
-        for i in range(0,1000):
-            br.sendTransform((pose_above.position.x, pose_above.position.y, pose_above.position.z),
-                             (pose_above.orientation.x, pose_above.orientation.y, pose_above.orientation.z, pose_above.orientation.w), 
-                             rospy.Time.now(), pose_above_name, rotation_link)
-                
-            try:
-                (trans,rot) = listener.lookupTransform("/base_link", pose_above_name, rospy.Time())
-                pose_above_base_frame.pose = (trans,rot)
-                pose_above_base_frame.header.frame_id = "/base_link"
-                pose_above_base_frame.header.stamp = rospy.Time.now()
-                success = True
-                break
-            except:
-                pass
-                #rospy.logerr("Could not transform from " + pose_above_pose_frame.header.frame_id + " to /base_link")
-            rate.sleep()
-                
-        if success == False:
-            rospy.logerr("Could not transform from " + pose_above_name + " to /base_link")
         
-        rospy.logerr("Inside z " + str( pose_inside.position.z) + " Above z " + str( pose_above.position.z))  
-        success = False
-        for i in range(0,1000):
-            br.sendTransform((pose_inside.position.x, pose_inside.position.y, pose_inside.position.z),
-                             (pose_inside.orientation.x, pose_inside.orientation.y, pose_inside.orientation.z, pose_inside.orientation.w), 
-                             rospy.Time.now(), pose_inside_name, rotation_link)
-
-            try:
-                (trans,rot) = listener.lookupTransform("/base_link", pose_inside_name, rospy.Time())
-                pose_inside_base_frame.pose = (trans,rot)
-                pose_inside_base_frame.header.frame_id = "/base_link"
-                pose_inside_base_frame.header.stamp = rospy.Time.now()
-                success = True
-                break
-            except:
-                pass
-                #rospy.logerr("Could not transform from " + pose_inside_pose_frame.header.frame_id + " to /base_link")
-            rate.sleep()
-               
-        if success == False:
-            rospy.logerr("Could not transform from " + pose_inside_name + " to /base_link")            
-
-        #add those two poses to the list of poses sent to the arm
-        list_of_poses.append( pose_above_base_frame.pose )
-        list_of_poses.append( pose_inside_base_frame.pose )
+        for index,point in enumerate(segmented_points):
+            #create a pose above the point (in the wall frame)
+            rospy.loginfo("Doing point: " + str(index))
+            
+            pose_above = Pose()
+            pose_above.position.x = point.x
+            pose_above.position.y = point.y
+            pose_above.position.z = point.z
+            pose_above.position.z -= 0.05
+            pose_above.orientation = quaternion
+            pose_above_name = "/pose_above_" + str(index)
+    
+            #then create a pose below the point (inside the wall)
+            pose_inside = Pose()
+            pose_inside.position.x = point.x
+            pose_inside.position.y = point.y
+            pose_inside.position.z = point.z
+            pose_inside.position.z += 0.005
+            pose_inside.orientation = quaternion
+            pose_inside_name = "/pose_inside_"  + str(index)
+    
+            #then transform those two poses in the base_link frame
+            #print "TODO: transform from ", rotation_link, " to /base_link"
+            
+            
+            pose_above_base_frame = None
+            pose_inside_base_frame = None
+            success = False
+            rate = rospy.Rate(100.0)
+           
+            for i in range(0,100):
+                br.sendTransform((pose_above.position.x, pose_above.position.y, pose_above.position.z),
+                                 (pose_above.orientation.x, pose_above.orientation.y, pose_above.orientation.z, pose_above.orientation.w), 
+                                 rospy.Time.now(), pose_above_name, rotation_link)
+                rate.sleep()    
+                try:
+                    (trans,rot) = listener.lookupTransform("/base_link", pose_above_name, rospy.Time())
+                    pose_above_base_frame = PoseStamped()
+                    pose_above_base_frame.pose = (trans,rot)
+                    pose_above_base_frame.header.frame_id = "/base_link"
+                    pose_above_base_frame.header.stamp = rospy.Time.now()
+                    success = True
+                    break
+                except:
+                    pass
+                    #rospy.logerr("Could not transform from " + pose_above_pose_frame.header.frame_id + " to /base_link")
+                
+                    
+            if success == False:
+                rospy.logerr("Could not transform from " + pose_above_name + " to /base_link")
+            
+            success = False
+            for i in range(0,100):
+                br.sendTransform((pose_inside.position.x, pose_inside.position.y, pose_inside.position.z),
+                                 (pose_inside.orientation.x, pose_inside.orientation.y, pose_inside.orientation.z, pose_inside.orientation.w), 
+                                 rospy.Time.now(), pose_inside_name, rotation_link)
+    
+                try:
+                    (trans,rot) = listener.lookupTransform("/base_link", pose_inside_name, rospy.Time())
+                    pose_inside_base_frame = PoseStamped()
+                    pose_inside_base_frame.pose = (trans,rot)
+                    pose_inside_base_frame.header.frame_id = "/base_link"
+                    pose_inside_base_frame.header.stamp = rospy.Time.now()
+                    success = True
+                    break
+                except:
+                    pass
+                    #rospy.logerr("Could not transform from " + pose_inside_pose_frame.header.frame_id + " to /base_link")
+                rate.sleep()
+                   
+            if success == False:
+                rospy.logerr("Could not transform from " + pose_inside_name + " to /base_link")            
+    
+            #add those two poses to the list of poses sent to the arm
+            if (pose_above_base_frame != None):
+                list_of_poses.append( pose_above_base_frame.pose )
+            else:
+                rospy.logerr("Could not convert pose above " + pose_above_name + " to /base_link")
+                
+            if (pose_inside_base_frame != None):
+                list_of_poses.append( pose_inside_base_frame.pose )
+            else:
+                rospy.logerr("Could not convert pose inside " + pose_inside_name + " to /base_link")
 
         return list_of_poses
 
