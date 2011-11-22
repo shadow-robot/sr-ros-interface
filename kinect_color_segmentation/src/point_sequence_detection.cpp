@@ -81,7 +81,7 @@ namespace sr_kinect
       response.normale.y = srv_output_normals->at(0).data_n[1];
       response.normale.z = srv_output_normals->at(0).data_n[2];
       response.normale.w = srv_output_normals->at(0).data_n[3];
-      
+      response.frame_name = srv_output_normals->header.frame_id;
       return true;
     }
     else
