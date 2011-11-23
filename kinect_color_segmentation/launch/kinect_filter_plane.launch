@@ -26,8 +26,8 @@
     <remap from="~input" to="/kinect_segmentation/passthroughX/output" />
     <rosparam>
       filter_field_name: y
-      filter_limit_min: -0.15
-      filter_limit_max: 0.00
+      filter_limit_min: -0.40
+      filter_limit_max: -0.10
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -36,8 +36,8 @@
     <remap from="~input" to="/kinect_segmentation/passthroughY/output" />
     <rosparam>
       filter_field_name: z
-      filter_limit_min: 0.55
-      filter_limit_max: 0.70
+      filter_limit_min: 0.67
+      filter_limit_max: 0.82
       filter_limit_negative: False
     </rosparam>
   </node>
