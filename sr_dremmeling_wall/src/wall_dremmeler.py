@@ -24,6 +24,7 @@ import tf
 import denso_msgs.msg
 from geometry_msgs.msg import Pose, Quaternion, PoseStamped
 from kinect_color_segmentation.srv import WallNormale, SurfaceToDremmel
+from tf.transformations import quaternion_from_euler
 
 class WallDremmeler(object):
     """
@@ -65,7 +66,11 @@ class WallDremmeler(object):
             wall_link = res.frame_name
         except:
             rospy.logerr("Couldn't get the wall normale")
-
+        
+        
+        wall_normale = self.rotate_normal(segmented_points, wall_normale, wall_link)
+       
+    
         #We build a list of poses to send to the hand.
         list_of_poses = self.build_poses( segmented_points, wall_normale, wall_link )
 
@@ -74,11 +79,72 @@ class WallDremmeler(object):
         goal = denso_msgs.msg.TrajectoryGoal
         goal.trajectory = list_of_poses
 
-        #self.trajectory_client.send_goal( goal )
-        #self.trajectory_client.wait_for_result()
+        self.trajectory_client.send_goal( goal )
+        self.trajectory_client.wait_for_result()
 
         rospy.loginfo( "Finished Dremmeling the surface: " + str( self.trajectory_client.get_result() ) )
 
+    def rotate_normal(self, segmented_points, quaternion, rotation_link):
+        br = tf.TransformBroadcaster()
+        listener = tf.TransformListener()
+        
+        pose = Pose()
+        pose.position.x = segmented_points[0].x
+        pose.position.y = segmented_points[0].y
+        pose.position.z = segmented_points[0].z
+        pose.orientation = quaternion
+        
+        normal_name = "/surface_normal"
+        
+        pose_rotated = Pose()
+        #position is the same, we just want to rotate
+        pose_rotated.position.x = 0.0
+        pose_rotated.position.y = 0.0
+        pose_rotated.position.z = 0.0
+        rotation_tmp_array = tf.transformations.quaternion_from_euler(0.0, 0.0, 3.14159266)
+        pose_rotated.orientation.x = rotation_tmp_array[0]
+        pose_rotated.orientation.y = rotation_tmp_array[1]
+        pose_rotated.orientation.z = rotation_tmp_array[2]
+        pose_rotated.orientation.w = rotation_tmp_array[3]
+        
+        rotated_normal_name = "/surface_normal_rotated"
+        
+        rate = rospy.Rate(100.0)        
+        pose_rotated_base = None
+        success = False
+        
+        for i in range(0,100):
+            br.sendTransform((pose.position.x, pose.position.y, pose.position.z),
+                             (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w), 
+                             rospy.Time.now(), normal_name, rotation_link)
+            
+            br.sendTransform((pose_rotated.position.x, pose_rotated.position.y, pose_rotated.position.z),
+                             (pose_rotated.orientation.x, pose_rotated.orientation.y, pose_rotated.orientation.z, pose_rotated.orientation.w), 
+                             rospy.Time.now(), rotated_normal_name, normal_name)
+            rate.sleep()    
+            try:
+                (trans,rot) = listener.lookupTransform(rotation_link, rotated_normal_name, rospy.Time())
+                pose_rotated_base = PoseStamped()
+                pose_rotated_base.pose.position.x = trans[0]
+                pose_rotated_base.pose.position.y = trans[1]
+                pose_rotated_base.pose.position.z = trans[2]
+                pose_rotated_base.pose.orientation.x = rot[0]
+                pose_rotated_base.pose.orientation.y = rot[1]
+                pose_rotated_base.pose.orientation.z = rot[2]
+                pose_rotated_base.pose.orientation.w = rot[3]
+                pose_rotated_base.header.frame_id = rotation_link
+                pose_rotated_base.header.stamp = rospy.Time.now()
+                success = True
+                break
+            except:
+                pass
+                #rospy.logerr("Could not transform from " + pose_above_pose_frame.header.frame_id + " to /base_link")
+                
+        if success == False:
+                rospy.logerr("Could not transform from " + rotated_normal_name + " to " + rotation_link)
+        
+        return pose_rotated_base.pose.orientation    
+        
 
     def build_poses(self, segmented_points, quaternion, rotation_link):
         list_of_poses = []
@@ -124,7 +190,13 @@ class WallDremmeler(object):
                 try:
                     (trans,rot) = listener.lookupTransform("/base_link", pose_above_name, rospy.Time())
                     pose_above_base_frame = PoseStamped()
-                    pose_above_base_frame.pose = (trans,rot)
+                    pose_above_base_frame.pose.position.x = trans[0]
+                    pose_above_base_frame.pose.position.y = trans[1]
+                    pose_above_base_frame.pose.position.z = trans[2]
+                    pose_above_base_frame.pose.orientation.x = rot[0]
+                    pose_above_base_frame.pose.orientation.y = rot[1]
+                    pose_above_base_frame.pose.orientation.z = rot[2]
+                    pose_above_base_frame.pose.orientation.w = rot[3]
                     pose_above_base_frame.header.frame_id = "/base_link"
                     pose_above_base_frame.header.stamp = rospy.Time.now()
                     success = True
@@ -146,7 +218,13 @@ class WallDremmeler(object):
                 try:
                     (trans,rot) = listener.lookupTransform("/base_link", pose_inside_name, rospy.Time())
                     pose_inside_base_frame = PoseStamped()
-                    pose_inside_base_frame.pose = (trans,rot)
+                    pose_inside_base_frame.pose.position.x = trans[0]
+                    pose_inside_base_frame.pose.position.y = trans[1]
+                    pose_inside_base_frame.pose.position.z = trans[2]
+                    pose_inside_base_frame.pose.orientation.x = rot[0]
+                    pose_inside_base_frame.pose.orientation.y = rot[1]
+                    pose_inside_base_frame.pose.orientation.z = rot[2]
+                    pose_inside_base_frame.pose.orientation.w = rot[3]
                     pose_inside_base_frame.header.frame_id = "/base_link"
                     pose_inside_base_frame.header.stamp = rospy.Time.now()
                     success = True
@@ -157,7 +235,8 @@ class WallDremmeler(object):
                 rate.sleep()
                    
             if success == False:
-                rospy.logerr("Could not transform from " + pose_inside_name + " to /base_link")            
+                rospy.logerr("Could not transform from " + pose_inside_name + " to /base_link")    
+                
     
             #add those two poses to the list of poses sent to the arm
             if (pose_above_base_frame != None):

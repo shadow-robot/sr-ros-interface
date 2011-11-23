@@ -75,12 +75,20 @@ namespace sr_kinect
     
     if (srv_output_normals->size() > 0)
     {
-      //As an initial approach we take the normal of the first point in the cloud 
-      //(all of them are supposed to be on the same plane)
-      response.normale.x = srv_output_normals->at(0).data_n[0];
-      response.normale.y = srv_output_normals->at(0).data_n[1];
-      response.normale.z = srv_output_normals->at(0).data_n[2];
-      response.normale.w = srv_output_normals->at(0).data_n[3];
+      double norm_x = 0, norm_y = 0, norm_z = 0, norm_w = 0;
+      for(unsigned int i=0; i < srv_output_normals->size(); ++i)
+      {
+        norm_x += srv_output_normals->at(i).data_n[0];
+        norm_y += srv_output_normals->at(i).data_n[1];
+        norm_z += srv_output_normals->at(i).data_n[2];
+        norm_w += srv_output_normals->at(i).data_n[3];
+      }
+      //We return the mean the normals of the cloud
+      //(all of the points are supposed to be on the same plane)
+      response.normale.x = norm_x / static_cast<double>(srv_output_normals->size());
+      response.normale.y = norm_y / static_cast<double>(srv_output_normals->size());
+      response.normale.z = norm_z / static_cast<double>(srv_output_normals->size());
+      response.normale.w = norm_w / static_cast<double>(srv_output_normals->size());
       response.frame_name = srv_output_normals->header.frame_id;
       return true;
     }
