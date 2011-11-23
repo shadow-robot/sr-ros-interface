@@ -128,6 +128,7 @@ namespace shadowrobot
                                                     bounding_box.pose_stamped.pose.position.z + bounding_box.dimensions.z / 2.0) );
     base_to_bottom_middle_tf.setRotation( tmp_quat );
 
+    double object_height = bounding_box.dimensions.z;
 
     std::stringstream tf_name_base_to_bot_mid;
     tf_name_base_to_bot_mid << "bot_mid_obj_" << index_pose;
@@ -183,7 +184,7 @@ namespace shadowrobot
     tf::Transform bottom_middle_to_correct_orientation_tf;
     tmp_quat.setRPY(0, 0, 2.0 * M_PI * double(index_pose) / double(default_number_of_computed_grasps) );
     bottom_middle_to_correct_orientation_tf.setRotation( tmp_quat );
-    bottom_middle_to_correct_orientation_tf.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+    bottom_middle_to_correct_orientation_tf.setOrigin( tf::Vector3(0.0, 0.0, object_height / 2.0) );
 
     std::stringstream tf_name_bot_mid_to_correct_or;
     tf_name_bot_mid_to_correct_or << "bot_mid_obj_correct_or_" << index_pose;
@@ -222,7 +223,7 @@ namespace shadowrobot
 
 
     bool success = false;
-    for(unsigned int i = 0; i < 1000; ++i)
+    for(unsigned int i = 0; i < 5000; ++i)
     {
       tf_broadcaster->sendTransform( tf::StampedTransform(base_to_bottom_middle_tf,
                                                           ros::Time::now(),
