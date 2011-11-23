@@ -31,7 +31,6 @@ from denso_msgs.msg import MoveArmPoseGoal, MoveArmPoseResult, MoveArmPoseAction
 from geometry_msgs.msg import Pose
 from re_kinect_object_detector.msg import DetectionResult
 from std_srvs.srv import Empty
-from math import acos, cos, sin, sqrt
 
 from interactive_marker import InteractiveConnectorSelector
 from visualization_msgs.msg import Marker, MarkerArray
@@ -56,7 +55,7 @@ class UnplugConnectorStateMachine(object):
         self.tf_broadcaster = tf.TransformBroadcaster()
 
         self.detection_subscriber = rospy.Subscriber("~input", DetectionResult, self.detection_callback)
-        
+
         self.publisher_marker_best_pose = rospy.Publisher("~best_pose", MarkerArray)
 
         rospy.wait_for_service('/sr_grasp_planner/plan_point_cluster_grasp')
@@ -66,7 +65,7 @@ class UnplugConnectorStateMachine(object):
 
         self.grasp_client = actionlib.SimpleActionClient('/right_arm/hand_posture_execution', GraspHandPostureExecutionAction)
         self.grasp_client.wait_for_server()
-        
+
         self.denso_trajectory_client = actionlib.SimpleActionClient('/denso_arm/trajectory', TrajectoryAction)
         self.denso_trajectory_client.wait_for_server()
 
@@ -81,7 +80,7 @@ class UnplugConnectorStateMachine(object):
             if not self.running:
                 self.running = True
                 list_of_grasps = self.plan_grasp( req )
-                
+
                 if list_of_grasps != []:
                     #we received a list of grasps. Select the best one
                     best_grasp = self.select_best_grasp( list_of_grasps )
@@ -159,32 +158,32 @@ class UnplugConnectorStateMachine(object):
 
         #pose_tip = self.get_pose("/denso_arm/tooltip")
         #best_grasp.grasp_pose.orientation = pose_tip.orientation
-        #print "----" 
-        #print "BEST GRASP:" 
-        #print " distance = ", min_distance, " (", tmp_index,")" 
-        #print "", best_grasp 
-        #print "----" 
+        #print "----"
+        #print "BEST GRASP:"
+        #print " distance = ", min_distance, " (", tmp_index,")"
+        #print "", best_grasp
+        #print "----"
         #then transform the grasp pose to be in the denso arm tf frame
         #may be not necessary: base link is probably the base of the
         #denso arm
         for i in range(0,100):
-            self.tf_broadcaster.sendTransform( ( best_grasp.grasp_pose.position.x, best_grasp.grasp_pose.position.y, best_grasp.grasp_pose.position.z) , 
-                                               ( best_grasp.grasp_pose.orientation.x, best_grasp.grasp_pose.orientation.y, 
+            self.tf_broadcaster.sendTransform( ( best_grasp.grasp_pose.position.x, best_grasp.grasp_pose.position.y, best_grasp.grasp_pose.position.z) ,
+                                               ( best_grasp.grasp_pose.orientation.x, best_grasp.grasp_pose.orientation.y,
                                                  best_grasp.grasp_pose.orientation.z, best_grasp.grasp_pose.orientation.w),
                                                rospy.Time.now(),
                                                "selected_pose",
                                                "base_link")
 
-            self.tf_broadcaster.sendTransform( (0.0, 0.0, 0.0), 
+            self.tf_broadcaster.sendTransform( (0.0, 0.0, 0.0),
                                                tf.transformations.quaternion_from_euler(0, -1.57, 0),
-                                               rospy.Time.now(), 
+                                               rospy.Time.now(),
                                                "selected_pose_rotated",
                                                "selected_pose")
             time.sleep(0.001)
-        
-            self.tf_broadcaster.sendTransform( (0.0, 0.0, -0.255), 
+
+            self.tf_broadcaster.sendTransform( (0.0, 0.0, -0.255),
                                                tf.transformations.quaternion_from_euler(0, 0, 1.57),
-                                               rospy.Time.now(), 
+                                               rospy.Time.now(),
                                                "selected_pose_for_arm_tip",
                                                "selected_pose_rotated")
             time.sleep(0.001)
@@ -269,30 +268,9 @@ class UnplugConnectorStateMachine(object):
         time.sleep(1)
 
         #then we move the arm to the grasp pose
-        # we interpolate to give a trajectory to 
-        # the arm. 
         goal = TrajectoryGoal()
         traj = []
-        pose_tip = self.get_pose("/denso_arm/tooltip")
-        interpolation_steps = 100
-        for i in range( 0, interpolation_steps ):
-            pose_tmp = Pose()
-            
-            pose_tmp.position.x = pose_tip.position.x + (grasp.grasp_pose.position.x - pose_tip.position.x) * float(i) / float(interpolation_steps)
-            pose_tmp.position.y = pose_tip.position.y + (grasp.grasp_pose.position.y - pose_tip.position.y) * float(i) / float(interpolation_steps)
-            pose_tmp.position.z = pose_tip.position.z + (grasp.grasp_pose.position.z - pose_tip.position.z) * float(i) / float(interpolation_steps)
-
-            pose_tmp.orientation = self.slerp( pose_tip.orientation, grasp.grasp_pose.orientation, float(i) / float(interpolation_steps) )
-            
-            #self.tf_broadcaster.sendTransform( ( pose_tmp.position.x, pose_tmp.position.y, pose_tmp.position.z) , 
-            #                                   ( pose_tmp.orientation.x, pose_tmp.orientation.y, 
-            #                                     pose_tmp.orientation.z, pose_tmp.orientation.w),
-            #                                   rospy.Time.now(),
-            #                                   "interp_"+str(interpolation_steps),
-            #                                   "base_link")
-            #time.sleep(0.1)
-
-            traj.append( pose_tmp )
+        traj.append( grasp.grasp_pose )
         goal.trajectory = traj
 
         self.denso_trajectory_client.send_goal( goal )
@@ -323,46 +301,11 @@ class UnplugConnectorStateMachine(object):
 
         return True
 
-    def slerp(self, qa, qb, t):
-        qm = qa
-        cos_half_theta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
-	# if qa=qb or qa=-qb then theta = 0 and we can return qa
-	if (abs(cos_half_theta) >= 1.0):
-            qm.w = qa.w
-            qm.x = qa.x
-            qm.y = qa.y
-            qm.z = qa.z
-            return qm
-        # Calculate temporary values.
-	halfTheta = acos(cos_half_theta)
-	sinHalfTheta = sqrt(1.0 - cos_half_theta*cos_half_theta);
-	# if theta = 180 degrees then result is not fully defined
-	# we could rotate around any axis normal to qa or qb
-	if (abs(sinHalfTheta) < 0.001):
-            qm.w = (qa.w * 0.5 + qb.w * 0.5)
-            qm.x = (qa.x * 0.5 + qb.x * 0.5)
-            qm.y = (qa.y * 0.5 + qb.y * 0.5)
-            qm.z = (qa.z * 0.5 + qb.z * 0.5)
-            return qm
-        
-	ratioA = sin((1 - t) * halfTheta) / sinHalfTheta
-	ratioB = sin(t * halfTheta) / sinHalfTheta
-	#calculate Quaternion.
-	qm.w = (qa.w * ratioA + qb.w * ratioB)
-	qm.x = (qa.x * ratioA + qb.x * ratioB)
-	qm.y = (qa.y * ratioA + qb.y * ratioB)
-	qm.z = (qa.z * ratioA + qb.z * ratioB)
-	return qm
-
-
     def unplug_connector(self, grasp):
         #We compute a list of poses to send to
         # the arm (going up from grasp)
         goal = TrajectoryGoal()
         traj = []
-        pose_tip = self.get_pose("/denso_arm/tooltip")
-        interpolation_steps = 100
-        list_poses = []
         z = 0.0
         lift_step = 0.01
         max_lift = 20
