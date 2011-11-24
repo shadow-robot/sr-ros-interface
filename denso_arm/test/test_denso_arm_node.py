@@ -44,7 +44,7 @@ def send_pose( x, y, z ):
     client.wait_for_server()
 
     pose_goal = build_pose( x, y, z )
-    goal = denso_msgs.msg.MoveArmPoseGoal(pose_goal, rate, rospy.rostime.Duration(time_out) )
+    goal = denso_msgs.msg.MoveArmPoseGoal(pose_goal, rate, rospy.rostime.Duration(time_out), 10. )
 
     client.send_goal(goal)
 
@@ -63,8 +63,11 @@ def send_trajectory( nb_poses ):
     start_z = 0.28740
 
     traj = []
+    speeds = []
     for i in range(0, nb_poses ):
         traj.append( build_pose(start_x + i*0.05, start_y, start_z ) )
+        speeds.append( 10. )
+
     goal.trajectory = traj
 
     client.send_goal( goal )
@@ -80,4 +83,4 @@ if __name__ == '__main__':
     send_pose( 0.52013, 0.06585, 0.28740 )
 
     #test sending a trajectory
-    send_trajectory( 5 )
+    #send_trajectory( 5 )

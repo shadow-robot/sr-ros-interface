@@ -173,6 +173,8 @@ namespace denso
       {
         if( !simulated )
         {
+	  denso_arm_->set_speed( goal->speed );
+
           if( denso_arm_->send_cartesian_position( pose_goal ) )
           {
             denso_mutex.unlock();
