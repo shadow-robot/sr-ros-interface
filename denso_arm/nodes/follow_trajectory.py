@@ -57,6 +57,9 @@ class DensoTrajectoryFollower( object ):
 
     def trajectory_cb(self, goal):
         rospy.loginfo( "Got a Trajectory request.")
+        if len(goal.speed) != len(goal.trajectory):
+            rospy.logerr("Wrong size for the speed vector.")
+            return 
 
         success = TrajectoryResult.SUCCESS
         start_time = rospy.Time.now()
