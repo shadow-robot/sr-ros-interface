@@ -82,12 +82,13 @@ class WallDremmeler(object):
     
     
         #We build a list of poses to send to the hand.
-        list_of_poses = self.build_poses( segmented_points, wall_normale, wall_link )
+        list_of_poses, list_of_speeds = self.build_poses( segmented_points, wall_normale, wall_link )
 
         #now we send this to the arm
         rospy.loginfo("Sending the list of poses to the arm")
         goal = denso_msgs.msg.TrajectoryGoal
         goal.trajectory = list_of_poses
+        goal.speed = list_of_speeds
 
         self.trajectory_client.send_goal( goal )
         self.trajectory_client.wait_for_result()
@@ -188,6 +189,7 @@ class WallDremmeler(object):
     
     def build_poses(self, segmented_points, quaternion, rotation_link):
         list_of_poses = []
+        list_of_speeds = []
         previous_point = None
         last_orientation_in_base_link = None
          
@@ -225,7 +227,7 @@ class WallDremmeler(object):
             pose_inside.position.x = point.x
             pose_inside.position.y = point.y
             pose_inside.position.z = point.z
-            pose_inside.position.z -= 0.020
+            pose_inside.position.z += 0.022
             pose_inside.orientation = quaternion
             pose_inside_name = "/pose_inside_"  + str(index)
     
@@ -302,11 +304,13 @@ class WallDremmeler(object):
             if send_pose_above == True:
                 if (pose_above_base_frame != None):
                     list_of_poses.append( pose_above_base_frame.pose )
+                    list_of_speeds.append( 25.0 )
                 else:
                     rospy.logerr("Could not convert pose above " + pose_above_name + " to /base_link")
                 
             if (pose_inside_base_frame != None):
                 list_of_poses.append( pose_inside_base_frame.pose )
+                list_of_speeds.append( 20.0 )
             else:
                 rospy.logerr("Could not convert pose inside " + pose_inside_name + " to /base_link")
         
@@ -317,7 +321,6 @@ class WallDremmeler(object):
         pose_out.position.z = 0.293
         pose_out.orientation = last_orientation_in_base_link
         list_of_poses.append( pose_out )
+        list_of_speeds.append( 25.0 )
         
-        return list_of_poses
-
-
+        return list_of_poses, list_of_speeds
