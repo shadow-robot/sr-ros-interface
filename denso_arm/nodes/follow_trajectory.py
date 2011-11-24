@@ -57,6 +57,9 @@ class DensoTrajectoryFollower( object ):
 
     def trajectory_cb(self, goal):
         rospy.loginfo( "Got a Trajectory request.")
+        if len(goal.speed) != len(goal.trajectory):
+            rospy.logerr("Wrong size for the speed vector.")
+            return 
 
         success = TrajectoryResult.SUCCESS
         start_time = rospy.Time.now()
@@ -66,10 +69,6 @@ class DensoTrajectoryFollower( object ):
                 rospy.loginfo("Denso Trajectory preempted.")
                 success = TrajectoryResult.PREEMPTED
                 break
-            arm_goal = MoveArmPoseGoal()
-            arm_goal.goal = pose
-            arm_goal.rate = DEFAULT_RATE
-            arm_goal.time_out = rospy.Duration.from_sec(DEFAULT_TIMEOUT)
 
             #publish feedback
             self.trajectory_feedback.step_index = step_index
@@ -93,6 +92,8 @@ class DensoTrajectoryFollower( object ):
                 tmp_goal.goal = pose_tmp
                 tmp_goal.rate = DEFAULT_RATE
                 tmp_goal.time_out = rospy.Duration.from_sec( DEFAULT_TIMEOUT )
+                tmp_goal.speed = goal.speed[step_index]
+
                 self.denso_arm_client.send_goal( tmp_goal )
                 self.denso_arm_client.wait_for_result()
 

@@ -270,8 +270,11 @@ class UnplugConnectorStateMachine(object):
         #then we move the arm to the grasp pose
         goal = TrajectoryGoal()
         traj = []
+        speed = []
         traj.append( grasp.grasp_pose )
+        speed.append( 5. )
         goal.trajectory = traj
+        goal.speed = speed
 
         self.denso_trajectory_client.send_goal( goal )
         self.denso_trajectory_client.wait_for_result()
@@ -306,6 +309,7 @@ class UnplugConnectorStateMachine(object):
         # the arm (going up from grasp)
         goal = TrajectoryGoal()
         traj = []
+        speed = []
         z = 0.0
         lift_step = 0.01
         max_lift = 20
@@ -315,7 +319,9 @@ class UnplugConnectorStateMachine(object):
             pose_tmp.position.z += lift_step
 
             traj.append( pose_tmp )
+            speed.append( 5. )
         goal.trajectory = traj
+        goal.speed = speed
 
         self.denso_trajectory_client.send_goal( goal )
         self.denso_trajectory_client.wait_for_result()
