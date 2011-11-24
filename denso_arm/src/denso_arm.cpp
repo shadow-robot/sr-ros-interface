@@ -46,12 +46,19 @@ namespace denso
   void DensoArm::init(std::string robot_ip, int robot_port, float initial_speed)
   {
     start_bcap(robot_ip, robot_port);
+    usleep(1000);
     start_controller();
+    usleep(1000);
     start_slave_task();
+    usleep(1000);
     take_robot();
+    usleep(1000);
     set_tooltip(1);
+    usleep(1000);
     set_speed(initial_speed);
+    usleep(1000);
     initialise_position_handles();
+    usleep(1000);
     set_power(1);
   }
 
@@ -120,7 +127,7 @@ namespace denso
       BCAP_HRESULT hr = bCap_RobotChange(socket_handle, robot_handle, (char *) command.str().c_str());
 
       if( FAILED(hr) )
-        printf("Couldn't set tool number - %i\n", hr);
+        printf("Couldn't set tool number - %x\n", hr);
     return true;
   }
 

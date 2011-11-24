@@ -20,11 +20,13 @@ import roslib; roslib.load_manifest('sr_dremmeling_wall')
 import rospy
 import actionlib
 import tf
-
+import time
+import math
 import denso_msgs.msg
-from geometry_msgs.msg import Pose, Quaternion, PoseStamped
+from geometry_msgs.msg import Pose, Quaternion, PoseStamped, Point
 from kinect_color_segmentation.srv import WallNormale, SurfaceToDremmel
 from tf.transformations import quaternion_from_euler
+from rospy.core import rospyerr
 
 class WallDremmeler(object):
     """
@@ -38,6 +40,9 @@ class WallDremmeler(object):
         self.trajectory_client = actionlib.SimpleActionClient('/denso_arm/trajectory', denso_msgs.msg.TrajectoryAction)
         #self.trajectory_client.wait_for_server()
 
+        self.listener = tf.TransformListener()
+        self.br = tf.TransformBroadcaster()
+        
         self.surface_to_dremmel_server = rospy.ServiceProxy( '/kinect_segmentation/PointSequenceDetection/segment', SurfaceToDremmel)
         self.wall_orientation_server = rospy.ServiceProxy( '/kinect_segmentation/PointSequenceDetection/get_wall_normale', WallNormale)
 
@@ -69,7 +74,12 @@ class WallDremmeler(object):
         
         
         wall_normale = self.rotate_normal(segmented_points, wall_normale, wall_link)
-       
+        
+        #Substitution of the surface normal for the tooltip normal to test the dremmelling
+        rospy.logerr("TODO: remove this. Using tooltip normal.")
+        tooltip_pose = self.get_pose("/denso_arm/tooltip", wall_link)
+        wall_normale = tooltip_pose.orientation
+    
     
         #We build a list of poses to send to the hand.
         list_of_poses = self.build_poses( segmented_points, wall_normale, wall_link )
@@ -84,10 +94,7 @@ class WallDremmeler(object):
 
         rospy.loginfo( "Finished Dremmeling the surface: " + str( self.trajectory_client.get_result() ) )
 
-    def rotate_normal(self, segmented_points, quaternion, rotation_link):
-        br = tf.TransformBroadcaster()
-        listener = tf.TransformListener()
-        
+    def rotate_normal(self, segmented_points, quaternion, rotation_link):      
         pose = Pose()
         pose.position.x = segmented_points[0].x
         pose.position.y = segmented_points[0].y
@@ -114,16 +121,16 @@ class WallDremmeler(object):
         success = False
         
         for i in range(0,100):
-            br.sendTransform((pose.position.x, pose.position.y, pose.position.z),
-                             (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w), 
-                             rospy.Time.now(), normal_name, rotation_link)
+            self.br.sendTransform((pose.position.x, pose.position.y, pose.position.z),
+                                  (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w), 
+                                  rospy.Time.now(), normal_name, rotation_link)
             
-            br.sendTransform((pose_rotated.position.x, pose_rotated.position.y, pose_rotated.position.z),
-                             (pose_rotated.orientation.x, pose_rotated.orientation.y, pose_rotated.orientation.z, pose_rotated.orientation.w), 
-                             rospy.Time.now(), rotated_normal_name, normal_name)
+            self.br.sendTransform((pose_rotated.position.x, pose_rotated.position.y, pose_rotated.position.z),
+                                  (pose_rotated.orientation.x, pose_rotated.orientation.y, pose_rotated.orientation.z, pose_rotated.orientation.w), 
+                                  rospy.Time.now(), rotated_normal_name, normal_name)
             rate.sleep()    
             try:
-                (trans,rot) = listener.lookupTransform(rotation_link, rotated_normal_name, rospy.Time())
+                (trans,rot) = self.listener.lookupTransform(rotation_link, rotated_normal_name, rospy.Time())
                 pose_rotated_base = PoseStamped()
                 pose_rotated_base.pose.position.x = trans[0]
                 pose_rotated_base.pose.position.y = trans[1]
@@ -141,35 +148,84 @@ class WallDremmeler(object):
                 #rospy.logerr("Could not transform from " + pose_above_pose_frame.header.frame_id + " to /base_link")
                 
         if success == False:
-                rospy.logerr("Could not transform from " + rotated_normal_name + " to " + rotation_link)
+            rospy.logerr("Could not transform from " + rotated_normal_name + " to " + rotation_link)
         
         return pose_rotated_base.pose.orientation    
         
+    def calculate_distance(self, point1, point2):
+        distance = math.sqrt((point1.x - point2.x) * (point1.x - point2.x)
+                             + (point1.y - point2.y) * (point1.y - point2.y)
+                             + (point1.z - point2.z) * (point1.z - point2.z))
+        return distance
+    
+    
+    def get_pose(self, link_name, base_link):
+        trans = None
+        rot = None
 
+        #try to get the pose of the given link_name
+        # in the base_link frame.
+        for i in range (0, 500):
+            try:
+                (trans, rot) = self.listener.lookupTransform( base_link, link_name,
+                                                              rospy.Time(0) )
+                break
+            except Exception, e:
+                time.sleep(0.01)
+                continue
+
+        pose = None
+        pose = Pose()
+        pose.position.x = trans[0]
+        pose.position.y = trans[1]
+        pose.position.z = trans[2]
+        pose.orientation.x = rot[0]
+        pose.orientation.y = rot[1]
+        pose.orientation.z = rot[2]
+        pose.orientation.w = rot[3]
+
+        return pose
+    
     def build_poses(self, segmented_points, quaternion, rotation_link):
         list_of_poses = []
-        
-        br = tf.TransformBroadcaster()
-        listener = tf.TransformListener()
-        
+        previous_point = None
+        last_orientation_in_base_link = None
+         
         for index,point in enumerate(segmented_points):
             #create a pose above the point (in the wall frame)
             rospy.loginfo("Doing point: " + str(index))
             
-            pose_above = Pose()
-            pose_above.position.x = point.x
-            pose_above.position.y = point.y
-            pose_above.position.z = point.z
-            pose_above.position.z -= 0.05
-            pose_above.orientation = quaternion
-            pose_above_name = "/pose_above_" + str(index)
+            send_pose_above = False
+            
+            #Create a pose above the surface only if it's the first time, or the point is at more than x meters from the previous 
+            if (previous_point == None):
+                previous_point = Point()
+                send_pose_above = True
+            elif (self.calculate_distance(previous_point, point) > 0.02):
+                send_pose_above = True
+            else:
+                send_pose_above = False
+            
+            #Save current point as previous
+            previous_point.x = point.x
+            previous_point.y = point.y
+            previous_point.z = point.z
+            
+            if send_pose_above == True:    
+                pose_above = Pose()
+                pose_above.position.x = point.x
+                pose_above.position.y = point.y
+                pose_above.position.z = point.z
+                pose_above.position.z -= 0.05
+                pose_above.orientation = quaternion
+                pose_above_name = "/pose_above_" + str(index)
     
             #then create a pose below the point (inside the wall)
             pose_inside = Pose()
             pose_inside.position.x = point.x
             pose_inside.position.y = point.y
             pose_inside.position.z = point.z
-            pose_inside.position.z += 0.005
+            pose_inside.position.z -= 0.020
             pose_inside.orientation = quaternion
             pose_inside_name = "/pose_inside_"  + str(index)
     
@@ -181,42 +237,43 @@ class WallDremmeler(object):
             pose_inside_base_frame = None
             success = False
             rate = rospy.Rate(100.0)
-           
-            for i in range(0,100):
-                br.sendTransform((pose_above.position.x, pose_above.position.y, pose_above.position.z),
-                                 (pose_above.orientation.x, pose_above.orientation.y, pose_above.orientation.z, pose_above.orientation.w), 
-                                 rospy.Time.now(), pose_above_name, rotation_link)
-                rate.sleep()    
-                try:
-                    (trans,rot) = listener.lookupTransform("/base_link", pose_above_name, rospy.Time())
-                    pose_above_base_frame = PoseStamped()
-                    pose_above_base_frame.pose.position.x = trans[0]
-                    pose_above_base_frame.pose.position.y = trans[1]
-                    pose_above_base_frame.pose.position.z = trans[2]
-                    pose_above_base_frame.pose.orientation.x = rot[0]
-                    pose_above_base_frame.pose.orientation.y = rot[1]
-                    pose_above_base_frame.pose.orientation.z = rot[2]
-                    pose_above_base_frame.pose.orientation.w = rot[3]
-                    pose_above_base_frame.header.frame_id = "/base_link"
-                    pose_above_base_frame.header.stamp = rospy.Time.now()
-                    success = True
-                    break
-                except:
-                    pass
-                    #rospy.logerr("Could not transform from " + pose_above_pose_frame.header.frame_id + " to /base_link")
+            
+            if send_pose_above == True:
+                for i in range(0,100):
+                    self.br.sendTransform((pose_above.position.x, pose_above.position.y, pose_above.position.z),
+                                          (pose_above.orientation.x, pose_above.orientation.y, pose_above.orientation.z, pose_above.orientation.w), 
+                                          rospy.Time.now(), pose_above_name, rotation_link)
+                    rate.sleep()    
+                    try:
+                        (trans,rot) = self.listener.lookupTransform("/base_link", pose_above_name, rospy.Time())
+                        pose_above_base_frame = PoseStamped()
+                        pose_above_base_frame.pose.position.x = trans[0]
+                        pose_above_base_frame.pose.position.y = trans[1]
+                        pose_above_base_frame.pose.position.z = trans[2]
+                        pose_above_base_frame.pose.orientation.x = rot[0]
+                        pose_above_base_frame.pose.orientation.y = rot[1]
+                        pose_above_base_frame.pose.orientation.z = rot[2]
+                        pose_above_base_frame.pose.orientation.w = rot[3]
+                        pose_above_base_frame.header.frame_id = "/base_link"
+                        pose_above_base_frame.header.stamp = rospy.Time.now()
+                        success = True
+                        break
+                    except:
+                        pass
+                        #rospy.logerr("Could not transform from " + pose_above_pose_frame.header.frame_id + " to /base_link")
                 
                     
-            if success == False:
-                rospy.logerr("Could not transform from " + pose_above_name + " to /base_link")
+                if success == False:
+                    rospy.logerr("Could not transform from " + pose_above_name + " to /base_link")
             
             success = False
             for i in range(0,100):
-                br.sendTransform((pose_inside.position.x, pose_inside.position.y, pose_inside.position.z),
-                                 (pose_inside.orientation.x, pose_inside.orientation.y, pose_inside.orientation.z, pose_inside.orientation.w), 
-                                 rospy.Time.now(), pose_inside_name, rotation_link)
+                self.br.sendTransform((pose_inside.position.x, pose_inside.position.y, pose_inside.position.z),
+                                      (pose_inside.orientation.x, pose_inside.orientation.y, pose_inside.orientation.z, pose_inside.orientation.w), 
+                                      rospy.Time.now(), pose_inside_name, rotation_link)
     
                 try:
-                    (trans,rot) = listener.lookupTransform("/base_link", pose_inside_name, rospy.Time())
+                    (trans,rot) = self.listener.lookupTransform("/base_link", pose_inside_name, rospy.Time())
                     pose_inside_base_frame = PoseStamped()
                     pose_inside_base_frame.pose.position.x = trans[0]
                     pose_inside_base_frame.pose.position.y = trans[1]
@@ -228,6 +285,9 @@ class WallDremmeler(object):
                     pose_inside_base_frame.header.frame_id = "/base_link"
                     pose_inside_base_frame.header.stamp = rospy.Time.now()
                     success = True
+                    
+                    #Copy orientaion
+                    last_orientation_in_base_link = pose_inside_base_frame.pose.orientation
                     break
                 except:
                     pass
@@ -239,16 +299,25 @@ class WallDremmeler(object):
                 
     
             #add those two poses to the list of poses sent to the arm
-            if (pose_above_base_frame != None):
-                list_of_poses.append( pose_above_base_frame.pose )
-            else:
-                rospy.logerr("Could not convert pose above " + pose_above_name + " to /base_link")
+            if send_pose_above == True:
+                if (pose_above_base_frame != None):
+                    list_of_poses.append( pose_above_base_frame.pose )
+                else:
+                    rospy.logerr("Could not convert pose above " + pose_above_name + " to /base_link")
                 
             if (pose_inside_base_frame != None):
                 list_of_poses.append( pose_inside_base_frame.pose )
             else:
                 rospy.logerr("Could not convert pose inside " + pose_inside_name + " to /base_link")
-
+        
+        #Enqueue a last position far from the target
+        pose_out = Pose()
+        pose_out.position.x = 0.528
+        pose_out.position.y = 0.118
+        pose_out.position.z = 0.293
+        pose_out.orientation = last_orientation_in_base_link
+        list_of_poses.append( pose_out )
+        
         return list_of_poses
 
 

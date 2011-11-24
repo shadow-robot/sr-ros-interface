@@ -16,8 +16,8 @@
     <remap from="~input" to="/camera/depth_registered/points" />
     <rosparam>
       filter_field_name: x
-      filter_limit_min: -0.3
-      filter_limit_max: 0.05
+      filter_limit_min: -0.10
+      filter_limit_max: 0.15
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -26,8 +26,8 @@
     <remap from="~input" to="/kinect_segmentation/passthroughX/output" />
     <rosparam>
       filter_field_name: y
-      filter_limit_min: -0.40
-      filter_limit_max: -0.10
+      filter_limit_min: -0.80
+      filter_limit_max: -0.20
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -36,8 +36,8 @@
     <remap from="~input" to="/kinect_segmentation/passthroughY/output" />
     <rosparam>
       filter_field_name: z
-      filter_limit_min: 0.67
-      filter_limit_max: 0.82
+      filter_limit_min: 0.70
+      filter_limit_max: 0.90
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -89,7 +89,7 @@
       negative: false
     </rosparam>
   </node>
-
+<!--
   <node pkg="nodelet" type="nodelet" name="extract_plane_normal_indices" args="load pcl/ExtractIndices camera_nodelet_manager" output="screen">
     <remap from="~input"   to="/kinect_segmentation/mls_smoothing/normals" />
     <remap from="~indices" to="/kinect_segmentation/planar_segmentation/inliers" />
@@ -97,7 +97,7 @@
       negative: false
     </rosparam>
   </node>
-
+-->
     <node pkg="nodelet" type="nodelet" name="statistical_outlier_removal_1" args="load pcl/StatisticalOutlierRemoval camera_nodelet_manager" output="screen">
       <remap from="~input" to="/kinect_segmentation/extract_plane_indices/output" />
       <rosparam>
@@ -106,6 +106,16 @@
         negative: False 
       </rosparam>
     </node>
+
+ <!-- Smooth normals again, now with only the segmented plane points as an input-->
+  <node pkg="nodelet" type="nodelet" name="mls_smoothing_plane" args="load pcl/MovingLeastSquares camera_nodelet_manager" output="screen">
+    <remap from="~input" to="/kinect_segmentation/statistical_outlier_removal_1/output" />
+    <rosparam>
+      search_radius: 0.02
+      spatial_locator: 0
+      gaussian_parameter: 0.02
+    </rosparam>
+  </node>
 
   <node pkg="nodelet" type="nodelet" name="BoxSegmentation" args="load sr_kinect/BoxSegmentation camera_nodelet_manager" output="screen">
     <remap from="cloud_in" to="/kinect_segmentation/passthroughZ/output"/>
@@ -119,11 +129,11 @@
     <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
         <remap from="cloud_in" to="/kinect_segmentation/BoxSegmentation/output"/>
         <rosparam>
-            filter_max_r: 70
+            filter_max_r: 20
             filter_min_r: 0
-            filter_max_g: 70
+            filter_max_g: 20
             filter_min_g: 0
-            filter_max_b: 70
+            filter_max_b: 20
             filter_min_b: 0       
         </rosparam>
     </node>
@@ -150,7 +160,7 @@
 
     <node pkg="nodelet" type="nodelet" name="PointSequenceDetection" args="load sr_kinect/PointSequenceDetection camera_nodelet_manager" output="screen">
         <remap from="cloud_in" to="/kinect_segmentation/voxel_grid/output"/>
-        <remap from="cloud_normals_in" to="/kinect_segmentation/extract_plane_normal_indices/output" />
+        <remap from="cloud_normals_in" to="/kinect_segmentation/mls_smoothing_plane/normals" />
       <rosparam>
         K: 4
         axis: x
