@@ -16,8 +16,8 @@
     <remap from="~input" to="/camera/depth_registered/points" />
     <rosparam>
       filter_field_name: x
-      filter_limit_min: -0.10
-      filter_limit_max: 0.15
+      filter_limit_min: 0.055
+      filter_limit_max: 0.25
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -26,8 +26,8 @@
     <remap from="~input" to="/kinect_segmentation/passthroughX/output" />
     <rosparam>
       filter_field_name: y
-      filter_limit_min: -0.80
-      filter_limit_max: -0.20
+      filter_limit_min: -0.18
+      filter_limit_max: -0.06
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -37,7 +37,7 @@
     <rosparam>
       filter_field_name: z
       filter_limit_min: 0.70
-      filter_limit_max: 0.90
+      filter_limit_max: 1.40
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -129,11 +129,11 @@
     <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
         <remap from="cloud_in" to="/kinect_segmentation/BoxSegmentation/output"/>
         <rosparam>
-            filter_max_r: 20
+            filter_max_r: 40
             filter_min_r: 0
-            filter_max_g: 20
+            filter_max_g: 40
             filter_min_g: 0
-            filter_max_b: 20
+            filter_max_b: 40
             filter_min_b: 0       
         </rosparam>
     </node>
