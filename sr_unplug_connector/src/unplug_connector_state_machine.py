@@ -103,7 +103,7 @@ class UnplugConnectorStateMachine(object):
         for index, name in enumerate(msg.ObjectNames):
             self.detected_objects[ name ] = msg.Detections[index]
 
-        self.interactive_markers = InteractiveConnectorSelector(msg.ObjectNames, self.run)
+        self.interactive_markers = InteractiveConnectorSelector(msg.ObjectNames, self.run, "select_connector")
 
     def plan_grasp(self, name):
         """

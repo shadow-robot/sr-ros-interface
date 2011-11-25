@@ -48,7 +48,7 @@ class WallDremmeler(object):
         self.surface_to_dremmel_server = rospy.ServiceProxy( '/kinect_segmentation/PointSequenceDetection/segment', SurfaceToDremmel)
         self.wall_orientation_server = rospy.ServiceProxy( '/kinect_segmentation/PointSequenceDetection/get_wall_normale', WallNormale)
 
-        self.interactive_markers = InteractiveConnectorSelector(["camera_link"], self.run)
+        self.interactive_markers = InteractiveConnectorSelector(["camera_link"], self.run, "dremmel_wall")
 
 
     def run(self, name):
