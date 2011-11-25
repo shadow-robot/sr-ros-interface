@@ -215,23 +215,29 @@ class WallDremmeler(object):
             previous_point.x = point.x
             previous_point.y = point.y
             previous_point.z = point.z
+            
+            pose_on_plane = Pose()
+            pose_on_plane.position.x = point.x
+            pose_on_plane.position.y = point.y
+            pose_on_plane.position.z = point.z
+            pose_on_plane.orientation = quaternion
+            pose_on_plane_name = "/pose_on_plane_" + str(index)
 
             if send_pose_above == True:
                 pose_above = Pose()
-                pose_above.position.x = point.x
-                pose_above.position.y = point.y
-                pose_above.position.z = point.z
-                pose_above.position.z -= 0.05
-                pose_above.orientation = quaternion
+                pose_above.position.x = 0.0
+                pose_above.position.y = 0.0
+                pose_above.position.z = -0.05
+                pose_above.orientation = Quaternion(0,0,0,1)
                 pose_above_name = "/pose_above_" + str(index)
 
             #then create a pose below the point (inside the wall)
             pose_inside = Pose()
-            pose_inside.position.x = point.x
-            pose_inside.position.y = point.y
-            pose_inside.position.z = point.z
-            pose_inside.position.z += 0.022
-            pose_inside.orientation = quaternion
+            pose_inside.position.x = 0.0
+            pose_inside.position.y = 0.0
+            #pose_inside.position.z = 0.022
+            pose_inside.position.z = 0.022
+            pose_inside.orientation = Quaternion(0,0,0,1)
             pose_inside_name = "/pose_inside_"  + str(index)
 
             #then transform those two poses in the base_link frame
@@ -245,9 +251,13 @@ class WallDremmeler(object):
 
             if send_pose_above == True:
                 for i in range(0,100):
+                    self.br.sendTransform((pose_on_plane.position.x, pose_on_plane.position.y, pose_on_plane.position.z),
+                                          (pose_on_plane.orientation.x, pose_on_plane.orientation.y, pose_on_plane.orientation.z, pose_on_plane.orientation.w),
+                                          rospy.Time.now(), pose_on_plane_name, rotation_link)
+                    rate.sleep()
                     self.br.sendTransform((pose_above.position.x, pose_above.position.y, pose_above.position.z),
                                           (pose_above.orientation.x, pose_above.orientation.y, pose_above.orientation.z, pose_above.orientation.w),
-                                          rospy.Time.now(), pose_above_name, rotation_link)
+                                          rospy.Time.now(), pose_above_name, pose_on_plane_name)
                     rate.sleep()
                     try:
                         (trans,rot) = self.listener.lookupTransform("/base_link", pose_above_name, rospy.Time())
@@ -273,9 +283,14 @@ class WallDremmeler(object):
 
             success = False
             for i in range(0,100):
+                self.br.sendTransform((pose_on_plane.position.x, pose_on_plane.position.y, pose_on_plane.position.z),
+                                      (pose_on_plane.orientation.x, pose_on_plane.orientation.y, pose_on_plane.orientation.z, pose_on_plane.orientation.w),
+                                      rospy.Time.now(), pose_on_plane_name, rotation_link)
+                rate.sleep()
                 self.br.sendTransform((pose_inside.position.x, pose_inside.position.y, pose_inside.position.z),
                                       (pose_inside.orientation.x, pose_inside.orientation.y, pose_inside.orientation.z, pose_inside.orientation.w),
-                                      rospy.Time.now(), pose_inside_name, rotation_link)
+                                      rospy.Time.now(), pose_inside_name, pose_on_plane_name)
+                rate.sleep()
 
                 try:
                     (trans,rot) = self.listener.lookupTransform("/base_link", pose_inside_name, rospy.Time())
