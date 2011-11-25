@@ -1,0 +1,38 @@
+#the number of patterns to be recognized
+6
+
+#pattern 1
+PATTERN_1
+data/4x4/4x4_1.patt
+80.0
+0.0 0.0
+
+#pattern 2
+PATTERN_2
+data/4x4/4x4_2.patt
+80.0
+0.0 0.0
+
+#pattern 2
+PATTERN_3
+data/4x4/4x4_3.patt
+80.0
+0.0 0.0
+
+#pattern 2
+PATTERN_4
+data/4x4/4x4_4.patt
+80.0
+0.0 0.0
+
+#pattern 2
+PATTERN_5
+data/4x4/4x4_5.patt
+80.0
+0.0 0.0
+
+#pattern 2
+PATTERN_6
+data/4x4/4x4_6.patt
+80.0
+0.0 0.0
