@@ -12,6 +12,7 @@
   <depend package="smach_msgs"/>
   <depend package="smach_ros"/>
   <depend package="smach"/>
+  <depend package="sr_utilities"/>
   <depend package="rospy"/>
   <depend package="actionlib"/>
   <depend package="object_manipulation_msgs"/>

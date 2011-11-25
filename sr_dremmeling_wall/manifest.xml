@@ -15,6 +15,7 @@
   <depend package="tf"/>
   <depend package="actionlib"/>
   <depend package="kinect_color_segmentation"/>
+  <depend package="sr_utilities"/>
 
 </package>
 

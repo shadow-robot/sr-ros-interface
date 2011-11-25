@@ -23,6 +23,5 @@ from wall_dremmeler import WallDremmeler
 if __name__ == '__main__':
     dremm = WallDremmeler()
 
-    dremm.run()
     rospy.spin()
 
