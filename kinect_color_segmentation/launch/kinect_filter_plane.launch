@@ -16,8 +16,8 @@
     <remap from="~input" to="/camera/depth_registered/points" />
     <rosparam>
       filter_field_name: x
-      filter_limit_min: 0.055
-      filter_limit_max: 0.25
+      filter_limit_min: 0.025
+      filter_limit_max: 0.28
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -26,8 +26,8 @@
     <remap from="~input" to="/kinect_segmentation/passthroughX/output" />
     <rosparam>
       filter_field_name: y
-      filter_limit_min: -0.18
-      filter_limit_max: -0.06
+      filter_limit_min: -0.32
+      filter_limit_max: -0.11
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -36,8 +36,8 @@
     <remap from="~input" to="/kinect_segmentation/passthroughY/output" />
     <rosparam>
       filter_field_name: z
-      filter_limit_min: 0.70
-      filter_limit_max: 1.40
+      filter_limit_min: 0.90
+      filter_limit_max: 1.20
       filter_limit_negative: False
     </rosparam>
   </node>
@@ -129,11 +129,11 @@
     <node pkg="nodelet" type="nodelet" name="KinectColorSegmentation" args="load sr_kinect/KinectColorSegmentation camera_nodelet_manager" output="screen">
         <remap from="cloud_in" to="/kinect_segmentation/BoxSegmentation/output"/>
         <rosparam>
-            filter_max_r: 40
+            filter_max_r: 45
             filter_min_r: 0
-            filter_max_g: 40
+            filter_max_g: 45
             filter_min_g: 0
-            filter_max_b: 40
+            filter_max_b: 45
             filter_min_b: 0       
         </rosparam>
     </node>
@@ -162,7 +162,7 @@
         <remap from="cloud_in" to="/kinect_segmentation/voxel_grid/output"/>
         <remap from="cloud_normals_in" to="/kinect_segmentation/mls_smoothing_plane/normals" />
       <rosparam>
-        K: 4
+        K: 200
         axis: x
       </rosparam>
     </node>

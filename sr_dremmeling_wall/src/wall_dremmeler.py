@@ -206,7 +206,7 @@ class WallDremmeler(object):
             if (previous_point == None):
                 previous_point = Point()
                 send_pose_above = True
-            elif (self.calculate_distance(previous_point, point) > 0.02):
+            elif (self.calculate_distance(previous_point, point) > 0.035):
                 send_pose_above = True
             else:
                 send_pose_above = False
@@ -235,7 +235,6 @@ class WallDremmeler(object):
             pose_inside = Pose()
             pose_inside.position.x = 0.0
             pose_inside.position.y = 0.0
-            #pose_inside.position.z = 0.022
             pose_inside.position.z = 0.022
             pose_inside.orientation = Quaternion(0,0,0,1)
             pose_inside_name = "/pose_inside_"  + str(index)
@@ -322,7 +321,7 @@ class WallDremmeler(object):
             if send_pose_above == True:
                 if (pose_above_base_frame != None):
                     list_of_poses.append( pose_above_base_frame.pose )
-                    list_of_speeds.append( 25.0 )
+                    list_of_speeds.append( 30.0 )
                 else:
                     rospy.logerr("Could not convert pose above " + pose_above_name + " to /base_link")
 
@@ -334,9 +333,9 @@ class WallDremmeler(object):
 
         #Enqueue a last position far from the target
         pose_out = Pose()
-        pose_out.position.x = 0.528
-        pose_out.position.y = 0.118
-        pose_out.position.z = 0.293
+        pose_out.position.x = 0.643
+        pose_out.position.y = -0.001
+        pose_out.position.z = 0.356
         pose_out.orientation = last_orientation_in_base_link
         list_of_poses.append( pose_out )
         list_of_speeds.append( 25.0 )
