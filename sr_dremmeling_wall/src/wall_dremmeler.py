@@ -28,6 +28,7 @@ from kinect_color_segmentation.srv import WallNormale, SurfaceToDremmel
 from tf.transformations import quaternion_from_euler
 from rospy.core import rospyerr
 
+from interactive_markers.interactive_marker_server import *
 from interactive_marker import InteractiveConnectorSelector
 
 class WallDremmeler(object):
@@ -48,7 +49,16 @@ class WallDremmeler(object):
         self.surface_to_dremmel_server = rospy.ServiceProxy( '/kinect_segmentation/PointSequenceDetection/segment', SurfaceToDremmel)
         self.wall_orientation_server = rospy.ServiceProxy( '/kinect_segmentation/PointSequenceDetection/get_wall_normale', WallNormale)
 
-        self.interactive_markers = InteractiveConnectorSelector(["camera_link"], self.run, "dremmel_wall")
+        self.interactive_marker_server = InteractiveMarkerServer("dremmel_wall")
+        self.interactive_markers = InteractiveConnectorSelector(["camera_link"], self.run, self.interactive_marker_server)
+
+        #rospy.loginfo("go to initial pose 1")
+        #self.go_to_initial_position()
+        
+        #time.sleep(5)
+
+        rospy.loginfo("go to initial pose 2")        
+        self.go_to_initial_position_2()
 
 
     def run(self, name):
@@ -89,7 +99,7 @@ class WallDremmeler(object):
 
         #now we send this to the arm
         rospy.loginfo("Sending the list of poses to the arm")
-        goal = denso_msgs.msg.TrajectoryGoal
+        goal = denso_msgs.msg.TrajectoryGoal()
         goal.trajectory = list_of_poses
         goal.speed = list_of_speeds
 
@@ -97,6 +107,9 @@ class WallDremmeler(object):
         self.trajectory_client.wait_for_result()
 
         rospy.loginfo( "Finished Dremmeling the surface: " + str( self.trajectory_client.get_result() ) )
+
+        #move the arm out of the way
+        self.go_to_initial_position_2()
 
     def rotate_normal(self, segmented_points, quaternion, rotation_link):
         pose = Pose()
@@ -233,9 +246,9 @@ class WallDremmeler(object):
 
             #then create a pose below the point (inside the wall)
             pose_inside = Pose()
-            pose_inside.position.x = 0.0
-            pose_inside.position.y = 0.0
-            pose_inside.position.z = 0.022
+            pose_inside.position.x = -0.025
+            pose_inside.position.y = 0.02
+            pose_inside.position.z = 0.042
             pose_inside.orientation = Quaternion(0,0,0,1)
             pose_inside_name = "/pose_inside_"  + str(index)
 
@@ -333,11 +346,75 @@ class WallDremmeler(object):
 
         #Enqueue a last position far from the target
         pose_out = Pose()
-        pose_out.position.x = 0.643
-        pose_out.position.y = -0.001
-        pose_out.position.z = 0.356
+        pose_out.position.x = 0.644
+        pose_out.position.y = 0.279
+        pose_out.position.z = 0.581
         pose_out.orientation = last_orientation_in_base_link
         list_of_poses.append( pose_out )
         list_of_speeds.append( 25.0 )
 
         return list_of_poses, list_of_speeds
+
+    def go_to_initial_position(self):
+        #Move the arm to a fixed initial position
+        goal = denso_msgs.msg.TrajectoryGoal()
+        traj = []
+        speed = []
+        pose_tmp = Pose()
+        pose_tmp.position.x = 0.639
+        pose_tmp.position.y = -0.005
+        pose_tmp.position.z = 0.356
+        pose_tmp.orientation.x = -0.659
+        pose_tmp.orientation.y = 0.256
+        pose_tmp.orientation.z = -0.2466
+        pose_tmp.orientation.w = 0.6626
+
+        traj.append( pose_tmp )
+        speed.append( 15. )
+
+        goal.trajectory = traj
+        goal.speed = speed
+
+        self.trajectory_client.send_goal( goal )
+        self.trajectory_client.wait_for_result()
+        res =  self.trajectory_client.get_result()
+        if res.val != denso_msgs.msg.TrajectoryResult.SUCCESS:
+            rospy.logerr("Failed to move the arm to the given position.")
+            return False
+
+        return True
+
+    def go_to_initial_position_2(self):
+        #Move the arm to a fixed initial position
+        goal = denso_msgs.msg.TrajectoryGoal()
+        traj = []
+        speed = []
+        pose_tmp = Pose()
+        pose_tmp.position.x = 0.61
+        pose_tmp.position.y = 0.036
+        pose_tmp.position.z = 0.669
+        pose_tmp.orientation.x = -0.653
+        pose_tmp.orientation.y = 0.271
+        pose_tmp.orientation.z = -0.261
+        pose_tmp.orientation.w = 0.657
+
+        #pose_tmp.orientation.x = -0.659
+        #pose_tmp.orientation.y = 0.256
+        #pose_tmp.orientation.z = -0.2466
+        #pose_tmp.orientation.w = 0.6626
+
+
+        traj.append( pose_tmp )
+        speed.append( 35. )
+
+        goal.trajectory = traj
+        goal.speed = speed
+
+        self.trajectory_client.send_goal( goal )
+        self.trajectory_client.wait_for_result()
+        res =  self.trajectory_client.get_result()
+        if res.val != denso_msgs.msg.TrajectoryResult.SUCCESS:
+            rospy.logerr("Failed to move the arm to the given position.")
+            return False
+
+        return True

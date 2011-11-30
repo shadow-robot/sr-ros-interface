@@ -18,9 +18,12 @@
 
 import roslib; roslib.load_manifest('static_tf_kinect_to_base_calibration')
 import rospy
+import math
 
 from tf import TransformListener, TransformBroadcaster
 from geometry_msgs.msg import Pose
+
+CONVERGE_THRESHOLD = 0.0005
 
 class TransformLearner(object):
     def __init__(self):
@@ -30,6 +33,7 @@ class TransformLearner(object):
         self.tf_broadcaster = TransformBroadcaster()
 
         self.possible_base_link_poses = []
+        self.baselink_averages = []
 
         self.rate = rospy.Rate(20)
 
@@ -50,7 +54,8 @@ class TransformLearner(object):
         self.run()
 
     def run(self):
-        while not rospy.is_shutdown():
+        calibration_complete = False
+        while ( not rospy.is_shutdown()) and (not calibration_complete):
             for index, marker in enumerate( self.markers.items() ):
                 pose_tmp = self.publish_and_get_pose( marker[0], marker[1], index )
                 if pose_tmp != None:
@@ -58,8 +63,12 @@ class TransformLearner(object):
 
             if len( self.possible_base_link_poses ) != 0:
                 best_guess_base_link_to_camera = self.average_poses()
+                self.baselink_averages.append( best_guess_base_link_to_camera )
+                calibration_complete = self.check_end_of_calibration()
 
-                print best_guess_base_link_to_camera
+                #print best_guess_base_link_to_camera
+                print str(best_guess_base_link_to_camera.position.x) + " " + str(best_guess_base_link_to_camera.position.y) + " " +str(best_guess_base_link_to_camera.position.z) + " " + str(best_guess_base_link_to_camera.orientation.x) + " " + str(best_guess_base_link_to_camera.orientation.y) + " " + str(best_guess_base_link_to_camera.orientation.z) + " " + str(best_guess_base_link_to_camera.orientation.w)
+                
 
                 self.tf_broadcaster.sendTransform( (best_guess_base_link_to_camera.position.x, best_guess_base_link_to_camera.position.y,
                                                     best_guess_base_link_to_camera.position.z),
@@ -148,3 +157,28 @@ class TransformLearner(object):
 
         return pose
 
+
+    def check_end_of_calibration(self):
+        
+        #Simple version: difference between the two last averages
+        if len(self.baselink_averages) > 1:
+            if ((math.sqrt((self.baselink_averages[len(self.baselink_averages) - 1].position.x - self.baselink_averages[len(self.baselink_averages) - 2].position.x)
+                           * (self.baselink_averages[len(self.baselink_averages) - 1].position.x - self.baselink_averages[len(self.baselink_averages) - 2].position.x)) < CONVERGE_THRESHOLD) and
+                (math.sqrt((self.baselink_averages[len(self.baselink_averages) - 1].position.y - self.baselink_averages[len(self.baselink_averages) - 2].position.y)
+                           * (self.baselink_averages[len(self.baselink_averages) - 1].position.y - self.baselink_averages[len(self.baselink_averages) - 2].position.y)) < CONVERGE_THRESHOLD) and
+                (math.sqrt((self.baselink_averages[len(self.baselink_averages) - 1].position.z - self.baselink_averages[len(self.baselink_averages) - 2].position.z)
+                           * (self.baselink_averages[len(self.baselink_averages) - 1].position.z - self.baselink_averages[len(self.baselink_averages) - 2].position.z)) < CONVERGE_THRESHOLD) and
+                (math.sqrt((self.baselink_averages[len(self.baselink_averages) - 1].orientation.x - self.baselink_averages[len(self.baselink_averages) - 2].orientation.x)
+                           * (self.baselink_averages[len(self.baselink_averages) - 1].orientation.x - self.baselink_averages[len(self.baselink_averages) - 2].orientation.x)) < CONVERGE_THRESHOLD) and
+                (math.sqrt((self.baselink_averages[len(self.baselink_averages) - 1].orientation.y - self.baselink_averages[len(self.baselink_averages) - 2].orientation.y)
+                           * (self.baselink_averages[len(self.baselink_averages) - 1].orientation.y - self.baselink_averages[len(self.baselink_averages) - 2].orientation.y)) < CONVERGE_THRESHOLD) and
+                (math.sqrt((self.baselink_averages[len(self.baselink_averages) - 1].orientation.z - self.baselink_averages[len(self.baselink_averages) - 2].orientation.z)
+                           * (self.baselink_averages[len(self.baselink_averages) - 1].orientation.z - self.baselink_averages[len(self.baselink_averages) - 2].orientation.z)) < CONVERGE_THRESHOLD) and
+                (math.sqrt((self.baselink_averages[len(self.baselink_averages) - 1].orientation.w - self.baselink_averages[len(self.baselink_averages) - 2].orientation.w)
+                           * (self.baselink_averages[len(self.baselink_averages) - 1].orientation.w - self.baselink_averages[len(self.baselink_averages) - 2].orientation.w)) < CONVERGE_THRESHOLD)):
+                print "This is the calibrated kinect transform value:"
+                return True
+            else:
+                return False
+        else:
+            return False

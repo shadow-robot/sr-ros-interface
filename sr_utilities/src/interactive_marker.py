@@ -22,9 +22,9 @@ import rospy
 from interactive_markers.interactive_marker_server import *
 
 class InteractiveConnectorSelector(object):
-    def __init__(self, object_names, callback_fct, topic_name):
+    def __init__(self, object_names, callback_fct, interactive_server):
         # create an interactive marker server on the topic namespace simple_marker
-        self.server = InteractiveMarkerServer(topic_name)
+        self.server = interactive_server
 
         self.callback_function = callback_fct
         self.object_names = object_names

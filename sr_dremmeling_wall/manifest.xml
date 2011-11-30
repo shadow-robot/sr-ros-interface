@@ -16,6 +16,7 @@
   <depend package="actionlib"/>
   <depend package="kinect_color_segmentation"/>
   <depend package="sr_utilities"/>
+  <depend package="interactive_markers"/>
 
 </package>
 

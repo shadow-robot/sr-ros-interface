@@ -72,6 +72,8 @@ namespace shadowrobot
     }
     sendupdate_msg.sendupdate_length = joint_vector.size();
 
+    object_manipulation_msgs::GraspHandPostureExecutionResult result;
+
     switch (goal->goal)
     {
     case object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP:
@@ -93,6 +95,8 @@ namespace shadowrobot
       sr_hand_target_pub.publish(sendupdate_msg);
       ROS_DEBUG("Hand in grasp position");
 
+      result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
+      action_server->setSucceeded( result );
       hand_occupied = true;
 
       break;
@@ -117,6 +121,9 @@ namespace shadowrobot
       sr_hand_target_pub.publish(sendupdate_msg);
       ROS_DEBUG("Hand in pregrasp position");
 
+      result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
+      action_server->setSucceeded( result );
+
       hand_occupied = false;
 
       break;
@@ -134,6 +141,9 @@ namespace shadowrobot
       sr_hand_target_pub.publish(sendupdate_msg);
       ROS_DEBUG("Hand opened");
 
+      result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
+      action_server->setSucceeded( result );
+
       hand_occupied = false;
 
       break;
@@ -144,9 +154,9 @@ namespace shadowrobot
     }
 
     //TODO: check the actual state of the hand and compare to sent targets?
-    object_manipulation_msgs::GraspHandPostureExecutionResult result;
-    result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
-    action_server->setSucceeded( result );
+    //object_manipulation_msgs::GraspHandPostureExecutionResult result;
+    //result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
+    //action_server->setSucceeded( result );
   }
 }
 
