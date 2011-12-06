@@ -1,0 +1,3 @@
+sh_ffj3_syntouch_controller:
+  joint: FFJ3
+  type: sr_mechanism_controllers/SrhSyntouchController

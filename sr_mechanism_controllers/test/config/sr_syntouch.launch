@@ -1,0 +1,10 @@
+<launch>
+
+  <rosparam command="load" file="$(find sr_mechanism_controllers)/test/config/sr_syntouch.yaml" />
+
+<!-- - -wait-for=/calibrated -->
+  <node name="default_loaded_controllers_spawner"
+        pkg="pr2_controller_manager" type="spawner" output="screen"
+        args="--wait-for=/calibrated sh_ffj3_syntouch_controller" />
+
+</launch>
