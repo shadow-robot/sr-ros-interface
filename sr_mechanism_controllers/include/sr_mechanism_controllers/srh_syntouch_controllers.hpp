@@ -59,7 +59,6 @@ namespace controller
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 
     sr_actuator::SrActuator* actuator_;
-    std::vector<tactiles::BiotacData>* biotacs_;
   };
 } // namespace
 

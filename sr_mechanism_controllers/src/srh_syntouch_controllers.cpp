@@ -71,7 +71,6 @@ namespace controller {
 
     //init the pointer to the biotacs data, updated at 1kHz
     actuator_ = static_cast<sr_actuator::SrActuator*>( robot->model_->getActuator( joint_name ) );
-    biotacs_ = static_cast< std::vector<tactiles::BiotacData>* >( actuator_->state_.tactiles_ );
 
     after_init();
     return true;
@@ -124,7 +123,7 @@ namespace controller {
     ////////////
     // TACTILES
     /////
-    double my_first_finger_tactile_pac0 = biotacs_->at(0).pac0;
+    double my_first_finger_tactile_pac0 = static_cast<std::vector<tactiles::AllTactileData>* >( actuator_->state_.tactiles_ )->at(0).biotac.pac0;
     ROS_ERROR_STREAM("PAC0, tactile " << my_first_finger_tactile_pac0);
 
     ////////////
