@@ -20,4 +20,8 @@
          type="controller::SrhMixedPositionVelocityJointController"
          base_class_type="pr2_controller_interface::Controller" />
 
+  <class name="sr_mechanism_controllers/SrhSyntouchController"
+         type="controller::SrhSyntouchController"
+         base_class_type="pr2_controller_interface::Controller" />
+
 </library>
