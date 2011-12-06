@@ -97,24 +97,23 @@ namespace sr_math_utils
    * overflowed between the 2 calls, then we're not able to detect the overflow.
    *
    * @param full_value the full value (with no overflow)
-   * @param last_value the value we received last time, between 0 and max_value.
-   * @param new_value the new value we received, between 0 and max_value.
-   * @param max_value the maximum value (max_value +1 = 0), typically 65535 for a 16bit number.
+   * @param new_value the new value we received from the motor.
    *
-   * @return a
+   * @return The new full value
    */
-  static inline int counter_with_overflow(unsigned long long int full_value, int last_value, int new_value, int max_value = 65535)
+  static inline uint64_t counter_with_overflow(uint64_t full_value, uint16_t new_value)
   {
-    int value_to_add = 0;
-
-    if( new_value < last_value) // overflowing
-      value_to_add = (max_value + 1 - last_value) + new_value;
-    else // not overflowing
-      value_to_add = new_value - last_value;
-
-    return full_value + value_to_add;
+    uint16_t last_value = full_value &    0xFFFF;       // Split the full value into the lower part
+    full_value   &= (uint64_t)0xFFFFFFFFFFFF0000LL;     // and the overflow part 
+    
+    if( new_value < last_value)                         // if we overflowed
+      full_value += (uint64_t)0x0000000000010000LL;     // then count the overflow
+    
+    full_value   |= (uint64_t)new_value;                // replace the bottom 16 bits with their new value
+    
+    return full_value;
   }
-
+    
 
   /**
    * Interpolate linearly between the 2 points, for the given value
