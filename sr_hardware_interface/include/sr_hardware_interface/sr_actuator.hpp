@@ -112,6 +112,8 @@ namespace sr_actuator
     int force_control_pterm;
     int force_control_iterm;
     int force_control_dterm;
+
+    void* tactiles_;
   }; //end class SrActuatorState
 
 
