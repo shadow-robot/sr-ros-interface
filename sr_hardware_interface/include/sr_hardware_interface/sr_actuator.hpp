@@ -47,6 +47,7 @@ namespace sr_actuator
       firmware_modified_(0),
       serial_number_low(0),
       serial_number_high(0),
+      serial_number(0),
       motor_gear_ratio(0),
       assembly_data_year(0),
       assembly_data_month(0),
@@ -89,8 +90,29 @@ namespace sr_actuator
     unsigned int server_firmware_svn_revision_;
     bool firmware_modified_;
 
+    //Serial number is composed of a low and
+    // a high byte.
+    void set_serial_number_low(unsigned int serial)
+    {
+      serial_number_low = serial;
+
+      if( serial_number_high != 0 ) //we received both bytes
+        compute_serial();
+    };
+    void set_serial_number_high(unsigned int serial)
+    {
+      serial_number_high = serial;
+
+      if( serial_number_low != 0 ) //we received both bytes
+        compute_serial();
+    };
+    void compute_serial()
+    {
+      serial_number = serial_number_low + (serial_number_high * 65536);
+    };
     unsigned int serial_number_low;
     unsigned int serial_number_high;
+    unsigned int serial_number;
 
     unsigned int motor_gear_ratio;
     unsigned int assembly_data_year;
