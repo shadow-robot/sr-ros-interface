@@ -45,6 +45,8 @@ namespace sr_actuator
       pic_firmware_svn_revision_(0),
       server_firmware_svn_revision_(0),
       firmware_modified_(0),
+      serial_number_low_set(false),
+      serial_number_high_set(false),
       serial_number_low(0),
       serial_number_high(0),
       serial_number(0),
@@ -96,20 +98,25 @@ namespace sr_actuator
     {
       serial_number_low = serial;
 
-      if( serial_number_high != 0 ) //we received both bytes
+      serial_number_low_set = true;
+      if( serial_number_high_set ) //we received both bytes
         compute_serial();
     };
     void set_serial_number_high(unsigned int serial)
     {
       serial_number_high = serial;
 
-      if( serial_number_low != 0 ) //we received both bytes
+      serial_number_high_set = true;
+      if( serial_number_low_set ) //we received both bytes
         compute_serial();
     };
     void compute_serial()
     {
       serial_number = serial_number_low + (serial_number_high * 65536);
     };
+
+    bool serial_number_low_set;
+    bool serial_number_high_set;
     unsigned int serial_number_low;
     unsigned int serial_number_high;
     unsigned int serial_number;
