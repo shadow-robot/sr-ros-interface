@@ -19,7 +19,7 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *
- * @brief Uses the biotac tactiles to compute the force demand.
+ * @brief Dummy controller to show how to use the biotac tactiles to compute the force demand.
  *
  */
 
@@ -29,7 +29,7 @@
 
 #include <sr_mechanism_controllers/sr_controller.hpp>
 #include <sr_robot_msgs/JointControllerState.h>
-#include "sr_robot_lib/tactile_sensors.hpp"
+#include <sr_hardware_interface/tactile_sensors.hpp>
 #include <sr_hardware_interface/sr_actuator.hpp>
 
 namespace controller

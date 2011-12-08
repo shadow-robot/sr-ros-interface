@@ -24,9 +24,9 @@
  *
  */
 
-#include "srh_example_controller.hpp"
-#include "angles/angles.h"
-#include "pluginlib/class_list_macros.h"
+#include "../example/srh_example_controller.hpp"
+#include <angles/angles.h>
+#include <pluginlib/class_list_macros.h>
 
 #include <std_msgs/Float64.h>
 

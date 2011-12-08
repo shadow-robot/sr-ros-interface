@@ -19,11 +19,11 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *
- * @brief Uses the biotac tactiles to compute the force demand.
+ * @brief Dummy controller to show how to use the biotac tactiles to compute the force demand.
  *
  */
 
-#include "sr_mechanism_controllers/srh_syntouch_controllers.hpp"
+#include "../example/srh_syntouch_controllers.hpp"
 #include "angles/angles.h"
 #include "pluginlib/class_list_macros.h"
 #include <sstream>
