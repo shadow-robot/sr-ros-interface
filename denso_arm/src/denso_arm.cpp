@@ -53,7 +53,7 @@ namespace denso
     usleep(1000);
     take_robot();
     usleep(1000);
-    set_tooltip(1);
+    set_tooltip(0);
     usleep(1000);
     set_speed(initial_speed);
     usleep(1000);

@@ -2,7 +2,7 @@
   <node pkg="dynamic_reconfigure" type="dynparam" name="dynparam" args="set /camera/driver depth_registration true" />
 
   <node pkg="tf" type="static_transform_publisher" name="base_to_kinect"
-    args="0.13553529475 -0.685317510614 0.409548732383 -0.0621147956341 0.0967658668536 0.600823506608 0.790668073959 /base_link /camera_link 100"/>
+    args="0.751746559436 -0.335668795571 0.411551506396 -0.207512613133 0.146404851465 0.841912797129 0.475902756582 /base_link /camera_link 100"/>
 
   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
 

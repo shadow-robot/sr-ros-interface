@@ -349,7 +349,7 @@ class UnplugConnectorStateMachine(object):
         pose_above_box.orientation.z = 0.577
         pose_above_box.orientation.w = 0.25212
         traj.append( pose_above_box )
-        speed.append( 65. )
+        speed.append( 100. )
 
         #pose_in_box = Pose()
         #pose_in_box.position.x = 0.561363
@@ -418,7 +418,7 @@ class UnplugConnectorStateMachine(object):
         pose_tmp.orientation.w = 0.430094
 
         traj.append( pose_tmp )
-        speed.append( 65. )
+        speed.append( 100. )
 
         goal.trajectory = traj
         goal.speed = speed
@@ -448,7 +448,7 @@ class UnplugConnectorStateMachine(object):
         pose_tmp.orientation.w = 0.135466
 
         traj.append( pose_tmp )
-        speed.append( 65. )
+        speed.append( 100. )
 
         goal.trajectory = traj
         goal.speed = speed
@@ -476,7 +476,7 @@ class UnplugConnectorStateMachine(object):
         pose_tmp.orientation.w = 0.0511
 
         traj.append( pose_tmp )
-        speed.append( 65. )
+        speed.append( 100. )
 
         goal.trajectory = traj
         goal.speed = speed
@@ -506,7 +506,7 @@ class UnplugConnectorStateMachine(object):
         pose_tmp.orientation.w = 0.135428
 
         traj.append( pose_tmp )
-        speed.append( 65. )
+        speed.append( 100. )
 
         goal.trajectory = traj
         goal.speed = speed

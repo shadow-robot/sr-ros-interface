@@ -22,6 +22,6 @@ from unplug_connector_state_machine import UnplugConnectorStateMachine
 if __name__ == '__main__':
     unplugger = UnplugConnectorStateMachine()
 
-    unplugger.run()
+    #unplugger.run()
 
 
