@@ -27,6 +27,7 @@
 #ifndef _SR_ACTUATOR_HPP_
 #define _SR_ACTUATOR_HPP_
 
+#include "sr_hardware_interface/tactile_sensors.hpp"
 #include <pr2_hardware_interface/hardware_interface.h>
 
 namespace sr_actuator
@@ -113,7 +114,7 @@ namespace sr_actuator
     int force_control_iterm;
     int force_control_dterm;
 
-    void* tactiles_;
+    std::vector<tactiles::AllTactileData>* tactiles_;
   }; //end class SrActuatorState
 
 
