@@ -38,6 +38,8 @@ rosbuild_add_library(${PROJECT_NAME}
   src/srh_mixed_position_velocity_controller.cpp
   src/sr_friction_compensation.cpp
 
+  example/srh_syntouch_controllers.cpp
+
   src/sr_controller.cpp
 )
 

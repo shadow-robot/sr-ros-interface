@@ -28,6 +28,8 @@
   <depend package="angles" />
   <depend package="control_toolbox" />
 
+  <depend package="sr_hardware_interface" />
+
   <depend package="xmlrpcpp" />
 
   <export>
