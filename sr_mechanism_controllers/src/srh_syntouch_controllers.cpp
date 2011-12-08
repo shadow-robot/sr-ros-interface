@@ -123,8 +123,12 @@ namespace controller {
     ////////////
     // TACTILES
     /////
+    //you have access here to the whole data coming from the 5 tactiles at full speed.
     double my_first_finger_tactile_pac0 = static_cast<std::vector<tactiles::AllTactileData>* >( actuator_->state_.tactiles_ )->at(0).biotac.pac0;
-    ROS_ERROR_STREAM("PAC0, tactile " << my_first_finger_tactile_pac0);
+    if(loop_count_ % 10 == 0)
+    {
+      ROS_ERROR_STREAM("PAC0, tactile " << my_first_finger_tactile_pac0);
+    }
 
     ////////////
     // EFFORT
