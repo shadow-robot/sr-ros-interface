@@ -19,6 +19,8 @@
 import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
+import roslib.packages
+
 from generic_plugin import GenericPlugin
 from sr_robot_msgs.srv import ForceController, SetEffortControllerGains, SetMixedPositionVelocityPidGains, SetPidGains
 from functools import partial
@@ -56,7 +58,7 @@ class AdvancedDialog(QtGui.QDialog):
 
             text_edit = QtGui.QLineEdit()
             text_edit.setFixedHeight(30)
-            text_edit.setFixedWidth(50)
+            text_edit.setFixedWidth(75)
             text_edit.setText( str(parameter[0]) )
 
             validator = QtGui.QDoubleValidator(parameter[2][0], parameter[2][1], 4, self)
@@ -254,7 +256,13 @@ class JointPidSetter(QtGui.QFrame):
             filter_files = "*effort_controller"+filter_files
 
         if self.parent.pid_saver == None:
-            filename = QtGui.QFileDialog.getOpenFileName(self, Qt.QString("Save Controller Settings"), Qt.QString(""), Qt.QString(filter_files) )
+            path_to_config = "~"
+            try:
+                path_to_config = roslib.packages.get_pkg_dir("sr_edc_controller_configuration")
+            except:
+                rospy.logwarn("couldnt find the sr_edc_controller_configuration package")
+                pass
+            filename = QtGui.QFileDialog.getOpenFileName(self, Qt.QString("Save Controller Settings"), Qt.QString(path_to_config), Qt.QString(filter_files) )
             if filename == "":
                 return
             self.parent.pid_saver = PidSaver(filename)
@@ -514,7 +522,7 @@ class JointPidSetter(QtGui.QFrame):
 
             text_edit = QtGui.QLineEdit()
             text_edit.setFixedHeight(30)
-            text_edit.setFixedWidth(50)
+            text_edit.setFixedWidth(75)
             text_edit.setText( str(parameter[0]) )
 
             validator = QtGui.QDoubleValidator(float(parameter[2][0]), float(parameter[2][1]), 2, self)

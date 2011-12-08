@@ -19,6 +19,7 @@
 import roslib; roslib.load_manifest('sr_control_gui')
 import rospy
 
+import roslib.packages
 import time
 
 from generic_plugin import GenericPlugin
@@ -155,7 +156,13 @@ class Bootloader(GenericPlugin):
         self.window.setWidget(self.frame)
 
     def choose_firmware(self):
-        filename = QtGui.QFileDialog.getOpenFileName(self.file_frame, Qt.QString("Firmware file"), Qt.QString(""), Qt.QString("*.hex") )
+        path_to_released_firmware = ""
+        try:
+            path_to_released_firmware = roslib.packages.get_pkg_dir("sr_external_dependencies")
+        except:
+            rospy.logwarn("couldnt find the sr_external_dependencies package")
+            pass
+        filename = QtGui.QFileDialog.getOpenFileName(self.file_frame, Qt.QString("Firmware file"), Qt.QString(path_to_released_firmware + "/compiled_firmware/released_firmware"), Qt.QString("*.hex") )
         if filename == "":
             if self.firmware_path == None:
                 self.program_btn.setEnabled(False)
