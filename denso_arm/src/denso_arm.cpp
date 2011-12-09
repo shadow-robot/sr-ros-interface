@@ -27,13 +27,15 @@
 #include "b-Cap/b-Cap.hpp"
 #include <sstream>
 
+#include <sr_utilities/sr_math_utils.hpp>
+
 namespace denso
 {
   const unsigned short DensoArm::nb_joints_ = 6;
 
   DensoArm::DensoArm()
   {
-    init("10.1.1.1", 1234, 0.5);
+    init("10.2.2.222", 5007, 5);
   }
 
   DensoArm::DensoArm(std::string robot_ip, int robot_port, float initial_speed)
@@ -44,11 +46,19 @@ namespace denso
   void DensoArm::init(std::string robot_ip, int robot_port, float initial_speed)
   {
     start_bcap(robot_ip, robot_port);
+    usleep(1000);
     start_controller();
+    usleep(1000);
     start_slave_task();
+    usleep(1000);
     take_robot();
+    usleep(1000);
+    set_tooltip(0);
+    usleep(1000);
     set_speed(initial_speed);
+    usleep(1000);
     initialise_position_handles();
+    usleep(1000);
     set_power(1);
   }
 
@@ -78,7 +88,7 @@ namespace denso
 
     for (unsigned short index_joint = 0; index_joint < nb_joints_; ++index_joint)
     {
-      denso_joints->at(index_joint).position = position[index_joint];
+      denso_joints->at(index_joint).position = sr_math_utils::to_rad( position[index_joint] );
 
       //We don't seem to have access to those
       denso_joints->at(index_joint).effort = 0.0;
@@ -109,17 +119,30 @@ namespace denso
   ///////
   // IN CARTESIAN SPACE
 
+  bool DensoArm::set_tooltip( int tool_number )
+  {
+      std::stringstream command;
+      command << "Tool="<<tool_number;
+
+      BCAP_HRESULT hr = bCap_RobotChange(socket_handle, robot_handle, (char *) command.str().c_str());
+
+      if( FAILED(hr) )
+        printf("Couldn't set tool number - %x\n", hr);
+    return true;
+  }
+
   bool DensoArm::send_cartesian_position( const Pose& pose )
   {
     std::stringstream command;
     command << "P(" <<  pose.x << "," <<  pose.y << "," << pose.z << "," << pose.roll << "," << pose.pitch << "," << pose.yaw << ")";
+    ROS_DEBUG_STREAM(" moving to: " << command.str() );
 
     BCAP_HRESULT hr = bCap_RobotMove(socket_handle, robot_handle, 2 ,(char *) command.str().c_str(), (char * ) "");
 
     if (FAILED(hr) && (hr != BCAP_E_ROBOTISBUSY) )
-      ROS_ERROR("Couldn't move robot - %d", (int) hr);
+      ROS_ERROR("Couldn't move robot - %x", (int) hr);
 
-    return (hr != BCAP_E_ROBOTISBUSY);
+    return ( SUCCEEDED(hr) );
   }
 
 
@@ -198,12 +221,12 @@ namespace denso
 
   void DensoArm::initialise_position_handles (void)
   {
-    BCAP_HRESULT hr = bCap_ControllerGetVariable(socket_handle, controller_handle, (char*)"@CURRENT_POSITION", (char*)"", &cartesian_position_handle);	/* Get var handle  */
+    BCAP_HRESULT hr = bCap_RobotGetVariable(socket_handle, robot_handle, (char*)"@CURRENT_POSITION", (char*)"", &cartesian_position_handle);	/* Get var handle  */
 
     if( FAILED(hr) )
       ROS_ERROR("Couldn't get cartesian variable handle - %i\n", hr);
 
-    hr = bCap_ControllerGetVariable(socket_handle, controller_handle, (char*)"@CURRENT_ANGLE", (char*)"", &joint_position_handle);	/* Get var handle  */
+    hr = bCap_RobotGetVariable(socket_handle, robot_handle, (char*)"@CURRENT_ANGLE", (char*)"", &joint_position_handle);	/* Get var handle  */
 
     if( FAILED(hr) )
       ROS_ERROR("Couldn't get angle variable handle - %i\n", hr);

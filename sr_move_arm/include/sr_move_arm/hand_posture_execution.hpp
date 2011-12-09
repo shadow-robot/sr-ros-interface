@@ -18,7 +18,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
 #include <object_manipulation_msgs/GraspStatus.h>
-
+#include <object_manipulation_msgs/ManipulationResult.h>
 
 #include <trajectory_msgs/JointTrajectory.h>
 

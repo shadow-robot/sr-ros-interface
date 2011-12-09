@@ -251,3 +251,13 @@ sr_arm_motor.gv
 shadow_robot/sr_hand/CMakeLists.txt
 shadow_robot/sr_tactile_sensors/CMakeLists.txt
 sr_mechanism_controllers/bin/joint_trajectory_action_controller
+￼
+kinect_color_segmentation/src/kinect_color_segmentation
+￼
+sr_dremmeling_wall/.cproject
+￼
+sr_dremmeling_wall/.project
+￼
+sr_dremmeling_wall/.pydevproject
+￼
+sr_dremmeling_wall/cmake_install.cmake

@@ -27,19 +27,31 @@
 
 namespace denso
 {
+  const bool DensoArmNode::simulated = false;
+
   DensoArmNode::DensoArmNode()
     : node_("~")
   {
-    denso_arm_ = boost::shared_ptr<DensoArm> ( new DensoArm() );
+    if( !simulated )
+      denso_arm_ = boost::shared_ptr<DensoArm> ( new DensoArm() );
 
     init_joints();
 
     //TODO: read from param
-    ros::Rate rate(100);
+    ros::Rate rate_js(50);
+    ros::Rate rate_tip(35);
 
     //init what's needed for the joint states publishing
     publisher_js_ = node_.advertise<sensor_msgs::JointState>("joint_states", 5);
-    timer_joint_states_ = node_.createTimer( rate.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
+    timer_joint_states_ = node_.createTimer( rate_js.expectedCycleTime(), &DensoArmNode::update_joint_states_callback, this);
+
+    //init the publishing of the tip pose
+    tip_pose_ = boost::shared_ptr<Pose>( new Pose() );
+    timer_tip_pose_ = node_.createTimer( rate_tip.expectedCycleTime(), &DensoArmNode::update_tip_pose_callback, this);
+    tf_tip_broadcaster_ = boost::shared_ptr<tf::TransformBroadcaster>( new tf::TransformBroadcaster() );
+
+    //init the tooltip server
+    tooltip_server = node_.advertiseService("set_tooltip", &DensoArmNode::set_tooltip, this);
 
     //init the actionlib server
     move_arm_pose_server_.reset(new MoveArmPoseServer(node_, "move_arm_pose",
@@ -52,15 +64,40 @@ namespace denso
   DensoArmNode::~DensoArmNode()
   {}
 
+  void DensoArmNode::update_tip_pose_callback(const ros::TimerEvent& e)
+  {
+    if( !denso_mutex.try_lock() )
+      return;
+
+    denso_arm_->get_cartesian_position( tip_pose_ );
+
+    denso_mutex.unlock();
+
+    tf_tip_broadcaster_->sendTransform( tf::StampedTransform( denso_pose_to_tf_transform(tip_pose_),
+                                                              ros::Time::now(),
+                                                              "/denso_arm/base",
+                                                              "/denso_arm/tooltip"));
+  }
+
   void DensoArmNode::update_joint_states_callback(const ros::TimerEvent& e)
   {
-    denso_arm_->update_state( denso_joints_ );
+    if( !denso_mutex.try_lock() )
+      return;
 
-    for( unsigned short index_joint = 0; index_joint < denso_arm_->get_nb_joints() ; ++index_joint)
+    if( !simulated )
+      denso_arm_->update_state( denso_joints_ );
+
+    denso_mutex.unlock();
+
+    joint_state_msg_.header.stamp = ros::Time::now();
+    if( !simulated )
     {
-      joint_state_msg_.position[index_joint] = denso_joints_->at(index_joint).position;
-      joint_state_msg_.velocity[index_joint] = denso_joints_->at(index_joint).velocity;
-      joint_state_msg_.effort[index_joint] = denso_joints_->at(index_joint).effort;
+      for( unsigned short index_joint = 0; index_joint < denso_arm_->get_nb_joints() ; ++index_joint)
+      {
+        joint_state_msg_.position[index_joint] = denso_joints_->at(index_joint).position;
+        joint_state_msg_.velocity[index_joint] = denso_joints_->at(index_joint).velocity;
+        joint_state_msg_.effort[index_joint] = denso_joints_->at(index_joint).effort;
+      }
     }
 
     publisher_js_.publish( joint_state_msg_ );
@@ -68,7 +105,9 @@ namespace denso
 
   void DensoArmNode::init_joints()
   {
-    const unsigned short nb_joints = denso_arm_->get_nb_joints();
+    unsigned short nb_joints = 6;
+    if( !simulated )
+      nb_joints = denso_arm_->get_nb_joints();
     denso_joints_ = boost::shared_ptr<DensoJointsVector>( new DensoJointsVector( nb_joints ) );
 
     for( unsigned short i=0; i < nb_joints; ++i )
@@ -83,6 +122,13 @@ namespace denso
       joint_state_msg_.velocity.push_back( 0.0 );
       joint_state_msg_.effort.push_back( 0.0 );
     }
+  }
+
+
+  bool DensoArmNode::set_tooltip( denso_msgs::SetTooltip::Request& req,
+                                  denso_msgs::SetTooltip::Response& resp )
+  {
+    return denso_arm_->set_tooltip( req.tool_number );
   }
 
   void DensoArmNode::go_to_arm_pose(const denso_msgs::MoveArmPoseGoalConstPtr& goal)
@@ -110,8 +156,42 @@ namespace denso
       geometry_msgs::Pose pose_tmp( goal->goal );
       Pose pose_goal = geometry_pose_to_denso_pose( pose_tmp );
 
-      if( denso_arm_->send_cartesian_position( pose_goal ) )
-        break; //We reached the target -> SUCCESS
+      ROS_DEBUG_STREAM(" RPY : " << pose_goal.roll << " / " << pose_goal.pitch << " / " << pose_goal.yaw);
+
+      bool locked = false;
+      for( unsigned int i=0; i < 1000; ++i)
+      {
+        if( denso_mutex.try_lock() )
+        {
+          locked = true;
+          break;
+        }
+        usleep(10000);
+      }
+
+      if( locked )
+      {
+        if( !simulated )
+        {
+	  denso_arm_->set_speed( goal->speed );
+
+          if( denso_arm_->send_cartesian_position( pose_goal ) )
+          {
+            denso_mutex.unlock();
+            break; //We reached the target -> SUCCESS
+          }
+        }
+        else
+        {
+          usleep( 500000 );
+          denso_mutex.unlock();
+          break;
+        }
+      }
+      else
+      {
+        ROS_WARN("Couldn't send the target to the arm.");
+      }
 
       //publish feedback
       time_left -= (ros::Time::now() - start_time);

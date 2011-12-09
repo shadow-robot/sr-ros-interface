@@ -13,7 +13,7 @@ from sr_robot_msgs.srv import which_fingers_are_touching
 
 from actionlib import SimpleActionClient
 from motion_planning_msgs.msg import *
-from move_arm_msgs.msg import *
+from arm_navigation_msgs.msg import *
 from geometric_shapes_msgs.msg import Shape
 from actionlib_msgs.msg import GoalStatus
 

@@ -67,6 +67,17 @@ namespace denso
 
     void get_cartesian_position( boost::shared_ptr<Pose> pose);
 
+    /**
+     * Sets the pose of the tooltip for the IK.
+     *
+     * @param tool_number the number of the tool in the denso arm.
+     *
+     * @return true if success
+     */
+    bool set_tooltip( int tool_number );
+
+    void set_speed(float speed);
+
     unsigned short get_nb_joints()
     {
       return nb_joints_;
@@ -88,7 +99,6 @@ namespace denso
     void start_controller(void);
     void take_robot(void);
     void set_power(int power_state);
-    void set_speed(float speed);
     void initialise_position_handles (void);
     void start_slave_task(void);
     void stop_slave_task(void);
