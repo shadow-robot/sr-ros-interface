@@ -38,6 +38,18 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 class UnplugConnectorStateMachine(object):
     """
+    Controls the process of unplugging connector:
+    
+    Put the hand and the arm in their initial positions (the hand is in a the grasping pose)
+    wait for the user to click on a recognised object (the connector we want to unplug)
+    calculate grasps around the selected object (selected by the user clicking the interactive marker),
+    send the arm to the best grasping position (with some intermediate positions to ensure that no forbidden poses will be asked to the arm),
+    grab the object with the hand
+    lift the arm (unplugging the connector)
+    move the arm to a position above the box where we want to drop the connector
+    move the arm down, closer to the box
+    open the hand to drop the connector
+    move arm to the final position
     """
 
     def __init__(self, ):

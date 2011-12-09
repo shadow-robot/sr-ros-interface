@@ -119,6 +119,9 @@ namespace sr_kinect
     
     if (cloud->size() > 0)
     {
+      //First of all an octree is used to detect major changes in the point cloud
+      //previous_pcl is only refreshed if this happens
+
       // Octree resolution - side length of octree voxels
       float resolution = 64.0f;
       // Instantiate octree-based point cloud change detection class
@@ -153,7 +156,10 @@ namespace sr_kinect
       }
   
   
-  
+      //Apply the ordering algorithm to previous_pcl cloud
+      //we use a kdTreeFLANN object to find the K nearest points from a starting point
+      //Ths points are added in order to an output cloud and removed from the input aux_pcl cloud
+      //the method is applied recursively until all the points have been processed
   
       boost::shared_ptr<PointCloud> aux_pcl = boost::shared_ptr<PointCloud>(new PointCloud(*previous_pcl) );
   
@@ -307,10 +313,6 @@ namespace sr_kinect
     return 0;
   }
 }
-
-
-
-
 
 /* For the emacs weenies in the crowd.
 Local Variables:

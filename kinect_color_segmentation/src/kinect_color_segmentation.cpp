@@ -32,7 +32,6 @@ namespace sr_kinect
 
   KinectColorSegmentation::KinectColorSegmentation()
     : nodelet::Nodelet(), filter_max_r_(255), filter_min_r_(0), filter_max_g_(255), filter_min_g_(0), filter_max_b_(255), filter_min_b_(0)
-    //,filter_max_x_(1000.0), filter_min_x_(-1000.0), filter_max_y_(1000.0), filter_min_y_(-1000.0), filter_max_z_(1000.0), filter_min_z_(-1000.0)
   {}
 
   void KinectColorSegmentation::onInit()
@@ -57,12 +56,6 @@ namespace sr_kinect
            &&(( cloud->at(i).g) < filter_max_g_)
            &&(( cloud->at(i).b) > filter_min_b_)
            &&(( cloud->at(i).b) < filter_max_b_)
-//           &&(( cloud->at(i,j).x) > filter_min_x_)
-//           &&(( cloud->at(i,j).x) < filter_max_x_)
-//           &&(( cloud->at(i,j).y) > filter_min_y_)
-//           &&(( cloud->at(i,j).y) < filter_max_y_)
-//           &&(( cloud->at(i,j).z) > filter_min_z_)
-//           &&(( cloud->at(i,j).z) < filter_max_z_)
           )
           segmented_pcl->push_back( cloud->at(i) );
     }
@@ -106,38 +99,6 @@ namespace sr_kinect
       filter_min_b_ = static_cast<unsigned int>(param_read);
       NODELET_INFO_STREAM("Read min b: " << filter_min_b_);
     }
-
-//    double param_read2 = 0;
-//    if (nh.getParam(base_name + "/filter_max_x", param_read2))
-//    {
-//      filter_max_x_ = param_read2;
-//      NODELET_INFO_STREAM("Read max x: " << filter_max_x_);
-//    }
-//    if (nh.getParam(base_name + "/filter_min_x", param_read2))
-//    {
-//      filter_min_x_ = param_read2;
-//      NODELET_INFO_STREAM("Read min x: " << filter_min_x_);
-//    }
-//    if (nh.getParam(base_name + "/filter_max_y", param_read2))
-//    {
-//      filter_max_y_ = param_read2;
-//      NODELET_INFO_STREAM("Read max y: " << filter_max_y_);
-//    }
-//    if (nh.getParam(base_name + "/filter_min_y", param_read2))
-//    {
-//      filter_min_y_ = param_read2;
-//      NODELET_INFO_STREAM("Read min y: " << filter_min_y_);
-//    }
-//    if (nh.getParam(base_name + "/filter_max_z", param_read2))
-//    {
-//      filter_max_z_ = param_read2;
-//      NODELET_INFO_STREAM("Read max z: " << filter_max_z_);
-//    }
-//    if (nh.getParam(base_name + "/filter_min_z", param_read2))
-//    {
-//      filter_min_z_ = param_read2;
-//      NODELET_INFO_STREAM("Read min z: " << filter_min_z_);
-//    }
   }
 }
 

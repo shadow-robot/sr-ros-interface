@@ -19,7 +19,7 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *
- * @brief  Segment the point cloud.
+ * @brief  Segment the point cloud filtering points on their RGB values.
  *
  *
  */
@@ -39,6 +39,10 @@ namespace sr_kinect
 {
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
 
+  /**
+   * The KinectColorSegmentation Nodelet segments a point cloud filtering points on their RGB values
+   * Publishes an /output topic with the segmented point cloud
+   */
   class KinectColorSegmentation
     : public nodelet::Nodelet
   {
@@ -48,6 +52,11 @@ namespace sr_kinect
 
     virtual void onInit();
 
+    /**
+     * Callback function for the input cloud topic
+     * Filters out the points that doesn't fit in the min max setting for the RGB values
+     * @param cloud The input point cloud
+     */
     void callback(const PointCloud::ConstPtr &cloud);
 
   private:
@@ -55,7 +64,6 @@ namespace sr_kinect
 
     ros::Publisher pub_;
     ros::Subscriber sub_;
-//    pcl_visualization::CloudViewer *viewer;
 
     boost::shared_ptr<PointCloud> segmented_pcl;
 
@@ -65,12 +73,6 @@ namespace sr_kinect
     unsigned int filter_min_g_;
     unsigned int filter_max_b_;
     unsigned int filter_min_b_;
-//    double filter_max_x_;
-//    double filter_min_x_;
-//    double filter_max_y_;
-//    double filter_min_y_;
-//    double filter_max_z_;
-//    double filter_min_z_;
   };
 }
 

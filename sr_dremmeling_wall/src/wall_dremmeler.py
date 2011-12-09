@@ -33,6 +33,19 @@ from interactive_marker import InteractiveConnectorSelector
 
 class WallDremmeler(object):
     """
+    Controls the process of dremelling certain regions of a wall with a dremel mounted on a Denso arm
+    
+    When the user clicks on the interactive marker, the current sequence of 3D points to be drilled is obtained, as well
+    as the normal to the surface of the wall.
+    
+    For every point, a pose for the tool is calculated, which is inside the wall, following the normal, to ensure that the tool 
+    will remove the first layer of the wall.
+    If consecutive points are farther than a set distance, an intermediate position which is above the surface of the wall is calculated,
+    so that the positions between the two points are not drilled.
+    
+    The calculated poses are sent to the arm.
+    
+    The tool we are using must be configured in the Denso arm's tool menu, and selected in set_tooltip(x) in DensoArm::init() (denso_arm package)   
     """
 
     def __init__(self, ):

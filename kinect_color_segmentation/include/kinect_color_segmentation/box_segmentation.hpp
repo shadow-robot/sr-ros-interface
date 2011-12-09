@@ -19,7 +19,7 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *
- * @brief  Segment the point cloud.
+ * @brief  Segment the point cloud calculating an xyz box from one of the input clouds, and applying this xyz filtering box to the other input cloud.
  *
  *
  */
@@ -44,6 +44,13 @@ namespace sr_kinect
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
   typedef pcl::ExtractIndices<pcl::PointXYZRGB> ExtractIndices;
 
+  /**
+   * The BoxSegmentation Nodelet calculates an xyz box from one of the input clouds, and apply this xyz filtering box to the other input cloud.
+   * Publishes an /output topic with the segmented point cloud
+   * Currently it is not a very effective tool, because the initial box is calculated as the max and min xyz boundaries of the point cloud
+   * not taking into account the geometry of the point cloud. The resulting box is always oriented acording to the xy yz xz planes.
+   * When used on a point cloud that represents a plane, it should calculate a box adapted to the shape of the cloud.
+   */
   class BoxSegmentation
     : public nodelet::Nodelet
   {
@@ -53,8 +60,23 @@ namespace sr_kinect
 
     virtual void onInit();
 
+    /**
+     * Callback function for the input RGB full sized cloud topic
+     * Filters out the points that doesn't fit in the box
+     * @param cloud The input point cloud
+     */
     void callback(const PointCloud::ConstPtr &cloud);
+
+    /**
+     * Callback function for the input downsampled point cloud that contains the points that belong to the plane
+     * Determines the box that contains the points
+     * @param cloud The input point cloud
+     */
     void callback2(const PointCloud::ConstPtr &cloud);
+
+    /**
+     * Currenly doesn't do anything
+     */
     void callback3(const pcl::ModelCoefficients::ConstPtr &coeff);
 
   private:

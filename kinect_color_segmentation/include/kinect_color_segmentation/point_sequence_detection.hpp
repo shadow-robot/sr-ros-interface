@@ -19,7 +19,7 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *
- * @brief  Creates an orderly sequence of points when the input is a line.
+ * @brief  Creates an orderly sequence of points from the input cloud.
  *
  *
  */
@@ -48,6 +48,16 @@ namespace sr_kinect
   typedef pcl::KdTreeFLANN<pcl::PointXYZRGB> KdTreeFLANN;
   typedef pcl::ExtractIndices<pcl::PointXYZRGB> ExtractIndices;
 
+  /**
+   * The PointSequenceDetection Nodelet orders a point cloud to obtain a phisically meaningful trajectory through all the points.
+   * The algorithm is based recursively on local proximity from a starting point.
+   * It also contains a movement detection mechanism. The output cloud only changes when the input cloud contains enough changes
+   * compared to the last used cloud.
+   * Publishes an /output topic with the ordered point cloud with the color changed to reflect the order (darker points first)
+   * It publishes two services:
+   *    One to obtain the last valid ordered point cloud
+   *    Another one to obtain the estimated normal of the surface (assuming that the points are on a plane) in the form of a quaternion
+   */
   class PointSequenceDetection
     : public nodelet::Nodelet
   {
@@ -57,9 +67,34 @@ namespace sr_kinect
 
     virtual void onInit();
 
+    /**
+     * Callback function for the input cloud topic
+     * Orders the point cloud to obtain a phisically meaningful trajectory through all the points.
+     * The algorithm is based recursively on local proximity from a starting point.
+     * It also contains a movement detection mechanism. The output cloud only changes when the input cloud contains enough changes
+     * compared to the last used cloud.
+     * @param cloud The input point cloud
+     */
     void points_callback(const PointCloud::ConstPtr &cloud);
+
+    /**
+     * Callback function for the normals cloud topic
+     * Receives an copies the input normals cloud
+     * @param cloud The input normals cloud
+     */
     void normals_callback(const PointCloudNormal::ConstPtr &cloud);
+
+    /**
+     * Callback function of the /segment service
+     * The response contains an ordered list of xyz points defining a trajectory
+     */
     bool point_sequence_srv_callback(kinect_color_segmentation::SurfaceToDremmel::Request& request, kinect_color_segmentation::SurfaceToDremmel::Response& response);
+
+    /**
+     * Callback function of the /get_wall_normale service
+     * The response contains a quaternion which is the estimated normal of the plane (assuming that the points are on a plane)
+     * (the average of the input cloud of normals)
+     */
     bool surface_normal_srv_callback(kinect_color_segmentation::WallNormale::Request& request, kinect_color_segmentation::WallNormale::Response& response);
 
   private:
