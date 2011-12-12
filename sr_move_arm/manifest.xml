@@ -3,8 +3,8 @@
 
     This is an actionlib server wrapup around the shadow arm. It's goal is to move
     the arm, given a goal. It also contains a reactive grasp / reactive approach action
-    server. This server computes dynamic checks during the approach phase, during 
-    the grasping, during the lifting of the object, as well as when placing the object 
+    server. This server computes dynamic checks during the approach phase, during
+    the grasping, during the lifting of the object, as well as when placing the object
     on the table.
 
   </description>
@@ -16,7 +16,7 @@
   <depend package="rospy"/>
   <depend package="std_msgs"/>
   <depend package="std_srvs"/>
-  <depend package="move_arm_msgs"/>
+  <depend package="arm_navigation_msgs"/>
   <depend package="trajectory_msgs"/>
   <depend package="pr2_controllers_msgs"/>
   <depend package="object_manipulation_msgs"/>

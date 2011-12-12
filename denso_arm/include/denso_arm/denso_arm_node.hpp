@@ -33,10 +33,15 @@
 #include <std_msgs/Float64.h>
 
 #include <denso_msgs/MoveArmPoseAction.h>
+#include <denso_msgs/SetTooltip.h>
 #include <actionlib/server/simple_action_server.h>
+#include <tf/transform_broadcaster.h>
+#include <sr_utilities/sr_math_utils.hpp>
 
 #include "denso_arm/denso_arm.hpp"
 #include "denso_arm/denso_joints.hpp"
+
+#include <boost/thread.hpp>
 
 #include <math.h>
 
@@ -49,16 +54,25 @@ namespace denso
     virtual ~DensoArmNode();
 
     void update_joint_states_callback(const ros::TimerEvent& e);
+    void update_tip_pose_callback(const ros::TimerEvent& e);
 
     typedef actionlib::SimpleActionServer<denso_msgs::MoveArmPoseAction> MoveArmPoseServer;
 
     void go_to_arm_pose(const denso_msgs::MoveArmPoseGoalConstPtr& goal);
 
+    bool set_tooltip( denso_msgs::SetTooltip::Request& req,
+                      denso_msgs::SetTooltip::Response& resp );
+
   protected:
     ros::NodeHandle node_;
+    /// a vector containing the joint positions for the denso arm
     boost::shared_ptr<DensoJointsVector> denso_joints_;
 
+    ///a pointer to the denso arm driver
     boost::shared_ptr<DensoArm> denso_arm_;
+
+    ///the cartesian pose of the tip of the arm.
+    boost::shared_ptr<Pose> tip_pose_;
 
     ////////
     //Publishing joint states
@@ -68,6 +82,13 @@ namespace denso
     ros::Publisher publisher_js_;
     ///The message published
     sensor_msgs::JointState joint_state_msg_;
+
+    ////////
+    //Publishing tip pose
+    /// A timer to publish the cartesian pose of the tip of the arm at a given frequency.
+    ros::Timer timer_tip_pose_;
+    /// A transform broadcaster used to publish the tip pose
+    boost::shared_ptr<tf::TransformBroadcaster> tf_tip_broadcaster_;
 
     ///////
     //Action lib server for moving the arm in cartesian space.
@@ -79,8 +100,20 @@ namespace denso
     ///The feedback: published while waiting for the action to be finished
     denso_msgs::MoveArmPoseFeedback move_arm_pose_feedback_;
 
+    ///A service server to be able to specify the tooltip pose (for IK)
+    ros::ServiceServer tooltip_server;
+
     ///Initialize the denso_joints_ vector.
     void init_joints();
+
+    /**
+     * mutex to make sure we don't send two commands at the same time
+     *  to the denso arm
+     */
+    boost::mutex denso_mutex;
+
+    ///Controls whether we're instantiating the driver or not.
+    static const bool simulated;
 
     /**
      * Transform an incoming geometry_msgs::Pose message
@@ -90,22 +123,45 @@ namespace denso
      *
      * @return the pose for the denzo arm.
      */
-    Pose geometry_pose_to_denso_pose(geometry_msgs::Pose geom_pose)
+    Pose geometry_pose_to_denso_pose(const geometry_msgs::Pose& geom_pose)
     {
       Pose pose_denso;
-      pose_denso.x = geom_pose.position.x;
-      pose_denso.y = geom_pose.position.y;
-      pose_denso.z = geom_pose.position.z;
+      //the position needs to be sent in mm to the denso arm
+      pose_denso.x = geom_pose.position.x * 1000.0;
+      pose_denso.y = geom_pose.position.y * 1000.0;
+      pose_denso.z = geom_pose.position.z * 1000.0;
 
+      double roll, pitch, yaw;
+      btQuaternion q;
+      tf::quaternionMsgToTF(geom_pose.orientation, q);
+      btMatrix3x3(q).getRPY(roll, pitch, yaw);
       //compute rpy from quaternion (cf http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles)
-      pose_denso.roll = atan( (2*(geom_pose.orientation.x*geom_pose.orientation.y + geom_pose.orientation.z*geom_pose.orientation.w))
-                              / ( 1 - 2*(geom_pose.orientation.y*geom_pose.orientation.y + geom_pose.orientation.z*geom_pose.orientation.z))  );
-      pose_denso.pitch = asin( 2*(geom_pose.orientation.x*geom_pose.orientation.z - geom_pose.orientation.w*geom_pose.orientation.y) );
-      pose_denso.yaw = atan( (2*(geom_pose.orientation.x*geom_pose.orientation.w + geom_pose.orientation.y*geom_pose.orientation.z))
-                             / ( 1 - 2*(geom_pose.orientation.z*geom_pose.orientation.z + geom_pose.orientation.w*geom_pose.orientation.w))  );
+      // The rpy needs to be sent in degrees to the denso arm
+      pose_denso.roll = sr_math_utils::to_degrees(roll);
+      pose_denso.pitch = sr_math_utils::to_degrees(pitch);
+      pose_denso.yaw = sr_math_utils::to_degrees(yaw);
 
       return pose_denso;
     };
+
+    /**
+     * Transforms a denso Pose to a tf::Transform.
+     *
+     * @param pose The pose we want to transform.
+     *
+     * @return The equivalent pose as a tf.
+     */
+    tf::Transform denso_pose_to_tf_transform(boost::shared_ptr<Pose> pose)
+    {
+      tf::Transform tf;
+      tf::Quaternion quat;
+
+      quat.setRPY( sr_math_utils::to_rad(pose->roll), sr_math_utils::to_rad(pose->pitch), sr_math_utils::to_rad(pose->yaw) );
+      tf.setOrigin( tf::Vector3(pose->x / 1000.0, pose->y / 1000.0 , pose->z / 1000.0) );
+      tf.setRotation( quat );
+
+      return tf;
+    }
 
   };
 }
