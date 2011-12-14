@@ -259,7 +259,6 @@ namespace shadowrobot
 
 	//	ROS_ERROR("Joint %s ,pub index %d, pub name %s", joint_name.c_str(),tmpData.publisher_index,etherCAT_publishers[tmpData.publisher_index].getTopic().c_str());
     etherCAT_publishers[tmpData.publisher_index].publish(target_msg);
-    ros::spinOnce();
 
     joints_map_mutex.unlock();
     return 0;
@@ -351,7 +350,7 @@ namespace shadowrobot
 					tmpData.force = fj0eff + msg->velocity[index];
 					std::string j0name=fj0char+"FJ0";
 					joints_map[j0name] = tmpData;
-					
+
 
 					fj0pos=0;
 					fj0vel=0;
@@ -393,12 +392,12 @@ namespace shadowrobot
 				//	ROS_INFO("%s, j0char:%s,flag:%d,equal:%d",joint_name.c_str(),fj0char.c_str(),fj0flag==true?1:0,joint_name[0]==fj0char[0]?1:0);
 				}
 			}
-	
+
 			tmpData.position = sr_math_utils::to_degrees(msg->position[index]);
 			tmpData.force = msg->effort[index];
 			tmpData.velocity = msg->velocity[index];
 			joints_map[joint_name] = tmpData;
-		
+
     }
 
     joints_map_mutex.unlock();

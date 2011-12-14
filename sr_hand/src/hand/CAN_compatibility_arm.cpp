@@ -132,7 +132,6 @@ namespace shadowrobot
 
 	//	ROS_ERROR("Joint %s ,pub index %d, pub name %s", joint_name.c_str(),tmpData.publisher_index,CAN_publishers[tmpData.publisher_index].getTopic().c_str());
     CAN_publishers[tmpData.publisher_index].publish(target_msg);
-    ros::spinOnce();
 
     joints_map_mutex.unlock();
     return 0;
@@ -211,12 +210,12 @@ namespace shadowrobot
 
       //joint found
       JointData tmpData(iter->second);
-	
+
 			tmpData.position = sr_math_utils::to_degrees(msg->position[index]);
 			tmpData.force = msg->effort[index];
 			tmpData.velocity = msg->velocity[index];
 			joints_map[joint_name] = tmpData;
-		
+
     }
 
     joints_map_mutex.unlock();

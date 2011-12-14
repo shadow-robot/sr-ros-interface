@@ -180,7 +180,6 @@ short VirtualArm::sendupdate( std::string joint_name, double target )
     //gazebo targets are in radians
     target_msg.data = toRad(target);
     gazebo_publishers[tmpData.publisher_index].publish(target_msg);
-    ros::spinOnce();
 #else
     tmpData.position = target;
 #endif
