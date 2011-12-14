@@ -264,7 +264,6 @@ namespace shadowrobot
       //gazebo targets are in radians
       target_msg.data = toRad( target );
       gazebo_publishers[joint_0_data.publisher_index].publish(target_msg);
-      ros::spinOnce();
 #else
       tmpData1.position = target / 2.0;
 #endif
@@ -299,8 +298,6 @@ namespace shadowrobot
     //gazebo targets are in radians
     target_msg.data = toRad(target);
     gazebo_publishers[tmpData.publisher_index].publish(target_msg);
-
-    ros::spinOnce();
 #else
     tmpData.position = target;
 #endif
