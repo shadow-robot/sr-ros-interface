@@ -1,0 +1,12 @@
+<library path="lib/SrGuiControllerTuner">
+  <class name="SrGuiControllerTuner" type="SrGuiControllerTuner" base_class_type="rosgui_rospy::Plugin">
+    <description>
+	A plugin for tuning the sr_mechanism_controllers.
+    </description>
+    <rosguiplugin>
+      <label>Controller Tuner</label>
+      <icon type="theme">input-gaming</icon>
+      <statustip>A plugin for tuning the sr_mechanism_controllers.</statustip>
+    </rosguiplugin>
+  </class>
+</library>
