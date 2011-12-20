@@ -51,9 +51,9 @@ class SrGuiControllerTuner(QObject):
         main_window = plugin_context.main_window()
         self._widget = QDockWidget(main_window)
 
-        ui_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'SrGuiControllerTuner.ui')
+        ui_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../uis/SrGuiControllerTuner.ui')
         loadUi(ui_file, self._widget)
-        self._widget.setObjectName('RobotSteeringUi')
+        self._widget.setObjectName('SrControllerTunerUi')
         if plugin_context.serial_number() > 1:
             self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % plugin_context.serial_number()))
         main_window.addDockWidget(Qt.RightDockWidgetArea, self._widget)
@@ -61,100 +61,7 @@ class SrGuiControllerTuner(QObject):
         # trigger deleteLater for plugin when _widget is closed
         self._widget.installEventFilter(self)
 
-        self._widget.topic_line_edit.textChanged.connect(self._on_topic_changed)
-
-        self._widget.x_linear_slider.valueChanged.connect(self._on_parameter_changed)
-        self._widget.z_angular_slider.valueChanged.connect(self._on_parameter_changed)
-
-        self._widget.increase_x_linear_push_button.pressed.connect(self._on_increase_x_linear_pressed)
-        self._widget.decrease_x_linear_push_button.pressed.connect(self._on_decrease_x_linear_pressed)
-        self._widget.increase_z_angular_push_button.pressed.connect(self._on_increase_z_angular_pressed)
-        self._widget.decrease_z_angular_push_button.pressed.connect(self._on_decrease_z_angular_pressed)
-        self._widget.stop_push_button.pressed.connect(self._on_stop_pressed)
-
-        self.shortcut_w = QShortcut(Qt.Key_W, self._widget)
-        self.shortcut_w.setContext(Qt.ApplicationShortcut)
-        self.shortcut_w.activated.connect(self._on_increase_x_linear_pressed)
-        self.shortcut_s = QShortcut(Qt.Key_S, self._widget)
-        self.shortcut_s.setContext(Qt.ApplicationShortcut)
-        self.shortcut_s.activated.connect(self._on_decrease_x_linear_pressed)
-        self.shortcut_a = QShortcut(Qt.Key_A, self._widget)
-        self.shortcut_a.setContext(Qt.ApplicationShortcut)
-        self.shortcut_a.activated.connect(self._on_increase_z_angular_pressed)
-        self.shortcut_d = QShortcut(Qt.Key_D, self._widget)
-        self.shortcut_d.setContext(Qt.ApplicationShortcut)
-        self.shortcut_d.activated.connect(self._on_decrease_z_angular_pressed)
-
-        self.shortcut_shift_w = QShortcut(Qt.SHIFT + Qt.Key_W, self._widget)
-        self.shortcut_shift_w.setContext(Qt.ApplicationShortcut)
-        self.shortcut_shift_w.activated.connect(self._on_strong_increase_x_linear_pressed)
-        self.shortcut_shift_s = QShortcut(Qt.SHIFT + Qt.Key_S, self._widget)
-        self.shortcut_shift_s.setContext(Qt.ApplicationShortcut)
-        self.shortcut_shift_s.activated.connect(self._on_strong_decrease_x_linear_pressed)
-        self.shortcut_shift_a = QShortcut(Qt.SHIFT + Qt.Key_A, self._widget)
-        self.shortcut_shift_a.setContext(Qt.ApplicationShortcut)
-        self.shortcut_shift_a.activated.connect(self._on_strong_increase_z_angular_pressed)
-        self.shortcut_shift_d = QShortcut(Qt.SHIFT + Qt.Key_D, self._widget)
-        self.shortcut_shift_d.setContext(Qt.ApplicationShortcut)
-        self.shortcut_shift_d.activated.connect(self._on_strong_decrease_z_angular_pressed)
-
-        self.shortcut_space = QShortcut(Qt.Key_Space, self._widget)
-        self.shortcut_space.setContext(Qt.ApplicationShortcut)
-        self.shortcut_space.activated.connect(self._on_stop_pressed)
-
-        # timer to consecutively send twist messages
-        self._update_parameter_timer = QTimer(self)
-        self._update_parameter_timer.timeout.connect(self._on_parameter_changed)
-        self._update_parameter_timer.start(100)
-
     @Slot(str)
-    def _on_topic_changed(self, topic):
-        topic = str(topic)
-        self._unregisterPublisher()
-        self._publisher = rospy.Publisher(topic, Twist)
-
-    def _on_parameter_changed(self):
-        self._send_twist(self._widget.x_linear_slider.value() / 1000.0, self._widget.z_angular_slider.value() / 1000.0)
-
-    def _send_twist(self, x_linear, z_angular):
-        if self._publisher is None:
-            return
-        twist = Twist()
-        twist.linear.x = x_linear
-        twist.linear.y = 0
-        twist.linear.z = 0
-        twist.angular.x = 0
-        twist.angular.y = 0
-        twist.angular.z = z_angular
-        self._publisher.publish(twist)
-
-    def _on_increase_x_linear_pressed(self):
-        self._widget.x_linear_slider.setValue(self._widget.x_linear_slider.value() + self._widget.x_linear_slider.singleStep())
-
-    def _on_decrease_x_linear_pressed(self):
-        self._widget.x_linear_slider.setValue(self._widget.x_linear_slider.value() - self._widget.x_linear_slider.singleStep())
-
-    def _on_increase_z_angular_pressed(self):
-        self._widget.z_angular_slider.setValue(self._widget.z_angular_slider.value() + self._widget.z_angular_slider.singleStep())
-
-    def _on_decrease_z_angular_pressed(self):
-        self._widget.z_angular_slider.setValue(self._widget.z_angular_slider.value() - self._widget.z_angular_slider.singleStep())
-
-    def _on_strong_increase_x_linear_pressed(self):
-        self._widget.x_linear_slider.setValue(self._widget.x_linear_slider.value() + self._widget.x_linear_slider.pageStep())
-
-    def _on_strong_decrease_x_linear_pressed(self):
-        self._widget.x_linear_slider.setValue(self._widget.x_linear_slider.value() - self._widget.x_linear_slider.pageStep())
-
-    def _on_strong_increase_z_angular_pressed(self):
-        self._widget.z_angular_slider.setValue(self._widget.z_angular_slider.value() + self._widget.z_angular_slider.pageStep())
-
-    def _on_strong_decrease_z_angular_pressed(self):
-        self._widget.z_angular_slider.setValue(self._widget.z_angular_slider.value() - self._widget.z_angular_slider.pageStep())
-
-    def _on_stop_pressed(self):
-        self._widget.x_linear_slider.setValue(0)
-        self._widget.z_angular_slider.setValue(0)
 
     def _unregisterPublisher(self):
         if self._publisher is not None:
@@ -175,9 +82,11 @@ class SrGuiControllerTuner(QObject):
         self._widget.deleteLater()
 
     def save_settings(self, global_settings, perspective_settings):
-        topic = self._widget.topic_line_edit.text()
-        perspective_settings.set_value('topic', topic)
+        print "saving settings"
+        #topic = self._widget.topic_line_edit.text()
+        #perspective_settings.set_value('topic', topic)
 
     def restore_settings(self, global_settings, perspective_settings):
-        topic = perspective_settings.value('topic', '/cmd_vel')
-        self._widget.topic_line_edit.setText(topic)
+        print "restoring settings"
+        #topic = perspective_settings.value('topic', '/cmd_vel')
+

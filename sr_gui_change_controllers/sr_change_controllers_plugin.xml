@@ -1,0 +1,12 @@
+<library path="lib/SrGuiChangeControllers">
+  <class name="SrGuiChangeControllers" type="SrGuiChangeControllers" base_class_type="rosgui_rospy::Plugin">
+    <description>
+	A plugin for loading the different controllers.
+    </description>
+    <rosguiplugin>
+      <label>Change Controllers</label>
+      <icon type="theme">input-gaming</icon>
+      <statustip>A plugin for loading the different controllers.</statustip>
+    </rosguiplugin>
+  </class>
+</library>
