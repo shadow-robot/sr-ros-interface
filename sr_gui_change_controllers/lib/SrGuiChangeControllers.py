@@ -75,7 +75,7 @@ class SrGuiChangeControllers(QObject):
 
     @Slot(str)
     def on_stop_ctrl_clicked_(self):
-        self.change_ctrl( "stopped" )
+        self.change_ctrl( "stop" )
 
     def on_effort_ctrl_clicked_(self):
         self.change_ctrl( "effort" )

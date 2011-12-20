@@ -36,10 +36,8 @@ from QtCore import QEvent, QObject, Qt, QTimer, Slot
 from QtGui import QDockWidget, QShortcut
 
 import roslib
-roslib.load_manifest('rosgui_robot_steering')
+roslib.load_manifest('sr_gui_controller_tuner')
 import rospy
-
-from geometry_msgs.msg import Twist
 
 class SrGuiControllerTuner(QObject):
 
