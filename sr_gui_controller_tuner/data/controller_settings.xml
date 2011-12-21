@@ -1,0 +1,65 @@
+<settings>
+  <fingers>
+    <finger name="FF">
+      <motor name="FFJ0"/>
+      <motor name="FFJ3"/>
+      <motor name="FFJ4"/>
+    </finger>
+    <finger name="MF">
+      <motor name="MFJ0"/>
+      <motor name="MFJ3"/>
+      <motor name="MFJ4"/>
+    </finger>
+    <finger name="RF">
+      <motor name="RFJ0"/>
+      <motor name="RFJ3"/>
+      <motor name="RFJ4"/>
+    </finger>
+    <finger name="LF">
+      <motor name="LFJ0"/>
+      <motor name="LFJ3"/>
+      <motor name="LFJ4"/>
+      <motor name="LFJ5"/>
+    </finger>
+    <finger name="TH">
+      <motor name="THJ1"/>
+      <motor name="THJ2"/>
+      <motor name="THJ3"/>
+      <motor name="THJ4"/>
+      <motor name="THJ5"/>
+    </finger>
+    <finger name="WR">
+      <motor name="WRJ1"/>
+      <motor name="WRJ2"/>
+    </finger>
+  </fingers>
+
+  <controller name="Motor Force">
+    <headers>
+      <item name="Finger" type="None"/>
+      <item name="Motor" type="None"/>
+      <item name="F" type="Int" min="0" max="32767"/>
+      <item name="P" type="Int" min="0" max="32767"/>
+      <item name="I" type="Int" min="0" max="32767"/>
+      <item name="D" type="Int" min="0" max="32767"/>
+      <item name="Imax" type="Int" min="0" max="16383"/>
+      <item name="Max Pwm" type="Int" min="0" max="1023"/>
+      <item name="Deadband" type="Int" min="0" max="255"/>
+      <item name="Sign" type="Bool"/>
+    </headers>
+  </controller>
+
+  <controller name="Position">
+    <headers>
+      <item name="Finger" type="None"/>
+      <item name="Motor" type="None"/>
+      <item name="P" type="Float"/>
+      <item name="I" type="Float"/>
+      <item name="D" type="Float"/>
+      <item name="Imax" type="Float"/>
+      <item name="Max Force" type="Float"/>
+      <item name="Deadband" type="Float"/>
+      <item name="Friction Deadband" type="Float"/>
+    </headers>
+  </controller>
+</settings>
