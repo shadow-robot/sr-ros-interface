@@ -21,7 +21,9 @@ import os
 
 from rosgui.QtBindingHelper import loadUi
 from QtCore import QEvent, QObject, Qt, QTimer, Slot
-from QtGui import QDockWidget, QShortcut, QTreeWidgetItem
+from QtGui import QDockWidget, QShortcut, QTreeWidgetItem, QCheckBox, QLineEdit, QIntValidator, QDoubleValidator, QFileDialog
+
+from QtCore import QVariant
 
 import roslib
 roslib.load_manifest('sr_gui_controller_tuner')
@@ -61,10 +63,49 @@ class SrGuiControllerTuner(QObject):
         self._widget.btn_refresh_ctrl.pressed.connect(self.on_btn_refresh_ctrl_clicked_)
         self._widget.dropdown_ctrl.activated.connect(self.on_changed_controller_type_)
 
+        self._widget.btn_save_selected.pressed.connect(self.on_btn_save_selected_clicked_)
+        self._widget.btn_save_all.pressed.connect(self.on_btn_save_all_clicked_)
+        self._widget.btn_select_file_path.pressed.connect(self.on_btn_select_file_path_clicked_)
+
+        self._widget.btn_set_selected.pressed.connect(self.on_btn_set_selected_clicked_)
+        self._widget.btn_set_all.pressed.connect(self.on_btn_set_all_clicked_)
+
+
 
     @Slot(str)
     def on_changed_controller_type_(self, index):
         self.refresh_controller_tree_( self.controllers_in_dropdown[index] )
+
+    def on_btn_select_file_path_clicked_(self):
+        path_to_config = "~"
+        try:
+            path_to_config = roslib.packages.get_pkg_dir("sr_edc_controller_configuration")
+        except:
+            rospy.logwarn("couldnt find the sr_edc_controller_configuration package")
+
+        filter_files = "*.yaml"
+        print "----"
+        print type( self._widget.tr("Save Controller Settings") )
+        filename = QFileDialog.getOpenFileName( self._widget.tr("Save Controller Settings"),
+                                                self._widget.tr(path_to_config),
+                                                self._widget.tr(filter_files) )
+        if filename == "":
+            return
+
+        self._widget.txt_save_file_path.setText(filename)
+
+
+    def on_btn_save_selected_clicked_(self):
+        print "TODO: saving selected"
+
+    def on_btn_save_all_clicked_(self):
+        print "TODO: saving All"
+
+    def on_btn_set_selected_clicked_(self):
+        print "TODO: setting selected"
+
+    def on_btn_set_all_clicked_(self):
+        print "TODO: setting All"
 
     def on_btn_refresh_ctrl_clicked_(self):
         ctrls = self.sr_controller_tuner_lib_.get_ctrls()
@@ -100,9 +141,31 @@ class SrGuiControllerTuner(QObject):
                 motor_item = QTreeWidgetItem( finger_item, motor_settings )
                 self._widget.tree_ctrl_settings.addTopLevelItem(motor_item)
 
+                for index_header,header in enumerate(ctrl_settings.headers):
+                    if header["type"] == "Bool":
+                        check_box = QCheckBox()
+                        check_box.setToolTip("Check if you want a negative sign\n(if the motor is being driven\n the wrong way around).")
+                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, check_box )
+
+                    if header["type"] == "Int":
+                        text_edit = QLineEdit()
+                        validator = QIntValidator( int( header["min"] ), int( header["max"] ), self )
+                        text_edit.setValidator(validator)
+
+                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, text_edit )
+
+                    if header["type"] == "Float":
+                        text_edit = QLineEdit()
+                        validator = QDoubleValidator( 0.0, 65535.0, 2, self )
+                        text_edit.setValidator(validator)
+
+                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, text_edit )
+
+
                 motor_item.setExpanded(True)
             finger_item.setExpanded(True)
         hand_item.setExpanded(True)
+
 
 
 
