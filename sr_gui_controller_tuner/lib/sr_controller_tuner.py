@@ -23,6 +23,8 @@ import rospy
 from xml.etree import ElementTree as ET
 from pr2_mechanism_msgs.srv import ListControllers
 
+from pid_loader_and_saver import PidLoader, PidSaver
+
 class CtrlSettings(object):
     """
     """
@@ -89,6 +91,7 @@ class SrControllerTunerLib(object):
         self.xml_path = xml_path
         self.all_controller_types = ["Motor Force", "Position", "Velocity",
                                      "Mixed Position/Velocity", "Effort"]
+        self.pid_loader = PidLoader()
 
     def get_ctrls(self):
         return ["Motor Force", "Position"]
@@ -122,3 +125,22 @@ class SrControllerTunerLib(object):
         ctrl_settings = CtrlSettings(self.xml_path, controller_type)
 
         return ctrl_settings
+
+    def load_parameters(self, controller_type, joint_name):
+        """
+        Load the parameters from the yaml file.
+        """
+        param_name = ""
+        if controller_type == "Motor Force":
+            param_name = "/"+ joint_name.lower() +"/pid"
+        elif controller_type == "Position":
+            param_name =  "/sh_"+ joint_name.lower()+"_position_controller/pid"
+        elif controller_type == "Velocity":
+            param_name =  "/sh_"+ joint_name.lower()+"_velocity_controller/pid"
+        elif controller_type == "Mixed Position/Velocity":
+            param_name = ["/sh_"+ joint_name.lower()+"_mixed_position_velocity_controller/position_pid",
+                          "/sh_"+ joint_name.lower()+"_mixed_position_velocity_controller/velocity_pid" ]
+        elif controller_type == "Effort":
+            param_name =  "/sh_"+ joint_name.lower()+"_effort_controller"
+
+        return self.pid_loader.get_settings( param_name )

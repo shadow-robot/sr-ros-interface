@@ -43,7 +43,7 @@
       <item name="I" type="Int" min="0" max="32767"/>
       <item name="D" type="Int" min="0" max="32767"/>
       <item name="Imax" type="Int" min="0" max="16383"/>
-      <item name="Max Pwm" type="Int" min="0" max="1023"/>
+      <item name="Max_Pwm" type="Int" min="0" max="1023"/>
       <item name="Deadband" type="Int" min="0" max="255"/>
       <item name="Sign" type="Bool"/>
     </headers>
@@ -56,10 +56,10 @@
       <item name="P" type="Float"/>
       <item name="I" type="Float"/>
       <item name="D" type="Float"/>
-      <item name="Imax" type="Float"/>
-      <item name="Max Force" type="Float"/>
-      <item name="Deadband" type="Float"/>
-      <item name="Friction Deadband" type="Float"/>
+      <item name="I_Clamp" type="Float"/>
+      <item name="Max_Force" type="Float"/>
+      <item name="Position_Deadband" type="Float"/>
+      <item name="Friction_Deadband" type="Float"/>
     </headers>
   </controller>
 </settings>

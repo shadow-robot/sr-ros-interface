@@ -84,15 +84,19 @@ class SrGuiControllerTuner(QObject):
             rospy.logwarn("couldnt find the sr_edc_controller_configuration package")
 
         filter_files = "*.yaml"
-        print "----"
-        print type( self._widget.tr("Save Controller Settings") )
-        filename = QFileDialog.getOpenFileName( self._widget.tr("Save Controller Settings"),
-                                                self._widget.tr(path_to_config),
-                                                self._widget.tr(filter_files) )
+        filename = path_to_config + "/motor_effort_controllers.yaml"
+                   #QFileDialog.getOpenFileName( self._widget.tr("Save Controller Settings"),
+                   #                             self._widget.tr(path_to_config),
+                   #                             self._widget.tr(filter_files) )
         if filename == "":
             return
 
-        self._widget.txt_save_file_path.setText(filename)
+        self._widget.txt_file_path.setText(filename)
+
+        #enable the save buttons once a file has
+        # been chosen
+        self._widget.btn_save_all.setEnabled(True)
+        self._widget.btn_save_selected.setEnabled(True)
 
 
     def on_btn_save_selected_clicked_(self):
@@ -141,9 +145,15 @@ class SrGuiControllerTuner(QObject):
                 motor_item = QTreeWidgetItem( finger_item, motor_settings )
                 self._widget.tree_ctrl_settings.addTopLevelItem(motor_item)
 
+                parameter_values = self.sr_controller_tuner_lib_.load_parameters( controller_type, motor_settings[1] )
+
                 for index_header,header in enumerate(ctrl_settings.headers):
                     if header["type"] == "Bool":
                         check_box = QCheckBox()
+
+                        if parameter_values["sign"] == 1.0:
+                            check_box.setChecked(True)
+
                         check_box.setToolTip("Check if you want a negative sign\n(if the motor is being driven\n the wrong way around).")
                         self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, check_box )
 
@@ -151,13 +161,15 @@ class SrGuiControllerTuner(QObject):
                         text_edit = QLineEdit()
                         validator = QIntValidator( int( header["min"] ), int( header["max"] ), self )
                         text_edit.setValidator(validator)
+                        text_edit.setText(str( int(parameter_values[header["name"].lower()]) ))
 
                         self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, text_edit )
 
                     if header["type"] == "Float":
                         text_edit = QLineEdit()
-                        validator = QDoubleValidator( 0.0, 65535.0, 2, self )
+                        validator = QDoubleValidator( -65535.0, 65535.0, 3, self )
                         text_edit.setValidator(validator)
+                        text_edit.setText(str( float(parameter_values[header["name"].lower()]) ))
 
                         self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, text_edit )
 
