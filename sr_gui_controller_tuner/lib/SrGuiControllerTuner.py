@@ -21,7 +21,7 @@ import os
 
 from rosgui.QtBindingHelper import loadUi
 from QtCore import QEvent, QObject, Qt, QTimer, Slot
-from QtGui import QDockWidget, QShortcut, QTreeWidgetItem, QCheckBox, QLineEdit, QIntValidator, QDoubleValidator, QFileDialog
+from QtGui import QDockWidget, QShortcut, QTreeWidgetItem, QCheckBox, QLineEdit, QIntValidator, QDoubleValidator, QFileDialog, QMessageBox
 
 from QtCore import QVariant
 
@@ -103,13 +103,24 @@ class SrGuiControllerTuner(QObject):
 
 
     def on_btn_save_selected_clicked_(self):
-        print "TODO: saving selected"
+        selected_items = self._widget.tree_ctrl_settings.selectedItems()
+
+        if len( selected_items ) == 0:
+            QMessageBox.warning(self._widget.tree_ctrl_settings, "Warning", "No motors selected.")
+
+        for it in selected_items:
+            if str(it.text(1)) != "":
+                self.save_controller( str(it.text(1)) )
 
     def on_btn_save_all_clicked_(self):
-        print "TODO: saving All"
+        for motor in self.ctrl_widgets.keys():
+            self.save_controller( motor )
 
     def on_btn_set_selected_clicked_(self):
         selected_items = self._widget.tree_ctrl_settings.selectedItems()
+
+        if len( selected_items ) == 0:
+            QMessageBox.warning(self._widget.tree_ctrl_settings, "Warning", "No motors selected.")
 
         for it in selected_items:
             if str(it.text(1)) != "":
@@ -148,6 +159,26 @@ class SrGuiControllerTuner(QObject):
 
         #uses the library to call the service properly
         self.sr_controller_tuner_lib_.set_controller(joint_name, self.controller_type, settings)
+
+    def save_controller(self, joint_name):
+        """
+        Sets the current values for the given controller
+        using the ros service.
+        """
+        dict_of_widgets = self.ctrl_widgets[joint_name]
+
+        settings = {}
+        for item in dict_of_widgets.items():
+            if item[0] == "sign":
+                if item[1].checkState() == Qt.Checked:
+                    settings["sign"] = 1
+                else:
+                    settings["sign"] = 0
+            else:
+                settings[item[0]] = item[1].text()
+
+        #uses the library to call the service properly
+        self.sr_controller_tuner_lib_.save_controller(joint_name, self.controller_type, settings)
 
 
     def refresh_controller_tree_(self, controller_type = "Motor Force"):

@@ -150,3 +150,9 @@ class SrControllerTunerLib(object):
         Sets the controller calling the proper service with the correct syntax.
         """
         print " setting PID for ", joint_name, " (", controller_type, ")-> ", controller_settings
+
+    def save_controller(self, joint_name, controller_type, controller_settings):
+        """
+        Sets the controller calling the proper service with the correct syntax.
+        """
+        print " saving PID for ", joint_name, " (", controller_type, ")-> ", controller_settings
