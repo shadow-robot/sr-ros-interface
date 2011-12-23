@@ -53,21 +53,21 @@
     <headers>
       <item name="Finger" type="None"/>
       <item name="Motor" type="None"/>
-      <item name="Position_PID/P" type="Float"/>
-      <item name="Position_PID/I" type="Float"/>
-      <item name="Position_PID/D" type="Float"/>
-      <item name="Position_PID/I_Clamp" type="Float"/>
-      <item name="Position_PID/Position_Deadband" type="Float"/>
+      <item name="Pos/P" type="Float"/>
+      <item name="Pos/I" type="Float"/>
+      <item name="Pos/D" type="Float"/>
+      <item name="Pos/I_Clamp" type="Float"/>
+      <item name="Pos/Position_Deadband" type="Float"/>
 
-      <item name="Position_PID/Min_Velocity" type="Float"/>
-      <item name="Position_PID/Max_Velocity" type="Float"/>
-      <item name="Velocity_PID/P" type="Float"/>
-      <item name="Velocity_PID/I" type="Float"/>
-      <item name="Velocity_PID/D" type="Float"/>
-      <item name="Velocity_PID/I_Clamp" type="Float"/>
-      <item name="Velocity_PID/Max_Force" type="Float"/>
+      <item name="Pos/Min_Velocity" type="Float"/>
+      <item name="Pos/Max_Velocity" type="Float"/>
+      <item name="Vel/P" type="Float"/>
+      <item name="Vel/I" type="Float"/>
+      <item name="Vel/D" type="Float"/>
+      <item name="Vel/I_Clamp" type="Float"/>
+      <item name="Vel/Max_Force" type="Float"/>
 
-      <item name="Velocity_PID/Friction_Deadband" type="Float"/>
+      <item name="Vel/Friction_Deadband" type="Float"/>
     </headers>
   </controller>
 

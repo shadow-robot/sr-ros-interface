@@ -34,11 +34,11 @@ class PidLoader(object):
         if len(param_name) == 2:
             tmp_dict = rospy.get_param(param_name[0])
             for item in tmp_dict.items():
-                param_dict["position_pid/"+item[0]] = item[1]
+                param_dict["pos/"+item[0]] = item[1]
 
             tmp_dict = rospy.get_param(param_name[1])
             for item in tmp_dict.items():
-                param_dict["velocity_pid/"+item[0]] = item[1]
+                param_dict["vel/"+item[0]] = item[1]
         else:
             param_dict = rospy.get_param(param_name)
         return param_dict
@@ -57,9 +57,9 @@ class PidSaver(object):
         yaml_config = yaml.load(document)
         if len(param_path) == 2:
             for item in parameters_dict.items():
-                if "position_pid/" in item[0]:
+                if "pos/" in item[0]:
                     yaml_config[param_path[0]]["position_pid"][item[0].split("position_pid/")[1]] = item[1]
-                elif "velocity_pid/" in item[0]:
+                elif "vel/" in item[0]:
                     yaml_config[param_path[0]]["velocity_pid"][item[0].split("velocity_pid/")[1]] = item[1]
                 else:
                     yaml_config[param_path[0]][param_path[1]][item[0]] = item[1]
