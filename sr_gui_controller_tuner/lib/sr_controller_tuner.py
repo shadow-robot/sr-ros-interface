@@ -94,8 +94,8 @@ class SrControllerTunerLib(object):
         self.pid_loader = PidLoader()
 
     def get_ctrls(self):
-        return ["Motor Force", "Position"]
-
+        #return ["Motor Force", "Position"]
+        #
         running_ctrls = []
 
         rospy.wait_for_service('/pr2_controller_manager/list_controllers')
@@ -144,3 +144,9 @@ class SrControllerTunerLib(object):
             param_name =  "/sh_"+ joint_name.lower()+"_effort_controller"
 
         return self.pid_loader.get_settings( param_name )
+
+    def set_controller(self, joint_name, controller_type, controller_settings):
+        """
+        Sets the controller calling the proper service with the correct syntax.
+        """
+        print " setting PID for ", joint_name, " (", controller_type, ")-> ", controller_settings

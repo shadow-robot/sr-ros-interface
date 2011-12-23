@@ -109,6 +109,9 @@
           <property name="text">
            <string>Save Selected</string>
           </property>
+          <property name="shortcut">
+           <string>F7</string>
+          </property>
          </widget>
         </item>
         <item>
@@ -118,6 +121,9 @@
           </property>
           <property name="text">
            <string>Save All</string>
+          </property>
+          <property name="shortcut">
+           <string>F6</string>
           </property>
          </widget>
         </item>
@@ -142,6 +148,9 @@
           <property name="text">
            <string>Set Selected</string>
           </property>
+          <property name="shortcut">
+           <string>F9</string>
+          </property>
          </widget>
         </item>
         <item>
@@ -151,6 +160,9 @@
           </property>
           <property name="text">
            <string>Set All</string>
+          </property>
+          <property name="shortcut">
+           <string>F8</string>
           </property>
          </widget>
         </item>

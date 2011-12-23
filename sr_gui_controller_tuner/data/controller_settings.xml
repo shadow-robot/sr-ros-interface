@@ -49,6 +49,28 @@
     </headers>
   </controller>
 
+  <controller name="Mixed Position/Velocity">
+    <headers>
+      <item name="Finger" type="None"/>
+      <item name="Motor" type="None"/>
+      <item name="Position_PID/P" type="Float"/>
+      <item name="Position_PID/I" type="Float"/>
+      <item name="Position_PID/D" type="Float"/>
+      <item name="Position_PID/I_Clamp" type="Float"/>
+      <item name="Position_PID/Position_Deadband" type="Float"/>
+
+      <item name="Position_PID/Min_Velocity" type="Float"/>
+      <item name="Position_PID/Max_Velocity" type="Float"/>
+      <item name="Velocity_PID/P" type="Float"/>
+      <item name="Velocity_PID/I" type="Float"/>
+      <item name="Velocity_PID/D" type="Float"/>
+      <item name="Velocity_PID/I_Clamp" type="Float"/>
+      <item name="Velocity_PID/Max_Force" type="Float"/>
+
+      <item name="Velocity_PID/Friction_Deadband" type="Float"/>
+    </headers>
+  </controller>
+
   <controller name="Position">
     <headers>
       <item name="Finger" type="None"/>
