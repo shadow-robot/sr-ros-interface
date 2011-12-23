@@ -158,7 +158,10 @@ class SrGuiControllerTuner(QObject):
                 settings[item[0]] = item[1].text()
 
         #uses the library to call the service properly
-        self.sr_controller_tuner_lib_.set_controller(joint_name, self.controller_type, settings)
+        success = self.sr_controller_tuner_lib_.set_controller(joint_name, self.controller_type, settings)
+        if success == False:
+            QMessageBox.warning(self._widget.tree_ctrl_settings, "Warning", "Failed to set the PID values for joint "+ joint_name +".")
+
 
     def save_controller(self, joint_name):
         """

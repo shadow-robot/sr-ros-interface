@@ -23,7 +23,9 @@ import rospy
 from xml.etree import ElementTree as ET
 from pr2_mechanism_msgs.srv import ListControllers
 
+from sr_robot_msgs.srv import ForceController, SetEffortControllerGains, SetMixedPositionVelocityPidGains, SetPidGains
 from pid_loader_and_saver import PidLoader, PidSaver
+import unicodedata
 
 class CtrlSettings(object):
     """
@@ -149,7 +151,84 @@ class SrControllerTunerLib(object):
         """
         Sets the controller calling the proper service with the correct syntax.
         """
-        print " setting PID for ", joint_name, " (", controller_type, ")-> ", controller_settings
+        rospy.loginfo(" setting PID for " + str( joint_name ) + " (" + str( controller_type ) + ")-> " + str(controller_settings) )
+
+        pid_service = None
+        service_name = ""
+        if controller_type == "Motor Force":
+            #/realtime_loop/change_force_PID_FFJ0
+            service_name =  "/realtime_loop/change_force_PID_"+joint_name.upper()
+            pid_service = rospy.ServiceProxy(service_name, ForceController)
+
+        elif controller_type == "Position":
+            #/sh_ffj3_position_controller/set_gains
+            service_name =  "/sh_"+joint_name.lower()+"_position_controller/set_gains"
+            pid_service = rospy.ServiceProxy(service_name, SetPidGains)
+
+        elif controller_type == "Velocity":
+            #/sh_ffj3_velocity_controller/set_gains
+            service_name =  "/sh_"+joint_name.lower()+"_velocity_controller/set_gains"
+            pid_service = rospy.ServiceProxy(service_name, SetPidGains)
+
+        elif controller_type == "Mixed Position/Velocity":
+            #/sh_ffj3_mixed_position_velocity_controller/set_gains
+            service_name =  "/sh_"+joint_name.lower()+"_mixed_position_velocity_controller/set_gains"
+            pid_service = rospy.ServiceProxy(service_name, SetMixedPositionVelocityPidGains)
+
+        elif controller_type == "Effort":
+            #/sh_ffj3_effort_controller/set_gains
+            service_name =  "/sh_"+joint_name.lower()+"_effort_controller/set_gains"
+            pid_service = rospy.ServiceProxy(service_name, SetEffortControllerGains)
+
+        else:
+            print "", controller_type, " is not a recognized controller type."
+
+        contrlr_settings_converted = {}
+        for param in controller_settings.items():
+            contrlr_settings_converted[ param[0] ] = float(param[1])
+
+        if controller_type == "Motor Force":
+            try:
+                pid_service(int(contrlr_settings_converted["max_pwm"]), int(contrlr_settings_converted["sgleftref"]),
+                            int(contrlr_settings_converted["sgrightref"]), int(contrlr_settings_converted["f"]),
+                            int(contrlr_settings_converted["p"]), int(contrlr_settings_converted["i"]),
+                            int(contrlr_settings_converted["d"]), int(contrlr_settings_converted["imax"]),
+                            int(contrlr_settings_converted["deadband"]), int(contrlr_settings_converted["sign"]) )
+            except:
+                return False
+
+        elif controller_type == "Position" or controller_type == "Velocity":
+            try:
+                pid_service(int(contrlr_settings_converted["p"]), int(contrlr_settings_converted["i"]),
+                            int(contrlr_settings_converted["d"]), int(contrlr_settings_converted["i_clamp"]),
+                            int(contrlr_settings_converted["max_force"]), float(contrlr_settings_converted["deadband"]),
+                            int(contrlr_settings_converted["friction_deadband"]) )
+            except:
+                return False
+
+        elif controller_type == "Mixed Position/Velocity":
+            try:
+                pid_service(float(contrlr_settings_converted["pos/p"]), float(contrlr_settings_converted["pos/i"]),
+                            float(contrlr_settings_converted["pos/d"]), float(contrlr_settings_converted["pos/i_clamp"]),
+                            float(contrlr_settings_converted["pos/min_velocity"]), float(contrlr_settings_converted["pos/max_velocity"]),
+                            float(contrlr_settings_converted["pos/position_deadband"]),
+                            float(contrlr_settings_converted["vel/p"]), float(contrlr_settings_converted["vel/i"]),
+                            float(contrlr_settings_converted["vel/d"]), float(contrlr_settings_converted["vel/i_clamp"]),
+                            float(contrlr_settings_converted["vel/max_force"]),
+                            int(contrlr_settings_converted["vel/friction_deadband"]) )
+            except:
+                return False
+
+        elif controller_type == "Effort":
+            try:
+                pid_service(int(contrlr_settings_converted["max_force"]), int(contrlr_settings_converted["friction_deadband"]) )
+            except:
+                return False
+        else:
+            print "", controller_type, " is not a recognized controller type."
+            return False
+        return True
+
 
     def save_controller(self, joint_name, controller_type, controller_settings):
         """
