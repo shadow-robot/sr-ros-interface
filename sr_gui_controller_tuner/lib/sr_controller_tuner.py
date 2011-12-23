@@ -151,8 +151,6 @@ class SrControllerTunerLib(object):
         """
         Sets the controller calling the proper service with the correct syntax.
         """
-        rospy.loginfo(" setting PID for " + str( joint_name ) + " (" + str( controller_type ) + ")-> " + str(controller_settings) )
-
         pid_service = None
         service_name = ""
         if controller_type == "Motor Force":
