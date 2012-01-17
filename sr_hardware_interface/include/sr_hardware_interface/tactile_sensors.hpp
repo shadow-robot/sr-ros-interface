@@ -47,7 +47,7 @@ namespace tactiles
     GenericTactileData(bool tactile_data_valid, int sample_frequency,
                        std::string manufacturer, std::string serial_number,
                        int software_version_current, int software_version_server,
-                       bool software_version_modified, int pcb_version)
+                       bool software_version_modified, std::string pcb_version)
       : tactile_data_valid(tactile_data_valid), sample_frequency(sample_frequency),
         manufacturer(manufacturer), serial_number(serial_number),
         software_version_current(software_version_current),
@@ -114,7 +114,7 @@ namespace tactiles
       return full_version;
     };
 
-    int pcb_version;
+    std::string pcb_version;
 
     inline double convertToInt(std::string const& s)
     {
