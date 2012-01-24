@@ -15,6 +15,7 @@
   <xacro:macro name="little_finger" params="link_prefix joint_prefix parent">
 
     <xacro:lfmetacarpal parent="${parent}">
+      <origin xyz="-0.033 0 0.02071" rpy="0 0 0" />
     </xacro:lfmetacarpal>
 
     <link name="lfknuckle">
