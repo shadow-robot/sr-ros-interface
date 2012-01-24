@@ -21,7 +21,7 @@ import os
 
 from rosgui.QtBindingHelper import loadUi
 from QtCore import QEvent, QObject, Qt, QTimer, Slot
-from QtGui import QDockWidget, QShortcut, QTreeWidgetItem, QCheckBox, QLineEdit, QIntValidator, QDoubleValidator, QFileDialog, QMessageBox
+from QtGui import QDockWidget, QShortcut, QTreeWidgetItem, QCheckBox, QSpinBox, QDoubleSpinBox, QFileDialog, QMessageBox
 
 from QtCore import QVariant
 
@@ -155,7 +155,7 @@ class SrGuiControllerTuner(QObject):
                 else:
                     settings["sign"] = 0
             else:
-                settings[item[0]] = item[1].text()
+                settings[item[0]] = item[1].value()
 
         #uses the library to call the service properly
         success = self.sr_controller_tuner_lib_.set_controller(joint_name, self.controller_type, settings)
@@ -178,7 +178,7 @@ class SrGuiControllerTuner(QObject):
                 else:
                     settings["sign"] = 0
             else:
-                settings[item[0]] = item[1].text()
+                settings[item[0]] = item[1].value()
 
         #uses the library to call the service properly
         self.sr_controller_tuner_lib_.save_controller(joint_name, self.controller_type, settings)
@@ -228,26 +228,25 @@ class SrGuiControllerTuner(QObject):
 
 
                     if header["type"] == "Int":
-                        text_edit = QLineEdit()
-                        validator = QIntValidator( int( header["min"] ), int( header["max"] ), self )
-                        text_edit.setValidator(validator)
+                        spin_box = QSpinBox()
+                        spin_box.setRange(int( header["min"] ), int( header["max"] ))
 
                         param_name = header["name"].lower()
-                        text_edit.setText( str( int(parameter_values[ param_name ] ) ) )
-                        self.ctrl_widgets[ motor_name ][param_name] = text_edit
+                        spin_box.setValue( int(parameter_values[ param_name ] ) )
+                        self.ctrl_widgets[ motor_name ][param_name] = spin_box
 
-                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, text_edit )
+                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, spin_box )
 
                     if header["type"] == "Float":
-                        text_edit = QLineEdit()
-                        validator = QDoubleValidator( -65535.0, 65535.0, 3, self )
-                        text_edit.setValidator(validator)
+                        spin_box = QDoubleSpinBox()
+                        spin_box.setRange( -65535.0, 65535.0 )
+                        spin_box.setDecimals(3)
 
                         param_name = header["name"].lower()
-                        text_edit.setText("%.3f"% float(parameter_values[param_name]))
-                        self.ctrl_widgets[ motor_name ][param_name] = text_edit
+                        spin_box.setValue(float(parameter_values[param_name]))
+                        self.ctrl_widgets[ motor_name ][param_name] = spin_box
 
-                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, text_edit )
+                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, spin_box )
 
                 motor_item.setExpanded(True)
             finger_item.setExpanded(True)
