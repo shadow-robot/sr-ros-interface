@@ -48,7 +48,7 @@
     <joint name="LFJ5" type="revolute">
       <parent link="${parent}"/>
       <child link="lfmetacarpal"/>
-      <origin xyz="-0.033 0 0.02071" rpy="0 0 0" />
+      <insert_block name="origin" />
       <axis xyz="0.573576436 0 0.819152044" />
       <limit lower="0" upper="0.69813170079773179" effort="10"
       velocity="1.0" />

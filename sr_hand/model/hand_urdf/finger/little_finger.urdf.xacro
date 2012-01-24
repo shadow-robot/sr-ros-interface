@@ -12,10 +12,10 @@
   <include filename="$(find sr_hand)/model/hand_urdf/finger/distal/distal.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/lfmetacarpal/lfmetacarpal.urdf.xacro" />
 
-  <xacro:macro name="little_finger" params="link_prefix joint_prefix parent">
+  <xacro:macro name="little_finger" params="link_prefix joint_prefix parent *origin">
 
     <xacro:lfmetacarpal parent="${parent}">
-      <origin xyz="-0.033 0 0.02071" rpy="0 0 0" />
+      <insert_block name="origin" />
     </xacro:lfmetacarpal>
 
     <link name="lfknuckle">

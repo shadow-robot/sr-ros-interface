@@ -38,6 +38,7 @@
     </xacro:finger>
 
     <xacro:little_finger link_prefix="lf" joint_prefix="LF" parent="palm">
+      <origin xyz="-0.033 0 0.02071" rpy="0 0 0" />
     </xacro:little_finger>
 
     <xacro:thumb parent="palm">
