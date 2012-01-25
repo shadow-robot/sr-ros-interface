@@ -8,13 +8,15 @@
 
   <include filename="$(find sr_hand)/model/hand_urdf/finger/lfmetacarpal/lfmetacarpal.transmission.xacro" />
 
-  <xacro:macro name="lfmetacarpal" params="parent *origin">
+  <!-- Right Handed -->
+  <xacro:macro name="lfmetacarpal" params="parent">
 
     <link name="lfmetacarpal">
       <inertial>
-        <insert_block name="origin" />
-        <mass value="0.075" />
-        <inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0" izz="0.1" />
+	<origin xyz="-0.033 0 0.02071" rpy="0 0 0" />
+	<mass value="0.075" />
+	<inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0"
+	izz="0.1" />
       </inertial>
       <visual>
 	<origin xyz="0 0 0" rpy="0 0 0" />
@@ -48,8 +50,61 @@
     <joint name="LFJ5" type="revolute">
       <parent link="${parent}"/>
       <child link="lfmetacarpal"/>
-      <insert_block name="origin" />
+      <origin xyz="-0.033 0 0.02071" rpy="0 0 0" />
       <axis xyz="0.573576436 0 0.819152044" />
+      <limit lower="0" upper="0.69813170079773179" effort="10"
+      velocity="1.0" />
+      <dynamics damping="50.5"/>
+    </joint>
+
+    <xacro:lfmetacarpal_transmission />
+
+  </xacro:macro>
+  
+  <!-- Left Handed -->
+  <xacro:macro name="lfmetacarpal_left" params="parent">
+
+    <link name="lfmetacarpal">
+      <inertial>
+	<origin xyz="0.033 0 0.02071" rpy="0 0 0" />
+	<mass value="0.075" />
+	<inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0"
+	izz="0.1" />
+      </inertial>
+      <visual>
+	<origin xyz="0 0 0" rpy="0 0 0" />
+	<geometry name="lfmetacarpal_visual">
+	  <mesh filename="package://sr_hand/model/meshes/lfmetacarpal_left.mesh" scale="0.001 0.001 0.001" />
+	</geometry>
+	<material name="Grey" />
+      </visual>
+      <collision>
+	<origin xyz="0.015 0 0.015" rpy="0 0 0" />
+	<geometry name="lfmetacarpal_collision_geom">
+	  <box size="0.005 0.005 0.03" />
+	</geometry>
+      </collision>
+    </link>
+    <gazebo reference="lfmetacarpal">
+      <sensor:contact name="lfmetacarpal_contact_sensor">
+        <geom>lfmetacarpal_geom</geom>
+       <updateRate>100.0</updateRate>
+        <controller:gazebo_ros_bumper name="lfmetacarpal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <frameName>lfmetacarpal</frameName>
+          <bumperTopicName>lfmetacarpal_bumper</bumperTopicName>
+          <interface:bumper name="lfmetacarpal_gazebo_ros_bumper_iface" />
+        </controller:gazebo_ros_bumper>
+      </sensor:contact>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <joint name="LFJ5" type="revolute">
+      <parent link="${parent}"/>
+      <child link="lfmetacarpal"/>
+      <origin xyz="0.033 0 0.02071" rpy="0 0 0" />
+      <axis xyz="0.573576436 0 -0.819152044" />
       <limit lower="0" upper="0.69813170079773179" effort="10"
       velocity="1.0" />
       <dynamics damping="50.5"/>
