@@ -16,6 +16,8 @@
     </xacro:wrist_base>
   </xacro:macro>
 
+  <!-- Macro to used to generate left and right handed versions.
+  DO NOT use out side of here ie treat as a private macro -->
   <xacro:macro name="wrist_base" params="parent *origin mesh">
   
     <link name="wrist" >
