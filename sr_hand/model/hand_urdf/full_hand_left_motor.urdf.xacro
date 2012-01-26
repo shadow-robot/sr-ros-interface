@@ -13,8 +13,6 @@
 
   <xacro:macro name="shadowhand_motor">
 
-      <!-- <xacro:property name="reflect" value="-1" /> -->
-
     <xacro:forearm_motor>
     </xacro:forearm_motor>
 
