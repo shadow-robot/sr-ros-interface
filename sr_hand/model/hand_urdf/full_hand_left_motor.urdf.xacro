@@ -43,10 +43,8 @@
     <xacro:little_finger_left link_prefix="lf" joint_prefix="LF" parent="palm">
     </xacro:little_finger_left>
 
-    <!--
-    <xacro:thumb parent="palm">
-    </xacro:thumb>
-    -->
+    <xacro:thumb_left parent="palm">
+    </xacro:thumb_left>
 
   </xacro:macro>
 
