@@ -18,9 +18,9 @@
     <xacro:forearm_motor>
     </xacro:forearm_motor>
 
-    <xacro:wrist parent="forearm_motor">
+    <xacro:wrist_left parent="forearm_motor">
       <origin xyz="0 -0.010 0.213" rpy="0 0 0" />
-    </xacro:wrist>
+    </xacro:wrist_left>
 
     <xacro:palm parent="wrist">
     </xacro:palm>
