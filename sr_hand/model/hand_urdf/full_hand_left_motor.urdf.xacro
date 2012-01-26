@@ -5,8 +5,7 @@
 
   <include filename="$(find sr_hand)/model/hand_urdf/forearm/forearm_motor.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/wrist/wrist.urdf.xacro" />
-  <!-- <include filename="$(find sr_hand)/model/hand_urdf/palm/palm.urdf.xacro" /> -->
-  <include filename="$(find sr_hand)/model/hand_urdf/palm/palm_left.urdf.xacro" />
+  <include filename="$(find sr_hand)/model/hand_urdf/palm/palm.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/classic_finger.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/little_finger.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/thumb/thumb.urdf.xacro" />
@@ -20,8 +19,8 @@
       <origin xyz="0 -0.010 0.213" rpy="0 0 0" />
     </xacro:wrist_left>
 
-    <xacro:palm parent="wrist">
-    </xacro:palm>
+    <xacro:palm_left parent="wrist">
+    </xacro:palm_left>
 
     <xacro:finger link_prefix="ff" joint_prefix="FF" parent="palm">
       <origin xyz="-0.033 0 0.095" rpy="0 0 0" />

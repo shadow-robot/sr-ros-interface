@@ -8,7 +8,19 @@
 
   <include filename="$(find sr_hand)/model/hand_urdf/palm/palm.transmission.xacro" />
 
+  <!-- Right Hand -->
   <xacro:macro name="palm" params="parent">
+    <xacro:palm_base parent="${parent}" mesh="palm.mesh" />
+  </xacro:macro>
+
+  <!-- Left Hand -->
+  <xacro:macro name="palm_left" params="parent">
+    <xacro:palm_base parent="${parent}" mesh="palm_left.mesh" />
+  </xacro:macro>
+
+  <!-- Macro to used to generate left and right handed versions.
+  DO NOT use out side of here ie treat as a private macro -->
+  <xacro:macro name="palm_base" params="parent mesh">
 
     <link name="palm" >
       <inertial>
@@ -19,7 +31,7 @@
       <visual>
 	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="palm_visual">
-	  <mesh filename="package://sr_hand/model/meshes/palm.mesh" scale="0.001 0.001 0.001" />
+      <mesh filename="package://sr_hand/model/meshes/${mesh}" scale="0.001 0.001 0.001" />
 	</geometry>
 	<material name="Grey"/>
       </visual>
