@@ -1,5 +1,10 @@
 <launch>
-  <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_muscle.urdf.xacro'" />
+  <group if="$(optenv LEFT_HAND 0)">
+    <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_left_muscle.urdf.xacro'" />
+  </group>
+  <group unless="$(optenv LEFT_HAND 0)">
+    <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_muscle.urdf.xacro'" />
+  </group>
   <param name="arm_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_muscle.urdf.xacro'" />
 
 
