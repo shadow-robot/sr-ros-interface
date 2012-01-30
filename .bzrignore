@@ -188,6 +188,8 @@ shadow_robot/sr_robot_msgs/build
 shadow_robot/sr_robot_msgs/msg_gen
 shadow_robot/sr_robot_msgs/src
 shadow_robot/sr_utilities/bin
+sr_utilities/bin/*
+sr_utilities/bin/test/*
 shadow_robot/sr_robot_msgs/srv_gen
 shadow_robot/sr_tactile_sensors/bin
 shadow_robot/sr_tactile_sensors/build
