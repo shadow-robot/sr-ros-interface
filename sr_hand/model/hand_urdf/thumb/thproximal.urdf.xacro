@@ -8,7 +8,19 @@
 
   <include filename="$(find sr_hand)/model/hand_urdf/thumb/thproximal.transmission.xacro" />
 
+  <!-- Right Hand -->
   <xacro:macro name="thproximal" params="parent">
+      <xacro:thproximal_base parent="${parent}" reflect="1" />
+  </xacro:macro>
+
+  <!-- Left Hand -->
+  <xacro:macro name="thproximal_left" params="parent">
+      <xacro:thproximal_base parent="${parent}" reflect="-1" />
+  </xacro:macro>
+
+  <!-- Macro to used to generate left and right handed versions.
+  DO NOT use out side of here ie treat as a private macro -->
+  <xacro:macro name="thproximal_base" params="parent reflect">
 
     <link name="thproximal">
       <inertial>
@@ -51,7 +63,7 @@
       <parent link="${parent}"/>
       <child link="thproximal"/>
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <axis xyz="1 0 0" />
+      <axis xyz="${reflect*1} 0 0" />
       <limit lower="0" upper="1.309" effort="10"
       velocity="1.0" />
       <dynamics damping="50.5"/>
@@ -60,5 +72,4 @@
     <xacro:thproximal_transmission />
 
   </xacro:macro>
-
 </robot>
