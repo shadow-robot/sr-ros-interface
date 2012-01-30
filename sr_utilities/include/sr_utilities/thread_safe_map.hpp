@@ -71,7 +71,7 @@ namespace threadsafe
       if(!mutex_->timed_lock(boost::posix_time::microseconds(lock_wait_time)))
         return false;
 
-      map_[first] = value;
+      (*map_)[first] = value;
       mutex_->unlock();
       return true;
 
