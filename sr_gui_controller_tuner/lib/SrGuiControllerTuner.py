@@ -66,7 +66,7 @@ class SrGuiControllerTuner(QObject):
         self.on_btn_refresh_ctrl_clicked_()
         #attach the button pressed to its action
         self._widget.btn_refresh_ctrl.pressed.connect(self.on_btn_refresh_ctrl_clicked_)
-        self._widget.dropdown_ctrl.activated.connect(self.on_changed_controller_type_)
+        self._widget.dropdown_ctrl.currentIndexChanged.connect(self.on_changed_controller_type_)
 
         self._widget.btn_save_selected.pressed.connect(self.on_btn_save_selected_clicked_)
         self._widget.btn_save_all.pressed.connect(self.on_btn_save_all_clicked_)
@@ -76,6 +76,9 @@ class SrGuiControllerTuner(QObject):
         self._widget.btn_set_all.pressed.connect(self.on_btn_set_all_clicked_)
 
     @Slot(str)
+    def on_changed_controller_type_(self):
+        pass
+
     def on_changed_controller_type_(self, index):
         self.refresh_controller_tree_( self.controllers_in_dropdown[index] )
 
@@ -252,6 +255,8 @@ class SrGuiControllerTuner(QObject):
             finger_item.setExpanded(True)
         hand_item.setExpanded(True)
 
+        for col in range(0, self._widget.tree_ctrl_settings.columnCount()):
+            self._widget.tree_ctrl_settings.resizeColumnToContents(col)
 
 
 
