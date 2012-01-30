@@ -32,7 +32,7 @@
 #include <boost/thread.hpp>
 
 #include <map>
-
+#include <vector>
 #include <iostream>
 
 namespace threadsafe
