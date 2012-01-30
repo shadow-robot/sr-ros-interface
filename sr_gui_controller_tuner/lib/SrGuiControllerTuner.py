@@ -90,10 +90,21 @@ class SrGuiControllerTuner(QObject):
             rospy.logwarn("couldnt find the sr_edc_controller_configuration package")
 
         filter_files = "*.yaml"
-        filename = path_to_config + "/motor_effort_controllers.yaml"
-                   #QFileDialog.getOpenFileName( self._widget.tr("Save Controller Settings"),
-                   #                             self._widget.tr(path_to_config),
-                   #                             self._widget.tr(filter_files) )
+        if self.controller_type == "Motor Force":
+            filter_files = "Config (*motor"+filter_files+")"
+        elif self.controller_type == "Position":
+            filter_files = "Config (*position_controller"+filter_files+")"
+        elif self.controller_type == "Velocity":
+            filter_files = "Config (*velocity_controller"+filter_files+")"
+        elif self.controller_type == "Mixed Position/Velocity":
+            filter_files = "Config (*position_velocity"+filter_files+")"
+        elif self.controller_type == "Effort":
+            filter_files = "Config (*effort_controller"+filter_files+")"
+
+        filename, _ = QFileDialog.getOpenFileName(self._widget.tree_ctrl_settings, self._widget.tr('Save Controller Settings'),
+                                                  self._widget.tr(path_to_config),
+                                                  self._widget.tr(filter_files))
+
         if filename == "":
             return
 
@@ -282,11 +293,11 @@ class SrGuiControllerTuner(QObject):
         self._widget.deleteLater()
 
     def save_settings(self, global_settings, perspective_settings):
-        print "saving settings"
+        pass
         #topic = self._widget.topic_line_edit.text()
         #perspective_settings.set_value('topic', topic)
 
     def restore_settings(self, global_settings, perspective_settings):
-        print "restoring settings"
+        pass
         #topic = perspective_settings.value('topic', '/cmd_vel')
 
