@@ -27,7 +27,7 @@ from QtCore import QVariant
 
 import roslib
 roslib.load_manifest('sr_gui_controller_tuner')
-import rospy
+import rospy, rosparam
 
 from sr_controller_tuner import SrControllerTunerLib
 
@@ -124,8 +124,12 @@ class SrGuiControllerTuner(QObject):
         self._widget.btn_save_selected.setEnabled(True)
 
     def on_btn_load_clicked_(self):
-        print "load param"
+        #reload the parameters in rosparam, then refresh the tree widget
+        paramlist = rosparam.load_file( self.file_to_save )
+        for params,ns in paramlist:
+            rosparam.upload_params(ns, params)
 
+        self.refresh_controller_tree_( self.controllers_in_dropdown[self._widget.dropdown_ctrl.currentIndex()] )
 
     def on_btn_save_selected_clicked_(self):
         selected_items = self._widget.tree_ctrl_settings.selectedItems()
