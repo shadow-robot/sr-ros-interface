@@ -116,6 +116,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="toolTip">
+           <string>(F7) save current parameters to the selected file for the selected motors</string>
+          </property>
           <property name="text">
            <string>Save Selected</string>
           </property>
@@ -128,6 +131,9 @@
          <widget class="QPushButton" name="btn_save_all">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>(F6) save current parameters to the selected file</string>
           </property>
           <property name="text">
            <string>Save All</string>
@@ -155,6 +161,9 @@
           <property name="enabled">
            <bool>true</bool>
           </property>
+          <property name="toolTip">
+           <string>(F9) set current parameters to the selected controllers</string>
+          </property>
           <property name="text">
            <string>Set Selected</string>
           </property>
@@ -167,6 +176,9 @@
          <widget class="QPushButton" name="btn_set_all">
           <property name="enabled">
            <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>(F8) set current parameters to all the controllers</string>
           </property>
           <property name="text">
            <string>Set All</string>
