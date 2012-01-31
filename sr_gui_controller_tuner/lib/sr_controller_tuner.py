@@ -228,8 +228,21 @@ class SrControllerTunerLib(object):
         return True
 
 
-    def save_controller(self, joint_name, controller_type, controller_settings):
+    def save_controller(self, joint_name, controller_type, controller_settings, filename):
         """
         Sets the controller calling the proper service with the correct syntax.
         """
-        print " saving PID for ", joint_name, " (", controller_type, ")-> ", controller_settings
+        param_name = []
+        if controller_type == "Motor Force":
+            param_name = [""+joint_name.lower() ,"pid"]
+        elif controller_type == "Position":
+            param_name =  ["sh_"+joint_name.lower()+"_position_controller" , "pid"]
+        elif controller_type == "Velocity":
+            param_name =  ["sh_"+joint_name.lower()+"_velocity_controller" , "pid"]
+        elif controller_type == "Mixed Position/Velocity":
+            param_name =  ["sh_"+joint_name.lower()+"_mixed_position_velocity_controller" , "pid"]
+        elif controller_type == "Effort":
+            param_name =  ["sh_"+joint_name.lower()+"_effort_controller"]
+
+        pid_saver = PidSaver(filename)
+        pid_saver.save_settings(param_name, controller_settings)

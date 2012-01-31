@@ -42,6 +42,8 @@ class SrGuiControllerTuner(QObject):
         main_window = plugin_context.main_window()
         self._widget = QDockWidget(main_window)
 
+        self.file_to_save = None
+
         ui_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../uis/SrGuiControllerTuner.ui')
         loadUi(ui_file, self._widget)
         self._widget.setObjectName('SrControllerTunerUi')
@@ -74,6 +76,8 @@ class SrGuiControllerTuner(QObject):
 
         self._widget.btn_set_selected.pressed.connect(self.on_btn_set_selected_clicked_)
         self._widget.btn_set_all.pressed.connect(self.on_btn_set_all_clicked_)
+
+        self._widget.btn_load.pressed.connect(self.on_btn_load_clicked_)
 
     @Slot(str)
     def on_changed_controller_type_(self):
@@ -108,12 +112,19 @@ class SrGuiControllerTuner(QObject):
         if filename == "":
             return
 
+        self.file_to_save = filename
+
         self._widget.txt_file_path.setText(filename)
+
+        self._widget.btn_load.setEnabled(True)
 
         #enable the save buttons once a file has
         # been chosen
         self._widget.btn_save_all.setEnabled(True)
         self._widget.btn_save_selected.setEnabled(True)
+
+    def on_btn_load_clicked_(self):
+        print "load param"
 
 
     def on_btn_save_selected_clicked_(self):
@@ -195,7 +206,7 @@ class SrGuiControllerTuner(QObject):
                 settings[item[0]] = item[1].value()
 
         #uses the library to call the service properly
-        self.sr_controller_tuner_lib_.save_controller(joint_name, self.controller_type, settings)
+        self.sr_controller_tuner_lib_.save_controller(joint_name, self.controller_type, settings, self.file_to_save)
 
 
     def refresh_controller_tree_(self, controller_type = "Motor Force"):
