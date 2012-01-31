@@ -85,11 +85,17 @@
           <property name="toolTip">
            <string/>
           </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
           <property name="frameShadow">
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="tabKeyNavigation">
            <bool>false</bool>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
           </property>
           <property name="selectionMode">
            <enum>QAbstractItemView::ExtendedSelection</enum>

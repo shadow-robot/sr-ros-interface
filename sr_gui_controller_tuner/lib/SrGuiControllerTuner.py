@@ -189,7 +189,10 @@ class SrGuiControllerTuner(QObject):
         #uses the library to call the service properly
         success = self.sr_controller_tuner_lib_.set_controller(joint_name, self.controller_type, settings)
         if success == False:
-            QMessageBox.warning(self._widget.tree_ctrl_settings, "Warning", "Failed to set the PID values for joint "+ joint_name +".")
+            if self.controller_type == "Motor Force":
+                QMessageBox.warning(self._widget.tree_ctrl_settings, "Warning", "Failed to set the PID values for joint "+ joint_name +". This won't work for Gazebo controllers as there are no force controllers yet.")
+            else:
+                QMessageBox.warning(self._widget.tree_ctrl_settings, "Warning", "Failed to set the PID values for joint "+ joint_name +".")
 
 
     def save_controller(self, joint_name):
