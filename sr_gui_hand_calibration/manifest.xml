@@ -1,0 +1,22 @@
+<package>
+  <description brief="sr_gui_hand_calibration">
+
+     This is a rosgui plugin for calibrating the Shadow EtherCAT Hand.
+
+  </description>
+  <author>Ugo Cupcic</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_gui_hand_calibration</url>
+  <depend package="rosgui"/>
+  <depend package="rosgui_rospy"/>
+  <depend package="rostopic"/>
+  <depend package="sr_robot_msgs"/>
+
+  <export>
+    <rosgui plugin="${prefix}/sr_gui_hand_calibration_plugin.xml"/>
+  </export>
+
+</package>
+
+

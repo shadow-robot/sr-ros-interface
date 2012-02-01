@@ -1,0 +1,12 @@
+<library path="lib/SrHandCalibration">
+  <class name="SrHandCalibration" type="SrHandCalibration" base_class_type="rosgui_rospy::Plugin">
+    <description>
+	A plugin for  for calibrating the Shadow EtherCAT Hand.
+    </description>
+    <rosguiplugin>
+      <label>Shadow Hand Calibration</label>
+      <icon type="theme">input-gaming</icon>
+      <statustip>A plugin for calibrating the Shadow EtherCAT Hand.</statustip>
+    </rosguiplugin>
+  </class>
+</library>
