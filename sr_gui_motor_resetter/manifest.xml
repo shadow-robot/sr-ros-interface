@@ -1,0 +1,18 @@
+<package>
+  <description brief="sr_gui_motor_resetter">
+
+     sr_gui_motor_resetter - gui plugin for resetting motors on the shadow hand.
+
+  </description>
+  <author>Mark Pitchless</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_gui_motor_resetter</url>
+  <depend package="rosgui"/>
+  <depend package="rosgui_rospy"/>
+  <depend package="rostopic"/>
+  <depend package="std_msgs"/>
+
+</package>
+
+
