@@ -43,6 +43,21 @@ class SrGuiMotorResetter(QObject):
 
         # trigger deleteLater for plugin when _widget is closed
         self._widget.installEventFilter(self)
+        
+        # Bind button clicks
+        self._widget.btn_select_all.pressed.connect(self.on_select_all_pressed)
+        self._widget.btn_select_none.pressed.connect(self.on_select_none_pressed)
+        self._widget.btn_reset_motors.pressed.connect(self.on_reset_motors_pressed)
+
+
+    def on_select_all_pressed(self):
+        print("Select all pressed");
+
+    def on_select_none_pressed(self):
+        print("Select none pressed");
+
+    def on_reset_motors_pressed(self):
+        print("Reset motors pressed");
 
     def _unregisterPublisher(self):
         if self._publisher is not None:
