@@ -25,7 +25,7 @@ from QtGui import QTreeWidgetItem, QColor
 green = QColor(153, 231, 96)
 red = QColor(236, 178, 178)
 
-class IndividualCalibration(object):
+class IndividualCalibration( QTreeWidgetItem ):
     """
 
     """
@@ -36,14 +36,24 @@ class IndividualCalibration(object):
         """
         self.raw_value = raw_value
         self.calibrated_value = calibrated_value
+        self.tree_widget = tree_widget
 
-        self.widget = QTreeWidgetItem(parent_widget, ["", "", str(self.raw_value), str(self.calibrated_value)])
-        for col in xrange(tree_widget.columnCount()):
-            self.widget.setBackgroundColor(col, QColor(red))
+        QTreeWidgetItem.__init__(self, parent_widget, ["", "", str(self.raw_value), str(self.calibrated_value)])
 
-        tree_widget.addTopLevelItem( self.widget )
+        for col in xrange(self.tree_widget.columnCount()):
+            self.setBackgroundColor(col, QColor(red))
 
-class JointCalibration(object):
+        self.tree_widget.addTopLevelItem( self )
+
+    def calibrate(self):
+        for col in xrange(self.tree_widget.columnCount()):
+            #calibrate only the calibration lines, not the items for
+            # the fingers / joints / hand
+            if self.text(2) != "":
+                self.setBackgroundColor(col, QColor(green))
+
+
+class JointCalibration( QTreeWidgetItem ):
     """
     """
 
@@ -59,15 +69,15 @@ class JointCalibration(object):
 
         self.calibrations = []
 
-        self.widget = QTreeWidgetItem(parent_widget, ["", joint_name, "", ""])
+        QTreeWidgetItem.__init__(self, parent_widget, ["", joint_name, "", ""] )
 
         for calibration in calibrations:
             self.calibrations.append( IndividualCalibration(calibration[0], calibration[1],
-                                                            self.widget, tree_widget) )
+                                                            self, tree_widget) )
 
-        tree_widget.addTopLevelItem(self.widget)
+        tree_widget.addTopLevelItem(self)
 
-class FingerCalibration(object):
+class FingerCalibration( QTreeWidgetItem ):
     """
     """
 
@@ -77,19 +87,19 @@ class FingerCalibration(object):
         """
         """
 
-        self.widget = QTreeWidgetItem(parent_widget, [finger_name, "", "", ""])
+        QTreeWidgetItem.__init__(self, parent_widget, [finger_name, "", "", ""] )
 
         self.joints = []
         for joint in finger_joints:
             self.joints.append( JointCalibration( joint_name = joint[0],
                                                   calibrations = joint[1],
-                                                  parent_widget = self.widget,
+                                                  parent_widget = self,
                                                   tree_widget = tree_widget ) )
 
-        tree_widget.addTopLevelItem(self.widget)
+        tree_widget.addTopLevelItem(self)
 
 
-class HandCalibration(object):
+class HandCalibration( QTreeWidgetItem ):
     """
     """
     #TODO: Import this from an xml file?
@@ -215,28 +225,29 @@ class HandCalibration(object):
         """
         self.fingers = []
 
-        self.widget = QTreeWidgetItem(["Hand", "", "", ""])
+
+        QTreeWidgetItem.__init__(self, ["Hand", "", "", ""] )
 
         for finger in fingers:
             if finger in self.joint_map.keys():
                 self.fingers.append( FingerCalibration( finger,
                                                         self.joint_map[finger],
-                                                        self.widget, tree_widget ) )
+                                                        self, tree_widget ) )
 
             else:
                 print finger, " not found in the calibration map"
 
 
         self.tree_widget = tree_widget
-        self.tree_widget.addTopLevelItem(self.widget)
+        self.tree_widget.addTopLevelItem(self)
         self.tree_widget.itemActivated.connect(self.calibrate_item)
 
     def calibrate_item(self, item):
-        for col in xrange(self.tree_widget.columnCount()):
-            #calibrate only the calibration lines, not the items for
-            # the fingers / joints / hand
-            if item.text(2) != "":
-                item.setBackgroundColor(col, QColor(green))
+        try:
+            #only the IndividualCalibration have the calibrate method
+            item.calibrate()
+        except:
+            pass
 
         #select the next row by default
         self.tree_widget.setItemSelected( item, False )
