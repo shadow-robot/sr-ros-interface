@@ -82,6 +82,8 @@ class SrHandCalibration(QObject):
             self._publisher.unregister()
             self._publisher = None
 
+        self.hand_model.unregister()
+
     def eventFilter(self, obj, event):
         if obj is self._widget and event.type() == QEvent.Close:
             # TODO: ignore() should not be necessary when returning True

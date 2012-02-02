@@ -20,7 +20,13 @@ import roslib
 roslib.load_manifest('sr_gui_hand_calibration')
 import rospy
 
-from QtGui import QTreeWidgetItem, QTreeWidgetItemIterator, QColor
+from etherCAT_hand_lib import EtherCAT_Hand_Lib
+from QtGui import QTreeWidgetItem, QTreeWidgetItemIterator, QColor, QIcon
+from PyQt4.Qt import QTimer
+from PyQt4.QtCore import SIGNAL
+
+import os
+from collections import deque
 
 green = QColor(153, 231, 96)
 red = QColor(236, 178, 178)
@@ -30,13 +36,17 @@ class IndividualCalibration( QTreeWidgetItem ):
 
     """
 
-    def __init__(self, raw_value = 0, calibrated_value = 0.0,
-                 parent_widget = None, tree_widget = None):
+    def __init__(self, joint_name,
+                 raw_value, calibrated_value,
+                 parent_widget, tree_widget,
+                 robot_lib):
         """
         """
+        self.joint_name = joint_name
         self.raw_value = raw_value
         self.calibrated_value = calibrated_value
         self.tree_widget = tree_widget
+        self.robot_lib = robot_lib
 
         QTreeWidgetItem.__init__(self, parent_widget, ["", "", str(self.raw_value), str(self.calibrated_value)])
 
@@ -48,6 +58,9 @@ class IndividualCalibration( QTreeWidgetItem ):
         self.is_calibrated = False
 
     def calibrate(self):
+        self.raw_value = self.robot_lib.get_average_raw_value(self.joint_name, 100)
+        self.setText( 3, str(self.raw_value) )
+
         for col in xrange(self.tree_widget.columnCount()):
             #calibrate only the calibration lines, not the items for
             # the fingers / joints / hand
@@ -61,25 +74,59 @@ class JointCalibration( QTreeWidgetItem ):
     """
     """
 
-    def __init__(self, joint_name = "FFJ0",
-                 calibrations = [ [0.0, 0.0],
-                                  [0.0, 22.5],
-                                  [0.0, 45.0],
-                                  [0.0, 67.5],
-                                  [0.0, 90.0] ],
-                 parent_widget = None, tree_widget = None):
+    nb_values_to_check = 5
+    def __init__(self, joint_name,
+                 calibrations,
+                 parent_widget, tree_widget,
+                 robot_lib):
         """
         """
+        self.joint_name = joint_name
+        self.robot_lib = robot_lib
 
         self.calibrations = []
+
+        self.last_raw_values = deque()
 
         QTreeWidgetItem.__init__(self, parent_widget, ["", joint_name, "", ""] )
 
         for calibration in calibrations:
-            self.calibrations.append( IndividualCalibration(calibration[0], calibration[1],
-                                                            self, tree_widget) )
+            self.calibrations.append( IndividualCalibration(joint_name,
+                                                            calibration[0], calibration[1],
+                                                            self, tree_widget, robot_lib) )
 
+        #display the current joint position in the GUI
+        self.timer = QTimer()
+        self.timer.start(200)
         tree_widget.addTopLevelItem(self)
+        tree_widget.connect(self.timer, SIGNAL('timeout()'), self.update_joint_pos)
+
+    def update_joint_pos(self):
+        raw_value = self.robot_lib.get_raw_value( self.joint_name )
+        self.setText( 2, str(raw_value) )
+
+        #if the 5 last values are equal, then display a warning
+        # as there's always some noise on the values
+        self.last_raw_values.append(raw_value)
+        if len(self.last_raw_values) > self.nb_values_to_check:
+            self.last_raw_values.popleft()
+
+            #only check if we have enough values
+            all_equal = True
+            last_data = self.last_raw_values[0]
+            for data in self.last_raw_values:
+                if data != last_data:
+                    all_equal = False
+                    break
+            if all_equal == True:
+                self.setIcon(0, QIcon( os.path.join(os.path.dirname(os.path.realpath(__file__)), '../icons/warn.gif')))
+                self.setToolTip(0,"No noise on the data for the last " + str(self.nb_values_to_check) + " values, there could be a problem with the sensor.")
+            else:
+                self.setIcon(0, None)
+                self.setToolTip(0, "")
+
+
+
 
 class FingerCalibration( QTreeWidgetItem ):
     """
@@ -87,7 +134,8 @@ class FingerCalibration( QTreeWidgetItem ):
 
     def __init__(self, finger_name,
                  finger_joints,
-                 parent_widget, tree_widget):
+                 parent_widget, tree_widget,
+                 robot_lib):
         """
         """
 
@@ -98,7 +146,8 @@ class FingerCalibration( QTreeWidgetItem ):
             self.joints.append( JointCalibration( joint_name = joint[0],
                                                   calibrations = joint[1],
                                                   parent_widget = self,
-                                                  tree_widget = tree_widget ) )
+                                                  tree_widget = tree_widget,
+                                                  robot_lib = robot_lib) )
 
         tree_widget.addTopLevelItem(self)
 
@@ -221,23 +270,27 @@ class HandCalibration( QTreeWidgetItem ):
                                        [0.0, 10.0] ] ] ]
                  }
 
-    def __init__(self, fingers = ["First Finger", "Middle Finger",
-                                  "Ring Finger", "Little Finger",
-                                  "Thumb", "Wrist"],
-                 tree_widget = None,
-                 progress_bar = None):
+    def __init__(self,
+                 tree_widget,
+                 progress_bar,
+                 fingers = ["First Finger", "Middle Finger",
+                            "Ring Finger", "Little Finger",
+                            "Thumb", "Wrist"]):
         """
         """
         self.fingers = []
 
-
         QTreeWidgetItem.__init__(self, ["Hand", "", "", ""] )
+
+        self.robot_lib = EtherCAT_Hand_Lib()
+        self.robot_lib.activate()
 
         for finger in fingers:
             if finger in self.joint_map.keys():
                 self.fingers.append( FingerCalibration( finger,
                                                         self.joint_map[finger],
-                                                        self, tree_widget ) )
+                                                        self, tree_widget,
+                                                        self.robot_lib) )
 
             else:
                 print finger, " not found in the calibration map"
@@ -249,6 +302,9 @@ class HandCalibration( QTreeWidgetItem ):
         self.tree_widget = tree_widget
         self.tree_widget.addTopLevelItem(self)
         self.tree_widget.itemActivated.connect(self.calibrate_item)
+
+    def unregister(self):
+        self.robot_lib.on_close()
 
     def calibrate_item(self, item):
         try:
