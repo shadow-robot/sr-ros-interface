@@ -21,11 +21,13 @@ import os
 
 from rosgui.QtBindingHelper import loadUi
 from QtCore import QEvent, QObject, Qt, QTimer, Slot
-from QtGui import QDockWidget, QShortcut
+from QtGui import QDockWidget, QShortcut, QColor, QTreeWidgetItem
 
 import roslib
 roslib.load_manifest('sr_gui_hand_calibration')
 import rospy
+
+from sr_hand_calibration_model import HandCalibration
 
 class SrHandCalibration(QObject):
 
@@ -47,7 +49,29 @@ class SrHandCalibration(QObject):
         # trigger deleteLater for plugin when _widget is closed
         self._widget.installEventFilter(self)
 
+        self._widget.tree_calibration.setColumnCount(4)
+        self._widget.tree_calibration.setHeaderLabels(["Finger", "Joint", "Raw Value", "Calibrated Value"])
+
+        self.hand_model = None
+
+        self._widget.btn_save.clicked.connect(self.btn_save_clicked_)
+
+        self.populate_tree()
+
     @Slot(str)
+
+    def populate_tree(self):
+        self._widget.tree_calibration.clear()
+
+        self.hand_model = HandCalibration( tree_widget = self._widget.tree_calibration )
+
+        self._widget.tree_calibration.expandAll()
+
+        for col in range(0, self._widget.tree_calibration.columnCount()):
+            self._widget.tree_calibration.resizeColumnToContents(col)
+
+    def btn_save_clicked_(self):
+        print "Clicked"
 
     def _unregisterPublisher(self):
         if self._publisher is not None:
