@@ -34,9 +34,9 @@ class SrGuiMotorResetter(QObject):
         main_window = plugin_context.main_window()
         self._widget = QDockWidget(main_window)
 
-        #ui_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../uis/SrChangeControllers.ui')
-        #loadUi(ui_file, self._widget)
-        #self._widget.setObjectName('SrMotorResetterUi')
+        ui_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../uis/SrGuiMotorResetter.ui')
+        loadUi(ui_file, self._widget)
+        self._widget.setObjectName('SrMotorResetterUi')
         if plugin_context.serial_number() > 1:
             self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % plugin_context.serial_number()))
         main_window.addDockWidget(Qt.RightDockWidgetArea, self._widget)
