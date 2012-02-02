@@ -65,6 +65,9 @@
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <widget class="QTreeWidget" name="tree_calibration">
+          <property name="animated">
+           <bool>true</bool>
+          </property>
           <column>
            <property name="text">
             <string notr="true">1</string>
