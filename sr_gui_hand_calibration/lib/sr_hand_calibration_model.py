@@ -20,7 +20,7 @@ import roslib
 roslib.load_manifest('sr_gui_hand_calibration')
 import rospy
 
-from QtGui import QTreeWidgetItem, QColor
+from QtGui import QTreeWidgetItem, QTreeWidgetItemIterator, QColor
 
 green = QColor(153, 231, 96)
 red = QColor(236, 178, 178)
@@ -45,12 +45,16 @@ class IndividualCalibration( QTreeWidgetItem ):
 
         self.tree_widget.addTopLevelItem( self )
 
+        self.is_calibrated = False
+
     def calibrate(self):
         for col in xrange(self.tree_widget.columnCount()):
             #calibrate only the calibration lines, not the items for
             # the fingers / joints / hand
             if self.text(2) != "":
                 self.setBackgroundColor(col, QColor(green))
+
+        self.is_calibrated = True
 
 
 class JointCalibration( QTreeWidgetItem ):
@@ -220,7 +224,8 @@ class HandCalibration( QTreeWidgetItem ):
     def __init__(self, fingers = ["First Finger", "Middle Finger",
                                   "Ring Finger", "Little Finger",
                                   "Thumb", "Wrist"],
-                 tree_widget = None):
+                 tree_widget = None,
+                 progress_bar = None):
         """
         """
         self.fingers = []
@@ -237,6 +242,7 @@ class HandCalibration( QTreeWidgetItem ):
             else:
                 print finger, " not found in the calibration map"
 
+        self.progress_bar = progress_bar
 
         self.tree_widget = tree_widget
         self.tree_widget.addTopLevelItem(self)
@@ -249,9 +255,22 @@ class HandCalibration( QTreeWidgetItem ):
         except:
             pass
 
+        it = QTreeWidgetItemIterator( self )
+        nb_of_items = 0
+        nb_of_calibrated_items = 0
+        while it.value():
+            it += 1
+            try:
+                if it.value().is_calibrated:
+                    nb_of_calibrated_items += 1
+                nb_of_items += 1
+
+            except:
+                pass
+        self.progress_bar.setValue( int( float(nb_of_calibrated_items) / float(nb_of_items) * 100.0 ) )
+
         #select the next row by default
         self.tree_widget.setItemSelected( item, False )
         next_item = self.tree_widget.itemBelow(item)
         self.tree_widget.setItemSelected( next_item, True )
         self.tree_widget.setCurrentItem( next_item )
-

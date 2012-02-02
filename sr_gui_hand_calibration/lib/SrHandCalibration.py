@@ -63,7 +63,7 @@ class SrHandCalibration(QObject):
     def populate_tree(self):
         self._widget.tree_calibration.clear()
 
-        self.hand_model = HandCalibration( tree_widget = self._widget.tree_calibration )
+        self.hand_model = HandCalibration( tree_widget = self._widget.tree_calibration, progress_bar = self._widget.progress )
 
         self._widget.tree_calibration.expandAll()
 
