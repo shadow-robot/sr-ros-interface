@@ -1,0 +1,12 @@
+<library path="lib/SrGuiMotorResetter">
+  <class name="SrGuiMotorResetter" type="SrGuiMotorResetter" base_class_type="rosgui_rospy::Plugin">
+    <description>
+	A plugin for resetting shadow hand motors.
+    </description>
+    <rosguiplugin>
+      <label>Motor Resetter</label>
+      <icon type="theme">input-gaming</icon>
+      <statustip>A plugin for resetting shadow hand motors.</statustip>
+    </rosguiplugin>
+  </class>
+</library>
