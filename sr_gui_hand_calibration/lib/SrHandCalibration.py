@@ -55,6 +55,7 @@ class SrHandCalibration(QObject):
         self.hand_model = None
 
         self._widget.btn_save.clicked.connect(self.btn_save_clicked_)
+        self._widget.btn_joint_0s.clicked.connect(self.btn_joint_0s_clicked_)
 
         self.populate_tree()
 
@@ -72,6 +73,9 @@ class SrHandCalibration(QObject):
 
     def btn_save_clicked_(self):
         print "Clicked"
+
+    def btn_joint_0s_clicked_(self):
+        self.hand_model.calibrate_joint0s( self._widget.btn_joint_0s )
 
     def _unregisterPublisher(self):
         if self._publisher is not None:

@@ -81,8 +81,11 @@
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QPushButton" name="btn_joint_0s">
+          <property name="toolTip">
+           <string>Save all joint 1 and 2s for all joint 0s in one go.</string>
+          </property>
           <property name="text">
-           <string>Save all Joint 0s</string>
+           <string>Save all Joint 0s (angle = 0.0)</string>
           </property>
          </widget>
         </item>
