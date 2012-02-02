@@ -12,6 +12,10 @@
   <depend package="rosgui_rospy"/>
   <depend package="rostopic"/>
   <depend package="std_msgs"/>
+  
+  <export>
+    <rosgui plugin="${prefix}/sr_motor_resetter_plugin.xml"/>
+  </export>
 
 </package>
 
