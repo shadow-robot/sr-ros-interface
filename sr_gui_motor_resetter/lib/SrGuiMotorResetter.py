@@ -19,10 +19,34 @@ import os
 import roslib
 roslib.load_manifest('sr_gui_motor_resetter')
 import rospy
+from std_srvs.srv import Empty
 
 from rosgui.QtBindingHelper import loadUi
-from QtCore import QEvent, QObject, Qt, QTimer, Slot
-from QtGui import QDockWidget, QShortcut, QMessageBox, QFrame, QHBoxLayout, QCheckBox, QLabel
+from QtCore import QEvent, QObject, Qt, QTimer, Slot, QThread, SIGNAL, QPoint
+from QtGui import QDockWidget, QShortcut, QMessageBox, QFrame, QHBoxLayout, QCheckBox, QLabel, QCursor
+
+class MotorFlasher(QThread):
+    def __init__(self, parent, nb_motors_to_program):
+        QThread.__init__(self, None)
+        self.parent = parent
+        self.nb_motors_to_program = nb_motors_to_program
+
+    def run(self):
+        programmed_motors = 0.
+        for motor in self.parent.motors:
+            if motor.checkbox.checkState() == Qt.Checked:
+                try:
+                    print("resetting: /realtime_loop/reset_motor_"+motor.motor_name)
+                    self.flasher_service = rospy.ServiceProxy('/realtime_loop/reset_motor_'+motor.motor_name, Empty)
+                    resp = self.flasher_service()
+
+                except rospy.ServiceException, e:
+                    self.emit( SIGNAL("failed(QString)"),
+                               QString( "Service did not process request: %s"%str(e) ) )
+                    return
+
+                self.emit( SIGNAL("motor_finished(QPoint)"),
+                           QPoint( programmed_motors / self.nb_motors_to_program * 100. , 0.0 ) )
 
 class Motor(QFrame):
     def __init__(self, parent, motor_name, motor_index):
@@ -69,8 +93,9 @@ class SrGuiMotorResetter(QObject):
 
         # motors_frame is defined in the ui file with a grid layout
         self.motors = []
-        self.motors_frame  = self._widget.motors_frame
+        self.motors_frame = self._widget.motors_frame
         self.populate_motors()
+        self.progress_bar = self._widget.motors_progress_bar
 
         # Bind button clicks
         self._widget.btn_select_all.pressed.connect(self.on_select_all_pressed)
@@ -118,6 +143,47 @@ class SrGuiMotorResetter(QObject):
 
     def on_reset_motors_pressed(self):
         print("Reset motors pressed");
+        self.progress_bar.setValue(0)
+        nb_motors_to_program = 0.
+        for motor in self.motors:
+            if motor.checkbox.checkState() == Qt.Checked:
+                nb_motors_to_program += 1.
+        if nb_motors_to_program == 0.:
+            QMessageBox.warning(self._widget, "Warning", "No motors selected for resetting.")
+            return
+
+        self.cursor = QCursor()
+        self.cursor.setShape(Qt.WaitCursor)
+        self._widget.setCursor(self.cursor)
+
+        self.motor_flasher = MotorFlasher(self, nb_motors_to_program)
+        self._widget.connect(self.motor_flasher, SIGNAL("finished()"), self.finished_programming_motors)
+        self._widget.connect(self.motor_flasher, SIGNAL("motor_finished(QPoint)"), self.one_motor_finished)
+        self._widget.connect(self.motor_flasher, SIGNAL("failed(QString)"), self.failed_programming_motors)
+
+        for motor in self.motors:
+            motor.checkbox.setEnabled(False)
+        self._widget.btn_select_all.setEnabled(False)
+        self._widget.btn_select_none.setEnabled(False)
+        self._widget.btn_reset_motors.setEnabled(False)
+
+        self.motor_flasher.start()
+
+    def one_motor_finished(self, point):
+        self.progress_bar.setValue( int(point.x()) )
+
+
+    def finished_programming_motors(self):
+        for motor in self.motors:
+            motor.checkbox.setEnabled(True)
+        self._widget.btn_select_all.setEnabled(True)
+        self._widget.btn_select_none.setEnabled(True)
+        self._widget.btn_reset_motors.setEnabled(True)
+        self.cursor.setShape(Qt.ArrowCursor)
+        self._widget.setCursor(self.cursor)
+
+    def failed_programming_motors(self, message):
+        QMessageBox.warning(self.frame, "Warning", message)
 
     def _unregisterPublisher(self):
         if self._publisher is not None:

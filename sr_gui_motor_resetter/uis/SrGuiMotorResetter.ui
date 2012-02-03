@@ -14,7 +14,7 @@
    <string>Motor Resetter</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
     <item>
      <widget class="QFrame" name="motors_frame">
       <property name="frameShape">
@@ -55,6 +55,13 @@
      <widget class="QPushButton" name="btn_reset_motors">
       <property name="text">
        <string>Reset Motors</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QProgressBar" name="motors_progress_bar">
+      <property name="value">
+       <number>0</number>
       </property>
      </widget>
     </item>
