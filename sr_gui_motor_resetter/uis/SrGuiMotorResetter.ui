@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>907</width>
-    <height>771</height>
+    <height>670</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -20,7 +20,7 @@
    <property name="mouseTracking">
     <bool>false</bool>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
     <item>
      <widget class="QFrame" name="motors_frame">
       <property name="frameShape">
@@ -49,13 +49,6 @@
        </widget>
       </item>
      </layout>
-    </item>
-    <item>
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
     </item>
     <item>
      <widget class="QPushButton" name="btn_reset_motors">
