@@ -67,8 +67,8 @@ namespace sr_actuator
       force_control_frequency_(0)
     {}
 
-    unsigned long long int  strain_gauge_left_;
-    unsigned long long int strain_gauge_right_;
+    signed short strain_gauge_left_;
+    signed short strain_gauge_right_;
 
     std::vector<int> raw_sensor_values_;
     std::vector<double> calibrated_sensor_values_;
