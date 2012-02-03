@@ -10,10 +10,16 @@
     <height>771</height>
    </rect>
   </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
   <property name="windowTitle">
    <string>Motor Resetter</string>
   </property>
-  <widget class="QWidget" name="dockWidgetContents">
+  <widget class="QWidget" name="contents">
+   <property name="mouseTracking">
+    <bool>false</bool>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
     <item>
      <widget class="QFrame" name="motors_frame">
@@ -60,6 +66,18 @@
     </item>
     <item>
      <widget class="QProgressBar" name="motors_progress_bar">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>27</height>
+       </size>
+      </property>
       <property name="value">
        <number>0</number>
       </property>

@@ -176,15 +176,12 @@ class SrGuiMotorResetter(QObject):
             return
         self.progress_bar.setMaximum(nb_motors_to_program)
 
-        self.cursor = QCursor()
-        self.cursor.setShape(Qt.WaitCursor)
-        self._widget.setCursor(self.cursor)
-
         self.motor_flasher = MotorFlasher(self, nb_motors_to_program)
         self._widget.connect(self.motor_flasher, SIGNAL("finished()"), self.finished_programming_motors)
         self._widget.connect(self.motor_flasher, SIGNAL("motor_finished(QPoint)"), self.one_motor_finished)
         self._widget.connect(self.motor_flasher, SIGNAL("failed(QString)"), self.failed_programming_motors)
 
+        self._widget.contents.setCursor(Qt.WaitCursor)
         self.motors_frame.setEnabled(False)
         self._widget.btn_select_all.setEnabled(False)
         self._widget.btn_select_none.setEnabled(False)
@@ -200,8 +197,7 @@ class SrGuiMotorResetter(QObject):
         self.motors_frame.setEnabled(True)
         self._widget.btn_select_all.setEnabled(True)
         self._widget.btn_select_none.setEnabled(True)
-        self.cursor.setShape(Qt.ArrowCursor)
-        self._widget.setCursor(self.cursor)
+        self._widget.contents.setCursor(Qt.ArrowCursor)
         self.progress_bar.hide()
         self._widget.btn_reset_motors.show()
 
