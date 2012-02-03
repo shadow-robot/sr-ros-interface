@@ -96,6 +96,7 @@ class SrGuiMotorResetter(QObject):
         self.motors_frame = self._widget.motors_frame
         self.populate_motors()
         self.progress_bar = self._widget.motors_progress_bar
+        self.progress_bar.hide()
 
         self.server_revision = 0
         self.diag_sub = rospy.Subscriber("/diagnostics", DiagnosticArray, self.diagnostics_callback)
@@ -191,7 +192,8 @@ class SrGuiMotorResetter(QObject):
         self.motors_frame.setEnabled(False)
         self._widget.btn_select_all.setEnabled(False)
         self._widget.btn_select_none.setEnabled(False)
-        self._widget.btn_reset_motors.setEnabled(False)
+        self.progress_bar.show()
+        self._widget.btn_reset_motors.hide()
 
         self.motor_flasher.start()
 
@@ -202,9 +204,10 @@ class SrGuiMotorResetter(QObject):
         self.motors_frame.setEnabled(True)
         self._widget.btn_select_all.setEnabled(True)
         self._widget.btn_select_none.setEnabled(True)
-        self._widget.btn_reset_motors.setEnabled(True)
         self.cursor.setShape(Qt.ArrowCursor)
         self._widget.setCursor(self.cursor)
+        self.progress_bar.hide()
+        self._widget.btn_reset_motors.show()
 
     def failed_programming_motors(self, message):
         QMessageBox.warning(self.frame, "Warning", message)
