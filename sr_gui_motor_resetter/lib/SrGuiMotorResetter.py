@@ -116,8 +116,7 @@ class SrGuiMotorResetter(QObject):
                 ["MFJ0", "MFJ1", "MFJ2", "MFJ3", "MFJ4"],
                 ["RFJ0", "RFJ1", "RFJ2", "RFJ3", "RFJ4"],
                 ["LFJ0", "LFJ1", "LFJ2", "LFJ3", "LFJ4", "LFJ5"],
-                ["THJ1", "THJ2", "THJ3", "THJ4"],
-                ["THJ5"],
+                ["THJ1", "THJ2", "THJ3", "THJ4","THJ5"],
                 ["WRJ1", "WRJ2"]
             ]
 
