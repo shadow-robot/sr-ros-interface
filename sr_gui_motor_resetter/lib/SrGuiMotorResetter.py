@@ -188,8 +188,7 @@ class SrGuiMotorResetter(QObject):
         self._widget.connect(self.motor_flasher, SIGNAL("motor_finished(QPoint)"), self.one_motor_finished)
         self._widget.connect(self.motor_flasher, SIGNAL("failed(QString)"), self.failed_programming_motors)
 
-        for motor in self.motors:
-            motor.checkbox.setEnabled(False)
+        self.motors_frame.setEnabled(False)
         self._widget.btn_select_all.setEnabled(False)
         self._widget.btn_select_none.setEnabled(False)
         self._widget.btn_reset_motors.setEnabled(False)
@@ -201,8 +200,7 @@ class SrGuiMotorResetter(QObject):
 
 
     def finished_programming_motors(self):
-        for motor in self.motors:
-            motor.checkbox.setEnabled(True)
+        self.motors_frame.setEnabled(True)
         self._widget.btn_select_all.setEnabled(True)
         self._widget.btn_select_none.setEnabled(True)
         self._widget.btn_reset_motors.setEnabled(True)
