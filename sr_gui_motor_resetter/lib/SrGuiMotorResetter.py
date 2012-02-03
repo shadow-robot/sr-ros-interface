@@ -22,7 +22,30 @@ import rospy
 
 from rosgui.QtBindingHelper import loadUi
 from QtCore import QEvent, QObject, Qt, QTimer, Slot
-from QtGui import QDockWidget, QShortcut, QMessageBox
+from QtGui import QDockWidget, QShortcut, QMessageBox, QFrame, QHBoxLayout, QCheckBox, QLabel
+
+class Motor(QFrame):
+    def __init__(self, parent, motor_name, motor_index):
+        QFrame.__init__(self, parent)
+
+        self.motor_name = motor_name
+        self.motor_index = motor_index
+
+        self.layout = QHBoxLayout()
+
+        self.checkbox = QCheckBox("", self)
+        self.layout.addWidget(self.checkbox)
+
+        self.label = QLabel( motor_name + " [" + str(motor_index) +"]" )
+        self.label.setToolTip("Motor name and motor index")
+        self.layout.addWidget(self.label)
+
+        self.revision_label = QLabel( "" )
+        self.revision_label.setToolTip("Svn Revision")
+        self.layout.addWidget(self.revision_label)
+
+        self.setLayout(self.layout)
+
 
 class SrGuiMotorResetter(QObject):
 
@@ -43,18 +66,55 @@ class SrGuiMotorResetter(QObject):
 
         # trigger deleteLater for plugin when _widget is closed
         self._widget.installEventFilter(self)
-        
+
+        # motors_frame is defined in the ui file with a grid layout
+        self.motors = []
+        self.motors_frame  = self._widget.motors_frame
+        self.populate_motors()
+
         # Bind button clicks
         self._widget.btn_select_all.pressed.connect(self.on_select_all_pressed)
         self._widget.btn_select_none.pressed.connect(self.on_select_none_pressed)
         self._widget.btn_reset_motors.pressed.connect(self.on_reset_motors_pressed)
 
 
+    def populate_motors(self):
+        if rospy.has_param("joint_to_motor_mapping"):
+            joint_to_motor_mapping = rospy.get_param("joint_to_motor_mapping")
+
+        joint_names = [
+                ["FFJ0", "FFJ1", "FFJ2", "FFJ3", "FFJ4"],
+                ["MFJ0", "MFJ1", "MFJ2", "MFJ3", "MFJ4"],
+                ["RFJ0", "RFJ1", "RFJ2", "RFJ3", "RFJ4"],
+                ["LFJ0", "LFJ1", "LFJ2", "LFJ3", "LFJ4", "LFJ5"],
+                ["THJ1", "THJ2", "THJ3", "THJ4"],
+                ["THJ5"],
+                ["WRJ1", "WRJ2"]
+            ]
+
+        row = 0
+        col = 0
+        index_jtm_mapping = 0
+        for finger in joint_names:
+            col = 0
+            for joint_name in finger:
+                motor_index = joint_to_motor_mapping[index_jtm_mapping]
+                if motor_index != -1:
+                    motor = Motor(self.motors_frame, joint_name, motor_index)
+                    self.motors_frame.layout().addWidget(motor, row, col)
+                    self.motors.append( motor )
+                    col += 1
+                index_jtm_mapping += 1
+            row += 1
+
+
     def on_select_all_pressed(self):
-        print("Select all pressed");
+        for motor in self.motors:
+            motor.checkbox.setCheckState( Qt.Checked )
 
     def on_select_none_pressed(self):
-        print("Select none pressed");
+        for motor in self.motors:
+            motor.checkbox.setCheckState( Qt.Unchecked )
 
     def on_reset_motors_pressed(self):
         print("Reset motors pressed");
@@ -79,10 +139,7 @@ class SrGuiMotorResetter(QObject):
 
     def save_settings(self, global_settings, perspective_settings):
         print "saving settings"
-        #topic = self._widget.topic_line_edit.text()
-        #perspective_settings.set_value('topic', topic)
 
     def restore_settings(self, global_settings, perspective_settings):
         print "restoring settings"
-        #topic = perspective_settings.value('topic', '/cmd_vel')
 
