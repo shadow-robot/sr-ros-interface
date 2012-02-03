@@ -63,6 +63,15 @@
       <property name="value">
        <number>0</number>
       </property>
+      <property name="textVisible">
+       <bool>true</bool>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
+      </property>
+      <property name="format">
+       <string>%v of %m</string>
+      </property>
      </widget>
     </item>
    </layout>

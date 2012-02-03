@@ -33,21 +33,20 @@ class MotorFlasher(QThread):
         self.nb_motors_to_program = nb_motors_to_program
 
     def run(self):
-        programmed_motors = 0.
+        programmed_motors = 0
         for motor in self.parent.motors:
             if motor.checkbox.checkState() == Qt.Checked:
                 try:
                     print("resetting: /realtime_loop/reset_motor_"+motor.motor_name)
                     self.flasher_service = rospy.ServiceProxy('/realtime_loop/reset_motor_'+motor.motor_name, Empty)
                     resp = self.flasher_service()
-
                 except rospy.ServiceException, e:
                     self.emit( SIGNAL("failed(QString)"),
                                QString( "Service did not process request: %s"%str(e) ) )
                     return
 
-                self.emit( SIGNAL("motor_finished(QPoint)"),
-                           QPoint( programmed_motors / self.nb_motors_to_program * 100. , 0.0 ) )
+                programmed_motors += 1
+                self.emit( SIGNAL("motor_finished(QPoint)"), QPoint( programmed_motors, 0.0 ) )
 
 class Motor(QFrame):
     def __init__(self, parent, motor_name, motor_index):
@@ -170,14 +169,15 @@ class SrGuiMotorResetter(QObject):
 
     def on_reset_motors_pressed(self):
         print("Reset motors pressed");
-        self.progress_bar.setValue(0)
-        nb_motors_to_program = 0.
+        self.progress_bar.reset()
+        nb_motors_to_program = 0
         for motor in self.motors:
             if motor.checkbox.checkState() == Qt.Checked:
-                nb_motors_to_program += 1.
-        if nb_motors_to_program == 0.:
+                nb_motors_to_program += 1
+        if nb_motors_to_program == 0:
             QMessageBox.warning(self._widget, "Warning", "No motors selected for resetting.")
             return
+        self.progress_bar.setMaximum(nb_motors_to_program)
 
         self.cursor = QCursor()
         self.cursor.setShape(Qt.WaitCursor)
@@ -197,7 +197,6 @@ class SrGuiMotorResetter(QObject):
 
     def one_motor_finished(self, point):
         self.progress_bar.setValue( int(point.x()) )
-
 
     def finished_programming_motors(self):
         self.motors_frame.setEnabled(True)
