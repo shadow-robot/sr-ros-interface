@@ -57,12 +57,8 @@ class Motor(QFrame):
 
         self.layout = QHBoxLayout()
 
-        self.checkbox = QCheckBox("", self)
+        self.checkbox = QCheckBox(motor_name + " [" + str(motor_index) +"]", self)
         self.layout.addWidget(self.checkbox)
-
-        self.label = QLabel( motor_name + " [" + str(motor_index) +"]" )
-        self.label.setToolTip("Motor name and motor index")
-        self.layout.addWidget(self.label)
 
         self.revision_label = QLabel( "" )
         self.revision_label.setToolTip("Svn Revision")
