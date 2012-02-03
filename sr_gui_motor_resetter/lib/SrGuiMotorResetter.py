@@ -20,10 +20,11 @@ import roslib
 roslib.load_manifest('sr_gui_motor_resetter')
 import rospy
 from std_srvs.srv import Empty
+from diagnostic_msgs.msg import DiagnosticArray
 
 from rosgui.QtBindingHelper import loadUi
 from QtCore import QEvent, QObject, Qt, QTimer, Slot, QThread, SIGNAL, QPoint
-from QtGui import QDockWidget, QShortcut, QMessageBox, QFrame, QHBoxLayout, QCheckBox, QLabel, QCursor
+from QtGui import QDockWidget, QShortcut, QMessageBox, QFrame, QHBoxLayout, QCheckBox, QLabel, QCursor, QColor
 
 class MotorFlasher(QThread):
     def __init__(self, parent, nb_motors_to_program):
@@ -97,6 +98,9 @@ class SrGuiMotorResetter(QObject):
         self.populate_motors()
         self.progress_bar = self._widget.motors_progress_bar
 
+        self.server_revision = 0
+        self.diag_sub = rospy.Subscriber("/diagnostics", DiagnosticArray, self.diagnostics_callback)
+
         # Bind button clicks
         self._widget.btn_select_all.pressed.connect(self.on_select_all_pressed)
         self._widget.btn_select_none.pressed.connect(self.on_select_none_pressed)
@@ -132,6 +136,30 @@ class SrGuiMotorResetter(QObject):
                 index_jtm_mapping += 1
             row += 1
 
+    def diagnostics_callback(self, msg):
+        for status in msg.status:
+            for motor in self.motors:
+                if motor.motor_name in status.name:
+                    for key_values in status.values:
+                        if "Firmware svn revision" in key_values.key:
+                            server_current_modified = key_values.value.split(" / ")
+
+                            if server_current_modified[0] > self.server_revision:
+                                self.server_revision = int( server_current_modified[0].strip() )
+
+                            palette = motor.revision_label.palette();
+                            palette.setColor(motor.revision_label.foregroundRole(), Qt.green)
+                            if server_current_modified[0].strip() != server_current_modified[1].strip():
+                                palette.setColor(motor.revision_label.foregroundRole(), QColor(255, 170, 23) )
+                                motor.revision_label.setPalette(palette);
+
+                            if "True" in server_current_modified[2]:
+                                palette.setColor(motor.revision_label.foregroundRole(), Qt.red)
+                                motor.revision_label.setText( "svn: "+ server_current_modified[1] + " [M]" )
+                                motor.revision_label.setPalette(palette);
+                            else:
+                                motor.revision_label.setText( " svn: " + server_current_modified[1] )
+                                motor.revision_label.setPalette(palette);
 
     def on_select_all_pressed(self):
         for motor in self.motors:
