@@ -35,6 +35,7 @@ import os
 from collections import deque
 
 green = QColor(153, 231, 96)
+orange = QColor(247, 206, 134)
 red = QColor(236, 178, 178)
 
 class IndividualCalibration( QTreeWidgetItem ):
@@ -77,8 +78,18 @@ class IndividualCalibration( QTreeWidgetItem ):
 
         self.is_calibrated = True
 
-    def modify(self, calibration):
-        print calibration
+    def set_is_loaded_calibration(self):
+        for col in xrange(self.tree_widget.columnCount()):
+            #set the background to orange: those values are loaded
+            # from the file, not recalibrated
+            if self.text(2) != "":
+                self.setBackgroundColor(col, QColor(orange))
+
+        self.is_calibrated = True
+
+
+    def get_calibration(self):
+        return [self.raw_value, self.calibrated_value]
 
 class JointCalibration( QTreeWidgetItem ):
     """
@@ -117,9 +128,24 @@ class JointCalibration( QTreeWidgetItem ):
             self.removeChild( calibration )
 
         for calibration in new_calibrations:
-            self.calibrations.append( IndividualCalibration(self.joint_name,
-                                                            calibration[0], calibration[1],
-                                                            self, self.tree_widget, self.robot_lib))
+            new_calib =  IndividualCalibration(self.joint_name,
+                                               calibration[0], calibration[1],
+                                               self, self.tree_widget, self.robot_lib)
+            new_calib.set_is_loaded_calibration()
+            self.calibrations.append( new_calib )
+
+
+    def get_joint_calibration(self):
+        config = []
+        for calibration in self.calibrations:
+            if calibration.is_calibrated:
+                config.append( calibration.get_calibration() )
+
+        if len(config) <= 1:
+            #no config, or only one point
+            # generating flat config
+            config = [[0, 0.0], [1, 0.0]]
+        return [self.joint_name, config]
 
     def update_joint_pos(self):
         raw_value = 5#self.robot_lib.get_raw_value( self.joint_name )
@@ -391,3 +417,22 @@ class HandCalibration( QTreeWidgetItem ):
                 if it.value().text(1) == joint[0]:
                     it.value().load_joint_calibration( joint[1] )
                 it += 1
+
+    def save(self, filepath):
+        yaml_config = {}
+
+        joint_configs = []
+        it = QTreeWidgetItemIterator( self )
+        while it.value():
+            try:
+                joint_configs.append( it.value().get_joint_calibration() )
+            except:
+                pass
+            it += 1
+
+        yaml_config["sr_calibrations"] = joint_configs
+
+        full_config_to_write = yaml.dump(yaml_config, default_flow_style=False)
+        f = open(filepath, 'w')
+        f.write(full_config_to_write)
+        f.close()

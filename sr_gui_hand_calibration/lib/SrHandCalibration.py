@@ -74,7 +74,21 @@ class SrHandCalibration(QObject):
             self._widget.tree_calibration.resizeColumnToContents(col)
 
     def btn_save_clicked_(self):
-        print "Save Clicked"
+        path_to_config = "~"
+        try:
+            path_to_config = roslib.packages.get_pkg_dir("sr_robot_lib") + "/config"
+        except:
+            rospy.logwarn("couldnt find the sr_edc_controller_configuration package")
+
+        filter_files = "*.yaml"
+        filename, _ = QFileDialog.getOpenFileName(self._widget.tree_calibration, self._widget.tr('Save Controller Settings'),
+                                                  self._widget.tr(path_to_config),
+                                                  self._widget.tr(filter_files))
+
+        if filename == "":
+            return
+
+        self.hand_model.save( filename )
 
     def btn_load_clicked_(self):
         path_to_config = "~"
