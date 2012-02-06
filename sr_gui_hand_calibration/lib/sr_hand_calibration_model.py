@@ -48,7 +48,7 @@ class IndividualCalibration( QTreeWidgetItem ):
         """
         """
         self.joint_name = joint_name
-        self.raw_value = raw_value
+        self.raw_value = int(raw_value)
         self.calibrated_value = calibrated_value
         self.tree_widget = tree_widget
         self.robot_lib = robot_lib
@@ -62,6 +62,9 @@ class IndividualCalibration( QTreeWidgetItem ):
 
         self.is_calibrated = False
 
+    def remove(self):
+        self.tree_widget.remove
+
     def calibrate(self):
         self.raw_value = 5#self.robot_lib.get_average_raw_value(self.joint_name, 100)
         self.setText( 3, str(self.raw_value) )
@@ -74,6 +77,8 @@ class IndividualCalibration( QTreeWidgetItem ):
 
         self.is_calibrated = True
 
+    def modify(self, calibration):
+        print calibration
 
 class JointCalibration( QTreeWidgetItem ):
     """
@@ -87,6 +92,7 @@ class JointCalibration( QTreeWidgetItem ):
         """
         """
         self.joint_name = joint_name
+        self.tree_widget = tree_widget
         self.robot_lib = robot_lib
 
         self.calibrations = []
@@ -106,9 +112,14 @@ class JointCalibration( QTreeWidgetItem ):
         tree_widget.addTopLevelItem(self)
         tree_widget.connect(self.timer, SIGNAL('timeout()'), self.update_joint_pos)
 
-    def load_joint_calibration(self, calibrations):
-        for calibration in calibrations:
-            self.calibrations.modify()
+    def load_joint_calibration(self, new_calibrations):
+        for calibration in self.calibrations:
+            self.removeChild( calibration )
+
+        for calibration in new_calibrations:
+            self.calibrations.append( IndividualCalibration(self.joint_name,
+                                                            calibration[0], calibration[1],
+                                                            self, self.tree_widget, self.robot_lib))
 
     def update_joint_pos(self):
         raw_value = 5#self.robot_lib.get_raw_value( self.joint_name )
@@ -373,10 +384,10 @@ class HandCalibration( QTreeWidgetItem ):
             document += line
         f.close()
         yaml_config = yaml.load(document)
-        print yaml_config
 
         for joint in yaml_config["sr_calibrations"]:
             it = QTreeWidgetItemIterator( self )
             while it.value():
                 if it.value().text(1) == joint[0]:
-                    print joint
+                    it.value().load_joint_calibration( joint[1] )
+                it += 1
