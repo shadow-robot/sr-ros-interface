@@ -83,7 +83,7 @@ class CtrlSettings(object):
             self.motors.append( motors_for_finger )
 
 
-class SrControllerTunerLib(object):
+class SrControllerTunerApp(object):
     """
     """
 
@@ -106,7 +106,7 @@ class SrControllerTunerLib(object):
         try:
             resp = controllers()
         except rospy.ServiceException, e:
-            print "Service did not process request: %s"%str(e)
+            rospy.logerr( "Service did not process request: %s"%str(e) )
 
         running_ctrls.append("Motor Force")
         if resp != None:
@@ -179,7 +179,7 @@ class SrControllerTunerLib(object):
             pid_service = rospy.ServiceProxy(service_name, SetEffortControllerGains)
 
         else:
-            print "", controller_type, " is not a recognized controller type."
+            rospy.logerr( "", controller_type, " is not a recognized controller type." )
 
         contrlr_settings_converted = {}
         for param in controller_settings.items():
@@ -223,7 +223,7 @@ class SrControllerTunerLib(object):
             except:
                 return False
         else:
-            print "", controller_type, " is not a recognized controller type."
+            rospy.logerr( "", controller_type, " is not a recognized controller type." )
             return False
         return True
 

@@ -29,7 +29,7 @@ import roslib
 roslib.load_manifest('sr_gui_controller_tuner')
 import rospy, rosparam
 
-from sr_controller_tuner import SrControllerTunerLib
+from sr_controller_tuner import SrControllerTunerApp
 
 class SrGuiControllerTuner(QObject):
 
@@ -62,7 +62,7 @@ class SrGuiControllerTuner(QObject):
         self.ctrl_widgets = {}
 
         #a library which helps us doing the real work.
-        self.sr_controller_tuner_lib_ = SrControllerTunerLib( os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/controller_settings.xml') )
+        self.sr_controller_tuner_app_ = SrControllerTunerApp( os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/controller_settings.xml') )
 
         #refresh the controllers once
         self.on_btn_refresh_ctrl_clicked_()
@@ -160,7 +160,7 @@ class SrGuiControllerTuner(QObject):
             self.set_controller( motor )
 
     def on_btn_refresh_ctrl_clicked_(self):
-        ctrls = self.sr_controller_tuner_lib_.get_ctrls()
+        ctrls = self.sr_controller_tuner_app_.get_ctrls()
         self.controllers_in_dropdown = []
         self._widget.dropdown_ctrl.clear()
         for ctrl in ctrls:
@@ -169,11 +169,7 @@ class SrGuiControllerTuner(QObject):
 
         self.refresh_controller_tree_()
 
-    def set_controller(self, joint_name):
-        """
-        Sets the current values for the given controller
-        using the ros service.
-        """
+    def read_settings(self, joint_name):
         dict_of_widgets = self.ctrl_widgets[joint_name]
 
         settings = {}
@@ -186,8 +182,17 @@ class SrGuiControllerTuner(QObject):
             else:
                 settings[item[0]] = item[1].value()
 
+        return settings
+
+    def set_controller(self, joint_name):
+        """
+        Sets the current values for the given controller
+        using the ros service.
+        """
+        settings = self.read_settings( joint_name )
+
         #uses the library to call the service properly
-        success = self.sr_controller_tuner_lib_.set_controller(joint_name, self.controller_type, settings)
+        success = self.sr_controller_tuner_app_.set_controller(joint_name, self.controller_type, settings)
         if success == False:
             if self.controller_type == "Motor Force":
                 QMessageBox.warning(self._widget.tree_ctrl_settings, "Warning", "Failed to set the PID values for joint "+ joint_name +". This won't work for Gazebo controllers as there are no force controllers yet.")
@@ -200,20 +205,10 @@ class SrGuiControllerTuner(QObject):
         Sets the current values for the given controller
         using the ros service.
         """
-        dict_of_widgets = self.ctrl_widgets[joint_name]
-
-        settings = {}
-        for item in dict_of_widgets.items():
-            if item[0] == "sign":
-                if item[1].checkState() == Qt.Checked:
-                    settings["sign"] = 1
-                else:
-                    settings["sign"] = 0
-            else:
-                settings[item[0]] = item[1].value()
+        settings = self.read_settings( joint_name )
 
         #uses the library to call the service properly
-        self.sr_controller_tuner_lib_.save_controller(joint_name, self.controller_type, settings, self.file_to_save)
+        self.sr_controller_tuner_app_.save_controller(joint_name, self.controller_type, settings, self.file_to_save)
 
 
     def refresh_controller_tree_(self, controller_type = "Motor Force"):
@@ -222,7 +217,7 @@ class SrGuiControllerTuner(QObject):
         the tree.
         """
         self.controller_type = controller_type
-        ctrl_settings = self.sr_controller_tuner_lib_.get_controller_settings( controller_type )
+        ctrl_settings = self.sr_controller_tuner_app_.get_controller_settings( controller_type )
 
         self._widget.tree_ctrl_settings.clear()
         self._widget.tree_ctrl_settings.setColumnCount(ctrl_settings.nb_columns)
@@ -243,42 +238,42 @@ class SrGuiControllerTuner(QObject):
                 motor_item = QTreeWidgetItem( finger_item, motor_settings )
                 self._widget.tree_ctrl_settings.addTopLevelItem(motor_item)
 
-                parameter_values = self.sr_controller_tuner_lib_.load_parameters( controller_type, motor_name )
+                parameter_values = self.sr_controller_tuner_app_.load_parameters( controller_type, motor_name )
                 self.ctrl_widgets[ motor_name ] = {}
 
-                for index_header,header in enumerate(ctrl_settings.headers):
-                    if header["type"] == "Bool":
+                for index_item,item in enumerate(ctrl_settings.headers):
+                    if item["type"] == "Bool":
                         check_box = QCheckBox()
 
                         if parameter_values["sign"] == 1.0:
                             check_box.setChecked(True)
 
                         check_box.setToolTip("Check if you want a negative sign\n(if the motor is being driven\n the wrong way around).")
-                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, check_box )
+                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_item, check_box )
 
                         self.ctrl_widgets[ motor_name ]["sign"] = check_box
 
 
-                    if header["type"] == "Int":
+                    if item["type"] == "Int":
                         spin_box = QSpinBox()
-                        spin_box.setRange(int( header["min"] ), int( header["max"] ))
+                        spin_box.setRange(int( item["min"] ), int( item["max"] ))
 
-                        param_name = header["name"].lower()
+                        param_name = item["name"].lower()
                         spin_box.setValue( int(parameter_values[ param_name ] ) )
                         self.ctrl_widgets[ motor_name ][param_name] = spin_box
 
-                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, spin_box )
+                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_item, spin_box )
 
-                    if header["type"] == "Float":
+                    if item["type"] == "Float":
                         spin_box = QDoubleSpinBox()
                         spin_box.setRange( -65535.0, 65535.0 )
                         spin_box.setDecimals(3)
 
-                        param_name = header["name"].lower()
+                        param_name = item["name"].lower()
                         spin_box.setValue(float(parameter_values[param_name]))
                         self.ctrl_widgets[ motor_name ][param_name] = spin_box
 
-                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_header, spin_box )
+                        self._widget.tree_ctrl_settings.setItemWidget(  motor_item, index_item, spin_box )
 
                 motor_item.setExpanded(True)
             finger_item.setExpanded(True)
@@ -312,10 +307,7 @@ class SrGuiControllerTuner(QObject):
 
     def save_settings(self, global_settings, perspective_settings):
         pass
-        #topic = self._widget.topic_line_edit.text()
-        #perspective_settings.set_value('topic', topic)
 
     def restore_settings(self, global_settings, perspective_settings):
         pass
-        #topic = perspective_settings.value('topic', '/cmd_vel')
 

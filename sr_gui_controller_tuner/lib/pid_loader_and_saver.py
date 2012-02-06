@@ -71,5 +71,12 @@ class PidSaver(object):
         f.close()
 
 if __name__ == '__main__':
-    pid_saver = PidSaver("/code/Projects/ROS_interfaces/sr-ros-interface/palm_edc/shadow_robot/sr_hand_palm_edc/sr_edc_controller_configuration/sr_edc_mixed_position_velocity_joint_controllers.yaml")
-    pid_saver.save_settings(["sh_wrj2_mixed_position_velocity_controller","pid"], {"d":1.0})
+    path_to_config = "~"
+    try:
+        path_to_config = roslib.packages.get_pkg_dir("sr_edc_controller_configuration")
+
+        pid_saver = PidSaver(path_to_config+"/sr_edc_mixed_position_velocity_joint_controllers.yaml")
+        pid_saver.save_settings(["sh_wrj2_mixed_position_velocity_controller","pid"], {"d":1.0})
+    except:
+        rospy.logwarn("couldnt find the sr_edc_controller_configuration package")
+
