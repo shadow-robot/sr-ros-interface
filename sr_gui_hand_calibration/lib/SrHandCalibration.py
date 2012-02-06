@@ -21,7 +21,8 @@ import os
 
 from rosgui.QtBindingHelper import loadUi
 from QtCore import QEvent, QObject, Qt, QTimer, Slot
-from QtGui import QDockWidget, QShortcut, QColor, QTreeWidgetItem
+from QtGui import QDockWidget, QShortcut, QColor, QTreeWidgetItem, QFileDialog, QMessageBox
+from QtCore import QVariant
 
 import roslib
 roslib.load_manifest('sr_gui_hand_calibration')
@@ -55,6 +56,7 @@ class SrHandCalibration(QObject):
         self.hand_model = None
 
         self._widget.btn_save.clicked.connect(self.btn_save_clicked_)
+        self._widget.btn_load.clicked.connect(self.btn_load_clicked_)
         self._widget.btn_joint_0s.clicked.connect(self.btn_joint_0s_clicked_)
 
         self.populate_tree()
@@ -72,7 +74,24 @@ class SrHandCalibration(QObject):
             self._widget.tree_calibration.resizeColumnToContents(col)
 
     def btn_save_clicked_(self):
-        print "Clicked"
+        print "Save Clicked"
+
+    def btn_load_clicked_(self):
+        path_to_config = "~"
+        try:
+            path_to_config = roslib.packages.get_pkg_dir("sr_robot_lib") + "/config"
+        except:
+            rospy.logwarn("couldnt find the sr_edc_controller_configuration package")
+
+        filter_files = "*.yaml"
+        filename, _ = QFileDialog.getOpenFileName(self._widget.tree_calibration, self._widget.tr('Save Controller Settings'),
+                                                  self._widget.tr(path_to_config),
+                                                  self._widget.tr(filter_files))
+
+        if filename == "":
+            return
+
+        self.hand_model.load( filename )
 
     def btn_joint_0s_clicked_(self):
         self.hand_model.calibrate_joint0s( self._widget.btn_joint_0s )

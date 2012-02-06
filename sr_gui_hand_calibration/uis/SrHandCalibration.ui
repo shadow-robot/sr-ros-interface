@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>660</width>
     <height>344</height>
    </rect>
   </property>
@@ -29,6 +29,19 @@
           </property>
           <property name="shortcut">
            <string>Ctrl+S</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_load">
+          <property name="toolTip">
+           <string>Load a Calibration File (Ctrl+o)</string>
+          </property>
+          <property name="text">
+           <string>Load Calibration</string>
+          </property>
+          <property name="shortcut">
+           <string>Ctrl+O</string>
           </property>
          </widget>
         </item>

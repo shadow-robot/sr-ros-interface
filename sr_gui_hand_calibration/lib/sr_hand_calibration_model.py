@@ -25,7 +25,13 @@ from QtGui import QTreeWidgetItem, QTreeWidgetItemIterator, QColor, QIcon
 from PyQt4.Qt import QTimer
 from PyQt4.QtCore import SIGNAL
 
+import yaml
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 import os
+
 from collections import deque
 
 green = QColor(153, 231, 96)
@@ -33,7 +39,6 @@ red = QColor(236, 178, 178)
 
 class IndividualCalibration( QTreeWidgetItem ):
     """
-
     """
 
     def __init__(self, joint_name,
@@ -58,7 +63,7 @@ class IndividualCalibration( QTreeWidgetItem ):
         self.is_calibrated = False
 
     def calibrate(self):
-        self.raw_value = self.robot_lib.get_average_raw_value(self.joint_name, 100)
+        self.raw_value = 5#self.robot_lib.get_average_raw_value(self.joint_name, 100)
         self.setText( 3, str(self.raw_value) )
 
         for col in xrange(self.tree_widget.columnCount()):
@@ -101,8 +106,12 @@ class JointCalibration( QTreeWidgetItem ):
         tree_widget.addTopLevelItem(self)
         tree_widget.connect(self.timer, SIGNAL('timeout()'), self.update_joint_pos)
 
+    def load_joint_calibration(self, calibrations):
+        for calibration in calibrations:
+            self.calibrations.modify()
+
     def update_joint_pos(self):
-        raw_value = self.robot_lib.get_raw_value( self.joint_name )
+        raw_value = 5#self.robot_lib.get_raw_value( self.joint_name )
         self.setText( 2, str(raw_value) )
 
         #if the 5 last values are equal, then display a warning
@@ -150,7 +159,6 @@ class FingerCalibration( QTreeWidgetItem ):
                                                   robot_lib = robot_lib) )
 
         tree_widget.addTopLevelItem(self)
-
 
 class HandCalibration( QTreeWidgetItem ):
     """
@@ -282,8 +290,8 @@ class HandCalibration( QTreeWidgetItem ):
 
         QTreeWidgetItem.__init__(self, ["Hand", "", "", ""] )
 
-        self.robot_lib = EtherCAT_Hand_Lib()
-        self.robot_lib.activate()
+        self.robot_lib = None#EtherCAT_Hand_Lib()
+        #self.robot_lib.activate()
 
         for finger in fingers:
             if finger in self.joint_map.keys():
@@ -358,3 +366,17 @@ class HandCalibration( QTreeWidgetItem ):
 
         self.progress_bar.setValue( int( float(nb_of_calibrated_items) / float(nb_of_items) * 100.0 ) )
 
+    def load(self, filepath):
+        f = open(filepath,'r')
+        document = ""
+        for line in f.readlines():
+            document += line
+        f.close()
+        yaml_config = yaml.load(document)
+        print yaml_config
+
+        for joint in yaml_config["sr_calibrations"]:
+            it = QTreeWidgetItemIterator( self )
+            while it.value():
+                if it.value().text(1) == joint[0]:
+                    print joint
