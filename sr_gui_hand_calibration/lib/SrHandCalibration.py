@@ -88,6 +88,12 @@ class SrHandCalibration(QObject):
         if filename == "":
             return
 
+        if not self.hand_model.is_calibration_complete():
+            btn_pressed = QMessageBox.warning(self._widget.tree_calibration, "Warning", "Are you sure you want to save this incomplete calibration? The uncalibrated values will be saved as a flat map (the calibrated value will always be 0)",
+                                              buttons = QMessageBox.Ok |  QMessageBox.Cancel)
+
+            if btn_pressed == QMessageBox.Cancel:
+                return
         self.hand_model.save( filename )
 
     def btn_load_clicked_(self):

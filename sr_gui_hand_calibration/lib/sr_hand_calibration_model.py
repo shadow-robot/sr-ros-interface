@@ -436,3 +436,16 @@ class HandCalibration( QTreeWidgetItem ):
         f = open(filepath, 'w')
         f.write(full_config_to_write)
         f.close()
+
+    def is_calibration_complete(self):
+        it = QTreeWidgetItemIterator( self )
+        while it.value():
+            try:
+                if not it.value().is_calibrated:
+                    return False
+            except:
+                pass
+            it += 1
+
+        return True
+
