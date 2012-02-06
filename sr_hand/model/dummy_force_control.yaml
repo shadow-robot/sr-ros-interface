@@ -1,0 +1,284 @@
+# this file contains dummy data for an internal force control
+# in Gazebo. The internal force control is not yet implemented,
+# but it would be closer to the actual model of the hand.
+
+ffj0:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+ffj3:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+ffj4:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+lfj0:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+lfj3:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+lfj4:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+lfj5:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+mfj0:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+mfj3:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+mfj4:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+rfj0:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+rfj3:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+rfj4:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj1:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 270
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj2:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj3:
+  pid:
+    d: 18000
+    deadband: 5.0
+    f: 1900
+    i: 320
+    imax: 1700
+    max_pwm: 1023.0
+    p: 4800
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj4:
+  pid:
+    d: 18000.0
+    deadband: 5.0
+    f: 1900.0
+    i: 280.0
+    imax: 1700.0
+    max_pwm: 1023.0
+    p: 4800.0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+thj5:
+  pid:
+    d: 18000.0
+    deadband: 5.0
+    f: 1900.0
+    i: 380.0
+    imax: 1800.0
+    max_pwm: 1023.0
+    p: 6800.0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0
+wrj1:
+  pid:
+    d: 18000.0
+    deadband: 5.0
+    f: 1900.0
+    i: 250.0
+    imax: 900.0
+    max_pwm: 1023.0
+    p: 3200.0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 1.0
+wrj2:
+  pid:
+    d: 18000.0
+    deadband: 5.0
+    f: 1900.0
+    i: 720.0
+    imax: 1700.0
+    max_pwm: 1023.0
+    p: 6100.0
+    sg_left: 0
+    sg_right: 0
+    sgleftref: 0.0
+    sgrightref: 0.0
+    sign: 0.0

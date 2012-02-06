@@ -195,7 +195,7 @@ namespace controller {
     min_velocity_ = req.min_velocity;
     max_velocity_ = req.max_velocity;
 
-    return false;
+    return true;
   }
 
   void SrhMixedPositionVelocityJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
