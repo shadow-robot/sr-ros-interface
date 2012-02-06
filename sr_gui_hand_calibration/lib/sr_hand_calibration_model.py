@@ -21,7 +21,7 @@ roslib.load_manifest('sr_gui_hand_calibration')
 import rospy
 
 from etherCAT_hand_lib import EtherCAT_Hand_Lib
-from QtGui import QTreeWidgetItem, QTreeWidgetItemIterator, QColor, QIcon
+from QtGui import QTreeWidgetItem, QTreeWidgetItemIterator, QColor, QIcon, QMessageBox
 from PyQt4.Qt import QTimer
 from PyQt4.QtCore import SIGNAL
 
@@ -171,7 +171,8 @@ class JointCalibration( QTreeWidgetItem ):
                 self.setIcon(0, None)
                 self.setToolTip(0, "")
 
-
+    def on_close(self):
+        self.timer.stop()
 
 
 class FingerCalibration( QTreeWidgetItem ):
@@ -324,11 +325,20 @@ class HandCalibration( QTreeWidgetItem ):
         """
         """
         self.fingers = []
+        #this is set to False if the user doesn't want to continue
+        # when there are no EtherCAT hand node currently running.
+        self.is_active = True
 
         QTreeWidgetItem.__init__(self, ["Hand", "", "", ""] )
 
         self.robot_lib = EtherCAT_Hand_Lib()
-        self.robot_lib.activate()
+        if not self.robot_lib.activate():
+            btn_pressed = QMessageBox.warning(tree_widget, "Warning", "The EtherCAT Hand node doesn't seem to be running, or the debug topic is not being published. Do you still want to continue? The calibration will be useless.",
+                                              buttons = QMessageBox.Ok |  QMessageBox.Cancel)
+
+            if btn_pressed == QMessageBox.Cancel:
+                self.is_active = False
+
 
         for finger in fingers:
             if finger in self.joint_map.keys():
@@ -349,6 +359,14 @@ class HandCalibration( QTreeWidgetItem ):
         self.tree_widget.itemActivated.connect(self.calibrate_item)
 
     def unregister(self):
+        it = QTreeWidgetItemIterator( self )
+        while it.value():
+            try:
+                it.value().on_close()
+            except:
+                pass
+            it += 1
+
         self.robot_lib.on_close()
 
     def calibrate_item(self, item):

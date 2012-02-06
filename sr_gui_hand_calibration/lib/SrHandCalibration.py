@@ -67,6 +67,9 @@ class SrHandCalibration(QObject):
         self._widget.tree_calibration.clear()
 
         self.hand_model = HandCalibration( tree_widget = self._widget.tree_calibration, progress_bar = self._widget.progress )
+        if not self.hand_model.is_active:
+            self.close_plugin()
+            return
 
         self._widget.tree_calibration.expandAll()
 
