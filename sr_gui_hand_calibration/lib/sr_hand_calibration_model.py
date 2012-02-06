@@ -67,7 +67,7 @@ class IndividualCalibration( QTreeWidgetItem ):
         self.tree_widget.remove
 
     def calibrate(self):
-        self.raw_value = 5#self.robot_lib.get_average_raw_value(self.joint_name, 100)
+        self.raw_value = self.robot_lib.get_average_raw_value(self.joint_name, 100)
         self.setText( 3, str(self.raw_value) )
 
         for col in xrange(self.tree_widget.columnCount()):
@@ -148,7 +148,7 @@ class JointCalibration( QTreeWidgetItem ):
         return [self.joint_name, config]
 
     def update_joint_pos(self):
-        raw_value = 5#self.robot_lib.get_raw_value( self.joint_name )
+        raw_value = self.robot_lib.get_raw_value( self.joint_name )
         self.setText( 2, str(raw_value) )
 
         #if the 5 last values are equal, then display a warning
@@ -327,8 +327,8 @@ class HandCalibration( QTreeWidgetItem ):
 
         QTreeWidgetItem.__init__(self, ["Hand", "", "", ""] )
 
-        self.robot_lib = None#EtherCAT_Hand_Lib()
-        #self.robot_lib.activate()
+        self.robot_lib = EtherCAT_Hand_Lib()
+        self.robot_lib.activate()
 
         for finger in fingers:
             if finger in self.joint_map.keys():
