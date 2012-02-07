@@ -1,0 +1,25 @@
+<package>
+  <description brief="sr_gui_bootloader">
+
+    A GUI plugin for bootloading the motors on the shadow etherCAT hand.
+
+  </description>
+  <author>Ugo Cupcic / ugo@shadowrobot.com</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sr_gui_bootloader</url>
+  <depend package="rosgui"/>
+  <depend package="rosgui_rospy"/>
+  <depend package="rostopic"/>
+  <depend package="std_msgs"/>
+  <depend package="std_srvs"/>
+  <depend package="diagnostic_msgs"/>
+  <depend package="sr_robot_msgs"/>
+
+  <export>
+    <rosgui plugin="${prefix}/sr_bootloader.xml"/>
+  </export>
+
+</package>
+
+

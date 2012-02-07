@@ -17,36 +17,41 @@ from __future__ import division
 import os
 
 import roslib
-roslib.load_manifest('sr_gui_motor_resetter')
+roslib.load_manifest('sr_gui_bootloader')
 import rospy
 from std_srvs.srv import Empty
 from diagnostic_msgs.msg import DiagnosticArray
 
 from rosgui.QtBindingHelper import loadUi
 from QtCore import QEvent, QObject, Qt, QTimer, Slot, QThread, SIGNAL, QPoint
-from QtGui import QDockWidget, QShortcut, QMessageBox, QFrame, QHBoxLayout, QCheckBox, QLabel, QCursor, QColor, QMessageBox
+from QtGui import QDockWidget, QShortcut, QMessageBox, QFrame, QHBoxLayout, QCheckBox, QLabel, QCursor, QColor, QFileDialog
 
-class MotorFlasher(QThread):
+from sr_robot_msgs.srv import SimpleMotorFlasher, SimpleMotorFlasherResponse
+
+class MotorBootloader(QThread):
     def __init__(self, parent, nb_motors_to_program):
         QThread.__init__(self, None)
         self.parent = parent
         self.nb_motors_to_program = nb_motors_to_program
 
     def run(self):
-        programmed_motors = 0
+        bootloaded_motors = 0
+        firmware_path = self.parent._widget.txt_path.text()
         for motor in self.parent.motors:
             if motor.checkbox.checkState() == Qt.Checked:
                 try:
-                    print("resetting: /realtime_loop/reset_motor_"+motor.motor_name)
-                    self.flasher_service = rospy.ServiceProxy('/realtime_loop/reset_motor_'+motor.motor_name, Empty)
-                    self.flasher_service()
+                    self.bootloader_service = rospy.ServiceProxy('SimpleMotorFlasher', SimpleMotorFlasher)
+                    resp = self.bootloader_service( firmware_path, motor.motor_index )
                 except rospy.ServiceException, e:
                     self.emit( SIGNAL("failed(QString)"),
                                "Service did not process request: %s"%str(e) )
                     return
 
-                programmed_motors += 1
-                self.emit( SIGNAL("motor_finished(QPoint)"), QPoint( programmed_motors, 0.0 ) )
+                if resp == SimpleMotorFlasherResponse.FAIL:
+                    self.emit( SIGNAL("failed(QString)"),
+                               "Bootloading motor "++"failed" )
+                bootloaded_motors += 1
+                self.emit( SIGNAL("motor_finished(QPoint)"), QPoint( bootloaded_motors, 0.0 ) )
 
 class Motor(QFrame):
     def __init__(self, parent, motor_name, motor_index):
@@ -67,17 +72,17 @@ class Motor(QFrame):
         self.setLayout(self.layout)
 
 
-class SrGuiMotorResetter(QObject):
+class SrGuiBootloader(QObject):
 
     def __init__(self, parent, plugin_context):
-        super(SrGuiMotorResetter, self).__init__(parent)
-        self.setObjectName('SrGuiMotorResetter')
+        super(SrGuiBootloader, self).__init__(parent)
+        self.setObjectName('SrGuiBootloader')
 
         self._publisher = None
         main_window = plugin_context.main_window()
         self._widget = QDockWidget(main_window)
 
-        ui_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../uis/SrGuiMotorResetter.ui')
+        ui_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../uis/SrBootloader.ui')
         loadUi(ui_file, self._widget)
         self._widget.setObjectName('SrMotorResetterUi')
         if plugin_context.serial_number() > 1:
@@ -98,9 +103,28 @@ class SrGuiMotorResetter(QObject):
         self.diag_sub = rospy.Subscriber("/diagnostics", DiagnosticArray, self.diagnostics_callback)
 
         # Bind button clicks
+        self._widget.btn_select_bootloader.pressed.connect(self.on_select_bootloader_pressed)
         self._widget.btn_select_all.pressed.connect(self.on_select_all_pressed)
         self._widget.btn_select_none.pressed.connect(self.on_select_none_pressed)
-        self._widget.btn_reset_motors.pressed.connect(self.on_reset_motors_pressed)
+        self._widget.btn_bootload.pressed.connect(self.on_bootload_pressed)
+
+    def on_select_bootloader_pressed(self):
+        #select hex file bootloader
+        path_to_bootloader = "~"
+        try:
+            path_to_bootloader = roslib.packages.get_pkg_dir("sr_external_dependencies") + "/compiled_firmware/released_firmware/"
+        except:
+            rospy.logwarn("couldnt find the sr_edc_controller_configuration package")
+
+        filter_files = "*.hex"
+        filename, _ = QFileDialog.getOpenFileName(self._widget.motors_frame, self._widget.tr('Select hex file to bootload'),
+                                                  self._widget.tr(path_to_bootloader),
+                                                  self._widget.tr(filter_files))
+        if filename == "":
+            return
+
+        self._widget.txt_path.setText( filename )
+        self._widget.btn_bootload.setEnabled( True )
 
 
     def populate_motors(self):
@@ -168,8 +192,7 @@ class SrGuiMotorResetter(QObject):
         for motor in self.motors:
             motor.checkbox.setCheckState( Qt.Unchecked )
 
-    def on_reset_motors_pressed(self):
-        print("Reset motors pressed");
+    def on_bootload_pressed(self):
         self.progress_bar.reset()
         nb_motors_to_program = 0
         for motor in self.motors:
@@ -180,19 +203,19 @@ class SrGuiMotorResetter(QObject):
             return
         self.progress_bar.setMaximum(nb_motors_to_program)
 
-        self.motor_flasher = MotorFlasher(self, nb_motors_to_program)
-        self._widget.connect(self.motor_flasher, SIGNAL("finished()"), self.finished_programming_motors)
-        self._widget.connect(self.motor_flasher, SIGNAL("motor_finished(QPoint)"), self.one_motor_finished)
-        self._widget.connect(self.motor_flasher, SIGNAL("failed(QString)"), self.failed_programming_motors)
+        self.motor_bootloader = MotorBootloader(self, nb_motors_to_program)
+        self._widget.connect(self.motor_bootloader, SIGNAL("finished()"), self.finished_programming_motors)
+        self._widget.connect(self.motor_bootloader, SIGNAL("motor_finished(QPoint)"), self.one_motor_finished)
+        self._widget.connect(self.motor_bootloader, SIGNAL("failed(QString)"), self.failed_programming_motors)
 
         self._widget.contents.setCursor(Qt.WaitCursor)
         self.motors_frame.setEnabled(False)
         self._widget.btn_select_all.setEnabled(False)
         self._widget.btn_select_none.setEnabled(False)
         self.progress_bar.show()
-        self._widget.btn_reset_motors.hide()
+        self._widget.btn_bootload.hide()
 
-        self.motor_flasher.start()
+        self.motor_bootloader.start()
 
     def one_motor_finished(self, point):
         self.progress_bar.setValue( int(point.x()) )
@@ -203,10 +226,10 @@ class SrGuiMotorResetter(QObject):
         self._widget.btn_select_none.setEnabled(True)
         self._widget.contents.setCursor(Qt.ArrowCursor)
         self.progress_bar.hide()
-        self._widget.btn_reset_motors.show()
+        self._widget.btn_bootload.show()
 
     def failed_programming_motors(self, message):
-        QMessageBox.warning(self.motors_frame, "Warning", message)
+        QMessageBox.warning(self._widget.motors_frame, "Warning", message)
 
     def _unregisterPublisher(self):
         if self._publisher is not None:
