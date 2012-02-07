@@ -39,10 +39,10 @@ class MotorFlasher(QThread):
                 try:
                     print("resetting: /realtime_loop/reset_motor_"+motor.motor_name)
                     self.flasher_service = rospy.ServiceProxy('/realtime_loop/reset_motor_'+motor.motor_name, Empty)
-                    resp = self.flasher_service()
+                    self.flasher_service()
                 except rospy.ServiceException, e:
                     self.emit( SIGNAL("failed(QString)"),
-                               QString( "Service did not process request: %s"%str(e) ) )
+                               "Service did not process request: %s"%str(e) )
                     return
 
                 programmed_motors += 1
@@ -206,7 +206,7 @@ class SrGuiMotorResetter(QObject):
         self._widget.btn_reset_motors.show()
 
     def failed_programming_motors(self, message):
-        QMessageBox.warning(self.frame, "Warning", message)
+        QMessageBox.warning(self.motors_frame, "Warning", message)
 
     def _unregisterPublisher(self):
         if self._publisher is not None:
