@@ -1,0 +1,12 @@
+<library path="lib/SrGuiBootloader">
+  <class name="SrGuiBootloader" type="SrGuiBootloader" base_class_type="rosgui_rospy::Plugin">
+    <description>
+	A plugin for bootloading the motors on the etherCAT shadow hand.
+    </description>
+    <rosguiplugin>
+      <label>Motor Bootloader</label>
+      <icon type="theme">redhat-graphics</icon>
+      <statustip>A plugin for bootloading the motors on the etherCAT shadow hand.</statustip>
+    </rosguiplugin>
+  </class>
+</library>
