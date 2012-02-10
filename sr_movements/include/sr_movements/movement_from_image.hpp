@@ -28,8 +28,9 @@
 #ifndef _MOVEMENT_FROM_IMAGE_HPP_
 #define _MOVEMENT_FROM_IMAGE_HPP_
 
-#include <png++/png.hpp>
+#include <Magick++.h>
 #include "sr_movements/partial_movement.hpp"
+#include <boost/smart_ptr.hpp>
 
 namespace shadowrobot
 {
@@ -46,9 +47,16 @@ namespace shadowrobot
      *  - The first encountered pixel is the target (the scale is
      *    the full range of the joint = the height of the png).
      *
-     * @param image an image containing a movement.
      */
-    void generate_movement( png::image<png::rgb_pixel> image);
+    void generate_movement_();
+
+    ///The image from which the movement is generated
+    boost::shared_ptr<Magick::Image> image_;
+
+    ///The number of columns in the image
+    ssize_t nb_cols_;
+    ///The number of rows in the image
+    ssize_t nb_rows_;
   };
 }
 

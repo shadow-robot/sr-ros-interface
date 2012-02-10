@@ -16,10 +16,11 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
+find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
+include_directories( ${ImageMagick_INCLUDE_DIRS})
+
 rosbuild_add_executable(sr_movements src/sr_movements.cpp src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
-rosbuild_add_compile_flags(sr_movements -I/usr/include/libpng12)
-rosbuild_add_link_flags(sr_movements -L/usr/lib -lpng12)
+target_link_libraries(sr_movements ${ImageMagick_LIBRARIES})
 
 rosbuild_add_library(sr_movement src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
-rosbuild_add_compile_flags(sr_movement -I/usr/include/libpng12)
-rosbuild_add_link_flags(sr_movement -L/usr/lib -lpng12)
+target_link_libraries(sr_movement ${ImageMagick_LIBRARIES})

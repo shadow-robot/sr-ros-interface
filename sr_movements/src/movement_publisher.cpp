@@ -73,13 +73,17 @@ namespace shadowrobot
 
           //get the target
           msg.data = partial_movements[i].get_target( static_cast<double>(j) / static_cast<double>(nb_mvt_step));
+
           //there was not target -> resend the last target
           if( msg.data == -1.0 )
+          {
             msg.data = last_target;
-
-          //interpolate to the correct range
-          msg.data = min + msg.data * (max - min);
-
+          }
+          else
+          {
+            //interpolate to the correct range
+            msg.data = min + msg.data * (max - min);
+          }
           //publish the message
           pub.publish( msg );
 
