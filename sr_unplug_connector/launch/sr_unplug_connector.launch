@@ -1,7 +1,0 @@
-<launch>
-
-  <node pkg="sr_unplug_connector" name="sr_unplug_connector" type="sr_unplug_connector" output="screen">
-    <remap from="~input" to="/re_kinect/detection_results"/>
-  </node>
-
-</launch>

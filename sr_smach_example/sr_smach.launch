@@ -1,4 +1,0 @@
-<launch>
-  <node pkg="sr_smach_example" name="sr_smach_example" type="sr_smach_example.py"/>
-  <node pkg="smach_viewer" name="smach_viewer" type="smach_viewer.py"/>
-</launch>

@@ -1,9 +1,0 @@
-[Core]
-Name = cyberglove_calibrator_plugin
-Module = CybergloveCalibratorPlugin
-
-[Documentation]
-Author = Ugo Cupcic
-Version = 0.1
-Website = http://www.shadowrobot.com
-Description = Cyberglove

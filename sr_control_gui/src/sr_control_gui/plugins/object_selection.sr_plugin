@@ -1,9 +1,0 @@
-[Core]
-Name = object_selection
-Module = ObjectSelection
-
-[Documentation]
-Author = Ugo Cupcic
-Version = 0.1
-Website = http://www.shadowrobot.com
-Description = Used to select an object for the ROS manipulation stack.
