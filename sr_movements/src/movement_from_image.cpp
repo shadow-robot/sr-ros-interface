@@ -26,6 +26,7 @@
 
 
 #include "sr_movements/movement_from_image.hpp"
+#include <ros/ros.h>
 
 #include <iostream>
 
@@ -34,29 +35,34 @@ namespace shadowrobot
   MovementFromImage::MovementFromImage(std::string image_path)
     : PartialMovement()
   {
-    png::image< png::rgb_pixel > image( image_path );
+    image_ = boost::shared_ptr<Magick::Image>( new Magick::Image() );
+    image_->read( image_path );
 
-    generate_movement(image);
+    nb_cols_ = image_->columns();
+    nb_rows_ = image_->rows();
+
+    generate_movement_();
   }
 
   MovementFromImage::~MovementFromImage()
   {}
 
 
-  void MovementFromImage::generate_movement( png::image<png::rgb_pixel> image )
+  void MovementFromImage::generate_movement_()
   {
-    png::byte empty_byte(0);
-    double img_height = static_cast<double>( image.get_width() );
-    for (size_t y = 0; y < image.get_height(); ++y)
+    const Magick::PixelPacket* pixel_cache = image_->getConstPixels(0,0,nb_cols_, nb_rows_);
+
+    for( ssize_t col = 0; col < nb_cols_; ++col)
     {
       bool no_pixel = true;
-      for (size_t x = 0; x < image.get_width(); ++x)
+      for( ssize_t row=0; row < nb_rows_; ++row)
       {
-        if( (image[x][y].red == empty_byte) && (image[x][y].green == empty_byte)
-            && (image[x][y].blue == empty_byte) )
+        const Magick::PixelPacket* tmp_pixel = pixel_cache + row * nb_cols_ + col;
+        if( tmp_pixel->red != 0xFFFF && tmp_pixel->green != 0xFFFF
+            && tmp_pixel->blue != 0xFFFF)
         {
           no_pixel = false;
-          steps.push_back( 1.0 - static_cast<double>(x) / img_height);
+          steps.push_back( 1.0 - static_cast<double>(row) / static_cast<double>(nb_rows_) );
           break;
         }
       }

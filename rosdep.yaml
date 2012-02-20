@@ -23,9 +23,9 @@ libspnav-dev:
   ubuntu: libspnav-dev
   debian: libspnav-dev
 
-libpng++-dev:
-  ubuntu: libpng++-dev
-  debian: libpng++-dev
+libmagick++-dev:
+  ubuntu: libmagick++-dev
+  debian: libmagick++-dev
 
 tinyxml:
   ubuntu: libtinyxml-dev
