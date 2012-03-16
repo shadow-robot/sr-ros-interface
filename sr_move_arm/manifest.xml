@@ -24,7 +24,6 @@
   <depend package="actionlib_msgs"/>
   <depend package="sr_robot_msgs"/>
   <depend package="object_manipulator"/>
-  <depend package="math_utils"/>
 
 </package>
 
