@@ -1,9 +1,0 @@
-<launch>
-	<node name="ar_kinect" pkg="ar_kinect" type="ar_kinect" respawn="false" output="screen">
-		<param name="marker_pattern_list" type="string" value="$(find static_tf_kinect_to_base_calibration)/data/objects_kinect"/>
-		<param name="marker_data_directory" type="string" value="$(find static_tf_kinect_to_base_calibration)"/>
-		<param name="threshold" type="int" value="100"/>
-	</node>
-
-	<node name="learn_transform" pkg="static_tf_kinect_to_base_calibration" type="learn_transform" output="screen"/>
-</launch>

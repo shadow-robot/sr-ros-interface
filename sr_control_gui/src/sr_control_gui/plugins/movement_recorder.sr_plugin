@@ -1,9 +1,0 @@
-[Core]
-Name = movement_recorder
-Module = MovementRecorder
-
-[Documentation]
-Author = Ugo Cupcic
-Version = 0.1
-Website = http://www.shadowrobot.com
-Description = ShadowHand

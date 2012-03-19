@@ -1,3 +1,0 @@
-sr_automatic_pid_tuning:
-  starting_seed: [ 300, 2000, 1000]
-  max_variations: [500, 2000, 3000]
