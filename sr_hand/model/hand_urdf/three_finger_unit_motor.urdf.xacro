@@ -7,7 +7,6 @@
   <include filename="$(find sr_hand)/model/hand_urdf/wrist/wrist.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/palm/palm.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/finger/classic_finger.urdf.xacro" />
-  <include filename="$(find sr_hand)/model/hand_urdf/finger/little_finger.urdf.xacro" />
   <include filename="$(find sr_hand)/model/hand_urdf/thumb/thumb.urdf.xacro" />
 
   <!-- Right Hand -->
