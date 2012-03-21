@@ -1,15 +1,10 @@
 <launch>
-	<group if="$(optenv ONE_FINGER 0)">
-    <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_one_finger_motor.urdf.xacro'" />
-  </group>
-  <group unless="$(optenv ONE_FINGER 0)">
-    <param name="hand_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_motor.urdf.xacro'" />
-  </group>
+  <include file="$(find sr_hand)/launch/load_hand_model.launch" />
 
   <param name="arm_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
 
 	<!--
-      	 	shadowarm 
+      	 	shadowarm
                        		 -->
 	<node pkg="sr_hand" name="shadowarm"
 	type="shadowarm_virtual">
@@ -71,9 +66,9 @@
 	<!-- publishes fixed transform: to link the arm and the hand for both targets
 	     and positions + a fixed transform to a fixed point at 0 0 0, to remap the
 	     arm base for both positions and targets. -->
-	
+
 	 <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" /> 
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
 
 	<node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos"
 		args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100"/>
@@ -88,10 +83,10 @@
  <!--
      Diagnostic Aggregator
                           -->
-  
+
   <node pkg="diagnostic_aggregator" type="aggregator_node"
         name="sr_diagnostic_aggregator" >
-    <rosparam command="load" 
+    <rosparam command="load"
               file="$(find sr_hand)/shadowhand_analyzer.yaml" />
   </node>
 

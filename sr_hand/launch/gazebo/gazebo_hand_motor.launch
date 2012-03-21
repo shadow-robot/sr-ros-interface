@@ -3,7 +3,6 @@
   <!-- start gazebo with an empty plane -->
   <include file="$(find sr_hand)/launch/gazebo/empty_world.launch"/>
 
-  <!-- spawn the arm model -->
   <group if="$(optenv ONE_FINGER 0)">
     <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_one_finger_motor.urdf.xacro'" />
   </group>
