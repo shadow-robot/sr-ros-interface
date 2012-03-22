@@ -264,3 +264,4 @@ sr_dremmeling_wall/.pydevproject
 ￼
 sr_dremmeling_wall/cmake_install.cmake
 sr_mechanism_controllers/bin/simple_trajectory
+sr_hand/bin/shadowarm_can
