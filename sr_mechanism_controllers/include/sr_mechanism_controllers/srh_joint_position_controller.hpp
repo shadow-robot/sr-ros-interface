@@ -58,8 +58,7 @@ namespace controller
 
     ///clamps the force demand to this value
     double max_force_demand;
-    ///the deadband for the friction compensation algorithm
-    int friction_deadband;
+
     ///the position deadband value used in the hysteresis_deadband
     double position_deadband;
 
