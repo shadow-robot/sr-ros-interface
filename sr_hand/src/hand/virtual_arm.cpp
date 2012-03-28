@@ -202,7 +202,9 @@ JointData VirtualArm::getJointData( std::string joint_name )
         //return the position
         iter->second.temperature = ((double)(rand() % 100) / 100.0);
         iter->second.current = ((double)(rand() % 100) / 100.0);
+#ifndef GAZEBO
         iter->second.force = ((double)(rand() % 100) / 100.0);
+#endif
 
         JointData tmpData = JointData(iter->second);
         joints_map_mutex.unlock();
@@ -225,7 +227,9 @@ SRArticulatedRobot::JointsMap VirtualArm::getAllJointsData()
         JointData tmpData = it->second;
         tmpData.temperature = ((double)(rand() % 100) / 100.0);
         tmpData.current = ((double)(rand() % 100) / 100.0);
+#ifndef GAZEBO
         tmpData.force = ((double)(rand() % 100) / 100.0);
+#endif
         tmpData.jointIndex = 0;
         tmpData.flags = "";
 
