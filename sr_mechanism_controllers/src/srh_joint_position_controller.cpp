@@ -156,6 +156,8 @@ namespace controller {
   bool SrhJointPositionController::setGains(sr_robot_msgs::SetPidGains::Request &req,
                                             sr_robot_msgs::SetPidGains::Response &resp)
   {
+    ROS_INFO_STREAM("Setting new PID parameters. P:"<< req.p<< " / I:" << req.i <<
+                    " / D:" << req.d << " / IClamp:"<<req.i_clamp<< ", max force: " <<req.max_force << ", friction deadband: "<< req.friction_deadband << " pos deadband: "<<req.deadband);
     pid_controller_position_->setGains(req.p,req.i,req.d,req.i_clamp,-req.i_clamp);
     max_force_demand = req.max_force;
     friction_deadband = req.friction_deadband;
