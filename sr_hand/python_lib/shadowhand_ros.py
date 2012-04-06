@@ -23,8 +23,9 @@ import rospy
 import subprocess
 import threading
 import rosgraph.masterapi
-from sr_robot_msgs.msg import sendupdate, joint, joints_data
+from sr_robot_msgs.msg import sendupdate, joint, joints_data, JointControllerState
 from sensor_msgs.msg import *
+from std_msgs.msg import Float64
 from grasps_parser import GraspParser
 from grasps_interpoler import GraspInterpoler
 
@@ -91,8 +92,17 @@ class ShadowHand_ROS():
         self.dict_tar = {}
         self.dict_arm_pos = {}
         self.dict_arm_tar = {}
+        self.dict_ethercat_joints = {}
+        self.eth_publishers = {}
+        self.eth_subscribers = {}
         #rospy.init_node('python_hand_library')
         self.sendupdate_lock = threading.Lock()
+
+        #contains the ending for the topic depending on which controllers are loaded
+        self.topic_ending = ""
+
+        ##EtherCAT hand
+        self.activate_etherCAT_hand()
 
         ###
         # Grasps
@@ -110,6 +120,38 @@ class ShadowHand_ROS():
 
     def create_grasp_interpoler(self, current_step, next_step):
         self.grasp_interpoler = GraspInterpoler(current_step, next_step)
+
+    def callback_ethercat_states(self, data, jointName):
+        """
+        @param data: The ROS message received which called the callback
+        If the message is the first received, initializes the dictionnaries
+        Else, it updates the lastMsg
+        @param joint: a Joint object that contains the name of the joint that we receive data from
+        """
+
+        joint_data = joint(joint_name=jointName, joint_target=math.degrees(float(data.set_point)), joint_position=math.degrees(float(data.process_value)))
+        # update the dictionary of joints
+        self.dict_ethercat_joints[joint_data.joint_name]=joint_data
+
+        # Build a CAN hand style lastMsg with the latest info in self.dict_ethercat_joints
+        self.lastMsg = joints_data()
+
+        for joint_name in self.dict_ethercat_joints.keys() :
+            self.lastMsg.joints_list.append(self.dict_ethercat_joints[joint_name])
+            #self.lastMsg.joints_list_length++
+
+        #TODO This is not the right way to do it. We should check that messages from all the joints have been received (but we don't know if we have all the joints, e.g three finger hand)
+        self.isReady = True
+
+        '''
+        if self.isFirstMessage :
+            self.init_actual_joints()
+            for joint in self.lastMsg.joints_list :
+                self.dict_pos[joint.joint_name]=joint.joint_position
+                self.dict_tar[joint.joint_name]=joint.joint_target
+            self.isFirstMessage = False
+            self.isReady = True
+        '''
 
     def callback(self, data):
         """
@@ -147,9 +189,21 @@ class ShadowHand_ROS():
                 if joint_msg.joint_name == joint_all.name:
                     self.handJoints.append(joint_all)
 
-    def check_hand_presence(self):
+    def check_hand_type(self):
         """
-        @return : true if the hand if detected
+        @return : true if some hand is detected
+        """
+        if self.check_etherCAT_hand_presence():
+            return "etherCAT"
+        elif self.check_gazebo_hand_presence():
+            return "gazebo"
+        elif self.check_CAN_hand_presence():
+            return "CANhand"
+        return None
+
+    def check_CAN_hand_presence(self):
+        """
+        @return : true if the CAN hand is detected
         """
         t = 0.0
         while not self.isReady:
@@ -183,10 +237,20 @@ class ShadowHand_ROS():
         Sends new targets to the hand from a dictionnary
         """
         #print(dicti)
-        message = []
-        for join in dicti.keys():
-            message.append(joint(joint_name=join, joint_target=dicti[join]))
-        self.pub.publish(sendupdate(len(message), message))
+        if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
+            for join in dicti.keys():
+                if not self.eth_publishers.has_key(join):
+                    topic = "/sh_"+ join.lower() + self.topic_ending+"/command"
+                    self.eth_publishers[join] = rospy.Publisher(topic, Float64)
+
+                msg_to_send = Float64()
+                msg_to_send.data = math.radians( float( dicti[join] ) )
+                self.eth_publishers[join].publish(msg_to_send)
+        elif self.check_hand_type() == "CANhand":
+            message = []
+            for join in dicti.keys():
+                message.append(joint(joint_name=join, joint_target=dicti[join]))
+            self.pub.publish(sendupdate(len(message), message))
 
     def sendupdate(self, jointName, angle=0):
         """
@@ -195,8 +259,19 @@ class ShadowHand_ROS():
         Sends a new target for the specified joint
         """
         self.sendupdate_lock.acquire()
-        message = [joint(joint_name=jointName, joint_target=angle)]
-        self.pub.publish(sendupdate(len(message), message))
+
+        if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
+            if not self.eth_publishers.has_key(jointName):
+                topic = "/sh_"+ jointName.lower() + self.topic_ending + "/command"
+                self.eth_publishers[jointName] = rospy.Publisher(topic, Float64)
+
+            msg_to_send = Float64()
+            msg_to_send.data = math.radians( float( angle ) )
+            self.eth_publishers[jointName].publish(msg_to_send)
+        elif self.check_hand_type() == "CANhand":
+            message = [joint(joint_name=jointName, joint_target=angle)]
+            self.pub.publish(sendupdate(len(message), message))
+
         self.sendupdate_lock.release()
 
     def sendupdate_arm_from_dict(self, dicti):
@@ -333,3 +408,55 @@ class ShadowHand_ROS():
         if reset == 1:
             print 'reset'
 
+    def check_etherCAT_hand_presence(self):
+        """
+        Only used to check if a real etherCAT hand is detected in the system
+        check if something is being published to this topic, otherwise
+        return false
+        """
+        try:
+            rospy.wait_for_message("/joint_states", JointState, timeout = 0.2)
+        except:
+            return False
+
+        return True
+
+    def check_gazebo_hand_presence(self):
+        """
+        Only used to check if a Gazebo simulated (etherCAT protocol) hand is detected in the system
+        check if something is being published to this topic, otherwise
+        return false
+        """
+        try:
+            rospy.wait_for_message("/gazebo/joint_states", JointState, timeout = 0.2)
+        except:
+            return False
+
+        return True
+
+    def activate_etherCAT_hand(self):
+        """
+        At the moment we just try to use the mixed position velocity controllers
+        """
+        success = True
+        for joint_all in self.allJoints :
+            self.topic_ending = "_mixed_position_velocity_controller"
+            topic = "/sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
+            success = True
+            try:
+                rospy.wait_for_message(topic, JointControllerState, timeout = 0.2)
+            except:
+                try:
+                    self.topic_ending = "_position_controller"
+                    topic = "/sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
+                    rospy.wait_for_message(topic, JointState, timeout = 0.2)
+                except:
+                    success = False
+
+        if success:
+            self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, JointControllerState, self.callback_ethercat_states, joint_all.name)
+
+        if len(self.eth_subscribers) > 0:
+            return True
+
+        return False
