@@ -128,8 +128,8 @@ class ShadowHand_ROS():
         Else, it updates the lastMsg
         @param joint: a Joint object that contains the name of the joint that we receive data from
         """
-
         joint_data = joint(joint_name=jointName, joint_target=math.degrees(float(data.set_point)), joint_position=math.degrees(float(data.process_value)))
+
         # update the dictionary of joints
         self.dict_ethercat_joints[joint_data.joint_name]=joint_data
 
@@ -453,8 +453,8 @@ class ShadowHand_ROS():
                 except:
                     success = False
 
-        if success:
-            self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, JointControllerState, self.callback_ethercat_states, joint_all.name)
+            if success:
+                self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, JointControllerState, self.callback_ethercat_states, joint_all.name)
 
         if len(self.eth_subscribers) > 0:
             return True
