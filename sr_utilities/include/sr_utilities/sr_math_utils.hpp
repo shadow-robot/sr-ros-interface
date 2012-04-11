@@ -161,6 +161,62 @@ namespace sr_math_utils
   //////////////
   namespace filters
   {
+
+    class LowPassFilter
+    {
+    public:
+      LowPassFilter(double tau= 0.05)
+	: is_first(true), dt(0.0), 
+	  timestamp_1(0.0), q_prev(0.0)
+      {
+	this->tau = tau;
+	value_derivative.first = 0.0;
+	value_derivative.second = 0.0;
+      };
+
+      /**
+       * Computes the filtered value and its derivative.
+       *
+       * @param q the newly received value.
+       * @param timestamp the time at which the last
+       *                  measurement was made (in sec).
+       *
+       * @return a pair containing the filtered value first, then
+       *         the derivative.
+       */
+      std::pair<double, double> compute(double q, double timestamp)
+      {
+	if( is_first )
+	{
+	  q_prev = q;
+	  //initializing dt to 1ms
+	  dt = 0.001;
+
+	  is_first = false;
+	}
+	else
+	  dt = timestamp - timestamp_1;
+
+	double alpha = exp(-dt / tau);
+
+	//filtering the input
+	value_derivative.first = alpha * value_derivative.first + (1 - alpha)*q;
+	//filtering the derivative
+	value_derivative.second = alpha * value_derivative.second + (1 - alpha) / dt * (q - q_prev);
+
+	q_prev = q;
+	timestamp_1 = timestamp;
+
+        return value_derivative;
+      };
+      
+    private:
+      bool is_first;
+      double tau, dt, timestamp_1, q_prev;
+
+      std::pair<double, double> value_derivative;
+    };
+
     /**
      * An alpha beta filter as described on:
      *  http://en.wikipedia.org/wiki/Alpha_beta_filter
@@ -169,7 +225,7 @@ namespace sr_math_utils
     class AlphaBetaFilter
     {
     public:
-      AlphaBetaFilter(double alpha = 0.85, double beta = 0.005)
+      AlphaBetaFilter(double alpha = 0.85, double beta = 0.05)
         : a(alpha), b(beta),
           xk_1(0.0), vk_1(0.0), xk(0.0), vk(0.0), rk(0.0),
           dt(0.0), timestamp_1(0.0)
