@@ -20,23 +20,17 @@
       <visual>
 	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="distal_visual">
-      <mesh filename="package://sr_hand/model/meshes/distal_ellipsoid.mesh" scale="0.001 0.001 0.001" />
-    </geometry>
-      <material name="Grey" />
+	  <mesh filename="package://sr_hand/model/meshes/distal_ellipsoid.mesh" scale="0.001 0.001 0.001" />
+	</geometry>
+	<material name="Grey" />
       </visual>
-<!--      <visual>
-	<origin xyz="0 0 0" rpy="0 0 0" />
-	<geometry name="nano17">
-      <mesh filename="package://sr_hand/model/meshes/nano17.mesh" scale="0.001 0.001 0.001" />
-      </geometry>
-     <material name="Grey" />
-      </visual>-->
       <collision>
-		<origin xyz="0 0 0.02" rpy="0 0 0" />
-			<geometry name="distal_collision_geom">
-			  <box size="0.015 0.015 0.020" />
-			</geometry>
-	  </collision>
+	<origin xyz="0 0 0" rpy="0 0 0" />
+	<geometry name="distal_collision_geom">
+
+	  <mesh filename="package://sr_hand/model/meshes/distal_ellipsoid.mesh" scale="0.001 0.001 0.001" />
+	</geometry>
+      </collision>
     </link>
     <gazebo reference="${link_prefix}distal">
       <sensor:contact name="${link_prefix}distal_contact_sensor">

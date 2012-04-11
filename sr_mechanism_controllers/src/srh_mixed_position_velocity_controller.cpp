@@ -175,8 +175,8 @@ namespace controller {
     pid_controller_position_->reset();
     pid_controller_velocity_->reset();
     read_parameters();
-
     ROS_WARN("Reseting PID");
+    last_time_ = robot_->getTime();
   }
 
   bool SrhMixedPositionVelocityJointController::setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req,
@@ -245,6 +245,15 @@ namespace controller {
     else
       error_position = command_ - joint_state_->position_;
 
+    //are we in the deadband?
+    bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
+
+    if( in_deadband ) //consider the error as 0 if we're in the deadband
+    {
+      error_position = 0.0;
+      pid_controller_position_->reset();
+    }
+
     double commanded_velocity = 0.0;
     double error_velocity = 0.0;
     double commanded_effort = 0.0;
@@ -258,8 +267,6 @@ namespace controller {
     ////////////
     // VELOCITY
     /////
-    //are we in the deadband?
-    bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
 
     //velocity loop:
     if( !in_deadband ) //don't compute the error if we're in the deadband
