@@ -25,9 +25,9 @@
       <material name="Grey" />
       </visual>
       <collision>
-	<origin xyz="0 0 0.02" rpy="0 0 0" />
+	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="distal_collision_geom">
-	  <box size="0.015 0.015 0.020" />
+	  <mesh filename="package://sr_hand/model/meshes/F1.mesh" scale="0.001 0.001 0.001" />
 	</geometry>
       </collision>
     </link>

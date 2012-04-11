@@ -27,9 +27,9 @@
 	</material>
       </visual>
       <collision>
-	<origin xyz="0 0 0.025" rpy="0 0 0 " />
+	<origin xyz="0 0.002 0.0025" rpy="0 0 0 " />
 	<geometry name="thmiddle_collision_geom">
-	  <box size="0.015 0.015 0.015" />
+	  <mesh filename="package://sr_hand/model/meshes/distal_ellipsoid.mesh" scale="0.001 0.001 0.001" />
 	</geometry>
       </collision>
     </link>
