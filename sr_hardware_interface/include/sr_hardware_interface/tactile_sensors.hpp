@@ -82,14 +82,24 @@ namespace tactiles
       std::vector<std::string> splitted_string;
       boost::split(splitted_string, version, boost::is_any_of("\n"));
 
-      BOOST_ASSERT(splitted_string.size() >= 3);
-      software_version_current = convertToInt(splitted_string[0]);
-      software_version_server = convertToInt(splitted_string[1]);
+      ROS_DEBUG("Tactile version: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X", static_cast<unsigned char>(version[0]), static_cast<unsigned char>(version[1]), static_cast<unsigned char>(version[2]), static_cast<unsigned char>(version[3]), static_cast<unsigned char>(version[4]), static_cast<unsigned char>(version[5]), static_cast<unsigned char>(version[6]), static_cast<unsigned char>(version[7]), static_cast<unsigned char>(version[8]), static_cast<unsigned char>(version[9]), static_cast<unsigned char>(version[10]), static_cast<unsigned char>(version[11]), static_cast<unsigned char>(version[12]), static_cast<unsigned char>(version[13]), static_cast<unsigned char>(version[14]), static_cast<unsigned char>(version[15]));
+      if (splitted_string.size() >= 3)
+      {
+          software_version_current = convertToInt(splitted_string[0]);
+          software_version_server = convertToInt(splitted_string[1]);
 
-      if( splitted_string[2] == "No")
-        software_version_modified = false;
+          if( splitted_string[2] == "No")
+            software_version_modified = false;
+          else
+            software_version_modified = true;
+      }
       else
-        software_version_modified = true;
+      {
+          ROS_ERROR("Incorrect tactile sensor version format");
+          software_version_current = 0;
+          software_version_server = 0;
+          software_version_modified = false;
+      }
     };
 
     /**
