@@ -11,7 +11,8 @@
       <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_three_finger_motor.urdf.xacro'" />
     </group>
     <group unless="$(optenv THREE_FINGER 0)">
-      <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_motor.urdf.xacro'" />
+      <param if="$(optenv BIOTAC_HAND 0)" name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_motor_biotac.urdf.xacro'" />
+      <param unless="$(optenv BIOTAC_HAND 0)" name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_motor.urdf.xacro'" />
     </group>
   </group>
 
