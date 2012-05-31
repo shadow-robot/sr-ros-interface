@@ -2,9 +2,9 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b sr_hardware_interface is ... 
+\b sr_hardware_interface contains the actuator used in the hand model.
 
-<!-- 
+<!--
 Provide an overview of your package.
 -->
 

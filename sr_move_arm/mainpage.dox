@@ -2,12 +2,11 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b sr_move_arm is ... 
-
-<!-- 
-Provide an overview of your package.
--->
-
+\b sr_move_arm is an actionlib server wrapup around the shadow arm. It's goal is to move
+    the arm, given a goal. It also contains a reactive grasp / reactive approach action
+    server. This server computes dynamic checks during the approach phase, during
+    the grasping, during the lifting of the object, as well as when placing the object
+    on the table.
 
 \section codeapi Code API
 

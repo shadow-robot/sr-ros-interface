@@ -2,12 +2,8 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b sr_kinematics is ... 
-
-<!-- 
-Provide an overview of your package.
--->
-
+\b sr_kinematics is a specific shadowhand package derived from arm_kinematics, for computing both forward and backward kinematics for the fingers except thumb.
+    Solution is analytic. Developed as an alternative to arm_kinematics that cannot solve coupled joints.
 
 \section codeapi Code API
 

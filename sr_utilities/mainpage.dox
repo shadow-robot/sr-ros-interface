@@ -2,12 +2,9 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b sr_utilities is ... 
+\b sr_utilities  contains different useful header libraries (math libraries, etc...).
 
-<!-- 
-Provide an overview of your package.
--->
-
+We recommend using it throughout your code as it is a very light dependency, but is quite useful (and tested).
 
 \section codeapi Code API
 

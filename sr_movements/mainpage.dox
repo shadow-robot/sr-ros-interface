@@ -2,25 +2,32 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b sr_movements is ... 
+\b This package reads a specified bitmap and send targets by replaying the drawn movement.
 
-<!-- 
-Provide an overview of your package.
--->
+It also receives an input topic and calculates the MSE for each cycle of the bitmap plot. The MSE is output to ROS_INFO and published in the topic mse_out.
 
+For example, using a hand drawn png file  will send targets between the specified min and max values on a (very) rough sinusoid. The black dot on each row represents the percentage between min and max. The top of the graph is 100% (=max), the bottom is 0% (=min)
 
-\section codeapi Code API
+\section howtorun How To run the node:
+You can start the node by:
+\code
+> rosrun sr_movements sr_movements /sr_movements/targets:=/sh_ffj3_mixed_position_velocity_controller/command /sr_movements/inputs:=/sh_ffj3_mixed_position_velocity_controller/state _image_path:="`rospack find sr_movements`/movements/test.png" _min:=.1 _max:=1.4 _publish_rate:=100 _repetition:=5 _nb_step:=1000 _msg_type:="sr"
+\endcode
 
-<!--
-Provide links to specific auto-generated API documentation within your
-package that is of particular interest to a reader. Doxygen will
-document pretty much every part of your code, so do your best here to
-point the reader to the actual API.
+\section rosinterface ROS interface
+\subsection topics Topics
+Publishes \b /sr_movements/targets with the targets values.
 
-If your codebase is fairly large or has different sets of APIs, you
-should use the doxygen 'group' tag to keep these APIs together. For
-example, the roscpp documentation has 'libros' group.
--->
+Publishes \b /sr_movements/mse_out with the calculated MSE values.
 
+Subscribe to \b /sr_movements/inputs to receive the data to calculate MSE.
+
+\subsection params Parameters
+- \b image_path (path to the image file)
+- \b min and \b max
+- \b publish_rate
+- \b repetition (number of times the movement is repeated)
+- \b nb_step (number of samples taken from the image)
+- \b msg_type (choose from "sr" or "pr2" to indicate whether it's a sr_robot_msgs or pr2_controllers_msgs state topic type)
 
 */
