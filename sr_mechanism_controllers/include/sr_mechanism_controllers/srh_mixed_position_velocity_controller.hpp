@@ -86,6 +86,9 @@ namespace controller
 
     ///read all the controller settings from the parameter server
     void read_parameters();
+
+    ///smallest demand we can send to the motors
+    int motor_min_force_threshold;
   };
 } // namespace
 

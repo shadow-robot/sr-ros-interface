@@ -41,9 +41,10 @@ using namespace std;
 
 namespace controller {
 
+
   SrhMixedPositionVelocityJointController::SrhMixedPositionVelocityJointController()
     : SrController(), max_velocity_(1.0), min_velocity_(-1.0),
-      position_deadband(0.05)
+      position_deadband(0.05), motor_min_force_threshold(0)
   {
   }
 
@@ -62,7 +63,6 @@ namespace controller {
     assert(robot);
     robot_ = robot;
     last_time_ = robot->getTime();
-
 
     //joint 0s
     if( joint_name.substr(3,1).compare("0") == 0)
@@ -295,6 +295,11 @@ namespace controller {
       commanded_effort += friction_offset;
     }
 
+    //if the demand is too small to be executed by the motor, then we ask for a force
+    // of 0
+    if( fabs(commanded_effort) <= motor_min_force_threshold )
+      commanded_effort = 0.0;
+
     if( has_j2 )
       joint_state_2->commanded_effort_ = commanded_effort;
     else
@@ -355,6 +360,7 @@ namespace controller {
 
     node_.param<int>("velocity_pid/friction_deadband", friction_deadband, 5);
     node_.param<double>("velocity_pid/max_force", max_force_demand, 1023.0);
+    node_.param<int>("motor_min_force_threshold", motor_min_force_threshold, 0);
   }
 }
 
