@@ -1,0 +1,3 @@
+# retrieve joint_state service
+---
+sensor_msgs/JointState joint_state

@@ -1,7 +1,7 @@
 <package>
   <description brief="sr_utilities">
 
-    sr_utilities contains different useful header libraries (math libraries, etc...).
+     sr_utilities
 
   </description>
   <author>Ugo Cupcic</author>
@@ -9,6 +9,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sr_utilities</url>
   <depend package="sensor_msgs"/>
+  <depend package="sr_robot_msgs"/>
   <depend package="rospy"/>
   <depend package="roscpp"/>
   <depend package="tf"/>

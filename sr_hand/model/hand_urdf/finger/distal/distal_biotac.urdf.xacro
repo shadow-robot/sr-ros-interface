@@ -13,7 +13,7 @@
     <link name="${link_prefix}distal">
       <inertial>
 	<mass value="0.010" />
-	<origin xyz="0 0 0.025" />
+	<origin xyz="0 0 0.013" />
 	<inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0"
 	izz="0.0" />
       </inertial>

@@ -29,6 +29,7 @@ MESSAGE(" ----- ")
 
 
 rosbuild_add_executable(joint_trajectory_action_controller src/joint_trajectory_action_controller.cpp)
+rosbuild_add_executable(joint_spline_trajectory_action_controller src/joint_spline_trajectory_action_controller.cpp)
 
 rosbuild_add_library(${PROJECT_NAME}
   src/srh_fake_joint_calibration_controller.cpp
@@ -65,3 +66,7 @@ rosbuild_add_gtest_build_flags(test/test_joint_position_controller)
 
 rosbuild_add_rostest(test/joint_pos_controller.test)
 rosbuild_add_rostest(test/joint_pos_controller_with_fc.test)
+
+#rosbuild_add_executable(simple_spline_trajectory example/simple_spline_trajectory.cpp)
+#rosbuild_add_executable(simple_trajectory example/simple_trajectory.cpp)
+#rosbuild_add_executable(simple_trajectory_compare example/simple_trajectory_compare.cpp)

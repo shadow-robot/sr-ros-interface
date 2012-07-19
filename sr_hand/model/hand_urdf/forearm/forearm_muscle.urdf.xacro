@@ -6,7 +6,7 @@
   
     <link name="forearm_muscle">
       <inertial>
-	<origin xyz="0 0 0" /> 
+	<origin xyz="0 0 0.175" /> 
 	<mass value="3.0" />
 	<inertia  ixx="0.00735" ixy="0.0"  ixz="0.0"  iyy="0.00735"  iyz="0.0"  izz="0.0343" />
       </inertial>

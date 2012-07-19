@@ -12,7 +12,7 @@
 
     <link name="${link_prefix}middle">
       <inertial>
-	<origin xyz="0 0 0.045" rpy="0 0 0" />
+	<origin xyz="0 0 0.0125" rpy="0 0 0" />
 	<mass value="0.012" />
 	<inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0"
 	izz="0.0" />
@@ -20,14 +20,14 @@
       <visual>
 	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="middle_visual">
-      <mesh filename="package://sr_hand/model/meshes/F2.mesh" scale="0.001 0.001 0.001" />
+      <mesh filename="package://sr_hand/model/meshes/F2.dae" scale="0.001 0.001 0.001" />
       </geometry>
       <material name="Grey" />
       </visual>
       <collision>
 	<origin xyz="0 0 0.0125" rpy="0 0 0" />
 	<geometry name="middle_collision_geom">
-	  <box size="0.005 0.005 0.010" />
+	  <box size="0.008 0.008 0.015" />
 	</geometry>
       </collision>
     </link>

@@ -1,9 +1,9 @@
 <package>
   <description brief="sr_mechanism_controllers">
 
-    The sr_mechanism_controllers package contains different types of
-    controllers for the etherCAT hand:(fake) calibration controllers,
-    position controllers, velocity controllers, force controllers, ...
+     The sr_mechanism_controllers package contains different types of
+     controllers for the etherCAT hand:(fake) calibration controllers,
+     position controllers, velocity controllers, force controllers, ...
 
   </description>
   <author>Ugo Cupcic / ugo@shadowrobot.com , contact@shadowrobot.com</author>
@@ -14,11 +14,14 @@
   <depend package="std_msgs" />
   <depend package="std_srvs" />
   <depend package="roscpp" />
+<!--  <depend package="sr_hand"/> -->
   <depend package="actionlib"/>
   <depend package="pr2_controllers_msgs"/>
+<!--  <depend package="pr2_mechanism_msgs"/> -->
   <depend package="sr_robot_msgs" />
   <depend package="sr_utilities" />
   <depend package="pr2_controller_interface" />
+<!--  <depend package="sr_hardware_interface" /> -->
   <depend package="pr2_mechanism_model" />
   <depend package="realtime_tools" />
   <depend package="robot_mechanism_controllers" />
@@ -33,6 +36,7 @@
   <depend package="xmlrpcpp" />
 
   <export>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib"/>
     <!--
       <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp"
 	   lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lpr2_calibration_controllers" />

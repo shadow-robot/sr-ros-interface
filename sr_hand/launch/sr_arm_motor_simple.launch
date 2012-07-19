@@ -1,14 +1,14 @@
 <launch>
   <include file="$(find sr_hand)/launch/load_hand_model.launch" />
 
-  <param name="arm_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
+  <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
 
 	<!--
       	 	shadowarm
                        		 -->
 	<node pkg="sr_hand" name="shadowarm"
 	type="shadowarm_virtual">
-		<remap from="robot_description" to="arm_description"/>
+		<remap from="robot_description" to="sa_description"/>
 		<param name="shadowhand_prefix" type="string" value="sr_arm/" />
 		<param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
 		<param name="publish_frequency_diagnostics" type="double" value="1.0" />
@@ -17,7 +17,7 @@
 	<!-- Robot state publisher: publishes tf information regarding the positions of the arm -->
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="robot_state_publisher_pos_arm">
-		<remap from="robot_description" to="arm_description"/>
+		<remap from="robot_description" to="sa_description"/>
 		<remap from="joint_states" to="/sr_arm/position/joint_states" />
 		<param name="publish_frequency" type="double" value="10.0" />
 		<param name="tf_prefix" type="string" value="sr_arm/position" />
@@ -26,7 +26,7 @@
 	<!-- Robot state publisher: publishes tf information regarding the targets of the arm -->
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="robot_state_publisher_target_arm">
-		<remap from="robot_description" to="arm_description"/>
+		<remap from="robot_description" to="sa_description"/>
 		<remap from="joint_states" to="sr_arm/target/joint_states" />
 		<param name="publish_frequency" type="double" value="1.0" />
 		<param name="tf_prefix" type="string" value="sr_arm/target" />
@@ -38,7 +38,7 @@
                          -->
 	<node pkg="sr_hand" name="shadowhand"
 	type="shadowhand_virtual" >
-		<remap from="robot_description" to="hand_description" />
+		<remap from="hand_description" to="sh_description" />
 		<param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
 		<param name="shadowhand_prefix" type="string" value="srh/" />
 		<param name="publish_frequency_diagnostics" type="double" value="1.0" />
@@ -48,7 +48,7 @@
 	<!-- Robot state publisher: publishes tf information regarding the position of the hand -->
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="srh_robot_state_publisher_pos">
-		<remap from="robot_description" to="hand_description"/>
+		<remap from="robot_description" to="sh_description"/>
 		<remap from="joint_states" to="srh/position/joint_states" />
 		<param name="publish_frequency" type="double" value="10.0" />
 		<param name="tf_prefix" type="string" value="srh/position" />
@@ -56,7 +56,7 @@
 
 	<node pkg="robot_state_publisher" type="state_publisher"
 	name="srh_robot_state_publisher_target">
-		<remap from="robot_description" to="hand_description"/>
+		<remap from="robot_description" to="sh_description"/>
 		<remap from="joint_states" to="srh/target/joint_states" />
 		<param name="publish_frequency" type="double" value="1.0" />
 		<param name="tf_prefix" type="string" value="srh/target" />

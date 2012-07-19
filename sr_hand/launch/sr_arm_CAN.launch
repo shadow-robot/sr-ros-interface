@@ -1,14 +1,16 @@
 <launch>
- <param name="arm_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
+<!-- DO NOT USE ROBOT DESCRIPTION IF NOT NEEDED  <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'" /> -->
+
+ <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
 
   <!--
            shadowarm 
                         -->
   <node pkg="sr_hand" name="shadowarm"
         type="shadowarm_can" >
-    <remap from="robot_description" to="arm_description"/>
     <param name="shadowhand_prefix" type="string" value="sr_arm/" />
     <param name="controller_suffix" type="string" value="position_controller" />
+    <remap from="joint_states" to="/sa/joint_states" />
     <param name="publish_frequency_diagnostics" type="double" value="1.0" />
     <param name="publish_frequency" type="double" value="100.0" />
   </node> 
@@ -16,23 +18,23 @@
        positions of the arm -->
   <node pkg="robot_state_publisher" type="state_publisher"
         name="robot_state_publisher_pos_arm">      
-    <remap from="robot_description" to="arm_description"/>
+    <remap from="robot_description" to="sa_description" />
     <remap from="joint_states" to="sr_arm/position/joint_states" />
     <param name="publish_frequency" type="double" value="10.0" />
     <param name="tf_prefix" type="string" value="sr_arm/position" />
-  </node>
- <!-- Robot state publisher: publishes tf information regarding the 
+  </node> 
+<!-- Robot state publisher: publishes tf information regarding the 
        targets of the arm -->
   <node pkg="robot_state_publisher" type="state_publisher"
         name="robot_state_publisher_target_arm">      
-    <remap from="robot_description" to="arm_description"/>
+    <remap from="robot_description" to="sa_description" />
     <remap from="joint_states" to="sr_arm/target/joint_states" />
     <param name="publish_frequency" type="double" value="1.0" />
     <param name="tf_prefix" type="string" value="sr_arm/target" />
-  </node>
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
+  </node> 
 
+<node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100" />
 </launch>
 
 

@@ -1,0 +1,25 @@
+<launch>
+  <include file="$(find sr_hand)/launch/sr_arm_CAN.launch"/>
+ 
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
+
+  <!--
+            Kinematics
+        -->
+        <node pkg="sr_kinematics" type="sr_arm_kinematics" name="sr_right_arm_kinematics" output="screen">
+                <param name="root_name" type="string" value="shadowarm_base"/>
+                <param name="tip_name" type="string" value="palm"/>
+                <param name="maxIterations" type="int" value="1000"/>
+                <param name="epsilon" type="double" value="0.001"/>
+<!-- <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/robot_padding.yaml" />
+          <rosparam command="load" file="$(find sr_object_manipulation_launch)/config/kdl_sr_arm_kinematics.yaml" /> -->
+        </node>
+
+	<!-- Publish palm x,y,z -->
+<!--DOES NOT WORK USES 100% CPU if virtual hand not there -->
+<!--	<node pkg="sr_utilities" type="palm_pos_publisher.py" name="palm_pos_pub" />  -->
+
+</launch>
+
+

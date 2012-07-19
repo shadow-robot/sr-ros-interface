@@ -110,9 +110,14 @@ ENDIF(DEFINED real_hand)
 #########################################
 IF(DEFINED ethercat_compat)
   rosbuild_add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
-  rosbuild_add_executable(shadowarm_can src/hand/sr_articulated_robot.cpp src/hand/CAN_compatibility_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/CAN_compatibility_arm_node.cpp src/sr_diagnosticer.cpp)
   rosbuild_link_boost(shadowhand_virtual thread)
 ENDIF(DEFINED ethercat_compat)
+
+###################################
+#  CAN COMPATIBILITY WRAPPER ARM  #
+###################################
+rosbuild_add_executable(shadowarm_can src/hand/sr_articulated_robot.cpp src/hand/CAN_compatibility_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/CAN_compatibility_arm_node.cpp)
+
 
 ##################
 #    REAL ARM    #
@@ -123,6 +128,8 @@ IF(DEFINED real_arm)
   rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
   rosbuild_link_boost(shadowarm_real thread)
   target_link_libraries(shadowarm_real robot)
+
+
 ENDIF(DEFINED real_arm)
 
 ##################
