@@ -101,7 +101,7 @@ namespace shadowrobot
       //send out the positions for this step to the joints
       for( size_t i = 0; i < joint_names.size(); i++ )
       {
-        ROS_ERROR_STREAM("trajectory: " << joint_names[i] << " " << trajectory_step.positions[i] << " / sleep: " << sleeping_time.toSec() );
+        ROS_DEBUG_STREAM("trajectory: " << joint_names[i] << " " << trajectory_step.positions[i] << " / sleep: " << sleeping_time.toSec() );
         ros::Publisher pub = joint_pub[joint_names[i]];
         std_msgs::Float64 msg;
         msg.data = trajectory_step.positions[i];

@@ -1,6 +1,6 @@
 /**
  * @file   joint_spline_trajectory_action_controller.cpp
- * @author Ugo Cupcic <ugo@shadowrobot.com>
+ * @author Guillaume Walck (UPMC) & Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Fri Mar  4 13:08:22 2011
  *
  * @brief  Implement an actionlib server to execute a
@@ -212,7 +212,7 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
   }
 
   ROS_INFO("waiting for getJointState");
-  if( ros::service::waitForService("getJointState"))
+  if( ros::service::waitForService("getJointState",4))
   {
     // open persistent link to joint_state service
     joint_state_client = nh.serviceClient<sr_utilities::getJointState>("getJointState",true);
@@ -230,10 +230,13 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
   qd.resize(joint_names_.size());
   qdd.resize(joint_names_.size());
 
-
-  desired_joint_state_pusblisher = nh.advertise<sensor_msgs::JointState> ("/desired_joint_states", 2);  
+  desired_joint_state_pusblisher = nh.advertise<sensor_msgs::JointState> ("/desired_joint_states", 2);
+  
+  command_sub = nh.subscribe("command", 1, &JointTrajectoryActionController::commandCB, this);
+  ROS_INFO("Listening to commands");
   
   action_server->start();
+  ROS_INFO("Action server started");
 }
 
 JointTrajectoryActionController::~JointTrajectoryActionController()
@@ -280,7 +283,7 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
 {
   bool success = true;
 
-  ros::Time time = last_time_ + ros::Duration(0.01);
+  ros::Time time = ros::Time::now() + ros::Duration(0.1);
   ROS_DEBUG("Figuring out new trajectory at %.3lf, with data from %.3lf",
           time.toSec(), goal->trajectory.header.stamp.toSec());
 
@@ -452,6 +455,7 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
   ros::Duration sleeping_time(0.0);
   ROS_DEBUG("Entering the execution loop");
 
+	last_time_ = ros::Time::now();
   while(ros::ok())
   { 
     ros::Time time = ros::Time::now();
@@ -471,7 +475,7 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
     // if the last trajectory is already in the past, stop the servoing 
     if( (traj[traj.size()-1].start_time+traj[traj.size()-1].duration) < time.toSec())
     {  
-	ROS_DEBUG("trajectory is finished %f<%f",(traj[traj.size()-1].start_time+traj[traj.size()-1].duration),time.toSec());   
+		   ROS_DEBUG("trajectory is finished %f<%f",(traj[traj.size()-1].start_time+traj[traj.size()-1].duration),time.toSec());   
        break;
     }
 
@@ -481,7 +485,8 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
         ROS_ERROR("No segments in the trajectory");
       else
         ROS_ERROR("No earlier segments.  First segment starts at %.3lf (now = %.3lf)", traj[0].start_time, time.toSec());
-      return;
+		  success = false;
+      break;
     }
     
     // ------ Trajectory Sampling
@@ -575,6 +580,277 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
     sampleQuinticSpline(coefficients, time,
                         position, velocity, acceleration);
   }
+}
+
+void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTrajectoryConstPtr &msg)
+{
+  bool success = true;
+
+  ros::Time time = last_time_ + ros::Duration(0.01);
+  ROS_DEBUG("Figuring out new trajectory at %.3lf, with data from %.3lf",
+          time.toSec(), msg->header.stamp.toSec());
+
+  boost::shared_ptr<SpecifiedTrajectory> new_traj_ptr(new SpecifiedTrajectory);
+  SpecifiedTrajectory &traj = *new_traj_ptr;
+ 
+
+  // Finds the end conditions of the final segment
+  std::vector<double> prev_positions(joint_names_.size());
+  std::vector<double> prev_velocities(joint_names_.size());
+  std::vector<double> prev_accelerations(joint_names_.size());
+
+  updateJointState();
+
+  ROS_DEBUG("Initial conditions for new set of splines:");
+  for (size_t i = 0; i < joint_names_.size(); ++i)
+  {
+    double position;
+    if(getPosition(joint_names_[i],position))
+      prev_positions[i]=position;
+    else
+    {
+      ROS_ERROR("Cannot get joint_state, not executing trajectory");
+      return;
+    }
+    prev_velocities[i]=0.0;
+    prev_accelerations[i]=0.0;
+  
+    ROS_DEBUG("    %.2lf, %.2lf, %.2lf  (%s)", prev_positions[i], prev_velocities[i],
+              prev_accelerations[i], joint_names_[i].c_str());
+  }
+  // ------ Tacks on the new segments
+  std::vector<double> positions;
+  std::vector<double> velocities;
+  std::vector<double> accelerations;
+  
+  std::vector<double> durations(msg->points.size());
+  if (msg->points.size() > 0)
+    durations[0] = msg->points[0].time_from_start.toSec();
+  for (size_t i = 1; i < msg->points.size(); ++i)
+    durations[i] = (msg->points[i].time_from_start - msg->points[i-1].time_from_start).toSec();
+
+  // no continuous joints so do not check if we should wrap
+  
+  // extract the traj
+  for (size_t i = 0; i < msg->points.size(); ++i)
+  {
+    Segment seg;
+
+    if(msg->header.stamp == ros::Time(0.0))
+      seg.start_time = (time + msg->points[i].time_from_start).toSec() - durations[i];
+    else
+      seg.start_time = (msg->header.stamp + msg->points[i].time_from_start).toSec() - durations[i];
+    seg.duration = durations[i];
+    seg.splines.resize(joint_names_.size());
+
+    // Checks that the incoming segment has the right number of elements.
+    if (msg->points[i].accelerations.size() != 0 && msg->points[i].accelerations.size() != joint_names_.size())
+    {
+      ROS_ERROR("Command point %d has %d elements for the accelerations", (int)i, (int)msg->points[i].accelerations.size());
+      return;
+    }
+    if (msg->points[i].velocities.size() != 0 && msg->points[i].velocities.size() != joint_names_.size())
+    {
+      ROS_ERROR("Command point %d has %d elements for the velocities", (int)i, (int)msg->points[i].velocities.size());
+      return;
+    }
+    if (msg->points[i].positions.size() != joint_names_.size())
+    {
+      ROS_ERROR("Command point %d has %d elements for the positions", (int)i, (int)msg->points[i].positions.size());
+      return;
+    }
+    
+     // Re-orders the joints in the command to match the internal joint order.
+    accelerations.resize(msg->points[i].accelerations.size());
+    velocities.resize(msg->points[i].velocities.size());
+    positions.resize(msg->points[i].positions.size());
+    for (size_t j = 0; j < joint_names_.size(); ++j)
+    {
+      if (!accelerations.empty()) accelerations[j] = msg->points[i].accelerations[j];
+      if (!velocities.empty()) velocities[j] = msg->points[i].velocities[j];
+      if (!positions.empty()) positions[j] = msg->points[i].positions[j];
+    }
+
+    // Converts the boundary conditions to splines.
+    for (size_t j = 0; j < joint_names_.size(); ++j)
+    {
+      if (prev_accelerations.size() > 0 && accelerations.size() > 0)
+      {
+        getQuinticSplineCoefficients(
+          prev_positions[j], prev_velocities[j], prev_accelerations[j],
+          positions[j], velocities[j], accelerations[j],
+          durations[i],
+          seg.splines[j].coef);
+      }
+      else if (prev_velocities.size() > 0 && velocities.size() > 0)
+      {
+        getCubicSplineCoefficients(
+          prev_positions[j], prev_velocities[j],
+          positions[j], velocities[j],
+          durations[i],
+          seg.splines[j].coef);
+        seg.splines[j].coef.resize(6, 0.0);
+      }
+      else
+      {
+        seg.splines[j].coef[0] = prev_positions[j];
+        if (durations[i] == 0.0)
+          seg.splines[j].coef[1] = 0.0;
+        else
+          seg.splines[j].coef[1] = (positions[j] - prev_positions[j]) / durations[i];
+        seg.splines[j].coef[2] = 0.0;
+        seg.splines[j].coef[3] = 0.0;
+        seg.splines[j].coef[4] = 0.0;
+        seg.splines[j].coef[5] = 0.0;
+      }
+    }
+    // Pushes the splines onto the end of the new trajectory.
+
+    traj.push_back(seg);
+
+    // Computes the starting conditions for the next segment
+
+    prev_positions = positions;
+    prev_velocities = velocities;
+    prev_accelerations = accelerations; 
+  }
+
+  // ------ Commits the new trajectory
+
+  if (!new_traj_ptr)
+  {
+    ROS_ERROR("The new trajectory was null!");
+    return;
+  }
+
+  ROS_DEBUG("The new trajectory has %d segments", (int)traj.size());
+
+  std::vector<sr_robot_msgs::joint> joint_vector_traj;
+  unsigned int controller_pub_idx=0;
+  //only one of these 2 will be used
+  std_msgs::Float64 target_msg;
+  sr_robot_msgs::sendupdate sendupdate_msg_traj;
+
+  //initializes the joint names
+  //TODO check if traj only contains joint that we control
+  //joint_names_ = goal->trajectory.joint_names;
+  joint_vector_traj.clear();
+
+  for(unsigned int i = 0; i < joint_names_.size(); ++i)
+  {
+    sr_robot_msgs::joint joint;
+    joint.joint_name = joint_names_[i];
+    joint_vector_traj.push_back(joint);
+  }
+
+  if(use_sendupdate)
+  {
+    sendupdate_msg_traj.sendupdate_length = joint_vector_traj.size();
+    ROS_DEBUG("Trajectory received: %d joints / %d msg length", (int)msg->joint_names.size(), sendupdate_msg_traj.sendupdate_length);
+  }
+
+  ros::Rate tmp_rate(1.0);
+
+//  std::vector<trajectory_msgs::JointTrajectoryPoint> trajectory_points = goal->trajectory.points;
+//  trajectory_msgs::JointTrajectoryPoint trajectory_step;
+
+  //loop through the steps
+  ros::Duration sleeping_time(0.0);
+  ROS_DEBUG("Entering the execution loop");
+
+  while(ros::ok())
+  { 
+    ros::Time time = ros::Time::now();
+    ros::Duration dt = time - last_time_;
+    last_time_ = time;
+    
+    // ------ Finds the current segment
+    ROS_DEBUG("Find current segment");
+
+    // Determines which segment of the trajectory to use.  (Not particularly realtime friendly).
+    int seg = -1;
+    while (seg + 1 < (int)traj.size() && traj[seg+1].start_time < time.toSec())
+    {
+      ++seg;
+    }
+
+    // if the last trajectory is already in the past, stop the servoing 
+    if( (traj[traj.size()-1].start_time+traj[traj.size()-1].duration) < time.toSec())
+    {  
+	ROS_DEBUG("trajectory is finished %f<%f",(traj[traj.size()-1].start_time+traj[traj.size()-1].duration),time.toSec());   
+       break;
+    }
+
+    if (seg == -1)
+    {
+      if (traj.size() == 0)
+        ROS_ERROR("No segments in the trajectory");
+      else
+        ROS_ERROR("No earlier segments.  First segment starts at %.3lf (now = %.3lf)", traj[0].start_time, time.toSec());
+      return;
+    }
+    
+    // ------ Trajectory Sampling
+    ROS_DEBUG("Sample the trajectory");
+
+    for (size_t i = 0; i < q.size(); ++i)
+    {
+      sampleSplineWithTimeBounds(traj[seg].splines[i].coef, traj[seg].duration,
+                                 time.toSec() - traj[seg].start_time,
+                                 q[i], qd[i], qdd[i]);
+    }
+    ROS_DEBUG("Sampled the trajectory"); 
+    //check if preempted
+    if (!ros::ok())
+    {
+      ROS_INFO("Joint Trajectory Stopping");
+      // set the action state to preempted
+      //action_server->setPreempted();
+      success = false;
+      break;
+    }
+    ROS_DEBUG("Update the targets");
+    //update the targets and publish target joint_states
+    sensor_msgs::JointState desired_joint_state_msg;
+    for(unsigned int i = 0; i < joint_names_.size(); ++i)
+    {
+      desired_joint_state_msg.name.push_back(joint_names_[i]);
+      desired_joint_state_msg.position.push_back(q[i]);
+      desired_joint_state_msg.velocity.push_back(qd[i]);
+      desired_joint_state_msg.effort.push_back(0.0);
+      if(!use_sendupdate)
+      {
+        if((controller_pub_idx=jointPubIdxMap[ joint_names_[i] ])>0) // if a controller exist for this joint
+        {
+          target_msg.data=q[i];
+          controller_publishers.at(controller_pub_idx-1).publish(target_msg);
+        }
+      }
+      else 
+      {
+        joint_vector_traj[i].joint_target = q[i] * 57.3;
+        ROS_DEBUG("traj[%s]: %f", joint_vector_traj[i].joint_name.c_str(), joint_vector_traj[i].joint_target);
+      }
+    }
+    ROS_DEBUG("Targets updated");
+
+    desired_joint_state_msg.header.stamp = ros::Time::now();
+    desired_joint_state_pusblisher.publish(desired_joint_state_msg);
+
+    if(use_sendupdate)
+    {
+      sendupdate_msg_traj.sendupdate_list = joint_vector_traj;  
+      sr_arm_target_pub.publish(sendupdate_msg_traj);
+      sr_hand_target_pub.publish(sendupdate_msg_traj);
+    }
+
+    ROS_DEBUG("Now sleep and loop");
+    sleeping_time.sleep();
+    sleeping_time = ros::Duration(0.1);
+    ROS_DEBUG("redo loop");
+  }
+
+  return;
 }
 
 }
