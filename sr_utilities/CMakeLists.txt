@@ -16,6 +16,8 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
+rosbuild_gensrv()
+
 rosbuild_add_library(sr_calibration src/calibration.cpp)
 
 rosbuild_add_gtest(test/test_calibration test/test_calibration.cpp src/calibration.cpp)

@@ -25,22 +25,22 @@
     <link name="thproximal">
       <inertial>
 	<mass value="0.016" />
-	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<origin xyz="0 0 0.019" rpy="0 0 0"/>
 	<inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0"	izz="0.1" />
       </inertial>
       <visual>
 	<origin xyz="0 0 0" rpy="0 0 0" />
 	<geometry name="thproximal_visual">
-      <mesh filename="package://sr_hand/model/meshes/TH3_z.mesh" scale="0.001 0.001 0.001" />
+      <mesh filename="package://sr_hand/model/meshes/TH3_z.dae" scale="0.001 0.001 0.001" />
       </geometry>
       <material name="shadow_thproximal_material">
 	  <color rgba="0.2 0.2 0.2 1.0"/>
 	</material>
       </visual>
       <collision>
-	<origin xyz="0 0 0.02" rpy="0 0 0" />
+	<origin xyz="0 0 0.019" rpy="0 0 0" />
 	<geometry name="thproximal_collision_geom">
-	  <box size="0.005 0.005 0.02" />
+	  <box size="0.008 0.008 0.020" />
 	</geometry>
       </collision>
     </link>

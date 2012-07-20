@@ -14,7 +14,7 @@
       <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'" />
     </group>
   </group>
-  <node name="spawn_hand" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -z 0.01 -model shadow_model -J ElbowJSwing 2.0" respawn="false" output="screen" />
+  <node name="spawn_hand" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -z 0.01 -model shadow_model -J ShoulderJSwing 0.78 -J ElbowJSwing 2.0" respawn="false" output="screen" />
 
   <!-- Controllers for the arm -->
   <rosparam file="$(find sr_hand)/model/hand_urdf/hand_controller_gazebo.yaml" command="load"/>
@@ -29,13 +29,12 @@
     <group if="$(optenv THREE_FINGER 0)">
       <node name="spawn_gazebo_controllers"
 	    pkg="pr2_controller_manager" type="spawner" respawn="false" output="screen"
-	    args="sa_sr_position_controller sa_ss_position_controller sa_es_position_controller sa_er_position_controller sh_ffj0_mixed_position_velocity_controller sh_ffj3_mixed_position_velocity_controller sh_ffj4_mixed_position_velocity_controller sh_rfj0_mixed_position_velocity_controller sh_rfj3_mixed_position_velocity_controller sh_rfj4_mixed_position_velocity_controller sh_thj1_mixed_position_velocity_controller sh_thj2_mixed_position_velocity_controller sh_thj3_mixed_position_velocity_controller sh_thj4_mixed_position_velocity_controller sh_thj5_mixed_position_velocity_controller sh_wrj1_mixed_position_velocity_controller sh_wrj2_mixed_position_velocity_controller" />
+	    args="sa_sr_position_controller sa_ss_position_controller sa_es_position_controller sa_er_position_controller sh_ffj0_mixed_position_velocity_controller sh_ffj3_mixed_position_velocity_controller sh_ffj4_mixed_position_velocity_controller sh_rfj0_mixed_position_velocity_controller sh_rfj3_mixed_position_velocity_controller sh_rfj4_mixed_position_velocity_controller sh_thj1_mixed_position_velocity_controller sh_thj2_mixed_position_velocity_controller sh_thj3_mixed_position_velocity_controller sh_thj4_mixed_position_velocity_controller sh_thj5_mixed_position_velocity_controller sh_wrj1_mixed_position_velocity_controller sh_wrj2_mixed_position_velocity_controller r_arm_cartesian_pose_controller r_arm_joint_trajectory_controller" />
     </group>
     <group unless="$(optenv THREE_FINGER 0)">
       <node name="spawn_gazebo_controllers"
 	    pkg="pr2_controller_manager" type="spawner" respawn="false" output="screen"
-	    args="sa_sr_position_controller sa_ss_position_controller sa_es_position_controller sa_er_position_controller sh_ffj0_mixed_position_velocity_controller sh_ffj3_mixed_position_velocity_controller sh_ffj4_mixed_position_velocity_controller sh_mfj0_mixed_position_velocity_controller sh_mfj3_mixed_position_velocity_controller sh_mfj4_mixed_position_velocity_controller sh_rfj0_mixed_position_velocity_controller sh_rfj3_mixed_position_velocity_controller sh_rfj4_mixed_position_velocity_controller sh_lfj0_mixed_position_velocity_controller sh_lfj3_mixed_position_velocity_controller sh_lfj4_mixed_position_velocity_controller sh_lfj5_mixed_position_velocity_controller sh_thj1_mixed_position_velocity_controller sh_thj2_mixed_position_velocity_controller sh_thj3_mixed_position_velocity_controller sh_thj4_mixed_position_velocity_controller sh_thj5_mixed_position_velocity_controller sh_wrj1_mixed_position_velocity_controller sh_wrj2_mixed_position_velocity_controller" />
+	    args="sa_sr_position_controller sa_ss_position_controller sa_es_position_controller sa_er_position_controller sh_ffj0_mixed_position_velocity_controller sh_ffj3_mixed_position_velocity_controller sh_ffj4_mixed_position_velocity_controller sh_mfj0_mixed_position_velocity_controller sh_mfj3_mixed_position_velocity_controller sh_mfj4_mixed_position_velocity_controller sh_rfj0_mixed_position_velocity_controller sh_rfj3_mixed_position_velocity_controller sh_rfj4_mixed_position_velocity_controller sh_lfj0_mixed_position_velocity_controller sh_lfj3_mixed_position_velocity_controller sh_lfj4_mixed_position_velocity_controller sh_lfj5_mixed_position_velocity_controller sh_thj1_mixed_position_velocity_controller sh_thj2_mixed_position_velocity_controller sh_thj3_mixed_position_velocity_controller sh_thj4_mixed_position_velocity_controller sh_thj5_mixed_position_velocity_controller sh_wrj1_mixed_position_velocity_controller sh_wrj2_mixed_position_velocity_controller r_arm_cartesian_pose_controller r_arm_joint_trajectory_controller" />
     </group>
   </group>
-
 </launch>

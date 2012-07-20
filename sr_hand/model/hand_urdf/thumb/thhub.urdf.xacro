@@ -13,7 +13,7 @@
     <link name="thhub">
       <inertial>
 	<mass value="0.002" />
-	<origin xyz="0.02687 0 0.02687" rpy="0 0 0"/>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
 	<inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0"
 	izz="0.1" />
       </inertial>

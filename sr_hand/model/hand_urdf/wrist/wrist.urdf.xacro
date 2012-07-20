@@ -4,7 +4,7 @@
 
   <!-- Right Hand -->
   <xacro:macro name="wrist" params="parent *origin">
-    <xacro:wrist_base parent="${parent}" mesh="wrist.mesh">
+    <xacro:wrist_base parent="${parent}" mesh="wrist.dae">
       <insert_block name="origin" />
     </xacro:wrist_base>
   </xacro:macro>
@@ -22,8 +22,8 @@
   
     <link name="wrist" >
       <inertial>
-	<!--<origin xyz="0 0.010 0.213" rpy="0 0 0" />-->
-	<insert_block name="origin" />
+	<origin xyz="0 0.0 0.0" rpy="0 0 0" />
+	<!--<insert_block name="origin" />-->
 	<mass value="0.1" />
 	<inertia  ixx="0.120" ixy="0.0"  ixz="0.0"  iyy="0.148"  iyz="0.0" izz="0.0438" /> 
       </inertial>

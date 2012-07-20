@@ -10,7 +10,7 @@
 
   <!-- Right Hand -->
   <xacro:macro name="palm" params="parent">
-    <xacro:palm_base parent="${parent}" mesh="palm.mesh" />
+    <xacro:palm_base parent="${parent}" mesh="palm.dae" />
   </xacro:macro>
 
   <!-- Left Hand -->
@@ -24,7 +24,7 @@
 
     <link name="palm" >
       <inertial>
-	<origin xyz="0 0 0.247" rpy="0 0 0" />
+	<origin xyz="0 0 0.035" rpy="0 0 0" />
 	<mass value="0.3" />
 	<inertia  ixx="0.5" ixy="0.0"  ixz="0.0"  iyy="0.5"  iyz="0.0"	izz="0.3" />
       </inertial>
