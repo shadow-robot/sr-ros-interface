@@ -30,6 +30,7 @@ namespace shadowrobot
 
   private:
     ros::NodeHandle nh, nh_tilde;
+    ros::Subscriber command_sub;
     ros::Publisher sr_arm_target_pub;
     ros::Publisher sr_hand_target_pub;
     ros::Publisher desired_joint_state_pusblisher;
@@ -76,6 +77,7 @@ namespace shadowrobot
 
 
     void execute_trajectory(const control_msgs::FollowJointTrajectoryGoalConstPtr& goal);
+    void commandCB(const trajectory_msgs::JointTrajectoryConstPtr &msg);
     void updateJointState();
     bool getPosition(std::string joint_name, double &position);
 

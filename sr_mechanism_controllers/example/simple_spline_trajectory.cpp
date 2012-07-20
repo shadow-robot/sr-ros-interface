@@ -1,10 +1,10 @@
 // http://www.ros.org/wiki/pr2_controllers/Tutorials/Moving%20the%20arm%20using%20the%20Joint%20Trajectory%20Action
 
 #include <ros/ros.h>
-#include <pr2_controllers_msgs/JointTrajectoryAction.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
 #include <actionlib/client/simple_action_client.h>
 
-typedef actionlib::SimpleActionClient< pr2_controllers_msgs::JointTrajectoryAction > TrajClient;
+typedef actionlib::SimpleActionClient< control_msgs::FollowJointTrajectoryAction > TrajClient;
 
 class ShadowTrajectory
 {
@@ -33,10 +33,10 @@ public:
   }
 
   //! Sends the command to start a given trajectory
-  void startTrajectory(pr2_controllers_msgs::JointTrajectoryGoal goal)
+  void startTrajectory(control_msgs::FollowJointTrajectoryGoal goal)
   {
     // When to start the trajectory: 1s from now
-    goal.trajectory.header.stamp = ros::Time::now(); //+ ros::Duration(1.0);
+    goal.trajectory.header.stamp = ros::Time::now()- ros::Duration(0.01);
     traj_client_->sendGoal(goal);
   }
 
@@ -51,10 +51,10 @@ public:
       be in its own trajectory - a trajectory can have one or more waypoints
       depending on the desired application.
   */
-  pr2_controllers_msgs::JointTrajectoryGoal arm_movement()
+	control_msgs::FollowJointTrajectoryGoal arm_movement()
   {
     //our goal variable
-    pr2_controllers_msgs::JointTrajectoryGoal goal;
+		control_msgs::FollowJointTrajectoryGoal goal;
 
     // First, the joint names, which apply to all waypoints
     goal.trajectory.joint_names.push_back("ShoulderJRotate");

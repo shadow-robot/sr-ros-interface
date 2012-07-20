@@ -1,0 +1,16 @@
+To get spline trajectory running :
+
+* in simulation make sure you started the getJointState service
+
+  rosrun sr_utilities get_joint_states.py /joint_states:=/gazebo/joint_states
+
+* in real make sure you started the ordered hand arm merger (which contains the service)
+
+  rosrun sr_utilities ordered_hand_arm_joint_states_merger.py
+
+
+Examples
+spline example requires joint_spline_trajectory_action_controller to be started
+other examples require joint_trajectory_action_controller to be started
+
+simple_trajectory_compare.cpp and simple_spline_trajectory.cpp are the same movement but for 2 different controllers
