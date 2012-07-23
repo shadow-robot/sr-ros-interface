@@ -6,27 +6,33 @@
 			<authoring_tool>Blender v:249 - Illusoft Collada Exporter v:0.3.162</authoring_tool>
 			<comments></comments>
 			<copyright></copyright>
-			<source_data>file:///home/guihome/Projets/ProjetHandle/ShadowHand/Modeles/VALIDE_vOptimizedWithoutDetails/BETA_shadow_hand_2012-07-09_envelop_opt_Zaligned_decimate-ready.blend</source_data>
+			<source_data>file:///media/ce7ff5ed-1b73-453e-869e-58fb97d47a68/ProjetHandle/ShadowHand/Modeles/VALIDE_vOptimizedWithoutDetails/BETA_shadow_hand_2012-07-22_envelop_opt_Zaligned_decimate-applied.blend</source_data>
 		</contributor>
-		<created>2012-07-09T16:36:29.521837</created>
-		<modified>2012-07-09T16:36:29.521858</modified>
+		<created>2012-07-23T02:18:03.236589</created>
+		<modified>2012-07-23T02:18:03.236602</modified>
 		<unit meter="0.01" name="centimeter"/>
 		<up_axis>Z_UP</up_axis>
 	</asset>
 	<library_effects>
-		<effect id="osg4mat0-fx" name="osg4mat0-fx">
+		<effect id="black_spec-fx" name="black_spec-fx">
 			<profile_COMMON>
 				<technique sid="blender">
-					<lambert>
+					<phong>
 						<emission>
 							<color>0.00000 0.00000 0.00000 1</color>
 						</emission>
 						<ambient>
-							<color>0.42000 0.37333 0.00000 1</color>
+							<color>0.06933 0.06933 0.06933 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.90000 0.80000 0.00000 1</color>
+							<color>0.18908 0.18908 0.18908 1</color>
 						</diffuse>
+						<specular>
+							<color>0.34989 0.34989 0.34989 1</color>
+						</specular>
+						<shininess>
+							<float>12.5</float>
+						</shininess>
 						<reflective>
 							<color>1.00000 1.00000 1.00000 1</color>
 						</reflective>
@@ -39,14 +45,14 @@
 						<transparency>
 							<float>0.0</float>
 						</transparency>
-					</lambert>
+					</phong>
 				</technique>
 			</profile_COMMON>
 		</effect>
 	</library_effects>
 	<library_materials>
-		<material id="osg4mat0" name="osg4mat0">
-			<instance_effect url="#osg4mat0-fx"/>
+		<material id="black_spec" name="black_spec">
+			<instance_effect url="#black_spec-fx"/>
 		</material>
 	</library_materials>
 	<library_geometries>
@@ -75,7 +81,7 @@
 				<vertices id="middle_001-Vertex">
 					<input semantic="POSITION" source="#middle_001-Position"/>
 				</vertices>
-				<triangles count="132" material="osg4mat0">
+				<triangles count="132" material="black_spec">
 					<input offset="0" semantic="VERTEX" source="#middle_001-Vertex"/>
 					<input offset="1" semantic="NORMAL" source="#middle_001-Normals"/>
 					<p>32 0 40 0 2 0 4 1 2 1 12 1 22 2 42 2 62 2 61 3 32 3 11 3 18 4 4 4 12 4 10 5 0 5 51 5 59 6 0 6 10 6 5 7 15 7 51 7 1 8 46 8 3 8 51 9 17 9 10 9 9 10 5 10 44 10 52 11 29 11 9 11 18 12 10 12 17 12 55 13 16 13 34 13 17 14 4 14 18 14 6 15 61 15 50 15 8 16 56 16 47 16 42 17 22 17 21 17 21 18 40 18 42 18 7 19 9 19 29 19 37 20 21 20 43 20 3 21 46 21 45 21 9 22 15 22 5 22 43 23 21 23 22 23 35 24 43 24 22 24 57 25 41 25 59 25 62 26 58 26 25 26 33 27 42 27 40 27 32 28 33 28 40 28 15 29 4 29 17 29 37 30 12 30 2 30 37 31 2 31 40 31 44 32 52 32 9 32 60 33 27 33 30 33 60 34 30 34 47 34 27 35 36 35 33 35 67 36 63 36 19 36 32 37 61 37 6 37 21 38 37 38 40 38 39 39 0 39 41 39 16 40 48 40 34 40 45 41 48 41 3 41 43 42 54 42 64 42 54 43 46 43 64 43 65 44 64 44 46 44 14 45 12 45 43 45 46 46 54 46 45 46 46 47 1 47 65 47 66 48 65 48 1 48 29 49 50 49 61 49 61 50 11 50 7 50 1 51 16 51 66 51 49 52 66 52 16 52 65 53 14 53 64 53 31 54 49 54 16 54 16 55 55 55 31 55 29 56 61 56 7 56 55 57 59 57 31 57 10 58 31 58 59 58 25 59 35 59 62 59 67 60 44 60 5 60 4 61 15 61 9 61 34 62 57 62 55 62 26 63 25 63 58 63 38 64 12 64 23 64 3 65 48 65 1 65 9 66 7 66 4 66 36 67 20 67 26 67 45 68 25 68 48 68 19 69 24 69 8 69 60 70 20 70 27 70 45 71 35 71 25 71 56 72 8 72 24 72 56 73 24 73 39 73 34 74 25 74 57 74 41 75 57 75 26 75 57 76 25 76 26 76 63 77 51 77 28 77 0 78 59 78 41 78 64 79 14 79 43 79 38 80 31 80 18 80 34 81 48 81 25 81 35 82 54 82 43 82 11 83 2 83 4 83 24 84 28 84 53 84 66 85 49 85 23 85 49 86 31 86 23 86 31 87 10 87 18 87 28 88 19 88 63 88 36 89 26 89 58 89 15 90 17 90 51 90 14 91 13 91 23 91 27 92 20 92 36 92 31 93 38 93 23 93 55 94 57 94 59 94 14 95 23 95 12 95 41 96 26 96 39 96 66 97 13 97 65 97 24 98 53 98 39 98 13 99 66 99 23 99 62 100 42 100 58 100 29 101 52 101 50 101 2 102 11 102 32 102 0 103 39 103 53 103 28 104 24 104 19 104 20 105 60 105 56 105 0 106 53 106 51 106 47 107 56 107 60 107 63 108 67 108 5 108 5 109 51 109 63 109 26 110 56 110 39 110 1 111 48 111 16 111 56 112 26 112 20 112 12 113 37 113 43 113 33 114 58 114 42 114 62 115 35 115 22 115 6 116 33 116 32 116 33 117 6 117 27 117 13 118 14 118 65 118 53 119 28 119 51 119 6 120 50 120 27 120 30 121 27 121 50 121 54 122 35 122 45 122 58 123 33 123 36 123 50 124 52 124 30 124 47 125 30 125 52 125 11 126 4 126 7 126 38 127 18 127 12 127 52 128 44 128 47 128 8 129 47 129 44 129 44 130 67 130 8 130 19 131 8 131 67 131</p>
@@ -94,7 +100,7 @@
 				<instance_geometry url="#middle_001">
 					<bind_material>
 						<technique_common>
-							<instance_material symbol="osg4mat0" target="#osg4mat0">
+							<instance_material symbol="black_spec" target="#black_spec">
 								<bind_vertex_input input_semantic="TEXCOORD" input_set="1" semantic="CHANNEL1"/>
 							</instance_material>
 						</technique_common>

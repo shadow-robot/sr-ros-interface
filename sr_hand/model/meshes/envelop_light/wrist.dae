@@ -6,10 +6,10 @@
 			<authoring_tool>Blender v:249 - Illusoft Collada Exporter v:0.3.162</authoring_tool>
 			<comments></comments>
 			<copyright></copyright>
-			<source_data>file:///home/guihome/Projets/ProjetHandle/ShadowHand/Modeles/VALIDE_vOptimizedWithoutDetails/BETA_shadow_hand_2012-07-09_envelop_opt_Zaligned_decimate-applied.blend</source_data>
+			<source_data>file:///media/ce7ff5ed-1b73-453e-869e-58fb97d47a68/ProjetHandle/ShadowHand/Modeles/VALIDE_vOptimizedWithoutDetails/BETA_shadow_hand_2012-07-22_envelop_opt_Zaligned_decimate-applied.blend</source_data>
 		</contributor>
-		<created>2012-07-09T17:16:06.329194</created>
-		<modified>2012-07-09T17:16:06.329217</modified>
+		<created>2012-07-23T02:20:30.787713</created>
+		<modified>2012-07-23T02:20:30.787736</modified>
 		<unit meter="0.01" name="centimeter"/>
 		<up_axis>Z_UP</up_axis>
 	</asset>
