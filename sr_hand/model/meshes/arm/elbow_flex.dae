@@ -6,32 +6,32 @@
 			<authoring_tool>Blender v:249 - Illusoft Collada Exporter v:0.3.162</authoring_tool>
 			<comments></comments>
 			<copyright></copyright>
-			<source_data>file:///home/guihome/Projets/ProjetHandle/ShadowHand/Modeles/arm_mesh/envelop_standard/elbow_flex_decimate_ready.blend</source_data>
+			<source_data>file:///media/ce7ff5ed-1b73-453e-869e-58fb97d47a68/ProjetHandle/ShadowHand/Modeles/arm_mesh/envelop_standard/elbow_flex_decimate_ready.blend</source_data>
 		</contributor>
-		<created>2012-07-09T17:18:57.450181</created>
-		<modified>2012-07-09T17:18:57.450203</modified>
+		<created>2012-07-23T02:27:37.104827</created>
+		<modified>2012-07-23T02:27:37.104839</modified>
 		<unit meter="0.01" name="centimeter"/>
 		<up_axis>Z_UP</up_axis>
 	</asset>
 	<library_effects>
-		<effect id="BaseWhite-fx" name="BaseWhite-fx">
+		<effect id="Delrin-fx" name="Delrin-fx">
 			<profile_COMMON>
 				<technique sid="blender">
 					<phong>
 						<emission>
-							<color>0.00000 0.00000 0.00000 1</color>
+							<color>0.01000 0.01000 0.01000 1</color>
 						</emission>
 						<ambient>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.02669 0.02659 0.02659 1</color>
 						</ambient>
 						<diffuse>
-							<color>1.00000 1.00000 1.00000 1</color>
+							<color>0.06813 0.06788 0.06788 1</color>
 						</diffuse>
 						<specular>
-							<color>0.00000 0.00000 0.00000 1</color>
+							<color>1.30486 1.30486 1.30486 1</color>
 						</specular>
 						<shininess>
-							<float>12.5</float>
+							<float>30.0</float>
 						</shininess>
 						<reflective>
 							<color>1.00000 1.00000 1.00000 1</color>
@@ -51,8 +51,8 @@
 		</effect>
 	</library_effects>
 	<library_materials>
-		<material id="BaseWhite" name="BaseWhite">
-			<instance_effect url="#BaseWhite-fx"/>
+		<material id="Delrin" name="Delrin">
+			<instance_effect url="#Delrin-fx"/>
 		</material>
 	</library_materials>
 	<library_geometries>
@@ -90,7 +90,7 @@
 				<vertices id="elbow_flex_001-Vertex">
 					<input semantic="POSITION" source="#elbow_flex_001-Position"/>
 				</vertices>
-				<triangles count="918" material="BaseWhite">
+				<triangles count="918" material="Delrin">
 					<input offset="0" semantic="VERTEX" source="#elbow_flex_001-Vertex"/>
 					<input offset="1" semantic="NORMAL" source="#elbow_flex_001-Normals"/>
 					<input offset="2" semantic="TEXCOORD" source="#elbow_flex_001-UV"/>
@@ -110,7 +110,7 @@
 				<instance_geometry url="#elbow_flex_001">
 					<bind_material>
 						<technique_common>
-							<instance_material symbol="BaseWhite" target="#BaseWhite">
+							<instance_material symbol="Delrin" target="#Delrin">
 								<bind_vertex_input input_semantic="TEXCOORD" input_set="1" semantic="CHANNEL1"/>
 							</instance_material>
 						</technique_common>
