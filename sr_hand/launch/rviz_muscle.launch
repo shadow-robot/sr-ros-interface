@@ -1,7 +1,7 @@
 <launch>
 
-  <param name="sh_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_muscle.urdf.xacro'" />
-  <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_muscle.urdf.xacro'" />
+  <param name="sh_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/shadowhand_muscle.urdf.xacro'" />
+  <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/sr_arm_muscle.urdf.xacro'" />
 
   <node pkg="rviz" name="rviz_visualizer" type="rviz"/>
 </launch>

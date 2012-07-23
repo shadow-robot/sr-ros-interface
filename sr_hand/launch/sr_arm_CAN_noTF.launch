@@ -1,10 +1,10 @@
 <launch>
-<!-- DO NOT USE ROBOT DESCRIPTION IF NOT NEEDED  <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/arm_and_hand_motor.urdf.xacro'" /> -->
+<!-- DO NOT USE ROBOT DESCRIPTION IF NOT NEEDED  <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/arm_and_hand_motor.urdf.xacro'" /> -->
 
- <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/sr_arm_motor.urdf.xacro'" />
+ <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/sr_arm_motor.urdf.xacro'" />
 
   <!--
-           shadowarm 
+           shadowarm
                         -->
   <node pkg="sr_hand" name="shadowarm"
         type="shadowarm_can" >
@@ -13,7 +13,7 @@
     <remap from="joint_states" to="/sa/joint_states" />
     <param name="publish_frequency_diagnostics" type="double" value="1.0" />
     <param name="publish_frequency" type="double" value="100.0" />
-  </node> 
+  </node>
 
 </launch>
 

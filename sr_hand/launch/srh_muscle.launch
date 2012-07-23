@@ -1,9 +1,9 @@
 <launch>
   <group if="$(optenv LEFT_HAND 0)">
-    <param name="sh_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_left_muscle.urdf.xacro'" />
+    <param name="sh_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/shadowhand_left_muscle.urdf.xacro'" />
   </group>
   <group unless="$(optenv LEFT_HAND 0)">
-    <param name="sh_description" command="$(find xacro)/xacro.py '$(find sr_hand)/model/robots/xacro/shadowhand_muscle.urdf.xacro'" />
+    <param name="sh_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/shadowhand_muscle.urdf.xacro'" />
   </group>
 
   <!-- shadowhand -->
