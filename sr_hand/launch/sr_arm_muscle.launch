@@ -83,8 +83,8 @@
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
 
-  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 1.5707963 0 0 /sr_arm/position/shadowarm_handsupport_muscle /srh/position/forearm_muscle 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 1.5707963 0 0 /sr_arm/target/shadowarm_handsupport_muscle /srh/target/forearm_muscle 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 1.5707963 0 0 /sr_arm/position/shadowarm_handsupport_muscle /srh/position/forearm 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 1.5707963 0 0 /sr_arm/target/shadowarm_handsupport_muscle /srh/target/forearm 100" />
 
   <!--
      Diagnostic Aggregator

@@ -32,9 +32,9 @@
        </node>
   -->
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub"
-	args="0.0 0.0 .0 3.14159 0 0 /srh/forearm /srh/position/forearm_motor 100" />
+	args="0.0 0.0 .0 3.14159 0 0 /srh/forearm /srh/position/forearm 100" />
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub"
-	args="0 0 0 0 0 0 /srh/position/forearm_motor /srh/target/forearm_motor
+	args="0 0 0 0 0 0 /srh/position/forearm /srh/target/forearm
 	      100" />
 
   <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator"

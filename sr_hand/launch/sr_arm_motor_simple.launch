@@ -71,9 +71,9 @@
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
 
   <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos"
-	args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100"/>
+	args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm 100"/>
   <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target"
-	args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100"/>
+	args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm 100"/>
 
   <!-- Joint States positions merger to get one single vector for both arm and hand -->
   <node pkg="sr_utilities" type="ordered_position_joint_states_merger.py" name="ordered_position_joint_states_merger"/>

@@ -54,12 +54,16 @@ ELSE(real_arm)
 ENDIF(real_arm)
 
 #Valves
-SET(valves $ENV{VALVES})
-IF(valves)
-  MESSAGE(" [x] Valves.")
-ELSE(valves)
+SET(muscle $ENV{MUSCLE})
+IF(real_hand)
+  IF(muscle)
+    MESSAGE(" [x] Valves.")
+  ELSE(muscle)
+    MESSAGE(" [ ] Valves.")
+  ENDIF(muscle)
+ELSE(real_hand)
   MESSAGE(" [ ] Valves.")
-ENDIF(valves)
+ENDIF(real_hand)
 MESSAGE("---------")
 
 #EtherCAT compatibility Interface

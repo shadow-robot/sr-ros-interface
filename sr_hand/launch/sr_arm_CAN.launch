@@ -33,8 +33,8 @@
     <param name="tf_prefix" type="string" value="sr_arm/target" />
   </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm_motor 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm_motor 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm 100" />
 </launch>
 
 
