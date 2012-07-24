@@ -1,16 +1,10 @@
 <launch>
-  <group if="$(optenv LEFT_HAND 0)">
-    <param name="sh_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/shadowhand_left_muscle.urdf.xacro'" />
-  </group>
-  <group unless="$(optenv LEFT_HAND 0)">
-    <param name="sh_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/shadowhand_muscle.urdf.xacro'" />
-  </group>
-  <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/sr_arm_muscle.urdf.xacro'" />
-
+  <include file="$(find sr_hand)/launch/load_hand_model.launch" />
+  <include file="$(find sr_hand)/launch/load_arm_model.launch" />
 
   <!--
-           shadowarm
-                        -->
+      shadowarm
+  -->
   <node pkg="sr_hand" name="shadowarm"
 	type="shadowarm_virtual" >
     <remap from="robot_description" to="sa_description"/>
@@ -42,8 +36,9 @@
 
 
   <!--
-           shadowhand
-                         -->
+      shadowhand
+  -->
+
   <node pkg="sr_hand" name="shadowhand"
 	type="shadowhand_virtual" >
     <remap from="hand_description" to="sh_description"/>
@@ -75,21 +70,40 @@
 
 
   <!--
-     publishes fixed transform: to link the arm and the hand
-     for both targets and positions + a fixed transform to a fixed
-     point at 0 0 0, to remap the arm base for both positions and
-     targets.
-                                                                    -->
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
+      publishes fixed transform: to link the arm and the hand
+      for both targets and positions + a fixed transform to a fixed
+      point at 0 0 0, to remap the arm base for both positions and
+      targets.
+  -->
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/desk_support 100" />
+  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/desk_support 100" />
 
-  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 1.5707963 0 0 /sr_arm/position/shadowarm_handsupport_muscle /srh/position/forearm 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 1.5707963 0 0 /sr_arm/target/shadowarm_handsupport_muscle /srh/target/forearm 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport /srh/position/forearm 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport /srh/target/forearm 100" />
+
+  <!-- Joint States positions merger to get one single vector for both arm and hand -->
+  <node pkg="sr_utilities" type="ordered_position_joint_states_merger.py" name="ordered_position_joint_states_merger"/>
+  <!-- Joint States targets merger to get one single vector for both arm and hand -->
+  <node pkg="sr_utilities" type="ordered_target_joint_states_merger.py" name="ordered_target_joint_states_merger"/>
+
+  <!-- Tactile merger to get one single vector for all tactiles (using ShadowPST msgs) -->
+  <node pkg="sr_tactile_sensors" type="virtual_ShadowPST_publisher.py" name="Tactiles_merger"/>
+
+  <node pkg="robot_state_publisher" type="state_publisher"
+        name="robot_state_publisher_full_pos">
+    <remap from="joint_states" to="gazebo/joint_states" />
+    <param name="publish_frequency" type="double" value="20.0" />
+  </node>
+
+  <!-- publish the kinect transforms if we're using SIMULATED environment -->
+  <group if="$(optenv SIMULATED 0)">
+    <include file="$(find sr_hand)/launch/static_transforms.launch"/>
+  </group>
+
 
   <!--
-     Diagnostic Aggregator
-                          -->
-
+      Diagnostic Aggregator
+  -->
   <node pkg="diagnostic_aggregator" type="aggregator_node"
         name="sr_diagnostic_aggregator" >
     <rosparam command="load"
