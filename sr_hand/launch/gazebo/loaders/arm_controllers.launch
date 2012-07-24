@@ -4,6 +4,6 @@
 
   <node name="spawn_gazebo_arm_controllers"
 	pkg="pr2_controller_manager" type="spawner" respawn="false" output="screen"
-	args="sa_sr_position_controller sa_ss_position_controller sa_es_position_controller sa_er_position_controller"/>
+	args="sa_sr_position_controller sa_ss_position_controller sa_es_position_controller sa_er_position_controller r_arm_cartesian_pose_controller r_arm_joint_trajectory_controller"/>
 
 </launch>
