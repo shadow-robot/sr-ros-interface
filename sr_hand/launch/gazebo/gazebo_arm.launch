@@ -1,7 +1,7 @@
 <launch>
 
   <!-- start gazebo with an empty plane -->
-  <include file="$(find sr_hand)/launch/gazebo/empty_world.launch"/>
+  <include file="$(find sr_hand)/launch/gazebo/loaders/empty_world.launch"/>
 
   <!-- spawn the arm model -->
   <group if="$(optenv MUSCLE 0)">
@@ -14,6 +14,6 @@
   <node name="spawn_hand" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -z 0.01 -model shadow_model  -J ShoulderJSwing 0.78 -J ElbowJSwing 2.0" respawn="false" output="screen" />
 
   <!-- Controllers for the arm -->
-  <include file="$(find sr_hand)/launch/gazebo/arm_controllers.launch"/>
+  <include file="$(find sr_hand)/launch/gazebo/loaders/arm_controllers.launch"/>
 
 </launch>
