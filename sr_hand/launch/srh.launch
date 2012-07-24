@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find sr_hand)/launch/load_hand_model.launch" />
+  <include file="$(find sr_hand)/launch/loaders/load_hand_model.launch" />
 
   <!-- shadowhand -->
   <node pkg="sr_hand" name="shadowhand"
