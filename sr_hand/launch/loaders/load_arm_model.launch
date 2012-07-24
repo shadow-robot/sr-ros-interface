@@ -1,11 +1,9 @@
 <launch>
   <group if="$(optenv MUSCLE 0)">
     <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/sr_arm_muscle.urdf.xacro'" />
-    <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/arm_and_hand_muscle.urdf.xacro'" />
   </group>
   <group unless="$(optenv MUSCLE 0)">
     <param name="sa_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/sr_arm_motor.urdf.xacro'" />
-    <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/arm_and_hand_motor.urdf.xacro'" />
   </group>
 
 </launch>

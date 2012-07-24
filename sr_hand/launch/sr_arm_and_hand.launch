@@ -89,12 +89,6 @@
   <!-- Tactile merger to get one single vector for all tactiles (using ShadowPST msgs) -->
   <node pkg="sr_tactile_sensors" type="virtual_ShadowPST_publisher.py" name="Tactiles_merger"/>
 
-  <node pkg="robot_state_publisher" type="state_publisher"
-        name="robot_state_publisher_full_pos">
-    <remap from="joint_states" to="gazebo/joint_states" />
-    <param name="publish_frequency" type="double" value="20.0" />
-  </node>
-
   <!-- publish the kinect transforms if we're using SIMULATED environment -->
   <group if="$(optenv SIMULATED 0)">
     <include file="$(find sr_hand)/launch/static_transforms.launch"/>
