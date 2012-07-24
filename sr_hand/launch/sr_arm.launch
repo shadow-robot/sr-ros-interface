@@ -1,6 +1,6 @@
 <launch>
-  <include file="$(find sr_hand)/launch/load_hand_model.launch" />
-  <include file="$(find sr_hand)/launch/load_arm_model.launch" />
+  <include file="$(find sr_hand)/launch/loaders/load_hand_model.launch" />
+  <include file="$(find sr_hand)/launch/loaders/load_arm_model.launch" />
 
   <!--
       shadowarm
