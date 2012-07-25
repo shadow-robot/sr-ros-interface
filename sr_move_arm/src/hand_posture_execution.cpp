@@ -15,7 +15,7 @@ namespace shadowrobot
   SrHandPostureExecutionSimpleAction::SrHandPostureExecutionSimpleAction() :
     nh_tilde("~"), hand_occupied(false)
   {
-    is_hand_occupied_client = nh.serviceClient<sr_robot_msgs::is_hand_occupied>("/sr_tactile_v/is_hand_occupied");
+    is_hand_occupied_client = nh.serviceClient<sr_robot_msgs::is_hand_occupied>("is_hand_occupied");
 
     action_server = boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> >(new actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction>("/right_arm/hand_posture_execution", boost::bind(&SrHandPostureExecutionSimpleAction::execute, this, _1), false));
 
@@ -87,7 +87,7 @@ namespace shadowrobot
       }
       for(unsigned int i = 0; i < goal->grasp.grasp_posture.position.size(); ++i)
       {
-        joint_vector[i].joint_target = goal->grasp.grasp_posture.position[i];
+        joint_vector[i].joint_target = goal->grasp.grasp_posture.position[i]*180.0/M_PI;
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
       sendupdate_msg.sendupdate_list = joint_vector;
@@ -113,7 +113,7 @@ namespace shadowrobot
       //move to pregrasp
       for(unsigned int i = 0; i < goal->grasp.pre_grasp_posture.position.size(); ++i)
       {
-        joint_vector[i].joint_target = goal->grasp.pre_grasp_posture.position[i];
+        joint_vector[i].joint_target = goal->grasp.pre_grasp_posture.position[i]*180.0/M_PI;
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
       sendupdate_msg.sendupdate_list = joint_vector;
