@@ -12,9 +12,9 @@ from sr_robot_msgs.msg import sendupdate, joint
 from sr_robot_msgs.srv import which_fingers_are_touching
 
 from actionlib import SimpleActionClient
-from motion_planning_msgs.msg import *
+#from motion_planning_msgs.msg import *
 from arm_navigation_msgs.msg import *
-from geometric_shapes_msgs.msg import Shape
+#from geometric_shapes_msgs.msg import Shape
 from actionlib_msgs.msg import GoalStatus
 
 ##abort exception
@@ -64,13 +64,16 @@ class ReactiveGrasper(object):
 
         #client to the tactile sensor manager.
         rospy.loginfo("Waiting for service which_fingers_are_touching")
-        rospy.wait_for_service('/sr_tactile_v/which_fingers_are_touching')
+        rospy.wait_for_service('which_fingers_are_touching')
         rospy.loginfo("OK service which_fingers_are_touching found.")
-        self.which_fingers_are_touching_client = rospy.ServiceProxy('/sr_tactile_v/which_fingers_are_touching', which_fingers_are_touching)
+        self.which_fingers_are_touching_client = rospy.ServiceProxy('which_fingers_are_touching', which_fingers_are_touching)
 
         #load tactile thresholds
-        self.light_touch_thresholds = rospy.get_param('~light_touch_thresholds', [100.,100.,100.,100.,0.0])
-        self.grasp_touch_thresholds = rospy.get_param('~grasp_touch_thresholds', [117.,117.,113.,111.,0.0])
+        self.light_touch_thresholds = rospy.get_param('light_touch_thresholds', [100.,100.,100.,100.,0.0])
+        rospy.loginfo("light and grasp threashold are :")
+	rospy.loginfo(self.light_touch_thresholds)
+        self.grasp_touch_thresholds = rospy.get_param('grasp_touch_thresholds', [117.,117.,113.,111.,0.0])
+        rospy.loginfo(self.grasp_touch_thresholds)
 
         #dictionary for ManipulationPhase
         self.manipulation_phase_dict = {}
@@ -354,9 +357,10 @@ class ReactiveGrasper(object):
                     touching = fingers_touching[touch_index]
                 if touching == 0:
                     joint_target = pregrasp_target + float(grasp_target - pregrasp_target)*(float(i_step) / float(nb_steps) )
+                    myjoint_target = joint_target * 180.0 / math.pi
                     current_targets[index] = joint_target
-                    sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
-                    rospy.logdebug("["+joint_name+"]: (p/g/t) = "+str(pregrasp_target)+"/"+str(grasp_target)+"/"+str(joint_target) + " ("+
+                    sendupdate_msg.append(joint(joint_name = joint_name, joint_target = myjoint_target))
+                    rospy.logdebug("["+joint_name+"]: (p/g/t) = "+str(pregrasp_target)+"/"+str(grasp_target)+"/"+str(myjoint_target) + " ("+
                                    str(float(i_step) / float(nb_steps))+"%)")
 
             self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
@@ -459,7 +463,8 @@ class ReactiveGrasper(object):
         sendupdate_msg = []
 
         for (joint_name, joint_target) in zip(joint_names, joint_targets):
-            sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target))
+            myjoint_target=joint_target * 180 / math.pi
+            sendupdate_msg.append(joint(joint_name = joint_name, joint_target = myjoint_target))
 
         self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
 

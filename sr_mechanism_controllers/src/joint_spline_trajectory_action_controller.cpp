@@ -164,7 +164,7 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
   joint_labels.push_back("WRJ1");
 
   //look for controllers and build controller name to joint map
-  if( ros::service::waitForService("sr_controller_manager/list_controllers",4) )
+  if( ros::service::waitForService("sr_controller_manager/list_controllers",20000) )
   {
     use_sendupdate=false;
     ros::ServiceClient controller_list_client = nh.serviceClient<pr2_mechanism_msgs::ListControllers>("sr_controller_manager/list_controllers");
@@ -212,7 +212,7 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
   }
 
   ROS_INFO("waiting for getJointState");
-  if( ros::service::waitForService("getJointState",4))
+  if( ros::service::waitForService("getJointState",20000))
   {
     // open persistent link to joint_state service
     joint_state_client = nh.serviceClient<sr_utilities::getJointState>("getJointState",true);

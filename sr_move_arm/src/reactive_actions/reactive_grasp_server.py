@@ -136,6 +136,7 @@ class ReactiveGraspActionServer(object):
                           Empty, self.grasp_adjustment_callback)
 
         self.rg = ReactiveGrasperWithPreempt(self._as, self._lift_as, self._approach_as, self._place_as, which_arm, self.use_slip_detection )
+        rospy.loginfo("Successfully launched reactive grasper")
 
 
     def reactive_grasp_cb(self, goal):

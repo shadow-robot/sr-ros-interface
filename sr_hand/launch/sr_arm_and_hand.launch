@@ -91,7 +91,7 @@
 
   <!-- publish the kinect transforms if we're using SIMULATED environment -->
   <group if="$(optenv SIMULATED 0)">
-    <include file="$(find sr_hand)/launch/static_transforms.launch"/>
+    <include file="$(find sr_hand)/launch/advanced/static_transforms.launch"/>
   </group>
 
 
