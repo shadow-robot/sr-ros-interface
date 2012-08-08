@@ -9,10 +9,6 @@ python-qt4-gl:
 yaml:
   debian: libyaml-dev
 
-tinyxml:
-  ubuntu: libtinyxml-dev
-  debian: libtinyxml-dev
-
 libdc1394-dev:
   debian: libdc1394-22-dev
 
