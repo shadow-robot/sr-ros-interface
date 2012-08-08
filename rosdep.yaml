@@ -20,7 +20,7 @@ libspnav-dev:
   ubuntu: libspnav-dev
   debian: libspnav-dev
 
-libmagick++-dev:
+libmagick:
   ubuntu: libmagick++-dev
   debian: libmagick++-dev
 
