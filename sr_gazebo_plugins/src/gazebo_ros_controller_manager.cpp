@@ -33,22 +33,20 @@
 #include <math.h>
 #include <unistd.h>
 #include <set>
-#include <gazebo/Global.hh>
-#include <gazebo/World.hh>
-#include <gazebo/PhysicsEngine.hh>
-#include <gazebo/XMLConfig.hh>
-#include <gazebo/Model.hh>
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-#include <gazebo/Joint.hh>
-#else
-#include <gazebo/HingeJoint.hh>
-#include <gazebo/SliderJoint.hh>
-#endif
-#include <gazebo/Simulator.hh>
-#include <gazebo/gazebo.h>
+
+//#include <gazebo/XMLConfig.hh>
+//#include "physics/physics.h"
+#include "physics/World.hh"
+#include "physics/HingeJoint.hh"
+#include "sensors/Sensor.hh"
+#include "sdf/interface/SDF.hh"
+#include "sdf/interface/Param.hh"
+#include "common/Exception.hh"
+#include "physics/PhysicsTypes.hh"
+#include "physics/Base.hh"
+
+
 #include <angles/angles.h>
-#include <gazebo/GazeboError.hh>
-#include <gazebo/ControllerFactory.hh>
 #include <urdf/model.h>
 #include <map>
 
@@ -56,41 +54,10 @@
 
 namespace gazebo {
 
-GZ_REGISTER_DYNAMIC_CONTROLLER("sr_gazebo_ros_controller_manager", GazeboRosControllerManager);
-
-GazeboRosControllerManager::GazeboRosControllerManager(Entity *parent)
-  : Controller(parent), hw_(), fake_calibration_(true)
+GazeboRosControllerManager::GazeboRosControllerManager()
 {
-  this->parent_model_ = dynamic_cast<Model*>(this->parent);
-
-  if (!this->parent_model_)
-    gzthrow("GazeboRosControllerManager controller requires a Model as its parent");
-
-  Param::Begin(&this->parameters);
-  this->robotParamP = new ParamT<std::string>("robotParam", "robot_description", 0);
-  this->robotNamespaceP = new ParamT<std::string>("robotNamespace", "/", 0);
-  this->setModelsJointsStatesServiceNameP = new ParamT<std::string>("setModelsJointsStatesServiceName","set_models_joints_states", 0);
-  Param::End();
-
-  if (getenv("CHECK_SPEEDUP"))
-  {
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-    wall_start_ = Simulator::Instance()->GetRealTime().Double();
-    sim_start_  = Simulator::Instance()->GetSimTime().Double();
-#else
-    wall_start_ = Simulator::Instance()->GetRealTime();
-    sim_start_  = Simulator::Instance()->GetSimTime();
-#endif
-  }
-
-  // check update rate against world physics update rate
-  // should be equal or higher to guarantee the wrench applied is not "diluted"
-  if (this->updatePeriod > 0 &&
-      (gazebo::World::Instance()->GetPhysicsEngine()->GetUpdateRate() > 1.0/this->updatePeriod))
-    ROS_ERROR("gazebo_ros_force controller update rate is less than physics update rate, wrench applied will be diluted (applied intermittently)");
-
-
 }
+
 
 /// \brief callback for setting models joints states
 bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
@@ -103,8 +70,23 @@ bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &r
 
 GazeboRosControllerManager::~GazeboRosControllerManager()
 {
-  delete this->robotParamP;
-  delete this->robotNamespaceP;
+  ROS_DEBUG("Calling FiniChild in GazeboRosControllerManager");
+
+  //pr2_hardware_interface::ActuatorMap::const_iterator it;
+  //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
+  //  delete it->second; // why is this causing double free corrpution?
+  this->cm_->~ControllerManager();
+  this->rosnode_->shutdown();
+#ifdef USE_CBQ
+  this->controller_manager_queue_.clear();
+  this->controller_manager_queue_.disable();
+  this->controller_manager_callback_queue_thread_.join();
+#endif
+  this->ros_spinner_thread_.join();
+
+
+
+
   delete this->cm_;
   delete this->rosnode_;
 
@@ -116,13 +98,57 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
   }
 }
 
-void GazeboRosControllerManager::LoadChild(XMLConfigNode *node)
+
+void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
+  // Get then name of the parent model
+  std::string modelName = _sdf->GetParent()->GetValueString("name");
+
+  // Get the world name.
+  this->world = _parent->GetWorld();
+
+  // Get a pointer to the model
+  this->parent_model_ = _parent;
+
+  // Error message if the model couldn't be found
+  if (!this->parent_model_)
+    gzerr << "Unable to get parent model\n";
+
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
+  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+      boost::bind(&GazeboRosControllerManager::UpdateChild, this));
+  gzdbg << "plugin model name: " << modelName << "\n";
+
+
+
+
+  if (getenv("CHECK_SPEEDUP"))
+  {
+    wall_start_ = this->world->GetRealTime().Double();
+    sim_start_  = this->world->GetSimTime().Double();
+  }
+
+  // check update rate against world physics update rate
+  // should be equal or higher to guarantee the wrench applied is not "diluted"
+  //if (this->updatePeriod > 0 &&
+  //    (this->world->GetPhysicsEngine()->GetUpdateRate() > 1.0/this->updatePeriod))
+  //  ROS_ERROR("gazebo_ros_force controller update rate is less than physics update rate, wrench applied will be diluted (applied intermittently)");
+
+
+
+
+
   // get parameter name
-  this->robotParamP->Load(node);
-  this->robotParam = this->robotParamP->GetValue();
-  this->robotNamespaceP->Load(node);
-  this->robotNamespace = this->robotNamespaceP->GetValue();
+  this->robotNamespace = "";
+  if (_sdf->HasElement("robotNamespace"))
+    this->robotNamespace = _sdf->GetElement("robotNamespace")->GetValueString();
+
+  this->robotParam = "robot_description";
+  if (_sdf->HasElement("robotParam"))
+    this->robotParam = _sdf->GetElement("robotParam")->GetValueString();
+
+  this->robotParam = this->robotNamespace+"/" + this->robotParam;
 
   if (!ros::isInitialized())
   {
@@ -131,15 +157,22 @@ void GazeboRosControllerManager::LoadChild(XMLConfigNode *node)
     ros::init(argc,argv,"gazebo",ros::init_options::NoSigintHandler|ros::init_options::AnonymousName);
   }
   this->rosnode_ = new ros::NodeHandle(this->robotNamespace);
-  ROS_INFO("starting Shadow Robot's gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
+  ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
 
+  // pr2_etherCAT calls ros::spin(), we'll thread out one spinner here to mimic that
+  this->ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );
+
+
+  // load a controller manager
   this->cm_ = new pr2_controller_manager::ControllerManager(&hw_,*this->rosnode_);
+  this->hw_.current_time_ = ros::Time(this->world->GetSimTime().Double());
+  if (this->hw_.current_time_ < ros::Time(0.001)) this->hw_.current_time_ == ros::Time(0.001); // hardcoded to minimum of 1ms on start up
 
   this->rosnode_->param("gazebo/start_robot_calibrated",this->fake_calibration_,true);
 
   // read pr2 urdf
   // setup actuators, then setup mechanism control node
-  ReadPr2Xml(node);
+  ReadPr2Xml();
 
   // Initializes the fake state (for running the transmissions backwards).
   this->fake_state_ = new pr2_mechanism_model::RobotState(&this->cm_->model_);
@@ -152,7 +185,7 @@ void GazeboRosControllerManager::LoadChild(XMLConfigNode *node)
       std::string joint_name = this->cm_->state_->joint_states_[i].joint_->name;
 
       // fill in gazebo joints pointer
-      gazebo::Joint *joint = this->parent_model_->GetJoint(joint_name);
+      gazebo::physics::JointPtr joint = this->parent_model_->GetJoint(joint_name);
       if (joint)
       {
         this->joints_.push_back(joint);
@@ -160,47 +193,30 @@ void GazeboRosControllerManager::LoadChild(XMLConfigNode *node)
       else
       {
         //ROS_WARN("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", joint_name.c_str());
-        this->joints_.push_back(NULL);
+        //this->joints_.push_back(NULL);  // FIXME: cannot be null, must be an empty boost shared pointer
+        this->joints_.push_back(gazebo::physics::JointPtr());  // FIXME: cannot be null, must be an empty boost shared pointer
+        ROS_ERROR("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", joint_name.c_str());
       }
 
     }
   }
 
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-  this->hw_.current_time_ = ros::Time(Simulator::Instance()->GetSimTime().Double());
-#else
-  this->hw_.current_time_ = ros::Time(Simulator::Instance()->GetSimTime());
-#endif
-}
-
-void GazeboRosControllerManager::InitChild()
-{
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-  this->hw_.current_time_ = ros::Time(Simulator::Instance()->GetSimTime().Double());
-#else
-  this->hw_.current_time_ = ros::Time(Simulator::Instance()->GetSimTime());
-#endif
 #ifdef USE_CBQ
   // start custom queue for controller manager
   this->controller_manager_callback_queue_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerQueueThread,this ) );
 #endif
 
-  // pr2_etherCAT calls ros::spin(), we'll thread out one spinner here to mimic that
-  this->ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );
-
 }
+
 
 void GazeboRosControllerManager::UpdateChild()
 {
+  if (this->world->IsPaused()) return;
+
   if (getenv("CHECK_SPEEDUP"))
   {
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-    double wall_elapsed = Simulator::Instance()->GetRealTime().Double() - wall_start_;
-    double sim_elapsed  = Simulator::Instance()->GetSimTime().Double()  - sim_start_;
-#else
-    double wall_elapsed = Simulator::Instance()->GetRealTime() - wall_start_;
-    double sim_elapsed  = Simulator::Instance()->GetSimTime()  - sim_start_;
-#endif
+    double wall_elapsed = this->world->GetRealTime().Double() - wall_start_;
+    double sim_elapsed  = this->world->GetSimTime().Double()  - sim_start_;
     std::cout << " real time: " <<  wall_elapsed
               << "  sim time: " <<  sim_elapsed
               << "  speed up: " <<  sim_elapsed / wall_elapsed
@@ -212,78 +228,46 @@ void GazeboRosControllerManager::UpdateChild()
   //  Pushes out simulation state
   //--------------------------------------------------
 
+  //ROS_ERROR("joints_.size()[%d]",(int)this->joints_.size());
   // Copies the state from the gazebo joints into the mechanism joints.
   for (unsigned int i = 0; i < this->joints_.size(); ++i)
   {
     if (!this->joints_[i])
       continue;
 
-    double damping_coef;
-    if (this->cm_->state_->joint_states_[i].joint_->dynamics)
-      damping_coef = this->cm_->state_->joint_states_[i].joint_->dynamics->damping;
-    else
-      damping_coef = 0;
-
     this->fake_state_->joint_states_[i].measured_effort_ = this->fake_state_->joint_states_[i].commanded_effort_;
 
-    switch(this->joints_[i]->GetType())
+    if (this->joints_[i]->HasType(gazebo::physics::Base::HINGE_JOINT))
     {
-    case Joint::HINGE: {
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-      Joint *hj = this->joints_[i];
+      gazebo::physics::JointPtr hj = this->joints_[i];
       this->fake_state_->joint_states_[i].position_ = this->fake_state_->joint_states_[i].position_ +
                     angles::shortest_angular_distance(this->fake_state_->joint_states_[i].position_,hj->GetAngle(0).GetAsRadian());
       this->fake_state_->joint_states_[i].velocity_ = hj->GetVelocity(0);
-#else
-      HingeJoint *hj = (HingeJoint*)this->joints_[i];
-      this->fake_state_->joint_states_[i].position_ = this->fake_state_->joint_states_[i].position_ +
-                    angles::shortest_angular_distance(this->fake_state_->joint_states_[i].position_,hj->GetAngle());
-      this->fake_state_->joint_states_[i].velocity_ = hj->GetAngleRate();
-#endif
-      break;
+      //if (this->joints_[i]->GetName() == "torso_lift_motor_screw_joint")
+      //  ROS_WARN("joint[%s] [%f]",this->joints_[i]->GetName().c_str(), this->fake_state_->joint_states_[i].position_);
     }
-    case Joint::SLIDER: {
-#ifndef ODE_SCREW_JOINT
-      static double torso_hack_damping_threshold = 1000.0; /// FIXME: if damping is greater than this value, do some unconventional smoothing to prevent instability due to safety controller
-#endif
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-      Joint *sj = this->joints_[i];
-#ifndef ODE_SCREW_JOINT
-      if (damping_coef > torso_hack_damping_threshold)
-      {
-        this->fake_state_->joint_states_[i].position_ *= (1.0 - torso_hack_damping_threshold / damping_coef);
-        this->fake_state_->joint_states_[i].position_ += (torso_hack_damping_threshold/damping_coef)*sj->GetAngle(0).GetAsRadian();
-        this->fake_state_->joint_states_[i].velocity_ *= (1.0 - torso_hack_damping_threshold / damping_coef);
-        this->fake_state_->joint_states_[i].velocity_ += (torso_hack_damping_threshold/damping_coef)*sj->GetVelocity(0);
-      }
-      else
-#endif
+    else if (this->joints_[i]->HasType(gazebo::physics::Base::SLIDER_JOINT))
+    {
+      gazebo::physics::JointPtr sj = this->joints_[i];
       {
         this->fake_state_->joint_states_[i].position_ = sj->GetAngle(0).GetAsRadian();
         this->fake_state_->joint_states_[i].velocity_ = sj->GetVelocity(0);
       }
-      break;
-#else
-      SliderJoint *sj = (SliderJoint*)this->joints_[i];
-#ifndef ODE_SCREW_JOINT
-      if (damping_coef > torso_hack_damping_threshold)
-      {
-        this->fake_state_->joint_states_[i].position_ *= (1.0 - torso_hack_damping_threshold / damping_coef);
-        this->fake_state_->joint_states_[i].position_ += (torso_hack_damping_threshold/damping_coef)*sj->GetPosition();
-        this->fake_state_->joint_states_[i].velocity_ *= (1.0 - torso_hack_damping_threshold / damping_coef);
-        this->fake_state_->joint_states_[i].velocity_ += (torso_hack_damping_threshold/damping_coef)*sj->GetPositionRate();
-      }
-      else
-#endif
-      {
-        this->fake_state_->joint_states_[i].position_ = sj->GetPosition();
-        this->fake_state_->joint_states_[i].velocity_ = sj->GetPositionRate();
-      }
-      break;
-#endif
+      //ROS_ERROR("joint[%s] is a slider [%f]",this->joints_[i]->GetName().c_str(),sj->GetAngle(0).GetAsRadian());
+      //if (this->joints_[i]->GetName() == "torso_lift_joint")
+      //  ROS_WARN("joint[%s] [%f]",this->joints_[i]->GetName().c_str(), this->fake_state_->joint_states_[i].position_);
     }
-    default:
-      abort();
+    else
+    {
+      /*
+      ROS_WARN("joint[%s] is not hinge [%d] nor slider",this->joints_[i]->GetName().c_str(),
+        (unsigned int)gazebo::physics::Base::HINGE_JOINT
+        );
+      for (unsigned int j = 0; j < this->joints_[i]->GetTypeCount(); j++)
+      {
+        ROS_WARN("  types: %d hinge[%d] slider[%d]",(unsigned int)this->joints_[i]->GetType(j),(unsigned int)this->joints_[i]->HasType(gazebo::physics::Base::HINGE_JOINT),(unsigned int)this->joints_[i]->HasType(gazebo::physics::Base::SLIDER_JOINT));
+      }
+      */
     }
   }
 
@@ -293,11 +277,7 @@ void GazeboRosControllerManager::UpdateChild()
   //--------------------------------------------------
   //  Runs Mechanism Control
   //--------------------------------------------------
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-  this->hw_.current_time_ = ros::Time(Simulator::Instance()->GetSimTime().Double());
-#else
-  this->hw_.current_time_ = ros::Time(Simulator::Instance()->GetSimTime());
-#endif
+  this->hw_.current_time_ = ros::Time(this->world->GetSimTime().Double());
   try
   {
     if (this->cm_->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
@@ -326,91 +306,37 @@ void GazeboRosControllerManager::UpdateChild()
 
     double effort = this->fake_state_->joint_states_[i].commanded_effort_;
 
-    double damping_coef;
+    double damping_coef = 0;
     if (this->cm_->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
     {
       if (this->cm_->state_->joint_states_[i].joint_->dynamics)
         damping_coef = this->cm_->state_->joint_states_[i].joint_->dynamics->damping;
-      else
-        damping_coef = 0;
     }
 
-    switch (this->joints_[i]->GetType())
+    if (this->joints_[i]->HasType(gazebo::physics::Base::HINGE_JOINT))
     {
-    case Joint::HINGE: {
-#if GAZEBO_MAJOR_VERSION >= 0 && GAZEBO_MINOR_VERSION >= 10
-      Joint *hj = this->joints_[i];
-      #if GAZEBO_PATCH_VERSION >= 1
-            // skip explicit damping force addition, taken care of in gazebo
-            double effort_command = effort;
-      #else
-            double current_velocity = hj->GetVelocity(0);
-            double damping_force = damping_coef * current_velocity;
-            double effort_command = effort - damping_force;
-      #endif
+      gazebo::physics::JointPtr hj = this->joints_[i];
+      double current_velocity = hj->GetVelocity(0);
+      double damping_force = damping_coef * current_velocity;
+      double effort_command = effort - damping_force;
       hj->SetForce(0,effort_command);
-#else
-      HingeJoint *hj = (HingeJoint*)this->joints_[i];
-      #if GAZEBO_PATCH_VERSION >= 1
-            // skip explicit damping force addition, taken care of in gazebo
-            double effort_command = effort;
-      #else
-            double current_velocity = hj->GetAngleRate();
-            double damping_force = damping_coef * current_velocity;
-            double effort_command = effort - damping_force;
-      #endif
-      hj->SetTorque(effort_command);
-#endif
-      break;
+      //if (this->joints_[i]->GetName() == "torso_lift_motor_screw_joint")
+      //  ROS_ERROR("gazebo [%s] command [%f] damping [%f]",this->joints_[i]->GetName().c_str(), effort, damping_force);
     }
-    case Joint::SLIDER: {
-#if GAZEBO_MAJOR_VERSION == 0 && GAZEBO_MINOR_VERSION >= 10
-      Joint *sj = this->joints_[i];
-      #if GAZEBO_PATCH_VERSION >= 1
-          double effort_command = effort;
-      #else
-          double current_velocity = sj->GetVelocity(0);
-          double damping_force = damping_coef * current_velocity;
-          double effort_command = effort-damping_force;
-      #endif
-      (this->joints_[i])->SetForce(0,effort_command);
-#else
-      SliderJoint *sj = (SliderJoint*)this->joints_[i];
-      #if GAZEBO_PATCH_VERSION >= 1
-          double effort_command = effort;
-      #else
-          double current_velocity = sj->GetPositionRate();
-          double damping_force = damping_coef * current_velocity;
-          double effort_command = effort-damping_force;
-      #endif
-      sj->SetSliderForce(effort_command);
-#endif
-      break;
-    }
-    default:
-      abort();
+    else if (this->joints_[i]->HasType(gazebo::physics::Base::SLIDER_JOINT))
+    {
+      gazebo::physics::JointPtr sj = this->joints_[i];
+      double current_velocity = sj->GetVelocity(0);
+      double damping_force = damping_coef * current_velocity;
+      double effort_command = effort-damping_force;
+      sj->SetForce(0,effort_command);
+      //if (this->joints_[i]->GetName() == "torso_lift_joint")
+      //  ROS_ERROR("gazebo [%s] command [%f] damping [%f]",this->joints_[i]->GetName().c_str(), effort, damping_force);
     }
   }
 }
 
-void GazeboRosControllerManager::FiniChild()
-{
-  ROS_DEBUG("Calling FiniChild in GazeboRosControllerManager");
-
-  //pr2_hardware_interface::ActuatorMap::const_iterator it;
-  //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
-  //  delete it->second; // why is this causing double free corrpution?
-  this->cm_->~ControllerManager();
-  this->rosnode_->shutdown();
-#ifdef USE_CBQ
-  this->controller_manager_queue_.clear();
-  this->controller_manager_queue_.disable();
-  this->controller_manager_callback_queue_thread_.join();
-#endif
-  this->ros_spinner_thread_.join();
-}
-
-void GazeboRosControllerManager::ReadPr2Xml(XMLConfigNode *node)
+void GazeboRosControllerManager::ReadPr2Xml()
 {
 
   std::string urdf_param_name;
@@ -466,11 +392,9 @@ void GazeboRosControllerManager::ReadPr2Xml(XMLConfigNode *node)
     std::set<std::string>::iterator it;
     for (it = get_actuators.actuators.begin(); it != get_actuators.actuators.end(); ++it)
     {
+      //std::cout << " adding actuator " << (*it) << std::endl;
       pr2_hardware_interface::Actuator* pr2_actuator = new sr_actuator::SrActuator(*it);
       pr2_actuator->state_.is_enabled_ = true;
-
-      ROS_DEBUG_STREAM("adding actuator: " << pr2_actuator->name_);
-
       this->hw_.addActuator(pr2_actuator);
     }
 
@@ -480,6 +404,7 @@ void GazeboRosControllerManager::ReadPr2Xml(XMLConfigNode *node)
     for (unsigned int i = 0; i < this->cm_->state_->joint_states_.size(); ++i)
       this->cm_->state_->joint_states_[i].calibrated_ = fake_calibration_;
   }
+
 }
 
 #ifdef USE_CBQ
@@ -511,4 +436,6 @@ void GazeboRosControllerManager::ControllerManagerROSThread()
     ros::spinOnce();
   }
 }
+  // Register this plugin with the simulator
+  GZ_REGISTER_MODEL_PLUGIN(GazeboRosControllerManager)
 } // namespace gazebo
