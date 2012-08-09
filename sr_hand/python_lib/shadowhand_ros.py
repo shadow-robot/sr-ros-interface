@@ -79,10 +79,6 @@ class ShadowHand_ROS():
         self.cyberglove_sub = 0
         self.cybergrasp_pub = 0
         self.cyberglove_sub = 0
-        self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
-        self.pub = rospy.Publisher('srh/sendupdate',sendupdate)
-        self.sub_arm = rospy.Subscriber('sr_arm/shadowhand_data', joints_data,self.callback_arm)
-        self.pub_arm = rospy.Publisher('sr_arm/sendupdate',sendupdate)
         self.isFirstMessage = True
         self.isFirstMessageArm = True
         self.isReady = False
@@ -115,6 +111,11 @@ class ShadowHand_ROS():
         self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasp/grasps.xml")
 
         self.grasp_interpoler = 0
+        self.pub = rospy.Publisher('srh/sendupdate',sendupdate)
+        self.pub_arm = rospy.Publisher('sr_arm/sendupdate',sendupdate)
+
+        self.sub_arm = rospy.Subscriber('sr_arm/shadowhand_data', joints_data,self.callback_arm)
+        self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
 
         threading.Thread(None, rospy.spin)
 
