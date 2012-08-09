@@ -58,6 +58,7 @@ ENDIF(DEFINED jenkins)
 
 #building the actual test
 rosbuild_add_executable(test/test_joint_position_controller test/test_joint_position_controller.cpp test/test_controllers.cpp src/srh_joint_position_controller.cpp src/sr_controller.cpp)
+target_link_libraries(test/test_joint_position_controller tinyxml)
 
 target_link_libraries(test/test_joint_position_controller ${PROJECT_NAME})
 IF(DEFINED jenkins)
