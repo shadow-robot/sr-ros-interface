@@ -80,7 +80,7 @@ namespace sr_deadband
      */
     bool is_in_deadband(T demand, T error, T deadband, double deadband_multiplicator = 5.0, unsigned int nb_errors_for_avg = 50)
     {
-      bool is_in_deadband;
+      bool is_in_deadband = false;
 
       last_errors.push_back( error );
       double avg_error = 0.0;
