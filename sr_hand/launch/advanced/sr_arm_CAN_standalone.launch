@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find sr_hand)/launch/sr_arm_CAN.launch"/>
+  <include file="$(find sr_hand)/launch/advanced/sr_arm_CAN.launch"/>
 
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
