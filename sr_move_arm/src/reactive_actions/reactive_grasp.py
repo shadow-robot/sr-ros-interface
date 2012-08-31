@@ -42,7 +42,7 @@ class ReactiveGrasper(object):
         #root and tip name for listening
         #to the current palm pose
         self.tf_listener = tf.TransformListener()
-        self.root_name = "base_link"
+        self.root_name = "world"
         self.tip_name = "palm"
 
         #for taking photos of each step
@@ -414,7 +414,7 @@ class ReactiveGrasper(object):
         approach_vect = scipy.array(grasp_pos) - scipy.array(approach_pos)
         return approach_vect
 
-    def return_rel_pose(self, vector, frame, start_pose = None, orthogonal_to_vect = None, orthogonal_to_vect_frame = 'base_link'):
+    def return_rel_pose(self, vector, frame, start_pose = None, orthogonal_to_vect = None, orthogonal_to_vect_frame = 'world'):
         """
         convert a relative vector in frame to a pose in the base_link frame
         if start_pose is not specified, uses current pose of the wrist
@@ -468,7 +468,7 @@ class ReactiveGrasper(object):
 
         self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
 
-    def command_cartesian(self, pose, frame_id='base_link'):
+    def command_cartesian(self, pose, frame_id='world'):
         """
         Tries to go to the given pose with the arm.
         """
