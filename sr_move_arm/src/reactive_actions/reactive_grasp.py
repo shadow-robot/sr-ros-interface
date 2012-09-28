@@ -10,7 +10,7 @@ from object_manipulator.convert_functions import *
 from object_manipulation_msgs.msg import GripperTranslation, ManipulationPhase
 from sr_robot_msgs.msg import sendupdate, joint
 from sr_robot_msgs.srv import which_fingers_are_touching
-
+from trajectory_msgs.msg import JointTrajectory
 from actionlib import SimpleActionClient
 #from motion_planning_msgs.msg import *
 from arm_navigation_msgs.msg import *
@@ -27,6 +27,8 @@ class ReactiveGrasper(object):
     def __init__(self, which_arm = 'r', slip_detection = False):
         self.using_slip_detection = slip_detection
         self.whicharm = which_arm
+
+	self.mypub = rospy.Publisher("/command",JointTrajectory)
 
         #force to use when closing hard
         self.close_force = 100
@@ -190,7 +192,13 @@ class ReactiveGrasper(object):
         #follow the joint_path if one is given
         if joint_path != None:
             self.check_preempt()
-            joint_names = joint_path.joint_names
+	    	    
+	    self.mypub.publish(joint_path)
+	    rospy.logerr("Sent a trajectory !")
+	    rospy.sleep(10)
+	    rospy.logerr("Trajectory should be finished !") 
+            '''joint_names = joint_path.joint_names
+	    countTime = 5
 
             for trajectory_step in joint_path.points:
                 sendupdate_msg = []
@@ -203,11 +211,12 @@ class ReactiveGrasper(object):
                 self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
 
                 current_sleep_time = trajectory_step.time_from_start - last_time
-                rospy.sleep( current_sleep_time )
+                rospy.sleep( countTime ) # current_sleep_time )
+		countTime=max(countTime-1,0.5)
                 last_time = trajectory_step.time_from_start
         else:
             #if no joint_path is given, go to the current_goal_pose
-            self.command_cartesian( current_goal_pose )
+            self.command_cartesian( current_goal_pose )'''
 
         return self.reactive_approach_result_dict["success"]
 

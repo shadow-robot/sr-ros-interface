@@ -585,10 +585,12 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
 void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTrajectoryConstPtr &msg)
 {
   bool success = true;
+  
+  ros::Time time = ros::Time::now()-ros::Duration(0.05);
+  last_time_ = time;
 
-  ros::Time time = last_time_ + ros::Duration(0.01);
-  ROS_DEBUG("Figuring out new trajectory at %.3lf, with data from %.3lf",
-          time.toSec(), msg->header.stamp.toSec());
+  ROS_ERROR("Figuring out new trajectory at %.3lf, with data from %.3lf with %d waypoints",
+          time.toSec(), msg->header.stamp.toSec(),msg->points.size());
 
   boost::shared_ptr<SpecifiedTrajectory> new_traj_ptr(new SpecifiedTrajectory);
   SpecifiedTrajectory &traj = *new_traj_ptr;
@@ -635,11 +637,17 @@ void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTraj
   for (size_t i = 0; i < msg->points.size(); ++i)
   {
     Segment seg;
-
+		ROS_ERROR("Current time %f and header time %f",msg->header.stamp.toSec(),ros::Time(0.0).toSec());
     if(msg->header.stamp == ros::Time(0.0))
+    {
       seg.start_time = (time + msg->points[i].time_from_start).toSec() - durations[i];
+      ROS_ERROR("Segment %d start time A %f,time_from_start %f, duration, %f",i,seg.start_time,msg->points[i].time_from_start.toSec(),durations[i]);
+    }
     else
+    {
       seg.start_time = (msg->header.stamp + msg->points[i].time_from_start).toSec() - durations[i];
+      ROS_ERROR("Segment start time B %f",seg.start_time);
+    }
     seg.duration = durations[i];
     seg.splines.resize(joint_names_.size());
 
@@ -777,7 +785,7 @@ void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTraj
     // if the last trajectory is already in the past, stop the servoing 
     if( (traj[traj.size()-1].start_time+traj[traj.size()-1].duration) < time.toSec())
     {  
-	ROS_DEBUG("trajectory is finished %f<%f",(traj[traj.size()-1].start_time+traj[traj.size()-1].duration),time.toSec());   
+	ROS_ERROR("trajectory is finished %f<%f",(traj[traj.size()-1].start_time+traj[traj.size()-1].duration),time.toSec());   
        break;
     }
 
