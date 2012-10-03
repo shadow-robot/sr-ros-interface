@@ -276,3 +276,4 @@ sr_utilities/src/sr_utilities
 test/tmp.urdf
 sr_description/test/tmp.urdf
 sr_description/lib
+sr_mechanism_controllers/_gtest_from_src
