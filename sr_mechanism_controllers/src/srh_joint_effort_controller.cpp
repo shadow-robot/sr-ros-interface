@@ -63,21 +63,37 @@ namespace controller {
     //joint 0s
     if( joint_name.substr(3,1).compare("0") == 0)
     {
+      has_j2 = true;
+      std::string j1 = joint_name.substr(0,3) + "1";
       std::string j2 = joint_name.substr(0,3) + "2";
-      joint_state_ = robot_->getJointState(j2);
+      ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
+
+      joint_state_ = robot_->getJointState(j1);
       if (!joint_state_)
       {
         ROS_ERROR("SrhEffortJointController could not find joint named \"%s\"\n",
-                  joint_name.c_str());
+                  j1.c_str());
+        return false;
+      }
+
+      joint_state_2 = robot_->getJointState(j2);
+      if (!joint_state_2)
+      {
+        ROS_ERROR("SrhEffortJointController could not find joint named \"%s\"\n",
+                  j2.c_str());
         return false;
       }
     }
-    joint_state_ = robot_->getJointState(joint_name);
-    if (!joint_state_)
+    else
     {
-      ROS_ERROR("SrhEffortJointController could not find joint named \"%s\"\n",
-                joint_name.c_str());
-      return false;
+      has_j2 = false;
+      joint_state_ = robot_->getJointState(joint_name);
+      if (!joint_state_)
+      {
+        ROS_ERROR("SrhJointPositionController could not find joint named \"%s\"\n",
+                  joint_name.c_str());
+        return false;
+      }
     }
 
     friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
@@ -113,7 +129,7 @@ namespace controller {
 
   void SrhEffortJointController::starting()
   {
-    command_ = joint_state_->measured_effort_;
+    command_ = 0.0;
     read_parameters();
   }
 
@@ -132,8 +148,11 @@ namespace controller {
 
   void SrhEffortJointController::update()
   {
-    if (!joint_state_->calibrated_)
-      return;
+    if( !has_j2)
+    {
+      if (!joint_state_->calibrated_)
+        return;
+    }
 
     assert(robot_ != NULL);
     ros::Time time = robot_->getTime();
@@ -143,7 +162,7 @@ namespace controller {
     if (!initialized_)
     {
       initialized_ = true;
-      command_ = joint_state_->measured_effort_;
+      command_ = 0.0;
     }
 
     //The commanded effort is the error directly:
@@ -156,10 +175,15 @@ namespace controller {
     commanded_effort = max( commanded_effort, -max_force_demand );
 
     //Friction compensation
-    //TODO: is this working for joint 0s ?
-    commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
+    if( has_j2 )
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
+    else
+      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
 
-    joint_state_->commanded_effort_ = commanded_effort;
+    if( has_j2 )
+      joint_state_2->commanded_effort_ = commanded_effort;
+    else
+      joint_state_->commanded_effort_ = commanded_effort;
 
     if(loop_count_ % 10 == 0)
     {
