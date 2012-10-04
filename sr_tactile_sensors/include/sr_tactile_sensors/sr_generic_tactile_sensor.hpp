@@ -34,6 +34,7 @@
 
 #include <boost/smart_ptr.hpp>
 #include <std_msgs/Float64.h>
+#include <XmlRpcValue.h>
 #include <sr_robot_msgs/is_hand_occupied.h>
 #include <sr_robot_msgs/which_fingers_are_touching.h>
 

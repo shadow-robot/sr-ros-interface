@@ -57,6 +57,7 @@ namespace shadowrobot
   SrTactileSensorManager::SrTactileSensorManager() :
     n_tilde("~"), publish_rate(20.0)
   {
+		using namespace XmlRpc;
     double publish_freq;
     n_tilde.param("publish_frequency", publish_freq, 20.0);
     publish_rate = ros::Rate(publish_freq);
@@ -64,7 +65,34 @@ namespace shadowrobot
     //initializing the thresholds to test if the hand is holding
     //something or not (compared agains the pressure value).
     double tmp[5]={117,117,113,111,0};
-    is_hand_occupied_thresholds = std::vector<double>(tmp, tmp+5);
+		XmlRpc::XmlRpcValue threshold_xmlrpc;
+		if(n_tilde.getParam("/grasp_touch_thresholds",threshold_xmlrpc))
+    {
+			ROS_ASSERT(threshold_xmlrpc.getType() == XmlRpc::XmlRpcValue::TypeArray);
+			if(threshold_xmlrpc.getType() == XmlRpc::XmlRpcValue::TypeArray)
+			{
+				if(threshold_xmlrpc.size() == 5)
+				{
+					for (int i = 0; i < threshold_xmlrpc.size(); ++i) 
+					{
+						if(threshold_xmlrpc[i].getType() == XmlRpc::XmlRpcValue::TypeDouble)
+							tmp[i] = static_cast<double>(threshold_xmlrpc[i]);
+						else
+							ROS_ERROR("grasp_touch_thresholds value %d is not a double, not loading",i+1);
+					}
+				}
+				else
+					ROS_ERROR("grasp_touch_thresholds must be of size 5, using default values");
+			}
+			else
+				ROS_ERROR("grasp_touch_thresholds must be an array, using default values");
+		}
+		else
+			ROS_WARN("grasp_touch_thresholds not set, using default values");
+
+		is_hand_occupied_thresholds = std::vector<double>(tmp, tmp+5);
+		ROS_DEBUG("is_hand_occupied_thresholds:[%f %f %f %f %f]", is_hand_occupied_thresholds.at(0),is_hand_occupied_thresholds.at(1),is_hand_occupied_thresholds.at(2),is_hand_occupied_thresholds.at(3),is_hand_occupied_thresholds.at(4));
+
 
     is_hand_occupied_server = n_tilde.advertiseService("is_hand_occupied", &SrTactileSensorManager::is_hand_occupied_cb, this);
     which_fingers_are_touching_server = n_tilde.advertiseService("which_fingers_are_touching", &SrTactileSensorManager::which_fingers_are_touching_cb, this);
@@ -83,6 +111,7 @@ namespace shadowrobot
       if(tactile_sensors[i]->get_touch_data() < is_hand_occupied_thresholds[i])
       {
         is_occupied = false;
+				ROS_DEBUG("is_hand_occupied_thresholds %d with val %f is smaller than threshold %f",i,tactile_sensors[i]->get_touch_data(),is_hand_occupied_thresholds[i]);
         break;
       }
     }
