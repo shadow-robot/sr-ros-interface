@@ -29,7 +29,10 @@
 
 #include <time.h>
 #include <ros/ros.h>
+#include <ros/topic.h>
 #include <std_msgs/Float64.h>
+#include <pr2_controllers_msgs/JointControllerState.h>
+#include <sr_robot_msgs/JointControllerState.h>
 
 namespace shadowrobot
 {
@@ -57,15 +60,9 @@ namespace shadowrobot
     tmpDataZero.max = 180.0;
     tmpData.max=90.0;
 
-    std::string controller_suffix;
-    std::string searched_param;
-    n_tilde.searchParam("controller_suffix", searched_param);
-    n_tilde.param(searched_param, controller_suffix, std::string("mixed_position_velocity_controller"));
-    std::string topic_prefix = "/sh_";
-    std::string topic_suffix = "_"+controller_suffix+"/command";
     std::string full_topic = "";
 
-    full_topic = topic_prefix + "ffj0" + topic_suffix;
+    full_topic = findControllerTopicName("ffj0");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     int tmp_index = 0;
     tmpDataZero.publisher_index = tmp_index;
@@ -73,7 +70,7 @@ namespace shadowrobot
     joints_map["FFJ1"] = tmpData;
     joints_map["FFJ2"] = tmpData;
 
-    full_topic = topic_prefix + "ffj3" + topic_suffix;
+    full_topic = findControllerTopicName("ffj3");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -81,13 +78,13 @@ namespace shadowrobot
 
     tmpData.min = -25.0;
     tmpData.max = 25.0;
-    full_topic = topic_prefix + "ffj4" + topic_suffix;
+    full_topic = findControllerTopicName("ffj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
     joints_map["FFJ4"] = tmpData;
 
-    full_topic = topic_prefix + "mfj0" + topic_suffix;
+    full_topic = findControllerTopicName("mfj0");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpDataZero.publisher_index = tmp_index;
@@ -98,7 +95,7 @@ namespace shadowrobot
     joints_map["MFJ1"] = tmpData;
     joints_map["MFJ2"] = tmpData;
 
-    full_topic = topic_prefix + "mfj3" + topic_suffix;
+    full_topic = findControllerTopicName("mfj3");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -106,13 +103,13 @@ namespace shadowrobot
 
     tmpData.min = -25.0;
     tmpData.max = 25.0;
-    full_topic = topic_prefix + "mfj4" + topic_suffix;
+    full_topic = findControllerTopicName("mfj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
     joints_map["MFJ4"] = tmpData;
 
-    full_topic = topic_prefix + "rfj0" + topic_suffix;
+    full_topic = findControllerTopicName("rfj0");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpDataZero.publisher_index = tmp_index;
@@ -122,7 +119,7 @@ namespace shadowrobot
     tmpData.max = 90.0;
     joints_map["RFJ1"] = tmpData;
     joints_map["RFJ2"] = tmpData;
-    full_topic = topic_prefix + "rfj3" + topic_suffix;
+    full_topic = findControllerTopicName("rfj3");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -130,13 +127,13 @@ namespace shadowrobot
 
     tmpData.min = -25.0;
     tmpData.max = 25.0;
-    full_topic = topic_prefix + "rfj4" + topic_suffix;
+    full_topic = findControllerTopicName("rfj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
     joints_map["RFJ4"] = tmpData;
 
-    full_topic = topic_prefix + "lfj0" + topic_suffix;
+    full_topic = findControllerTopicName("lfj0");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpDataZero.publisher_index = tmp_index;
@@ -147,7 +144,7 @@ namespace shadowrobot
     joints_map["LFJ1"] = tmpData;
     joints_map["LFJ2"] = tmpData;
 
-    full_topic = topic_prefix + "lfj3" + topic_suffix;
+    full_topic = findControllerTopicName("lfj3");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -155,7 +152,7 @@ namespace shadowrobot
 
     tmpData.min = -25.0;
     tmpData.max = 25.0;
-    full_topic = topic_prefix + "lfj4" + topic_suffix;
+    full_topic = findControllerTopicName("lfj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -163,7 +160,7 @@ namespace shadowrobot
 
     tmpData.min = 0.0;
     tmpData.max = 45.0;
-    full_topic = topic_prefix + "lfj5" + topic_suffix;
+    full_topic = findControllerTopicName("lfj5");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -171,7 +168,7 @@ namespace shadowrobot
 
     tmpData.min = 0.0;
     tmpData.max = 90.0;
-    full_topic = topic_prefix + "thj1" + topic_suffix;
+    full_topic = findControllerTopicName("thj1");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -179,7 +176,7 @@ namespace shadowrobot
 
     tmpData.min = -30.0;
     tmpData.max = 30.0;
-    full_topic = topic_prefix + "thj2" + topic_suffix;
+    full_topic = findControllerTopicName("thj2");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -187,7 +184,7 @@ namespace shadowrobot
 
     tmpData.min = -15.0;
     tmpData.max = 15.0;
-    full_topic = topic_prefix + "thj3" + topic_suffix;
+    full_topic = findControllerTopicName("thj3");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -195,7 +192,7 @@ namespace shadowrobot
 
     tmpData.min = 0.0;
     tmpData.max = 75.0;
-    full_topic = topic_prefix + "thj4" + topic_suffix;
+    full_topic = findControllerTopicName("thj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -203,7 +200,7 @@ namespace shadowrobot
 
     tmpData.min = -60.0;
     tmpData.max = 60.0;
-    full_topic = topic_prefix + "thj5" + topic_suffix;
+    full_topic = findControllerTopicName("thj5");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -211,7 +208,7 @@ namespace shadowrobot
 
     tmpData.min = -30.0;
     tmpData.max = 40.0;
-    full_topic = topic_prefix + "wrj1" + topic_suffix;
+    full_topic = findControllerTopicName("wrj1");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
@@ -219,13 +216,47 @@ namespace shadowrobot
 
     tmpData.min = -30.0;
     tmpData.max = 10.0;
-    full_topic = topic_prefix + "wrj2" + topic_suffix;
+    full_topic = findControllerTopicName("wrj2");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
     tmpData.publisher_index = tmp_index;
     joints_map["WRJ2"] = tmpData;
 
     joints_map_mutex.unlock();
+  }
+
+  std::string EtherCATCompatibilityHand::findControllerTopicName( std::string joint_name)
+  {
+    ros::Duration max_wait(0.8);
+    std::string controller_suffix = "mixed_position_velocity_controller";
+    std::string topic = "/sh_"+ joint_name + "_" + controller_suffix + "/state";
+    bool success = true;
+    sr_robot_msgs::JointControllerState::ConstPtr msg_received = ros::topic::waitForMessage<sr_robot_msgs::JointControllerState>(topic, max_wait);
+    if(!msg_received)
+    {
+      ROS_WARN("Mixed controller state not received for joint: %s", joint_name.c_str());
+      controller_suffix = "position_controller";
+      topic = "/sh_"+ joint_name + "_" + controller_suffix + "/state";
+      pr2_controllers_msgs::JointControllerState::ConstPtr msg_received_2 = ros::topic::waitForMessage<pr2_controllers_msgs::JointControllerState>(topic, max_wait);
+      if(!msg_received_2)
+      {
+        ROS_WARN("Position controller state not received for joint: %s", joint_name.c_str());
+        success = false;
+      }
+    }
+
+    if(!success)
+    {
+      std::string searched_param;
+      n_tilde.searchParam("controller_suffix", searched_param);
+      n_tilde.param(searched_param, controller_suffix, std::string("mixed_position_velocity_controller"));
+    }
+
+    std::string topic_prefix = "/sh_";
+    std::string topic_suffix = "_" + controller_suffix + "/command";
+    std::string full_topic = topic_prefix + joint_name + topic_suffix;
+
+    return full_topic;
   }
 
   short EtherCATCompatibilityHand::sendupdate( std::string joint_name, double target )
