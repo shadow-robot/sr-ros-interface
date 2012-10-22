@@ -18,6 +18,7 @@
   <depend package="std_srvs"/>
   <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
+  <depend package="pr2_controllers_msgs"/>
   <depend package="sr_utilities"/>
   <depend package="diagnostic_msgs"/>
   <depend package="dynamic_reconfigure"/>

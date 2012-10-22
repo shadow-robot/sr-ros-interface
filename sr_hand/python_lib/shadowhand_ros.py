@@ -23,6 +23,7 @@ import rospy
 import subprocess
 import threading
 import rosgraph.masterapi
+import pr2_controllers_msgs.msg
 from sr_robot_msgs.msg import sendupdate, joint, joints_data, JointControllerState
 from sensor_msgs.msg import *
 from std_msgs.msg import Float64
@@ -418,6 +419,7 @@ class ShadowHand_ROS():
         try:
             rospy.wait_for_message("/joint_states", JointState, timeout = 0.2)
         except:
+            rospy.logwarn("no message received from /joint_states")
             return False
 
         return True
@@ -450,12 +452,15 @@ class ShadowHand_ROS():
                 try:
                     self.topic_ending = "_position_controller"
                     topic = "/sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
-                    rospy.wait_for_message(topic, JointState, timeout = 0.2)
+                    rospy.wait_for_message(topic, pr2_controllers_msgs.msg.JointControllerState, timeout = 0.2)
                 except:
                     success = False
 
             if success:
-                self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, JointControllerState, self.callback_ethercat_states, joint_all.name)
+                if self.topic_ending == "_mixed_position_velocity_controller":
+                    self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, JointControllerState, self.callback_ethercat_states, joint_all.name)
+                else:
+                    self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, pr2_controllers_msgs.msg.JointControllerState, self.callback_ethercat_states, joint_all.name)
 
         if len(self.eth_subscribers) > 0:
             return True

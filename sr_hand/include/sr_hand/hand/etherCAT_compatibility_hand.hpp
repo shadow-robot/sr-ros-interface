@@ -98,6 +98,16 @@ namespace shadowrobot
      */
     void initializeMap();
 
+    /**
+     * Finds the controller suffix to use for a certain joint based on listening to the controller state for that joint.
+     * mixed_position_velocity_controller and
+     * position_controller
+     * are checked. If none of them is sending messages, the "controller_suffix" parameter is used
+     *
+     * Full controller command topic name is returned
+     */
+    std::string findControllerTopicName( std::string joint_name);
+
     ///This vector stores publishers to each joint controller.
     std::vector< ros::Publisher > etherCAT_publishers;
 
