@@ -109,6 +109,7 @@ namespace controller {
     pid_controller_velocity_ = pid_velocity;
 
     serve_set_gains_ = node_.advertiseService("set_gains", &SrhJointVelocityController::setGains, this);
+    serve_reset_gains_ = node_.advertiseService("reset_gains", &SrhJointVelocityController::resetGains, this);
 
     after_init();
     return true;
@@ -157,6 +158,26 @@ namespace controller {
     max_force_demand = req.max_force;
     friction_deadband = req.friction_deadband;
     velocity_deadband = req.deadband;
+
+    return true;
+  }
+
+  bool SrhJointVelocityController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
+  {
+    if( has_j2 )
+      command_ = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
+    else
+      command_ = joint_state_->velocity_;
+
+    if (!pid_controller_velocity_->init(ros::NodeHandle(node_, "velocity_pid")))
+      return false;
+
+    read_parameters();
+
+    if( has_j2 )
+      ROS_WARN_STREAM("Reseting controller gains: " << joint_state_->joint_->name << " and " << joint_state_2->joint_->name);
+    else
+      ROS_WARN_STREAM("Reseting controller gains: " << joint_state_->joint_->name);
 
     return true;
   }

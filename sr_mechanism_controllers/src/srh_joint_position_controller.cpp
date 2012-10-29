@@ -114,6 +114,7 @@ namespace controller {
     pid_controller_position_ = pid_position;
 
     serve_set_gains_ = node_.advertiseService("set_gains", &SrhJointPositionController::setGains, this);
+    serve_reset_gains_ = node_.advertiseService("reset_gains", &SrhJointPositionController::resetGains, this);
 
     after_init();
     return true;
@@ -146,7 +147,8 @@ namespace controller {
   {
     if( has_j2 )
       command_ = joint_state_->position_ + joint_state_2->position_;
-    command_ = joint_state_->position_;
+    else
+      command_ = joint_state_->position_;
     pid_controller_position_->reset();
     read_parameters();
 
@@ -166,6 +168,26 @@ namespace controller {
     return true;
   }
 
+  bool SrhJointPositionController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
+  {
+    if( has_j2 )
+      command_ = joint_state_->position_ + joint_state_2->position_;
+    else
+      command_ = joint_state_->position_;
+
+    if (!pid_controller_position_->init(ros::NodeHandle(node_, "pid")))
+      return false;
+
+    read_parameters();
+
+    if( has_j2 )
+      ROS_WARN_STREAM("Reseting controller gains: " << joint_state_->joint_->name << " and " << joint_state_2->joint_->name);
+    else
+      ROS_WARN_STREAM("Reseting controller gains: " << joint_state_->joint_->name);
+
+    return true;
+  }
+
   void SrhJointPositionController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
   {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
@@ -173,8 +195,6 @@ namespace controller {
 
   void SrhJointPositionController::update()
   {
-    ROS_DEBUG_STREAM("updating controller: " << joint_name_);
-
     if( !has_j2)
     {
       if (!joint_state_->calibrated_)
