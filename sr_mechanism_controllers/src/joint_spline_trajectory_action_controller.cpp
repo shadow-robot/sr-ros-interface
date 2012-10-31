@@ -283,7 +283,8 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
 {
   bool success = true;
 
-  ros::Time time = ros::Time::now() + ros::Duration(0.1);
+  ros::Time time = ros::Time::now() - ros::Duration(0.05);
+  last_time_ = time;
   ROS_DEBUG("Figuring out new trajectory at %.3lf, with data from %.3lf",
           time.toSec(), goal->trajectory.header.stamp.toSec());
 
@@ -585,10 +586,12 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
 void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTrajectoryConstPtr &msg)
 {
   bool success = true;
+  
+  ros::Time time = ros::Time::now()-ros::Duration(0.05);
+  last_time_ = time;
 
-  ros::Time time = last_time_ + ros::Duration(0.01);
-  ROS_DEBUG("Figuring out new trajectory at %.3lf, with data from %.3lf",
-          time.toSec(), msg->header.stamp.toSec());
+  ROS_ERROR("Figuring out new trajectory at %.3lf, with data from %.3lf with %d waypoints",
+          time.toSec(), msg->header.stamp.toSec(),msg->points.size());
 
   boost::shared_ptr<SpecifiedTrajectory> new_traj_ptr(new SpecifiedTrajectory);
   SpecifiedTrajectory &traj = *new_traj_ptr;
@@ -635,28 +638,34 @@ void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTraj
   for (size_t i = 0; i < msg->points.size(); ++i)
   {
     Segment seg;
-
+		ROS_DEBUG("Current time %f and header time %f",msg->header.stamp.toSec(),ros::Time(0.0).toSec());
     if(msg->header.stamp == ros::Time(0.0))
+    {
       seg.start_time = (time + msg->points[i].time_from_start).toSec() - durations[i];
+      ROS_DEBUG("Segment %d start time A %f,time_from_start %f, duration, %f",i,seg.start_time,msg->points[i].time_from_start.toSec(),durations[i]);
+    }
     else
+    {
       seg.start_time = (msg->header.stamp + msg->points[i].time_from_start).toSec() - durations[i];
+      ROS_DEBUG("Segment start time B %f",seg.start_time);
+    }
     seg.duration = durations[i];
     seg.splines.resize(joint_names_.size());
 
     // Checks that the incoming segment has the right number of elements.
     if (msg->points[i].accelerations.size() != 0 && msg->points[i].accelerations.size() != joint_names_.size())
     {
-      ROS_ERROR("Command point %d has %d elements for the accelerations", (int)i, (int)msg->points[i].accelerations.size());
+      ROS_DEBUG("Command point %d has %d elements for the accelerations", (int)i, (int)msg->points[i].accelerations.size());
       return;
     }
     if (msg->points[i].velocities.size() != 0 && msg->points[i].velocities.size() != joint_names_.size())
     {
-      ROS_ERROR("Command point %d has %d elements for the velocities", (int)i, (int)msg->points[i].velocities.size());
+      ROS_DEBUG("Command point %d has %d elements for the velocities", (int)i, (int)msg->points[i].velocities.size());
       return;
     }
     if (msg->points[i].positions.size() != joint_names_.size())
     {
-      ROS_ERROR("Command point %d has %d elements for the positions", (int)i, (int)msg->points[i].positions.size());
+      ROS_DEBUG("Command point %d has %d elements for the positions", (int)i, (int)msg->points[i].positions.size());
       return;
     }
     
@@ -777,7 +786,7 @@ void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTraj
     // if the last trajectory is already in the past, stop the servoing 
     if( (traj[traj.size()-1].start_time+traj[traj.size()-1].duration) < time.toSec())
     {  
-	ROS_DEBUG("trajectory is finished %f<%f",(traj[traj.size()-1].start_time+traj[traj.size()-1].duration),time.toSec());   
+      ROS_DEBUG("trajectory is finished %f<%f",(traj[traj.size()-1].start_time+traj[traj.size()-1].duration),time.toSec());   
        break;
     }
 
