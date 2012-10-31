@@ -1,8 +1,9 @@
 <launch>
-  <node pkg="tf" type="static_transform_publisher" name="world_to_fixed"
-	args="0 0 0 0 0 0 /world /fixed  100"/>
-  <node pkg="tf" type="static_transform_publisher" name="world_to_base_link"
-	args="0 0 0 0 0 0 /world /base_link  100"/>
+
+<!-- we start this in sr_manipulation  <node pkg="tf" type="static_transform_publisher" name="world_to_fixed"
+	args="0 0 0 0 0 0 /world /fixed  100"/> -->
+<!--  <node pkg="tf" type="static_transform_publisher" name="world_to_base_link"
+	args="0 0 0 0 0 0 /world /base_link  100"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_to_fixed"
        args="0 0 0 0 0 0 /base_link /fixed  100"/>-->
 
