@@ -52,6 +52,7 @@ namespace controller
     virtual void update();
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
+    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
     bool setGains(sr_robot_msgs::SetEffortControllerGains::Request &req, sr_robot_msgs::SetEffortControllerGains::Response &resp);
 
   private:
