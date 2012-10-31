@@ -57,6 +57,7 @@ namespace controller
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
     virtual void getGains_velocity(double &p, double &i, double &d, double &i_max, double &i_min);
+    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
     bool setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req, sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp);
 
   private:

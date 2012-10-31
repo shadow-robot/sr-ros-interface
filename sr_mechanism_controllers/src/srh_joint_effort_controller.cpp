@@ -99,6 +99,7 @@ namespace controller {
     friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
 
     serve_set_gains_ = node_.advertiseService("set_gains", &SrhEffortJointController::setGains, this);
+    serve_reset_gains_ = node_.advertiseService("reset_gains", &SrhEffortJointController::resetGains, this);
 
     ROS_DEBUG_STREAM(" joint_state name: " << joint_state_->joint_->name);
     ROS_DEBUG_STREAM(" In Init: " << getJointName() << " This: " << this
@@ -138,6 +139,20 @@ namespace controller {
   {
     max_force_demand = req.max_force;
     friction_deadband = req.friction_deadband;
+
+    return true;
+  }
+
+  bool SrhEffortJointController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
+  {
+    command_ = 0.0;
+
+    read_parameters();
+
+    if( has_j2 )
+      ROS_WARN_STREAM("Reseting controller gains: " << joint_state_->joint_->name << " and " << joint_state_2->joint_->name);
+    else
+      ROS_WARN_STREAM("Reseting controller gains: " << joint_state_->joint_->name);
 
     return true;
   }

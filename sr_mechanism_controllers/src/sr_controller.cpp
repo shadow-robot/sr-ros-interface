@@ -90,6 +90,11 @@ namespace controller {
   void SrController::starting()
   {}
 
+  bool SrController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
+  {
+    return true;
+  }
+
   void SrController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
   {}
 

@@ -35,6 +35,7 @@
 #include <boost/thread/condition.hpp>
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Float64.h>
+#include <std_srvs/Empty.h>
 #include <pr2_controllers_msgs/JointControllerState.h>
 
 #include <utility>
@@ -77,6 +78,8 @@ namespace controller
      * \brief Issues commands to the joint. Should be called at regular intervals
      */
     virtual void update();
+
+    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
 
@@ -128,6 +131,7 @@ namespace controller
 
     ros::Subscriber sub_command_;
     ros::ServiceServer serve_set_gains_;
+    ros::ServiceServer serve_reset_gains_;
 
     ///clamps the force demand to this value
     double max_force_demand;
