@@ -70,7 +70,7 @@ namespace controller {
       if (!joint_state_)
       {
         ROS_ERROR("SrhVelocityController could not find joint named \"%s\"\n",
-                  joint_name.c_str());
+                  j1.c_str());
         return false;
       }
 
@@ -78,7 +78,7 @@ namespace controller {
       if (!joint_state_2)
       {
         ROS_ERROR("SrhVelocityController could not find joint named \"%s\"\n",
-                  joint_name.c_str());
+                  j2.c_str());
         return false;
       }
       if (!joint_state_2->calibrated_)
@@ -227,12 +227,15 @@ namespace controller {
       commanded_effort = min( commanded_effort, max_force_demand );
       commanded_effort = max( commanded_effort, -max_force_demand );
 
-      commanded_effort += friction_compensator->friction_compensation( (joint_state_->position_ + joint_state_2->position_) ,(joint_state_->velocity_ + joint_state_2->velocity_), int(commanded_effort), friction_deadband );
+      if( has_j2 )
+        commanded_effort += friction_compensator->friction_compensation( (joint_state_->position_ + joint_state_2->position_) ,(joint_state_->velocity_ + joint_state_2->velocity_), int(commanded_effort), friction_deadband );
+      else
+        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_, joint_state_->velocity_, int(commanded_effort), friction_deadband );
     }
     if( has_j2 )
       joint_state_2->commanded_effort_ = commanded_effort;
     else
-      joint_state_2->commanded_effort_ = commanded_effort;
+      joint_state_->commanded_effort_ = commanded_effort;
 
     if(loop_count_ % 10 == 0)
     {
