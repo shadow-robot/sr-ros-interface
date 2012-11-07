@@ -159,6 +159,16 @@ namespace controller {
     friction_deadband = req.friction_deadband;
     velocity_deadband = req.deadband;
 
+    //Setting the new parameters in the parameter server
+    node_.setParam("pid/p", req.p);
+    node_.setParam("pid/i", req.i);
+    node_.setParam("pid/d", req.d);
+    node_.setParam("pid/i_clamp", req.i_clamp);
+
+    node_.setParam("pid/max_force", max_force_demand);
+    node_.setParam("pid/velocity_deadband", velocity_deadband);
+    node_.setParam("pid/friction_deadband", friction_deadband);
+
     return true;
   }
 

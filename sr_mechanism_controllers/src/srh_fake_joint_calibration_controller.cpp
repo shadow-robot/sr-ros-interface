@@ -118,6 +118,8 @@ namespace controller {
       initialize_pids();
       joint_->calibrated_ = true;
       state_ = CALIBRATED;
+      //We add the following line to delay for some time the first publish and allow the correct initialization of the subscribers in calibrate.py
+      last_publish_time_ = robot_->getTime();
       break;
     case CALIBRATED:
       if (pub_calibrated_)
