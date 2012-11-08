@@ -19,6 +19,7 @@
   <depend package="sensor_msgs"/>
   <depend package="sr_robot_msgs"/>
   <depend package="pr2_controllers_msgs"/>
+  <depend package="pr2_mechanism_msgs"/>
   <depend package="sr_utilities"/>
   <depend package="diagnostic_msgs"/>
   <depend package="dynamic_reconfigure"/>
@@ -28,7 +29,7 @@
   <depend package="gazebo_msgs"/>
 
   <export>
-	<cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lSrVirtual"/>
+	<cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lSrVirtual -lshadowhandRos"/>
 	<python path="${prefix}/python_lib"/>
 	<python path="${prefix}/python_lib/grasp"/>
   </export>

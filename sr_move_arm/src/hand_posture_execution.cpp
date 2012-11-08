@@ -21,7 +21,7 @@ namespace shadowrobot
 
     get_status_server = nh.advertiseService("/right_arm/grasp_status", &SrHandPostureExecutionSimpleAction::getStatusCallback, this);
 
-    sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
+    shadowhand_ros_lib = boost::shared_ptr<shadowrobot::ShadowhandRos>( new shadowrobot::ShadowhandRos() );
 
     action_server->start();
   }
@@ -70,7 +70,6 @@ namespace shadowrobot
       joint.joint_name = joint_names[i];
       joint_vector.push_back(joint);
     }
-    sendupdate_msg.sendupdate_length = joint_vector.size();
 
     object_manipulation_msgs::GraspHandPostureExecutionResult result;
 
@@ -90,9 +89,8 @@ namespace shadowrobot
         joint_vector[i].joint_target = goal->grasp.grasp_posture.position[i]*180.0/M_PI;
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
-      sendupdate_msg.sendupdate_list = joint_vector;
 
-      sr_hand_target_pub.publish(sendupdate_msg);
+      shadowhand_ros_lib->sendCommands(joint_vector);
       ROS_DEBUG("Hand in grasp position");
 
       result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
@@ -116,9 +114,8 @@ namespace shadowrobot
         joint_vector[i].joint_target = goal->grasp.pre_grasp_posture.position[i]*180.0/M_PI;
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
-      sendupdate_msg.sendupdate_list = joint_vector;
 
-      sr_hand_target_pub.publish(sendupdate_msg);
+      shadowhand_ros_lib->sendCommands(joint_vector);
       ROS_DEBUG("Hand in pregrasp position");
 
       result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
@@ -136,9 +133,8 @@ namespace shadowrobot
         joint_vector[i].joint_target = 0.0;
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
-      sendupdate_msg.sendupdate_list = joint_vector;
 
-      sr_hand_target_pub.publish(sendupdate_msg);
+      shadowhand_ros_lib->sendCommands(joint_vector);
       ROS_DEBUG("Hand opened");
 
       result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
