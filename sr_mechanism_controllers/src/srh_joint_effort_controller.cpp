@@ -140,6 +140,10 @@ namespace controller {
     max_force_demand = req.max_force;
     friction_deadband = req.friction_deadband;
 
+    //Setting the new parameters in the parameter server
+    node_.setParam("max_force", max_force_demand);
+    node_.setParam("friction_deadband", friction_deadband);
+
     return true;
   }
 
