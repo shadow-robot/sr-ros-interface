@@ -8,7 +8,6 @@ import tf
 import scipy, time
 from object_manipulator.convert_functions import *
 from object_manipulation_msgs.msg import GripperTranslation, ManipulationPhase
-from sr_robot_msgs.msg import sendupdate, joint
 from sr_robot_msgs.srv import which_fingers_are_touching
 from trajectory_msgs.msg import JointTrajectory
 from actionlib import SimpleActionClient
@@ -16,6 +15,8 @@ from actionlib import SimpleActionClient
 from arm_navigation_msgs.msg import *
 #from geometric_shapes_msgs.msg import Shape
 from actionlib_msgs.msg import GoalStatus
+
+from shadowhand_ros import ShadowHand_ROS
 
 ##abort exception
 class Aborted(Exception): pass
@@ -54,8 +55,7 @@ class ReactiveGrasper(object):
         self._phase_pub = rospy.Publisher('/reactive_manipulation_phase', ManipulationPhase)
 
         #send targets to the arm / hand
-        self.sr_hand_target_pub = rospy.Publisher('/srh/sendupdate', sendupdate)
-        self.sr_arm_target_pub = rospy.Publisher('/sr_arm/sendupdate', sendupdate)
+        self.sr_lib   = ShadowHand_ROS()
         self.move_arm_client = None
 
         if which_arm == 'r':
@@ -235,15 +235,15 @@ class ReactiveGrasper(object):
             joint_names = joint_path.joint_names
 
             for trajectory_step in joint_path.points:
-                sendupdate_msg = []
+                sendupdate_dict = {}
 
                 for (joint_name, joint_target) in zip(joint_names, trajectory_step.positions):
                     # convert targets to degrees
-                    sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target * 57.325))
+                    sendupdate_dict[joint_name] = joint_target * 57.325
 
-                self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
-                self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
-
+                self.sr_lib.sendupdate_arm_from_dict(sendupdate_dict)
+                self.sr_lib.sendupdate_from_dict(sendupdate_dict)
+                
                 current_sleep_time = trajectory_step.time_from_start - last_time
                 rospy.sleep( current_sleep_time )
                 last_time = trajectory_step.time_from_start
@@ -269,14 +269,14 @@ class ReactiveGrasper(object):
             joint_names = joint_path.joint_names
 
             for trajectory_step in joint_path.points:
-                sendupdate_msg = []
+                sendupdate_dict = {}
 
                 for (joint_name, joint_target) in zip(joint_names, trajectory_step.positions):
                     # convert targets to degrees
-                    sendupdate_msg.append(joint(joint_name = joint_name, joint_target = joint_target * 57.325))
+                    sendupdate_dict[joint_name] = joint_target * 57.325
 
-                self.sr_arm_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
-                self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+                self.sr_lib.sendupdate_arm_from_dict(sendupdate_dict)
+                self.sr_lib.sendupdate_from_dict(sendupdate_dict)
 
                 current_sleep_time = trajectory_step.time_from_start - last_time
                 rospy.sleep( current_sleep_time )
@@ -352,7 +352,7 @@ class ReactiveGrasper(object):
         fingers_touching = [0,0,0,0,0]
 
         for i_step in range(0, nb_steps + 1):
-            sendupdate_msg = []
+            sendupdate_dict = {}
             fingers_touch_index = {"FF":0, "MF":1, "RF":2, "LF":3, "TH":4}
             for (index, joint_name, grasp_target, pregrasp_target) in zip(range(0,len(joint_names)),joint_names, grasp, pregrasp):
                 # only update the finger that are not touching
@@ -368,11 +368,11 @@ class ReactiveGrasper(object):
                     joint_target = pregrasp_target + float(grasp_target - pregrasp_target)*(float(i_step) / float(nb_steps) )
                     myjoint_target = joint_target * 180.0 / math.pi
                     current_targets[index] = joint_target
-                    sendupdate_msg.append(joint(joint_name = joint_name, joint_target = myjoint_target))
+                    sendupdate_dict[joint_name] = myjoint_target
                     rospy.logdebug("["+joint_name+"]: (p/g/t) = "+str(pregrasp_target)+"/"+str(grasp_target)+"/"+str(myjoint_target) + " ("+
                                    str(float(i_step) / float(nb_steps))+"%)")
 
-            self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+            self.sr_lib.sendupdate_from_dict(sendupdate_dict)
             rospy.sleep(iteration_time)
             #check which fingers are touching
             which_fingers_are_touching_response = []
@@ -469,13 +469,13 @@ class ReactiveGrasper(object):
         """
         joint_names = pregrasp_posture.name
         joint_targets = pregrasp_posture.position
-        sendupdate_msg = []
+        sendupdate_dict = {}
 
         for (joint_name, joint_target) in zip(joint_names, joint_targets):
             myjoint_target=joint_target * 180 / math.pi
-            sendupdate_msg.append(joint(joint_name = joint_name, joint_target = myjoint_target))
+            sendupdate_dict[joint_name] = myjoint_target
 
-        self.sr_hand_target_pub.publish(sendupdate(len(sendupdate_msg), sendupdate_msg) )
+        self.sr_lib.sendupdate_from_dict(sendupdate_dict)
 
     def command_cartesian(self, pose, frame_id='world'):
         """
