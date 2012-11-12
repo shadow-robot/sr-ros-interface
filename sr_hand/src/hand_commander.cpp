@@ -76,10 +76,13 @@ void HandCommander::initializeEthercatHand()
   {
     if(controller_list.response.state[i]=="running")
     {
-      if (node_.getParam("/"+controller_list.response.controllers[i]+"/joint", controlled_joint_name))
+      std::string controller = controller_list.response.controllers[i];
+      if (node_.getParam("/"+controller+"/joint", controlled_joint_name))
       {
-        ROS_DEBUG("controller %d:%s controls joint %s\n",(int)i,controller_list.response.controllers[i].c_str(),controlled_joint_name.c_str());
-        sr_hand_target_pub_map[controlled_joint_name] = node_.advertise<std_msgs::Float64>(controller_list.response.controllers[i] +"/command", 2);
+        ROS_DEBUG("controller %d:%s controls joint %s\n",
+            (int)i,controller.c_str(),controlled_joint_name.c_str());
+        sr_hand_target_pub_map[controlled_joint_name]
+            = node_.advertise<std_msgs::Float64>(controller+"/command", 2);
         ethercat_controllers_found = true;
       }
     }
