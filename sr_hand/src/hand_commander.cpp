@@ -72,13 +72,13 @@ void HandCommander::initializeEthercatHand()
 
   controller_list_client.call(controller_list);
 
-  for (unsigned int i=0;i<controller_list.response.controllers.size() ;i++ )
+  for (size_t i=0;i<controller_list.response.controllers.size() ;i++ )
   {
     if(controller_list.response.state[i]=="running")
     {
       if (node_.getParam("/"+controller_list.response.controllers[i]+"/joint", controlled_joint_name))
       {
-        ROS_DEBUG("controller %d:%s controls joint %s\n",i,controller_list.response.controllers[i].c_str(),controlled_joint_name.c_str());
+        ROS_DEBUG("controller %d:%s controls joint %s\n",(int)i,controller_list.response.controllers[i].c_str(),controlled_joint_name.c_str());
         sr_hand_target_pub_map[controlled_joint_name] = node_.advertise<std_msgs::Float64>(controller_list.response.controllers[i] +"/command", 2);
         ethercat_controllers_found = true;
       }
@@ -93,7 +93,7 @@ void HandCommander::sendCommands(std::vector<sr_robot_msgs::joint> joint_vector)
   {
     if(ethercat_controllers_found)
     {
-      for(unsigned int i = 0; i < joint_vector.size(); ++i)
+      for(size_t i = 0; i < joint_vector.size(); ++i)
       {
         std_msgs::Float64 target;
         target.data = joint_vector.at(i).joint_target * M_PI/180.0;
