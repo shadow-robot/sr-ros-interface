@@ -163,3 +163,6 @@ rosbuild_add_executable(examples/link_joints examples/link_joints.cpp)
 ############################################################################
 rosbuild_add_library(HandCommander src/hand_commander.cpp)
 rosbuild_link_boost(HandCommander thread)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+rosbuild_add_gtest(test/hand_commander_test test/hand_commander_test.cpp)
+target_link_libraries(test/hand_commander_test HandCommander)
