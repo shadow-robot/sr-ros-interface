@@ -21,7 +21,7 @@ namespace shadowrobot
 
     get_status_server = nh.advertiseService("/right_arm/grasp_status", &SrHandPostureExecutionSimpleAction::getStatusCallback, this);
 
-    shadowhand_ros_lib = boost::shared_ptr<shadowrobot::ShadowhandRos>( new shadowrobot::ShadowhandRos() );
+    shadowhand_ros_lib = boost::shared_ptr<shadowrobot::HandCommander>( new shadowrobot::HandCommander() );
 
     action_server->start();
   }

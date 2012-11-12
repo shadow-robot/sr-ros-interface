@@ -29,7 +29,7 @@
   <depend package="gazebo_msgs"/>
 
   <export>
-	<cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lSrVirtual -lshadowhandRos"/>
+	<cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lSrVirtual -lHandCommander"/>
 	<python path="${prefix}/python_lib"/>
 	<python path="${prefix}/python_lib/grasp"/>
   </export>
