@@ -94,18 +94,18 @@ void HandCommander::sendCommands(std::vector<sr_robot_msgs::joint> joint_vector)
 {
   if(hand_type == shadowhandRosLib::ETHERCAT)
   {
-    if(ethercat_controllers_found)
-    {
-      for(size_t i = 0; i < joint_vector.size(); ++i)
-      {
-        std_msgs::Float64 target;
-        target.data = joint_vector.at(i).joint_target * M_PI/180.0;
-        sr_hand_target_pub_map[joint_vector.at(i).joint_name].publish(target);
-      }
-    }
-    else
+    if(!ethercat_controllers_found)
     {
       initializeEthercatHand();
+      // No controllers we found so bail out
+      if (!ethercat_controllers_found)
+          return;
+    }
+    for(size_t i = 0; i < joint_vector.size(); ++i)
+    {
+      std_msgs::Float64 target;
+      target.data = joint_vector.at(i).joint_target * M_PI/180.0;
+      sr_hand_target_pub_map[joint_vector.at(i).joint_name].publish(target);
     }
   }
   else
