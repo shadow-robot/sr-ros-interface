@@ -1,5 +1,5 @@
 /**
- * @file   shadowhand_ros.hpp
+ * @file   hand_commander.h
  * @author Toni Oliver <toni@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Nov 08 15:34:37 2012
  *
@@ -27,8 +27,7 @@
  *
  */
 
-#ifndef SHADOWHAND_ROS_H_
-#define SHADOWHAND_ROS_H_
+#pragma once
 
 #include <ros/ros.h>
 #include <vector>
@@ -59,13 +58,13 @@ namespace shadowrobot
  * This ROS subscriber is used to issue commands to the hand / arm, from sending a set of targets, to changing the
  * controller parameters.
  */
-class ShadowhandRos
+class HandCommander
 {
 public:
-    ShadowhandRos();
+    HandCommander();
 
     /// Destructor
-    ~ShadowhandRos();
+    ~HandCommander();
 
     void sendCommands(std::vector<sr_robot_msgs::joint> joint_vector);
 
@@ -88,6 +87,3 @@ private:
 }; // end class ShadowhandSubscriber
 
 } // end namespace
-
-
-#endif

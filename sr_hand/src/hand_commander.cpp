@@ -1,5 +1,5 @@
 /**
- * @file   shadowhand_ros.cpp
+ * @file   hand_commander.cpp
  * @author Toni Oliver <toni@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Nov 08 15:34:37 2012
  *
@@ -27,7 +27,7 @@
  *
  */
 
-#include <sr_hand/shadowhand_ros.hpp>
+#include <sr_hand/hand_commander.h>
 #include <pr2_mechanism_msgs/ListControllers.h>
 #include <sr_robot_msgs/sendupdate.h>
 #include <std_msgs/Float64.h>
@@ -38,7 +38,7 @@ namespace shadowrobot
 
 #define TIMEOUT_TO_DETECT_CONTROLLER_MANAGER 3.0
 
-ShadowhandRos::ShadowhandRos():
+HandCommander::HandCommander():
     hand_type(shadowhandRosLib::UNKNOWN),
     ethercat_controllers_found(false)
 {
@@ -47,21 +47,21 @@ ShadowhandRos::ShadowhandRos():
   {
     hand_type = shadowhandRosLib::ETHERCAT;
     initializeEthercatHand();
-    ROS_INFO("ShadowhandRos library: ETHERCAT hand detected");
+    ROS_INFO("HandCommander library: ETHERCAT hand detected");
   }
   else
   {
     hand_type = shadowhandRosLib::CAN;
     sr_hand_target_pub = node_.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
-    ROS_INFO("ShadowhandRos library: CAN hand detected");
+    ROS_INFO("HandCommander library: CAN hand detected");
   }
 }
 
-ShadowhandRos::~ShadowhandRos()
+HandCommander::~HandCommander()
 {
 }
 
-void ShadowhandRos::initializeEthercatHand()
+void HandCommander::initializeEthercatHand()
 {
   sr_hand_target_pub_map.clear();
 
@@ -87,7 +87,7 @@ void ShadowhandRos::initializeEthercatHand()
 
 }
 
-void ShadowhandRos::sendCommands(std::vector<sr_robot_msgs::joint> joint_vector)
+void HandCommander::sendCommands(std::vector<sr_robot_msgs::joint> joint_vector)
 {
   if(hand_type == shadowhandRosLib::ETHERCAT)
   {
