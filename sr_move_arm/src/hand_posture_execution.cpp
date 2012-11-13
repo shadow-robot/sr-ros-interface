@@ -61,7 +61,18 @@ namespace shadowrobot
     }
 
 
-    std::vector<std::string> joint_names = goal->grasp.pre_grasp_posture.name;
+    std::vector<std::string> joint_names;
+    if (goal->goal == object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP)
+      joint_names = goal->grasp.grasp_posture.name;
+    else
+      joint_names = goal->grasp.pre_grasp_posture.name;
+    
+    if (joint_names.empty())
+    {
+      ROS_ERROR("Shadow Robot grasp execution: names empty in requested grasp");
+      action_server->setAborted();
+      return;
+    }
 
     joint_vector.clear();
     for(unsigned int i = 0; i < joint_names.size(); ++i)
@@ -80,9 +91,9 @@ namespace shadowrobot
 
       if (goal->grasp.grasp_posture.position.empty())
       {
-	ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested grasp");
-	action_server->setAborted();
-	return;
+        ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested grasp");
+        action_server->setAborted();
+        return;
       }
       for(unsigned int i = 0; i < goal->grasp.grasp_posture.position.size(); ++i)
       {
@@ -104,9 +115,9 @@ namespace shadowrobot
 
       if (goal->grasp.pre_grasp_posture.position.empty())
       {
-	ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested pre_grasp");
-	action_server->setAborted();
-	return;
+        ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested pre_grasp");
+        action_server->setAborted();
+        return;
       }
       //move to pregrasp
       for(unsigned int i = 0; i < goal->grasp.pre_grasp_posture.position.size(); ++i)
@@ -174,3 +185,4 @@ Local Variables:
    c-basic-offset: 2
 End:
 */
+// vim: expandtab:ts=2:sw=2

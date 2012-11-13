@@ -14,6 +14,7 @@
   <url>http://ros.org/wiki/sr_move_arm</url>
   <depend package="roscpp"/>
   <depend package="rospy"/>
+  <depend package="rostest"/>
   <depend package="std_msgs"/>
   <depend package="std_srvs"/>
   <depend package="arm_navigation_msgs"/>

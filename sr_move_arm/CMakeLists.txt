@@ -23,3 +23,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_executable(hand_posture_execution src/hand_posture_execution.cpp)
 rosbuild_link_boost(hand_posture_execution thread)
+
+rosbuild_add_rostest(test/hand_posture_execution_test.launch)
