@@ -1,0 +1,3 @@
+<launch>
+    <test test-name="hand_commander_test" pkg="sr_hand" type="hand_commander_test" />
+</launch>
