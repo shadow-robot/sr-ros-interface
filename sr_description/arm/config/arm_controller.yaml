@@ -5,25 +5,25 @@ sa_sr_position_controller:
     p: 60.5
     i: 31.0
     d: 8.0
-    i_clamp: 1
+    i_clamp: 30
 
 sa_ss_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ShoulderJSwing
   pid:
     p: 300.0
-    i: 360.0
+    i: 160.0
     d: 400.0
-    i_clamp: 20.0
+    i_clamp: 90.0
 
 sa_es_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ElbowJSwing
   pid:
-    p: 100.0
+    p: 130.0
     i: 150.0
     d: 150.0
-    i_clamp: 10.0
+    i_clamp: 90.0
 
 sa_er_position_controller:
   type: robot_mechanism_controllers/JointPositionController

@@ -21,7 +21,7 @@ namespace shadowrobot
 
     get_status_server = nh.advertiseService("/right_arm/grasp_status", &SrHandPostureExecutionSimpleAction::getStatusCallback, this);
 
-    sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
+    shadowhand_ros_lib = boost::shared_ptr<shadowrobot::HandCommander>( new shadowrobot::HandCommander() );
 
     action_server->start();
   }
@@ -61,7 +61,18 @@ namespace shadowrobot
     }
 
 
-    std::vector<std::string> joint_names = goal->grasp.pre_grasp_posture.name;
+    std::vector<std::string> joint_names;
+    if (goal->goal == object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP)
+      joint_names = goal->grasp.grasp_posture.name;
+    else
+      joint_names = goal->grasp.pre_grasp_posture.name;
+    
+    if (joint_names.empty())
+    {
+      ROS_ERROR("Shadow Robot grasp execution: names empty in requested grasp");
+      action_server->setAborted();
+      return;
+    }
 
     joint_vector.clear();
     for(unsigned int i = 0; i < joint_names.size(); ++i)
@@ -70,7 +81,6 @@ namespace shadowrobot
       joint.joint_name = joint_names[i];
       joint_vector.push_back(joint);
     }
-    sendupdate_msg.sendupdate_length = joint_vector.size();
 
     object_manipulation_msgs::GraspHandPostureExecutionResult result;
 
@@ -81,18 +91,17 @@ namespace shadowrobot
 
       if (goal->grasp.grasp_posture.position.empty())
       {
-	ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested grasp");
-	action_server->setAborted();
-	return;
+        ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested grasp");
+        action_server->setAborted();
+        return;
       }
       for(unsigned int i = 0; i < goal->grasp.grasp_posture.position.size(); ++i)
       {
         joint_vector[i].joint_target = goal->grasp.grasp_posture.position[i]*180.0/M_PI;
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
-      sendupdate_msg.sendupdate_list = joint_vector;
 
-      sr_hand_target_pub.publish(sendupdate_msg);
+      shadowhand_ros_lib->sendCommands(joint_vector);
       ROS_DEBUG("Hand in grasp position");
 
       result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
@@ -106,9 +115,9 @@ namespace shadowrobot
 
       if (goal->grasp.pre_grasp_posture.position.empty())
       {
-	ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested pre_grasp");
-	action_server->setAborted();
-	return;
+        ROS_ERROR("Shadow Robot grasp execution: position vector empty in requested pre_grasp");
+        action_server->setAborted();
+        return;
       }
       //move to pregrasp
       for(unsigned int i = 0; i < goal->grasp.pre_grasp_posture.position.size(); ++i)
@@ -116,9 +125,8 @@ namespace shadowrobot
         joint_vector[i].joint_target = goal->grasp.pre_grasp_posture.position[i]*180.0/M_PI;
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
-      sendupdate_msg.sendupdate_list = joint_vector;
 
-      sr_hand_target_pub.publish(sendupdate_msg);
+      shadowhand_ros_lib->sendCommands(joint_vector);
       ROS_DEBUG("Hand in pregrasp position");
 
       result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
@@ -136,9 +144,8 @@ namespace shadowrobot
         joint_vector[i].joint_target = 0.0;
         ROS_DEBUG("[%s]: %f", joint_names[i].c_str(), joint_vector[i].joint_target);
       }
-      sendupdate_msg.sendupdate_list = joint_vector;
 
-      sr_hand_target_pub.publish(sendupdate_msg);
+      shadowhand_ros_lib->sendCommands(joint_vector);
       ROS_DEBUG("Hand opened");
 
       result.result.value = object_manipulation_msgs::ManipulationResult::SUCCESS;
@@ -178,3 +185,4 @@ Local Variables:
    c-basic-offset: 2
 End:
 */
+// vim: expandtab:ts=2:sw=2

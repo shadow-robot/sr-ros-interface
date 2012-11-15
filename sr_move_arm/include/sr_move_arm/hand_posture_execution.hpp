@@ -12,8 +12,8 @@
 
 #include <ros/ros.h>
 #include <boost/smart_ptr.hpp>
-#include <sr_robot_msgs/sendupdate.h>
 #include <sr_robot_msgs/is_hand_occupied.h>
+#include <sr_hand/hand_commander.hpp>
 
 #include <actionlib/server/simple_action_server.h>
 #include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
@@ -41,10 +41,9 @@ namespace shadowrobot
 
     boost::shared_ptr<actionlib::SimpleActionServer<object_manipulation_msgs::GraspHandPostureExecutionAction> > action_server;
 
-    Publisher sr_hand_target_pub;
+    boost::shared_ptr<shadowrobot::HandCommander> shadowhand_ros_lib;
     ServiceServer get_status_server;
     ServiceClient is_hand_occupied_client;
-    sr_robot_msgs::sendupdate sendupdate_msg;
     std::vector<sr_robot_msgs::joint> joint_vector;
 
     bool hand_occupied;
@@ -57,4 +56,4 @@ Local Variables:
 End:
 */
 
-#endif SR_MOVE_ARM_SIMPLE_ACTION_H
+#endif //SR_MOVE_ARM_SIMPLE_ACTION_H
