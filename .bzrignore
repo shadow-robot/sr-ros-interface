@@ -308,3 +308,4 @@ sr_utilities/.project
 sr_utilities/.pydevproject
 sr_utilities/cmake_install.cmake
 sr_mechanism_controllers/_gtest_from_src
+./auto
