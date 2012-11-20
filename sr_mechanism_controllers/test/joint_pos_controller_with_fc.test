@@ -1,4 +1,6 @@
 <launch>
+  <include file="$(find sr_description)/loaders/load_hand_model.launch" />
+
   <rosparam command="load" file="$(find sr_mechanism_controllers)/test/config/friction_compensation.yaml" />
   <param name="with_friction_compensation" type="int" value="1"/>
 
