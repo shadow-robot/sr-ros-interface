@@ -308,3 +308,7 @@ sr_utilities/.project
 sr_utilities/.pydevproject
 sr_utilities/cmake_install.cmake
 sr_mechanism_controllers/_gtest_from_src
+./auto
+./sr_hand/bin/test/hand_commander_test
+./sr_mechanism_controllers/bin/test/test_joint_position_controller
+./sr_move_arm/bin/hand_posture_execution

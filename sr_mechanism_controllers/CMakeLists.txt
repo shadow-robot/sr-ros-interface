@@ -67,8 +67,8 @@ IF(DEFINED jenkins)
 ENDIF(DEFINED jenkins)
 rosbuild_add_gtest_build_flags(test/test_joint_position_controller)
 
-rosbuild_add_rostest(test/joint_pos_controller.test)
-rosbuild_add_rostest(test/joint_pos_controller_with_fc.test)
+#rosbuild_add_rostest(test/joint_pos_controller.test)
+#rosbuild_add_rostest(test/joint_pos_controller_with_fc.test)
 
 #rosbuild_add_executable(simple_spline_trajectory example/simple_spline_trajectory.cpp)
 #rosbuild_add_executable(simple_trajectory example/simple_trajectory.cpp)

@@ -34,6 +34,7 @@
 #include <pr2_hardware_interface/hardware_interface.h>
 #include <pr2_mechanism_model/robot.h>
 #include <tinyxml.h>
+#include <sr_hardware_interface/sr_actuator.hpp>
 
 class TestControllers
 {
@@ -51,7 +52,7 @@ public:
   boost::shared_ptr<pr2_mechanism_model::Robot> robot;
   boost::shared_ptr<pr2_mechanism_model::RobotState> robot_state;
   boost::shared_ptr<TiXmlDocument> model;
-  boost::shared_ptr<pr2_hardware_interface::Actuator> actuator;
+  boost::shared_ptr<sr_actuator::SrActuator> actuator;
   pr2_mechanism_model::JointState* joint_state;
 };
 

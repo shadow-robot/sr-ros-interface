@@ -38,16 +38,42 @@ void TestControllers::init()
   hw = boost::shared_ptr<pr2_hardware_interface::HardwareInterface>( new pr2_hardware_interface::HardwareInterface() );
 
   //add a fake FFJ3 actuator
-  actuator = boost::shared_ptr<pr2_hardware_interface::Actuator>( new pr2_hardware_interface::Actuator("FFJ3") );
+  actuator = boost::shared_ptr<sr_actuator::SrActuator>( new sr_actuator::SrActuator("FFJ3") );
   actuator->state_.is_enabled_ = true;
   hw->addActuator( actuator.get() );
 
   robot = boost::shared_ptr<pr2_mechanism_model::Robot>( new pr2_mechanism_model::Robot( hw.get()) );
 
   model = boost::shared_ptr<TiXmlDocument>( new TiXmlDocument() );
-  bool loadOkay = model->LoadFile("/code/Projects/ROS_interfaces/sr-ros-interface/palm_edc/shadow_robot/sr_hand/model/robots/shadowhand_motor.urdf");
 
-  if ( loadOkay )
+  ros::NodeHandle rosnode;
+  std::string urdf_param_name;
+  std::string urdf_string;
+  // search and wait for robot_description on param server
+  while(urdf_string.empty())
+  {
+    ROS_DEBUG("Waiting for urdf: %s on the param server.", "sh_description");
+    if (rosnode.searchParam("sh_description",urdf_param_name))
+    {
+      rosnode.getParam(urdf_param_name,urdf_string);
+      ROS_DEBUG("found upstream\n%s\n------\n%s\n------\n%s","sh_description",urdf_param_name.c_str(),urdf_string.c_str());
+    }
+    else
+    {
+      rosnode.getParam("sh_description",urdf_string);
+      ROS_DEBUG("found in node namespace\n%s\n------\n%s\n------\n%s","sh_description",urdf_param_name.c_str(),urdf_string.c_str());
+    }
+    usleep(100000);
+  }
+  ROS_DEBUG("Parsing xml...");
+
+  // initialize TiXmlDocument doc with a string
+  if (!model->Parse(urdf_string.c_str()) && model->Error())
+  {
+    ROS_ERROR("Failed to parse urdf: %s\n",
+            urdf_string.c_str());
+  }
+  else
   {
     robot->initXml( model->RootElement() );
 
@@ -62,10 +88,6 @@ void TestControllers::init()
     //initialize the controller:
     joint_state->position_ = 0.0;
     controller->update();
-  }
-  else
-  {
-    ROS_ERROR("Failed to load the model.");
   }
 }
 
