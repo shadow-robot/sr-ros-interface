@@ -41,6 +41,7 @@ namespace shadowrobot
     std::vector< ros::Publisher > controller_publishers;  //!< This vector stores publishers to each joint controller.
     std::map<std::string,std::string> jointControllerMap; //!< stores a map of controller name and associated joints
     std::map<std::string,unsigned int> jointPubIdxMap; //! stores a map of publisher associated with joint index
+    std::map<std::string,unsigned int> joint_state_idx_map; //! store internal order of joints
     bool use_sendupdate;
     
     ros::Time last_time_;
@@ -91,3 +92,5 @@ End:
 */
 
 #endif
+
+

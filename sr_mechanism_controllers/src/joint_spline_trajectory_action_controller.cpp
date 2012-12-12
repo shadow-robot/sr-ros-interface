@@ -155,13 +155,19 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
     joint_labels.push_back((std::string)name_value);
   }
 */
-
-  joint_labels.push_back("ShoulderJRotate");
-  joint_labels.push_back("ShoulderJSwing");
-  joint_labels.push_back("ElbowJSwing");
-  joint_labels.push_back("ElbowJRotate");
-  joint_labels.push_back("WRJ2");
-  joint_labels.push_back("WRJ1");
+    // This the internal order of the joints
+    joint_labels.push_back("ShoulderJRotate");
+    joint_labels.push_back("ShoulderJSwing");
+    joint_labels.push_back("ElbowJSwing");
+    joint_labels.push_back("ElbowJRotate");
+    joint_labels.push_back("WRJ2");
+    joint_labels.push_back("WRJ1");
+  
+    // fillup a joint_state_idx_map
+    for(unsigned int i=0;i<joint_labels.size();i++)
+    {
+        joint_state_idx_map[joint_labels[i]]=i;
+    }
 
   //look for controllers and build controller name to joint map
   if( ros::service::waitForService("sr_controller_manager/list_controllers",20000) )
@@ -304,7 +310,7 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
   {
     double position;
     if(getPosition(joint_names_[i],position))
-      prev_positions[i]=position;
+      prev_positions[joint_state_idx_map[joint_names_[i]]]=position;
     else
     {
       ROS_ERROR("Cannot get joint_state, not executing trajectory");
@@ -358,15 +364,15 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
       return;
     }
     
-     // Re-orders the joints in the command to match the internal joint order.
+    // Re-orders the joints in the command to match the internal joint order.
     accelerations.resize(goal->trajectory.points[i].accelerations.size());
     velocities.resize(goal->trajectory.points[i].velocities.size());
     positions.resize(goal->trajectory.points[i].positions.size());
-    for (size_t j = 0; j < joint_names_.size(); ++j)
+    for (size_t j = 0; j < goal->trajectory.joint_names.size(); ++j)
     {
-      if (!accelerations.empty()) accelerations[j] = goal->trajectory.points[i].accelerations[j];
-      if (!velocities.empty()) velocities[j] = goal->trajectory.points[i].velocities[j];
-      if (!positions.empty()) positions[j] = goal->trajectory.points[i].positions[j];
+      if (!accelerations.empty()) accelerations[ joint_state_idx_map[goal->trajectory.joint_names[j]] ] = goal->trajectory.points[i].accelerations[j];
+      if (!velocities.empty()) velocities[ joint_state_idx_map[goal->trajectory.joint_names[j]] ] = goal->trajectory.points[i].velocities[j];
+      if (!positions.empty()) positions[ joint_state_idx_map[goal->trajectory.joint_names[j]] ] = goal->trajectory.points[i].positions[j];
     }
 
     // Converts the boundary conditions to splines.
@@ -431,7 +437,7 @@ void JointTrajectoryActionController::execute_trajectory(const control_msgs::Fol
 
   //initializes the joint names
   //TODO check if traj only contains joint that we control
-  //joint_names_ = goal->trajectory.joint_names;
+  //joint_names_ = internal order. not goal->trajectory.joint_names;
   joint_vector_traj.clear();
 
   for(unsigned int i = 0; i < joint_names_.size(); ++i)
@@ -884,4 +890,6 @@ Local Variables:
    c-basic-offset: 2
 End:
 */
+
+
 
