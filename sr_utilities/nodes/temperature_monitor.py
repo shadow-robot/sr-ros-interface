@@ -39,20 +39,28 @@ class Joint(object):
         self.x = x
         self.y = y
         self.joint_name = joint_name
+        self.temperature = -1
         
-        self.window = self.screen.subwin(1, 15, self.y+1, self.x + 1)
-        self.window.addstr(0, 0, joint_name)
+        #self.window = self.screen.subwin(1, 15, self.y+1, self.x + 1)
+        self.refresh()
+        
                                 
     def set_temperature(self, temperature):
-        if temperature == -1: #joint not found
-            self.window.addstr(0, 6, "X", curses.color_pair(4) )
-        elif temperature < COOL:
-            self.window.addstr(0, 6, str(temperature), curses.color_pair(1) )
-        elif temperature < WARM:
-            self.window.addstr(0, 6, str(temperature), curses.color_pair(2) )
+        self.temperature = temperature
+        self.refresh()
+        
+    def refresh(self):
+        self.screen.addstr(self.y+1, self.x+1, self.joint_name)
+        
+        if self.temperature == -1: #joint not found
+            self.screen.addstr(self.y + 1, self.x + 6, "X", curses.color_pair(4) )
+        elif self.temperature < COOL:
+            self.screen.addstr(self.y + 1, self.x+6, str(self.temperature), curses.color_pair(1) )
+        elif self.temperature < WARM:
+            self.screen.addstr(self.y + 1, self.x + 6, str(self.temperature), curses.color_pair(2) )
         else:
-            self.window.addstr(0, 6, str(temperature), curses.color_pair(3) )
-        self.window.refresh()
+            self.screen.addstr(self.y + 1, self.x + 6, str(self.temperature), curses.color_pair(3) )
+        #self.window.refresh()#0,0,0,0,1,15)
         
 class TemperatureMonitor(object):    
     def __init__(self, screen = None):
@@ -61,7 +69,10 @@ class TemperatureMonitor(object):
         except:
             pass
         self.screen = screen
-        self.screen.border(0)
+        self.pad = curses.newpad(21,17)
+        self.pad_pos_x_ = 0
+        self.pad_pos_y_ = 0
+        self.pad.border(0)
         self.joint_monitors = {}
         
         curses.init_pair(4, curses.COLOR_WHITE, curses.COLOR_BLACK)
@@ -73,14 +84,16 @@ class TemperatureMonitor(object):
             begin_x = 0
             begin_y = CASE_HEIGHT*index
 
-            self.joint_monitors[joint_name] = Joint(self.screen, joint_name, begin_x, begin_y)
-            self.joint_monitors[joint_name].set_temperature(-1)
+            self.joint_monitors[joint_name] = Joint(self.pad, joint_name, begin_x, begin_y)
             
         self.diag_sub_ = rospy.Subscriber("/diagnostics", DiagnosticArray, self.diag_cb_)
+        self.resize_()
                   
         while True:
-            event = self.screen.getch()
+            event = self.pad.getch()
             if event == ord("q"): break
+            elif event == curses.KEY_RESIZE:
+                self.resize_()
     
     def diag_cb_(self, msg):
         for status in msg.status:
@@ -91,6 +104,15 @@ class TemperatureMonitor(object):
                             self.joint_monitors[joint].set_temperature(round(float(value.value), 1))
                             break
                     break
+        self.resize_()
+    
+    def resize_(self):
+        y,x = self.screen.getmaxyx()
+        self.pad.border(0)
+        for monitor in self.joint_monitors.values():
+            monitor.refresh()
+        
+        self.pad.refresh(self.pad_pos_y_, self.pad_pos_x_, 0,0, y - 1, x -1)
                                 
 if __name__ == '__main__':
     rospy.init_node("temperature_monitor", anonymous=True)
