@@ -44,10 +44,9 @@ class Joint(object):
         self.window.addstr(0, 0, joint_name)
                                 
     def set_temperature(self, temperature):
-        print temperature
         if temperature == -1: #joint not found
             self.window.addstr(0, 6, "X", curses.color_pair(4) )
-        if temperature < COOL:
+        elif temperature < COOL:
             self.window.addstr(0, 6, str(temperature), curses.color_pair(1) )
         elif temperature < WARM:
             self.window.addstr(0, 6, str(temperature), curses.color_pair(2) )
@@ -67,7 +66,7 @@ class TemperatureMonitor(object):
         
         curses.init_pair(4, curses.COLOR_WHITE, curses.COLOR_BLACK)
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
-        curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_MAGENTA)
+        curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_YELLOW)
         curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_RED)
         
         for index,joint_name in enumerate(JOINT_NAMES):
