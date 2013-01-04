@@ -30,8 +30,8 @@ JOINT_NAMES = ["FFJ0", "FFJ3", "FFJ4",
                "LFJ0", "LFJ3", "LFJ4",
                "THJ1", "THJ2", "THJ3", "THJ4", "THJ5",
                "WRJ1", "WRJ2"]
-COOL = 40
-WARM = 50
+COOL = 50
+WARM = 55
 
 class Joint(object):
     def __init__(self, screen, joint_name, x, y):
@@ -76,7 +76,7 @@ class TemperatureMonitor(object):
         self.pad_pos_x_ = 0
         self.pad_pos_y_ = 0
         self.pad.border(0)
-        self.joint_monitors = {}
+        self.joint_monitors = {}        
         
         curses.init_pair(4, curses.COLOR_WHITE, curses.COLOR_BLACK)
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
@@ -97,16 +97,20 @@ class TemperatureMonitor(object):
             if event == ord("q"): break
             elif event == curses.KEY_RESIZE:
                 self.resize_()
-            elif event == curses.KEY_DOWN:
+            
+            elif event == ord("s"):                
                 self.pad_pos_y_ += 1
-            elif event == curses.KEY_UP:
+                self.refresh_()
+            elif event == ord("w"):
                 self.pad_pos_y_ -= 1
-            elif event == curses.KEY_LEFT:
+                self.refresh_()
+            elif event == ord("a"):
                 self.pad_pos_x_ -= 1
-            elif event == curses.KEY_RIGHT:
+                self.refresh_()
+            elif event == ord("d"):
                 self.pad_pos_x_ += 1
-                
-    
+                self.refresh_()
+        
     def diag_cb_(self, msg):
         for status in msg.status:
             for joint in JOINT_NAMES:
@@ -119,15 +123,21 @@ class TemperatureMonitor(object):
         self.resize_()
     
     def resize_(self):
+        self.pad_pos_x_ = 0
+        self.pad_pos_y_ = 0
+        self.refresh_()
+    
+    def refresh_(self):
         y,x = self.screen.getmaxyx()
+        self.pad_pos_x_ = min(max(self.pad_pos_x_, 0), self.MAX_X - 1)
+        self.pad_pos_y_ = min(max(self.pad_pos_y_, 0), self.MAX_Y - 1)
+        self.pad.refresh(self.pad_pos_y_, self.pad_pos_x_, 0,0, y - 1, x -1)
         self.pad.border(0)
         for monitor in self.joint_monitors.values():
             monitor.refresh()
         
-        self.pad_pos_x_ = min(max(self.pad_pos_x_, 0), self.MAX_X)
-        self.pad_pos_y_ = min(max(self.pad_pos_y_, 0), self.MAX_Y)
-        self.pad.refresh(self.pad_pos_y_, self.pad_pos_x_, 0,0, y - 1, x -1)
-                                
+        
+        
 if __name__ == '__main__':
     rospy.init_node("temperature_monitor", anonymous=True)
     try:
