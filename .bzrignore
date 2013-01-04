@@ -312,3 +312,11 @@ sr_mechanism_controllers/_gtest_from_src
 ./sr_hand/bin/test/hand_commander_test
 ./sr_mechanism_controllers/bin/test/test_joint_position_controller
 ./sr_move_arm/bin/hand_posture_execution
+sr_description/.cproject
+sr_description/.project
+sr_description/.pydevproject
+sr_description/_gtest_from_src
+sr_description/cmake_install.cmake
+sr_hand/_gtest_from_src
+sr_utilities/_gtest_from_src
+./sr_utilities/.settings
