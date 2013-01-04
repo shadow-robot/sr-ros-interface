@@ -18,6 +18,7 @@
 
 import roslib; roslib.load_manifest("sr_utilities")
 import rospy
+from diagnostic_msgs.msg import DiagnosticArray
 
 import curses, traceback
 
@@ -29,8 +30,8 @@ JOINT_NAMES = ["FFJ0", "FFJ3", "FFJ4",
                "LFJ0", "LFJ3", "LFJ4",
                "THJ1", "THJ2", "THJ3", "THJ4", "THJ5",
                "WRJ1", "WRJ2"]
-COOL = 5
-WARM = 10
+COOL = 40
+WARM = 50
 
 class Joint(object):
     def __init__(self, screen, joint_name, x, y):
@@ -43,16 +44,23 @@ class Joint(object):
         self.window.addstr(0, 0, joint_name)
                                 
     def set_temperature(self, temperature):
+        print temperature
+        if temperature == -1: #joint not found
+            self.window.addstr(0, 6, "X", curses.color_pair(4) )
         if temperature < COOL:
             self.window.addstr(0, 6, str(temperature), curses.color_pair(1) )
         elif temperature < WARM:
             self.window.addstr(0, 6, str(temperature), curses.color_pair(2) )
         else:
             self.window.addstr(0, 6, str(temperature), curses.color_pair(3) )
+        self.window.refresh()
         
 class TemperatureMonitor(object):    
-    def __init__(self, screen):
-        curses.curs_set(0)
+    def __init__(self, screen = None):
+        try:
+            curses.curs_set(0)
+        except:
+            pass
         self.screen = screen
         self.screen.border(0)
         self.joint_monitors = {}
@@ -67,11 +75,23 @@ class TemperatureMonitor(object):
             begin_y = CASE_HEIGHT*index
 
             self.joint_monitors[joint_name] = Joint(self.screen, joint_name, begin_x, begin_y)
-            self.joint_monitors[joint_name].set_temperature(index)
+            self.joint_monitors[joint_name].set_temperature(-1)
+            
+        self.diag_sub_ = rospy.Subscriber("/diagnostics", DiagnosticArray, self.diag_cb_)
                   
         while True:
             event = self.screen.getch()
             if event == ord("q"): break
+    
+    def diag_cb_(self, msg):
+        for status in msg.status:
+            for joint in JOINT_NAMES:
+                if joint in status.name:
+                    for value in status.values:
+                        if value.key == "Temperature":
+                            self.joint_monitors[joint].set_temperature(round(float(value.value), 1))
+                            break
+                    break
                                 
 if __name__ == '__main__':
     rospy.init_node("temperature_monitor", anonymous=True)
@@ -79,4 +99,3 @@ if __name__ == '__main__':
         curses.wrapper(TemperatureMonitor)
     except:
         traceback.print_exc()
-    
