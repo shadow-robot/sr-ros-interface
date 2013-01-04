@@ -63,13 +63,16 @@ class Joint(object):
         #self.window.refresh()#0,0,0,0,1,15)
         
 class TemperatureMonitor(object):    
+    MAX_X = 17
+    MAX_Y = 21
+    
     def __init__(self, screen = None):
         try:
             curses.curs_set(0)
         except:
             pass
         self.screen = screen
-        self.pad = curses.newpad(21,17)
+        self.pad = curses.newpad(self.MAX_Y,self.MAX_X)
         self.pad_pos_x_ = 0
         self.pad_pos_y_ = 0
         self.pad.border(0)
@@ -94,6 +97,15 @@ class TemperatureMonitor(object):
             if event == ord("q"): break
             elif event == curses.KEY_RESIZE:
                 self.resize_()
+            elif event == curses.KEY_DOWN:
+                self.pad_pos_y_ += 1
+            elif event == curses.KEY_UP:
+                self.pad_pos_y_ -= 1
+            elif event == curses.KEY_LEFT:
+                self.pad_pos_x_ -= 1
+            elif event == curses.KEY_RIGHT:
+                self.pad_pos_x_ += 1
+                
     
     def diag_cb_(self, msg):
         for status in msg.status:
@@ -112,6 +124,8 @@ class TemperatureMonitor(object):
         for monitor in self.joint_monitors.values():
             monitor.refresh()
         
+        self.pad_pos_x_ = min(max(self.pad_pos_x_, 0), self.MAX_X)
+        self.pad_pos_y_ = min(max(self.pad_pos_y_, 0), self.MAX_Y)
         self.pad.refresh(self.pad_pos_y_, self.pad_pos_x_, 0,0, y - 1, x -1)
                                 
 if __name__ == '__main__':
