@@ -11,6 +11,9 @@
   <depend package="roscpp"/>
   <depend package="self_test"/>
 
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_self_test"/>
+  </export>
 </package>
 
 

@@ -50,7 +50,7 @@ void SrTestRunner::addTopicTest(std::string topic_name, double frequency)
 
 void SrTestRunner::addServiceTest(std::string service_name)
 {
-  add("Testing service "+service_name, boost::bind(&SrTestRunner::service_test_cb_, this, service_name) );
+  //add("Testing service "+service_name, boost::bind(&SrTestRunner::service_test_cb_, this, service_name) );
 }
 
 void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status, std::string service_name)
