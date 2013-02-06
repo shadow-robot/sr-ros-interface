@@ -38,13 +38,16 @@ public:
   SrTestRunner();
   virtual ~SrTestRunner();
 
+  using DiagnosticTaskVector::add;
+  using TestRunner::setID;
+
   void addTopicTest(std::string topic_name, double frequency);
   void addServiceTest(std::string service_name);
 
 private:
   static const double SERVICE_TIMEOUT_CONST_;
 
-  void service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status, std::string service_name);
+  void service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status);
 };
 
 }

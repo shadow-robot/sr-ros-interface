@@ -26,12 +26,12 @@
 
 #include "sr_self_test/sr_self_test.hpp"
 
-namespace shadow_robot {
-
+namespace shadow_robot
+{
 SrSelfTest::SrSelfTest()
 {
   test_runner_.setID("12345");
-  test_runner_.addServiceTest("");
+  test_runner_.addServiceTest("/gazebo/self_test");
 }
 
 SrSelfTest::~SrSelfTest()

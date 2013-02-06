@@ -46,20 +46,22 @@ SrTestRunner::~SrTestRunner()
 void SrTestRunner::addTopicTest(std::string topic_name, double frequency)
 {
 
-}
+};
 
 void SrTestRunner::addServiceTest(std::string service_name)
 {
-  //add("Testing service "+service_name, boost::bind(&SrTestRunner::service_test_cb_, this, service_name) );
-}
+  ROS_ERROR_STREAM(" Adding service test: " << service_name);
+  add("Testing service "+service_name, this,  &SrTestRunner::service_test_cb_);
+  ROS_ERROR("OK added");
+};
 
-void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status, std::string service_name)
+void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status)
 {
-  if( ros::service::exists(service_name, true) )
+  if( ros::service::exists("/gazebo/self_test", true) )
     status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Service exists.");
   else
     status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Service not available.");
-}
+};
 
 } //end namespace
 
