@@ -36,7 +36,7 @@ namespace shadow_robot
 class SrSelfTest {
 public:
   SrSelfTest();
-  ~SrSelfTest();
+  ~SrSelfTest() {};
 
 private:
   // self_test::TestRunner is the handles sequencing driver self-tests.

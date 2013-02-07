@@ -30,13 +30,8 @@ namespace shadow_robot
 {
 SrSelfTest::SrSelfTest()
 {
-  test_runner_.setID("12345");
-  test_runner_.addServiceTest("/gazebo/self_test");
+  //test_runner_.setID("12345");
+  //test_runner_.addServiceTest("/gazebo/self_test");
 }
-
-SrSelfTest::~SrSelfTest()
-{
-}
-
 }  // namespace shadow_robot
 

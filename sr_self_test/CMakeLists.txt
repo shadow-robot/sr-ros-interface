@@ -28,3 +28,9 @@ rosbuild_add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
+
+###
+# Tests
+###
+rosbuild_add_gtest(sr_self_test_test test/test_self_test.cpp)
+target_link_libraries(sr_self_test_test sr_self_test)
