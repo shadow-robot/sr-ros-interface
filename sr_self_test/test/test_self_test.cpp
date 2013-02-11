@@ -45,7 +45,12 @@ public:
   MyNode() : self_test_()
   {
     self_test_.setID("12345");
-    self_test_.addServiceTest("/sr_self_test_test/self_test");
+
+    std::vector<std::string> services_to_test;
+    services_to_test.push_back("/sr_self_test_test/self_test");
+    services_to_test.push_back("/rosout/get_loggers");
+
+    self_test_.addServicesTest(services_to_test);
   }
 
   bool spin()

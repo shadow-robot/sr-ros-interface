@@ -43,12 +43,15 @@ public:
   using TestRunner::setID;
 
   void addTopicTest(std::string topic_name, double frequency);
-  void addServiceTest(std::string service_name);
+  void addServicesTest(std::vector<std::string> services_to_test);
 
 private:
   static const double SERVICE_TIMEOUT_CONST_;
 
+  std::vector<std::string> services_to_test_;
   void service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status);
+  size_t index_service_to_test_;
+
 };
 
 }

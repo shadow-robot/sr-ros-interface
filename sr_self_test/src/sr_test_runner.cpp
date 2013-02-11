@@ -32,7 +32,7 @@ namespace shadow_robot
 //const double SrTestRunner::SERVICE_TIMEOUT_CONST_ = 1.0;
 
 SrTestRunner::SrTestRunner() :
-    self_test::TestRunner()
+  self_test::TestRunner(), index_service_to_test_(0)
 {
 };
 
@@ -42,22 +42,28 @@ SrTestRunner::~SrTestRunner()
 
 void SrTestRunner::addTopicTest(std::string topic_name, double frequency)
 {
-
 };
 
-void SrTestRunner::addServiceTest(std::string service_name)
+void SrTestRunner::addServicesTest(std::vector<std::string> services_to_test)
 {
-  ROS_ERROR_STREAM(" Adding service test: " << service_name);
-  add("Testing service "+service_name, this,  &SrTestRunner::service_test_cb_);
-  ROS_ERROR("OK added");
+  services_to_test_ = services_to_test;
+  index_service_to_test_=0;
+
+  for (size_t i=0; i < services_to_test_.size(); ++i)
+  {
+    add("Testing "+services_to_test_[i]+" is present.", this,  &SrTestRunner::service_test_cb_);
+  }
 };
 
 void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status)
 {
-        // if( ros::service::exists("/gazebo/self_test", true) )
-    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Service exists.");
-//  else
-    // status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Service not available.");
+  if( ros::service::exists(services_to_test_[index_service_to_test_], false) )
+    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Service "+services_to_test_[index_service_to_test_]+" exists.");
+  else
+    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Service "+services_to_test_[index_service_to_test_]+" not available.");
+
+  if(index_service_to_test_ + 1 < services_to_test_.size())
+    index_service_to_test_ ++;
 };
 
 } //end namespace
