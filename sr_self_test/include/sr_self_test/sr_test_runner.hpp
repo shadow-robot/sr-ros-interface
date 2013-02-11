@@ -36,6 +36,7 @@ class SrTestRunner : public self_test::TestRunner
 {
 public:
   SrTestRunner();
+
   virtual ~SrTestRunner();
 
   using DiagnosticTaskVector::add;

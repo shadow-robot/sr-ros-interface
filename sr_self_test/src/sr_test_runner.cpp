@@ -29,19 +29,16 @@
 
 namespace shadow_robot
 {
-const double SrTestRunner::SERVICE_TIMEOUT_CONST_ = 1.0;
+//const double SrTestRunner::SERVICE_TIMEOUT_CONST_ = 1.0;
 
 SrTestRunner::SrTestRunner() :
     self_test::TestRunner()
 {
-
 };
 
 SrTestRunner::~SrTestRunner()
 {
 };
-
-
 
 void SrTestRunner::addTopicTest(std::string topic_name, double frequency)
 {
@@ -57,10 +54,10 @@ void SrTestRunner::addServiceTest(std::string service_name)
 
 void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status)
 {
-  if( ros::service::exists("/gazebo/self_test", true) )
+        // if( ros::service::exists("/gazebo/self_test", true) )
     status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Service exists.");
-  else
-    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Service not available.");
+//  else
+    // status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Service not available.");
 };
 
 } //end namespace

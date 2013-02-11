@@ -32,5 +32,7 @@ rosbuild_add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp)
 ###
 # Tests
 ###
-rosbuild_add_gtest(sr_self_test_test test/test_self_test.cpp)
+rosbuild_add_executable(sr_self_test_test test/test_self_test.cpp)
+rosbuild_add_gtest_build_flags(sr_self_test)
 target_link_libraries(sr_self_test_test sr_self_test)
+rosbuild_add_rostest(test/sr_self_test.test)

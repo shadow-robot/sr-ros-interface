@@ -29,46 +29,44 @@
 
 #include <diagnostic_msgs/SelfTest.h>
 
-#include <gtest/gtest.h>
 
-class SrSelfTestTest : public testing::Test
+class MyNode
 {
-protected:
-  virtual void SetUp()
-  {
-    nh_ = ros::NodeHandle("~");
-    test_client_ = nh_.serviceClient<diagnostic_msgs::SelfTest>("self_test");
-  }
+public:
+
+  // self_test::TestRunner is the handles sequencing driver self-tests.
+  shadow_robot::SrTestRunner self_test_;
+
+  // A value showing statefulness of tests
+  double some_val;
 
   ros::NodeHandle nh_;
-  ros::ServiceClient test_client_;
-  shadow_robot::SrSelfTest self_test_;
+
+  MyNode() : self_test_()
+  {
+    self_test_.setID("12345");
+    self_test_.addServiceTest("/sr_self_test_test/self_test");
+  }
+
+  bool spin()
+  {
+    while (nh_.ok())
+    {
+      ros::Duration(1).sleep();
+
+      self_test_.checkTest();
+    }
+    return true;
+  }
 };
 
-TEST_F(SrSelfTestTest, constructor)
-{
-  EXPECT_TRUE(true);
-  ROS_ERROR("segfault on destructor? oO");
-}
-
-TEST_F(SrSelfTestTest, call_test_service)
-{
-  ROS_ERROR("this is not called");
-
-  EXPECT_TRUE(test_client_.waitForExistence(ros::Duration(10.0)));
-
-  diagnostic_msgs::SelfTest srv;
-  if(test_client_.call(srv))
-    EXPECT_TRUE(true);
-  else
-    EXPECT_TRUE(false);
-}
 
 int main(int argc, char **argv)
 {
-  testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "sr_self_test_test");
-  // init the node
 
-  return RUN_ALL_TESTS();
+  MyNode n;
+  n.spin();
+
+  return(0);
 }

@@ -38,6 +38,11 @@ public:
   SrSelfTest();
   ~SrSelfTest() {};
 
+  void checkTest()
+  {
+    test_runner_.checkTest();
+  }
+
 private:
   // self_test::TestRunner is the handles sequencing driver self-tests.
   shadow_robot::SrTestRunner test_runner_;
