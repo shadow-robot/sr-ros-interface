@@ -35,7 +35,7 @@ namespace shadow_robot
 {
 class SrSelfTest {
 public:
-  SrSelfTest();
+  SrSelfTest(bool simulated);
   ~SrSelfTest() {};
 
   void checkTest()

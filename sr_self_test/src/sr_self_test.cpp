@@ -28,7 +28,7 @@
 
 namespace shadow_robot
 {
-SrSelfTest::SrSelfTest()
+SrSelfTest::SrSelfTest(bool simulated=true)
 {
   test_runner_.setID("12345");
 
@@ -39,46 +39,50 @@ SrSelfTest::SrSelfTest()
   services_to_test.push_back("/pr2_controller_manager/reload_controller_libraries");
   services_to_test.push_back("/pr2_controller_manager/switch_controller");
   services_to_test.push_back("/pr2_controller_manager/unload_controller");
-  services_to_test.push_back("/sh_ffj0_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_ffj0_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_ffj3_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_ffj3_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_ffj4_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_ffj4_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_lfj0_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_lfj0_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_lfj3_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_lfj3_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_lfj4_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_lfj4_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_lfj5_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_lfj5_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_mfj0_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_mfj0_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_mfj3_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_mfj3_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_mfj4_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_mfj4_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_rfj0_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_rfj0_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_rfj3_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_rfj3_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_rfj4_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_rfj4_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_thj1_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_thj1_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_thj2_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_thj2_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_thj3_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_thj3_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_thj4_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_thj4_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_thj5_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_thj5_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_wrj1_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_wrj1_mixed_position_velocity_controller/set_gains");
-  services_to_test.push_back("/sh_wrj2_mixed_position_velocity_controller/reset_gains");
-  services_to_test.push_back("/sh_wrj2_mixed_position_velocity_controller/set_gains");
+
+  if( simulated )
+  {
+    services_to_test.push_back("/sh_ffj0_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_ffj0_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_ffj3_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_ffj3_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_ffj4_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_ffj4_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_lfj0_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_lfj0_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_lfj3_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_lfj3_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_lfj4_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_lfj4_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_lfj5_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_lfj5_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_mfj0_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_mfj0_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_mfj3_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_mfj3_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_mfj4_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_mfj4_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_rfj0_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_rfj0_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_rfj3_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_rfj3_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_rfj4_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_rfj4_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_thj1_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_thj1_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_thj2_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_thj2_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_thj3_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_thj3_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_thj4_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_thj4_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_thj5_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_thj5_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_wrj1_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_wrj1_mixed_position_velocity_controller/set_gains");
+    services_to_test.push_back("/sh_wrj2_mixed_position_velocity_controller/reset_gains");
+    services_to_test.push_back("/sh_wrj2_mixed_position_velocity_controller/set_gains");
+  }
 
   test_runner_.addServicesTest(services_to_test);
 }
