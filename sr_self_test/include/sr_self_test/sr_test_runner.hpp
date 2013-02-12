@@ -47,6 +47,9 @@ public:
   void addServicesTest(std::vector<std::string> services_to_test);
 
   void plot(std::map<std::string, std::vector<double> > joints);
+  void plot(std::map<std::string, std::vector<double> > joints, bool testing);
+  void plot(std::map<std::string, std::vector<double> > joints, std::string path);
+  void plot(std::map<std::string, std::vector<double> > joints, std::string path, bool testing);
 
 private:
   static const double SERVICE_TIMEOUT_CONST_;

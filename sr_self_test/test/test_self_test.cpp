@@ -52,10 +52,30 @@ public:
 
     self_test_.addServicesTest(services_to_test);
 
-    self_test_.add("Testing plots", this, &MyNode::test_plot);
+    self_test_.add("Testing plot - not saving", this, &MyNode::test_plot);
+    self_test_.add("Testing plot - saving", this, &MyNode::test_plot_save);
   }
 
   void test_plot(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    self_test_.plot(get_fake_joints(), true);
+
+    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "A plot should be displayed in a gnuplot window.");
+  }
+
+  void test_plot_save(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    std::string path = "/tmp/plot.png";
+    self_test_.plot(get_fake_joints(), path, true);
+
+    std::ifstream test_file(path.c_str());
+    if( test_file.good() )
+      status.summary(diagnostic_msgs::DiagnosticStatus::OK, "The plot seems to have been saved in " + path);
+    else
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "No file found at " + path + " the plot was probably not saved correctly.");
+  }
+
+  std::map<std::string, std::vector<double> > get_fake_joints()
   {
     std::map<std::string, std::vector<double> > joints;
 
@@ -73,9 +93,7 @@ public:
     joints["FFJ3 positions"] = ffj3_pos;
     joints["FFJ3 targets"] = ffj3_tar;
 
-    self_test_.plot(joints);
-
-    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "A plot should be displayed in a gnuplot window.");
+    return joints;
   }
 
   bool spin()

@@ -68,9 +68,36 @@ namespace shadow_robot
 
   void SrTestRunner::plot(std::map<std::string, std::vector<double> > joints)
   {
-    gnuplot_.reset(new Gnuplot("gnuplot -persist"));
+    plot(joints, "");
+  }
 
+  void SrTestRunner::plot(std::map<std::string, std::vector<double> > joints, bool testing)
+  {
+    plot(joints, "", testing);
+  }
+
+  void SrTestRunner::plot(std::map<std::string, std::vector<double> > joints, std::string path)
+  {
+    plot(joints, path, false);
+  }
+
+  void SrTestRunner::plot(std::map<std::string, std::vector<double> > joints, std::string path, bool testing)
+  {
+    if( testing )
+      gnuplot_.reset(new Gnuplot("gnuplot"));//close the window right after the test when running a test
+    else
+      gnuplot_.reset(new Gnuplot("gnuplot -persist"));
+
+    //saving the plot to file if path provided
+    if( path != "" )
+    {
+      *gnuplot_.get() << "set terminal png\n";
+      *gnuplot_.get() << "set output '"+path+"'\n";
+    }
+
+    //plot legend and style
     std::string cmd = "plot ";
+    std::string title = "";
     std::map<std::string, std::vector<double> >::const_iterator last_it = joints.end();
     --last_it;
     for (std::map<std::string, std::vector<double> >::const_iterator it = joints.begin(); it != joints.end(); ++it)
@@ -80,9 +107,14 @@ namespace shadow_robot
         cmd += "\n";
       else
         cmd += ",";
+
+      title += it->first + " ";
     }
+
+    *gnuplot_.get() << "set title '"+title+"'\n";
     *gnuplot_.get() << cmd;
 
+    //plotting the data
     for (std::map<std::string, std::vector<double> >::const_iterator it = joints.begin(); it != joints.end(); ++it)
     {
       gnuplot_->send(it->second);
