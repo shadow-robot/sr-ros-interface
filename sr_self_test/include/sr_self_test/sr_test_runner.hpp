@@ -46,6 +46,8 @@ public:
   void addTopicTest(std::string topic_name, double frequency);
   void addServicesTest(std::vector<std::string> services_to_test);
 
+  void plot(std::map<std::string, std::vector<double> > joints);
+
 private:
   static const double SERVICE_TIMEOUT_CONST_;
 
@@ -54,11 +56,14 @@ private:
   size_t index_service_to_test_;
 
   boost::shared_ptr<Gnuplot> gnuplot_;
-  void plot_();
 };
 
 }
 
-
+/* For the emacs weenies in the crowd.
+   Local Variables:
+   c-basic-offset: 2
+   End:
+*/
 
 #endif /* SR_TEST_RUNNER_HPP_ */

@@ -43,10 +43,18 @@ public:
     test_runner_.checkTest();
   }
 
+  void check_movements();
+
 private:
   // self_test::TestRunner is the handles sequencing driver self-tests.
   shadow_robot::SrTestRunner test_runner_;
 };
 }
+
+/* For the emacs weenies in the crowd.
+   Local Variables:
+   c-basic-offset: 2
+   End:
+*/
 
 #endif /* SR_SELF_TEST_HPP_ */

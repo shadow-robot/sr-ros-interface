@@ -51,6 +51,31 @@ public:
     services_to_test.push_back("/rosout/get_loggers");
 
     self_test_.addServicesTest(services_to_test);
+
+    self_test_.add("Testing plots", this, &MyNode::test_plot);
+  }
+
+  void test_plot(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    std::map<std::string, std::vector<double> > joints;
+
+    std::vector<double> ffj0_pos, ffj0_tar, ffj3_pos, ffj3_tar;
+    for (int i = 0; i < 20; ++i)
+    {
+      ffj0_pos.push_back(1.0/float(i));
+      ffj0_tar.push_back(1.0/float(i+1));
+      ffj3_pos.push_back(1.0/float(i*2));
+      ffj3_tar.push_back(2.0/float(i));
+    }
+
+    joints["FFJ0 positions"] = ffj0_pos;
+    joints["FFJ0 targets"] = ffj0_tar;
+    joints["FFJ3 positions"] = ffj3_pos;
+    joints["FFJ3 targets"] = ffj3_tar;
+
+    self_test_.plot(joints);
+
+    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "A plot should be displayed in a gnuplot window.");
   }
 
   bool spin()
@@ -75,3 +100,9 @@ int main(int argc, char **argv)
 
   return(0);
 }
+
+/* For the emacs weenies in the crowd.
+   Local Variables:
+   c-basic-offset: 2
+   End:
+*/

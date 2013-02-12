@@ -31,50 +31,68 @@ namespace shadow_robot
 {
 //const double SrTestRunner::SERVICE_TIMEOUT_CONST_ = 1.0;
 
-SrTestRunner::SrTestRunner() :
-  self_test::TestRunner(), index_service_to_test_(0)
-{
-  gnuplot_.reset(new Gnuplot("gnuplot -persist"));
-  plot_();
-};
-
-SrTestRunner::~SrTestRunner()
-{
-};
-
-void SrTestRunner::addTopicTest(std::string topic_name, double frequency)
-{
-};
-
-void SrTestRunner::addServicesTest(std::vector<std::string> services_to_test)
-{
-  services_to_test_ = services_to_test;
-  index_service_to_test_=0;
-
-  for (size_t i=0; i < services_to_test_.size(); ++i)
+  SrTestRunner::SrTestRunner() :
+    self_test::TestRunner(), index_service_to_test_(0)
   {
-    add("Testing "+services_to_test_[i]+" is present.", this,  &SrTestRunner::service_test_cb_);
+  };
+
+  SrTestRunner::~SrTestRunner()
+  {
+  };
+
+  void SrTestRunner::addTopicTest(std::string topic_name, double frequency)
+  {
+  };
+
+  void SrTestRunner::addServicesTest(std::vector<std::string> services_to_test)
+  {
+    services_to_test_ = services_to_test;
+    index_service_to_test_=0;
+
+    for (size_t i=0; i < services_to_test_.size(); ++i)
+    {
+      add("Testing "+services_to_test_[i]+" is present.", this,  &SrTestRunner::service_test_cb_);
+    }
+  };
+
+  void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    if( ros::service::exists(services_to_test_[index_service_to_test_], false) )
+      status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Service "+services_to_test_[index_service_to_test_]+" exists.");
+    else
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Service "+services_to_test_[index_service_to_test_]+" not available.");
+
+    if(index_service_to_test_ + 1 < services_to_test_.size())
+      index_service_to_test_ ++;
+  };
+
+  void SrTestRunner::plot(std::map<std::string, std::vector<double> > joints)
+  {
+    gnuplot_.reset(new Gnuplot("gnuplot -persist"));
+
+    std::string cmd = "plot ";
+    std::map<std::string, std::vector<double> >::const_iterator last_it = joints.end();
+    --last_it;
+    for (std::map<std::string, std::vector<double> >::const_iterator it = joints.begin(); it != joints.end(); ++it)
+    {
+      cmd += " '-' with lines title '"+it->first+"'";
+      if( it == last_it)
+        cmd += "\n";
+      else
+        cmd += ",";
+    }
+    *gnuplot_.get() << cmd;
+
+    for (std::map<std::string, std::vector<double> >::const_iterator it = joints.begin(); it != joints.end(); ++it)
+    {
+      gnuplot_->send(it->second);
+    }
   }
-};
-
-void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status)
-{
-  if( ros::service::exists(services_to_test_[index_service_to_test_], false) )
-    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Service "+services_to_test_[index_service_to_test_]+" exists.");
-  else
-    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Service "+services_to_test_[index_service_to_test_]+" not available.");
-
-  if(index_service_to_test_ + 1 < services_to_test_.size())
-    index_service_to_test_ ++;
-};
-
-void SrTestRunner::plot_()
-{
-	double arr[] = { 1, 3, 2 };
-
-	*gnuplot_.get() << "plot '-' with lines\n";
-	gnuplot_->send(arr);
-}
 } //end namespace
 
 
+/* For the emacs weenies in the crowd.
+   Local Variables:
+   c-basic-offset: 2
+   End:
+*/
