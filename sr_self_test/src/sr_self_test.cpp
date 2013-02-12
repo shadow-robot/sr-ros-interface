@@ -28,7 +28,7 @@
 
 namespace shadow_robot
 {
-  SrSelfTest::SrSelfTest(bool simulated=true)
+  SrSelfTest::SrSelfTest(bool simulated)
   {
     test_runner_.setID("12345");
 
