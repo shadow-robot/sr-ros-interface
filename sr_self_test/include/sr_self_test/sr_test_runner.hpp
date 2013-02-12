@@ -28,7 +28,8 @@
 #ifndef SR_TEST_RUNNER_HPP_
 #define SR_TEST_RUNNER_HPP_
 
-#include "self_test/self_test.h"
+#include <self_test/self_test.h>
+#include "sr_self_test/gnuplot-iostream.h"
 
 namespace shadow_robot
 {
@@ -52,6 +53,8 @@ private:
   void service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status);
   size_t index_service_to_test_;
 
+  boost::shared_ptr<Gnuplot> gnuplot_;
+  void plot_();
 };
 
 }

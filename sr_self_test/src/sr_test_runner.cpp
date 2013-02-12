@@ -34,6 +34,8 @@ namespace shadow_robot
 SrTestRunner::SrTestRunner() :
   self_test::TestRunner(), index_service_to_test_(0)
 {
+  gnuplot_.reset(new Gnuplot("gnuplot -persist"));
+  plot_();
 };
 
 SrTestRunner::~SrTestRunner()
@@ -66,6 +68,13 @@ void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper&
     index_service_to_test_ ++;
 };
 
+void SrTestRunner::plot_()
+{
+	double arr[] = { 1, 3, 2 };
+
+	*gnuplot_.get() << "plot '-' with lines\n";
+	gnuplot_->send(arr);
+}
 } //end namespace
 
 
