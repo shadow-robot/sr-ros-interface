@@ -21,12 +21,17 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
+find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
+include_directories( ${ImageMagick_INCLUDE_DIRS})
+
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(gnuplot_cpp src/gnuplot.cpp)
 rosbuild_add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp)
 rosbuild_link_boost(sr_self_test system)
 rosbuild_link_boost(sr_self_test iostreams)
 rosbuild_link_boost(sr_self_test filesystem)
+rosbuild_link_boost(sr_self_test thread)
+target_link_libraries(sr_self_test sr_movement)
 
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()

@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/sr_self_test</url>
   <depend package="roscpp"/>
   <depend package="self_test"/>
+  <depend package="sr_movements"/>
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_self_test"/>

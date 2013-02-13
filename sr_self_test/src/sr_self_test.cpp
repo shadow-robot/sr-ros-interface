@@ -25,13 +25,108 @@
  */
 
 #include "sr_self_test/sr_self_test.hpp"
+#include <boost/filesystem.hpp>
 
 namespace shadow_robot
 {
-  SrSelfTest::SrSelfTest(bool simulated)
+  const double SrSelfTest::MAX_MSE_CONST_ = 0.18;
+
+  TestJointMovement::TestJointMovement(std::string joint_name)
+    : mse(0.0), nh_tilde_("~")
   {
+    joint_name_ = joint_name;
+
+    //subscribes to the mean square error (published by movement pub below)
+    mse_sub_ = nh_tilde_.subscribe("mse_out", 1, &TestJointMovement::mse_cb_, this);
+
+    //initialises the movement publisher
+    std::string img_path;
+    nh_tilde_.getParam("image_path", img_path);
+
+    mvt_from_img_.reset(new shadowrobot::MovementFromImage(img_path) );
+
+    double min, max, publish_rate;
+    unsigned int repetition, nb_mvt_step;
+    min = 0.0;
+    max = 1.5;
+    publish_rate = 10.0;
+    repetition = 1;
+    nb_mvt_step = 1000;
+    std::string controller_type = "sr";
+
+    mvt_pub_.reset(new shadowrobot::MovementPublisher(min, max, publish_rate, repetition,
+                                                      nb_mvt_step, controller_type));
+    mvt_pub_->add_movement( *mvt_from_img_.get() );
+
+    sub_ = nh_tilde_.subscribe("/sh_"+joint_name+"_mixed_position_velocity_controller/state", nb_mvt_step, &shadowrobot::MovementPublisher::calculateErrorCallback, mvt_pub_.get());
+    sub_state_ = nh_tilde_.subscribe("/sh_"+joint_name+"_mixed_position_velocity_controller/state", nb_mvt_step, &TestJointMovement::state_cb_, this);
+
+    pub_ = nh_tilde_.advertise<std_msgs::Float64>("/sh_"+joint_name+"_mixed_position_velocity_controller/command", 5);
+
+    mvt_pub_->set_subscriber(sub_);
+    mvt_pub_->set_publisher(pub_);
+    mvt_pub_->start();
+  }
+
+  void TestJointMovement::state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
+  {
+    values[joint_name_ +" position"].push_back(msg->process_value);
+    values[joint_name_ +" target"].push_back(msg->set_point);
+    values[joint_name_ +" error"].push_back(msg->error);
+  }
+
+  void TestJointMovement::mse_cb_(const std_msgs::Float64::ConstPtr& msg)
+  {
+    mse = msg->data;
+
+    //unsubscribe after receiving the message
+  }
+
+  SrSelfTest::SrSelfTest(bool simulated)
+    : nh_tilde_("~")
+  {
+    simulated_ = simulated;
+
+    //create folder in /tmp for storing the plots
+    path_to_plots_ = "/tmp/shadow_robot/";
+    boost::filesystem::create_directories(path_to_plots_);
+
     test_runner_.setID("12345");
 
+    //add the different tests
+    test_services_();
+    test_runner_.add("Check movements", this, &SrSelfTest::check_movements_);
+  }
+
+  void SrSelfTest::check_movements_(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    std::string joint_name = "ffj3";
+    std::string img_path;
+    if( !nh_tilde_.getParam("image_path", img_path) )
+    {
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Parameter image_path not set, can't analyse movements.");
+      return;
+    }
+
+    test_mvts_[joint_name].reset( new TestJointMovement(joint_name) );
+
+    //wait a bit for mse to be received
+    ros::Duration(1.0).sleep();
+
+    //plot the data
+    test_runner_.plot(test_mvts_[joint_name]->values, path_to_plots_+joint_name+".png");
+
+    //check they are correct
+    std::stringstream diag_msg;
+    diag_msg << "Movement for " << joint_name << " (mse = " << test_mvts_[joint_name]->mse <<")";
+    if(test_mvts_[joint_name]->mse < MAX_MSE_CONST_)
+      status.summary(diagnostic_msgs::DiagnosticStatus::OK, diag_msg.str());
+    else
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, diag_msg.str());
+  }
+
+  void SrSelfTest::test_services_()
+  {
     std::vector<std::string> services_to_test;
     services_to_test.push_back("/pr2_controller_manager/list_controller_types");
     services_to_test.push_back("/pr2_controller_manager/list_controllers");
@@ -40,7 +135,7 @@ namespace shadow_robot
     services_to_test.push_back("/pr2_controller_manager/switch_controller");
     services_to_test.push_back("/pr2_controller_manager/unload_controller");
 
-    if( simulated )
+    if( simulated_ )
     {
       services_to_test.push_back("/sh_ffj0_mixed_position_velocity_controller/reset_gains");
       services_to_test.push_back("/sh_ffj0_mixed_position_velocity_controller/set_gains");
@@ -85,11 +180,6 @@ namespace shadow_robot
     }
 
     test_runner_.addServicesTest(services_to_test);
-  }
-
-  void SrSelfTest::check_movements()
-  {
-
   }
 }  // namespace shadow_robot
 

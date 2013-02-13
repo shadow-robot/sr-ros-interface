@@ -167,6 +167,11 @@ namespace shadowrobot
   {
     pub = publisher;
   }
+
+  void MovementPublisher::set_subscriber(ros::Subscriber Subscriber)
+  {
+    sub_ = Subscriber;
+  }
 }
 
 /* For the emacs weenies in the crowd.

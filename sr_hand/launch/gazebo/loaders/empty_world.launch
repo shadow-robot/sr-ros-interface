@@ -4,8 +4,9 @@
 
   <node name="gazebo" pkg="gazebo" type="gazebo" args=" $(find gazebo_worlds)/worlds/empty.world" respawn="false" output="screen">
     <remap from="joint_states" to="gazebo/joint_states"/>
+    <param name="image_path" value="$(find sr_movements)/movements/test.png"/>
   </node>
-    
+
   <group unless="$(optenv GAZEBO_NO_X 0)">
     <node name="gazebo_gui" pkg="gazebo" type="gui" respawn="false" output="screen"/>
   </group>

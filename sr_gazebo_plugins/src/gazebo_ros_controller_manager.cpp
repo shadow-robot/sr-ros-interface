@@ -55,7 +55,7 @@
 namespace gazebo {
 
 GazeboRosControllerManager::GazeboRosControllerManager()
-        : self_test()
+        : self_test(true)
 {
 }
 

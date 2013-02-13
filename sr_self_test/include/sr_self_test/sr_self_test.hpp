@@ -31,24 +31,71 @@
 
 #include "sr_self_test/sr_test_runner.hpp"
 
+#include <boost/thread.hpp>
+#include <sr_movements/movement_from_image.hpp>
+#include <sr_movements/movement_publisher.hpp>
+#include <ros/ros.h>
+#include <std_msgs/Float64.h>
+#include <sr_robot_msgs/JointControllerState.h>
+
 namespace shadow_robot
 {
-class SrSelfTest {
-public:
-  SrSelfTest(bool simulated);
-  ~SrSelfTest() {};
-
-  void checkTest()
+  class TestJointMovement
   {
-    test_runner_.checkTest();
-  }
+  public:
+    TestJointMovement(std::string joint_name);
+    ~TestJointMovement() {};
 
-  void check_movements();
+    double mse;
+    std::map<std::string, std::vector<double> > values;
 
-private:
-  // self_test::TestRunner is the handles sequencing driver self-tests.
-  shadow_robot::SrTestRunner test_runner_;
-};
+  private:
+    ros::Subscriber sub_;
+    ros::Publisher pub_;
+
+    ros::Subscriber sub_state_;
+    void state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
+
+    ros::Subscriber mse_sub_;
+    void mse_cb_(const std_msgs::Float64::ConstPtr& msg);
+
+    boost::shared_ptr<shadowrobot::MovementFromImage> mvt_from_img_;
+    boost::shared_ptr<shadowrobot::MovementPublisher> mvt_pub_;
+
+    ros::NodeHandle nh_tilde_;
+
+    boost::shared_ptr<boost::thread> thread_;
+
+    std::string joint_name_;
+  };
+
+  class SrSelfTest {
+  public:
+    SrSelfTest(bool simulated);
+    ~SrSelfTest() {};
+
+    void checkTest()
+    {
+      test_runner_.checkTest();
+    }
+
+  private:
+    // self_test::TestRunner is the handles sequencing driver self-tests.
+    shadow_robot::SrTestRunner test_runner_;
+
+    bool simulated_;
+
+    void test_services_();
+    void check_movements_(diagnostic_updater::DiagnosticStatusWrapper& status);
+
+    ros::NodeHandle nh_tilde_;
+
+    std::map<std::string, boost::shared_ptr<TestJointMovement> > test_mvts_;
+
+    static const double MAX_MSE_CONST_;
+
+    std::string path_to_plots_;
+  };
 }
 
 /* For the emacs weenies in the crowd.
