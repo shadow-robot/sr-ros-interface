@@ -43,7 +43,7 @@ namespace shadow_robot
   class TestJointMovement
   {
   public:
-    TestJointMovement(std::string joint_name);
+    TestJointMovement(std::string joint_name, std::pair<double, double> min_max);
     ~TestJointMovement() {};
 
     double mse;
@@ -86,7 +86,13 @@ namespace shadow_robot
     bool simulated_;
 
     void test_services_();
-    void check_movements_(diagnostic_updater::DiagnosticStatusWrapper& status);
+
+    std::vector<std::string> joints_to_test_;
+    std::vector<std::pair<double, double> > min_and_maxs_;
+
+    size_t index_joints_to_test_;
+    void add_all_movements_tests_();
+    void test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status);
 
     ros::NodeHandle nh_tilde_;
 

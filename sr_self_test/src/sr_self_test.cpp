@@ -25,13 +25,14 @@
  */
 
 #include "sr_self_test/sr_self_test.hpp"
+#include <sr_utilities/sr_math_utils.hpp>
 #include <boost/filesystem.hpp>
 
 namespace shadow_robot
 {
   const double SrSelfTest::MAX_MSE_CONST_ = 0.18;
 
-  TestJointMovement::TestJointMovement(std::string joint_name)
+  TestJointMovement::TestJointMovement(std::string joint_name, std::pair<double, double> min_max)
     : mse(0.0), nh_tilde_("~")
   {
     joint_name_ = joint_name;
@@ -47,8 +48,8 @@ namespace shadow_robot
 
     double min, max, publish_rate;
     unsigned int repetition, nb_mvt_step;
-    min = 0.0;
-    max = 1.5;
+    min = min_max.first;
+    max = min_max.second;
     publish_rate = 10.0;
     repetition = 1;
     nb_mvt_step = 1000;
@@ -95,12 +96,125 @@ namespace shadow_robot
 
     //add the different tests
     test_services_();
-    test_runner_.add("Check movements", this, &SrSelfTest::check_movements_);
+    add_all_movements_tests_();
   }
 
-  void SrSelfTest::check_movements_(diagnostic_updater::DiagnosticStatusWrapper& status)
+  void SrSelfTest::add_all_movements_tests_()
   {
-    std::string joint_name = "ffj3";
+    std::pair<double, double> min_max;
+
+    //TODO: min max and joint names should be read from urdf
+    min_max.first = 0.0;
+    min_max.second = sr_math_utils::to_rad(180.0);
+    joints_to_test_.push_back("ffj0");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.second = sr_math_utils::to_rad(90.0);
+    joints_to_test_.push_back("ffj3");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-25.0);
+    min_max.second = sr_math_utils::to_rad(25.0);
+    joints_to_test_.push_back("ffj4");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = 0.0;
+    min_max.second = sr_math_utils::to_rad(180.0);
+    joints_to_test_.push_back("mfj0");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.second = sr_math_utils::to_rad(90.0);
+    joints_to_test_.push_back("mfj3");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-25.0);
+    min_max.second = sr_math_utils::to_rad(25.0);
+    joints_to_test_.push_back("mfj4");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = 0.0;
+    min_max.second = sr_math_utils::to_rad(180.0);
+    joints_to_test_.push_back("rfj0");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.second = sr_math_utils::to_rad(90.0);
+    joints_to_test_.push_back("rfj3");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-25.0);
+    min_max.second = sr_math_utils::to_rad(25.0);
+    joints_to_test_.push_back("rfj4");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = 0.0;
+    min_max.second = sr_math_utils::to_rad(180.0);
+    joints_to_test_.push_back("lfj0");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.second = sr_math_utils::to_rad(90.0);
+    joints_to_test_.push_back("lfj3");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-25.0);
+    min_max.second = sr_math_utils::to_rad(25.0);
+    joints_to_test_.push_back("lfj4");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = 0.0;
+    min_max.second = sr_math_utils::to_rad(40.0);
+    joints_to_test_.push_back("lfj5");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = 0.0;
+    min_max.second = sr_math_utils::to_rad(90.0);
+    joints_to_test_.push_back("thj1");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-30.0);
+    min_max.second = sr_math_utils::to_rad(30.0);
+    joints_to_test_.push_back("thj2");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-15.0);
+    min_max.second = sr_math_utils::to_rad(15.0);
+    joints_to_test_.push_back("thj3");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = 0.0;
+    min_max.second = sr_math_utils::to_rad(70.0);
+    joints_to_test_.push_back("thj4");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-60.0);
+    min_max.second = sr_math_utils::to_rad(60.0);
+    joints_to_test_.push_back("thj5");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-45.0);
+    min_max.second = sr_math_utils::to_rad(35.0);
+    joints_to_test_.push_back("wrj1");
+    min_and_maxs_.push_back(min_max);
+
+    min_max.first = sr_math_utils::to_rad(-30.0);
+    min_max.second = sr_math_utils::to_rad(10.0);
+    joints_to_test_.push_back("wrj1");
+    min_and_maxs_.push_back(min_max);
+
+    index_joints_to_test_ = 0;
+
+    for(size_t i=0; i < joints_to_test_.size(); ++i)
+    {
+      test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
+    }
+  }
+
+  void SrSelfTest::test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    ROS_ERROR_STREAM("id = " << index_joints_to_test_ << " / " <<joints_to_test_.size() << " / " << min_and_maxs_.size());
+
+    std::string joint_name = joints_to_test_[index_joints_to_test_];
+    std::pair<double, double> min_max = min_and_maxs_[index_joints_to_test_];
+
     std::string img_path;
     if( !nh_tilde_.getParam("image_path", img_path) )
     {
@@ -108,7 +222,7 @@ namespace shadow_robot
       return;
     }
 
-    test_mvts_[joint_name].reset( new TestJointMovement(joint_name) );
+    test_mvts_[joint_name].reset( new TestJointMovement(joint_name, min_max) );
 
     //wait a bit for mse to be received
     ros::Duration(1.0).sleep();
@@ -123,6 +237,9 @@ namespace shadow_robot
       status.summary(diagnostic_msgs::DiagnosticStatus::OK, diag_msg.str());
     else
       status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, diag_msg.str());
+
+    if( index_joints_to_test_ + 1 < joints_to_test_.size() )
+      ++index_joints_to_test_;
   }
 
   void SrSelfTest::test_services_()
@@ -134,50 +251,6 @@ namespace shadow_robot
     services_to_test.push_back("/pr2_controller_manager/reload_controller_libraries");
     services_to_test.push_back("/pr2_controller_manager/switch_controller");
     services_to_test.push_back("/pr2_controller_manager/unload_controller");
-
-    if( simulated_ )
-    {
-      services_to_test.push_back("/sh_ffj0_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_ffj0_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_ffj3_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_ffj3_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_ffj4_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_ffj4_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_lfj0_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_lfj0_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_lfj3_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_lfj3_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_lfj4_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_lfj4_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_lfj5_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_lfj5_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_mfj0_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_mfj0_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_mfj3_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_mfj3_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_mfj4_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_mfj4_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_rfj0_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_rfj0_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_rfj3_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_rfj3_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_rfj4_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_rfj4_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_thj1_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_thj1_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_thj2_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_thj2_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_thj3_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_thj3_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_thj4_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_thj4_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_thj5_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_thj5_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_wrj1_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_wrj1_mixed_position_velocity_controller/set_gains");
-      services_to_test.push_back("/sh_wrj2_mixed_position_velocity_controller/reset_gains");
-      services_to_test.push_back("/sh_wrj2_mixed_position_velocity_controller/set_gains");
-    }
 
     test_runner_.addServicesTest(services_to_test);
   }
