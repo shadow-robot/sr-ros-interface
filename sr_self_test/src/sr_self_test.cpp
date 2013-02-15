@@ -88,15 +88,28 @@ namespace shadow_robot
   {
     simulated_ = simulated;
 
+    //rename existing folder if it exists
+    if( boost::filesystem::exists("/tmp/self_tests") )
+    {
+      //delete the last backup if it exists
+      if( boost::filesystem::exists("/tmp/self_tests.bk") )
+        boost::filesystem::remove_all("/tmp/self_tests.bk");
+
+      //backup last test plots
+      boost::filesystem::rename("/tmp/self_tests", "/tmp/self_tests.bk");
+    }
     //create folder in /tmp for storing the plots
-    path_to_plots_ = "/tmp/shadow_robot/";
+    path_to_plots_ = "/tmp/self_tests/"+ros::this_node::getName();
     boost::filesystem::create_directories(path_to_plots_);
 
     test_runner_.setID("12345");
 
     //add the different tests
+    ROS_ERROR("1");
     test_services_();
+    ROS_ERROR("2");
     add_all_movements_tests_();
+    ROS_ERROR("ready");
   }
 
   void SrSelfTest::add_all_movements_tests_()
@@ -113,107 +126,21 @@ namespace shadow_robot
     joints_to_test_.push_back("ffj3");
     min_and_maxs_.push_back(min_max);
 
-    min_max.first = sr_math_utils::to_rad(-25.0);
-    min_max.second = sr_math_utils::to_rad(25.0);
-    joints_to_test_.push_back("ffj4");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = 0.0;
-    min_max.second = sr_math_utils::to_rad(180.0);
-    joints_to_test_.push_back("mfj0");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.second = sr_math_utils::to_rad(90.0);
-    joints_to_test_.push_back("mfj3");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = sr_math_utils::to_rad(-25.0);
-    min_max.second = sr_math_utils::to_rad(25.0);
-    joints_to_test_.push_back("mfj4");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = 0.0;
-    min_max.second = sr_math_utils::to_rad(180.0);
-    joints_to_test_.push_back("rfj0");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.second = sr_math_utils::to_rad(90.0);
-    joints_to_test_.push_back("rfj3");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = sr_math_utils::to_rad(-25.0);
-    min_max.second = sr_math_utils::to_rad(25.0);
-    joints_to_test_.push_back("rfj4");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = 0.0;
-    min_max.second = sr_math_utils::to_rad(180.0);
-    joints_to_test_.push_back("lfj0");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.second = sr_math_utils::to_rad(90.0);
-    joints_to_test_.push_back("lfj3");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = sr_math_utils::to_rad(-25.0);
-    min_max.second = sr_math_utils::to_rad(25.0);
-    joints_to_test_.push_back("lfj4");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = 0.0;
-    min_max.second = sr_math_utils::to_rad(40.0);
-    joints_to_test_.push_back("lfj5");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = 0.0;
-    min_max.second = sr_math_utils::to_rad(90.0);
-    joints_to_test_.push_back("thj1");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = sr_math_utils::to_rad(-30.0);
-    min_max.second = sr_math_utils::to_rad(30.0);
-    joints_to_test_.push_back("thj2");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = sr_math_utils::to_rad(-15.0);
-    min_max.second = sr_math_utils::to_rad(15.0);
-    joints_to_test_.push_back("thj3");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = 0.0;
-    min_max.second = sr_math_utils::to_rad(70.0);
-    joints_to_test_.push_back("thj4");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = sr_math_utils::to_rad(-60.0);
-    min_max.second = sr_math_utils::to_rad(60.0);
-    joints_to_test_.push_back("thj5");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = sr_math_utils::to_rad(-45.0);
-    min_max.second = sr_math_utils::to_rad(35.0);
-    joints_to_test_.push_back("wrj1");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.first = sr_math_utils::to_rad(-30.0);
-    min_max.second = sr_math_utils::to_rad(10.0);
-    joints_to_test_.push_back("wrj1");
-    min_and_maxs_.push_back(min_max);
-
     index_joints_to_test_ = 0;
 
     for(size_t i=0; i < joints_to_test_.size(); ++i)
     {
-      test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
+      ROS_ERROR_STREAM(" adding " << i << "/" << joints_to_test_.size() );
+      //test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
+      ROS_ERROR("toto");
     }
   }
 
   void SrSelfTest::test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    ROS_ERROR_STREAM("id = " << index_joints_to_test_ << " / " <<joints_to_test_.size() << " / " << min_and_maxs_.size());
-
     std::string joint_name = joints_to_test_[index_joints_to_test_];
     std::pair<double, double> min_max = min_and_maxs_[index_joints_to_test_];
+
 
     std::string img_path;
     if( !nh_tilde_.getParam("image_path", img_path) )
