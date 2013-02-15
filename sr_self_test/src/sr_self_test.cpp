@@ -99,7 +99,7 @@ namespace shadow_robot
       boost::filesystem::rename("/tmp/self_tests", "/tmp/self_tests.bk");
     }
     //create folder in /tmp for storing the plots
-    path_to_plots_ = "/tmp/self_tests/"+ros::this_node::getName();
+    path_to_plots_ = "/tmp/self_tests/"+ros::this_node::getName() + "/";
     boost::filesystem::create_directories(path_to_plots_);
 
     test_runner_.setID("12345");
