@@ -105,11 +105,8 @@ namespace shadow_robot
     test_runner_.setID("12345");
 
     //add the different tests
-    ROS_ERROR("1");
     test_services_();
-    ROS_ERROR("2");
     add_all_movements_tests_();
-    ROS_ERROR("ready");
   }
 
   void SrSelfTest::add_all_movements_tests_()
@@ -130,9 +127,7 @@ namespace shadow_robot
 
     for(size_t i=0; i < joints_to_test_.size(); ++i)
     {
-      ROS_ERROR_STREAM(" adding " << i << "/" << joints_to_test_.size() );
-      //test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
-      ROS_ERROR("toto");
+      test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
     }
   }
 
