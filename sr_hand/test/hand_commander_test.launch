@@ -1,3 +1,4 @@
 <launch>
-    <test test-name="hand_commander_test" pkg="sr_hand" type="hand_commander_test" />
+  <include file="$(find sr_description)/loaders/load_hand_model.launch" />
+  <test test-name="hand_commander_test" pkg="sr_hand" type="hand_commander_test"/>
 </launch>
