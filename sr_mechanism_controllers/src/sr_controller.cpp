@@ -41,7 +41,7 @@ namespace controller {
       min_(0.0), max_(sr_math_utils::pi),
       loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
       n_tilde_("~"),
-      max_force_demand(1023.), friction_deadband(5)
+      max_force_demand(1023.), friction_deadband(5), max_force_factor_(1.0)
   {
   }
 
@@ -53,6 +53,7 @@ namespace controller {
   void SrController::after_init()
   {
     sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrController::setCommandCB, this);
+    sub_max_force_factor_ = node_.subscribe<std_msgs::Float64>("max_force_factor", 1, &SrController::maxForceFactorCB, this);
   }
 
 
@@ -129,6 +130,14 @@ namespace controller {
       return max_;
 
     return cmd;
+  }
+
+  void SrController::maxForceFactorCB(const std_msgs::Float64ConstPtr& msg)
+  {
+    if((msg->data >= 0.0) && (msg->data <= 1.0))
+    {
+      max_force_factor_ = msg->data;
+    }
   }
 }
 
