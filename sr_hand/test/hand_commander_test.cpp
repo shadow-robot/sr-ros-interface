@@ -16,6 +16,15 @@ TEST(HandCommander, constructor)
     EXPECT_TRUE(true);
 }
 
+TEST(HandCommander, topic_state)
+{
+    HandCommander handcmd = HandCommander();
+
+    std::string topic = handcmd.get_controller_state_topic("ffj3");
+    EXPECT_EQ("/sh_ffj3_mixed_position_velocity_controller/state", topic);
+
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);

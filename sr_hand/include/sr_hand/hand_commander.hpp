@@ -68,6 +68,16 @@ public:
 
     void sendCommands(std::vector<sr_robot_msgs::joint> joint_vector);
 
+    /**
+     * Returns the topic name for the controller state of a given joint. Useful for
+     * easily subscribing to the corresponding state topic in another node.
+     *
+     * @param joint_name the joint for which you want the topic
+     *
+     * @return the full name of the topic to which you need to subscribe
+     */
+    std::string get_controller_state_topic(std::string joint_name);
+
 private:
     ///ros node handle
     NodeHandle node_;
@@ -75,6 +85,9 @@ private:
     Publisher sr_hand_target_pub;
     ///Publishers for the ethercat hand targets for every joint
     boost::ptr_map<std::string,Publisher> sr_hand_target_pub_map;
+
+    ///A map of topics for the controller states
+    std::map<std::string, std::string> sr_hand_sub_topics;
 
     shadowhandRosLib::HandType hand_type;
     bool ethercat_controllers_found;
