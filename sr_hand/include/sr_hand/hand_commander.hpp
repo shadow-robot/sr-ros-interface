@@ -37,6 +37,7 @@
 #include <boost/smart_ptr.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <sr_robot_msgs/joint.h>
+#include <urdf/model.h>
 
 using namespace ros;
 
@@ -58,9 +59,9 @@ namespace shadowrobot
  * This ROS subscriber is used to issue commands to the hand / arm, from sending a set of targets, to changing the
  * controller parameters.
  */
-class HandCommander
-{
-public:
+  class HandCommander
+  {
+  public:
     HandCommander();
 
     /// Destructor
@@ -68,9 +69,22 @@ public:
 
     void sendCommands(std::vector<sr_robot_msgs::joint> joint_vector);
 
-private:
+    /**
+     * Reads the min and max for a given joint from the urdf description.
+     *
+     * @param joint_name name of the joint (upper or lower case) (e.g. FFJ3)
+     *
+     * @return a pair containing first the min then the max for the given joint.
+     */
+    std::pair<double, double> get_min_max(std::string joint_name);
+
+  private:
     ///ros node handle
     NodeHandle node_;
+
+    ///stores data about the hand (read from urdf)
+    std::map<std::string, boost::shared_ptr<urdf::Joint> > all_joints;
+
     ///Publisher for the CAN hand targets
     Publisher sr_hand_target_pub;
     ///Publishers for the ethercat hand targets for every joint
@@ -86,6 +100,12 @@ private:
     void initializeEthercatHand();
 
     static const double TIMEOUT_TO_DETECT_CONTROLLER_MANAGER;
-}; // end class ShadowhandSubscriber
+  }; // end class ShadowhandSubscriber
 
 } // end namespace
+
+/* For the emacs weenies in the crowd.
+Local Variables:
+   c-basic-offset: 2
+End:
+*/

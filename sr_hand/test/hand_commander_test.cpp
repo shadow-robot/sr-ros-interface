@@ -16,6 +16,25 @@ TEST(HandCommander, constructor)
     EXPECT_TRUE(true);
 }
 
+TEST(HandCommander, min_max)
+{
+    HandCommander handcmd = HandCommander();
+
+    std::pair<double, double> min_max = handcmd.get_min_max("FFJ3");
+    EXPECT_DOUBLE_EQ(min_max.first, 0.0);
+    EXPECT_DOUBLE_EQ(min_max.second, 1.57079632679);
+
+    //also works for lower case
+    min_max = handcmd.get_min_max("ffj3");
+    EXPECT_DOUBLE_EQ(min_max.first, 0.0);
+    EXPECT_DOUBLE_EQ(min_max.second, 1.57079632679);
+
+    //returns 0, 0 if joint not found
+    min_max = handcmd.get_min_max("stupid");
+    EXPECT_DOUBLE_EQ(min_max.first, 0.0);
+    EXPECT_DOUBLE_EQ(min_max.second, 0.0);
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
