@@ -37,12 +37,8 @@ namespace sr_actuator
   public:
     SrActuatorState() :
       pr2_hardware_interface::ActuatorState(),
-      strain_gauge_left_(0),
-      strain_gauge_right_(0),
       temperature_(0),
       position_unfiltered_(0.0),
-      force_unfiltered_(0.0),
-      pwm_(0),
       can_msgs_received_(0),
       can_msgs_transmitted_(0),
       pic_firmware_svn_revision_(0),
@@ -53,24 +49,13 @@ namespace sr_actuator
       serial_number_low(0),
       serial_number_high(0),
       serial_number(0),
-      motor_gear_ratio(0),
       assembly_data_year(0),
       assembly_data_month(0),
       assembly_data_day(0),
       tests_(0),
-      can_error_counters(0),
-      force_control_f_(0),
-      force_control_p_(0),
-      force_control_i_(0),
-      force_control_d_(0),
-      force_control_imax_(0),
-      force_control_deadband_(0),
-      force_control_sign_(0),
-      force_control_frequency_(0)
+      can_error_counters(0)
     {}
 
-    signed short strain_gauge_left_;
-    signed short strain_gauge_right_;
 
     std::vector<int> raw_sensor_values_;
     std::vector<double> calibrated_sensor_values_;
@@ -87,9 +72,6 @@ namespace sr_actuator
     double temperature_;
 
     double position_unfiltered_;
-    double force_unfiltered_;
-
-    int pwm_;
 
     uint64_t can_msgs_received_;
     uint64_t can_msgs_transmitted_;
@@ -127,13 +109,45 @@ namespace sr_actuator
     unsigned int serial_number_high;
     unsigned int serial_number;
 
-    unsigned int motor_gear_ratio;
     unsigned int assembly_data_year;
     unsigned int assembly_data_month;
     unsigned int assembly_data_day;
 
     int tests_;
     unsigned int can_error_counters;
+
+    std::vector<tactiles::AllTactileData>* tactiles_;
+  }; //end class SrActuatorState
+
+  class SrMotorActuatorState : public SrActuatorState
+  {
+  public:
+    SrMotorActuatorState() :
+      SrActuatorState(),
+      strain_gauge_left_(0),
+      strain_gauge_right_(0),
+      force_unfiltered_(0.0),
+      pwm_(0),
+      motor_gear_ratio(0),
+      force_control_f_(0),
+      force_control_p_(0),
+      force_control_i_(0),
+      force_control_d_(0),
+      force_control_imax_(0),
+      force_control_deadband_(0),
+      force_control_sign_(0),
+      force_control_frequency_(0)
+    {}
+
+    signed short strain_gauge_left_;
+    signed short strain_gauge_right_;
+
+
+    double force_unfiltered_;
+
+    int pwm_;
+
+    unsigned int motor_gear_ratio;
 
     int force_control_f_;
     int force_control_p_;
@@ -147,24 +161,74 @@ namespace sr_actuator
     int force_control_pterm;
     int force_control_iterm;
     int force_control_dterm;
+  }; //end class SrMotorActuatorState
 
-    std::vector<tactiles::AllTactileData>* tactiles_;
-  }; //end class SrActuatorState
-
-
-
-  class SrActuator : public pr2_hardware_interface::Actuator
+  class SrMuscleActuatorState : public SrActuatorState
   {
   public:
-    SrActuator()
+    SrMuscleActuatorState() :
+      SrActuatorState()
+    {}
+
+  }; //end class SrMuscleActuatorState
+
+  class SrMuscleActuatorCommand : public pr2_hardware_interface::ActuatorCommand
+  {
+  public:
+    SrMuscleActuatorCommand() :
+      pr2_hardware_interface::ActuatorCommand()
+    {}
+
+  }; //end class SrMuscleActuatorCommand
+
+
+  class SrGenericActuator : public pr2_hardware_interface::Actuator
+  {
+  public:
+    SrGenericActuator()
       : pr2_hardware_interface::Actuator()
     {};
 
-    SrActuator(std::string name)
+    SrGenericActuator(std::string name)
       : pr2_hardware_interface::Actuator(name)
     {};
 
     SrActuatorState state_;
+  }; //end class SrGenericActuator
+
+  /**
+   * This class defines a Motor actuator (it should be renamed to SrMotorActuator)
+   */
+  class SrActuator : public SrGenericActuator
+  {
+  public:
+    SrActuator()
+      : SrGenericActuator()
+    {};
+
+    SrActuator(std::string name)
+      : SrGenericActuator(name)
+    {};
+
+    SrMotorActuatorState state_;
+  }; //end class SrActuator
+
+  /**
+   * This class defines a Muscle actuator
+   */
+  class SrMuscleActuator : public SrGenericActuator
+  {
+  public:
+    SrMuscleActuator()
+      : SrGenericActuator()
+    {};
+
+    SrMuscleActuator(std::string name)
+      : SrGenericActuator(name)
+    {};
+
+    SrMuscleActuatorState state_;
+    SrMuscleActuatorCommand command_;
   }; //end class SrActuator
 }
 
