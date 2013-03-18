@@ -22,6 +22,9 @@ TEST(HandCommander, topic_state)
 
     std::string topic = handcmd.get_controller_state_topic("ffj3");
     EXPECT_EQ("/sh_ffj3_mixed_position_velocity_controller/state", topic);
+
+    topic = handcmd.get_controller_state_topic("unknown joint");
+    EXPECT_EQ("", topic);
 }
 
 TEST(HandCommander, min_max)
