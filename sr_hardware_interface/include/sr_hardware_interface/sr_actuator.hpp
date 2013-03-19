@@ -193,7 +193,7 @@ namespace sr_actuator
       : pr2_hardware_interface::Actuator(name)
     {};
 
-    SrActuatorState state_;
+    //SrActuatorState state_;
   }; //end class SrGenericActuator
 
   /**
