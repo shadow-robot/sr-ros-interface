@@ -35,14 +35,18 @@
 #include <pr2_controllers_msgs/JointControllerState.h>
 #include <sr_robot_msgs/JointControllerState.h>
 #include <math.h>
+#include <sr_hand/hand_commander.hpp>
 
 namespace shadowrobot
 {
   class MovementPublisher
   {
   public:
+    MovementPublisher( std::string joint_name, double rate=100.0, unsigned int repetition = 1, unsigned int nb_mvt_step = 1000 , std::string controller_type = "");
+
     MovementPublisher( double min_value = 0.0, double max_value = 1.5,
                        double rate=100.0, unsigned int repetition = 1, unsigned int nb_mvt_step = 1000 , std::string controller_type = "");
+
     virtual ~MovementPublisher();
 
     void start();
@@ -76,10 +80,30 @@ namespace shadowrobot
     void set_subscriber(ros::Subscriber Subscriber);
 
   protected:
+    /**
+     * Subscribes with the correct type (based on controller_type_)
+     * to the given topic.
+     * Also initialises the MSE publisher.
+     *
+     * @param input Topic to which we're subscribing.
+     */
+    void subscribe_and_default_pub_(std::string input);
+
+    /**
+     * Publishes the message, using either the
+     * HandCommander (recommended) or the previous
+     * approach, using directly a remapped publisher.
+     *
+     */
+    void publish_();
+
+    boost::shared_ptr<HandCommander> hand_commander_;
+    std::string joint_name_;
+
     std::vector<PartialMovement> partial_movements;
     ros::NodeHandle nh_tilde;
     ros::Publisher pub;
-    ros::Publisher pub_2;
+    ros::Publisher pub_mse_;
     ros::Subscriber sub_;
 
     ros::Rate publishing_rate;
@@ -87,6 +111,7 @@ namespace shadowrobot
     double min, max;
 
     std_msgs::Float64 msg;
+    std::vector<sr_robot_msgs::joint> joint_vector_;
     double last_target_;
 
     unsigned int nb_mvt_step;

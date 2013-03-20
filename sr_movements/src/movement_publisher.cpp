@@ -30,6 +30,28 @@
 
 namespace shadowrobot
 {
+  MovementPublisher::MovementPublisher(std::string joint_name, double rate, unsigned int repetition, unsigned int nb_mvt_step, std::string controller_type)
+    : joint_name_(joint_name), nh_tilde("~"), publishing_rate( rate ), repetition(repetition),
+      min(0.0), max(1.5), last_target_(0.0), nb_mvt_step(nb_mvt_step),
+      SError_(0.0), MSError_(0.0), n_samples_(0), controller_type(controller_type)
+  {
+    hand_commander_.reset(new HandCommander());
+
+    //if using the HandCommander, we're initialising the
+    // vector of joints to send here, out of the loop.
+    std::vector<sr_robot_msgs::joint> joint_vector;
+    sr_robot_msgs::joint joint;
+    joint.joint_name = joint_name_;
+    joint_vector.push_back(joint);
+
+    std::pair<double, double> min_max = hand_commander_->get_min_max(joint_name_);
+    min = min_max.first;
+    max = min_max.second;
+
+    std::string input = hand_commander_->get_controller_state_topic(joint_name_);
+    subscribe_and_default_pub_(joint_name_);
+  }
+
   MovementPublisher::MovementPublisher(double min_value, double max_value,
                                        double rate, unsigned int repetition, unsigned int nb_mvt_step, std::string controller_type)
     : nh_tilde("~"), publishing_rate( rate ), repetition(repetition),
@@ -37,21 +59,28 @@ namespace shadowrobot
       SError_(0.0), MSError_(0.0), n_samples_(0), controller_type(controller_type)
   {
     pub = nh_tilde.advertise<std_msgs::Float64>("targets", 5);
-    pub_2 = nh_tilde.advertise<std_msgs::Float64>("mse_out", 5);
+
+    subscribe_and_default_pub_("inputs");
+  }
+
+  void MovementPublisher::subscribe_and_default_pub_(std::string input)
+  {
+    pub_mse_ = nh_tilde.advertise<std_msgs::Float64>("mse_out", 5);
+
     if(controller_type.compare("sr")==0)
     {
       //nb_mvt_step is used to set the size of the buffer
-      sub_ = nh_tilde.subscribe("inputs", nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
+      sub_ = nh_tilde.subscribe(input, nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
     }
     else if(controller_type.compare("pr2")==0)
     {
-      sub_ = nh_tilde.subscribe("inputs", nb_mvt_step, &MovementPublisher::pr2_calculateErrorCallback, this);
+      sub_ = nh_tilde.subscribe(input, nb_mvt_step, &MovementPublisher::pr2_calculateErrorCallback, this);
     }
     else
     {
       ROS_WARN_STREAM("Warning: You didn't choose a msg_type to listen. sr_robot_msgs was chosen by default");
       //nb_mvt_step is used to set the size of the buffer
-      sub_ = nh_tilde.subscribe("inputs", nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
+      sub_ = nh_tilde.subscribe(input, nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
     }
   }
 
@@ -85,7 +114,7 @@ namespace shadowrobot
             msg.data = min + msg.data * (max - min);
           }
           //publish the message
-          pub.publish( msg );
+          publish_();
 
           //wait for a bit
           publishing_rate.sleep();
@@ -100,7 +129,7 @@ namespace shadowrobot
 
       //publish the error information
       msg.data = MSError_;
-      pub_2.publish( msg );
+      pub_mse_.publish( msg );
 
       //Reset the error counter
       SError_ = 0.0;
@@ -146,13 +175,27 @@ namespace shadowrobot
     if( msg.data == -1.0 )
       msg.data = last_target_;
 
-    //publish the message
-    pub.publish( msg );
+    publish_();
 
     //wait for a bit
     publishing_rate.sleep();
 
     last_target_ = msg.data;
+  }
+
+  void MovementPublisher::publish_()
+  {
+    //publish the message
+    //use the default publisher if the HandCommander is not instantiated
+    // (for compatibility reason)
+    if( hand_commander_ == NULL )
+      pub.publish( msg );
+    //otherwise use the HandCommander
+    else
+    {
+      joint_vector_[0].joint_target = msg.data;
+      hand_commander_->sendCommands(joint_vector_);
+    }
   }
 
   void MovementPublisher::stop()
