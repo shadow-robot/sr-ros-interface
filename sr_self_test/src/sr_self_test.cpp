@@ -32,7 +32,7 @@ namespace shadow_robot
 {
   const double SrSelfTest::MAX_MSE_CONST_ = 0.18;
 
-  TestJointMovement::TestJointMovement(std::string joint_name, std::pair<double, double> min_max)
+  TestJointMovement::TestJointMovement(std::string joint_name)
     : mse(0.0), nh_tilde_("~")
   {
     joint_name_ = joint_name;
@@ -46,26 +46,20 @@ namespace shadow_robot
 
     mvt_from_img_.reset(new shadowrobot::MovementFromImage(img_path) );
 
-    double min, max, publish_rate;
+    double publish_rate;
     unsigned int repetition, nb_mvt_step;
-    min = min_max.first;
-    max = min_max.second;
     publish_rate = 10.0;
     repetition = 1;
     nb_mvt_step = 1000;
     std::string controller_type = "sr";
 
-    mvt_pub_.reset(new shadowrobot::MovementPublisher(min, max, publish_rate, repetition,
+    mvt_pub_.reset(new shadowrobot::MovementPublisher(joint_name, publish_rate, repetition,
                                                       nb_mvt_step, controller_type));
     mvt_pub_->add_movement( *mvt_from_img_.get() );
 
-    sub_ = nh_tilde_.subscribe("/sh_"+joint_name+"_mixed_position_velocity_controller/state", nb_mvt_step, &shadowrobot::MovementPublisher::calculateErrorCallback, mvt_pub_.get());
-    sub_state_ = nh_tilde_.subscribe("/sh_"+joint_name+"_mixed_position_velocity_controller/state", nb_mvt_step, &TestJointMovement::state_cb_, this);
+    sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
+                                      &TestJointMovement::state_cb_, this );
 
-    pub_ = nh_tilde_.advertise<std_msgs::Float64>("/sh_"+joint_name+"_mixed_position_velocity_controller/command", 5);
-
-    mvt_pub_->set_subscriber(sub_);
-    mvt_pub_->set_publisher(pub_);
     mvt_pub_->start();
   }
 
@@ -111,17 +105,8 @@ namespace shadow_robot
 
   void SrSelfTest::add_all_movements_tests_()
   {
-    std::pair<double, double> min_max;
-
-    //TODO: min max and joint names should be read from urdf
-    min_max.first = 0.0;
-    min_max.second = sr_math_utils::to_rad(180.0);
     joints_to_test_.push_back("ffj0");
-    min_and_maxs_.push_back(min_max);
-
-    min_max.second = sr_math_utils::to_rad(90.0);
     joints_to_test_.push_back("ffj3");
-    min_and_maxs_.push_back(min_max);
 
     index_joints_to_test_ = 0;
 
@@ -134,8 +119,6 @@ namespace shadow_robot
   void SrSelfTest::test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
     std::string joint_name = joints_to_test_[index_joints_to_test_];
-    std::pair<double, double> min_max = min_and_maxs_[index_joints_to_test_];
-
 
     std::string img_path;
     if( !nh_tilde_.getParam("image_path", img_path) )
@@ -144,7 +127,7 @@ namespace shadow_robot
       return;
     }
 
-    test_mvts_[joint_name].reset( new TestJointMovement(joint_name, min_max) );
+    test_mvts_[joint_name].reset( new TestJointMovement(joint_name) );
 
     //wait a bit for mse to be received
     ros::Duration(1.0).sleep();

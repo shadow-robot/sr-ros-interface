@@ -43,7 +43,7 @@ namespace shadow_robot
   class TestJointMovement
   {
   public:
-    TestJointMovement(std::string joint_name, std::pair<double, double> min_max);
+    TestJointMovement(std::string joint_name);
     ~TestJointMovement() {};
 
     double mse;
@@ -88,7 +88,6 @@ namespace shadow_robot
     void test_services_();
 
     std::vector<std::string> joints_to_test_;
-    std::vector<std::pair<double, double> > min_and_maxs_;
 
     size_t index_joints_to_test_;
     void add_all_movements_tests_();
