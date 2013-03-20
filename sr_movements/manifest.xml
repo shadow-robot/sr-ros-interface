@@ -15,6 +15,7 @@
   <depend package="sensor_msgs"/>
   <depend package="sr_utilities"/>
   <depend package="roscpp"/>
+  <depend package="sr_hand"/>
 
   <rosdep name="libmagick"/>
 

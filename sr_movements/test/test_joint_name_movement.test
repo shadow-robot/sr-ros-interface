@@ -1,0 +1,20 @@
+<launch>
+  <include file="$(find sr_hand)/launch/gazebo/gazebo_hand.launch" />
+  <include file="$(find sr_description)/loaders/load_hand_model.launch" />
+
+  <node pkg="sr_movements" name="sr_movements" type="sr_movements">
+    <param name="joint_name" value="ffj3"/>
+    <param name="image_path" value="$(find sr_movements)/movements/test.png"/>
+    <param name="publish_rate" value="100"/>
+    <param name="repetition" value="5"/>
+    <param name="nb_step" value="1000"/>
+    <param name="msg_type" value="sr"/>
+    <param name="testing" value="true"/>
+  </node>
+  <test test-name="hztest_test" pkg="rostest" type="hztest" name="hztest1">
+    <param name="topic" value="/sh_ffj3_mixed_position_velocity_controller/command" />
+    <param name="hz" value="100.0" />
+    <param name="hzerror" value="0.5" />
+    <param name="test_duration" value="5.0" />
+  </test>
+</launch>

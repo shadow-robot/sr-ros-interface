@@ -114,6 +114,7 @@ namespace shadowrobot
       }
       for(size_t i = 0; i < joint_vector.size(); ++i)
       {
+        boost::algorithm::to_upper(joint_vector.at(i).joint_name);
         std_msgs::Float64 target;
         target.data = joint_vector.at(i).joint_target * M_PI/180.0;
         sr_hand_target_pub_map[joint_vector.at(i).joint_name].publish(target);
