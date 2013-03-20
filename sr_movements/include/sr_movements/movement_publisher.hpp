@@ -88,7 +88,7 @@ namespace shadowrobot
     void add_movement(PartialMovement mvt);
 
     void set_publisher(ros::Publisher publisher);
-    void set_subscriber(ros::Subscriber Subscriber);
+    void set_subscriber(ros::Subscriber subscriber);
 
   protected:
     /**

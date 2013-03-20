@@ -217,9 +217,9 @@ namespace shadowrobot
     pub = publisher;
   }
 
-  void MovementPublisher::set_subscriber(ros::Subscriber Subscriber)
+  void MovementPublisher::set_subscriber(ros::Subscriber subscriber)
   {
-    sub_ = Subscriber;
+    sub_ = subscriber;
   }
 }
 
