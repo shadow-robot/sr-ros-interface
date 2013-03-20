@@ -1,0 +1,20 @@
+<launch>
+  <node pkg="sr_movements" name="sr_movements" type="sr_movements">
+    <remap from="~targets" to="/sh_ffj3_mixed_position_velocity_controller/command"/>
+    <remap from="~inputs" to="/sh_ffj3_mixed_position_velocity_controller/state"/>
+    <param name="image_path" value="$(find sr_movements)/movements/test.png"/>
+    <param name="min" value="0.1"/>
+    <param name="max" value="1.4"/>
+    <param name="publish_rate" value="100"/>
+    <param name="repetition" value="5"/>
+    <param name="nb_step" value="1000"/>
+    <param name="msg_type" value="sr"/>
+  </node>
+
+  <test test-name="hztest_test" pkg="rostest" type="hztest" name="hztest1">
+    <param name="topic" value="/sh_ffj3_mixed_position_velocity_controller/command" />
+    <param name="hz" value="100.0" />
+    <param name="hzerror" value="0.5" />
+    <param name="test_duration" value="5.0" />
+  </test>
+</launch>

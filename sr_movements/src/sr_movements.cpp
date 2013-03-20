@@ -45,10 +45,6 @@ int main(int argc, char *argv[])
     shadowrobot::MovementFromImage mvt_im( img_path );
 
     double min, max, publish_rate;
-    if( !nh_tilde.getParam("min", min) )
-      min = 0.0;
-    if( !nh_tilde.getParam("max", max) )
-      max = 1.5;
     if( !nh_tilde.getParam("publish_rate", publish_rate) )
       publish_rate = 100.0;
 
@@ -64,11 +60,44 @@ int main(int argc, char *argv[])
     if( !nh_tilde.getParam("msg_type", controller_type) )
       controller_type = "";
 
-    shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate, static_cast<unsigned int>(repetition),
-                                            static_cast<unsigned int>(nb_mvt_step), controller_type);
-    mvt_pub.add_movement( mvt_im );
+    std::string joint_name;
+    if( !nh_tilde.getParam("joint_name", joint_name) )
+    {
+      //for compatibility, if no joint_name is provided, then we use the
+      // provided min and max to instantiate the movement publisher
+      // which will use the remapped topics.
+      if( !nh_tilde.getParam("min", min) )
+        min = 0.0;
+      if( !nh_tilde.getParam("max", max) )
+        max = 1.5;
 
-    mvt_pub.start();
+      shadowrobot::MovementPublisher mvt_pub( min, max, publish_rate,
+                                              static_cast<unsigned int>(repetition),
+                                              static_cast<unsigned int>(nb_mvt_step),
+                                              controller_type);
+
+      mvt_pub.add_movement( mvt_im );
+      mvt_pub.start();
+    }
+    else
+    {
+      //check if this is a test using gazebo
+      bool testing;
+      if( !nh_tilde.getParam("testing", testing))
+        testing = false;
+
+      //This is the new easier to implement version of the movement
+      // publisher. Simply uses the name of the joint to instantiate
+      // the MovementPublisher, grabbing min, max and topics from the
+      // HandCommander.
+      shadowrobot::MovementPublisher mvt_pub( joint_name, publish_rate,
+                                              static_cast<unsigned int>(repetition),
+                                              static_cast<unsigned int>(nb_mvt_step),
+                                              controller_type, testing);
+
+      mvt_pub.add_movement( mvt_im );
+      mvt_pub.start();
+    }
   }
   else
   {
