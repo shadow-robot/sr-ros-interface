@@ -221,6 +221,11 @@ namespace shadowrobot
   {
     sub_ = subscriber;
   }
+
+  std::string MovementPublisher::get_subscriber_topic()
+  {
+    return sub_.getTopic();
+  }
 }
 
 /* For the emacs weenies in the crowd.
