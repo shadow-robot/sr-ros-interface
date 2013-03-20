@@ -16,6 +16,17 @@ TEST(HandCommander, constructor)
     EXPECT_TRUE(true);
 }
 
+TEST(HandCommander, topic_state)
+{
+    HandCommander handcmd = HandCommander();
+
+    std::string topic = handcmd.get_controller_state_topic("ffj3");
+    EXPECT_EQ("/sh_ffj3_mixed_position_velocity_controller/state", topic);
+
+    topic = handcmd.get_controller_state_topic("unknown joint");
+    EXPECT_EQ("", topic);
+}
+
 TEST(HandCommander, min_max)
 {
     HandCommander handcmd = HandCommander();
@@ -40,5 +51,9 @@ int main(int argc, char **argv)
     testing::InitGoogleTest(&argc, argv);
     ros::init(argc, argv, "hand_commander_test");
     ros::NodeHandle nh; // init the node
+
+    //sleep until gazebo is ready
+    sleep(10.0);
+
     return RUN_ALL_TESTS();
 }

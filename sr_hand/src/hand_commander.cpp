@@ -95,10 +95,10 @@ namespace shadowrobot
           sr_hand_target_pub_map[controlled_joint_name]
             = node_.advertise<std_msgs::Float64>(controller+"/command", 2);
           ethercat_controllers_found = true;
+          sr_hand_sub_topics[controlled_joint_name] = "/"+ controller+"/state";
         }
       }
     }
-
   }
 
   void HandCommander::sendCommands(std::vector<sr_robot_msgs::joint> joint_vector)
@@ -114,6 +114,7 @@ namespace shadowrobot
       }
       for(size_t i = 0; i < joint_vector.size(); ++i)
       {
+        boost::algorithm::to_upper(joint_vector.at(i).joint_name);
         std_msgs::Float64 target;
         target.data = joint_vector.at(i).joint_target * M_PI/180.0;
         sr_hand_target_pub_map[joint_vector.at(i).joint_name].publish(target);
@@ -147,6 +148,32 @@ namespace shadowrobot
     }
 
     return min_max;
+  }
+
+  std::string HandCommander::get_controller_state_topic(std::string joint_name)
+  {
+    std::string topic;
+
+    if(hand_type == shadowhandRosLib::ETHERCAT)
+    {
+      //urdf names are upper case
+      boost::algorithm::to_upper(joint_name);
+      std::map<std::string, std::string>::iterator it = sr_hand_sub_topics.find(joint_name);
+      if( it != sr_hand_sub_topics.end() )
+      {
+        topic = it->second;
+      }
+      else
+      {
+        ROS_ERROR_STREAM(" Controller for joint " << joint_name << " not found.");
+      }
+    }
+    else
+    {
+      topic = "/shadowhand_data";
+    }
+
+    return topic;
   }
 }
 

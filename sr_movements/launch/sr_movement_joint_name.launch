@@ -1,0 +1,12 @@
+<launch>
+  <include file="$(find sr_description)/loaders/load_hand_model.launch" />
+
+  <node pkg="sr_movements" name="sr_movements" type="sr_movements">
+    <param name="joint_name" value="ffj3"/>
+    <param name="image_path" value="$(find sr_movements)/movements/test.png"/>
+    <param name="publish_rate" value="100"/>
+    <param name="repetition" value="10"/>
+    <param name="nb_step" value="1000"/>
+    <param name="msg_type" value="sr"/>
+  </node>
+</launch>
