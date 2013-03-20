@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 set(ROS_BUILD_TYPE RelWithDeb)
@@ -8,9 +7,6 @@ rosbuild_genmsg()
 rosbuild_gensrv()
 
 add_definitions(-fPIC)
-
-find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
-include_directories( ${ImageMagick_INCLUDE_DIRS})
 
 
 #
