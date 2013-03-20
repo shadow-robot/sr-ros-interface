@@ -24,6 +24,7 @@ target_link_libraries(sr_movements ${ImageMagick_LIBRARIES})
 target_link_libraries(sr_movements HandCommander)
 
 rosbuild_add_rostest(test/test_movements.test)
+rosbuild_add_rostest(test/test_joint_name_movement.test)
 
 rosbuild_add_library(sr_movement src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
 target_link_libraries(sr_movement ${ImageMagick_LIBRARIES})

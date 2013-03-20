@@ -30,19 +30,25 @@
 
 namespace shadowrobot
 {
-  MovementPublisher::MovementPublisher(std::string joint_name, double rate, unsigned int repetition, unsigned int nb_mvt_step, std::string controller_type)
+  MovementPublisher::MovementPublisher(std::string joint_name, double rate, unsigned int repetition, unsigned int nb_mvt_step, std::string controller_type, bool testing)
     : joint_name_(joint_name), nh_tilde("~"), publishing_rate( rate ), repetition(repetition),
       min(0.0), max(1.5), last_target_(0.0), nb_mvt_step(nb_mvt_step),
       SError_(0.0), MSError_(0.0), n_samples_(0), controller_type(controller_type)
   {
+    //this is a gazebo test, sleep for a long while to make sure gazebo is started.
+    if(testing)
+    {
+      ROS_INFO("This is a test: sleeping 10 seconds for Gazebo to start.");
+      sleep(20.0);
+    }
+
     hand_commander_.reset(new HandCommander());
 
     //if using the HandCommander, we're initialising the
     // vector of joints to send here, out of the loop.
-    std::vector<sr_robot_msgs::joint> joint_vector;
     sr_robot_msgs::joint joint;
     joint.joint_name = joint_name_;
-    joint_vector.push_back(joint);
+    joint_vector_.push_back(joint);
 
     std::pair<double, double> min_max = hand_commander_->get_min_max(joint_name_);
     min = min_max.first;
@@ -193,7 +199,7 @@ namespace shadowrobot
     //otherwise use the HandCommander
     else
     {
-      joint_vector_[0].joint_target = msg.data;
+      joint_vector_[0].joint_target = sr_math_utils::to_degrees(msg.data);
       hand_commander_->sendCommands(joint_vector_);
     }
   }
