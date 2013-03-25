@@ -178,11 +178,7 @@ namespace shadowrobot
 
     for( it; it != sr_hand_sub_topics.end(); ++it )
     {
-      //we don't want the dummy "joint tips" to appear in the list
-      if( std::string::npos == it->first.find("tip") )
-      {
-        all_joints_names.push_back(it->first);
-      }
+      all_joints_names.push_back(it->first);
     }
 
     return all_joints_names;
