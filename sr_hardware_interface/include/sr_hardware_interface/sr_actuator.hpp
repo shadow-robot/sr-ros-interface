@@ -172,6 +172,7 @@ namespace sr_actuator
 
     ///Pressure sensors for each of the two muscles of the actuator
     uint16_t pressure_[2];
+    int8_t last_commanded_valve_[2];
   }; //end class SrMuscleActuatorState
 
   class SrMuscleActuatorCommand : public pr2_hardware_interface::ActuatorCommand
@@ -181,6 +182,7 @@ namespace sr_actuator
       pr2_hardware_interface::ActuatorCommand()
     {}
 
+    int8_t valve_[2];
   }; //end class SrMuscleActuatorCommand
 
 
