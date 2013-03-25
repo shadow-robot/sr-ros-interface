@@ -37,6 +37,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 #include <sr_robot_msgs/JointControllerState.h>
+#include <sr_hand/hand_commander.hpp>
 
 namespace shadow_robot
 {
@@ -83,6 +84,9 @@ namespace shadow_robot
     // self_test::TestRunner is the handles sequencing driver self-tests.
     shadow_robot::SrTestRunner test_runner_;
 
+    ///The hand commander is used for getting a list of all controlled joints
+    boost::shared_ptr<shadowrobot::HandCommander> hand_commander_;
+
     bool simulated_;
 
     void test_services_();
@@ -90,8 +94,9 @@ namespace shadow_robot
     std::vector<std::string> joints_to_test_;
 
     size_t index_joints_to_test_;
-    void add_all_movements_tests_();
+    void add_all_movements_tests_(const ros::TimerEvent& event);
     void test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status);
+    ros::Timer test_movement_timer_;
 
     ros::NodeHandle nh_tilde_;
 

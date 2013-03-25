@@ -100,13 +100,21 @@ namespace shadow_robot
 
     //add the different tests
     test_services_();
-    add_all_movements_tests_();
+
+    //calling this from a oneshot timer because we're using the
+    // hand commander which needs the hand to be fully initialised
+    // before we can instantiate it.
+    test_movement_timer_ = nh_tilde_.createTimer( ros::Duration(5.0),
+                                                  &SrSelfTest::add_all_movements_tests_, this,
+                                                  true );
   }
 
-  void SrSelfTest::add_all_movements_tests_()
+  void SrSelfTest::add_all_movements_tests_(const ros::TimerEvent& event)
   {
-    //joints_to_test_.push_back("ffj0");
-    joints_to_test_.push_back("ffj3");
+    if( hand_commander_ == NULL )
+      hand_commander_.reset(new shadowrobot::HandCommander());
+
+    joints_to_test_ = hand_commander_->get_all_joints();
 
     index_joints_to_test_ = 0;
 
