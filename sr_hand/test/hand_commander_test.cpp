@@ -23,6 +23,9 @@ TEST(HandCommander, topic_state)
     std::string topic = handcmd.get_controller_state_topic("ffj3");
     EXPECT_EQ("/sh_ffj3_mixed_position_velocity_controller/state", topic);
 
+    topic = handcmd.get_controller_state_topic("ffj0");
+    EXPECT_EQ("/sh_ffj0_mixed_position_velocity_controller/state", topic);
+
     topic = handcmd.get_controller_state_topic("unknown joint");
     EXPECT_EQ("", topic);
 }
@@ -41,9 +44,16 @@ TEST(HandCommander, min_max)
     EXPECT_DOUBLE_EQ(min_max.second, 1.57079632679);
 
     //returns 0, 0 if joint not found
-    min_max = handcmd.get_min_max("stupid");
+    min_max = handcmd.get_min_max("unknown joint");
     EXPECT_DOUBLE_EQ(min_max.first, 0.0);
     EXPECT_DOUBLE_EQ(min_max.second, 0.0);
+}
+
+TEST(HandCommander, all_joints)
+{
+    HandCommander handcmd = HandCommander();
+
+    EXPECT_EQ(handcmd.get_all_joints().size(), 20);
 }
 
 int main(int argc, char **argv)

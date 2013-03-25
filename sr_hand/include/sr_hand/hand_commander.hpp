@@ -88,6 +88,14 @@ namespace shadowrobot
      */
     std::pair<double, double> get_min_max(std::string joint_name);
 
+    /**
+     * Get all the joint names from the robot description.
+     *  Ideal for looping over all joints.
+     *
+     * @return A vector of joint names.
+     */
+    std::vector<std::string> get_all_joints();
+
   private:
     ///ros node handle
     NodeHandle node_;

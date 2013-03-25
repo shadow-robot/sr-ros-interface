@@ -105,7 +105,7 @@ namespace shadow_robot
 
   void SrSelfTest::add_all_movements_tests_()
   {
-    joints_to_test_.push_back("ffj0");
+    //joints_to_test_.push_back("ffj0");
     joints_to_test_.push_back("ffj3");
 
     index_joints_to_test_ = 0;

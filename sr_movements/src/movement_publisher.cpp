@@ -55,7 +55,7 @@ namespace shadowrobot
     max = min_max.second;
 
     std::string input = hand_commander_->get_controller_state_topic(joint_name_);
-    subscribe_and_default_pub_(joint_name_);
+    subscribe_and_default_pub_(input);
   }
 
   MovementPublisher::MovementPublisher(double min_value, double max_value,
@@ -224,7 +224,7 @@ namespace shadowrobot
 
   std::string MovementPublisher::get_subscriber_topic()
   {
-    return sub_.getTopic();
+    return hand_commander_->get_controller_state_topic(joint_name_);
   }
 }
 

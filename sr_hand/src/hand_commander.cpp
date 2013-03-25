@@ -150,6 +150,23 @@ namespace shadowrobot
     return min_max;
   }
 
+  std::vector<std::string> HandCommander::get_all_joints()
+  {
+    std::vector<std::string> all_joints_names;
+    std::map<std::string, std::string>::iterator it = sr_hand_sub_topics.begin();
+
+    for( it; it != sr_hand_sub_topics.end(); ++it )
+    {
+      //we don't want the dummy "joint tips" to appear in the list
+      if( std::string::npos == it->first.find("tip") )
+      {
+        all_joints_names.push_back(it->first);
+      }
+    }
+
+    return all_joints_names;
+  }
+
   std::string HandCommander::get_controller_state_topic(std::string joint_name)
   {
     std::string topic;
