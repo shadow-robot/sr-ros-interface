@@ -132,19 +132,40 @@ namespace shadowrobot
 
   std::pair<double, double> HandCommander::get_min_max(std::string joint_name)
   {
-    std::pair<double, double> min_max;
-    //urdf names are upper case
-    boost::algorithm::to_upper(joint_name);
-    std::map<std::string, boost::shared_ptr<urdf::Joint> >::iterator it = all_joints.find(joint_name);
-
-    if( it != all_joints.end() )
+    //needs to get min max for J1 and J2 if J0
+    std::vector<std::string> joint_names, split_name;
+    boost::split( split_name, joint_name, boost::is_any_of("0") );
+    if( split_name.size() == 1)
     {
-      min_max.first = it->second->limits->lower;
-      min_max.second = it->second->limits->upper;
+      //not a J0
+      joint_names.push_back(joint_name);
     }
     else
     {
-      ROS_ERROR_STREAM("Joint " << joint_name << " not found in the urdf description.");
+      //this is a J0, push J1 and J2
+      joint_names.push_back(split_name[0] + "1");
+      joint_names.push_back(split_name[0] + "2");
+    }
+
+
+    std::pair<double, double> min_max;
+    for( size_t i = 0; i < joint_names.size(); ++i)
+    {
+      std::string jn = joint_names[i];
+
+      //urdf names are upper case
+      boost::algorithm::to_upper(jn);
+      std::map<std::string, boost::shared_ptr<urdf::Joint> >::iterator it = all_joints.find(jn);
+
+      if( it != all_joints.end() )
+      {
+        min_max.first += it->second->limits->lower;
+        min_max.second += it->second->limits->upper;
+      }
+      else
+      {
+        ROS_ERROR_STREAM("Joint " << jn << " not found in the urdf description.");
+      }
     }
 
     return min_max;

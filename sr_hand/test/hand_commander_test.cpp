@@ -43,6 +43,11 @@ TEST(HandCommander, min_max)
     EXPECT_DOUBLE_EQ(min_max.first, 0.0);
     EXPECT_DOUBLE_EQ(min_max.second, 1.57079632679);
 
+    //j0 should be 0, 180
+    min_max = handcmd.get_min_max("ffj0");
+    EXPECT_DOUBLE_EQ(min_max.first, 0.0);
+    EXPECT_DOUBLE_EQ(min_max.second, 3.14159265358);
+
     //returns 0, 0 if joint not found
     min_max = handcmd.get_min_max("unknown joint");
     EXPECT_DOUBLE_EQ(min_max.first, 0.0);
