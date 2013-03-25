@@ -98,6 +98,20 @@ namespace shadow_robot
     void test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status);
     ros::Timer test_movement_timer_;
 
+    /**
+     * Sends a "safe target" to the given joint: we want to avoid the collisions
+     *  when running the movement tests.
+     *
+     * @param joint_name the joint we want to put in a safe position.
+     */
+    void send_safe_target_(std::string joint_name);
+    ///A map storing the safe targets for the joints (only those different than min)
+    boost::shared_ptr<std::map<std::string, sr_robot_msgs::joint> > safe_targets_;
+    /**
+     * Initialises the map safe_targets_
+     */
+    void init_safe_targets_();
+
     ros::NodeHandle nh_tilde_;
 
     std::map<std::string, boost::shared_ptr<TestJointMovement> > test_mvts_;

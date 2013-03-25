@@ -104,7 +104,7 @@ namespace shadow_robot
     //calling this from a oneshot timer because we're using the
     // hand commander which needs the hand to be fully initialised
     // before we can instantiate it.
-    test_movement_timer_ = nh_tilde_.createTimer( ros::Duration(5.0),
+    test_movement_timer_ = nh_tilde_.createTimer( ros::Duration(10.0),
                                                   &SrSelfTest::add_all_movements_tests_, this,
                                                   true );
   }
@@ -115,10 +115,15 @@ namespace shadow_robot
       hand_commander_.reset(new shadowrobot::HandCommander());
 
     joints_to_test_ = hand_commander_->get_all_joints();
-
+    //send all the joints to their safe positions:
+    for( size_t i=0; i<joints_to_test_.size(); ++i)
+    {
+      send_safe_target_(joints_to_test_[i]);
+      ros::Duration(0.1).sleep();
+    }
     index_joints_to_test_ = 0;
 
-    for(size_t i=0; i < joints_to_test_.size(); ++i)
+    for(size_t i=0; i < 4;++i)//joints_to_test_.size(); ++i)
     {
       test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
     }
@@ -151,8 +156,78 @@ namespace shadow_robot
     else
       status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, diag_msg.str());
 
+    //sends the joint to a collision safe position
+    send_safe_target_(joint_name);
+    ros::Duration(0.5).sleep();
+
     if( index_joints_to_test_ + 1 < joints_to_test_.size() )
       ++index_joints_to_test_;
+  }
+
+  void SrSelfTest::send_safe_target_(std::string joint_name)
+  {
+    if( safe_targets_ == NULL )
+      init_safe_targets_();
+
+    std::vector<sr_robot_msgs::joint> joint_vector;
+    joint_vector.resize(1);
+
+    std::map<std::string, sr_robot_msgs::joint>::iterator safe_target;
+    safe_target = safe_targets_->find(joint_name);
+    if( safe_target == safe_targets_->end() )
+    {
+      //joint not found in the map -> use the min
+      joint_vector[0].joint_name = joint_name;
+      joint_vector[0].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max(joint_name).first );
+    }
+    else
+    {
+      joint_vector[0].joint_name = safe_target->second.joint_name;
+      joint_vector[0].joint_target = safe_target->second.joint_target;
+    }
+
+    hand_commander_->sendCommands(joint_vector);
+    ros::spinOnce();
+  }
+
+  void SrSelfTest::init_safe_targets_()
+  {
+    safe_targets_.reset( new std::map<std::string, sr_robot_msgs::joint>());
+    sr_robot_msgs::joint safe_target;
+
+    //??J4 -> min or max or 0... need to find a way to do that
+    safe_target.joint_name = "FFJ4";
+    safe_target.joint_target = 0.0;
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+    safe_target.joint_name = "MFJ4";
+    safe_target.joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max(safe_target.joint_name).second );
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );    safe_target.joint_name = "RFJ4";
+    safe_target.joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max(safe_target.joint_name).first );
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );    safe_target.joint_name = "LFJ4";
+    safe_target.joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max(safe_target.joint_name).first );
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+
+    //wrist -> 0
+    safe_target.joint_name = "WRJ1";
+    safe_target.joint_target = 0.0;
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+    safe_target.joint_name = "WRJ2";
+    safe_target.joint_target = 0.0;
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+
+    //thumb -> 0
+    safe_target.joint_name = "THJ2";
+    safe_target.joint_target = 0.0;
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+    safe_target.joint_name = "THJ3";
+    safe_target.joint_target = 0.0;
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+    safe_target.joint_name = "THJ4";
+    safe_target.joint_target = 0.0;
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+    safe_target.joint_name = "THJ5";
+    safe_target.joint_target = 0.0;
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
   }
 
   void SrSelfTest::test_services_()
