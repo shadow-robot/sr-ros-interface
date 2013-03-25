@@ -47,6 +47,14 @@ TEST(HandCommander, min_max)
     min_max = handcmd.get_min_max("unknown joint");
     EXPECT_DOUBLE_EQ(min_max.first, 0.0);
     EXPECT_DOUBLE_EQ(min_max.second, 0.0);
+
+    //Check that we can get the min and max for each joint
+    std::vector<std::string> all_joints = handcmd.get_all_joints();
+    for( size_t i=0; i < all_joints.size(); ++i)
+    {
+       min_max = handcmd.get_min_max(all_joints[i]);
+       EXPECT_TRUE(min_max.first != min_max.second); //min = max if joint not found
+    }
 }
 
 TEST(HandCommander, all_joints)
