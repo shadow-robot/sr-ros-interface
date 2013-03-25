@@ -9,6 +9,7 @@
 
   <!-- spawn the arm and hand model -->
   <include file="$(find sr_description)/loaders/load_arm_and_hand_model.launch" />
+  <include file="$(find sr_description)/loaders/load_hand_model.launch" />
   <node name="spawn_hand" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -z 0.0 -model shadow_model -J ShoulderJSwing 0.78 -J ElbowJSwing 2.0" respawn="false" output="screen" />
 
   <!-- Controllers for the arm and hand -->

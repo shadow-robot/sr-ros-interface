@@ -47,9 +47,16 @@ namespace shadowrobot
     std::string robot_desc_string;
     node_.param("/sh_description", robot_desc_string, std::string());
     urdf::Model robot_model;
-    if (!robot_model.initString(robot_desc_string)){
-      ROS_ERROR("Failed to parse urdf file");
-      return;
+    if (!robot_model.initString(robot_desc_string))
+    {
+      ROS_WARN("Failed to parse urdf file - trying with robot_description instead of sh_description.");
+
+      node_.param("/robot_description", robot_desc_string, std::string());
+      if (!robot_model.initString(robot_desc_string))
+      {
+        ROS_ERROR("Couldn't parse the urdf file on /sh_description or on /robot_description.");
+        return;
+      }
     }
     all_joints = robot_model.joints_;
 
@@ -178,7 +185,11 @@ namespace shadowrobot
 
     for( it; it != sr_hand_sub_topics.end(); ++it )
     {
-      all_joints_names.push_back(it->first);
+      // all Hand joint names have a length of 4...
+      //The other way would be to check if the name is in a list
+      // of possible names. Not sure what's best.
+      if(it->first.size() == 4)
+        all_joints_names.push_back(it->first);
     }
 
     return all_joints_names;
