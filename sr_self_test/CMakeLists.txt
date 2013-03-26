@@ -31,7 +31,6 @@ rosbuild_link_boost(sr_self_test system)
 rosbuild_link_boost(sr_self_test iostreams)
 rosbuild_link_boost(sr_self_test filesystem)
 rosbuild_link_boost(sr_self_test thread)
-target_link_libraries(sr_self_test sr_movement)
 
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
