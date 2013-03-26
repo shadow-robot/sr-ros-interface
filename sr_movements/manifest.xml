@@ -20,7 +20,7 @@
   <rosdep name="libmagick"/>
 
   <export>
-    <cpp cflags="-I${prefix}/include/" lflags="-L${prefix}/lib" />
+    <cpp cflags="-I${prefix}/include/" lflags="-L${prefix}/lib -lsr_movement"/>
   </export>
 
 </package>
