@@ -261,9 +261,11 @@ namespace shadow_robot
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
     safe_target.joint_name = "MFJ4";
     safe_target.joint_target = 0.0;
-    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );    safe_target.joint_name = "RFJ4";
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+    safe_target.joint_name = "RFJ4";
     safe_target.joint_target = 0.0;
-    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );    safe_target.joint_name = "LFJ4";
+    safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
+    safe_target.joint_name = "LFJ4";
     safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
 
