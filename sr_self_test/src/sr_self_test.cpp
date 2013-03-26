@@ -104,7 +104,10 @@ namespace shadow_robot
     //calling this from a oneshot timer because we're using the
     // hand commander which needs the hand to be fully initialised
     // before we can instantiate it.
-    test_movement_timer_ = nh_tilde_.createTimer( ros::Duration(10.0),
+    // Using 30s sleep here is a pain... not sure how to best get
+    // rid of that... testing for availability of some services may
+    // be not enough.
+    test_movement_timer_ = nh_tilde_.createTimer( ros::Duration(30.0),
                                                   &SrSelfTest::add_all_movements_tests_, this,
                                                   true );
   }
@@ -115,15 +118,15 @@ namespace shadow_robot
       hand_commander_.reset(new shadowrobot::HandCommander());
 
     joints_to_test_ = hand_commander_->get_all_joints();
+
     //send all the joints to their safe positions:
     for( size_t i=0; i<joints_to_test_.size(); ++i)
     {
       send_safe_target_(joints_to_test_[i]);
-      ros::Duration(0.1).sleep();
+      ros::Duration(0.4).sleep();
     }
     index_joints_to_test_ = 0;
-
-    for(size_t i=0; i < 4;++i)//joints_to_test_.size(); ++i)
+    for(size_t i=0; i < joints_to_test_.size(); ++i)
     {
       test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
     }
@@ -132,6 +135,10 @@ namespace shadow_robot
   void SrSelfTest::test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
     std::string joint_name = joints_to_test_[index_joints_to_test_];
+
+    //sends the joint to a collision safe position
+    send_safe_target_(joint_name);
+    ros::Duration(0.5).sleep();
 
     std::string img_path;
     if( !nh_tilde_.getParam("image_path", img_path) )
@@ -156,10 +163,6 @@ namespace shadow_robot
     else
       status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, diag_msg.str());
 
-    //sends the joint to a collision safe position
-    send_safe_target_(joint_name);
-    ros::Duration(0.5).sleep();
-
     if( index_joints_to_test_ + 1 < joints_to_test_.size() )
       ++index_joints_to_test_;
   }
@@ -169,25 +172,80 @@ namespace shadow_robot
     if( safe_targets_ == NULL )
       init_safe_targets_();
 
-    std::vector<sr_robot_msgs::joint> joint_vector;
-    joint_vector.resize(1);
+    update_safe_targets_(joint_name);
 
-    std::map<std::string, sr_robot_msgs::joint>::iterator safe_target;
-    safe_target = safe_targets_->find(joint_name);
-    if( safe_target == safe_targets_->end() )
+    std::vector<sr_robot_msgs::joint> joint_vector;
+    joint_vector.resize( joints_to_test_.size() );
+
+    for( size_t i=0; i<joints_to_test_.size(); ++i)
     {
-      //joint not found in the map -> use the min
-      joint_vector[0].joint_name = joint_name;
-      joint_vector[0].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max(joint_name).first );
-    }
-    else
-    {
-      joint_vector[0].joint_name = safe_target->second.joint_name;
-      joint_vector[0].joint_target = safe_target->second.joint_target;
+      std::map<std::string, sr_robot_msgs::joint>::iterator safe_target;
+      safe_target = safe_targets_->find( joints_to_test_[i] );
+      if( safe_target == safe_targets_->end() )
+      {
+        //joint not found in the map -> use the min
+        joint_vector[i].joint_name = joints_to_test_[i];
+        joint_vector[i].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max( joints_to_test_[i] ).first );
+      }
+      else
+      {
+        joint_vector[i].joint_name = joints_to_test_[i];
+        joint_vector[i].joint_target = safe_target->second.joint_target;
+      }
     }
 
     hand_commander_->sendCommands(joint_vector);
     ros::spinOnce();
+  }
+
+  void SrSelfTest::update_safe_targets_(std::string joint_name)
+  {
+    //This is very hugly.... not sure how to make it prettier easily - haven't much time...
+    if( joint_name.compare("FFJ4") == 0 )
+    {
+      (*safe_targets_.get())["FFJ4"].joint_target = 0.0;
+      (*safe_targets_.get())["MFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").second );
+      (*safe_targets_.get())["RFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("RFJ4").first );
+      (*safe_targets_.get())["LFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("LFJ4").first );
+    }
+    else
+    {
+      if( joint_name.compare("MFJ4") == 0 )
+      {
+        (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
+        (*safe_targets_.get())["MFJ4"].joint_target = 0.0;
+        (*safe_targets_.get())["RFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("RFJ4").first );
+        (*safe_targets_.get())["LFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("LFJ4").first );
+      }
+      else
+      {
+        if( joint_name.compare("RFJ4") == 0 )
+        {
+          (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
+          (*safe_targets_.get())["MFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").first );
+          (*safe_targets_.get())["RFJ4"].joint_target = 0.0;
+          (*safe_targets_.get())["LFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("LFJ4").first );
+        }
+        else
+        {
+          if( joint_name.compare("LFJ4") == 0 )
+          {
+            (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
+            (*safe_targets_.get())["MFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").first );
+            (*safe_targets_.get())["RFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").second );
+            (*safe_targets_.get())["LFJ4"].joint_target = 0.0;
+          }
+          else
+          {
+            (*safe_targets_.get())["FFJ4"].joint_target = 0.0;
+            (*safe_targets_.get())["MFJ4"].joint_target = 0.0;
+            (*safe_targets_.get())["RFJ4"].joint_target = 0.0;
+            (*safe_targets_.get())["LFJ4"].joint_target = 0.0;
+          }
+        }
+      }
+    }
+    //we ignore the other joints
   }
 
   void SrSelfTest::init_safe_targets_()
@@ -200,11 +258,11 @@ namespace shadow_robot
     safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
     safe_target.joint_name = "MFJ4";
-    safe_target.joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max(safe_target.joint_name).second );
+    safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );    safe_target.joint_name = "RFJ4";
-    safe_target.joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max(safe_target.joint_name).first );
+    safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );    safe_target.joint_name = "LFJ4";
-    safe_target.joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max(safe_target.joint_name).first );
+    safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
 
     //wrist -> 0

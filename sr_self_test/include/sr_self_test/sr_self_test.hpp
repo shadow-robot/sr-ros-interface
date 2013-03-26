@@ -99,10 +99,10 @@ namespace shadow_robot
     ros::Timer test_movement_timer_;
 
     /**
-     * Sends a "safe target" to the given joint: we want to avoid the collisions
+     * Sends a "safe target" to all the joints: we want to avoid the collisions
      *  when running the movement tests.
      *
-     * @param joint_name the joint we want to put in a safe position.
+     * @param joint_name the joint we're going to move.
      */
     void send_safe_target_(std::string joint_name);
     ///A map storing the safe targets for the joints (only those different than min)
@@ -111,6 +111,14 @@ namespace shadow_robot
      * Initialises the map safe_targets_
      */
     void init_safe_targets_();
+    /**
+     * Updates the map safe_targets_ based on the joint we're going to move.
+     *  For example ??J4 safe values are different depending on which joint
+     *   4 has been moved already.
+     *
+     * @param joint_name The name of the joint we're going to move.
+     */
+    void update_safe_targets_(std::string joint_name);
 
     ros::NodeHandle nh_tilde_;
 
