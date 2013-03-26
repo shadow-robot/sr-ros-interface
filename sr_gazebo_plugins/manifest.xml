@@ -35,6 +35,7 @@
 
   <depend package="sr_hardware_interface" />
   <depend package="pr2_gazebo_plugins" />
+  <depend package="sr_self_test" />
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib" />
