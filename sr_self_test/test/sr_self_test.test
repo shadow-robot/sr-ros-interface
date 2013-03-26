@@ -1,0 +1,9 @@
+<launch>
+    <node name="sr_self_test_test" pkg="sr_self_test" type="sr_self_test_test" />
+
+    <test pkg="self_test" type="selftest_rostest"
+        test-name="test_sr_self_test" time-limit="30">
+	<param name="node_to_test" value="sr_self_test_test"/>
+    </test>
+
+</launch>

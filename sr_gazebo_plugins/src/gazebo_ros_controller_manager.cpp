@@ -55,6 +55,7 @@
 namespace gazebo {
 
 GazeboRosControllerManager::GazeboRosControllerManager()
+        : self_test(true)
 {
 }
 
@@ -431,6 +432,7 @@ void GazeboRosControllerManager::ControllerManagerROSThread()
 
   while (this->rosnode_->ok())
   {
+    self_test.checkTest();
     //rate.sleep(); // using rosrate gets stuck on model delete
     usleep(1000);
     ros::spinOnce();

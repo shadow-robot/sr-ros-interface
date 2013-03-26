@@ -90,6 +90,8 @@ namespace shadowrobot
     void set_publisher(ros::Publisher publisher);
     void set_subscriber(ros::Subscriber subscriber);
 
+    std::string get_subscriber_topic();
+
   protected:
     /**
      * Subscribes with the correct type (based on controller_type_)

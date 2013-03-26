@@ -45,11 +45,18 @@ namespace shadowrobot
     //Get the urdf model from the parameter server
     // this is used for returning min and max for joints for example.
     std::string robot_desc_string;
-    node_.param("/sh_description", robot_desc_string, std::string());
+    node_.param("sh_description", robot_desc_string, std::string());
     urdf::Model robot_model;
-    if (!robot_model.initString(robot_desc_string)){
-      ROS_ERROR("Failed to parse urdf file");
-      return;
+    if (!robot_model.initString(robot_desc_string))
+    {
+      ROS_WARN("Failed to parse urdf file - trying with robot_description instead of sh_description.");
+
+      node_.param("robot_description", robot_desc_string, std::string());
+      if (!robot_model.initString(robot_desc_string))
+      {
+        ROS_ERROR("Couldn't parse the urdf file on sh_description or on robot_description.");
+        return;
+      }
     }
     all_joints = robot_model.joints_;
 
@@ -132,22 +139,60 @@ namespace shadowrobot
 
   std::pair<double, double> HandCommander::get_min_max(std::string joint_name)
   {
-    std::pair<double, double> min_max;
-    //urdf names are upper case
-    boost::algorithm::to_upper(joint_name);
-    std::map<std::string, boost::shared_ptr<urdf::Joint> >::iterator it = all_joints.find(joint_name);
-
-    if( it != all_joints.end() )
+    //needs to get min max for J1 and J2 if J0
+    std::vector<std::string> joint_names, split_name;
+    boost::split( split_name, joint_name, boost::is_any_of("0") );
+    if( split_name.size() == 1)
     {
-      min_max.first = it->second->limits->lower;
-      min_max.second = it->second->limits->upper;
+      //not a J0
+      joint_names.push_back(joint_name);
     }
     else
     {
-      ROS_ERROR_STREAM("Joint " << joint_name << " not found in the urdf description.");
+      //this is a J0, push J1 and J2
+      joint_names.push_back(split_name[0] + "1");
+      joint_names.push_back(split_name[0] + "2");
+    }
+
+
+    std::pair<double, double> min_max;
+    for( size_t i = 0; i < joint_names.size(); ++i)
+    {
+      std::string jn = joint_names[i];
+
+      //urdf names are upper case
+      boost::algorithm::to_upper(jn);
+      std::map<std::string, boost::shared_ptr<urdf::Joint> >::iterator it = all_joints.find(jn);
+
+      if( it != all_joints.end() )
+      {
+        min_max.first += it->second->limits->lower;
+        min_max.second += it->second->limits->upper;
+      }
+      else
+      {
+        ROS_ERROR_STREAM("Joint " << jn << " not found in the urdf description.");
+      }
     }
 
     return min_max;
+  }
+
+  std::vector<std::string> HandCommander::get_all_joints()
+  {
+    std::vector<std::string> all_joints_names;
+    std::map<std::string, std::string>::iterator it = sr_hand_sub_topics.begin();
+
+    for( it; it != sr_hand_sub_topics.end(); ++it )
+    {
+      // all Hand joint names have a length of 4...
+      //The other way would be to check if the name is in a list
+      // of possible names. Not sure what's best.
+      if(it->first.size() == 4)
+        all_joints_names.push_back(it->first);
+    }
+
+    return all_joints_names;
   }
 
   std::string HandCommander::get_controller_state_topic(std::string joint_name)
