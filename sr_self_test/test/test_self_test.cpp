@@ -47,7 +47,7 @@ public:
     self_test_.setID("12345");
 
     std::vector<std::string> services_to_test;
-    services_to_test.push_back("/sr_self_test_test/self_test");
+    services_to_test.push_back("sr_self_test_test/self_test");
     services_to_test.push_back("/rosout/get_loggers");
 
     self_test_.addServicesTest(services_to_test);
@@ -67,6 +67,8 @@ public:
   {
     std::string path = "/tmp/plot.png";
     self_test_.plot(get_fake_joints(), path, true);
+
+    ros::Duration(0.5).sleep();
 
     std::ifstream test_file(path.c_str());
     if( test_file.good() )
