@@ -234,7 +234,7 @@ namespace shadow_robot
           {
             (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
             (*safe_targets_.get())["MFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").first );
-            (*safe_targets_.get())["RFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").second );
+            (*safe_targets_.get())["RFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("RFJ4").second );
             (*safe_targets_.get())["LFJ4"].joint_target = 0.0;
           }
           else
