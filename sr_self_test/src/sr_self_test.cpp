@@ -165,6 +165,8 @@ namespace shadow_robot
 
     if( index_joints_to_test_ + 1 < joints_to_test_.size() )
       ++index_joints_to_test_;
+    else
+      index_joints_to_test_ = 0;
   }
 
   void SrSelfTest::send_safe_target_(std::string joint_name)
