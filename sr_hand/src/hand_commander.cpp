@@ -45,16 +45,16 @@ namespace shadowrobot
     //Get the urdf model from the parameter server
     // this is used for returning min and max for joints for example.
     std::string robot_desc_string;
-    node_.param("/sh_description", robot_desc_string, std::string());
+    node_.param("sh_description", robot_desc_string, std::string());
     urdf::Model robot_model;
     if (!robot_model.initString(robot_desc_string))
     {
       ROS_WARN("Failed to parse urdf file - trying with robot_description instead of sh_description.");
 
-      node_.param("/robot_description", robot_desc_string, std::string());
+      node_.param("robot_description", robot_desc_string, std::string());
       if (!robot_model.initString(robot_desc_string))
       {
-        ROS_ERROR("Couldn't parse the urdf file on /sh_description or on /robot_description.");
+        ROS_ERROR("Couldn't parse the urdf file on sh_description or on robot_description.");
         return;
       }
     }
