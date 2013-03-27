@@ -32,51 +32,6 @@ namespace shadow_robot
 {
   const double SrSelfTest::MAX_MSE_CONST_ = 0.18;
 
-  TestJointMovement::TestJointMovement(std::string joint_name)
-    : mse(0.0), nh_tilde_("~")
-  {
-    joint_name_ = joint_name;
-
-    //subscribes to the mean square error (published by movement pub below)
-    mse_sub_ = nh_tilde_.subscribe("mse_out", 1, &TestJointMovement::mse_cb_, this);
-
-    //initialises the movement publisher
-    std::string img_path;
-    nh_tilde_.getParam("image_path", img_path);
-
-    mvt_from_img_.reset(new shadowrobot::MovementFromImage(img_path) );
-
-    double publish_rate;
-    unsigned int repetition, nb_mvt_step;
-    publish_rate = 10.0;
-    repetition = 1;
-    nb_mvt_step = 1000;
-    std::string controller_type = "sr";
-
-    mvt_pub_.reset(new shadowrobot::MovementPublisher(joint_name, publish_rate, repetition,
-                                                      nb_mvt_step, controller_type));
-    mvt_pub_->add_movement( *mvt_from_img_.get() );
-
-    sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
-                                      &TestJointMovement::state_cb_, this );
-
-    mvt_pub_->start();
-  }
-
-  void TestJointMovement::state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
-  {
-    values[joint_name_ +" position"].push_back(msg->process_value);
-    values[joint_name_ +" target"].push_back(msg->set_point);
-    values[joint_name_ +" error"].push_back(msg->error);
-  }
-
-  void TestJointMovement::mse_cb_(const std_msgs::Float64::ConstPtr& msg)
-  {
-    mse = msg->data;
-
-    //unsubscribe after receiving the message
-  }
-
   SrSelfTest::SrSelfTest(bool simulated)
     : nh_tilde_("~")
   {

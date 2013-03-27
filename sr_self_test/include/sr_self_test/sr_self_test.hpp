@@ -32,44 +32,14 @@
 #include "sr_self_test/sr_test_runner.hpp"
 
 #include <boost/thread.hpp>
-#include <sr_movements/movement_from_image.hpp>
-#include <sr_movements/movement_publisher.hpp>
-#include <ros/ros.h>
-#include <std_msgs/Float64.h>
-#include <sr_robot_msgs/JointControllerState.h>
+#include <sr_robot_msgs/joint.h>
 #include <sr_hand/hand_commander.hpp>
+#include <ros/ros.h>
+
+#include "sr_self_test/test_joint_movement.hpp"
 
 namespace shadow_robot
 {
-  class TestJointMovement
-  {
-  public:
-    TestJointMovement(std::string joint_name);
-    ~TestJointMovement() {};
-
-    double mse;
-    std::map<std::string, std::vector<double> > values;
-
-  private:
-    ros::Subscriber sub_;
-    ros::Publisher pub_;
-
-    ros::Subscriber sub_state_;
-    void state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
-
-    ros::Subscriber mse_sub_;
-    void mse_cb_(const std_msgs::Float64::ConstPtr& msg);
-
-    boost::shared_ptr<shadowrobot::MovementFromImage> mvt_from_img_;
-    boost::shared_ptr<shadowrobot::MovementPublisher> mvt_pub_;
-
-    ros::NodeHandle nh_tilde_;
-
-    boost::shared_ptr<boost::thread> thread_;
-
-    std::string joint_name_;
-  };
-
   class SrSelfTest {
   public:
     SrSelfTest(bool simulated);
