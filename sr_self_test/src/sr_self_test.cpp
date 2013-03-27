@@ -67,6 +67,22 @@ namespace shadow_robot
                                                   true );
   }
 
+  void SrSelfTest::test_services_()
+  {
+    std::vector<std::string> services_to_test;
+    services_to_test.push_back("pr2_controller_manager/list_controller_types");
+    services_to_test.push_back("pr2_controller_manager/list_controllers");
+    services_to_test.push_back("pr2_controller_manager/load_controller");
+    services_to_test.push_back("pr2_controller_manager/reload_controller_libraries");
+    services_to_test.push_back("pr2_controller_manager/switch_controller");
+    services_to_test.push_back("pr2_controller_manager/unload_controller");
+
+    test_runner_.addServicesTest(services_to_test);
+  }
+
+  ///////
+  // TESTING MOVEMENTS
+
   void SrSelfTest::add_all_movements_tests_(const ros::TimerEvent& event)
   {
     if( hand_commander_ == NULL )
@@ -245,19 +261,6 @@ namespace shadow_robot
     safe_target.joint_name = "THJ5";
     safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
-  }
-
-  void SrSelfTest::test_services_()
-  {
-    std::vector<std::string> services_to_test;
-    services_to_test.push_back("pr2_controller_manager/list_controller_types");
-    services_to_test.push_back("pr2_controller_manager/list_controllers");
-    services_to_test.push_back("pr2_controller_manager/load_controller");
-    services_to_test.push_back("pr2_controller_manager/reload_controller_libraries");
-    services_to_test.push_back("pr2_controller_manager/switch_controller");
-    services_to_test.push_back("pr2_controller_manager/unload_controller");
-
-    test_runner_.addServicesTest(services_to_test);
   }
 }  // namespace shadow_robot
 
