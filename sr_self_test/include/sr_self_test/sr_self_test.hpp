@@ -37,6 +37,7 @@
 #include <ros/ros.h>
 
 #include "sr_self_test/test_joint_movement.hpp"
+#include "sr_self_test/diagnostic_parser.hpp"
 
 namespace shadow_robot
 {
@@ -105,6 +106,15 @@ namespace shadow_robot
     static const double MAX_MSE_CONST_;
     ///Where the plots of the movements are stored
     std::string path_to_plots_;
+
+
+    ///////
+    // PARSING DIAGNOSTICS
+
+    ///Class used for parsing the diagnostics
+    boost::shared_ptr<DiagnosticParser> diagnostic_parser_;
+    ///Adding a test which parses diagnostics for jitter, dropped messages, etc...
+    void add_diagnostic_parser_();
   };
 }
 

@@ -65,6 +65,10 @@ namespace shadow_robot
     test_movement_timer_ = nh_tilde_.createTimer( ros::Duration(30.0),
                                                   &SrSelfTest::add_all_movements_tests_, this,
                                                   true );
+
+    //diagnostics are only present for the real hand.
+    if( !simulated )
+      add_diagnostic_parser_();
   }
 
   void SrSelfTest::test_services_()
@@ -262,6 +266,18 @@ namespace shadow_robot
     safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
   }
+
+
+  ///////
+  // PARSING DIAGNOSTICS
+
+  void SrSelfTest::add_diagnostic_parser_()
+  {
+    diagnostic_parser_.reset( new DiagnosticParser() );
+
+    test_runner_.add("Parse Diagnostics", diagnostic_parser_.get(), &DiagnosticParser::parse_diagnostics);
+  }
+
 }  // namespace shadow_robot
 
 
