@@ -37,6 +37,7 @@
 namespace shadow_robot
 {
   typedef boost::variant<int, double> DiagValues;
+  typedef std::map<std::string, DiagValues> DiagMap;
 
   class VariantParser
     : public boost::static_visitor<void>
@@ -52,7 +53,7 @@ namespace shadow_robot
       values_it->second = ::atof(new_value.c_str() );
     }
 
-    std::map<std::string, DiagValues>::iterator values_it;
+    DiagMap::iterator values_it;
     std::string new_value;
   };
 
@@ -70,7 +71,7 @@ namespace shadow_robot
     {
       for( size_t values_i = 0; values_i < values.size(); ++values_i )
       {
-        std::map<std::string, DiagValues>::iterator values_it;
+        DiagMap::iterator values_it;
         values_it = values_->begin();
         for(values_it = values_->begin(); values_it != values_->end(); ++values_it)
         {
@@ -90,7 +91,7 @@ namespace shadow_robot
       std::stringstream ss;
       ss << "Diagnostics["<< name <<"]:";
 
-      std::map<std::string, DiagValues>::iterator values_it;
+      DiagMap::iterator values_it;
 
       for(values_it = values_->begin(); values_it != values_->end(); ++values_it)
       {
@@ -103,7 +104,7 @@ namespace shadow_robot
     std::string name;
 
   protected:
-    boost::shared_ptr< std::map<std::string, DiagValues> > values_;
+    boost::shared_ptr< DiagMap > values_;
   };
 
   class RTLoopDiagnostics
@@ -113,7 +114,7 @@ namespace shadow_robot
     RTLoopDiagnostics(std::string name)
       : BaseDiagnostics(name)
     {
-      values_.reset(new std::map<std::string, DiagValues>() );
+      values_.reset(new DiagMap() );
       values_->insert( std::pair<std::string, DiagValues>("Avg Loop Jitter (us)", 0.0) ); //jitter is a double
       values_->insert( std::pair<std::string, DiagValues>("Control Loop Overruns", 0) ); //control loop overruns is int
     }
