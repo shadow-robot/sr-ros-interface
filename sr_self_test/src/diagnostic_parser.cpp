@@ -29,10 +29,37 @@
 namespace shadow_robot
 {
   DiagnosticParser::DiagnosticParser()
-  {}
+  {
+    diagnostics_.push_back( new RTLoopDiagnostics("Realtime Control Loop"));
+
+    diag_sub_ = nh_.subscribe("diagnostics_agg", 1, &DiagnosticParser::diagnostics_agg_cb_, this);
+  }
 
   void DiagnosticParser::parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status)
-  {}
+  {
+    //wait for a bit to make sure we've received the diag messages
+    for(size_t i=0; i<50; ++i)
+    {
+      ros::Duration(0.1).sleep();
+      ros::spinOnce();
+    }
+
+    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Diagnostic parser: " + diagnostics_[0].to_string() );
+  }
+
+  void DiagnosticParser::diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
+  {
+    for( size_t status_i = 0; status_i < msg->status.size(); ++status_i )
+    {
+      for( size_t diag_i = 0; diag_i < diagnostics_.size() ; ++diag_i )
+      {
+        if( msg->status[status_i].name.find(diagnostics_[diag_i].name) != std::string::npos )
+        {
+          diagnostics_[diag_i].parse_diagnostics(msg->status[status_i].values);
+        }
+      }
+    }
+  }
 }
 
 /* For the emacs weenies in the crowd.
