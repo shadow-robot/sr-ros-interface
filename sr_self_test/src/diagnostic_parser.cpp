@@ -37,14 +37,27 @@ namespace shadow_robot
 
   void DiagnosticParser::parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    //wait for a bit to make sure we've received the diag messages
     for(size_t i=0; i<50; ++i)
-    {
-      ros::Duration(0.1).sleep();
+    {      ros::Duration(0.1).sleep();
       ros::spinOnce();
     }
 
-    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Diagnostic parser: " + diagnostics_[0].to_string() );
+    std::pair<bool, std::string> res;
+    bool ok = true;
+    std::string full_parse_res = "Diagnostic parser: ";
+
+    for(size_t i = 0; i < diagnostics_.size(); ++i)
+    {
+      res = diagnostics_[i].to_string();
+      if( !res.first )
+        ok = false;
+      full_parse_res += res.second + " | ";
+    }
+
+    if(ok)
+      status.summary( diagnostic_msgs::DiagnosticStatus::OK, full_parse_res );
+    else
+      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR, full_parse_res );
   }
 
   void DiagnosticParser::diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)

@@ -37,7 +37,7 @@
 namespace shadow_robot
 {
   typedef boost::variant<int, double> DiagValues;
-  typedef std::map<std::string, DiagValues> DiagMap;
+  typedef std::map<std::string, std::vector<DiagValues> > DiagMap;
 
   class VariantParser
     : public boost::static_visitor<void>
@@ -45,16 +45,41 @@ namespace shadow_robot
   public:
     void operator()(int int_val) const
     {
-      values_it->second = ::atoi( new_value.c_str() );
+      values_it->second[0] = ::atoi( new_value.c_str() );
     }
 
     void operator()(double double_val) const
     {
-      values_it->second = ::atof(new_value.c_str() );
+      values_it->second[0] = ::atof(new_value.c_str() );
     }
 
     DiagMap::iterator values_it;
     std::string new_value;
+  };
+
+  class VariantGreaterThan
+    : public boost::static_visitor<bool>
+  {
+  public:
+    bool operator()(const int value1, const int value2) const
+    {
+      return value1 > value2;
+    }
+
+    bool operator()(const double value1, const double value2) const
+    {
+      return value1 > value2;
+    }
+
+    bool operator()(const double value1, const int value2) const
+    {
+      return value1 > value2;
+    }
+
+    bool operator()(const int value1, const double value2) const
+    {
+      return value1 > value2;
+    }
   };
 
   class BaseDiagnostics
@@ -80,25 +105,43 @@ namespace shadow_robot
             VariantParser parser;
             parser.new_value = values[values_i].value;
             parser.values_it = values_it;
-            boost::apply_visitor( parser, values_it->second);
+            boost::apply_visitor( parser, values_it->second[0]);
           }
         }
       }
     }
 
-    virtual std::string to_string()
+    virtual std::pair<bool, std::string> to_string()
     {
       std::stringstream ss;
-      ss << "Diagnostics["<< name <<"]:";
+      bool ok = true;
+
+      ss << "Diagnostics[" << name << "]:";
 
       DiagMap::iterator values_it;
-
+      VariantGreaterThan greater_than;
       for(values_it = values_->begin(); values_it != values_->end(); ++values_it)
       {
-        ss <<" " << values_it->first << "=" << values_it->second;
+        //is value > min?
+        bool min_comp = boost::apply_visitor(greater_than, values_it->second[0], values_it->second[1]);
+        //is value > max?
+        bool max_comp = boost::apply_visitor(greater_than, values_it->second[0], values_it->second[2]);
+
+        // value is in the [min;max] interval
+        if( min_comp && (!max_comp) )
+        {
+          ss <<" OK(";
+        }
+        else
+        {
+          ok = false;
+          ss <<" ERROR(";
+        }
+
+        ss << values_it->first << "=" << values_it->second[0] <<")";
       }
 
-      return ss.str();
+      return std::pair<bool, std::string>(ok, ss.str());
     }
 
     std::string name;
@@ -115,8 +158,16 @@ namespace shadow_robot
       : BaseDiagnostics(name)
     {
       values_.reset(new DiagMap() );
-      values_->insert( std::pair<std::string, DiagValues>("Avg Loop Jitter (us)", 0.0) ); //jitter is a double
-      values_->insert( std::pair<std::string, DiagValues>("Control Loop Overruns", 0) ); //control loop overruns is int
+      std::vector<DiagValues> jitter(3);
+      jitter[0] = 0.0; //current value
+      jitter[1] = 0.0; //min
+      jitter[2] = 100.0; //max
+      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Avg Loop Jitter (us)", jitter) );
+      std::vector<DiagValues> ctrl_overrun(3);
+      ctrl_overrun[0] = 0; //current value
+      ctrl_overrun[1] = 0; //min
+      ctrl_overrun[2] = 500; //max (not sure it makes sense, we should check the rate at which it goes up)
+      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Control Loop Overruns", ctrl_overrun) );
     }
 
     ~RTLoopDiagnostics()
