@@ -72,7 +72,7 @@ namespace shadow_robot
       {
         if( msg->status[status_i].name.find(diagnostics_[diag_i].name) != std::string::npos )
         {
-          diagnostics_[diag_i].parse_diagnostics(msg->status[status_i].values);
+          diagnostics_[diag_i].parse_diagnostics(msg->status[status_i].values, msg->status[status_i].level);
         }
       }
     }

@@ -29,6 +29,7 @@
 
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
+#include <diagnostic_msgs/DiagnosticStatus.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/variant.hpp>
 #include <sstream>
@@ -92,7 +93,8 @@ namespace shadow_robot
     ~BaseDiagnostics()
     {}
 
-    virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values) = 0;
+    virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values,
+                                   short level) = 0;
 
     virtual std::pair<bool, std::string> to_string() = 0;
 
@@ -110,7 +112,8 @@ namespace shadow_robot
     ~MinMaxDiagnostics()
     {};
 
-    virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values)
+    virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values,
+                                   short level)
     {
       for( size_t values_i = 0; values_i < values.size(); ++values_i )
       {
@@ -220,17 +223,38 @@ namespace shadow_robot
     ~IsOKDiagnostics()
     {};
 
-    virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values)
+    virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values,
+                                   short level)
     {
-      ROS_ERROR("TODO");
+      level_ = level;
     };
 
     virtual std::pair<bool, std::string> to_string()
     {
-      std::pair<bool, std::string> result;
-      ROS_ERROR("TODO");
-      return result;
+      std::stringstream ss;
+      bool ok = true;
+
+      ss << "Diagnostics[" << name << "]:";
+
+      if( level_ == diagnostic_msgs::DiagnosticStatus::ERROR )
+      {
+        ok = false;
+        ss << " status = ERROR";
+      }
+      else if( level_ == diagnostic_msgs::DiagnosticStatus::WARN )
+      {
+        ss << " status = WARN";
+      }
+      else
+      {
+        ss << " status = OK";
+      }
+
+      return std::pair<bool, std::string>(ok, ss.str());
     };
+
+  protected:
+    short level_;
   };
 
   class DiagnosticParser
