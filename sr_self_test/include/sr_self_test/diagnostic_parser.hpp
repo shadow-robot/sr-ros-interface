@@ -92,6 +92,24 @@ namespace shadow_robot
     ~BaseDiagnostics()
     {}
 
+    virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values) = 0;
+
+    virtual std::pair<bool, std::string> to_string() = 0;
+
+    std::string name;
+  };
+
+  class MinMaxDiagnostics
+    : public BaseDiagnostics
+  {
+  public:
+    MinMaxDiagnostics(std::string name)
+      : BaseDiagnostics(name)
+    {};
+
+    ~MinMaxDiagnostics()
+    {};
+
     virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values)
     {
       for( size_t values_i = 0; values_i < values.size(); ++values_i )
@@ -144,18 +162,16 @@ namespace shadow_robot
       return std::pair<bool, std::string>(ok, ss.str());
     }
 
-    std::string name;
-
   protected:
     boost::shared_ptr< DiagMap > values_;
   };
 
   class RTLoopDiagnostics
-    : public BaseDiagnostics
+    : public MinMaxDiagnostics
   {
   public:
     RTLoopDiagnostics(std::string name)
-      : BaseDiagnostics(name)
+      : MinMaxDiagnostics(name)
     {
       values_.reset(new DiagMap() );
       std::vector<DiagValues> jitter(3);
@@ -171,6 +187,50 @@ namespace shadow_robot
   private:
     double avg_jitter;
     int control_loop_overruns;
+  };
+
+  class EtherCATMasterDiagnostics
+    : public MinMaxDiagnostics
+  {
+  public:
+    EtherCATMasterDiagnostics(std::string name)
+      : MinMaxDiagnostics(name)
+    {
+      values_.reset(new DiagMap() );
+      std::vector<DiagValues> dropped_packet(3);
+      dropped_packet[0] = 0; //current value
+      dropped_packet[1] = 0; //min
+      dropped_packet[2] = 200; //max (TODO: this should be a ratio dropped/sent packets??)
+      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Dropped Packets", dropped_packet) );
+    }
+
+    ~EtherCATMasterDiagnostics()
+    {};
+  };
+
+  class IsOKDiagnostics
+    : public BaseDiagnostics
+  {
+  public:
+    IsOKDiagnostics(std::string name)
+      : BaseDiagnostics(name)
+    {
+    };
+
+    ~IsOKDiagnostics()
+    {};
+
+    virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values)
+    {
+      ROS_ERROR("TODO");
+    };
+
+    virtual std::pair<bool, std::string> to_string()
+    {
+      std::pair<bool, std::string> result;
+      ROS_ERROR("TODO");
+      return result;
+    };
   };
 
   class DiagnosticParser
