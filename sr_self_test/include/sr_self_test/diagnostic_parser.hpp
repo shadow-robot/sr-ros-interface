@@ -163,11 +163,6 @@ namespace shadow_robot
       jitter[1] = 0.0; //min
       jitter[2] = 100.0; //max
       values_->insert( std::pair<std::string, std::vector<DiagValues> >("Avg Loop Jitter (us)", jitter) );
-      std::vector<DiagValues> ctrl_overrun(3);
-      ctrl_overrun[0] = 0; //current value
-      ctrl_overrun[1] = 0; //min
-      ctrl_overrun[2] = 500; //max (not sure it makes sense, we should check the rate at which it goes up)
-      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Control Loop Overruns", ctrl_overrun) );
     }
 
     ~RTLoopDiagnostics()

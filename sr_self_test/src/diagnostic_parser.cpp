@@ -38,7 +38,8 @@ namespace shadow_robot
   void DiagnosticParser::parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
     for(size_t i=0; i<50; ++i)
-    {      ros::Duration(0.1).sleep();
+    {
+      ros::Duration(0.1).sleep();
       ros::spinOnce();
     }
 
