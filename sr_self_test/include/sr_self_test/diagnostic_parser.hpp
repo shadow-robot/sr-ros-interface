@@ -143,7 +143,7 @@ namespace shadow_robot
       std::stringstream ss;
       bool ok = true;
 
-      ss << "Diagnostics[" << name << "]:";
+      ss << "\nDiagnostics[" << name << "]:";
 
       DiagMap::iterator values_it;
       VariantGreaterThan greater_than;
@@ -189,7 +189,7 @@ namespace shadow_robot
       : MinMaxDiagnostics(name)
     {
       values_.reset(new DiagMap() );
-      std::vector<DiagValues> jitter(3);
+      std::vector<DiagValues> jitter(4);
       jitter[0] = 0.0; //current value
       jitter[1] = 0.0; //min
       jitter[2] = 100.0; //max
@@ -247,7 +247,7 @@ namespace shadow_robot
       voltage[0] = 0.0; //current value
       voltage[1] = 23.9; //min
       voltage[2] = 24.1; //max
-      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Measured Current", voltage) );
+      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Measured Voltage", voltage) );
     }
 
     ~MotorDiagnostics()
@@ -334,7 +334,9 @@ namespace shadow_robot
     void diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg);
 
     boost::ptr_vector<BaseDiagnostics> diagnostics_;
-    boost::ptr_map<std::string, BaseDiagnostics> all_diagnostics_;
+
+    typedef boost::ptr_map<std::string, BaseDiagnostics> DiagnosticsMap;
+    DiagnosticsMap all_diagnostics_;
   };
 }
 

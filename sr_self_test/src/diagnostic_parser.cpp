@@ -25,6 +25,7 @@
  */
 
 #include "sr_self_test/diagnostic_parser.hpp"
+#include <boost/foreach.hpp>
 
 namespace shadow_robot
 {
@@ -51,9 +52,9 @@ namespace shadow_robot
     bool ok = true;
     std::string full_parse_res = "Diagnostic parser: ";
 
-    for(size_t i = 0; i < diagnostics_.size(); ++i)
+    BOOST_FOREACH(DiagnosticsMap::value_type diag, all_diagnostics_)
     {
-      res = diagnostics_[i].to_string();
+      res = diag.second->to_string();
       if( !res.first )
         ok = false;
       full_parse_res += res.second + " | ";
@@ -73,12 +74,22 @@ namespace shadow_robot
       {
         if( msg->status[status_i].name.find(diagnostics_[diag_i].name) != std::string::npos )
         {
-          all_diagnostics_.insert( diagnostics_[diag_i].name,
-                                   diagnostics_[diag_i].shallow_clone(msg->status[status_i].name) );
+          std::string full_name = msg->status[status_i].name;
+          DiagnosticsMap::iterator it;
+          it = all_diagnostics_.find(full_name);
 
-          diagnostics_[diag_i].parse_diagnostics(msg->status[status_i].values,
-                                                 msg->status[status_i].level,
-                                                 diagnostics_[diag_i].name);
+          //insert a new diag if it doesn't exist already
+          if( it == all_diagnostics_.end() )
+          {
+            all_diagnostics_.insert( full_name,
+                                     diagnostics_[diag_i].shallow_clone(full_name) );
+
+            it = all_diagnostics_.find(full_name);
+          }
+
+          it->second->parse_diagnostics( msg->status[status_i].values,
+                                         msg->status[status_i].level,
+                                         full_name );
         }
       }
     }
