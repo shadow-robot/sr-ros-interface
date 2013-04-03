@@ -39,7 +39,7 @@
 namespace shadow_robot
 {
   typedef boost::variant<int, double> DiagValues;
-  typedef std::map<std::string, std::vector<DiagValues> > DiagMap;
+  typedef std::map<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > > DiagMap;
 
   class VariantParser
     : public boost::static_visitor<void>
@@ -47,12 +47,12 @@ namespace shadow_robot
   public:
     void operator()(int int_val) const
     {
-      values_it->second[0] = ::atoi( new_value.c_str() );
+      values_it->second.first.push_back( ::atoi( new_value.c_str() ) );
     }
 
     void operator()(double double_val) const
     {
-      values_it->second[0] = ::atof(new_value.c_str() );
+      values_it->second.first.push_back( ::atof(new_value.c_str() ) );
     }
 
     DiagMap::iterator values_it;
@@ -132,7 +132,7 @@ namespace shadow_robot
             VariantParser parser;
             parser.new_value = values[values_i].value;
             parser.values_it = values_it;
-            boost::apply_visitor( parser, values_it->second[0]);
+            boost::apply_visitor( parser, values_it->second.second[0]);
           }
         }
       }
@@ -149,23 +149,29 @@ namespace shadow_robot
       VariantGreaterThan greater_than;
       for(values_it = values_->begin(); values_it != values_->end(); ++values_it)
       {
-        //is value > min?
-        bool min_comp = boost::apply_visitor(greater_than, values_it->second[0], values_it->second[1]);
-        //is value > max?
-        bool max_comp = boost::apply_visitor(greater_than, values_it->second[0], values_it->second[2]);
+        //TODO: do this for all received values.
 
-        // value is in the [min;max] interval
-        if( min_comp && (!max_comp) )
+        for(size_t i = 0; i<values_it->second.first.size(); ++i)
         {
-          ss <<" OK(";
-        }
-        else
-        {
-          ok = false;
-          ss <<" ERROR(";
-        }
+          //is value > min?
+          bool min_comp = boost::apply_visitor(greater_than, values_it->second.first[i], values_it->second.second[0]);
+          //is value > max?
+          bool max_comp = boost::apply_visitor(greater_than, values_it->second.first[i], values_it->second.second[1]);
 
-        ss << values_it->first << "=" << values_it->second[0] <<")";
+          // value is in the [min;max] interval
+          if( min_comp && (!max_comp) )
+          {
+            ss <<" OK(";
+          }
+          else
+          {
+            ok = false;
+            ss <<" ERROR(";
+          }
+
+          //TODO: return meaningful value
+          ss << values_it->first << "=" << values_it->second.first[i] <<")";
+        }
       }
 
       return std::pair<bool, std::string>(ok, ss.str());
@@ -189,11 +195,11 @@ namespace shadow_robot
       : MinMaxDiagnostics(name)
     {
       values_.reset(new DiagMap() );
-      std::vector<DiagValues> jitter(4);
-      jitter[0] = 0.0; //current value
-      jitter[1] = 0.0; //min
-      jitter[2] = 100.0; //max
-      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Avg Loop Jitter (us)", jitter) );
+      std::pair<std::vector<DiagValues>, std::vector<DiagValues> > jitter;
+      jitter.second.resize(2);
+      jitter.second[0] = 0.0; //min
+      jitter.second[1] = 100.0; //max
+      values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Avg Loop Jitter (us)", jitter) );
     }
 
     ~RTLoopDiagnostics()
@@ -218,11 +224,11 @@ namespace shadow_robot
       : MinMaxDiagnostics(name)
     {
       values_.reset(new DiagMap() );
-      std::vector<DiagValues> dropped_packet(3);
-      dropped_packet[0] = 0; //current value
-      dropped_packet[1] = 0; //min
-      dropped_packet[2] = 200; //max (TODO: this should be a ratio dropped/sent packets??)
-      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Dropped Packets", dropped_packet) );
+      std::pair<std::vector<DiagValues>, std::vector<DiagValues> > dropped_packet;
+      dropped_packet.second.resize(2);
+      dropped_packet.second[0] = 0; //min
+      dropped_packet.second[1] = 200; //max  (TODO: this should be a ratio dropped/sent packets??)
+      values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Dropped Packets", dropped_packet) );
     }
 
     ~EtherCATMasterDiagnostics()
@@ -243,11 +249,11 @@ namespace shadow_robot
       : MinMaxDiagnostics(name)
     {
       values_.reset(new DiagMap() );
-      std::vector<DiagValues> voltage(3);
-      voltage[0] = 0.0; //current value
-      voltage[1] = 23.9; //min
-      voltage[2] = 24.1; //max
-      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Measured Voltage", voltage) );
+      std::pair<std::vector<DiagValues>, std::vector<DiagValues> > voltage;
+      voltage.second.resize(2);
+      voltage.second[0] = 23.9; //min
+      voltage.second[1] = 24.1; //max
+      values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Measured Voltage", voltage) );
     }
 
     ~MotorDiagnostics()
@@ -266,8 +272,7 @@ namespace shadow_robot
   public:
     IsOKDiagnostics(std::string name)
       : BaseDiagnostics(name)
-    {
-    };
+    {};
 
     ~IsOKDiagnostics()
     {};
