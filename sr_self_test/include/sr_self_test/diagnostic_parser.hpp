@@ -31,6 +31,7 @@
 #include <diagnostic_msgs/DiagnosticArray.h>
 #include <diagnostic_msgs/DiagnosticStatus.h>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/variant.hpp>
 #include <sstream>
 #include <ros/ros.h>
@@ -94,11 +95,14 @@ namespace shadow_robot
     {}
 
     virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values,
-                                   short level) = 0;
+                                   short level, std::string full_name) = 0;
 
     virtual std::pair<bool, std::string> to_string() = 0;
 
+    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name) = 0;
+
     std::string name;
+    std::string full_name;
   };
 
   class MinMaxDiagnostics
@@ -113,8 +117,10 @@ namespace shadow_robot
     {};
 
     virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values,
-                                   short level)
+                                   short level, std::string full_name)
     {
+      this->full_name = full_name;
+
       for( size_t values_i = 0; values_i < values.size(); ++values_i )
       {
         DiagMap::iterator values_it;
@@ -165,6 +171,12 @@ namespace shadow_robot
       return std::pair<bool, std::string>(ok, ss.str());
     }
 
+    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
+    {
+      std::auto_ptr<BaseDiagnostics> tmp( new MinMaxDiagnostics(name) );
+      return tmp;
+    };
+
   protected:
     boost::shared_ptr< DiagMap > values_;
   };
@@ -186,6 +198,12 @@ namespace shadow_robot
 
     ~RTLoopDiagnostics()
     {}
+
+    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
+    {
+      std::auto_ptr<BaseDiagnostics> tmp( new RTLoopDiagnostics(name) );
+      return tmp;
+    };
 
   private:
     double avg_jitter;
@@ -209,6 +227,37 @@ namespace shadow_robot
 
     ~EtherCATMasterDiagnostics()
     {};
+
+    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
+    {
+      std::auto_ptr<BaseDiagnostics> tmp( new EtherCATMasterDiagnostics(name) );
+      return tmp;
+    };
+  };
+
+  class MotorDiagnostics
+    : public MinMaxDiagnostics
+  {
+  public:
+    MotorDiagnostics(std::string name)
+      : MinMaxDiagnostics(name)
+    {
+      values_.reset(new DiagMap() );
+      std::vector<DiagValues> voltage(3);
+      voltage[0] = 0.0; //current value
+      voltage[1] = 23.9; //min
+      voltage[2] = 24.1; //max
+      values_->insert( std::pair<std::string, std::vector<DiagValues> >("Measured Current", voltage) );
+    }
+
+    ~MotorDiagnostics()
+    {};
+
+    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
+    {
+      std::auto_ptr<BaseDiagnostics> tmp( new MotorDiagnostics(name) );
+      return tmp;
+    };
   };
 
   class IsOKDiagnostics
@@ -224,8 +273,9 @@ namespace shadow_robot
     {};
 
     virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values,
-                                   short level)
+                                   short level, std::string full_name)
     {
+      this->full_name = full_name;
       level_ = level;
     };
 
@@ -234,7 +284,7 @@ namespace shadow_robot
       std::stringstream ss;
       bool ok = true;
 
-      ss << "Diagnostics[" << name << "]:";
+      ss << "Diagnostics[" << full_name << "]:";
 
       if( level_ == diagnostic_msgs::DiagnosticStatus::ERROR )
       {
@@ -251,6 +301,12 @@ namespace shadow_robot
       }
 
       return std::pair<bool, std::string>(ok, ss.str());
+    };
+
+    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
+    {
+      std::auto_ptr<BaseDiagnostics> tmp( new IsOKDiagnostics(name) );
+      return tmp;
     };
 
   protected:
@@ -278,6 +334,7 @@ namespace shadow_robot
     void diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg);
 
     boost::ptr_vector<BaseDiagnostics> diagnostics_;
+    boost::ptr_map<std::string, BaseDiagnostics> all_diagnostics_;
   };
 }
 
