@@ -142,6 +142,7 @@ namespace shadow_robot
     {
       std::stringstream ss;
       bool ok = true;
+      DiagValues out_of_range_value;
 
       ss << "\nDiagnostics[" << name << "]:";
 
@@ -149,8 +150,7 @@ namespace shadow_robot
       VariantGreaterThan greater_than;
       for(values_it = values_->begin(); values_it != values_->end(); ++values_it)
       {
-        //TODO: do this for all received values.
-
+        //We're checking all values. If one is out of the specified range -> test fails
         for(size_t i = 0; i<values_it->second.first.size(); ++i)
         {
           //is value > min?
@@ -160,18 +160,24 @@ namespace shadow_robot
 
           // value is in the [min;max] interval
           if( min_comp && (!max_comp) )
-          {
-            ss <<" OK(";
-          }
+          { }
           else
           {
             ok = false;
-            ss <<" ERROR(";
+            out_of_range_value = values_it->second.first[i];
           }
-
-          //TODO: return meaningful value
-          ss << values_it->first << "=" << values_it->second.first[i] <<")";
         }
+        if (ok)
+        {
+          ss <<" OK(";
+        }
+        else
+        {
+          ss <<" ERROR(";
+        }
+
+        //we're returning the last value that was out of the range
+        ss << values_it->first << "=" << out_of_range_value <<")";
       }
 
       return std::pair<bool, std::string>(ok, ss.str());
@@ -251,8 +257,8 @@ namespace shadow_robot
       values_.reset(new DiagMap() );
       std::pair<std::vector<DiagValues>, std::vector<DiagValues> > voltage;
       voltage.second.resize(2);
-      voltage.second[0] = 23.9; //min
-      voltage.second[1] = 24.1; //max
+      voltage.second[0] = 23.5; //min
+      voltage.second[1] = 24.5; //max
       values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Measured Voltage", voltage) );
     }
 
