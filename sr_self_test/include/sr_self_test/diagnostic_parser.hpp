@@ -165,6 +165,7 @@ namespace shadow_robot
           {
             ok = false;
             out_of_range_value = values_it->second.first[i];
+            break; //test fails no need to go further
           }
         }
         if (ok)
@@ -176,7 +177,7 @@ namespace shadow_robot
           ss <<" ERROR(";
         }
 
-        //we're returning the last value that was out of the range
+        //we're returning the first value that was out of the range
         ss << values_it->first << "=" << out_of_range_value <<")";
       }
 
