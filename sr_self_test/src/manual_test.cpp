@@ -38,6 +38,8 @@ namespace shadow_robot
 
   void ManualTests::run_manual_tests(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
+    user_input_client_.waitForExistence();
+
     //Run Tactile test
     //TODO: start rxplot for the tactiles
     // ask the user to press the tactiles
@@ -66,7 +68,6 @@ namespace shadow_robot
     {
       status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Calibration test failed: " + calibration_srv.response.message);
     }
-
   }
 } //end namespace
 
