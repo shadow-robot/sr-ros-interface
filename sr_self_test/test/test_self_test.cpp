@@ -54,6 +54,8 @@ public:
 
     self_test_.add("Testing plot - not saving", this, &MyNode::test_plot);
     self_test_.add("Testing plot - saving", this, &MyNode::test_plot_save);
+
+    self_test_.addManualTests();
   }
 
   void test_plot(diagnostic_updater::DiagnosticStatusWrapper& status)

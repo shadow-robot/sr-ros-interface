@@ -120,6 +120,12 @@ namespace shadow_robot
       gnuplot_->send(it->second);
     }
   }
+
+  void SrTestRunner::addManualTests()
+  {
+    manual_tests_.reset(new ManualTests());
+    add("Manual Tests", manual_tests_.get(), &ManualTests::run_manual_tests);
+  }
 } //end namespace
 
 
