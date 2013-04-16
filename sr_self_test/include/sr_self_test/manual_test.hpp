@@ -27,8 +27,6 @@
 #define _MANUAL_TEST_H_
 
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
-#include <sr_robot_msgs/BiotacAll.h>
-#include <sr_robot_msgs/ShadowPST.h>
 
 namespace shadow_robot
 {
@@ -44,12 +42,8 @@ namespace shadow_robot
   private:
     ros::NodeHandle nh_;
 
-    ///ROS subscriber to the PS3 tactile topic
-    ros::Subscriber tactile_ps3_sub_;
-    void tactile_ps3_cb_(sr_robot_msgs::BiotacAllConstPtr& msg);
-    ///ROS subscriber to the PST tactile topic
-    ros::Subscriber tactile_pst_sub_;
-    void tactile_pst_cb_(sr_robot_msgs::ShadowPSTConstPtr& msg);
+    ///Service client for getting the user input
+    ros::ServiceClient user_input_client_;
   };
 } //end namespace
 

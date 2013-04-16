@@ -26,25 +26,48 @@
 #include "sr_self_test/manual_test.hpp"
 #include <diagnostic_msgs/DiagnosticStatus.h>
 
+#include <sr_robot_msgs/ManualSelfTest.h>
+
 namespace shadow_robot
 {
   ManualTests::ManualTests()
+    : nh_("~")
   {
-    //Subscribes to tactiles
-    ros::Subscriber tactile_ps3_sub_;
-    ros::Subscriber tactile_pst_sub_;
+    user_input_client_ = nh_.serviceClient<sr_robot_msgs::ManualSelfTest>("manual_self_tests");
   }
 
   void ManualTests::run_manual_tests(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Implement test");
+    //Run Tactile test
+    //TODO: start rxplot for the tactiles
+    // ask the user to press the tactiles
+    sr_robot_msgs::ManualSelfTest tactile_srv;
+    tactile_srv.request.message = "Please press on the tactile sensors one after the other. Check that they react on the displayed plot.";
+    user_input_client_.call(tactile_srv);
+
+    //Run Calibration test
+    //TODO: start rviz
+    // ask the user to check the calibration visually
+    sr_robot_msgs::ManualSelfTest calibration_srv;
+    calibration_srv.request.message = "Please check that the positions of the joints in the 3d model of the hand match those in the real hand.";
+    user_input_client_.call(calibration_srv);
+
+    if( tactile_srv.response.ok && calibration_srv.response.ok )
+    {
+      status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Tactile and calibrations are ok.");
+      return;
+    }
+
+    if( !tactile_srv.response.ok )
+    {
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Tactile test failed: " + tactile_srv.response.message);
+    }
+    if( !calibration_srv.response.ok )
+    {
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Calibration test failed: " + calibration_srv.response.message);
+    }
+
   }
-
-  void ManualTests::tactile_ps3_cb_(sr_robot_msgs::BiotacAllConstPtr& msg)
-  {}
-
-  void ManualTests::tactile_pst_cb_(sr_robot_msgs::ShadowPSTConstPtr& msg)
-  {}
 } //end namespace
 
 /* For the emacs weenies in the crowd.
