@@ -65,22 +65,22 @@ namespace shadow_robot
   public:
     bool operator()(const int value1, const int value2) const
     {
-      return value1 > value2;
+      return value1 >= value2;
     }
 
     bool operator()(const double value1, const double value2) const
     {
-      return value1 > value2;
+      return value1 >= value2;
     }
 
     bool operator()(const double value1, const int value2) const
     {
-      return value1 > value2;
+      return value1 >= value2;
     }
 
     bool operator()(const int value1, const double value2) const
     {
-      return value1 > value2;
+      return value1 >= value2;
     }
   };
 
@@ -261,6 +261,12 @@ namespace shadow_robot
       voltage.second[0] = 23.5; //min
       voltage.second[1] = 24.5; //max
       values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Measured Voltage", voltage) );
+
+      std::pair<std::vector<DiagValues>, std::vector<DiagValues> > temperature;
+      temperature.second.resize(2);
+      temperature.second[0] = 20.0; //min
+      temperature.second[1] = 50.0; //max
+      values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Temperature", temperature) );
     }
 
     ~MotorDiagnostics()
