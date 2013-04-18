@@ -105,6 +105,12 @@ namespace shadow_robot
     static const double MAX_MSE_CONST_;
     ///Where the plots of the movements are stored
     std::string path_to_plots_;
+
+
+    ///////
+    // PARSING DIAGNOSTICS
+
+    void parse_diagnostics_();
   };
 }
 

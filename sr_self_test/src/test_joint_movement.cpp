@@ -1,5 +1,5 @@
 /**
- * @file   test_joint_movement.hpp
+ * @file   test_joint_movement.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Wed Mar 27 05:47:00 2013
  *

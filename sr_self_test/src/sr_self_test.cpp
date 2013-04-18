@@ -262,6 +262,15 @@ namespace shadow_robot
     safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
   }
+
+
+  ///////
+  // PARSING DIAGNOSTICS
+
+  void SrSelfTest::parse_diagnostics_()
+  {
+    test_runner_.add_diagnostic_parser();
+  }
 }  // namespace shadow_robot
 
 
