@@ -31,6 +31,8 @@
 #include <self_test/self_test.h>
 #include "sr_self_test/gnuplot-iostream.h"
 
+#include "sr_self_test/sensor_noise_test.hpp"
+
 namespace shadow_robot
 {
 class SrTestRunner : public self_test::TestRunner
@@ -62,6 +64,7 @@ private:
   size_t index_service_to_test_;
 
   boost::shared_ptr<Gnuplot> gnuplot_;
+  boost::shared_ptr<SensorNoiseTest> sensor_noise_test_;
 };
 
 }

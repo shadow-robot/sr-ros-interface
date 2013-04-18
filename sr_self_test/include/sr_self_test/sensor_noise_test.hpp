@@ -27,8 +27,9 @@
 #ifndef _SENSOR_NOISE_TEST_H_
 #define _SENSOR_NOISE_TEST_H_
 
-#include "diagnostic_updater/DiagnosticStatusWrapper.h"
+#include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
+#include "diagnostic_updater/DiagnosticStatusWrapper.h"
 
 namespace shadow_robot
 {
@@ -40,6 +41,12 @@ namespace shadow_robot
     {};
 
     void test_sensor_noise(diagnostic_updater::DiagnosticStatusWrapper& status);
+
+  private:
+    ros::NodeHandle nh_;
+    ros::Subscriber joint_states_sub_;
+
+    void joint_states_cb_(const sensor_msgs::JointState::ConstPtr& msg);
   };
 }
 

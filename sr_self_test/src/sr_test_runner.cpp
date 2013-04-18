@@ -56,7 +56,10 @@ namespace shadow_robot
   };
 
   void SrTestRunner::addSensorNoiseTest()
-  {}
+  {
+    sensor_noise_test_.reset(new SensorNoiseTest());
+    add("Testing sensor noise.", sensor_noise_test_.get(), &SensorNoiseTest::test_sensor_noise);
+  }
 
   void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
