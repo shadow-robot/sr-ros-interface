@@ -56,13 +56,6 @@ public:
     self_test_.add("Testing plot - saving", this, &MyNode::test_plot_save);
 
     self_test_.addSensorNoiseTest();
-
-    ros::Rate rate(100);
-    for (size_t i = 0; i < 200; ++i)
-    {
-      ros::spinOnce();
-      rate.sleep();
-    }
   }
 
   void test_plot(diagnostic_updater::DiagnosticStatusWrapper& status)
