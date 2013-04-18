@@ -41,14 +41,14 @@ namespace shadow_robot
     user_input_client_.waitForExistence();
 
     //Run Tactile test
-    //TODO: start rxplot for the tactiles
+    //The user needs to start rxplot for the tactiles
     // ask the user to press the tactiles
     sr_robot_msgs::ManualSelfTest tactile_srv;
     tactile_srv.request.message = "Please press on the tactile sensors one after the other. Check that they react using rxplot.";
     user_input_client_.call(tactile_srv);
 
     //Run Calibration test
-    //TODO: start rviz
+    //The user needs to start rviz
     // ask the user to check the calibration visually
     sr_robot_msgs::ManualSelfTest calibration_srv;
     calibration_srv.request.message = "Please check that the positions of the joints in the 3d model of the hand (using rviz) match those in the real hand.";
