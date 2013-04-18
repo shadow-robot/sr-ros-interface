@@ -64,22 +64,22 @@ namespace shadow_robot
   public:
     bool operator()(const int value1, const int value2) const
     {
-      return value1 > value2;
+      return value1 >= value2;
     }
 
     bool operator()(const double value1, const double value2) const
     {
-      return value1 > value2;
+      return value1 >= value2;
     }
 
     bool operator()(const double value1, const int value2) const
     {
-      return value1 > value2;
+      return value1 >= value2;
     }
 
     bool operator()(const int value1, const double value2) const
     {
-      return value1 > value2;
+      return value1 >= value2;
     }
   };
 
