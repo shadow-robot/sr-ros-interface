@@ -28,7 +28,7 @@
 #include <ros/ros.h>
 
 #include <diagnostic_msgs/SelfTest.h>
-
+#include <sr_robot_msgs/ManualSelfTest.h>
 
 class MyNode
 {
@@ -37,10 +37,10 @@ public:
   // self_test::TestRunner is the handles sequencing driver self-tests.
   shadow_robot::SrTestRunner self_test_;
 
+  ros::NodeHandle nh_;
+
   // A value showing statefulness of tests
   double some_val;
-
-  ros::NodeHandle nh_;
 
   MyNode() : self_test_()
   {
@@ -54,8 +54,9 @@ public:
 
     self_test_.add("Testing plot - not saving", this, &MyNode::test_plot);
     self_test_.add("Testing plot - saving", this, &MyNode::test_plot_save);
-
     self_test_.add_diagnostic_parser();
+    self_test_.addManualTests();
+    self_test_.addSensorNoiseTest();
   }
 
   void test_plot(diagnostic_updater::DiagnosticStatusWrapper& status)
@@ -104,14 +105,15 @@ public:
   {
     while (nh_.ok())
     {
-      ros::Duration(1).sleep();
+      ros::Duration(0.01).sleep();
 
       self_test_.checkTest();
+
+      ros::spinOnce();
     }
     return true;
   }
 };
-
 
 int main(int argc, char **argv)
 {

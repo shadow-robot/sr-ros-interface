@@ -55,6 +55,12 @@ namespace shadow_robot
     }
   };
 
+  void SrTestRunner::addSensorNoiseTest()
+  {
+    sensor_noise_test_.reset(new SensorNoiseTest());
+    add("Testing sensor noise.", sensor_noise_test_.get(), &SensorNoiseTest::test_sensor_noise);
+  }
+
   void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
     if( ros::service::exists(services_to_test_[index_service_to_test_], false) )
@@ -128,6 +134,11 @@ namespace shadow_robot
     add("Parse Diagnostics", diagnostic_parser_.get(), &DiagnosticParser::parse_diagnostics);
   }
 
+  void SrTestRunner::addManualTests()
+  {
+    manual_tests_.reset(new ManualTests());
+    add("Manual Tests", manual_tests_.get(), &ManualTests::run_manual_tests);
+  }
 } //end namespace
 
 

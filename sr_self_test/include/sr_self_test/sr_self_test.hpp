@@ -106,11 +106,13 @@ namespace shadow_robot
     ///Where the plots of the movements are stored
     std::string path_to_plots_;
 
-
     ///////
     // PARSING DIAGNOSTICS
 
     void parse_diagnostics_();
+
+    ///add manual tests
+    void add_manual_tests_();
   };
 }
 
