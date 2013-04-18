@@ -30,6 +30,7 @@
 
 #include <self_test/self_test.h>
 #include "sr_self_test/gnuplot-iostream.h"
+#include "sr_self_test/diagnostic_parser.hpp"
 
 namespace shadow_robot
 {
@@ -51,6 +52,9 @@ public:
   void plot(std::map<std::string, std::vector<double> > joints, std::string path);
   void plot(std::map<std::string, std::vector<double> > joints, std::string path, bool testing);
 
+  ///Adding a test which parses diagnostics for jitter, dropped messages, etc...
+  void add_diagnostic_parser();
+
 private:
   static const double SERVICE_TIMEOUT_CONST_;
 
@@ -59,6 +63,9 @@ private:
   size_t index_service_to_test_;
 
   boost::shared_ptr<Gnuplot> gnuplot_;
+
+  ///Class used for parsing the diagnostics
+  boost::shared_ptr<DiagnosticParser> diagnostic_parser_;
 };
 
 }
