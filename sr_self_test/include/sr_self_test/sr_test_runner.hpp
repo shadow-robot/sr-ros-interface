@@ -46,6 +46,9 @@ public:
   void addTopicTest(std::string topic_name, double frequency);
   void addServicesTest(std::vector<std::string> services_to_test);
 
+  ///Tests the noise of the pose sensor
+  void addSensorNoiseTest();
+
   void plot(std::map<std::string, std::vector<double> > joints);
   void plot(std::map<std::string, std::vector<double> > joints, bool testing);
   void plot(std::map<std::string, std::vector<double> > joints, std::string path);

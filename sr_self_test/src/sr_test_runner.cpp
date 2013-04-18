@@ -55,6 +55,9 @@ namespace shadow_robot
     }
   };
 
+  void SrTestRunner::addSensorNoiseTest()
+  {}
+
   void SrTestRunner::service_test_cb_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
     if( ros::service::exists(services_to_test_[index_service_to_test_], false) )
