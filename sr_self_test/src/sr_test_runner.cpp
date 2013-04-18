@@ -120,6 +120,14 @@ namespace shadow_robot
       gnuplot_->send(it->second);
     }
   }
+
+  void SrTestRunner::add_diagnostic_parser()
+  {
+    diagnostic_parser_.reset( new DiagnosticParser() );
+
+    add("Parse Diagnostics", diagnostic_parser_.get(), &DiagnosticParser::parse_diagnostics);
+  }
+
 } //end namespace
 
 
