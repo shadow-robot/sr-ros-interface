@@ -11,6 +11,7 @@
   <depend package="roscpp"/>
   <depend package="self_test"/>
   <depend package="sr_movements"/>
+  <depend package="sr_robot_msgs"/>
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsr_self_test"/>
