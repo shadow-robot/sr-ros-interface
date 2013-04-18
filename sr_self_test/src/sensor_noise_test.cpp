@@ -29,7 +29,7 @@
 
 namespace shadow_robot
 {
-  const double SensorNoiseTest::MAX_NOISE_CONST_ = 0.035; //2 degrees
+  const double SensorNoiseTest::MAX_NOISE_CONST_ = 0.0087; //0.5 degrees
 
   SensorNoiseTest::SensorNoiseTest()
   {
@@ -65,7 +65,7 @@ namespace shadow_robot
         }
 
         double noise = max - min;
-        if( noise > MAX_NOISE_CONST_ )
+        if( noise > MAX_NOISE_CONST_ || noise == 0.0 )
         {
           failed_joints.push_back(joint_states->first);
           failed_noises.push_back( noise );
