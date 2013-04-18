@@ -30,6 +30,7 @@
 
 #include <self_test/self_test.h>
 #include "sr_self_test/gnuplot-iostream.h"
+#include "sr_self_test/manual_test.hpp"
 
 namespace shadow_robot
 {
@@ -45,6 +46,8 @@ public:
 
   void addTopicTest(std::string topic_name, double frequency);
   void addServicesTest(std::vector<std::string> services_to_test);
+  ///Those tests require the user input
+  void addManualTests();
 
   void plot(std::map<std::string, std::vector<double> > joints);
   void plot(std::map<std::string, std::vector<double> > joints, bool testing);
@@ -59,6 +62,9 @@ private:
   size_t index_service_to_test_;
 
   boost::shared_ptr<Gnuplot> gnuplot_;
+
+  ///runs manual test (visual calibration check, tactiles...)
+  boost::shared_ptr<ManualTests> manual_tests_;
 };
 
 }

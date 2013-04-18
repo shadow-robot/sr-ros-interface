@@ -26,7 +26,7 @@ include_directories( ${ImageMagick_INCLUDE_DIRS})
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(gnuplot_cpp src/gnuplot.cpp)
-rosbuild_add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp src/test_joint_movement.cpp)
+rosbuild_add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp src/test_joint_movement.cpp src/manual_test.cpp)
 rosbuild_link_boost(sr_self_test system)
 rosbuild_link_boost(sr_self_test iostreams)
 rosbuild_link_boost(sr_self_test filesystem)
