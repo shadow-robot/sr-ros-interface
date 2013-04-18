@@ -56,6 +56,13 @@ namespace shadow_robot
     //add the different tests
     test_services_();
 
+    //some tests can only be run on the real hand
+    if(!simulated)
+    {
+      //add manual tests (tactile, calibration)
+      add_manual_tests_();
+    }
+
     //calling this from a oneshot timer because we're using the
     // hand commander which needs the hand to be fully initialised
     // before we can instantiate it.
@@ -263,7 +270,6 @@ namespace shadow_robot
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
   }
 
-
   ///////
   // PARSING DIAGNOSTICS
 
@@ -271,6 +277,15 @@ namespace shadow_robot
   {
     test_runner_.add_diagnostic_parser();
   }
+
+  //////
+  // Add Manual Tests
+
+  void SrSelfTest::add_manual_tests_()
+  {
+    test_runner_.addManualTests();
+  }
+
 }  // namespace shadow_robot
 
 

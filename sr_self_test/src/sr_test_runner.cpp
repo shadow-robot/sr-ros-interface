@@ -128,6 +128,11 @@ namespace shadow_robot
     add("Parse Diagnostics", diagnostic_parser_.get(), &DiagnosticParser::parse_diagnostics);
   }
 
+  void SrTestRunner::addManualTests()
+  {
+    manual_tests_.reset(new ManualTests());
+    add("Manual Tests", manual_tests_.get(), &ManualTests::run_manual_tests);
+  }
 } //end namespace
 
 
