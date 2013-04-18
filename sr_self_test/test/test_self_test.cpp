@@ -56,6 +56,7 @@ public:
     self_test_.add("Testing plot - saving", this, &MyNode::test_plot_save);
     self_test_.add_diagnostic_parser();
     self_test_.addManualTests();
+    self_test_.addSensorNoiseTest();
   }
 
   void test_plot(diagnostic_updater::DiagnosticStatusWrapper& status)

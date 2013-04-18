@@ -63,6 +63,10 @@ namespace shadow_robot
       add_manual_tests_();
     }
 
+    //test the noise of the sensors
+    if( !simulated_ )
+      test_runner_.addSensorNoiseTest();
+
     //calling this from a oneshot timer because we're using the
     // hand commander which needs the hand to be fully initialised
     // before we can instantiate it.

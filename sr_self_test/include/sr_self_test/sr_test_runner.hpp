@@ -33,6 +33,8 @@
 #include "sr_self_test/diagnostic_parser.hpp"
 #include "sr_self_test/manual_test.hpp"
 
+#include "sr_self_test/sensor_noise_test.hpp"
+
 namespace shadow_robot
 {
 class SrTestRunner : public self_test::TestRunner
@@ -49,6 +51,9 @@ public:
   void addServicesTest(std::vector<std::string> services_to_test);
   ///Those tests require the user input
   void addManualTests();
+
+  ///Tests the noise of the pose sensor
+  void addSensorNoiseTest();
 
   void plot(std::map<std::string, std::vector<double> > joints);
   void plot(std::map<std::string, std::vector<double> > joints, bool testing);
@@ -72,6 +77,8 @@ private:
 
   ///runs manual test (visual calibration check, tactiles...)
   boost::shared_ptr<ManualTests> manual_tests_;
+
+  boost::shared_ptr<SensorNoiseTest> sensor_noise_test_;
 };
 
 }
