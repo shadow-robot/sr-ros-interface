@@ -18,7 +18,10 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @brief
+ * @brief We want to be able to run some tests with the user input (ask the
+ *        user to choose whether the test failed or passed). This can be used
+ *        for example for visually checking the calibration or pressing the
+ *        tactiles manually.
  *
  *
  */

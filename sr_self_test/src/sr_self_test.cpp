@@ -60,12 +60,12 @@ namespace shadow_robot
     if(!simulated)
     {
       //add manual tests (tactile, calibration)
-      add_manual_tests_();
-    }
-
-    //test the noise of the sensors
-    if( !simulated_ )
+      test_runner_.addManualTests();
+      //parses the diagnostics to find common problems
+      test_runner_.add_diagnostic_parser();
+      //test the noise of the sensors
       test_runner_.addSensorNoiseTest();
+    }
 
     //calling this from a oneshot timer because we're using the
     // hand commander which needs the hand to be fully initialised
@@ -272,22 +272,6 @@ namespace shadow_robot
     safe_target.joint_name = "THJ5";
     safe_target.joint_target = 0.0;
     safe_targets_->insert( std::pair<std::string, sr_robot_msgs::joint>(safe_target.joint_name, safe_target) );
-  }
-
-  ///////
-  // PARSING DIAGNOSTICS
-
-  void SrSelfTest::parse_diagnostics_()
-  {
-    test_runner_.add_diagnostic_parser();
-  }
-
-  //////
-  // Add Manual Tests
-
-  void SrSelfTest::add_manual_tests_()
-  {
-    test_runner_.addManualTests();
   }
 
 }  // namespace shadow_robot
