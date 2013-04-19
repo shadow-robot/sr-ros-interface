@@ -42,6 +42,8 @@ namespace shadow_robot
 
   void DiagnosticParser::parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
+    //wait for 5 seconds while we parse the diagnostics.
+    // spin to make sure we get the messages
     for(size_t i=0; i<50; ++i)
     {
       ros::Duration(0.1).sleep();

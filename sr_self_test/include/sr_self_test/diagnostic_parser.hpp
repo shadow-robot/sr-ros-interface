@@ -124,7 +124,6 @@ namespace shadow_robot
       for( size_t values_i = 0; values_i < values.size(); ++values_i )
       {
         DiagMap::iterator values_it;
-        values_it = values_->begin();
         for(values_it = values_->begin(); values_it != values_->end(); ++values_it)
         {
           if( values[values_i].key.compare(values_it->first) == 0 )
