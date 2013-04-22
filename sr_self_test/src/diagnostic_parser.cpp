@@ -25,6 +25,7 @@
  */
 
 #include "sr_self_test/diagnostic_parser.hpp"
+#include "sr_self_test/motor_test.hpp"
 #include <boost/foreach.hpp>
 
 namespace shadow_robot
