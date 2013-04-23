@@ -29,7 +29,7 @@
 #ifndef _MOTOR_TEST_H_
 #define _MOTOR_TEST_H_
 
-#include "sr_self_test/diagnostic_parser.hpp"
+#include "sr_self_test/diagnostics_parser/diagnostics_common.hpp"
 
 namespace shadow_robot
 {
