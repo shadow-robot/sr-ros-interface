@@ -29,6 +29,16 @@
 
 namespace shadow_robot
 {
+  MotorTest::MotorTest(self_test::TestRunner* test_runner)
+    : test_runner_(test_runner)
+  {
+    test_runner_->add("Motor tests", this, &MotorTest::run_test);
+  }
+
+  void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "TODO: implement this");
+  }
 }
 
 /* For the emacs weenies in the crowd.

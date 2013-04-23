@@ -65,6 +65,8 @@ namespace shadow_robot
       test_runner_.add_diagnostic_parser();
       //test the noise of the sensors
       test_runner_.addSensorNoiseTest();
+      //test the motors
+      test_runner_.add_motor_tests();
     }
 
     //calling this from a oneshot timer because we're using the

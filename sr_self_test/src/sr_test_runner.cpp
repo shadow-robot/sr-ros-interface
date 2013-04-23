@@ -137,6 +137,11 @@ namespace shadow_robot
     manual_tests_.reset(new ManualTests());
     add("Manual Tests", manual_tests_.get(), &ManualTests::run_manual_tests);
   }
+
+  void SrTestRunner::add_motor_tests()
+  {
+    motor_test_.reset( new MotorTest(this) );
+  }
 } //end namespace
 
 

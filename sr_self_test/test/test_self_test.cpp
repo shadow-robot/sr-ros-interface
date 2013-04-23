@@ -57,6 +57,7 @@ public:
     self_test_.add_diagnostic_parser();
     self_test_.addManualTests();
     self_test_.addSensorNoiseTest();
+    self_test_.add_motor_tests();
   }
 
   void test_plot(diagnostic_updater::DiagnosticStatusWrapper& status)

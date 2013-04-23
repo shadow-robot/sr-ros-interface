@@ -29,10 +29,21 @@
 #ifndef _MOTOR_TEST_H_
 #define _MOTOR_TEST_H_
 
-#include "sr_self_test/diagnostics_parser/diagnostics_common.hpp"
+#include <self_test/self_test.h>
 
 namespace shadow_robot
 {
+  class MotorTest
+  {
+  public:
+    MotorTest(self_test::TestRunner* test_runner);
+    virtual ~MotorTest() {};
+
+    void run_test(diagnostic_updater::DiagnosticStatusWrapper& status);
+
+  protected:
+    self_test::TestRunner* test_runner_;
+  };
 }
 
   /* For the emacs weenies in the crowd.

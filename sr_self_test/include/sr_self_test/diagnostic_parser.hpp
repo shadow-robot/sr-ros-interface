@@ -48,8 +48,6 @@ namespace shadow_robot
     ~DiagnosticParser()
     {};
 
-    void parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status);
-
   private:
     ros::NodeHandle nh_;
 
