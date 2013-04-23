@@ -29,8 +29,8 @@
 
 namespace shadow_robot
 {
-  MotorDiagnostics::MotorDiagnostics(std::string name)
-    : MinMaxDiagnostics(name)
+  MotorDiagnostics::MotorDiagnostics(std::string name, self_test::TestRunner* test_runner)
+    : MinMaxDiagnostics(name, test_runner)
   {
     values_.reset(new DiagMap() );
     DiagnosticTest voltage;
@@ -47,7 +47,7 @@ namespace shadow_robot
 
   std::auto_ptr<BaseDiagnostics> MotorDiagnostics::shallow_clone(std::string name)
   {
-    std::auto_ptr<BaseDiagnostics> tmp( new MotorDiagnostics(name) );
+    std::auto_ptr<BaseDiagnostics> tmp( new MotorDiagnostics(name, test_runner_) );
     return tmp;
   };
 }
