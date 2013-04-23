@@ -32,11 +32,11 @@ namespace shadow_robot
   DiagnosticParser::DiagnosticParser(self_test::TestRunner* test_runner)
     : test_runner_(test_runner)
   {
-    diagnostics_.push_back( new RTLoopDiagnostics("Realtime Control Loop"));
-    diagnostics_.push_back( new EtherCATMasterDiagnostics("EtherCAT Master"));
-    diagnostics_.push_back( new MotorDiagnostics("SRDMotor"));
-    diagnostics_.push_back( new IsOKDiagnostics("EtherCAT Dual CAN Palm"));
-    diagnostics_.push_back( new IsOKDiagnostics("SRBridge")); //TODO: not sure what's the 00
+    diagnostics_.push_back( new RTLoopDiagnostics("Realtime Control Loop", test_runner_));
+    diagnostics_.push_back( new EtherCATMasterDiagnostics("EtherCAT Master", test_runner_));
+    diagnostics_.push_back( new MotorDiagnostics("SRDMotor", test_runner_));
+    diagnostics_.push_back( new IsOKDiagnostics("EtherCAT Dual CAN Palm", test_runner_));
+    diagnostics_.push_back( new IsOKDiagnostics("SRBridge", test_runner_)); //TODO: not sure what's the 00
 
     diag_sub_ = nh_.subscribe("diagnostics_agg", 1, &DiagnosticParser::diagnostics_agg_cb_, this);
 
@@ -55,16 +55,8 @@ namespace shadow_robot
 
     BOOST_FOREACH(DiagnosticsMap::value_type diag, all_diagnostics_)
     {
-      current_res_ = diag.second->to_string();
-      test_runner_->add(diag.first, this, &DiagnosticParser::parse_diagnostics);
+      diag.second->add_test();
     }
-  }
-  void DiagnosticParser::parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status)
-  {
-    if( current_res_.first )
-      status.summary( diagnostic_msgs::DiagnosticStatus::OK, current_res_.second );
-    else
-      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR, current_res_.second );
   }
 
   void DiagnosticParser::diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)

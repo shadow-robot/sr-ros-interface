@@ -46,8 +46,8 @@ namespace shadow_robot
     : public MinMaxDiagnostics
   {
   public:
-    RTLoopDiagnostics(std::string name)
-      : MinMaxDiagnostics(name)
+    RTLoopDiagnostics(std::string name, self_test::TestRunner* test_runner)
+      : MinMaxDiagnostics(name, test_runner)
     {
       values_.reset(new DiagMap() );
       DiagnosticTest jitter;
@@ -60,7 +60,7 @@ namespace shadow_robot
 
     virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
     {
-      std::auto_ptr<BaseDiagnostics> tmp( new RTLoopDiagnostics(name) );
+      std::auto_ptr<BaseDiagnostics> tmp( new RTLoopDiagnostics(name, test_runner_) );
       return tmp;
     };
 
@@ -73,8 +73,8 @@ namespace shadow_robot
     : public MinMaxDiagnostics
   {
   public:
-    EtherCATMasterDiagnostics(std::string name)
-      : MinMaxDiagnostics(name)
+    EtherCATMasterDiagnostics(std::string name, self_test::TestRunner* test_runner)
+      : MinMaxDiagnostics(name, test_runner)
     {
       values_.reset(new DiagMap() );
       DiagnosticTest dropped_packet;
@@ -88,7 +88,7 @@ namespace shadow_robot
 
     virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
     {
-      std::auto_ptr<BaseDiagnostics> tmp( new EtherCATMasterDiagnostics(name) );
+      std::auto_ptr<BaseDiagnostics> tmp( new EtherCATMasterDiagnostics(name, test_runner_) );
       return tmp;
     };
   };

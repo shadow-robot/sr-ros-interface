@@ -37,7 +37,7 @@ namespace shadow_robot
     : public MinMaxDiagnostics
   {
   public:
-    MotorDiagnostics(std::string name);
+    MotorDiagnostics(std::string name, self_test::TestRunner* test_runner);
     ~MotorDiagnostics();
 
     virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name);

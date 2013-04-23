@@ -37,6 +37,8 @@
 #include <boost/variant.hpp>
 #include <sstream>
 #include <ros/ros.h>
+#include <self_test/self_test.h>
+
 
 namespace shadow_robot
 {
@@ -109,8 +111,8 @@ namespace shadow_robot
   class BaseDiagnostics
   {
   public:
-    BaseDiagnostics(std::string name)
-      : name(name)
+    BaseDiagnostics(std::string name, self_test::TestRunner* test_runner)
+      : name(name), test_runner_(test_runner)
     {}
 
     ~BaseDiagnostics()
@@ -119,20 +121,37 @@ namespace shadow_robot
     virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values,
                                    short level, std::string full_name) = 0;
 
-    virtual std::pair<bool, std::string> to_string() = 0;
+    virtual void add_test()
+    {
+      test_runner_->add(full_name, this, &BaseDiagnostics::run_test);
+    }
+
+    virtual void run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
+    {
+      std::pair<bool, std::string> res = to_string_();
+      if( res.first )
+        status.summary( diagnostic_msgs::DiagnosticStatus::OK, res.second );
+      else
+        status.summary( diagnostic_msgs::DiagnosticStatus::ERROR, res.second );
+    };
 
     virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name) = 0;
 
     std::string name;
     std::string full_name;
+
+  protected:
+    self_test::TestRunner* test_runner_;
+
+    virtual std::pair<bool, std::string> to_string_() = 0;
   };
 
   class MinMaxDiagnostics
     : public BaseDiagnostics
   {
   public:
-    MinMaxDiagnostics(std::string name)
-      : BaseDiagnostics(name)
+    MinMaxDiagnostics(std::string name, self_test::TestRunner* test_runner)
+      : BaseDiagnostics(name, test_runner)
     {};
 
     ~MinMaxDiagnostics()
@@ -159,7 +178,16 @@ namespace shadow_robot
       }
     }
 
-    virtual std::pair<bool, std::string> to_string()
+    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
+    {
+      std::auto_ptr<BaseDiagnostics> tmp( new MinMaxDiagnostics(name, test_runner_) );
+      return tmp;
+    };
+
+  protected:
+    boost::shared_ptr< DiagMap > values_;
+
+    virtual std::pair<bool, std::string> to_string_()
     {
       std::stringstream ss;
       bool ok = true;
@@ -204,23 +232,14 @@ namespace shadow_robot
 
       return std::pair<bool, std::string>(ok, ss.str());
     }
-
-    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
-    {
-      std::auto_ptr<BaseDiagnostics> tmp( new MinMaxDiagnostics(name) );
-      return tmp;
-    };
-
-  protected:
-    boost::shared_ptr< DiagMap > values_;
   };
 
   class IsOKDiagnostics
     : public BaseDiagnostics
   {
   public:
-    IsOKDiagnostics(std::string name)
-      : BaseDiagnostics(name)
+    IsOKDiagnostics(std::string name, self_test::TestRunner* test_runner)
+      : BaseDiagnostics(name, test_runner)
     {};
 
     ~IsOKDiagnostics()
@@ -233,7 +252,16 @@ namespace shadow_robot
       level_ = level;
     };
 
-    virtual std::pair<bool, std::string> to_string()
+    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
+    {
+      std::auto_ptr<BaseDiagnostics> tmp( new IsOKDiagnostics(name, test_runner_) );
+      return tmp;
+    };
+
+  protected:
+    short level_;
+
+    virtual std::pair<bool, std::string> to_string_()
     {
       std::stringstream ss;
       bool ok = true;
@@ -256,15 +284,6 @@ namespace shadow_robot
 
       return std::pair<bool, std::string>(ok, ss.str());
     };
-
-    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
-    {
-      std::auto_ptr<BaseDiagnostics> tmp( new IsOKDiagnostics(name) );
-      return tmp;
-    };
-
-  protected:
-    short level_;
   };
 }
 
