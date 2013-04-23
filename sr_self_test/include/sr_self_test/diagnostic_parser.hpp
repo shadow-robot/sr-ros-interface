@@ -63,6 +63,12 @@ namespace shadow_robot
 
     ///ROS subscriber to the diagnostics_agg topic
     ros::Subscriber diag_sub_;
+
+    std::pair<bool, std::string> current_res_;
+
+    ///Wait for the diagnostics to be received then run all tests on them
+    void run_tests_();
+
     /**
      * Susbscribed to the diagnostics_agg topic.
      * @param msg new incoming msg
