@@ -20,7 +20,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * @brief Run different tests on the motors (parses diagnostics, apply PWM offset
+ * @brief Run different tests on the motors (apply PWM offset
  *        and measure current, test strain gauges, etc.. )
  *
  *
@@ -33,15 +33,6 @@
 
 namespace shadow_robot
 {
-  class MotorDiagnostics
-    : public MinMaxDiagnostics
-  {
-  public:
-    MotorDiagnostics(std::string name, self_test::TestRunner* test_runner);
-    ~MotorDiagnostics();
-
-    virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name);
-  };
 }
 
   /* For the emacs weenies in the crowd.
