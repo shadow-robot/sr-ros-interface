@@ -29,8 +29,10 @@
 
 namespace shadow_robot
 {
-  DiagnosticParser::DiagnosticParser()
+  DiagnosticParser::DiagnosticParser(SrTestRunner* test_runner)
   {
+    test_runner_ = test_runner;
+
     diagnostics_.push_back( new RTLoopDiagnostics("Realtime Control Loop"));
     diagnostics_.push_back( new EtherCATMasterDiagnostics("EtherCAT Master"));
     diagnostics_.push_back( new MotorDiagnostics("SRDMotor"));
@@ -38,6 +40,8 @@ namespace shadow_robot
     diagnostics_.push_back( new IsOKDiagnostics("SRBridge")); //TODO: not sure what's the 00
 
     diag_sub_ = nh_.subscribe("diagnostics_agg", 1, &DiagnosticParser::diagnostics_agg_cb_, this);
+
+    test_runner_->add("Parse Diagnostics", this, &DiagnosticParser::parse_diagnostics);
   }
 
   void DiagnosticParser::parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status)
