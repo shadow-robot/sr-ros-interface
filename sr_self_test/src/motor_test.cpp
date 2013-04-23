@@ -25,7 +25,7 @@
  *
  */
 
-#include "sr_self_test/motor_test.hpp"
+#include "sr_self_test/diagnostics_parser/motor_test.hpp"
 
 namespace shadow_robot
 {
