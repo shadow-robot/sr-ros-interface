@@ -35,21 +35,16 @@
 #include <boost/variant.hpp>
 #include <sstream>
 #include <ros/ros.h>
+#include <self_test/self_test.h>
 
 #include "sr_self_test/diagnostics_parser/diagnostics_specific.hpp"
 
-//circular dependency (solved with 2 forward declarations)
-#include "sr_self_test/sr_test_runner.hpp"
-
 namespace shadow_robot
 {
-  ///forward declaration of the test runner class
-  class SrTestRunner;
-
   class DiagnosticParser
   {
   public:
-    DiagnosticParser(SrTestRunner* test_runner);
+    DiagnosticParser(self_test::TestRunner* test_runner);
     ~DiagnosticParser()
     {};
 
@@ -59,7 +54,7 @@ namespace shadow_robot
     ros::NodeHandle nh_;
 
     ///Pointer to the test runner to be able to add new tests for each parser.
-    SrTestRunner* test_runner_;
+    self_test::TestRunner* test_runner_;
 
     ///ROS subscriber to the diagnostics_agg topic
     ros::Subscriber diag_sub_;

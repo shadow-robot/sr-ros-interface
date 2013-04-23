@@ -29,10 +29,9 @@
 
 namespace shadow_robot
 {
-  DiagnosticParser::DiagnosticParser(SrTestRunner* test_runner)
+  DiagnosticParser::DiagnosticParser(self_test::TestRunner* test_runner)
+    : test_runner_(test_runner)
   {
-    test_runner_ = test_runner;
-
     diagnostics_.push_back( new RTLoopDiagnostics("Realtime Control Loop"));
     diagnostics_.push_back( new EtherCATMasterDiagnostics("EtherCAT Master"));
     diagnostics_.push_back( new MotorDiagnostics("SRDMotor"));
