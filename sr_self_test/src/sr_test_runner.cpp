@@ -129,9 +129,7 @@ namespace shadow_robot
 
   void SrTestRunner::add_diagnostic_parser()
   {
-    diagnostic_parser_.reset( new DiagnosticParser() );
-
-    add("Parse Diagnostics", diagnostic_parser_.get(), &DiagnosticParser::parse_diagnostics);
+    diagnostic_parser_.reset( new DiagnosticParser(this) );
   }
 
   void SrTestRunner::addManualTests()

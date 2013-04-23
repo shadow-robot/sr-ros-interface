@@ -29,8 +29,10 @@
 
 namespace shadow_robot
 {
-  DiagnosticParser::DiagnosticParser()
+  DiagnosticParser::DiagnosticParser(SrTestRunner* test_runner)
   {
+    test_runner_ = test_runner;
+
     diagnostics_.push_back( new RTLoopDiagnostics("Realtime Control Loop"));
     diagnostics_.push_back( new EtherCATMasterDiagnostics("EtherCAT Master"));
     diagnostics_.push_back( new MotorDiagnostics("SRDMotor"));
@@ -38,9 +40,11 @@ namespace shadow_robot
     diagnostics_.push_back( new IsOKDiagnostics("SRBridge")); //TODO: not sure what's the 00
 
     diag_sub_ = nh_.subscribe("diagnostics_agg", 1, &DiagnosticParser::diagnostics_agg_cb_, this);
+
+    run_tests_();
   }
 
-  void DiagnosticParser::parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status)
+  void DiagnosticParser::run_tests_()
   {
     //wait for 5 seconds while we parse the diagnostics.
     // spin to make sure we get the messages
@@ -50,22 +54,18 @@ namespace shadow_robot
       ros::spinOnce();
     }
 
-    std::pair<bool, std::string> res;
-    bool ok = true;
-    std::string full_parse_res = "Diagnostic parser: ";
-
     BOOST_FOREACH(DiagnosticsMap::value_type diag, all_diagnostics_)
     {
-      res = diag.second->to_string();
-      if( !res.first )
-        ok = false;
-      full_parse_res += res.second + " | ";
+      current_res_ = diag.second->to_string();
+      test_runner_->add(diag.first, this, &DiagnosticParser::parse_diagnostics);
     }
-
-    if(ok)
-      status.summary( diagnostic_msgs::DiagnosticStatus::OK, full_parse_res );
+  }
+  void DiagnosticParser::parse_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& status)
+  {
+    if( current_res_.first )
+      status.summary( diagnostic_msgs::DiagnosticStatus::OK, current_res_.second );
     else
-      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR, full_parse_res );
+      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR, current_res_.second );
   }
 
   void DiagnosticParser::diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
