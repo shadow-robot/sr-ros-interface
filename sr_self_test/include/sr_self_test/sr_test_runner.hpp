@@ -30,7 +30,6 @@
 
 #include <self_test/self_test.h>
 #include "sr_self_test/gnuplot-iostream.h"
-//circular dependency (solved with 2 forward declarations)
 #include "sr_self_test/diagnostic_parser.hpp"
 #include "sr_self_test/manual_test.hpp"
 
@@ -38,9 +37,6 @@
 
 namespace shadow_robot
 {
-  ///Forward declaration of the diagnostic parser class
-  class DiagnosticParser;
-
 class SrTestRunner : public self_test::TestRunner
 {
 public:
