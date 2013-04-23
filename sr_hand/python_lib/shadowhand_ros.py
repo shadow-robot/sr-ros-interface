@@ -112,8 +112,8 @@ class ShadowHand_ROS():
         self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasp/grasps.xml")
 
         self.grasp_interpoler = 0
-        self.pub = rospy.Publisher('srh/sendupdate',sendupdate)
-        self.pub_arm = rospy.Publisher('sr_arm/sendupdate',sendupdate)
+        self.pub = rospy.Publisher('srh/sendupdate',sendupdate, latch=True)
+        self.pub_arm = rospy.Publisher('sr_arm/sendupdate',sendupdate, latch=True)
 
         self.sub_arm = rospy.Subscriber('sr_arm/shadowhand_data', joints_data,self.callback_arm)
         self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
@@ -231,7 +231,7 @@ class ShadowHand_ROS():
         Set the library to publish to a new topic
         """
         print 'Changing publisher to ' + topic
-        self.pub = rospy.Publisher(topic,sendupdate)
+        self.pub = rospy.Publisher(topic,sendupdate, latch=True)
 
     def sendupdate_from_dict(self, dicti):
         """
@@ -243,7 +243,7 @@ class ShadowHand_ROS():
             for join in dicti.keys():
                 if not self.eth_publishers.has_key(join):
                     topic = "/sh_"+ join.lower() + self.topic_ending+"/command"
-                    self.eth_publishers[join] = rospy.Publisher(topic, Float64)
+                    self.eth_publishers[join] = rospy.Publisher(topic, Float64, latch=True)
 
                 msg_to_send = Float64()
                 msg_to_send.data = math.radians( float( dicti[join] ) )
@@ -265,7 +265,7 @@ class ShadowHand_ROS():
         if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
             if not self.eth_publishers.has_key(jointName):
                 topic = "/sh_"+ jointName.lower() + self.topic_ending + "/command"
-                self.eth_publishers[jointName] = rospy.Publisher(topic, Float64)
+                self.eth_publishers[jointName] = rospy.Publisher(topic, Float64, latch=True)
 
             msg_to_send = Float64()
             msg_to_send.data = math.radians( float( angle ) )
