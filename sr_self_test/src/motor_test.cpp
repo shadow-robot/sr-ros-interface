@@ -33,17 +33,13 @@ namespace shadow_robot
     : MinMaxDiagnostics(name)
   {
     values_.reset(new DiagMap() );
-    std::pair<std::vector<DiagValues>, std::vector<DiagValues> > voltage;
-    voltage.second.resize(2);
-    voltage.second[0] = 23.5; //min
-    voltage.second[1] = 24.5; //max
-    values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Measured Voltage", voltage) );
+    DiagnosticTest voltage;
+    voltage.min_max = std::make_pair(23.5, 24.5); //min and max acceptable voltage
+    values_->insert( std::pair<std::string, DiagnosticTest>("Measured Voltage", voltage) );
 
-    std::pair<std::vector<DiagValues>, std::vector<DiagValues> > temperature;
-    temperature.second.resize(2);
-    temperature.second[0] = 20.0; //min
-    temperature.second[1] = 50.0; //max
-    values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Temperature", temperature) );
+    DiagnosticTest temperature;
+    temperature.min_max = std::make_pair(20.0, 50.0); //min and max acceptable temperature
+    values_->insert( std::pair<std::string, DiagnosticTest>("Temperature", temperature) );
   }
 
   MotorDiagnostics::~MotorDiagnostics()

@@ -41,26 +41,46 @@
 namespace shadow_robot
 {
   typedef boost::variant<int, double> DiagValues;
-  typedef std::map<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > > DiagMap;
 
+  class DiagnosticTest
+  {
+  public:
+    DiagnosticTest()
+    {};
+    ~DiagnosticTest()
+    {};
+
+    std::vector<DiagValues> received_values;
+    std::pair<DiagValues, DiagValues> min_max;
+  };
+
+  typedef std::map<std::string, DiagnosticTest> DiagMap;
+
+  /**
+   * Adds a new value to the list of received value for a given
+   * test.
+   */
   class VariantParser
     : public boost::static_visitor<void>
   {
   public:
     void operator()(int int_val) const
     {
-      values_it->second.first.push_back( ::atoi( new_value.c_str() ) );
+      values_it->second.received_values.push_back( ::atoi( new_value.c_str() ) );
     }
 
     void operator()(double double_val) const
     {
-      values_it->second.first.push_back( ::atof(new_value.c_str() ) );
+      values_it->second.received_values.push_back( ::atof(new_value.c_str() ) );
     }
 
     DiagMap::iterator values_it;
     std::string new_value;
   };
 
+  /**
+   * Compare to Diagnostic Values
+   */
   class VariantGreaterThan
     : public boost::static_visitor<bool>
   {
@@ -133,7 +153,7 @@ namespace shadow_robot
             VariantParser parser;
             parser.new_value = values[values_i].value;
             parser.values_it = values_it;
-            boost::apply_visitor( parser, values_it->second.second[0]);
+            boost::apply_visitor( parser, values_it->second.min_max.first);
           }
         }
       }
@@ -152,12 +172,12 @@ namespace shadow_robot
       for(values_it = values_->begin(); values_it != values_->end(); ++values_it)
       {
         //We're checking all values. If one is out of the specified range -> test fails
-        for(size_t i = 0; i<values_it->second.first.size(); ++i)
+        for(size_t i = 0; i<values_it->second.received_values.size(); ++i)
         {
           //is value > min?
-          bool min_comp = boost::apply_visitor(greater_than, values_it->second.first[i], values_it->second.second[0]);
+          bool min_comp = boost::apply_visitor(greater_than, values_it->second.received_values[i], values_it->second.min_max.first);
           //is value > max?
-          bool max_comp = boost::apply_visitor(greater_than, values_it->second.first[i], values_it->second.second[1]);
+          bool max_comp = boost::apply_visitor(greater_than, values_it->second.received_values[i], values_it->second.min_max.second);
 
           // value is in the [min;max] interval
           if( min_comp && (!max_comp) )
@@ -165,7 +185,7 @@ namespace shadow_robot
           else
           {
             ok = false;
-            out_of_range_value = values_it->second.first[i];
+            out_of_range_value = values_it->second.received_values[i];
             break; //test fails no need to go further
           }
         }

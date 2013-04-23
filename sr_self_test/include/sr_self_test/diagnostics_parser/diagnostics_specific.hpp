@@ -50,11 +50,9 @@ namespace shadow_robot
       : MinMaxDiagnostics(name)
     {
       values_.reset(new DiagMap() );
-      std::pair<std::vector<DiagValues>, std::vector<DiagValues> > jitter;
-      jitter.second.resize(2);
-      jitter.second[0] = 0.0; //min
-      jitter.second[1] = 100.0; //max
-      values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Avg Loop Jitter (us)", jitter) );
+      DiagnosticTest jitter;
+      jitter.min_max = std::make_pair(0.0, 100.0); //min and max acceptable jitter
+      values_->insert( std::pair<std::string, DiagnosticTest>("Avg Loop Jitter (us)", jitter) );
     }
 
     ~RTLoopDiagnostics()
@@ -79,11 +77,10 @@ namespace shadow_robot
       : MinMaxDiagnostics(name)
     {
       values_.reset(new DiagMap() );
-      std::pair<std::vector<DiagValues>, std::vector<DiagValues> > dropped_packet;
-      dropped_packet.second.resize(2);
-      dropped_packet.second[0] = 0; //min
-      dropped_packet.second[1] = 200; //max  (TODO: this should be a ratio dropped/sent packets??)
-      values_->insert( std::pair<std::string, std::pair<std::vector<DiagValues>, std::vector<DiagValues> > >("Dropped Packets", dropped_packet) );
+      DiagnosticTest dropped_packet;
+      dropped_packet.min_max = std::make_pair(0, 200); //min and max acceptable dropped packets
+      //max  (TODO: this should be a ratio dropped/sent packets??)
+      values_->insert( std::pair<std::string, DiagnosticTest>("Dropped Packets", dropped_packet) );
     }
 
     ~EtherCATMasterDiagnostics()
