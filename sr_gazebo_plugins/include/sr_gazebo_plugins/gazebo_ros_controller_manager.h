@@ -63,11 +63,11 @@ public:
   virtual ~GazeboRosControllerManager();
   void Load( physics::ModelPtr _parent, sdf::ElementPtr _sdf );
 
-  shadow_robot::SrSelfTest self_test;
 protected:
   // Inherited from gazebo::Controller
   virtual void UpdateChild();
 
+  boost::shared_ptr<shadow_robot::SrSelfTest> self_test_;
 private:
 
   gazebo::physics::ModelPtr parent_model_;
