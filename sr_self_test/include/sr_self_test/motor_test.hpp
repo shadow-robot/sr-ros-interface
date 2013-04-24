@@ -30,19 +30,24 @@
 #define _MOTOR_TEST_H_
 
 #include <self_test/self_test.h>
+#include <sr_hand/hand_commander.hpp>
 
 namespace shadow_robot
 {
   class MotorTest
   {
   public:
-    MotorTest(self_test::TestRunner* test_runner);
+    MotorTest( self_test::TestRunner* test_runner,
+               std::string joint_name,
+               shadowrobot::HandCommander* hand_commander);
     virtual ~MotorTest() {};
 
     void run_test(diagnostic_updater::DiagnosticStatusWrapper& status);
 
   protected:
     self_test::TestRunner* test_runner_;
+    std::string joint_name_;
+    shadowrobot::HandCommander* hand_commander_;
   };
 }
 

@@ -29,10 +29,12 @@
 
 namespace shadow_robot
 {
-  MotorTest::MotorTest(self_test::TestRunner* test_runner)
-    : test_runner_(test_runner)
+  MotorTest::MotorTest(self_test::TestRunner* test_runner,
+                       std::string joint_name,
+                       shadowrobot::HandCommander* hand_commander)
+    : test_runner_(test_runner), joint_name_(joint_name), hand_commander_(hand_commander)
   {
-    test_runner_->add("Motor tests", this, &MotorTest::run_test);
+    test_runner_->add("Test motor ["+joint_name_+"]", this, &MotorTest::run_test);
   }
 
   void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)

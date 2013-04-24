@@ -65,8 +65,6 @@ namespace shadow_robot
       test_runner_.add_diagnostic_parser();
       //test the noise of the sensors
       test_runner_.addSensorNoiseTest();
-      //test the motors
-      test_runner_.add_motor_tests();
     }
 
     //calling this from a oneshot timer because we're using the
@@ -102,6 +100,7 @@ namespace shadow_robot
       hand_commander_.reset(new shadowrobot::HandCommander());
 
     joints_to_test_ = hand_commander_->get_all_joints();
+    motor_tests_.clear();
 
     //send all the joints to their safe positions:
     for( size_t i=0; i<joints_to_test_.size(); ++i)
@@ -112,7 +111,10 @@ namespace shadow_robot
     index_joints_to_test_ = 0;
     for(size_t i=0; i < joints_to_test_.size(); ++i)
     {
+      //checking the movement of the finger
       test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
+      //running some tests on the motor (PWM mode, strain gauge response, etc...)
+      motor_tests_.push_back(MotorTest(&test_runner_, joints_to_test_[i], hand_commander_.get() ) );
     }
   }
 

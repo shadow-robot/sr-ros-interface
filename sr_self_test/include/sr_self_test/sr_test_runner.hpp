@@ -32,7 +32,6 @@
 #include "sr_self_test/gnuplot-iostream.h"
 #include "sr_self_test/diagnostic_parser.hpp"
 #include "sr_self_test/manual_test.hpp"
-#include "sr_self_test/motor_test.hpp"
 
 #include "sr_self_test/sensor_noise_test.hpp"
 
@@ -64,9 +63,6 @@ public:
   ///Adding a test which parses diagnostics for jitter, dropped messages, etc...
   void add_diagnostic_parser();
 
-  ///Adding a test for the motors
-  void add_motor_tests();
-
 private:
   static const double SERVICE_TIMEOUT_CONST_;
 
@@ -83,7 +79,6 @@ private:
   boost::shared_ptr<ManualTests> manual_tests_;
 
   boost::shared_ptr<SensorNoiseTest> sensor_noise_test_;
-  boost::shared_ptr<MotorTest> motor_test_;
 };
 
 }
