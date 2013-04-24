@@ -53,10 +53,13 @@ namespace shadowrobot
      * @param controller_type the type of controller ("sr" or "pr2")
      * @param testing set to true when running a gazebo test (just adds a long sleep).
      */
-    MovementPublisher( std::string joint_name, double rate=100.0, unsigned int repetition = 1, unsigned int nb_mvt_step = 1000 , std::string controller_type = "", bool testing = false);
+    MovementPublisher( std::string joint_name, double rate=100.0,
+                       unsigned int repetition = 1, unsigned int nb_mvt_step = 1000 ,
+                       std::string controller_type = "", bool testing = false);
 
     MovementPublisher( double min_value = 0.0, double max_value = 1.5,
-                       double rate=100.0, unsigned int repetition = 1, unsigned int nb_mvt_step = 1000 , std::string controller_type = "");
+                       double rate=100.0, unsigned int repetition = 1,
+                       unsigned int nb_mvt_step = 1000 , std::string controller_type = "");
 
     virtual ~MovementPublisher();
 

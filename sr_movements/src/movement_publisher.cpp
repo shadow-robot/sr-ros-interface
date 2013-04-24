@@ -59,7 +59,8 @@ namespace shadowrobot
   }
 
   MovementPublisher::MovementPublisher(double min_value, double max_value,
-                                       double rate, unsigned int repetition, unsigned int nb_mvt_step, std::string controller_type)
+                                       double rate, unsigned int repetition,
+                                       unsigned int nb_mvt_step, std::string controller_type)
     : nh_tilde("~"), publishing_rate( rate ), repetition(repetition),
       min(min_value), max(max_value), last_target_(0.0), nb_mvt_step(nb_mvt_step),
       SError_(0.0), MSError_(0.0), n_samples_(0), controller_type(controller_type)
