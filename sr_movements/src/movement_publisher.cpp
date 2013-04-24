@@ -30,7 +30,7 @@
 
 namespace shadowrobot
 {
-  MovementPublisher::MovementPublisher(std::string joint_name, double rate, unsigned int repetition, unsigned int nb_mvt_step, std::string controller_type, bool testing)
+  MovementPublisher::MovementPublisher(std::string joint_name, double rate, unsigned int repetition, unsigned int nb_mvt_step, std::string controller_type, bool testing, HandCommander* hand_commander)
     : joint_name_(joint_name), nh_tilde("~"), publishing_rate( rate ), repetition(repetition),
       min(0.0), max(1.5), last_target_(0.0), nb_mvt_step(nb_mvt_step),
       SError_(0.0), MSError_(0.0), n_samples_(0), controller_type(controller_type)
@@ -42,7 +42,10 @@ namespace shadowrobot
       sleep(20.0);
     }
 
-    hand_commander_.reset(new HandCommander());
+    if( hand_commander != NULL )
+      hand_commander_.reset(hand_commander);
+    else
+      hand_commander_.reset(new HandCommander());
 
     //if using the HandCommander, we're initialising the
     // vector of joints to send here, out of the loop.

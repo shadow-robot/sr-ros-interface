@@ -32,13 +32,14 @@
 #include <sr_robot_msgs/JointControllerState.h>
 #include <std_msgs/Float64.h>
 #include <ros/ros.h>
+#include <sr_hand/hand_commander.hpp>
 
 namespace shadow_robot
 {
   class TestJointMovement
   {
   public:
-    TestJointMovement(std::string joint_name);
+    TestJointMovement(std::string joint_name, shadowrobot::HandCommander* hand_commander);
     ~TestJointMovement() {};
 
     double mse;
@@ -62,6 +63,8 @@ namespace shadow_robot
     boost::shared_ptr<boost::thread> thread_;
 
     std::string joint_name_;
+
+    shadowrobot::HandCommander* hand_commander;
   };
 }
 

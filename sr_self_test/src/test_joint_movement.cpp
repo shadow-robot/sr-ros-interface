@@ -28,7 +28,7 @@
 
 namespace shadow_robot
 {
-  TestJointMovement::TestJointMovement(std::string joint_name)
+  TestJointMovement::TestJointMovement(std::string joint_name, shadowrobot::HandCommander* hand_commander)
     : mse(0.0), nh_tilde_("~")
   {
     joint_name_ = joint_name;
@@ -50,7 +50,8 @@ namespace shadow_robot
     std::string controller_type = "sr";
 
     mvt_pub_.reset(new shadowrobot::MovementPublisher(joint_name, publish_rate, repetition,
-                                                      nb_mvt_step, controller_type));
+                                                      nb_mvt_step, controller_type, false,
+                                                      hand_commander ));
     mvt_pub_->add_movement( *mvt_from_img_.get() );
 
     sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
