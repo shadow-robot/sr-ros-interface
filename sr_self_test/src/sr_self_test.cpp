@@ -114,7 +114,7 @@ namespace shadow_robot
       //checking the movement of the finger
 //      test_runner_.add("Check movements ["+joints_to_test_[i]+"]", this, &SrSelfTest::test_movement_);
       //running some tests on the motor (PWM mode, strain gauge response, etc...)
-      motor_tests_.push_back(MotorTest(&test_runner_, joints_to_test_[i], hand_commander_.get() ) );
+      motor_tests_.push_back(new MotorTest(&test_runner_, joints_to_test_[i], hand_commander_.get() ) );
     }
   }
 

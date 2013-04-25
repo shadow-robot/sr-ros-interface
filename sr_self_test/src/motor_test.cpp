@@ -25,52 +25,92 @@
  *
  */
 
+#include <boost/algorithm/string.hpp>
 #include "sr_self_test/motor_test.hpp"
+#include <pr2_mechanism_msgs/ListControllers.h>
+#include <pr2_mechanism_msgs/SwitchController.h>
+#include <pr2_mechanism_msgs/LoadController.h>
 
 namespace shadow_robot
 {
   MotorTest::MotorTest(self_test::TestRunner* test_runner,
                        std::string joint_name,
                        shadowrobot::HandCommander* hand_commander)
-    : test_runner_(test_runner), joint_name_(joint_name), hand_commander_(hand_commander)
+    : test_runner_(test_runner), joint_name_( joint_name ), hand_commander_(hand_commander)
   {
-    test_runner_->add("Test motor ["+joint_name_+"]", this, &MotorTest::run_test);
+    //joint name is lower case in the controller topics
+    boost::algorithm::to_lower(joint_name_);
 
+    test_runner_->add("Test motor ["+joint_name_+"]", this, &MotorTest::run_test);
     // @todo: subscribe to relevant topic and services
   }
 
   void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    //go to effort mode
-    if( !switch_to_effort_() )
+    std::string current_ctrl, effort_ctrl;
+    //list currently running controllers and find the one for effort control
+    pr2_mechanism_msgs::ListControllers list_ctrl;
+    if( ros::service::call("pr2_controller_manager/list_controllers", list_ctrl))
     {
-      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Failed to switch to effort mode - aborting test.");
-      return;
+      for (size_t i = 0; i < list_ctrl.response.controllers.size(); ++i)
+      {
+        if( list_ctrl.response.state[i].compare( "running" ) == 0 )
+        {
+          if( list_ctrl.response.controllers[i].find( joint_name_ ) != std::string::npos )
+          {
+            current_ctrl = list_ctrl.response.controllers[i];
+          }
+        }
+        if( list_ctrl.response.controllers[i].find( "_effort_controller" ) != std::string::npos )
+        {
+          effort_ctrl = list_ctrl.response.controllers[i];
+        }
+      }
+    }
+    else
+    {
+      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                      "Failed to list controllers - aborting test." );
     }
 
+    //load the effort controller if necessary
+    if( effort_ctrl.compare("") == 0 )
+    {
+      pr2_mechanism_msgs::LoadController load_ctrl;
+      load_ctrl.request.name = "sh_"+joint_name_+"_effort_controller";
+      if( !ros::service::call("pr2_controller_manager/load_controller", load_ctrl))
+      {
+        status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                        "Failed to load controller "+load_ctrl.request.name+" - aborting test." );
+      }
+    }
+
+    //switching to effort controllers (in PWM -> send direct PWM demand)
+    pr2_mechanism_msgs::SwitchController switch_ctrl;
+    switch_ctrl.request.start_controllers.push_back(effort_ctrl);
+    switch_ctrl.request.stop_controllers.push_back(current_ctrl);
+    switch_ctrl.request.strictness = pr2_mechanism_msgs::SwitchController::Request::BEST_EFFORT;
+    if( !ros::service::call("pr2_controller_manager/switch_controller", switch_ctrl))
+    {
+        status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                        "Failed to switch from controller "+current_ctrl+" to controller "+effort_ctrl +" - aborting test." );
+    }
     // @todo: apply effort and record data
 
     // @todo: analyse data
 
-    //reset to previous control mode
-    if( !switch_to_effort_(true) )
+    //@todo reset to previous control mode
+    switch_ctrl.request.start_controllers.push_back(current_ctrl);
+    switch_ctrl.request.stop_controllers.push_back(effort_ctrl);
+    switch_ctrl.request.strictness = pr2_mechanism_msgs::SwitchController::Request::BEST_EFFORT;
+    if( !ros::service::call("pr2_controller_manager/switch_controller", switch_ctrl))
     {
-      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Failed to switch back to previous controllers - test failed.");
-      return;
+        status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                        "Failed to switch from controller "+effort_ctrl+" to controller "+current_ctrl +" - aborting test." );
     }
 
     //test succeeded
     status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Test passed.");
-  }
-
-  bool MotorTest::switch_to_effort_(bool switch_back)
-  {
-
-    //list the current controllers
-    //pr2_mechanism_msgs::ListControllers list_ctrl;
-    //now we load the proper controllers.
-
-    return true;
   }
 }
 

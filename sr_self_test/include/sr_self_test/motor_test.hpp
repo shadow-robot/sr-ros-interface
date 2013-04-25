@@ -49,17 +49,6 @@ namespace shadow_robot
     self_test::TestRunner* test_runner_;
     std::string joint_name_;
     shadowrobot::HandCommander* hand_commander_;
-
-    /**
-     * Switches to effort controllers to be able to
-     *  send a given PWM offset. Switches back to previous type of
-     *  control if switch_back=true.
-     *
-     * @param switch_back If false (default), switches to effort
-     *                    controllers, otherwise switches back to previous
-     *                    control type.
-     */
-    bool switch_to_effort_(bool switch_back=false);
   };
 }
 
