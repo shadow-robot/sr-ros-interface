@@ -1,6 +1,6 @@
 <launch>
   <rosparam file="$(find sr_description)/hand/config/hand_controller_gazebo.yaml" command="load"/>
-  <rosparam unless="$(optenv PWM_CONTROL 0)" command="load" file="$(find sr_ethercat_hand_config)/controls/host/sr_edc_effort_controllers.yaml" />
+  <rosparam file="$(find sr_description)/hand/config/hand_effort_controller_gazebo.yaml" command="load"/>
 
   <group if="$(optenv ONE_FINGER 0)">
     <node name="spawn_gazebo_hand_controllers"
