@@ -37,50 +37,40 @@ namespace shadow_robot
     test_runner_->add("Test motor ["+joint_name_+"]", this, &MotorTest::run_test);
 
     // @todo: subscribe to relevant topic and services
-    change_ctrl_type_client_ = nh_.serviceClient<sr_robot_msgs::ChangeControlType>("change_control_type");
   }
 
   void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    // @todo: go to PWM mode
-    switch_to_PWM_();
+    //go to effort mode
+    if( !switch_to_effort_() )
+    {
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Failed to switch to effort mode - aborting test.");
+      return;
+    }
 
-    // @todo: apply PWM and record data
+    // @todo: apply effort and record data
 
     // @todo: analyse data
 
-    // @todo: reset to previous control mode
-    switch_to_PWM_(true);
+    //reset to previous control mode
+    if( !switch_to_effort_(true) )
+    {
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Failed to switch back to previous controllers - test failed.");
+      return;
+    }
 
-    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "TODO: implement this");
+    //test succeeded
+    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Test passed.");
   }
 
-  bool MotorTest::switch_to_PWM_(bool switch_back)
+  bool MotorTest::switch_to_effort_(bool switch_back)
   {
-    sr_robot_msgs::ChangeControlType srv;
 
-    if( !switch_back )
-      srv.request.control_type.control_type = sr_robot_msgs::ControlType::PWM;
-    else
-    {
-      //@todo: how can we know which type of control it was before?
-      srv.request.control_type.control_type = sr_robot_msgs::ControlType::TORQUE;
-    }
+    //list the current controllers
+    //pr2_mechanism_msgs::ListControllers list_ctrl;
+    //now we load the proper controllers.
 
-    //fist we change to the correct control type
-    if( change_ctrl_type_client_.call(srv) )
-    {
-      //now we load the proper controllers.
-    }
-    else
-    {
-      if(switch_back)
-        ROS_ERROR("Failed to switch back to previous controllers.");
-      else
-        ROS_ERROR("Failed to switch to PWM control");
-
-      return false;
-    }
+    return true;
   }
 }
 
