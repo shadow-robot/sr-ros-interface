@@ -31,6 +31,7 @@
 
 #include <self_test/self_test.h>
 #include <sr_hand/hand_commander.hpp>
+#include <sr_robot_msgs/ChangeControlType.h>
 
 namespace shadow_robot
 {
@@ -45,9 +46,22 @@ namespace shadow_robot
     void run_test(diagnostic_updater::DiagnosticStatusWrapper& status);
 
   protected:
+    ros::NodeHandle nh_;
     self_test::TestRunner* test_runner_;
     std::string joint_name_;
     shadowrobot::HandCommander* hand_commander_;
+    ros::ServiceClient change_ctrl_type_client_;
+
+    /**
+     * Switches to PWM control (+effort controllers) to be able to
+     *  send a given PWM offset. Switches back to previous type of
+     *  control if switch_back=true.
+     *
+     * @param switch_back If false (default), switches to PWM + effort
+     *                    controllers, otherwise switches back to previous
+     *                    control type.
+     */
+    bool switch_to_PWM_(bool switch_back=false);
   };
 }
 
