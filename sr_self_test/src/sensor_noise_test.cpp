@@ -33,11 +33,12 @@ namespace shadow_robot
 
   SensorNoiseTest::SensorNoiseTest()
   {
-    joint_states_sub_ = nh_.subscribe("joint_states", 50, &SensorNoiseTest::joint_states_cb_, this);
   }
 
   void SensorNoiseTest::test_sensor_noise(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
+    joint_states_sub_ = nh_.subscribe("joint_states", 50, &SensorNoiseTest::joint_states_cb_, this);
+
     ros::Rate rate(100);
     for (size_t i = 0; i < 200; ++i)
     {
@@ -85,6 +86,8 @@ namespace shadow_robot
     }
     else
       status.summary(diagnostic_msgs::DiagnosticStatus::OK, "All the noises are below threshold.");
+
+    joint_states_sub_.shutdown();
   }
 
   void SensorNoiseTest::joint_states_cb_(const sensor_msgs::JointState::ConstPtr& msg)

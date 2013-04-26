@@ -72,5 +72,7 @@ namespace shadow_robot
     mse = msg->data;
 
     //unsubscribe after receiving the message
+    mse_sub_.shutdown();
+    sub_state_.shutdown();
   }
 }
