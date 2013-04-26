@@ -44,13 +44,13 @@ namespace shadow_robot
     boost::algorithm::to_lower(joint_name_);
 
     test_runner_->add("Test motor ["+joint_name_+"]", this, &MotorTest::run_test);
-
-    //subscribe to diagnostic topic
-    diagnostic_sub_ = nh_.subscribe("diagnostics_agg", 1, &MotorTest::diagnostics_agg_cb_, this);
   }
 
   void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
+    //subscribe to diagnostic topic
+    diagnostic_sub_ = nh_.subscribe("diagnostics_agg", 1, &MotorTest::diagnostics_agg_cb_, this);
+
     std::string current_ctrl, effort_ctrl;
     //list currently running controllers and find the one for effort control
     pr2_mechanism_msgs::ListControllers list_ctrl;
@@ -144,16 +144,32 @@ namespace shadow_robot
   void MotorTest::diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
   {
     //ignore the data if we're not recording.
-    if(record_data_ == 0)
-      return;
+    //if(record_data_ == 0)
+    // return;
 
-    if(record_data_ == 1)
+    for( size_t status_i = 0; status_i < msg->status.size(); ++status_i )
     {
-      ROS_ERROR("Recording +");
-    }
-    else if (record_data_ == -1)
-    {
-      ROS_ERROR("Recording -");
+      if( msg->status[status_i].name.find("SRDMotor "+boost::algorithm::to_upper_copy(joint_name_) ) != std::string::npos )
+      {
+        for (size_t value_i = 0; value_i < msg->status[status_i].values.size(); ++value_i)
+        {
+          if( msg->status[status_i].values[value_i].key.compare("Measured Current") == 0 )
+          {
+            ROS_ERROR_STREAM("Measured current ("<< status_i <<"/"<<value_i <<") = " << msg->status[status_i].values[value_i].value << " ["<< msg->status[status_i].name <<"]");
+          }
+          else if( msg->status[status_i].values[value_i].key.compare("Strain Gauge Left") == 0 &&
+                   record_data_ == 1 )
+          {
+            ROS_ERROR_STREAM("SGL = " << msg->status[status_i].values[value_i].value);
+          }
+          else if( msg->status[status_i].values[value_i].key.compare("Strain Gauge Right") == 0 &&
+                   record_data_ == -1)
+          {
+            ROS_ERROR_STREAM("SGR = " << msg->status[status_i].values[value_i].value);
+          }
+        }
+      }
+
     }
   }
 }
