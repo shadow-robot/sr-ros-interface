@@ -30,6 +30,7 @@
 #include <pr2_mechanism_msgs/ListControllers.h>
 #include <pr2_mechanism_msgs/SwitchController.h>
 #include <pr2_mechanism_msgs/LoadController.h>
+#include <std_msgs/Float64.h>
 
 namespace shadow_robot
 {
@@ -92,12 +93,31 @@ namespace shadow_robot
     switch_ctrl.request.strictness = pr2_mechanism_msgs::SwitchController::Request::BEST_EFFORT;
     if( !ros::service::call("pr2_controller_manager/switch_controller", switch_ctrl))
     {
-        status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
-                        "Failed to switch from controller "+current_ctrl+" to controller "+effort_ctrl +" - aborting test." );
+      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                      "Failed to switch from controller "+current_ctrl+" to controller "+effort_ctrl +" - aborting test." );
     }
-    // @todo: apply effort and record data
 
+    //apply effort and start recording data
+    effort_pub_ = nh_.advertise<std_msgs::Float64>(effort_ctrl+"/command", 5, true);
+    std_msgs::Float64 target;
+    ros::Rate rate(10.0);
+
+    //first one way
+    target.data = 150.0;
+    for (unsigned int i=0; i < 50; ++i)
+    {
+      effort_pub_.publish(target);
+      rate.sleep();
+    }
     // @todo: analyse data
+
+    //then the other
+    target.data = -150.0;
+    for (unsigned int i=0; i < 50; ++i)
+    {
+      effort_pub_.publish(target);
+      rate.sleep();
+    }
 
     //@todo reset to previous control mode
     switch_ctrl.request.start_controllers.push_back(current_ctrl);
@@ -105,8 +125,8 @@ namespace shadow_robot
     switch_ctrl.request.strictness = pr2_mechanism_msgs::SwitchController::Request::BEST_EFFORT;
     if( !ros::service::call("pr2_controller_manager/switch_controller", switch_ctrl))
     {
-        status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
-                        "Failed to switch from controller "+effort_ctrl+" to controller "+current_ctrl +" - aborting test." );
+      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                      "Failed to switch from controller "+effort_ctrl+" to controller "+current_ctrl +" - aborting test." );
     }
 
     //test succeeded

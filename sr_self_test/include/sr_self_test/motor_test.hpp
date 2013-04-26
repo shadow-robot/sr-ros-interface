@@ -49,6 +49,7 @@ namespace shadow_robot
     self_test::TestRunner* test_runner_;
     std::string joint_name_;
     shadowrobot::HandCommander* hand_commander_;
+    ros::Publisher effort_pub_;
   };
 }
 
