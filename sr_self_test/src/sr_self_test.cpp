@@ -57,7 +57,7 @@ namespace shadow_robot
     test_services_();
 
     //some tests can only be run on the real hand
-    if(!simulated)
+    if(!simulated_)
     {
       //add manual tests (tactile, calibration)
       test_runner_.addManualTests();
@@ -112,9 +112,13 @@ namespace shadow_robot
     for(size_t i=0; i < joints_to_test_.size(); ++i)
     {
       //checking the movement of the finger
-//      test_runner_.add("Check movements ["+joints_to_test_[i]+"]", this, &SrSelfTest::test_movement_);
-      //running some tests on the motor (PWM mode, strain gauge response, etc...)
-      motor_tests_.push_back(new MotorTest(&test_runner_, joints_to_test_[i], hand_commander_.get() ) );
+      test_runner_.add("Check movements ["+joints_to_test_[i]+"]", this, &SrSelfTest::test_movement_);
+
+      if(!simulated_)
+      {
+        //running some tests on the motor (PWM mode, strain gauge response, etc...)
+        motor_tests_.push_back(new MotorTest(&test_runner_, joints_to_test_[i], hand_commander_.get() ) );
+      }
     }
   }
 

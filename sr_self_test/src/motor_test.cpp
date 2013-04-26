@@ -30,6 +30,7 @@
 #include <pr2_mechanism_msgs/ListControllers.h>
 #include <pr2_mechanism_msgs/SwitchController.h>
 #include <pr2_mechanism_msgs/LoadController.h>
+#include <sr_robot_msgs/ChangeControlType.h>
 #include <std_msgs/Float64.h>
 #include <sstream>
 
@@ -54,6 +55,30 @@ namespace shadow_robot
     test_current_moving_ = true;
     test_strain_gauge_right_ = true;
     test_strain_gauge_left_ = true;
+
+    //check current control type
+    sr_robot_msgs::ControlType current_ctrl_type;
+    sr_robot_msgs::ChangeControlType change_ctrl_type;
+    change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::QUERY;
+    if( ros::service::call("change_control_type", change_ctrl_type) )
+    {
+      current_ctrl_type = change_ctrl_type.response.result;
+    }
+    else
+    {
+      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                      "Failed to get current control type - aborting test." );
+      return;
+    }
+
+    //switch to PWM
+    change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::PWM;
+    if( !ros::service::call("change_control_type", change_ctrl_type) )
+    {
+      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                      "Failed to change to PWM control type - aborting test." );
+      return;
+    }
 
     //subscribe to diagnostic topic
     diagnostic_sub_ = nh_.subscribe("diagnostics_agg", 1, &MotorTest::diagnostics_agg_cb_, this);
@@ -82,6 +107,7 @@ namespace shadow_robot
     {
       status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
                       "Failed to list controllers - aborting test." );
+      return;
     }
 
     //load the effort controller if necessary
@@ -106,6 +132,7 @@ namespace shadow_robot
     {
       status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
                       "Failed to switch from controller "+current_ctrl+" to controller "+effort_ctrl +" - aborting test." );
+      return;
     }
 
     //apply effort and start recording data
@@ -133,13 +160,21 @@ namespace shadow_robot
     }
 
     //then nothing (to check that current is back to 0)
+    record_data_ = 0;
     for (unsigned int i=0; i < 50; ++i)
     {
       rate.sleep();
     }
 
     //reset to previous control mode
-    record_data_ = 0;
+    change_ctrl_type.request.control_type = current_ctrl_type;
+    if( !ros::service::call("change_control_type", change_ctrl_type) )
+    {
+      status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
+                      "Failed to change back to the previous control type - aborting test." );
+      return;
+    }
+
     switch_ctrl.request.start_controllers.push_back(current_ctrl);
     switch_ctrl.request.stop_controllers.push_back(effort_ctrl);
     switch_ctrl.request.strictness = pr2_mechanism_msgs::SwitchController::Request::BEST_EFFORT;
@@ -147,6 +182,7 @@ namespace shadow_robot
     {
       status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
                       "Failed to switch from controller "+effort_ctrl+" to controller "+current_ctrl +" - aborting test." );
+      return;
     }
 
     //stop the subscriber
