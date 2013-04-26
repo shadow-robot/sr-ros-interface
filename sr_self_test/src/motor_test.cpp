@@ -31,6 +31,7 @@
 #include <pr2_mechanism_msgs/SwitchController.h>
 #include <pr2_mechanism_msgs/LoadController.h>
 #include <std_msgs/Float64.h>
+#include <sstream>
 
 namespace shadow_robot
 {
@@ -38,7 +39,7 @@ namespace shadow_robot
                        std::string joint_name,
                        shadowrobot::HandCommander* hand_commander)
     : test_runner_(test_runner), joint_name_( joint_name ), hand_commander_(hand_commander),
-      record_data_(0)
+      record_data_(0), test_current_zero_(true), test_current_moving_(true), test_strain_gauge_right_(true), test_strain_gauge_left_(true)
   {
     //joint name is lower case in the controller topics
     boost::algorithm::to_lower(joint_name_);
@@ -48,6 +49,12 @@ namespace shadow_robot
 
   void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
+    //reset test results
+    test_current_zero_ = true;
+    test_current_moving_ = true;
+    test_strain_gauge_right_ = true;
+    test_strain_gauge_left_ = true;
+
     //subscribe to diagnostic topic
     diagnostic_sub_ = nh_.subscribe("diagnostics_agg", 1, &MotorTest::diagnostics_agg_cb_, this);
 
@@ -115,7 +122,6 @@ namespace shadow_robot
       effort_pub_.publish(target);
       rate.sleep();
     }
-    // @todo: analyse data
 
     //then the other
     target.data = -150.0;
@@ -123,6 +129,12 @@ namespace shadow_robot
     for (unsigned int i=0; i < 50; ++i)
     {
       effort_pub_.publish(target);
+      rate.sleep();
+    }
+
+    //then nothing (to check that current is back to 0)
+    for (unsigned int i=0; i < 50; ++i)
+    {
       rate.sleep();
     }
 
@@ -140,16 +152,34 @@ namespace shadow_robot
     //stop the subscriber
     diagnostic_sub_.shutdown();
 
-    //test succeeded
-    status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Test passed.");
+    //test results
+    std::stringstream ss;
+    if( test_current_zero_ && test_current_moving_ &&
+        test_strain_gauge_right_ && test_strain_gauge_left_ )
+    {
+      status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Test passed.");
+      return;
+    }
+
+    //there was an error during the test
+    else
+    {
+      ss << "Test failed: ";
+      if(!test_current_zero_)
+        ss << " Current was not zero when the motor was stopped. ";
+      if(!test_current_moving_)
+        ss << " Current was out of specified interval when the motor was driven. ";
+      if(!test_strain_gauge_right_)
+        ss << " Problem with Strain Gauge Right.";
+      if(!test_strain_gauge_left_)
+        ss << " Problem with Strain Gauge Left.";
+    }
+
+    status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str());
   }
 
   void MotorTest::diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
   {
-    //ignore the data if we're not recording.
-    //if(record_data_ == 0)
-    // return;
-
     for( size_t status_i = 0; status_i < msg->status.size(); ++status_i )
     {
       if( msg->status[status_i].name.find("SRDMotor "+boost::algorithm::to_upper_copy(joint_name_) ) != std::string::npos )
@@ -158,17 +188,38 @@ namespace shadow_robot
         {
           if( msg->status[status_i].values[value_i].key.compare("Measured Current") == 0 )
           {
-            ROS_ERROR_STREAM("Measured current ("<< status_i <<"/"<<value_i <<") = " << msg->status[status_i].values[value_i].value << " ["<< msg->status[status_i].name <<"]");
+            double current = ::atof( msg->status[status_i].values[value_i].value.c_str() );
+
+            //not sending any targets, current should be close to 0
+            if( record_data_ == 0)
+            {
+              if( current > 0.01 || current < -0.01 )
+                test_current_zero_ = false;
+            }
+            else
+            {
+              //sending some targets, current should be between ? and ?
+              //@todo find min max values for current when driving motors
+              if( current > 25.0 || current < 20.0 )
+                test_current_moving_ = false;
+            }
           }
           else if( msg->status[status_i].values[value_i].key.compare("Strain Gauge Left") == 0 &&
                    record_data_ == 1 )
           {
-            ROS_ERROR_STREAM("SGL = " << msg->status[status_i].values[value_i].value);
+            //@todo is it always SGL for + and SGR for - ??
+            int sgl = ::atoi( msg->status[status_i].values[value_i].value.c_str() );
+            //@todo check min value for SG under tension
+            if( sgl < 30 )
+              test_strain_gauge_left_ = false;
           }
           else if( msg->status[status_i].values[value_i].key.compare("Strain Gauge Right") == 0 &&
                    record_data_ == -1)
           {
-            ROS_ERROR_STREAM("SGR = " << msg->status[status_i].values[value_i].value);
+            //@todo same here
+            int sgr = ::atoi( msg->status[status_i].values[value_i].value.c_str() );
+            if( sgr < 30 )
+              test_strain_gauge_right_ = false;
           }
         }
       }

@@ -54,6 +54,11 @@ namespace shadow_robot
     ///0 if not recording, 1 if going +, -1 if going -
     short record_data_;
 
+    bool test_current_zero_;
+    bool test_current_moving_;
+    bool test_strain_gauge_right_;
+    bool test_strain_gauge_left_;
+
     /**
      * Susbscribed to the diagnostics_agg topic.
      * @param msg new incoming msg
