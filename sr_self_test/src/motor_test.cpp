@@ -37,13 +37,16 @@ namespace shadow_robot
   MotorTest::MotorTest(self_test::TestRunner* test_runner,
                        std::string joint_name,
                        shadowrobot::HandCommander* hand_commander)
-    : test_runner_(test_runner), joint_name_( joint_name ), hand_commander_(hand_commander)
+    : test_runner_(test_runner), joint_name_( joint_name ), hand_commander_(hand_commander),
+      record_data_(0)
   {
     //joint name is lower case in the controller topics
     boost::algorithm::to_lower(joint_name_);
 
     test_runner_->add("Test motor ["+joint_name_+"]", this, &MotorTest::run_test);
-    // @todo: subscribe to relevant topic and services
+
+    //subscribe to diagnostic topic
+    diagnostic_sub_ = nh_.subscribe("diagnostics_agg", 1, &MotorTest::diagnostics_agg_cb_, this);
   }
 
   void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
@@ -55,16 +58,16 @@ namespace shadow_robot
     {
       for (size_t i = 0; i < list_ctrl.response.controllers.size(); ++i)
       {
-        if( list_ctrl.response.state[i].compare( "running" ) == 0 )
+        if( list_ctrl.response.controllers[i].find( joint_name_ ) != std::string::npos )
         {
-          if( list_ctrl.response.controllers[i].find( joint_name_ ) != std::string::npos )
+          if( list_ctrl.response.state[i].compare( "running" ) == 0 )
           {
             current_ctrl = list_ctrl.response.controllers[i];
           }
-        }
-        if( list_ctrl.response.controllers[i].find( "_effort_controller" ) != std::string::npos )
-        {
-          effort_ctrl = list_ctrl.response.controllers[i];
+          if( list_ctrl.response.controllers[i].find( "_effort_controller" ) != std::string::npos )
+          {
+            effort_ctrl = list_ctrl.response.controllers[i];
+          }
         }
       }
     }
@@ -77,8 +80,9 @@ namespace shadow_robot
     //load the effort controller if necessary
     if( effort_ctrl.compare("") == 0 )
     {
+      effort_ctrl = "sh_"+joint_name_+"_effort_controller";
       pr2_mechanism_msgs::LoadController load_ctrl;
-      load_ctrl.request.name = "sh_"+joint_name_+"_effort_controller";
+      load_ctrl.request.name = effort_ctrl;
       if( !ros::service::call("pr2_controller_manager/load_controller", load_ctrl))
       {
         status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
@@ -100,10 +104,12 @@ namespace shadow_robot
     //apply effort and start recording data
     effort_pub_ = nh_.advertise<std_msgs::Float64>(effort_ctrl+"/command", 5, true);
     std_msgs::Float64 target;
-    ros::Rate rate(10.0);
+    ros::Rate rate(2.0);
 
     //first one way
     target.data = 150.0;
+    record_data_ = 1;
+
     for (unsigned int i=0; i < 50; ++i)
     {
       effort_pub_.publish(target);
@@ -113,13 +119,15 @@ namespace shadow_robot
 
     //then the other
     target.data = -150.0;
+    record_data_ = -1;
     for (unsigned int i=0; i < 50; ++i)
     {
       effort_pub_.publish(target);
       rate.sleep();
     }
 
-    //@todo reset to previous control mode
+    //reset to previous control mode
+    record_data_ = 0;
     switch_ctrl.request.start_controllers.push_back(current_ctrl);
     switch_ctrl.request.stop_controllers.push_back(effort_ctrl);
     switch_ctrl.request.strictness = pr2_mechanism_msgs::SwitchController::Request::BEST_EFFORT;
@@ -131,6 +139,22 @@ namespace shadow_robot
 
     //test succeeded
     status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Test passed.");
+  }
+
+  void MotorTest::diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
+  {
+    //ignore the data if we're not recording.
+    if(record_data_ == 0)
+      return;
+
+    if(record_data_ == 1)
+    {
+      ROS_ERROR("Recording +");
+    }
+    else if (record_data_ == -1)
+    {
+      ROS_ERROR("Recording -");
+    }
   }
 }
 

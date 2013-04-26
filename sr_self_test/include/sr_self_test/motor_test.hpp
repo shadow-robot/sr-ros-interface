@@ -50,6 +50,15 @@ namespace shadow_robot
     std::string joint_name_;
     shadowrobot::HandCommander* hand_commander_;
     ros::Publisher effort_pub_;
+    ros::Subscriber diagnostic_sub_;
+    ///0 if not recording, 1 if going +, -1 if going -
+    short record_data_;
+
+    /**
+     * Susbscribed to the diagnostics_agg topic.
+     * @param msg new incoming msg
+     */
+    void diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg);
   };
 }
 
