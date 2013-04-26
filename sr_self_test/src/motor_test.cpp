@@ -137,6 +137,9 @@ namespace shadow_robot
                       "Failed to switch from controller "+effort_ctrl+" to controller "+current_ctrl +" - aborting test." );
     }
 
+    //stop the subscriber
+    diagnostic_sub_.shutdown();
+
     //test succeeded
     status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Test passed.");
   }
