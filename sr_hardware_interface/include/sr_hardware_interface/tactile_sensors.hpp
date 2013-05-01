@@ -244,10 +244,77 @@ namespace tactiles
     boost::array<short int, 19ul> electrodes; //int16u in word[2]
   };
 
+  class UBI0Data
+    : public GenericTactileData
+  {
+  public:
+    UBI0Data()
+      : GenericTactileData()
+    {};
+
+    UBI0Data(const UBI0Data& ubi0)
+      : GenericTactileData(ubi0.tactile_data_valid, ubi0.sample_frequency,
+                           ubi0.manufacturer, ubi0.serial_number,
+                           ubi0.software_version_current,
+                           ubi0.software_version_server,
+                           ubi0.software_version_modified,
+                           ubi0.pcb_version)
+    {
+      for(unsigned int i =0; i<ubi0.distal.size() ;i++)
+      {
+        distal[i] = ubi0.distal[i];
+      }
+      for(unsigned int i =0; i<ubi0.middle.size() ;i++)
+      {
+        middle[i] = ubi0.middle[i];
+      }
+      for(unsigned int i =0; i<ubi0.proximal.size() ;i++)
+      {
+        proximal[i] = ubi0.proximal[i];
+      }
+    };
+
+    UBI0Data(const GenericTactileData& gtd)
+      : GenericTactileData(gtd.tactile_data_valid, gtd.sample_frequency,
+                           gtd.manufacturer, gtd.serial_number,
+                           gtd.software_version_current,
+                           gtd.software_version_server,
+                           gtd.software_version_modified,
+                           gtd.pcb_version)
+    {};
+
+    ~UBI0Data() {};
+
+
+    boost::array<short int, 12ul> distal;
+    boost::array<short int, 4ul> middle;
+    boost::array<short int, 4ul> proximal;
+  };
+
+  class UBI0PalmData
+  {
+  public:
+    UBI0PalmData()
+    {};
+
+    UBI0PalmData(const UBI0PalmData& ubi0)
+    {
+      for(unsigned int i =0; i<ubi0.palm.size() ;i++)
+      {
+        palm[i] = ubi0.palm[i];
+      }
+    };
+
+    ~UBI0PalmData() {};
+
+    boost::array<short int, 16ul> palm;
+  };
+
   struct AllTactileData
   {
     BiotacData biotac;
     PST3Data pst;
+    UBI0Data ubi0;
   };
 }
 
