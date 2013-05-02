@@ -197,6 +197,9 @@ namespace sr_actuator
       : pr2_hardware_interface::Actuator(name)
     {};
 
+    //A virtual destructor to make the class polymorphic (the compiler is picky about trying to dynamic_cast non-polymorphic classes)
+    virtual ~SrGenericActuator();
+
     //SrActuatorState state_;
   }; //end class SrGenericActuator
 
@@ -214,6 +217,8 @@ namespace sr_actuator
       : SrGenericActuator(name)
     {};
 
+    virtual ~SrActuator();
+
     SrMotorActuatorState state_;
   }; //end class SrActuator
 
@@ -230,6 +235,8 @@ namespace sr_actuator
     SrMuscleActuator(std::string name)
       : SrGenericActuator(name)
     {};
+
+    virtual ~SrMuscleActuator();
 
     SrMuscleActuatorState state_;
     SrMuscleActuatorCommand command_;
