@@ -63,7 +63,6 @@ namespace shadow_robot
     ///a vector containing all the joints to be tested
     std::vector<std::string> joints_to_test_;
 
-
     ///////
     // TESTING MOVEMENTS
 

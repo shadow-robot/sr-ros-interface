@@ -89,7 +89,6 @@ namespace shadowrobot
     std::string controlled_joint_name;
 
     controller_list_client.call(controller_list);
-
     for (size_t i=0;i<controller_list.response.controllers.size() ;i++ )
     {
       if(controller_list.response.state[i]=="running")

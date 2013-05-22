@@ -96,27 +96,84 @@ namespace shadow_robot
 
   void SrSelfTest::add_all_movements_tests_(const ros::TimerEvent& event)
   {
-    if( hand_commander_ == NULL )
-      hand_commander_.reset(new shadowrobot::HandCommander());
-
-    joints_to_test_ = hand_commander_->get_all_joints();
-
-    //send all the joints to their safe positions:
-    for( size_t i=0; i<joints_to_test_.size(); ++i)
+    if(simulated_)
     {
-      send_safe_target_(joints_to_test_[i]);
-      ros::Duration(0.4).sleep();
+      if( hand_commander_ == NULL )
+        hand_commander_.reset(new shadowrobot::HandCommander());
+
+      joints_to_test_ = hand_commander_->get_all_joints();
     }
+    else
+    {
+      joints_to_test_.clear();
+      //we're adding all the possible joints here. They're checked against
+      // controlled joints from hand commander later in the movement test.
+      joints_to_test_.push_back("FFJ0");
+      joints_to_test_.push_back("FFJ3");
+      joints_to_test_.push_back("FFJ4");
+
+      joints_to_test_.push_back("MFJ0");
+      joints_to_test_.push_back("MFJ3");
+      joints_to_test_.push_back("MFJ4");
+
+      joints_to_test_.push_back("RFJ0");
+      joints_to_test_.push_back("RFJ3");
+      joints_to_test_.push_back("RFJ4");
+
+      joints_to_test_.push_back("LFJ0");
+      joints_to_test_.push_back("LFJ3");
+      joints_to_test_.push_back("LFJ4");
+      joints_to_test_.push_back("LFJ5");
+
+      joints_to_test_.push_back("THJ1");
+      joints_to_test_.push_back("THJ2");
+      joints_to_test_.push_back("THJ3");
+      joints_to_test_.push_back("THJ4");
+      joints_to_test_.push_back("THJ5");
+
+      joints_to_test_.push_back("WRJ1");
+      joints_to_test_.push_back("WRJ2");
+    }
+
     index_joints_to_test_ = 0;
     for(size_t i=0; i < joints_to_test_.size(); ++i)
     {
-      test_runner_.add("Check movements", this, &SrSelfTest::test_movement_);
+      test_runner_.add("Check movements "+joints_to_test_[i], this, &SrSelfTest::test_movement_);
     }
   }
 
   void SrSelfTest::test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
+    if( hand_commander_ == NULL )
+      hand_commander_.reset(new shadowrobot::HandCommander());
+
+    if(index_joints_to_test_ == 0)
+    {
+      //send all the joints to their safe positions:
+      for( size_t i=0; i<joints_to_test_.size(); ++i)
+      {
+        send_safe_target_(joints_to_test_[i]);
+        ros::Duration(0.4).sleep();
+      }
+    }
+
     std::string joint_name = joints_to_test_[index_joints_to_test_];
+
+    if(!simulated_)
+    {
+      //only test the joint that are controlled from the hand commander
+      bool test_joint = false;
+      for(size_t i=0; i < hand_commander_->get_all_joints().size(); ++i)
+      {
+        if(joint_name.compare(hand_commander_->get_all_joints()[i]) == 0)
+        {
+          test_joint = true;
+          break;
+        }
+      }
+      if(!test_joint)
+        status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Not testing the joint.");
+    }
 
     //sends the joint to a collision safe position
     send_safe_target_(joint_name);

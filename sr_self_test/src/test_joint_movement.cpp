@@ -55,11 +55,20 @@ namespace shadow_robot
 
     sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
                                       &TestJointMovement::state_cb_, this );
+    pr2_sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
+                                          &TestJointMovement::pr2_state_cb_, this );
 
     mvt_pub_->start();
   }
 
   void TestJointMovement::state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
+  {
+    values[joint_name_ +" position"].push_back(msg->process_value);
+    values[joint_name_ +" target"].push_back(msg->set_point);
+    values[joint_name_ +" error"].push_back(msg->error);
+  }
+
+  void TestJointMovement::pr2_state_cb_(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg)
   {
     values[joint_name_ +" position"].push_back(msg->process_value);
     values[joint_name_ +" target"].push_back(msg->set_point);
