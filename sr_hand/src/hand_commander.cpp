@@ -58,6 +58,7 @@ namespace shadowrobot
         return;
       }
     }
+
     all_joints = robot_model.joints_;
 
     //We use the presence of the pr2_controller_manager/list_controllers service to detect that the hand is ethercat

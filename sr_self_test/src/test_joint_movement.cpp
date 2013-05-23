@@ -53,10 +53,18 @@ namespace shadow_robot
                                                       nb_mvt_step, controller_type));
     mvt_pub_->add_movement( *mvt_from_img_.get() );
 
-    sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
-                                      &TestJointMovement::state_cb_, this );
-    pr2_sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
-                                          &TestJointMovement::pr2_state_cb_, this );
+    try
+    {
+      sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
+                                        &TestJointMovement::state_cb_, this );
+      pr2_sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
+                                            &TestJointMovement::pr2_state_cb_, this );
+    }
+    catch(...)
+    {
+      //we ignore the exceptions: we're subscribing to the same topic name
+      // with different callback types, one of them will fail the other not.
+    }
 
     mvt_pub_->start();
   }
@@ -82,3 +90,10 @@ namespace shadow_robot
     //unsubscribe after receiving the message
   }
 }
+
+/* For the emacs weenies in the crowd.
+   Local Variables:
+   c-basic-offset: 2
+   End:
+*/
+
