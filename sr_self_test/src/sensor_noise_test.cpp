@@ -79,7 +79,7 @@ namespace shadow_robot
       ss << "Noises out of threshold: ";
       for (size_t i = 0; i < failed_joints.size(); ++i)
       {
-        ss << "[" << failed_joints[i] << " => " << failed_noises[i] << " ] ";
+        ss << "[" << failed_joints[i] << " -> " << failed_noises[i] << " ] ";
       }
       status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, ss.str());
     }

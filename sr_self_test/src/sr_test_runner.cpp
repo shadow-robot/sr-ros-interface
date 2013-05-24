@@ -105,7 +105,8 @@ namespace shadow_robot
     std::string cmd = "plot ";
     std::string title = "";
     std::map<std::string, std::vector<double> >::const_iterator last_it = joints.end();
-    --last_it;
+    if( !joints.empty())
+      --last_it;
     for (std::map<std::string, std::vector<double> >::const_iterator it = joints.begin(); it != joints.end(); ++it)
     {
       cmd += " '-' with lines title '"+it->first+"'";

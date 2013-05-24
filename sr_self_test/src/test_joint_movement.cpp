@@ -25,6 +25,10 @@
  */
 
 #include "sr_self_test/test_joint_movement.hpp"
+#include <stdio.h>
+#include "boost/iostreams/device/file_descriptor.hpp"
+#include "boost/iostreams/stream.hpp"
+
 
 namespace shadow_robot
 {
@@ -47,23 +51,38 @@ namespace shadow_robot
     publish_rate = 10.0;
     repetition = 1;
     nb_mvt_step = 1000;
-    std::string controller_type = "sr";
+
+    hand_commander_.reset(new shadowrobot::HandCommander());
+    std::string controller_state_topic = hand_commander_->get_controller_state_topic(joint_name);
+    std::string controller_state_topic_type = get_ROS_topic_type(controller_state_topic);
+    std::string controller_type = "";
+    if(controller_state_topic_type.compare("pr2_controllers_msgs/JointControllerState") == 0)
+    {
+      controller_type = "pr2";
+    }
+    else if(controller_state_topic_type.compare("sr_robot_msgs/JointControllerState") == 0)
+    {
+      controller_type = "sr";
+    }
+    else
+    {
+      ROS_ERROR_STREAM("Unknown controller state type: " << controller_state_topic_type << " trying to use pr2 type instead");
+      controller_type = "pr2";
+    }
 
     mvt_pub_.reset(new shadowrobot::MovementPublisher(joint_name, publish_rate, repetition,
                                                       nb_mvt_step, controller_type));
     mvt_pub_->add_movement( *mvt_from_img_.get() );
 
-    try
+    if(controller_type.compare("pr2") == 0)
     {
-      sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
-                                        &TestJointMovement::state_cb_, this );
       pr2_sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
                                             &TestJointMovement::pr2_state_cb_, this );
     }
-    catch(...)
+    else
     {
-      //we ignore the exceptions: we're subscribing to the same topic name
-      // with different callback types, one of them will fail the other not.
+      sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
+                                        &TestJointMovement::state_cb_, this );
     }
 
     mvt_pub_->start();
@@ -88,6 +107,35 @@ namespace shadow_robot
     mse = msg->data;
 
     //unsubscribe after receiving the message
+  }
+
+  std::string TestJointMovement::get_ROS_topic_type(std::string topic_name)
+  {
+    typedef boost::iostreams::file_descriptor_source boost_fd;
+    typedef boost::iostreams::stream<boost_fd> boost_stream; 
+    
+    FILE *myfile;
+    std::string cmd;
+
+    cmd = "rostopic type " + topic_name;
+
+    // make sure to popen and it succeeds
+    if(!(myfile = popen(cmd.c_str(), "r")))
+    {
+      ROS_ERROR_STREAM("Command failed: " << cmd);
+    }
+
+    boost_fd fd(fileno(myfile), boost::iostreams::never_close_handle);
+    boost_stream stream(fd);
+    //stream.set_auto_close(false); // https://svn.boost.org/trac/boost/ticket/3517
+    std::string topic_type;
+    if( !std::getline(stream,topic_type))
+    {
+      ROS_ERROR_STREAM("Could nod read line from get_ROS_topic_type command");
+    }
+
+    pclose(myfile);
+    return topic_type;
   }
 }
 
