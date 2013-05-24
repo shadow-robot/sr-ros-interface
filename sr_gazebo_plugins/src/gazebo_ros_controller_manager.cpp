@@ -432,7 +432,7 @@ void GazeboRosControllerManager::ControllerManagerROSThread()
 
   while (this->rosnode_->ok())
   {
-    self_test.checkTest();
+    self_test.checkTestAsync();
     //rate.sleep(); // using rosrate gets stuck on model delete
     usleep(1000);
     ros::spinOnce();

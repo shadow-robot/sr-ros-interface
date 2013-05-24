@@ -29,13 +29,12 @@
 
 #include <diagnostic_msgs/SelfTest.h>
 
-#include "sr_self_test/sr_test_runner.hpp"
-
 #include <boost/thread.hpp>
 #include <sr_robot_msgs/joint.h>
 #include <sr_hand/hand_commander.hpp>
 #include <ros/ros.h>
 
+#include "sr_self_test/sr_test_runner.hpp"
 #include "sr_self_test/test_joint_movement.hpp"
 
 namespace shadow_robot
@@ -48,6 +47,11 @@ namespace shadow_robot
     void checkTest()
     {
       test_runner_.checkTest();
+    }
+
+    void checkTestAsync()
+    {
+      test_thread_.reset(new boost::thread(boost::bind(&SrSelfTest::checkTest, this)));
     }
 
   private:
@@ -104,6 +108,9 @@ namespace shadow_robot
     static const double MAX_MSE_CONST_;
     ///Where the plots of the movements are stored
     std::string path_to_plots_;
+
+    ///Thread for running the tests in parallel when doing the tests on real hand
+    boost::shared_ptr<boost::thread> test_thread_;
   };
 }
 
