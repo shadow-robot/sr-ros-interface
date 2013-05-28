@@ -29,17 +29,24 @@
 
 namespace shadow_robot
 {
-  const double SensorNoiseTest::MAX_NOISE_CONST_ = 0.0087; //0.5 degrees
+  const double SensorNoiseTest::MAX_NOISE_CONST_ = 0.00348; //0.2 degrees //0.0087; //0.5 degrees
+  const double SensorNoiseTest::NOISE_EPSILON_CONST_ = 0.000000001; //So small that no real sensor can have smaller noise
 
   SensorNoiseTest::SensorNoiseTest()
   {
-    joint_states_sub_ = nh_.subscribe("joint_states", 50, &SensorNoiseTest::joint_states_cb_, this);
+    
   }
 
   void SensorNoiseTest::test_sensor_noise(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
+    // We subscribe to the joint_states topic when the test starts running.
+    // This way we avoid the initial ramping up of the filtered position when the driver starts
+    // (first pos=0, then the real sensor data is fed into the filter, and the position starts approaching that value)
+    // We can perfectly assume that the filtered value is stabilized here.
+    joint_states_sub_ = nh_.subscribe("joint_states", 50, &SensorNoiseTest::joint_states_cb_, this);
+
     ros::Rate rate(100);
-    for (size_t i = 0; i < 200; ++i)
+    for (size_t i = 0; i < 400; ++i)
     {
       ros::spinOnce();
       rate.sleep();
@@ -55,6 +62,7 @@ namespace shadow_robot
       {
         min = joint_states->second[0];
         max = joint_states->second[0];
+
         //starting loop at 1, as we already assigned 0 to min/max
         for (size_t i = 1; i < joint_states->second.size(); ++i)
         {
@@ -65,7 +73,9 @@ namespace shadow_robot
         }
 
         double noise = max - min;
-        if( noise > MAX_NOISE_CONST_ || noise == 0.0 )
+        ROS_INFO("Joint %s Pos min: %lf  max: %lf  noise: %lf", joint_states->first,  min , max , noise );
+        
+        if( noise > MAX_NOISE_CONST_ || noise <= NOISE_EPSILON_CONST_ )
         {
           failed_joints.push_back(joint_states->first);
           failed_noises.push_back( noise );
