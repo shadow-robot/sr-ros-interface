@@ -60,7 +60,7 @@ namespace shadow_robot
     sr_robot_msgs::ControlType current_ctrl_type;
     sr_robot_msgs::ChangeControlType change_ctrl_type;
     change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::QUERY;
-    if( ros::service::call("change_control_type", change_ctrl_type) )
+    if( ros::service::call("realtime_loop/change_control_type", change_ctrl_type) )
     {
       current_ctrl_type = change_ctrl_type.response.result;
     }
@@ -73,7 +73,7 @@ namespace shadow_robot
 
     //switch to PWM
     change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::PWM;
-    if( !ros::service::call("change_control_type", change_ctrl_type) )
+    if( !ros::service::call("realtime_loop/change_control_type", change_ctrl_type) )
     {
       status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
                       "Failed to change to PWM control type - aborting test." );
@@ -144,7 +144,7 @@ namespace shadow_robot
     target.data = 150.0;
     record_data_ = 1;
 
-    for (unsigned int i=0; i < 50; ++i)
+    for (unsigned int i=0; i < 10; ++i)
     {
       effort_pub_.publish(target);
       rate.sleep();
@@ -153,22 +153,27 @@ namespace shadow_robot
     //then the other
     target.data = -150.0;
     record_data_ = -1;
-    for (unsigned int i=0; i < 50; ++i)
+    for (unsigned int i=0; i < 10; ++i)
     {
       effort_pub_.publish(target);
       rate.sleep();
     }
 
     //then nothing (to check that current is back to 0)
+    target.data = 0.0;
     record_data_ = 0;
-    for (unsigned int i=0; i < 50; ++i)
+    for (unsigned int i=0; i < 10; ++i)
     {
+      effort_pub_.publish(target);
       rate.sleep();
     }
 
+    //stop the subscriber
+    diagnostic_sub_.shutdown();
+
     //reset to previous control mode
     change_ctrl_type.request.control_type = current_ctrl_type;
-    if( !ros::service::call("change_control_type", change_ctrl_type) )
+    if( !ros::service::call("realtime_loop/change_control_type", change_ctrl_type) )
     {
       status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
                       "Failed to change back to the previous control type - aborting test." );
@@ -184,9 +189,6 @@ namespace shadow_robot
                       "Failed to switch from controller "+effort_ctrl+" to controller "+current_ctrl +" - aborting test." );
       return;
     }
-
-    //stop the subscriber
-    diagnostic_sub_.shutdown();
 
     //test results
     std::stringstream ss;
@@ -229,33 +231,61 @@ namespace shadow_robot
             //not sending any targets, current should be close to 0
             if( record_data_ == 0)
             {
-              if( current > 0.01 || current < -0.01 )
+              if( current > 0.011 )
+              {
                 test_current_zero_ = false;
+                ROS_DEBUG("Current zero test error: %f", current);
+              }
+              else
+              {
+                test_current_zero_ = true;
+              }
             }
             else
             {
               //sending some targets, current should be between ? and ?
               //@todo find min max values for current when driving motors
-              if( current > 25.0 || current < 20.0 )
+              if( current > 0.5 || current < 0.012 )
+              {
                 test_current_moving_ = false;
+                ROS_DEBUG("Current moving test error: %f", current);
+              }
+              else
+              {
+                test_current_moving_ = true;
+              }
             }
           }
           else if( msg->status[status_i].values[value_i].key.compare("Strain Gauge Left") == 0 &&
-                   record_data_ == 1 )
+                   record_data_ == -1 )
           {
             //@todo is it always SGL for + and SGR for - ??
             int sgl = ::atoi( msg->status[status_i].values[value_i].value.c_str() );
             //@todo check min value for SG under tension
-            if( sgl < 30 )
+            if( sgl < 50 )
+            {
               test_strain_gauge_left_ = false;
+              ROS_DEBUG("sgl test error: %d", sgl);
+            }
+            else
+            {
+              test_strain_gauge_left_ = true;
+            }
           }
           else if( msg->status[status_i].values[value_i].key.compare("Strain Gauge Right") == 0 &&
-                   record_data_ == -1)
+                   record_data_ == 1)
           {
             //@todo same here
             int sgr = ::atoi( msg->status[status_i].values[value_i].value.c_str() );
-            if( sgr < 30 )
+            if( sgr < 50 )
+            {
               test_strain_gauge_right_ = false;
+              ROS_DEBUG("sgr test error: %d", sgr);
+            }
+            else
+            {
+              test_strain_gauge_right_ = true;
+            }
           }
         }
       }
