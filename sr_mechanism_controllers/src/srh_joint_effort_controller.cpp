@@ -190,8 +190,8 @@ namespace controller {
     double commanded_effort = command_;
 
     //Clamps the effort
-    commanded_effort = min( commanded_effort, max_force_demand );
-    commanded_effort = max( commanded_effort, -max_force_demand );
+    commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );
+    commanded_effort = max( commanded_effort, -(max_force_demand * max_force_factor_) );
 
     //Friction compensation
     if( has_j2 )
