@@ -138,6 +138,10 @@ namespace controller {
     {
       max_force_factor_ = msg->data;
     }
+    else
+    {
+      ROS_ERROR("Max force factor must be between 0.0 and 1.0. Discarding received value: %f", msg->data);
+    }
   }
 }
 
