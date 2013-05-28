@@ -51,6 +51,7 @@ namespace shadow_robot
     std::map<std::string, std::vector<double> > all_joint_states_;
 
     static const double MAX_NOISE_CONST_;
+    static const double NOISE_EPSILON_CONST_;
   };
 }
 
