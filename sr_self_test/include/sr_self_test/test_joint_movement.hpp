@@ -33,6 +33,7 @@
 #include <std_msgs/Float64.h>
 #include <ros/ros.h>
 #include <sr_hand/hand_commander.hpp>
+#include <boost/smart_ptr.hpp>
 
 namespace shadow_robot
 {
@@ -50,10 +51,13 @@ namespace shadow_robot
     ros::Publisher pub_;
 
     ros::Subscriber sub_state_;
+    ros::Subscriber pr2_sub_state_;
     void state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
+    void pr2_state_cb_(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg);
 
     ros::Subscriber mse_sub_;
     void mse_cb_(const std_msgs::Float64::ConstPtr& msg);
+    std::string get_ROS_topic_type(std::string topic_name);
 
     boost::shared_ptr<shadowrobot::MovementFromImage> mvt_from_img_;
     boost::shared_ptr<shadowrobot::MovementPublisher> mvt_pub_;
@@ -63,8 +67,9 @@ namespace shadow_robot
     boost::shared_ptr<boost::thread> thread_;
 
     std::string joint_name_;
-
-    shadowrobot::HandCommander* hand_commander;
+    
+    /// used with the sole purpose of knowing the name of the topic we want to subscribe to
+    boost::shared_ptr<shadowrobot::HandCommander> hand_commander_;
   };
 }
 

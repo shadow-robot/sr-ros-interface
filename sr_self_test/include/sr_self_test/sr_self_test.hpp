@@ -52,6 +52,11 @@ namespace shadow_robot
       test_runner_.checkTest();
     }
 
+    void checkTestAsync()
+    {
+      test_thread_.reset(new boost::thread(boost::bind(&SrSelfTest::checkTest, this)));
+    }
+
   private:
     ros::NodeHandle nh_tilde_;
     // self_test::TestRunner is the handles sequencing driver self-tests.
@@ -64,6 +69,7 @@ namespace shadow_robot
     void test_services_();
     ///a vector containing all the joints to be tested
     std::vector<std::string> joints_to_test_;
+
     ///a vector containing the test to be run on the motors.
     boost::ptr_vector<MotorTest> motor_tests_;
 
@@ -108,6 +114,9 @@ namespace shadow_robot
     static const double MAX_MSE_CONST_;
     ///Where the plots of the movements are stored
     std::string path_to_plots_;
+
+    ///Thread for running the tests in parallel when doing the tests on real hand
+    boost::shared_ptr<boost::thread> test_thread_;
   };
 }
 
