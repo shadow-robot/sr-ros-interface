@@ -231,7 +231,7 @@ namespace shadow_robot
             //not sending any targets, current should be close to 0
             if( record_data_ == 0)
             {
-              if( current > 0.011 )
+              if( current > 0.016 )
               {
                 test_current_zero_ = false;
                 ROS_DEBUG("Current zero test error: %f", current);
