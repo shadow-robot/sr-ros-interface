@@ -29,12 +29,15 @@
 
 #include <diagnostic_msgs/SelfTest.h>
 
+#include "sr_self_test/sr_test_runner.hpp"
+#include "sr_self_test/motor_test.hpp"
+
 #include <boost/thread.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <sr_robot_msgs/joint.h>
 #include <sr_hand/hand_commander.hpp>
 #include <ros/ros.h>
 
-#include "sr_self_test/sr_test_runner.hpp"
 #include "sr_self_test/test_joint_movement.hpp"
 
 namespace shadow_robot
@@ -66,6 +69,9 @@ namespace shadow_robot
     void test_services_();
     ///a vector containing all the joints to be tested
     std::vector<std::string> joints_to_test_;
+
+    ///a vector containing the test to be run on the motors.
+    boost::ptr_vector<MotorTest> motor_tests_;
 
     ///////
     // TESTING MOVEMENTS

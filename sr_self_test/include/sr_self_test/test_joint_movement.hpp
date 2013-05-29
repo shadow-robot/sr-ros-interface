@@ -40,7 +40,7 @@ namespace shadow_robot
   class TestJointMovement
   {
   public:
-    TestJointMovement(std::string joint_name);
+    TestJointMovement(std::string joint_name, shadowrobot::HandCommander* hand_commander);
     ~TestJointMovement() {};
 
     double mse;
