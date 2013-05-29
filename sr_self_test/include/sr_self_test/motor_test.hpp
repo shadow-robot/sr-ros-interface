@@ -29,10 +29,48 @@
 #ifndef _MOTOR_TEST_H_
 #define _MOTOR_TEST_H_
 
-#include "sr_self_test/diagnostics_parser/diagnostics_common.hpp"
+#include <self_test/self_test.h>
+#include <sr_hand/hand_commander.hpp>
 
 namespace shadow_robot
 {
+  class MotorTest
+  {
+  public:
+    MotorTest( self_test::TestRunner* test_runner,
+               std::string joint_name,
+               shadowrobot::HandCommander* hand_commander);
+    virtual ~MotorTest() {};
+
+    void run_test(diagnostic_updater::DiagnosticStatusWrapper& status);
+
+  protected:
+    ros::NodeHandle nh_;
+    self_test::TestRunner* test_runner_;
+    std::string joint_name_;
+    shadowrobot::HandCommander* hand_commander_;
+    ros::Publisher effort_pub_;
+    ros::Subscriber diagnostic_sub_;
+    double PWM_target_;
+    ///0 if not recording, 1 if going +, -1 if going -
+    short record_data_;
+
+    bool test_current_zero_;
+    bool test_current_moving_;
+    bool test_strain_gauge_right_;
+    bool test_strain_gauge_left_;
+
+    static const double STANDARD_PWM_TARGET_;
+    static const double WRJ1_PWM_TARGET_;
+    static const double WRJ2_PWM_TARGET_;
+    static const int STRAIN_GAUGE_THRESHOLD_;
+
+    /**
+     * Susbscribed to the diagnostics_agg topic.
+     * @param msg new incoming msg
+     */
+    void diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg);
+  };
 }
 
   /* For the emacs weenies in the crowd.

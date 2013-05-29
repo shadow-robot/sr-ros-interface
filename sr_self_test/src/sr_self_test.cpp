@@ -57,7 +57,7 @@ namespace shadow_robot
     test_services_();
 
     //some tests can only be run on the real hand
-    if(!simulated)
+    if(!simulated_)
     {
       //add manual tests (tactile, calibration)
       test_runner_.addManualTests();
@@ -135,10 +135,19 @@ namespace shadow_robot
       joints_to_test_.push_back("WRJ2");
     }
 
+    motor_tests_.clear();
+
     index_joints_to_test_ = 0;
     for(size_t i=0; i < joints_to_test_.size(); ++i)
     {
-      test_runner_.add("Check movements "+joints_to_test_[i], this, &SrSelfTest::test_movement_);
+      //checking the movement of the finger
+      test_runner_.add("Check movements ["+joints_to_test_[i]+"]", this, &SrSelfTest::test_movement_);
+
+      if(!simulated_)
+      {
+        //running some tests on the motor (PWM mode, strain gauge response, etc...)
+        motor_tests_.push_back(new MotorTest(&test_runner_, joints_to_test_[i], hand_commander_.get() ) );
+      }
     }
   }
 
@@ -185,8 +194,7 @@ namespace shadow_robot
       status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Parameter image_path not set, can't analyse movements.");
       return;
     }
-
-    test_mvts_[joint_name].reset( new TestJointMovement(joint_name) );
+    test_mvts_[joint_name].reset( new TestJointMovement(joint_name, hand_commander_.get()) );
 
     //wait a bit for mse to be received
     ros::Duration(1.0).sleep();

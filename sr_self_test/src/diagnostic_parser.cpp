@@ -38,13 +38,13 @@ namespace shadow_robot
     diagnostics_.push_back( new IsOKDiagnostics("EtherCAT Dual CAN Palm", test_runner_));
     diagnostics_.push_back( new IsOKDiagnostics("SRBridge", test_runner_)); //TODO: not sure what's the 00
 
-    diag_sub_ = nh_.subscribe("diagnostics_agg", 1, &DiagnosticParser::diagnostics_agg_cb_, this);
-
     run_tests_();
   }
 
   void DiagnosticParser::run_tests_()
   {
+    diag_sub_ = nh_.subscribe("diagnostics_agg", 1, &DiagnosticParser::diagnostics_agg_cb_, this);
+
     //wait for 5 seconds while we parse the diagnostics.
     // spin to make sure we get the messages
     for(size_t i=0; i<50; ++i)
@@ -57,6 +57,8 @@ namespace shadow_robot
     {
       diag.second->add_test();
     }
+
+    diag_sub_.shutdown();
   }
 
   void DiagnosticParser::diagnostics_agg_cb_(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)

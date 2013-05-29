@@ -32,7 +32,7 @@
 
 namespace shadow_robot
 {
-  TestJointMovement::TestJointMovement(std::string joint_name)
+  TestJointMovement::TestJointMovement(std::string joint_name, shadowrobot::HandCommander* hand_commander)
     : mse(0.0), nh_tilde_("~")
   {
     joint_name_ = joint_name;
@@ -48,11 +48,15 @@ namespace shadow_robot
 
     double publish_rate;
     unsigned int repetition, nb_mvt_step;
-    publish_rate = 10.0;
+    publish_rate = 100.0;
     repetition = 1;
-    nb_mvt_step = 1000;
+    nb_mvt_step = 10000;
 
-    hand_commander_.reset(new shadowrobot::HandCommander());
+    if( hand_commander != NULL )
+      hand_commander_.reset(hand_commander);
+    else
+      hand_commander_.reset(new shadowrobot::HandCommander());
+
     std::string controller_state_topic = hand_commander_->get_controller_state_topic(joint_name);
     std::string controller_state_topic_type = get_ROS_topic_type(controller_state_topic);
     std::string controller_type = "";
@@ -71,7 +75,8 @@ namespace shadow_robot
     }
 
     mvt_pub_.reset(new shadowrobot::MovementPublisher(joint_name, publish_rate, repetition,
-                                                      nb_mvt_step, controller_type));
+                                                      nb_mvt_step, controller_type, false,
+                                                      hand_commander ));
     mvt_pub_->add_movement( *mvt_from_img_.get() );
 
     if(controller_type.compare("pr2") == 0)
@@ -107,6 +112,8 @@ namespace shadow_robot
     mse = msg->data;
 
     //unsubscribe after receiving the message
+    mse_sub_.shutdown();
+    sub_state_.shutdown();
   }
 
   std::string TestJointMovement::get_ROS_topic_type(std::string topic_name)
