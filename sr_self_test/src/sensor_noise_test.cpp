@@ -29,7 +29,7 @@
 
 namespace shadow_robot
 {
-  const double SensorNoiseTest::MAX_NOISE_CONST_ = 0.00348; //0.2 degrees //0.0087; //0.5 degrees
+  const double SensorNoiseTest::MAX_NOISE_CONST_ = 0.0087; //0.5 degrees
   const double SensorNoiseTest::NOISE_EPSILON_CONST_ = 0.000000001; //So small that no real sensor can have smaller noise
 
   SensorNoiseTest::SensorNoiseTest()
@@ -72,7 +72,7 @@ namespace shadow_robot
         }
 
         double noise = max - min;
-        ROS_INFO("Joint %s Pos min: %lf  max: %lf  noise: %lf", joint_states->first.c_str(),  min , max , noise );
+        ROS_DEBUG("Joint %s Pos min: %lf  max: %lf  noise: %lf", joint_states->first.c_str(),  min , max , noise );
         
         if( noise > MAX_NOISE_CONST_ || noise <= NOISE_EPSILON_CONST_ )
         {

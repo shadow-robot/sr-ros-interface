@@ -48,9 +48,9 @@ namespace shadow_robot
 
     double publish_rate;
     unsigned int repetition, nb_mvt_step;
-    publish_rate = 10.0;
+    publish_rate = 100.0;
     repetition = 1;
-    nb_mvt_step = 1000;
+    nb_mvt_step = 10000;
 
     if( hand_commander != NULL )
       hand_commander_.reset(hand_commander);

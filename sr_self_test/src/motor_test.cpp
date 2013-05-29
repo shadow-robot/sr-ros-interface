@@ -36,14 +36,27 @@
 
 namespace shadow_robot
 {
+  const double MotorTest::STANDARD_PWM_TARGET_ = 150.0; //Used for most of the motors
+  const double MotorTest::WRJ1_PWM_TARGET_ = 250.0; //Used for WRJ1
+  const double MotorTest::WRJ2_PWM_TARGET_ = 190.0; //Used for WRJ2
+
+  const int MotorTest::STRAIN_GAUGE_THRESHOLD_ = 40; //the minimum value of the SG when pulling in that direction
+
   MotorTest::MotorTest(self_test::TestRunner* test_runner,
                        std::string joint_name,
                        shadowrobot::HandCommander* hand_commander)
     : test_runner_(test_runner), joint_name_( joint_name ), hand_commander_(hand_commander),
-      record_data_(0), test_current_zero_(true), test_current_moving_(true), test_strain_gauge_right_(true), test_strain_gauge_left_(true)
+      record_data_(0), test_current_zero_(true), test_current_moving_(true), test_strain_gauge_right_(true), test_strain_gauge_left_(true), PWM_target_(STANDARD_PWM_TARGET_)
   {
     //joint name is lower case in the controller topics
     boost::algorithm::to_lower(joint_name_);
+
+    if(joint_name_.compare("wrj1") == 0)
+      PWM_target_ = WRJ1_PWM_TARGET_;
+    else if(joint_name_.compare("wrj2") == 0)
+      PWM_target_ = WRJ2_PWM_TARGET_;
+    else 
+      PWM_target_ = STANDARD_PWM_TARGET_;
 
     test_runner_->add("Test motor ["+joint_name_+"]", this, &MotorTest::run_test);
   }
@@ -141,7 +154,7 @@ namespace shadow_robot
     ros::Rate rate(2.0);
 
     //first one way
-    target.data = 150.0;
+    target.data = PWM_target_;
     record_data_ = 1;
 
     for (unsigned int i=0; i < 10; ++i)
@@ -151,7 +164,7 @@ namespace shadow_robot
     }
 
     //then the other
-    target.data = -150.0;
+    target.data = -PWM_target_;
     record_data_ = -1;
     for (unsigned int i=0; i < 10; ++i)
     {
@@ -262,7 +275,7 @@ namespace shadow_robot
             //@todo is it always SGL for + and SGR for - ??
             int sgl = ::atoi( msg->status[status_i].values[value_i].value.c_str() );
             //@todo check min value for SG under tension
-            if( sgl < 50 )
+            if( sgl < STRAIN_GAUGE_THRESHOLD_ )
             {
               test_strain_gauge_left_ = false;
               ROS_DEBUG("sgl test error: %d", sgl);
@@ -277,7 +290,7 @@ namespace shadow_robot
           {
             //@todo same here
             int sgr = ::atoi( msg->status[status_i].values[value_i].value.c_str() );
-            if( sgr < 50 )
+            if( sgr < STRAIN_GAUGE_THRESHOLD_ )
             {
               test_strain_gauge_right_ = false;
               ROS_DEBUG("sgr test error: %d", sgr);

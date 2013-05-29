@@ -51,6 +51,7 @@ namespace shadow_robot
     shadowrobot::HandCommander* hand_commander_;
     ros::Publisher effort_pub_;
     ros::Subscriber diagnostic_sub_;
+    double PWM_target_;
     ///0 if not recording, 1 if going +, -1 if going -
     short record_data_;
 
@@ -58,6 +59,11 @@ namespace shadow_robot
     bool test_current_moving_;
     bool test_strain_gauge_right_;
     bool test_strain_gauge_left_;
+
+    static const double STANDARD_PWM_TARGET_;
+    static const double WRJ1_PWM_TARGET_;
+    static const double WRJ2_PWM_TARGET_;
+    static const int STRAIN_GAUGE_THRESHOLD_;
 
     /**
      * Susbscribed to the diagnostics_agg topic.
