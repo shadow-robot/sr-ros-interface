@@ -47,7 +47,12 @@ namespace shadow_robot
     //The user needs to start rxplot for the tactiles
     // ask the user to press the tactiles
     sr_robot_msgs::ManualSelfTest tactile_srv;
-    tactile_srv.request.message = "Please press on the tactile sensors one after the other. Check that they react using rxplot.";
+    tactile_srv.request.message = "Please press on the tactile sensors one after the other. Check that they react using rxplot. \n\n";
+    tactile_srv.request.message += "If you have a hand equipped with biotacs:\n";
+    tactile_srv.request.message += "   > rxplot /realtime_loop/tactile/tactiles[0]/pac0,/realtime_loop/tactile/tactiles[1]/pac0,/realtime_loop/tactile/tactiles[2]/pac0,/realtime_loop/tactile/tactiles[3]/pac0,/realtime_loop/tactile/tactiles[4]/pac0\n";
+    tactile_srv.request.message += "\n";
+    tactile_srv.request.message += "If you have a hand equipped with PSTs:\n";
+    tactile_srv.request.message += "   > rxplot /realtime_loop/tactile/pressure[0],/realtime_loop/tactile/pressure[1],/realtime_loop/tactile/pressure[2],/realtime_loop/tactile/pressure[3],/realtime_loop/tactile/pressure[4]\n";
     user_input_client_.call(tactile_srv);
 
     //Run Calibration test
