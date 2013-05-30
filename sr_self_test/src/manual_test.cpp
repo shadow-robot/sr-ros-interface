@@ -62,6 +62,11 @@ namespace shadow_robot
     calibration_srv.request.message = "Please check that the positions of the joints in the 3d model of the hand (using rviz) match those in the real hand.";
     user_input_client_.call(calibration_srv);
 
+    //General Information before going to the motor tests
+    sr_robot_msgs::ManualSelfTest general_info_srv;
+    general_info_srv.request.message = "Please start the position controllers for the hand now. You can use the change controllers plugin. Be aware that the remaining tests can take up to 1/2h to complete - make sure the computer doesn't go to sleep while the tests are running or they'll stop.";
+    user_input_client_.call(general_info_srv);
+
     if( tactile_srv.response.ok && calibration_srv.response.ok )
     {
       status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Tactile and calibrations are ok.");
