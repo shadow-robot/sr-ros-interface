@@ -43,6 +43,10 @@ namespace shadow_robot
   {
     user_input_client_.waitForExistence();
 
+    sr_robot_msgs::ManualSelfTest busses_info_srv;
+    busses_info_srv.request.message = "If the previous tests passed, the communications with the hand are fine.";
+    user_input_client_.call(busses_info_srv);
+
     //Run Tactile test
     //The user needs to start rxplot for the tactiles
     // ask the user to press the tactiles

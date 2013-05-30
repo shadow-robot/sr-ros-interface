@@ -59,10 +59,15 @@ namespace shadow_robot
     //some tests can only be run on the real hand
     if(!simulated_)
     {
-      //add manual tests (tactile, calibration)
-      test_runner_.addManualTests();
       //parses the diagnostics to find common problems
       test_runner_.add_diagnostic_parser();
+
+      //manual tests come after diagnostic parsing
+      // as we notify the user that the hand
+      // connection seems to be fine if the previous
+      // tests passed
+      //add manual tests (tactile, calibration)
+      test_runner_.addManualTests();
       //test the noise of the sensors
       test_runner_.addSensorNoiseTest();
     }
