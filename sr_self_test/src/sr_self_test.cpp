@@ -267,7 +267,7 @@ namespace shadow_robot
     {
       if( joint_name.compare("MFJ4") == 0 )
       {
-        (*safe_targets_.get())["FFJ3"].joint_target = 45.0;
+        (*safe_targets_.get())["FFJ3"].joint_target = 0.0;
         (*safe_targets_.get())["MFJ3"].joint_target = 45.0;
         (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
         (*safe_targets_.get())["MFJ4"].joint_target = 0.0;
@@ -289,7 +289,7 @@ namespace shadow_robot
         {
           if( joint_name.compare("LFJ4") == 0 )
           {
-            (*safe_targets_.get())["MFJ3"].joint_target = 0.0;
+            (*safe_targets_.get())["RFJ3"].joint_target = 0.0;
             (*safe_targets_.get())["LFJ3"].joint_target = 45.0;
             (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
             (*safe_targets_.get())["MFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").first );
