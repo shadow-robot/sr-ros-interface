@@ -59,10 +59,15 @@ namespace shadow_robot
     //some tests can only be run on the real hand
     if(!simulated_)
     {
-      //add manual tests (tactile, calibration)
-      test_runner_.addManualTests();
       //parses the diagnostics to find common problems
       test_runner_.add_diagnostic_parser();
+
+      //manual tests come after diagnostic parsing
+      // as we notify the user that the hand
+      // connection seems to be fine if the previous
+      // tests passed
+      //add manual tests (tactile, calibration)
+      test_runner_.addManualTests();
       //test the noise of the sensors
       test_runner_.addSensorNoiseTest();
     }
@@ -252,6 +257,7 @@ namespace shadow_robot
     //This is very hugly.... not sure how to make it prettier easily - haven't much time...
     if( joint_name.compare("FFJ4") == 0 )
     {
+      (*safe_targets_.get())["FFJ3"].joint_target = 45.0;
       (*safe_targets_.get())["FFJ4"].joint_target = 0.0;
       (*safe_targets_.get())["MFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").second );
       (*safe_targets_.get())["RFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("RFJ4").first );
@@ -261,6 +267,8 @@ namespace shadow_robot
     {
       if( joint_name.compare("MFJ4") == 0 )
       {
+        (*safe_targets_.get())["FFJ3"].joint_target = 0.0;
+        (*safe_targets_.get())["MFJ3"].joint_target = 45.0;
         (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
         (*safe_targets_.get())["MFJ4"].joint_target = 0.0;
         (*safe_targets_.get())["RFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("RFJ4").first );
@@ -270,6 +278,8 @@ namespace shadow_robot
       {
         if( joint_name.compare("RFJ4") == 0 )
         {
+          (*safe_targets_.get())["MFJ3"].joint_target = 0.0;
+          (*safe_targets_.get())["RFJ3"].joint_target = 45.0;
           (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
           (*safe_targets_.get())["MFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").first );
           (*safe_targets_.get())["RFJ4"].joint_target = 0.0;
@@ -279,6 +289,8 @@ namespace shadow_robot
         {
           if( joint_name.compare("LFJ4") == 0 )
           {
+            (*safe_targets_.get())["RFJ3"].joint_target = 0.0;
+            (*safe_targets_.get())["LFJ3"].joint_target = 45.0;
             (*safe_targets_.get())["FFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("FFJ4").first );
             (*safe_targets_.get())["MFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("MFJ4").first );
             (*safe_targets_.get())["RFJ4"].joint_target = sr_math_utils::to_degrees( hand_commander_->get_min_max("RFJ4").second );
@@ -286,6 +298,11 @@ namespace shadow_robot
           }
           else
           {
+            (*safe_targets_.get())["FFJ3"].joint_target = 0.0;
+            (*safe_targets_.get())["MFJ3"].joint_target = 0.0;
+            (*safe_targets_.get())["RFJ3"].joint_target = 0.0;
+            (*safe_targets_.get())["LFJ3"].joint_target = 0.0;
+
             (*safe_targets_.get())["FFJ4"].joint_target = 0.0;
             (*safe_targets_.get())["MFJ4"].joint_target = 0.0;
             (*safe_targets_.get())["RFJ4"].joint_target = 0.0;

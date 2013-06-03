@@ -36,7 +36,7 @@ namespace shadow_robot
   class ManualTests
   {
   public:
-    ManualTests();
+    ManualTests( std::string message, int id);
     virtual ~ManualTests()
     {};
 
@@ -44,6 +44,11 @@ namespace shadow_robot
 
   private:
     ros::NodeHandle nh_;
+
+    ///the message we want the user to see
+    std::string message_;
+    ///an id for the test
+    int id_;
 
     ///Service client for getting the user input
     ros::ServiceClient user_input_client_;

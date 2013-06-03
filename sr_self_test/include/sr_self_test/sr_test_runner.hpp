@@ -76,7 +76,7 @@ private:
   boost::shared_ptr<DiagnosticParser> diagnostic_parser_;
 
   ///runs manual test (visual calibration check, tactiles...)
-  boost::shared_ptr<ManualTests> manual_tests_;
+  std::vector<boost::shared_ptr<ManualTests> > manual_tests_;
 
   boost::shared_ptr<SensorNoiseTest> sensor_noise_test_;
 };
