@@ -72,6 +72,9 @@ namespace shadow_robot
       test_runner_.addSensorNoiseTest();
     }
 
+
+    test_runner_.addManualTests();
+
     //calling this from a oneshot timer because we're using the
     // hand commander which needs the hand to be fully initialised
     // before we can instantiate it.
@@ -101,6 +104,8 @@ namespace shadow_robot
 
   void SrSelfTest::add_all_movements_tests_(const ros::TimerEvent& event)
   {
+    return;
+
     if(simulated_)
     {
       if( hand_commander_ == NULL )

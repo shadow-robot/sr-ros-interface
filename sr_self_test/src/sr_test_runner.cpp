@@ -135,8 +135,28 @@ namespace shadow_robot
 
   void SrTestRunner::addManualTests()
   {
-    manual_tests_.reset(new ManualTests());
-    add("Manual Tests", manual_tests_.get(), &ManualTests::run_manual_tests);
+    std::string msg;
+
+    msg = "If the previous tests passed, the communications\n with the hand are fine.";
+    manual_tests_.push_back( boost::shared_ptr<ManualTests>(new ManualTests(msg, 0) ) );
+    add("Manual Tests: communications", manual_tests_.back().get(), &ManualTests::run_manual_tests);
+
+    msg = "Please press on the tactile sensors one after the other.\n Check that they react using rxplot. \n\n";
+    msg += "If you have a hand equipped with biotacs:\n";
+    msg += "   > rxplot /realtime_loop/tactile/tactiles[0]/pac0,/realtime_loop/tactile/tactiles[1]/pac0,/realtime_loop/tactile/tactiles[2]/pac0,/realtime_loop/tactile/tactiles[3]/pac0,/realtime_loop/tactile/tactiles[4]/pac0\n";
+    msg += "\n";
+    msg += "If you have a hand equipped with PSTs:\n";
+    msg += "   > rxplot /realtime_loop/tactile/pressure[0],/realtime_loop/tactile/pressure[1],/realtime_loop/tactile/pressure[2],/realtime_loop/tactile/pressure[3],/realtime_loop/tactile/pressure[4]\n";
+    manual_tests_.push_back( boost::shared_ptr<ManualTests>(new ManualTests(msg, 1) ) );
+    add("Manual Tests: tactiles.", manual_tests_.back().get(), &ManualTests::run_manual_tests);
+
+    msg = "Please check that the positions of the joints in the 3d model\n of the hand (using rviz) match those in the real hand.";
+    manual_tests_.push_back( boost::shared_ptr<ManualTests>(new ManualTests(msg, 2) ) );
+    add("Manual Tests: joint positions - rviz.", manual_tests_.back().get(), &ManualTests::run_manual_tests);
+
+    msg = "Please start the position controllers for the hand now.\n You can use the change controllers plugin.\n\n Be aware that the remaining tests can take up to 1/2h to complete - make sure the computer doesn't go to sleep \nwhile the tests are running or they'll stop. \nYou can press OK once the controllers are running.";
+    manual_tests_.push_back( boost::shared_ptr<ManualTests>(new ManualTests(msg, 3) ) );
+    add("Manual Tests: general information.", manual_tests_.back().get(), &ManualTests::run_manual_tests);
   }
 } //end namespace
 

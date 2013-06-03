@@ -33,9 +33,12 @@
 
 namespace shadow_robot
 {
-  ManualTests::ManualTests()
+  ManualTests::ManualTests( std::string message, int id )
     : nh_("~")
   {
+    message_ = message;
+    id_ = id;
+
     user_input_client_ = nh_.serviceClient<sr_robot_msgs::ManualSelfTest>("manual_self_tests");
   }
 
@@ -43,47 +46,18 @@ namespace shadow_robot
   {
     user_input_client_.waitForExistence();
 
-    sr_robot_msgs::ManualSelfTest busses_info_srv;
-    busses_info_srv.request.message = "If the previous tests passed, the communications with the hand are fine.";
-    user_input_client_.call(busses_info_srv);
+    sr_robot_msgs::ManualSelfTest srv;
+    srv.request.message = message_;
 
-    //Run Tactile test
-    //The user needs to start rxplot for the tactiles
-    // ask the user to press the tactiles
-    sr_robot_msgs::ManualSelfTest tactile_srv;
-    tactile_srv.request.message = "Please press on the tactile sensors one after the other. Check that they react using rxplot. \n\n";
-    tactile_srv.request.message += "If you have a hand equipped with biotacs:\n";
-    tactile_srv.request.message += "   > rxplot /realtime_loop/tactile/tactiles[0]/pac0,/realtime_loop/tactile/tactiles[1]/pac0,/realtime_loop/tactile/tactiles[2]/pac0,/realtime_loop/tactile/tactiles[3]/pac0,/realtime_loop/tactile/tactiles[4]/pac0\n";
-    tactile_srv.request.message += "\n";
-    tactile_srv.request.message += "If you have a hand equipped with PSTs:\n";
-    tactile_srv.request.message += "   > rxplot /realtime_loop/tactile/pressure[0],/realtime_loop/tactile/pressure[1],/realtime_loop/tactile/pressure[2],/realtime_loop/tactile/pressure[3],/realtime_loop/tactile/pressure[4]\n";
-    user_input_client_.call(tactile_srv);
+    user_input_client_.call(srv);
 
-    //Run Calibration test
-    //The user needs to start rviz
-    // ask the user to check the calibration visually
-    sr_robot_msgs::ManualSelfTest calibration_srv;
-    calibration_srv.request.message = "Please check that the positions of the joints in the 3d model of the hand (using rviz) match those in the real hand.";
-    user_input_client_.call(calibration_srv);
-
-    //General Information before going to the motor tests
-    sr_robot_msgs::ManualSelfTest general_info_srv;
-    general_info_srv.request.message = "Please start the position controllers for the hand now. You can use the change controllers plugin. Be aware that the remaining tests can take up to 1/2h to complete - make sure the computer doesn't go to sleep while the tests are running or they'll stop.";
-    user_input_client_.call(general_info_srv);
-
-    if( tactile_srv.response.ok && calibration_srv.response.ok )
+    if( srv.response.ok )
     {
-      status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Tactile and calibrations are ok.");
-      return;
+      status.summary(diagnostic_msgs::DiagnosticStatus::OK, "OK");
     }
-
-    if( !tactile_srv.response.ok )
+    else
     {
-      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Tactile test failed: " + tactile_srv.response.message);
-    }
-    if( !calibration_srv.response.ok )
-    {
-      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Calibration test failed: " + calibration_srv.response.message);
+      status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Test failed: " + srv.response.message);
     }
   }
 } //end namespace
