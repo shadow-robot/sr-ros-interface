@@ -1,12 +1,37 @@
 <launch>
-  <!-- start gazebo with an empty plane -->
-  <param name="/use_sim_time" value="true" />
 
-  <node name="gazebo" pkg="gazebo" type="gazebo" args=" $(find sr_description)/other/worlds/empty.world" respawn="false" output="screen">
-    <remap from="joint_states" to="/gazebo/joint_states"/>
-  </node>
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="throttled" default="false"/>
 
-  <group unless="$(optenv GAZEBO_NO_X 0)">
+  <!-- set use_sim_time flag -->
+  <group if="$(arg use_sim_time)">
+    <param name="/use_sim_time" value="true" />
+  </group>
+
+
+  <!-- start empty world -->
+  <group if="$(arg paused)">
+    <group if="$(arg throttled)">
+      <node name="gazebo" pkg="gazebo" type="gazebo" args="-u $(find gazebo_worlds)/worlds/empty_throttled.world" respawn="false" output="screen"/>
+    </group>
+    <group unless="$(arg throttled)">
+      <node name="gazebo" pkg="gazebo" type="gazebo" args="-u $(find gazebo_worlds)/worlds/empty.world" respawn="false" output="screen"/>
+    </group>
+  </group>
+  <group unless="$(arg paused)">
+    <group if="$(arg throttled)">
+      <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find gazebo_worlds)/worlds/empty_throttled.world" respawn="false" output="screen"/>
+    </group>
+    <group unless="$(arg throttled)">
+      <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find gazebo_worlds)/worlds/empty.world" respawn="false" output="screen"/>
+    </group>
+  </group>
+
+  <!-- start gui -->
+  <group if="$(arg gui)">
     <node name="gazebo_gui" pkg="gazebo" type="gui" respawn="false" output="screen"/>
   </group>
+
 </launch>

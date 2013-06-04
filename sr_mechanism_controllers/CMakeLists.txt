@@ -27,8 +27,6 @@ ELSE(DEFINED debug)
 ENDIF(DEFINED debug)
 MESSAGE(" ----- ")
 
-
-rosbuild_add_executable(joint_trajectory_action_controller src/joint_trajectory_action_controller.cpp)
 rosbuild_add_executable(joint_spline_trajectory_action_controller src/joint_spline_trajectory_action_controller.cpp)
 
 rosbuild_add_executable(simple_spline_trajectory example/simple_spline_trajectory.cpp)
@@ -40,6 +38,7 @@ rosbuild_add_library(${PROJECT_NAME}
   src/srh_joint_velocity_controller.cpp
   src/srh_mixed_position_velocity_controller.cpp
   src/sr_friction_compensation.cpp
+  src/joint_trajectory_action_controller.cpp
 
   example/srh_syntouch_controllers.cpp
 
