@@ -138,11 +138,11 @@ namespace shadow_robot
     std::string msg;
 
     msg = "Please press on the tactile sensors one after the other.\n Check that they react using rxplot. \n\n";
-    msg += "If you have a hand equipped with biotacs:\n";
-    msg += "   > rxplot /realtime_loop/tactile/tactiles[0]/pac0,/realtime_loop/tactile/tactiles[1]/pac0,/realtime_loop/tactile/tactiles[2]/pac0,/realtime_loop/tactile/tactiles[3]/pac0,/realtime_loop/tactile/tactiles[4]/pac0\n";
+    msg += "If you have a hand equipped with biotacs (cycle [0] to change the finger tip):\n";
+    msg += "   > rxplot /tactile/tactiles[0]/pac0";
     msg += "\n";
-    msg += "If you have a hand equipped with PSTs:\n";
-    msg += "   > rxplot /realtime_loop/tactile/pressure[0],/realtime_loop/tactile/pressure[1],/realtime_loop/tactile/pressure[2],/realtime_loop/tactile/pressure[3],/realtime_loop/tactile/pressure[4]\n";
+    msg += "If you have a hand equipped with PSTs (cycle [0] to change the finger tip):\n";
+    msg += "   > rxplot /tactile/pressure[0]\n";
     manual_tests_.push_back( boost::shared_ptr<ManualTests>(new ManualTests(msg, 1) ) );
     add("Manual Tests: tactiles.", manual_tests_.back().get(), &ManualTests::run_manual_tests);
 
