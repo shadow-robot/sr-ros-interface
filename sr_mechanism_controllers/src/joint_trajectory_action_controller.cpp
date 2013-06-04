@@ -1032,8 +1032,6 @@ q[i], qd[i], qdd[i]);
 
   void JointTrajectoryActionController::goalCBFollow(GoalHandleFollow gh)
   {
-    ROS_ERROR("FOLLOW");
-
     std::vector<std::string> joint_names(joints_.size());
     for (size_t j = 0; j < joints_.size(); ++j)
       joint_names[j] = joints_[j]->joint_->name;
@@ -1106,24 +1104,17 @@ q[i], qd[i], qdd[i]);
 
     while( ros::ok() )
     {
-      ROS_ERROR("Callback");
-
       boost::shared_ptr<RTGoalHandleFollow> current_active_goal(rt_active_goal_follow_);
       if( current_active_goal == NULL )
       {
-        ROS_ERROR("No goal set");
         rate.sleep();
         continue;
       }
       if( current_active_goal->gh_.getGoalStatus().status !=  actionlib_msgs::GoalStatus::ACTIVE)
       {
-        ROS_ERROR("No goal set");
         rate.sleep();
         continue;
       }
-
-      ROS_ERROR_STREAM("PUBLISHING TARGETS ");
-      ROS_ERROR_STREAM("      "<< joints_.size() );
 
       std::stringstream dbg;
 
@@ -1141,7 +1132,6 @@ q[i], qd[i], qdd[i]);
         }
         catch(...)
         {
-          ROS_ERROR("Failed");
         }
       }
       ROS_ERROR_STREAM( dbg.str() );

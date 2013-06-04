@@ -11,10 +11,10 @@ sa_ss_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ShoulderJSwing
   pid:
-    p: 16000.0
-    i: 6000.0
-    d: 400.0
-    i_clamp: 5000.0
+    p: 300.0
+    i: 100.0
+    d: 150.0
+    i_clamp: 100.0
 
 sa_es_position_controller:
   type: robot_mechanism_controllers/JointPositionController
