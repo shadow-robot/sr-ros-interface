@@ -173,8 +173,6 @@ namespace sr_controller {
 
     //Update the joint_targets_ with the one from the current segment
     JointTargetMap::iterator it;
-    //clear the map in case some of the joints are not present in the segment
-    joint_targets_.clear();
     Segment tmp_seg = traj[seg];
     for( it = tmp_seg.joint_targets.begin(); it != tmp_seg.joint_targets.end(); ++it )
     {
@@ -273,7 +271,7 @@ namespace sr_controller {
       JointTargetMap::iterator it;
       for (size_t k = 0; k < msg->joint_names.size(); ++k)
       {
-        if( joint_targets_.find(msg->joint_names[k]) == joint_targets_.end() )
+        if( joint_pub_.find(msg->joint_names[k]) == joint_pub_.end() )
         {
           ROS_ERROR("Unable to locate joint %s in the commanded trajectory.", msg->joint_names[k].c_str());
           if (gh)
@@ -357,8 +355,6 @@ namespace sr_controller {
     for (size_t i = 1; i < msg->points.size(); ++i)
       durations[i] = (msg->points[i].time_from_start - msg->points[i-1].time_from_start).toSec();
 
-    std::vector<double> positions;
-
     for (size_t i = 0; i < msg->points.size(); ++i)
     {
       Segment seg;
@@ -375,6 +371,8 @@ namespace sr_controller {
       {
         seg.joint_targets[ msg->joint_names[joint_index] ] = msg->points[i].positions[joint_index];
       }
+
+      new_traj.push_back( seg );
     }
 
     //ROS_ERROR("Last segment goal id: %s", new_traj[new_traj.size()-1].gh->gh_.getGoalID().id.c_str());
@@ -526,7 +524,7 @@ namespace sr_controller {
 
   void JointTrajectoryActionController::publish_targets_()
   {
-    ros::Rate rate(10.0); //@todo read rate from param
+    ros::Rate rate(20.0); //@todo read rate from param
     std_msgs::Float64 msg;
 
     while( ros::ok() )
