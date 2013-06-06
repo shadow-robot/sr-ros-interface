@@ -139,27 +139,6 @@ public:
   }
 };
 
-class JointTolerance
-{
-public:
-  JointTolerance(double _position = 0, double _velocity = 0, double _acceleration = 0) :
-    position(_position), velocity(_velocity), acceleration(_acceleration)
-  {
-  }
-
-  bool violated(double p_err, double v_err = 0, double a_err = 0) const
-  {
-    return
-      (position > 0 && fabs(p_err) > position) ||
-      (velocity > 0 && fabs(v_err) > velocity) ||
-      (acceleration > 0 && fabs(a_err) > acceleration);
-  }
-
-  double position;
-  double velocity;
-  double acceleration;
-};
-
 class JointTrajectoryActionController : public pr2_controller_interface::Controller
 {
   // Action typedefs for the original PR2 specific joint trajectory action
@@ -189,28 +168,11 @@ private:
   int loop_count_;
   pr2_mechanism_model::RobotState *robot_;
   ros::Time last_time_;
-  std::vector<pr2_mechanism_model::JointState*> joints_;
-  std::vector<double> masses_;  // Rough estimate of joint mass, used for feedforward control
-  std::vector<control_toolbox::Pid> pids_;
-  std::vector<bool> proxies_enabled_;
-  std::vector<control_toolbox::LimitedProxy> proxies_;
 
   boost::shared_ptr<boost::thread> thread_pub_;
   JointPubMap joint_pub_;
   JointTargetMap joint_targets_;
   void publish_targets_();
-
-  std::vector<JointTolerance> default_trajectory_tolerance_;
-  std::vector<JointTolerance> default_goal_tolerance_;
-  double default_goal_time_constraint_;
-
-  /*
-  double goal_time_constraint_;
-  double stopped_velocity_tolerance_;
-  std::vector<double> goal_constraints_;
-  std::vector<double> trajectory_constraints_;
-  */
-  std::vector<boost::shared_ptr<filters::FilterChain<double> > > output_filters_;
 
   ros::NodeHandle node_;
 
@@ -244,23 +206,12 @@ private:
 
   void preemptActiveGoal();
 
-  // coef[0] + coef[1]*t + ... + coef[5]*t^5
-  struct Spline
-  {
-    std::vector<double> coef;
-
-    Spline() : coef(6, 0.0) {}
-  };
-
   struct Segment
   {
     double start_time;
     double duration;
-    std::vector<Spline> splines;
-    std::vector<double> joint_targets;
+    JointTargetMap joint_targets;
 
-    std::vector<JointTolerance> trajectory_tolerance;
-    std::vector<JointTolerance> goal_tolerance;
     double goal_time_tolerance;
 
     boost::shared_ptr<RTGoalHandle> gh;
@@ -270,20 +221,6 @@ private:
 
   realtime_tools::RealtimeBox<
     boost::shared_ptr<const SpecifiedTrajectory> > current_trajectory_box_;
-
-  // Holds the trajectory that we are currently following.  The mutex
-  // guarding current_trajectory_ is locked from within realtime, so
-  // it may only be locked for a bounded duration.
-  //boost::shared_ptr<const SpecifiedTrajectory> current_trajectory_;
-  //boost::recursive_mutex current_trajectory_lock_RT_;
-
-  std::vector<double> q, qd, qdd;  // Preallocated in init
-
-  // Samples, but handling time bounds.  When the time is past the end
-  // of the spline duration, the position is the last valid position,
-  // and the derivatives are all 0.
-  static void sampleSplineWithTimeBounds(const std::vector<double>& coefficients, double duration, double time,
-                                         double& position, double& velocity, double& acceleration);
 };
 
 }
