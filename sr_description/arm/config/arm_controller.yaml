@@ -58,13 +58,6 @@ r_arm_joint_trajectory_controller:
     - ElbowJRotate
     - WRJ2
     - WRJ1
-  gains:
-    ShoulderJRotate: {p: 600.5, i: 31.0, d: 8.0, i_clamp: 300.}
-    ShoulderJSwing: {p: 300.0, i: 160.0, d: 400.0, i_clamp: 300.0}
-    ElbowJSwing: {p: 930.0, i: 150.0, d: 150.0, i_clamp: 700.0}
-    ElbowJRotate: {p: 240.0, i: 150.0, d: 15.0, i_clamp: 150.0}
-    WRJ2: {p: 300.0, i: 0.0, d: 4.0, i_clamp: 2.0}
-    WRJ1: {p: 300.0, i: 0.0, d: 4.0, i_clamp: 2.0}
   joint_trajectory_action_node:
     joints:
       - ShoulderJRotate
