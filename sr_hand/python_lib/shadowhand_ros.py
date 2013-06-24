@@ -242,7 +242,7 @@ class ShadowHand_ROS():
         if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
             for join in dicti.keys():
                 if not self.eth_publishers.has_key(join):
-                    topic = "/sh_"+ join.lower() + self.topic_ending+"/command"
+                    topic = "sh_"+ join.lower() + self.topic_ending+"/command"
                     self.eth_publishers[join] = rospy.Publisher(topic, Float64)
 
                 msg_to_send = Float64()
@@ -264,7 +264,7 @@ class ShadowHand_ROS():
 
         if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
             if not self.eth_publishers.has_key(jointName):
-                topic = "/sh_"+ jointName.lower() + self.topic_ending + "/command"
+                topic = "sh_"+ jointName.lower() + self.topic_ending + "/command"
                 self.eth_publishers[jointName] = rospy.Publisher(topic, Float64)
 
             msg_to_send = Float64()
@@ -417,9 +417,9 @@ class ShadowHand_ROS():
         return false
         """
         try:
-            rospy.wait_for_message("/joint_states", JointState, timeout = 0.2)
+            rospy.wait_for_message("joint_states", JointState, timeout = 0.2)
         except:
-            rospy.logwarn("no message received from /joint_states")
+            rospy.logwarn("no message received from joint_states")
             return False
 
         return True
@@ -431,7 +431,7 @@ class ShadowHand_ROS():
         return false
         """
         try:
-            rospy.wait_for_message("/gazebo/joint_states", JointState, timeout = 0.2)
+            rospy.wait_for_message("gazebo/joint_states", JointState, timeout = 0.2)
         except:
             return False
 
@@ -444,14 +444,14 @@ class ShadowHand_ROS():
         success = True
         for joint_all in self.allJoints :
             self.topic_ending = "_mixed_position_velocity_controller"
-            topic = "/sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
+            topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
             success = True
             try:
                 rospy.wait_for_message(topic, JointControllerState, timeout = 0.2)
             except:
                 try:
                     self.topic_ending = "_position_controller"
-                    topic = "/sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
+                    topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
                     rospy.wait_for_message(topic, pr2_controllers_msgs.msg.JointControllerState, timeout = 0.2)
                 except:
                     success = False
