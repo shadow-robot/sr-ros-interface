@@ -27,4 +27,4 @@ else( NOT TINYXML_FOUND )
   set(LIBS ${LIBS} ${TINYXML_LIBRARIES})
 endif( NOT TINYXML_FOUND )
 
-rosbuild_add_library( sr_mechanism_model src/joint_0_transmission.cpp src/simple_transmission.cpp)
+rosbuild_add_library( sr_mechanism_model src/joint_0_transmission.cpp src/simple_transmission.cpp src/joint_0_transmission_for_muscle.cpp src/simple_transmission_for_muscle.cpp)

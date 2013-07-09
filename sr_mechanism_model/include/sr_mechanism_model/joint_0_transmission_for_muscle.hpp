@@ -1,7 +1,6 @@
 /**
- * @file   joint_0_transmission.hpp
+ * @file   joint_0_transmission_for_muscle.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
- * @date   Tue Jun 28 11:35:05 2011
  *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
@@ -26,8 +25,8 @@
  *
  */
 
-#ifndef _JOINT_0_TRANSMISSION_HPP_
-#define _JOINT_0_TRANSMISSION_HPP_
+#ifndef _JOINT_0_TRANSMISSION_FOR_MUSCLE_HPP_
+#define _JOINT_0_TRANSMISSION_FOR_MUSCLE_HPP_
 
 #include <tinyxml.h>
 #include "pr2_mechanism_model/transmission.h"
@@ -37,11 +36,11 @@
 
 namespace sr_mechanism_model
 {
-  class J0Transmission : public pr2_mechanism_model::Transmission
+  class J0TransmissionForMuscle : public pr2_mechanism_model::Transmission
   {
   public:
-    J0Transmission() {}
-    ~J0Transmission() {}
+    J0TransmissionForMuscle() {}
+    ~J0TransmissionForMuscle() {}
 
     bool initXml(TiXmlElement *config, pr2_mechanism_model::Robot *robot);
     bool initXml(TiXmlElement *config);
