@@ -20,4 +20,7 @@
          type="controller::SrhMixedPositionVelocityJointController"
          base_class_type="pr2_controller_interface::Controller" />
 
+  <class name="sr_mechanism_controllers/SrhMuscleJointPositionController"
+         type="controller::SrhMuscleJointPositionController"
+         base_class_type="pr2_controller_interface::Controller" />
 </library>
