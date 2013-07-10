@@ -225,6 +225,19 @@ namespace controller {
         command_ = joint_state_->position_;
     }
 
+    //IGNORE the following  lines if we don't want to use the pressure sensors data
+    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
+    //ethercat_hardware and pr2_etherCAT main loop
+    // So we heve encoded the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
+    // have any measured effort in the muscle hand anyway).
+    // Here we extract the pressure values from joint_state_->measured_effort_ and decode that back into uint16.
+    double pressure_0_tmp = fmod(joint_state_->measured_effort_, 0x10000);
+    double pressure_1_tmp = (fmod(joint_state_->measured_effort_, 0x100000000) - pressure_0_tmp) / 0x10000;
+    uint8_t pressure_0 = static_cast<uint16_t>(pressure_0_tmp + 0.5);
+    uint8_t pressure_1 = static_cast<uint16_t>(pressure_1_tmp + 0.5);
+
+    //****************************************
+
     command_ = clamp_command( command_ );
 
     //Compute position demand from position error:
@@ -255,10 +268,40 @@ namespace controller {
         commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
     }
 
-    if( has_j2 )
-      joint_state_2->commanded_effort_ = commanded_effort;
-    else
-      joint_state_->commanded_effort_ = commanded_effort;
+
+
+    //The valve commands can have values between -4 and 4
+    int8_t valve[2];
+
+    //************************************************
+    // After doing any computation we consider we encode the obtained valve commands into joint_state_->commanded_effort_
+    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
+    //ethercat_hardware and pr2_etherCAT main loop
+    // So the controller encodes the two int8 (that are in fact int4) that contain the valve commands into the double commanded_effort_. (We don't
+    // have any real commanded_effort_ in the muscle hand anyway).
+
+    uint16_t valve_tmp[2];
+    for(int i=0;i<2;++i)
+    {
+      //Check that the limits of the valve command are not exceded
+      if (valve[i] > 4)
+        valve[i] = 4;
+      if (valve[i] < -4)
+        valve[i] = -4;
+      //encode
+      if (valve[i] < 0)
+        valve_tmp[i] = -valve[i] + 8;
+      else
+        valve_tmp[i] = valve[i];
+    }
+
+    //We encode the valve 0 command in the lowest "half byte" i.e. the lowest 16 integer values in the double var (see decoding in simple_transmission_for_muscle.cpp)
+    //the valve 1 command is envoded in the next 4 bits
+    joint_state_->commanded_effort_ = static_cast<double>(valve_tmp[0]) + static_cast<double>(valve_tmp[1] << 4);
+
+    //*******************************************************************************
+
+
 
     if(loop_count_ % 10 == 0)
     {
