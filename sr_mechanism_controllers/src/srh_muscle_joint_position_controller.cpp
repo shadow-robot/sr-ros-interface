@@ -204,6 +204,9 @@ namespace controller {
 
   void SrhMuscleJointPositionController::update()
   {
+    //The valve commands can have values between -4 and 4
+    int8_t valve[2];
+
     if( !has_j2)
     {
       if (!joint_state_->calibrated_)
@@ -268,10 +271,36 @@ namespace controller {
         commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
     }
 
+    //************************************************
+    // Here goes the control algorithm
+
+    // We'll start with a very simple approach
+    // We take the old motor hand's position control commanded effort and make a translation to valve commands
+    // by using only -4 , +4  and 0 valve commands. I.e. empty valve open or filling valve during the whole next 1 ms period
+    // or valves closed during the same period
+    // The 2 involved muscles will act complementary for the moment, when one inflates, the other deflates at the same rate
+    // As this is just an initial approach algorithm we'll fix a value of 50 as a threshold to consider that we close the valves
+    if (fabs(commanded_effort) < 50)
+    {
+      valve[0] = 0;
+      valve[1] = 0;
+    }
+    else if(commanded_effort < 0)
+    {
+      valve[0] = 4;
+      valve[1] = -4;
+    }
+    else
+    {
+      valve[0] = -4;
+      valve[1] = 4;
+    }
 
 
-    //The valve commands can have values between -4 and 4
-    int8_t valve[2];
+
+    //************************************************
+
+
 
     //************************************************
     // After doing any computation we consider we encode the obtained valve commands into joint_state_->commanded_effort_
