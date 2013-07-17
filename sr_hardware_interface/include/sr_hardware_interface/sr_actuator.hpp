@@ -179,7 +179,8 @@ namespace sr_actuator
   {
   public:
     SrMuscleActuatorCommand() :
-      pr2_hardware_interface::ActuatorCommand()
+      pr2_hardware_interface::ActuatorCommand(),
+      valve_{0, 0}
     {}
 
     int8_t valve_[2];
