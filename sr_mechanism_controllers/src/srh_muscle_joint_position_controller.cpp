@@ -83,11 +83,11 @@ namespace controller {
                   joint_name.c_str());
         return false;
       }
-      if (!joint_state_2->calibrated_)
-      {
-        ROS_ERROR("Joint %s not calibrated for SrhMuscleJointPositionController", j2.c_str());
-        return false;
-      }
+//      if (!joint_state_2->calibrated_)
+//      {
+//        ROS_ERROR("Joint %s not calibrated for SrhMuscleJointPositionController", j2.c_str());
+//        return false;
+//      }
     }
     else
     {
@@ -99,11 +99,11 @@ namespace controller {
                   joint_name.c_str());
         return false;
       }
-      if (!joint_state_->calibrated_)
-      {
-        ROS_ERROR("Joint %s not calibrated for SrhMuscleJointPositionController", joint_name.c_str());
-        return false;
-      }
+//      if (!joint_state_->calibrated_)
+//      {
+//        ROS_ERROR("Joint %s not calibrated for SrhMuscleJointPositionController", joint_name.c_str());
+//        return false;
+//      }
     }
 
     //get the min and max value for the current joint:
@@ -207,11 +207,11 @@ namespace controller {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];
 
-    if( !has_j2)
-    {
-      if (!joint_state_->calibrated_)
-        return;
-    }
+//    if( !has_j2)
+//    {
+//      if (!joint_state_->calibrated_)
+//        return;
+//    }
 
     assert(robot_ != NULL);
     ros::Time time = robot_->getTime();
@@ -359,6 +359,13 @@ namespace controller {
                  controller_state_publisher_->msg_.d,
                  controller_state_publisher_->msg_.i_clamp,
                  dummy);
+
+        //WARNING Just to debug
+        controller_state_publisher_->msg_.i = static_cast<double>(valve[0]);
+        controller_state_publisher_->msg_.d = static_cast<double>(valve[1]);
+        controller_state_publisher_->msg_.i_clamp = joint_state_->commanded_effort_;
+
+
         controller_state_publisher_->unlockAndPublish();
       }
     }
