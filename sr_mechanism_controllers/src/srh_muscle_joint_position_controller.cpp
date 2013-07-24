@@ -292,8 +292,8 @@ namespace controller {
     }
     else
     {
-      valve[0] = -4;
-      valve[1] = 4;
+      valve[0] = -3;
+      valve[1] = 3;
     }
 
 
@@ -303,7 +303,7 @@ namespace controller {
 
 
     //************************************************
-    // After doing any computation we consider we encode the obtained valve commands into joint_state_->commanded_effort_
+    // After doing any computation we consider, we encode the obtained valve commands into joint_state_->commanded_effort_
     //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
     //ethercat_hardware and pr2_etherCAT main loop
     // So the controller encodes the two int8 (that are in fact int4) that contain the valve commands into the double commanded_effort_. (We don't
