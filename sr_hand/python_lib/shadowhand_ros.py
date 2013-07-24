@@ -47,25 +47,25 @@ class ShadowHand_ROS():
         initializes the hand publisher and subscriber to the default
         values of shadowhand_data and sendupdate
         """
-        self.allJoints = [Joint("THJ1", "smart_motor_th1"),
-                           Joint("THJ2", "smart_motor_th2", -30, 30),
+        self.allJoints = [Joint("THJ1", "smart_motor_th1", 0, 90),
+                           Joint("THJ2", "smart_motor_th2", -40, 40),
                            Joint("THJ3", "smart_motor_th3",-15, 15),
                            Joint("THJ4", "smart_motor_th4",0, 75),
                            Joint("THJ5", "smart_motor_th5",-60, 60),
                            Joint("FFJ0", "smart_motor_ff2", 0, 180),
                            Joint("FFJ3", "smart_motor_ff3"),
-                           Joint("FFJ4", "smart_motor_ff4", -25, 25),
+                           Joint("FFJ4", "smart_motor_ff4", -20, 20),
                            Joint("MFJ0", "smart_motor_mf2", 0, 180),
                            Joint("MFJ3", "smart_motor_mf3"),
-                           Joint("MFJ4", "smart_motor_mf4", -25, 25),
+                           Joint("MFJ4", "smart_motor_mf4", -20, 20),
                            Joint("RFJ0", "smart_motor_rf2", 0, 180),
                            Joint("RFJ3", "smart_motor_rf3"),
-                           Joint("RFJ4", "smart_motor_rf4", -25,25),
+                           Joint("RFJ4", "smart_motor_rf4", -20,20),
                            Joint("LFJ0", "smart_motor_lf2", 0, 180),
                            Joint("LFJ3", "smart_motor_lf3"),
-                           Joint("LFJ4", "smart_motor_lf4", -25, 25),
+                           Joint("LFJ4", "smart_motor_lf4", -20, 20),
                            Joint("LFJ5", "smart_motor_lf5", 0, 45),
-                           Joint("WRJ1", "smart_motor_wr1", -30, 40),
+                           Joint("WRJ1", "smart_motor_wr1", -45, 30),
                            Joint("WRJ2", "smart_motor_wr2", -30, 10),
                            ]
         self.handJoints = []
