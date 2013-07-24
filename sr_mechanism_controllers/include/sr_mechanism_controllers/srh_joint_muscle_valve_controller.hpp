@@ -1,5 +1,5 @@
 /**
- * @file   srh_joint_velocity_controller.hpp
+ * @file   srh_effort_joint_controller.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Wed Aug 17 12:32:01 2011
  *
@@ -19,28 +19,30 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *
- * @brief  Follows a position target. The position demand is converted into a force
- * demand by a PID loop.
+ * @brief Compute an effort demand from the effort error. As the
+ *  effort PID loop is running on the motor boards, there's no PID
+ *  loops involved here. We're just using the friction compensation
+ *  algorithm to take into account the friction of the tendons.
  *
  */
 
 
-#ifndef _SRH_MUSCLE_JOINT_POSITION_CONTROLLER_HPP_
-#define _SRH_MUSCLE_JOINT_POSITION_CONTROLLER_HPP_
+#ifndef _SRH_MUSCLE_VALVE_CONTROLLER_HPP_
+#define _SRH_MUSCLE_VALVE_CONTROLLER_HPP_
 
 #include <sr_mechanism_controllers/sr_controller.hpp>
-#include <sr_robot_msgs/JointMusclePositionControllerState.h>
+#include <sr_robot_msgs/JointMuscleValveControllerState.h>
+#include <sr_robot_msgs/JointMuscleValveControllerCommand.h>
 
 namespace controller
 {
-  class SrhMuscleJointPositionController : public SrController
+  class SrhJointMuscleValveController : public SrController
   {
   public:
-    SrhMuscleJointPositionController();
-    ~SrhMuscleJointPositionController();
+    SrhJointMuscleValveController();
+    ~SrhJointMuscleValveController();
 
-    bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
-               boost::shared_ptr<control_toolbox::Pid> pid_position);
+    bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name);
     bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting();
@@ -52,27 +54,17 @@ namespace controller
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
     virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
-    bool setGains(sr_robot_msgs::SetPidGains::Request &req, sr_robot_msgs::SetPidGains::Response &resp);
+    //bool setGains(sr_robot_msgs::SetEffortControllerGains::Request &req, sr_robot_msgs::SetEffortControllerGains::Response &resp);
 
   private:
-    boost::shared_ptr<control_toolbox::Pid> pid_controller_position_;       /**< Internal PID controller for the position loop. */
-
     //publish our joint controller state
-    boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointMusclePositionControllerState> > controller_state_publisher_;
+    boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointMuscleValveControllerState> > controller_state_publisher_;
 
-    ///clamps the force demand to this value
-    double max_force_demand;
-
-    ///the position deadband value used in the hysteresis_deadband
-    double position_deadband;
-
-    ///We're using an hysteresis deadband.
-    sr_deadband::HysteresisDeadband<double> hysteresis_deadband;
+    ros::Subscriber sub_command_;
+    void setCommandCB(const sr_robot_msgs::JointMuscleValveControllerCommandConstPtr& msg);
 
     ///read all the controller settings from the parameter server
     void read_parameters();
-
-    std::string joint_name_;
   };
 } // namespace
 

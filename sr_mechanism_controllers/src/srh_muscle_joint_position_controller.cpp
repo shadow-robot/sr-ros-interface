@@ -136,7 +136,7 @@ namespace controller {
       return false;
 
     controller_state_publisher_.reset(
-      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
+      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointMusclePositionControllerState>
       (node_, "state", 1));
 
     return init(robot, joint_name, pid_position);
@@ -351,7 +351,10 @@ namespace controller {
 
         controller_state_publisher_->msg_.error = error_position;
         controller_state_publisher_->msg_.time_step = dt_.toSec();
-        controller_state_publisher_->msg_.command = commanded_effort;
+        controller_state_publisher_->msg_.pseudo_command = commanded_effort;
+        controller_state_publisher_->msg_.valve_muscle_0 = static_cast<double>(valve[0]);
+        controller_state_publisher_->msg_.valve_muscle_1 = static_cast<double>(valve[1]);
+        controller_state_publisher_->msg_.packed_valve = joint_state_->commanded_effort_;
 
         double dummy;
         getGains(controller_state_publisher_->msg_.p,
@@ -359,13 +362,6 @@ namespace controller {
                  controller_state_publisher_->msg_.d,
                  controller_state_publisher_->msg_.i_clamp,
                  dummy);
-
-        //WARNING Just to debug
-        controller_state_publisher_->msg_.i = static_cast<double>(valve[0]);
-        controller_state_publisher_->msg_.d = static_cast<double>(valve[1]);
-        controller_state_publisher_->msg_.i_clamp = joint_state_->commanded_effort_;
-
-
         controller_state_publisher_->unlockAndPublish();
       }
     }
