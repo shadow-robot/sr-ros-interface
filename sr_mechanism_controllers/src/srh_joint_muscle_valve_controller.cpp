@@ -42,7 +42,9 @@ using namespace std;
 namespace controller {
 
   SrhJointMuscleValveController::SrhJointMuscleValveController()
-    : SrController()
+    : SrController(),
+      cmd_valve_muscle_min_(-4),
+      cmd_valve_muscle_max_(4)
   {
   }
 
@@ -168,6 +170,10 @@ namespace controller {
 
   void SrhJointMuscleValveController::update()
   {
+    //The valve commands can have values between -4 and 4
+    int8_t valve[2];
+    unsigned int i;
+
 //    if( !has_j2)
 //    {
 //      if (!joint_state_->calibrated_)
@@ -182,48 +188,126 @@ namespace controller {
     if (!initialized_)
     {
       initialized_ = true;
-      command_ = 0.0;
+      cmd_valve_muscle_[0] = 0.0;
+      cmd_valve_muscle_[1] = 0.0;
+      cmd_duration_ms_[0] = 0;
+      cmd_duration_ms_[1] = 0;
+      current_duration_ms_[0] = cmd_duration_ms_[0];
+      current_duration_ms_[1] = cmd_duration_ms_[1];
     }
 
-    //The commanded effort is the error directly:
-    // the PID loop for the force controller is running on the
-    // motorboard.
-    double commanded_effort = command_;
 
-    //Clamps the effort
-    commanded_effort = min( commanded_effort, max_force_demand );
-    commanded_effort = max( commanded_effort, -max_force_demand );
+    //IGNORE the following  lines if we don't want to use the pressure sensors data
+    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
+    //ethercat_hardware and pr2_etherCAT main loop
+    // So we heve encoded the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
+    // have any measured effort in the muscle hand anyway).
+    // Here we extract the pressure values from joint_state_->measured_effort_ and decode that back into uint16.
+    double pressure_0_tmp = fmod(joint_state_->measured_effort_, 0x10000);
+    double pressure_1_tmp = (fmod(joint_state_->measured_effort_, 0x100000000) - pressure_0_tmp) / 0x10000;
+    uint16_t pressure_0 = static_cast<uint16_t>(pressure_0_tmp + 0.5);
+    uint16_t pressure_1 = static_cast<uint16_t>(pressure_1_tmp + 0.5);
 
-    //Friction compensation
-    if( has_j2 )
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
-    else
-      commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
+    //****************************************
 
-    if( has_j2 )
-      joint_state_2->commanded_effort_ = commanded_effort;
-    else
-      joint_state_->commanded_effort_ = commanded_effort;
+
+
+
+
+    //************************************************
+    // Here goes the control algorithm
+
+    // This controller will allow the user to specify a separate command for each of the two muscles that control the joint.
+    // The user will also specify a duration in ms for that command. During this duration the command will be sent to the hand
+    // every ms (every cycle of this 1Khz control loop).
+    //Once this duration period has elapsed, a command of 0 will be sent to the muscle (meaning both the filling and emptying valves for that
+    // muscle remain closed)
+    // A duration of 0 means that there is no timeout, so the valve command will be sent to the muscle until a different valve command is received
+    // BE CAREFUL WHEN USING A DURATION OF 0 AS THIS COULD EVENTUALLY DAMAGE THE MUSCLE
+
+    for(i=0;i<2;++i)
+    {
+      if (cmd_duration_ms_[i] == 0) // if the commanded duration is 0 it means that it will not timeout
+      {
+        // So we will use the last commanded valve command
+        valve[i] = cmd_valve_muscle_[i];
+      }
+      else
+      {
+        if(current_duration_ms_[i] > 0) // If the command has not timed out yet
+        {
+          // we will use the last commanded valve command
+          valve[i] = cmd_valve_muscle_[i];
+          // and decrement the counter. This is a milliseconds counter, and this loop is running once every millisecond
+          current_duration_ms_[i]--;
+        }
+        else // If the command has already timed out
+        {
+          // we will use 0 to close the valves
+          valve[i] = 0;
+        }
+      }
+    }
+
+
+    //************************************************
+
+
+
+
+
+
+
+    //************************************************
+    // After doing any computation we consider, we encode the obtained valve commands into joint_state_->commanded_effort_
+    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
+    //ethercat_hardware and pr2_etherCAT main loop
+    // So the controller encodes the two int8 (that are in fact int4) that contain the valve commands into the double commanded_effort_. (We don't
+    // have any real commanded_effort_ in the muscle hand anyway).
+
+    uint16_t valve_tmp[2];
+    for(i=0;i<2;++i)
+    {
+      //Check that the limits of the valve command are not exceded
+      if (valve[i] > 4)
+        valve[i] = 4;
+      if (valve[i] < -4)
+        valve[i] = -4;
+      //encode
+      if (valve[i] < 0)
+        valve_tmp[i] = -valve[i] + 8;
+      else
+        valve_tmp[i] = valve[i];
+    }
+
+    //We encode the valve 0 command in the lowest "half byte" i.e. the lowest 16 integer values in the double var (see decoding in simple_transmission_for_muscle.cpp)
+    //the valve 1 command is envoded in the next 4 bits
+    joint_state_->commanded_effort_ = static_cast<double>(valve_tmp[0]) + static_cast<double>(valve_tmp[1] << 4);
+
+    //*******************************************************************************
+
+
+
 
     if(loop_count_ % 10 == 0)
     {
       if(controller_state_publisher_ && controller_state_publisher_->trylock())
       {
         controller_state_publisher_->msg_.header.stamp = time;
-        controller_state_publisher_->msg_.set_point = command_;
-        controller_state_publisher_->msg_.process_value = joint_state_->measured_effort_;
-        //TODO: compute the derivative of the effort.
-        controller_state_publisher_->msg_.process_value_dot = -1.0;
-        controller_state_publisher_->msg_.error = commanded_effort - joint_state_->measured_effort_;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
-        controller_state_publisher_->msg_.command = commanded_effort;
 
-        double dummy;
-        getGains(controller_state_publisher_->msg_.p,
-                 controller_state_publisher_->msg_.i,
-                 controller_state_publisher_->msg_.d,
-                 controller_state_publisher_->msg_.i_clamp,
-                 dummy);
+        controller_state_publisher_->msg_.set_valve_muscle_0 = cmd_valve_muscle_[0];
+        controller_state_publisher_->msg_.set_valve_muscle_1 = cmd_valve_muscle_[1];
+        controller_state_publisher_->msg_.set_duration_muscle_0 = cmd_duration_ms_[0];
+        controller_state_publisher_->msg_.set_duration_muscle_1 = cmd_duration_ms_[1];
+        controller_state_publisher_->msg_.current_valve_muscle_0 = valve[0];
+        controller_state_publisher_->msg_.current_valve_muscle_1 = valve[1];
+        controller_state_publisher_->msg_.current_duration_muscle_0 = current_duration_ms_[0];
+        controller_state_publisher_->msg_.current_duration_muscle_1 = current_duration_ms_[1];
+        controller_state_publisher_->msg_.packed_valve = joint_state_->commanded_effort_;
+        controller_state_publisher_->msg_.muscle_pressure_0 = pressure_0;
+        controller_state_publisher_->msg_.muscle_pressure_1 = pressure_1;
+        controller_state_publisher_->msg_.time_step = dt_.toSec();
+
         controller_state_publisher_->unlockAndPublish();
       }
     }
@@ -239,7 +323,26 @@ namespace controller {
 
   void SrhJointMuscleValveController::setCommandCB(const sr_robot_msgs::JointMuscleValveControllerCommandConstPtr& msg)
   {
-    command_ = msg->data;
+    cmd_valve_muscle_[0] = clamp_command(msg->cmd_valve_muscle[0]);
+    cmd_valve_muscle_[1] = clamp_command(msg->cmd_valve_muscle[1]);
+    //These variables hold the commanded duration
+    cmd_duration_ms_[0] = static_cast<unsigned int>(msg->cmd_duration_ms[0]);
+    cmd_duration_ms_[1] = static_cast<unsigned int>(msg->cmd_duration_ms[1]);
+    //These are the actual counters that we will decrement
+    current_duration_ms_[0] = cmd_duration_ms_[0];
+    current_duration_ms_[1] = cmd_duration_ms_[1];
+  }
+
+  /// enforce that the value of the received command is in the allowed range
+  int8_t SrhJointMuscleValveController::clamp_command( int8_t cmd )
+  {
+    if(cmd < cmd_valve_muscle_min_)
+      return cmd_valve_muscle_min_;
+
+    if(cmd > cmd_valve_muscle_max_)
+      return cmd_valve_muscle_max_;
+
+    return cmd;
   }
 }
 

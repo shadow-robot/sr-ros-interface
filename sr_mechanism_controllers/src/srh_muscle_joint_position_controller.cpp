@@ -72,7 +72,7 @@ namespace controller {
       if (!joint_state_)
       {
         ROS_ERROR("SrhMuscleJointPositionController could not find joint named \"%s\"\n",
-                  joint_name.c_str());
+                  j1.c_str());
         return false;
       }
 
@@ -80,7 +80,7 @@ namespace controller {
       if (!joint_state_2)
       {
         ROS_ERROR("SrhMuscleJointPositionController could not find joint named \"%s\"\n",
-                  joint_name.c_str());
+                  j2.c_str());
         return false;
       }
 //      if (!joint_state_2->calibrated_)
@@ -136,7 +136,7 @@ namespace controller {
       return false;
 
     controller_state_publisher_.reset(
-      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointMusclePositionControllerState>
+      new realtime_tools::RealtimePublisher<sr_robot_msgs::JointMusclePositionControllerState>
       (node_, "state", 1));
 
     return init(robot, joint_name, pid_position);
@@ -236,8 +236,8 @@ namespace controller {
     // Here we extract the pressure values from joint_state_->measured_effort_ and decode that back into uint16.
     double pressure_0_tmp = fmod(joint_state_->measured_effort_, 0x10000);
     double pressure_1_tmp = (fmod(joint_state_->measured_effort_, 0x100000000) - pressure_0_tmp) / 0x10000;
-    uint8_t pressure_0 = static_cast<uint16_t>(pressure_0_tmp + 0.5);
-    uint8_t pressure_1 = static_cast<uint16_t>(pressure_1_tmp + 0.5);
+    uint16_t pressure_0 = static_cast<uint16_t>(pressure_0_tmp + 0.5);
+    uint16_t pressure_1 = static_cast<uint16_t>(pressure_1_tmp + 0.5);
 
     //****************************************
 
@@ -271,6 +271,8 @@ namespace controller {
         commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
     }
 
+
+
     //************************************************
     // Here goes the control algorithm
 
@@ -285,15 +287,15 @@ namespace controller {
       valve[0] = 0;
       valve[1] = 0;
     }
-    else if(commanded_effort < 0)
+    else if(commanded_effort > 0)
     {
       valve[0] = 4;
       valve[1] = -4;
     }
     else
     {
-      valve[0] = -3;
-      valve[1] = 3;
+      valve[0] = -4;
+      valve[1] = 4;
     }
 
 
@@ -355,6 +357,9 @@ namespace controller {
         controller_state_publisher_->msg_.valve_muscle_0 = static_cast<double>(valve[0]);
         controller_state_publisher_->msg_.valve_muscle_1 = static_cast<double>(valve[1]);
         controller_state_publisher_->msg_.packed_valve = joint_state_->commanded_effort_;
+        controller_state_publisher_->msg_.muscle_pressure_0 = pressure_0;
+        controller_state_publisher_->msg_.muscle_pressure_1 = pressure_1;
+
 
         double dummy;
         getGains(controller_state_publisher_->msg_.p,
