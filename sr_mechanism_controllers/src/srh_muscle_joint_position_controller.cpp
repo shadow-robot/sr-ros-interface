@@ -354,8 +354,8 @@ namespace controller {
         controller_state_publisher_->msg_.error = error_position;
         controller_state_publisher_->msg_.time_step = dt_.toSec();
         controller_state_publisher_->msg_.pseudo_command = commanded_effort;
-        controller_state_publisher_->msg_.valve_muscle_0 = static_cast<double>(valve[0]);
-        controller_state_publisher_->msg_.valve_muscle_1 = static_cast<double>(valve[1]);
+        controller_state_publisher_->msg_.valve_muscle_0 = valve[0];
+        controller_state_publisher_->msg_.valve_muscle_1 = valve[1];
         controller_state_publisher_->msg_.packed_valve = joint_state_->commanded_effort_;
         controller_state_publisher_->msg_.muscle_pressure_0 = pressure_0;
         controller_state_publisher_->msg_.muscle_pressure_1 = pressure_1;
