@@ -40,7 +40,7 @@ using namespace std;
 namespace controller {
 
   SrhMuscleJointPositionController::SrhMuscleJointPositionController()
-    : SrController(), position_deadband(0.015)
+    : SrController(), position_deadband(0.015), command_acc_(0)
   {
   }
 
@@ -246,32 +246,50 @@ namespace controller {
     //Compute position demand from position error:
     double error_position = 0.0;
     double commanded_effort = 0.0;
-    if( has_j2 )
-      error_position = (joint_state_->position_ + joint_state_2->position_) - command_;
-    else
-      error_position = joint_state_->position_ - command_;
 
-    bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
-
-    //don't compute the error if we're in the deadband.
-    if( in_deadband )
-      error_position = 0.0;
-
-    commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
-
-    //clamp the result to max force
-    commanded_effort = min( commanded_effort, max_force_demand );
-    commanded_effort = max( commanded_effort, -max_force_demand );
-
-    if( !in_deadband )
+    //Run the PID loop to get a new command, we don't do this at the full rate
+    //as that will drive the valves too hard with switch changes. Instead we
+    //store a longer time in the command accumulator to keep using at the full
+    //loop rate.
+    if(loop_count_ % 100 == 0)
     {
+
       if( has_j2 )
-        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
+        error_position = (joint_state_->position_ + joint_state_2->position_) - command_;
       else
-        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
+        error_position = joint_state_->position_ - command_;
+
+      bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
+
+      //don't compute the error if we're in the deadband.
+      if( in_deadband )
+        error_position = 0.0;
+
+      commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
+
+      //clamp the result to max force
+      commanded_effort = min( commanded_effort, max_force_demand );
+      commanded_effort = max( commanded_effort, -max_force_demand );
+
+  //    if( !in_deadband )
+  //    {
+  //      if( has_j2 )
+  //        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ + joint_state_2->position_ , joint_state_->velocity_ + joint_state_2->velocity_, int(commanded_effort), friction_deadband );
+  //      else
+  //        commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
+  //    }
+
+      command_acc_ = commanded_effort;
+//      if (fabs(command_acc_) != 0) {
+//        ROS_INFO_STREAM("Set Command_acc: " << command_acc_);
+//      }
+
+      //We want the last time we updated the PID loop not sent commands.
+      last_time_ = time;
     }
-
-
+//    if (fabs(command_acc_) != 0) {
+//      ROS_INFO_STREAM("Command_acc: " << command_acc_);
+//    }
 
     //************************************************
     // Here goes the control algorithm
@@ -282,22 +300,42 @@ namespace controller {
     // or valves closed during the same period
     // The 2 involved muscles will act complementary for the moment, when one inflates, the other deflates at the same rate
     // As this is just an initial approach algorithm we'll fix a value of 50 as a threshold to consider that we close the valves
-    if (fabs(commanded_effort) < 50)
+//    if (fabs(commanded_effort) < 50)
+//    {
+//      valve[0] = 0;
+//      valve[1] = 0;
+//    }
+//    else if(commanded_effort > 0)
+//    {
+//      valve[0] = 4;
+//      valve[1] = -4;
+//    }
+//    else
+//    {
+//      valve[0] = -4;
+//      valve[1] = 4;
+//    }
+
+    //Drive the joint from the accumulator. This runs at full update speed so
+    //we can keep valves open continuously (with high enough P).
+    double amt = abs(command_acc_) < 4 ? fabs(command_acc_) : 4;
+    if (abs(command_acc_) == 0)
     {
       valve[0] = 0;
       valve[1] = 0;
     }
-    else if(commanded_effort > 0)
+    else if(command_acc_ > 0)
     {
-      valve[0] = 4;
-      valve[1] = -4;
+      command_acc_ -= amt;
+      valve[0] = amt;
+      valve[1] = -amt;
     }
     else
     {
-      valve[0] = -4;
-      valve[1] = 4;
+      command_acc_ += amt;
+      valve[0] = -amt;
+      valve[1] = amt;
     }
-
 
 
     //************************************************
@@ -332,8 +370,6 @@ namespace controller {
 
     //*******************************************************************************
 
-
-
     if(loop_count_ % 10 == 0)
     {
       if(controller_state_publisher_ && controller_state_publisher_->trylock())
@@ -353,7 +389,7 @@ namespace controller {
 
         controller_state_publisher_->msg_.error = error_position;
         controller_state_publisher_->msg_.time_step = dt_.toSec();
-        controller_state_publisher_->msg_.pseudo_command = commanded_effort;
+        controller_state_publisher_->msg_.pseudo_command = command_acc_;
         controller_state_publisher_->msg_.valve_muscle_0 = valve[0];
         controller_state_publisher_->msg_.valve_muscle_1 = valve[1];
         controller_state_publisher_->msg_.packed_valve = joint_state_->commanded_effort_;
@@ -371,8 +407,7 @@ namespace controller {
       }
     }
     loop_count_++;
-
-    last_time_ = time;
+    //last_time_ = time;
   }
 
   void SrhMuscleJointPositionController::read_parameters()

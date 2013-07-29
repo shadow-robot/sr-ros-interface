@@ -69,6 +69,9 @@ namespace controller
     ///We're using an hysteresis deadband.
     sr_deadband::HysteresisDeadband<double> hysteresis_deadband;
 
+    ///Command accumulator, time to keep the valves open/shut, sign gives the direction
+    int command_acc_;
+
     ///read all the controller settings from the parameter server
     void read_parameters();
 
