@@ -261,7 +261,7 @@ namespace controller {
     //as that will drive the valves too hard with switch changes. Instead we
     //store a longer time in the command accumulator to keep using at the full
     //loop rate.
-    if(loop_count_ % 100 == 0)
+    if(loop_count_ % 50 == 0)
     {
       double commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
 
