@@ -245,7 +245,17 @@ namespace controller {
 
     //Compute position demand from position error:
     double error_position = 0.0;
-    double commanded_effort = 0.0;
+
+    if( has_j2 )
+      error_position = (joint_state_->position_ + joint_state_2->position_) - command_;
+    else
+      error_position = joint_state_->position_ - command_;
+
+    bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
+
+    //don't compute the error if we're in the deadband.
+    if( in_deadband )
+      error_position = 0.0;
 
     //Run the PID loop to get a new command, we don't do this at the full rate
     //as that will drive the valves too hard with switch changes. Instead we
@@ -253,19 +263,7 @@ namespace controller {
     //loop rate.
     if(loop_count_ % 100 == 0)
     {
-
-      if( has_j2 )
-        error_position = (joint_state_->position_ + joint_state_2->position_) - command_;
-      else
-        error_position = joint_state_->position_ - command_;
-
-      bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_position, position_deadband);
-
-      //don't compute the error if we're in the deadband.
-      if( in_deadband )
-        error_position = 0.0;
-
-      commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
+      double commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
 
       //clamp the result to max force
       commanded_effort = min( commanded_effort, max_force_demand );
