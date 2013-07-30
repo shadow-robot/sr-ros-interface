@@ -278,44 +278,17 @@ namespace controller {
   //    }
 
       command_acc_ = commanded_effort;
-//      if (fabs(command_acc_) != 0) {
-//        ROS_INFO_STREAM("Set Command_acc: " << command_acc_);
-//      }
 
       //We want the last time we updated the PID loop not sent commands.
       last_time_ = time;
     }
-//    if (fabs(command_acc_) != 0) {
-//      ROS_INFO_STREAM("Command_acc: " << command_acc_);
-//    }
 
-    //************************************************
-    // Here goes the control algorithm
-
-    // We'll start with a very simple approach
-    // We take the old motor hand's position control commanded effort and make a translation to valve commands
-    // by using only -4 , +4  and 0 valve commands. I.e. empty valve open or filling valve during the whole next 1 ms period
-    // or valves closed during the same period
-    // The 2 involved muscles will act complementary for the moment, when one inflates, the other deflates at the same rate
-    // As this is just an initial approach algorithm we'll fix a value of 50 as a threshold to consider that we close the valves
-//    if (fabs(commanded_effort) < 50)
-//    {
-//      valve[0] = 0;
-//      valve[1] = 0;
-//    }
-//    else if(commanded_effort > 0)
-//    {
-//      valve[0] = 4;
-//      valve[1] = -4;
-//    }
-//    else
-//    {
-//      valve[0] = -4;
-//      valve[1] = 4;
-//    }
-
-    //Drive the joint from the accumulator. This runs at full update speed so
-    //we can keep valves open continuously (with high enough P).
+    // Drive the joint from the accumulator. This runs at full update speed so
+    // we can keep valves open continuously (with high enough P). A value of 4 fills
+    // the valve for the whole of the next 1ms. 2 for half that time etc. Negative
+    // values empty the valve.
+    // The 2 involved muscles will act complementary for the moment, when one inflates,
+    // the other deflates at the same rate
     double amt = abs(command_acc_) < 4 ? fabs(command_acc_) : 4;
     if (abs(command_acc_) == 0)
     {
@@ -334,10 +307,6 @@ namespace controller {
       valve[0] = -amt;
       valve[1] = amt;
     }
-
-
-    //************************************************
-
 
 
     //************************************************
@@ -368,6 +337,7 @@ namespace controller {
 
     //*******************************************************************************
 
+    // Send status msg
     if(loop_count_ % 10 == 0)
     {
       if(controller_state_publisher_ && controller_state_publisher_->trylock())
@@ -405,7 +375,6 @@ namespace controller {
       }
     }
     loop_count_++;
-    //last_time_ = time;
   }
 
   void SrhMuscleJointPositionController::read_parameters()
