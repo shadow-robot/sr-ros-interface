@@ -10,4 +10,10 @@
       This transmission is used to control the other joints of the Robot.
     </description>
   </class>
+
+  <class name="sr_mechanism_model/BiotacTransmission" type="sr_mechanism_model::BiotacTransmission" base_class_type="pr2_mechanism_model::Transmission">
+    <description>
+      This transmission is used to control the theoretical joint 0s in our hand: the joint 0 is the combination of the joint 1 (distal) and joint 2 (middle). Those 2 joints are controlled by one actuator only but have a sensor each. On the Biotac hand, joint 1 is fixed to 20.0 degrees.
+    </description>
+  </class>
 </library>
