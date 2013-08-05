@@ -64,6 +64,8 @@ namespace sr_mechanism_model
     pr2_mechanism_model::JointCalibrationSimulator joint_calibration_simulator_;
 
     bool init_joint(TiXmlElement *jel, pr2_mechanism_model::Robot *robot);
+
+    static const double BIOTAC_ANGLE;
   };
 
 } //end namespace sr_mechanism_model

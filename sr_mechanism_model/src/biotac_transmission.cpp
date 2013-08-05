@@ -35,10 +35,6 @@
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
-
-#define BIOTAC_ANGLE  (20.0 * M_PI / 180.0)
-
-
 using namespace pr2_hardware_interface;
 
 PLUGINLIB_DECLARE_CLASS(sr_mechanism_model, BiotacTransmission,
@@ -48,6 +44,8 @@ PLUGINLIB_DECLARE_CLASS(sr_mechanism_model, BiotacTransmission,
 
 namespace sr_mechanism_model
 {
+  const double BIOTAC_ANGLE = (20.0 * M_PI / 180.0);
+
   bool BiotacTransmission::initXml(TiXmlElement *elt, pr2_mechanism_model::Robot *robot)
   {
     const char *name = elt->Attribute("name");
