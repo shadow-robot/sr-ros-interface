@@ -22,5 +22,9 @@ include_directories( ${ImageMagick_INCLUDE_DIRS})
 rosbuild_add_executable(sr_movements src/sr_movements.cpp src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
 target_link_libraries(sr_movements ${ImageMagick_LIBRARIES})
 
+rosbuild_add_rostest(test/test_movements.test)
+rosbuild_add_rostest(test/test_joint_name_movement.test)
+
 rosbuild_add_library(sr_movement src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
 target_link_libraries(sr_movement ${ImageMagick_LIBRARIES})
+

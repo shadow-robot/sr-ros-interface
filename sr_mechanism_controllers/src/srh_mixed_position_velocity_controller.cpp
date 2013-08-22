@@ -323,8 +323,8 @@ namespace controller {
     commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
 
     //clamp the result to max force
-    commanded_effort = min( commanded_effort, max_force_demand );
-    commanded_effort = max( commanded_effort, -max_force_demand );
+    commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );
+    commanded_effort = max( commanded_effort, -(max_force_demand * max_force_factor_) );
 
     //Friction compensation, only if we're not in the deadband.
     int friction_offset = 0;
