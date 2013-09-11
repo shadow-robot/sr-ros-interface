@@ -52,6 +52,8 @@
 
 #include "boost/thread/mutex.hpp"
 
+#include <sr_self_test/sr_self_test.hpp>
+
 namespace gazebo
 {
 class GazeboRosControllerManager : public ModelPlugin
@@ -65,6 +67,7 @@ protected:
   // Inherited from gazebo::Controller
   virtual void UpdateChild();
 
+  boost::shared_ptr<shadow_robot::SrSelfTest> self_test_;
 private:
 
   gazebo::physics::ModelPtr parent_model_;

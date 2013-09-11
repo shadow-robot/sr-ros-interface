@@ -15,11 +15,12 @@
   <depend package="sensor_msgs"/>
   <depend package="sr_utilities"/>
   <depend package="roscpp"/>
+  <depend package="sr_hand"/>
 
   <rosdep name="libmagick"/>
 
   <export>
-    <cpp cflags="-I${prefix}/include/" lflags="-L${prefix}/lib" />
+    <cpp cflags="-I${prefix}/include/" lflags="-L${prefix}/lib -lsr_movement"/>
   </export>
 
 </package>

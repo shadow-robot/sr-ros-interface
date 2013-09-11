@@ -30,8 +30,8 @@ VirtualShadowhandLibrary::VirtualShadowhandLibrary() :
      joints_map["FFJ1"] = tmpData;
      joints_map["FFJ2"] = tmpData;
      joints_map["FFJ3"] = tmpData;
-     tmpData.min = -25.0;
-     tmpData.max = 25.0;
+     tmpData.min = -20.0;
+     tmpData.max = 20.0;
      joints_map["FFJ4"] = tmpData;
 
      joints_map["MFJ0"] = tmpDataZero;
@@ -40,8 +40,8 @@ VirtualShadowhandLibrary::VirtualShadowhandLibrary() :
      joints_map["MFJ1"] = tmpData;
      joints_map["MFJ2"] = tmpData;
      joints_map["MFJ3"] = tmpData;
-     tmpData.min = -25.0;
-     tmpData.max = 25.0;
+     tmpData.min = -20.0;
+     tmpData.max = 20.0;
      joints_map["MFJ4"] = tmpData;
 
      joints_map["RFJ0"] = tmpDataZero;
@@ -50,8 +50,8 @@ VirtualShadowhandLibrary::VirtualShadowhandLibrary() :
      joints_map["RFJ1"] = tmpData;
      joints_map["RFJ2"] = tmpData;
      joints_map["RFJ3"] = tmpData;
-     tmpData.min = -25.0;
-     tmpData.max = 25.0;
+     tmpData.min = -20.0;
+     tmpData.max = 20.0;
      joints_map["RFJ4"] = tmpData;
 
      joints_map["LFJ0"] = tmpDataZero;
@@ -60,8 +60,8 @@ VirtualShadowhandLibrary::VirtualShadowhandLibrary() :
      joints_map["LFJ1"] = tmpData;
      joints_map["LFJ2"] = tmpData;
      joints_map["LFJ3"] = tmpData;
-     tmpData.min = -25.0;
-     tmpData.max = 25.0;
+     tmpData.min = -20.0;
+     tmpData.max = 20.0;
      joints_map["LFJ4"] = tmpData;
      tmpData.min = 0.0;
      tmpData.max = 45.0;
@@ -70,8 +70,8 @@ VirtualShadowhandLibrary::VirtualShadowhandLibrary() :
      tmpData.min = 0.0;
      tmpData.max = 90.0;
      joints_map["THJ1"] = tmpData;
-     tmpData.min = -30.0;
-     tmpData.max = 30.0;
+     tmpData.min = -40.0;
+     tmpData.max = 40.0;
      joints_map["THJ2"] = tmpData;
      tmpData.min = -15.0;
      tmpData.max = 15.0;
@@ -84,7 +84,7 @@ VirtualShadowhandLibrary::VirtualShadowhandLibrary() :
      joints_map["THJ5"] = tmpData;
 
      tmpData.min = -30.0;
-     tmpData.max = 40.0;
+     tmpData.max = 45.0;
      joints_map["WRJ1"] = tmpData;
      tmpData.min = -30.0;
      tmpData.max = 10.0;
