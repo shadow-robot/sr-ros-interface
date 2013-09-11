@@ -4,6 +4,7 @@
 
   <node name="gazebo" pkg="gazebo" type="gazebo" args=" $(find sr_description)/other/worlds/empty.world" respawn="false" output="screen">
     <remap from="joint_states" to="/gazebo/joint_states"/>
+    <param name="image_path" value="$(find sr_movements)/movements/test.png"/>
   </node>
 
   <group unless="$(optenv GAZEBO_NO_X 0)">

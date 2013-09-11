@@ -234,8 +234,8 @@ namespace controller {
       commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
 
       //clamp the result to max force
-      commanded_effort = min( commanded_effort, max_force_demand );
-      commanded_effort = max( commanded_effort, -max_force_demand );
+      commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );
+      commanded_effort = max( commanded_effort, -(max_force_demand * max_force_factor_) );
 
       if( has_j2 )
         commanded_effort += friction_compensator->friction_compensation( (joint_state_->position_ + joint_state_2->position_) ,(joint_state_->velocity_ + joint_state_2->velocity_), int(commanded_effort), friction_deadband );

@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find sr_hand)/launch/gazebo/gazebo_arm_and_hand.launch" />
+
+  <test test-name="hand_commander_arm_and_hand_test" pkg="sr_hand" type="hand_commander_test"/>
+</launch>

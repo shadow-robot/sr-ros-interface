@@ -47,25 +47,25 @@ class ShadowHand_ROS():
         initializes the hand publisher and subscriber to the default
         values of shadowhand_data and sendupdate
         """
-        self.allJoints = [Joint("THJ1", "smart_motor_th1"),
-                           Joint("THJ2", "smart_motor_th2", -30, 30),
+        self.allJoints = [Joint("THJ1", "smart_motor_th1", 0, 90),
+                           Joint("THJ2", "smart_motor_th2", -40, 40),
                            Joint("THJ3", "smart_motor_th3",-15, 15),
                            Joint("THJ4", "smart_motor_th4",0, 75),
                            Joint("THJ5", "smart_motor_th5",-60, 60),
                            Joint("FFJ0", "smart_motor_ff2", 0, 180),
                            Joint("FFJ3", "smart_motor_ff3"),
-                           Joint("FFJ4", "smart_motor_ff4", -25, 25),
+                           Joint("FFJ4", "smart_motor_ff4", -20, 20),
                            Joint("MFJ0", "smart_motor_mf2", 0, 180),
                            Joint("MFJ3", "smart_motor_mf3"),
-                           Joint("MFJ4", "smart_motor_mf4", -25, 25),
+                           Joint("MFJ4", "smart_motor_mf4", -20, 20),
                            Joint("RFJ0", "smart_motor_rf2", 0, 180),
                            Joint("RFJ3", "smart_motor_rf3"),
-                           Joint("RFJ4", "smart_motor_rf4", -25,25),
+                           Joint("RFJ4", "smart_motor_rf4", -20,20),
                            Joint("LFJ0", "smart_motor_lf2", 0, 180),
                            Joint("LFJ3", "smart_motor_lf3"),
-                           Joint("LFJ4", "smart_motor_lf4", -25, 25),
+                           Joint("LFJ4", "smart_motor_lf4", -20, 20),
                            Joint("LFJ5", "smart_motor_lf5", 0, 45),
-                           Joint("WRJ1", "smart_motor_wr1", -30, 40),
+                           Joint("WRJ1", "smart_motor_wr1", -45, 30),
                            Joint("WRJ2", "smart_motor_wr2", -30, 10),
                            ]
         self.handJoints = []
@@ -112,8 +112,8 @@ class ShadowHand_ROS():
         self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasp/grasps.xml")
 
         self.grasp_interpoler = 0
-        self.pub = rospy.Publisher('srh/sendupdate',sendupdate)
-        self.pub_arm = rospy.Publisher('sr_arm/sendupdate',sendupdate)
+        self.pub = rospy.Publisher('srh/sendupdate',sendupdate, latch=True)
+        self.pub_arm = rospy.Publisher('sr_arm/sendupdate',sendupdate, latch=True)
 
         self.sub_arm = rospy.Subscriber('sr_arm/shadowhand_data', joints_data,self.callback_arm)
         self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
@@ -231,7 +231,7 @@ class ShadowHand_ROS():
         Set the library to publish to a new topic
         """
         print 'Changing publisher to ' + topic
-        self.pub = rospy.Publisher(topic,sendupdate)
+        self.pub = rospy.Publisher(topic,sendupdate, latch=True)
 
     def sendupdate_from_dict(self, dicti):
         """
@@ -243,7 +243,7 @@ class ShadowHand_ROS():
             for join in dicti.keys():
                 if not self.eth_publishers.has_key(join):
                     topic = "/sh_"+ join.lower() + self.topic_ending+"/command"
-                    self.eth_publishers[join] = rospy.Publisher(topic, Float64)
+                    self.eth_publishers[join] = rospy.Publisher(topic, Float64, latch=True)
 
                 msg_to_send = Float64()
                 msg_to_send.data = math.radians( float( dicti[join] ) )
@@ -265,7 +265,7 @@ class ShadowHand_ROS():
         if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
             if not self.eth_publishers.has_key(jointName):
                 topic = "/sh_"+ jointName.lower() + self.topic_ending + "/command"
-                self.eth_publishers[jointName] = rospy.Publisher(topic, Float64)
+                self.eth_publishers[jointName] = rospy.Publisher(topic, Float64, latch=True)
 
             msg_to_send = Float64()
             msg_to_send.data = math.radians( float( angle ) )

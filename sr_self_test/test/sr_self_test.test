@@ -1,0 +1,13 @@
+<launch>
+    <!-- Run a small bag in a loop that publishes diagnostics of the hand.  -->
+    <node pkg="rosbag" type="play" args="--loop $(find sr_self_test)/test/shadowhand.bag" name="rosbag" />
+
+    <node name="sr_self_test_test" pkg="sr_self_test" type="sr_self_test_test" output="screen"/>
+    <node name="automatic_response" pkg="sr_self_test" type="automatic_manual_test_response.py" />
+
+    <test pkg="self_test" type="selftest_rostest"
+        test-name="test_sr_self_test" time-limit="30">
+	<param name="node_to_test" value="sr_self_test_test"/>
+    </test>
+
+</launch>

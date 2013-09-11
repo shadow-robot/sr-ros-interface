@@ -76,8 +76,8 @@ namespace shadowrobot
     tmpData.publisher_index = tmp_index;
     joints_map["FFJ3"] = tmpData;
 
-    tmpData.min = -25.0;
-    tmpData.max = 25.0;
+    tmpData.min = -20.0;
+    tmpData.max = 20.0;
     full_topic = findControllerTopicName("ffj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -101,8 +101,8 @@ namespace shadowrobot
     tmpData.publisher_index = tmp_index;
     joints_map["MFJ3"] = tmpData;
 
-    tmpData.min = -25.0;
-    tmpData.max = 25.0;
+    tmpData.min = -20.0;
+    tmpData.max = 20.0;
     full_topic = findControllerTopicName("mfj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -125,8 +125,8 @@ namespace shadowrobot
     tmpData.publisher_index = tmp_index;
     joints_map["RFJ3"] = tmpData;
 
-    tmpData.min = -25.0;
-    tmpData.max = 25.0;
+    tmpData.min = -20.0;
+    tmpData.max = 20.0;
     full_topic = findControllerTopicName("rfj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -150,8 +150,8 @@ namespace shadowrobot
     tmpData.publisher_index = tmp_index;
     joints_map["LFJ3"] = tmpData;
 
-    tmpData.min = -25.0;
-    tmpData.max = 25.0;
+    tmpData.min = -20.0;
+    tmpData.max = 20.0;
     full_topic = findControllerTopicName("lfj4");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -174,8 +174,8 @@ namespace shadowrobot
     tmpData.publisher_index = tmp_index;
     joints_map["THJ1"] = tmpData;
 
-    tmpData.min = -30.0;
-    tmpData.max = 30.0;
+    tmpData.min = -40.0;
+    tmpData.max = 40.0;
     full_topic = findControllerTopicName("thj2");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
@@ -207,7 +207,7 @@ namespace shadowrobot
     joints_map["THJ5"] = tmpData;
 
     tmpData.min = -30.0;
-    tmpData.max = 40.0;
+    tmpData.max = 45.0;
     full_topic = findControllerTopicName("wrj1");
     etherCAT_publishers.push_back(node.advertise<std_msgs::Float64>(full_topic, 2));
     tmp_index ++;
