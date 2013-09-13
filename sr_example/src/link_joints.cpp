@@ -39,14 +39,17 @@
  * read the position for a specific joint and send this as the target to
  * another joint.
  *
- * To test this program, just start the hand, rviz visualizer, the control GUI
- * and this example (in 4 different consoles):
- * \verbatim
- roslaunch sr_hand srh_motor.launch
- roslaunch sr_hand rviz_motor.launch
- rosrun sr_control_gui __init__.py
- rosrun sr_hand link_joints
+ * This example can be tested with the simulated hand (or simulated hand and arm)
+ * by using the following commands in separate terminals
+ * * \verbatim
+ * roslaunch sr_hand  gazebo_arm_and_hand.launch
+ * or
+ * roslaunch sr_hand  gazebo_hand.launch
+ * and then
+ * rosrun sr_example link_joints
+ * rosrun rqt_gui rqt_gui
  \endverbatim
+ * in the rqt_gui go to plugins->ShadowRobot->joint slider and select EtherCAT hand
  * If you move the joint slider for FFJ3, then MFJ3 will move as well.
  *
  *
@@ -57,14 +60,15 @@
 #include <string>
 
 //messages
-#include <sr_robot_msgs/joints_data.h>
-#include <sr_robot_msgs/joint.h>
-#include <sr_robot_msgs/sendupdate.h>
+#include <std_msgs/Float64.h>
+#include <sr_robot_msgs/JointControllerState.h>
 
 /// the name of the parent joint
-std::string parent_name = "FFJ3";
+std::string parent_name = "ffj3";
 /// the name of the child joint to link to the parent
-std::string child_name  = "MFJ3";
+std::string child_name  = "mfj3";
+/// the type of controller that will be running (use the mixed controllers by default with the simulated hand (in gazebo))
+std::string controller_type = "_mixed_position_velocity_controller";
 
 //a ros subscriber (will be instantiated later on)
 ros::Subscriber sub;
@@ -73,55 +77,18 @@ ros::Publisher pub;
 
 /**
  * The callback function is called each time a message is received on the
- * topic /srh/shadowhand_data
+ * controller
  *
  * @param msg message of type sr_hand::joints_data
  */
-void callback(const sr_robot_msgs::joints_dataConstPtr& msg)
+void callback(const sr_robot_msgs::JointControllerStateConstPtr& msg)
 {
-  //loop on all the sendupdate messages received (if > 0)
-  int msg_length = msg->joints_list_length;
-  if( msg_length == 0)
-    {
-      ROS_WARN("Received empty message.");
-      return;
-    }
+  //publish the message
+  std_msgs::Float64 command;
+  command.data = msg->set_point;
+  pub.publish(command);
 
-  //OK, not empty => read the data
-  for(unsigned short index_msg=0; index_msg < msg_length; ++index_msg)
-    {
-      //get the sensor name
-      std::string sensor_name = msg->joints_list[index_msg].joint_name;
-
-      /**
-       * if it's the parent joint, read the target, and send it to the
-       * child.
-       */
-      if(sensor_name.compare(parent_name) == 0)
-	{
-	  //get the position (to be set as the target of the child joint)
-	  float target = msg->joints_list[index_msg].joint_position;
-
-	  //form a sendupdate msg.
-	  sr_robot_msgs::sendupdate msg;
-	  std::vector<sr_robot_msgs::joint> jointVector;
-
-	  //fill the message
-	  sr_robot_msgs::joint joint;
-	  joint.joint_name = child_name;
-	  joint.joint_target = target;
-	  jointVector.push_back(joint);
-
-	  msg.sendupdate_length = jointVector.size();
-	  msg.sendupdate_list = jointVector;
-
-	  //publish the message
-	  pub.publish(msg);
-
-	  return;
-	}
-    }
-
+  return;
 }
 
 /**
@@ -139,17 +106,17 @@ int main(int argc, char** argv)
   ros::NodeHandle node;
 
   /**
-   * init the subscriber and subscribe to the topic
-   * /srh/shadowhand_data, using the callback function
+   * init the subscriber and subscribe to the
+   * parent joint controller topic using the callback function
    * callback()
    */
-  sub = node.subscribe("/srh/shadowhand_data", 2,  callback);
+  sub = node.subscribe("sh_" + parent_name + controller_type + "/state", 2,  callback);
 
   /**
-   * init the publisher on the topic /srh/sendupdate
-   * publishing messages of the type sr_robot_msgs::sendupdate.
+   * init the publisher on the child joint controller command topic
+   * publishing messages of the type std_msgs::Float64.
    */
-  pub = node.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
+  pub = node.advertise<std_msgs::Float64>("sh_" + child_name + controller_type + "/command", 2);
 
   //subscribe until interrupted.
   while( ros::ok() )
