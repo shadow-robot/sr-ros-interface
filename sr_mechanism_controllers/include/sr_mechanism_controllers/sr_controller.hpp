@@ -140,6 +140,18 @@ namespace controller
 
     ///We're using an hysteresis deadband.
     sr_deadband::HysteresisDeadband<double> hysteresis_deadband;
+
+    //The max force factor is a number between 0.0 and 1.0 that will multiply the max_force_demand
+    //it is initialized to 1.0 and can be updated via a topic.
+    //This is intended to be used e.g. as part of a hand self protection mechanism, where max_force is reduced in certain cases
+    double max_force_factor_;
+    ros::Subscriber sub_max_force_factor_;
+    /**
+     * Callback function for the max force factor topic
+     *
+     * @param msg the message receiver over the topic
+     */
+    void maxForceFactorCB(const std_msgs::Float64ConstPtr& msg);
   };
 } // namespace
 

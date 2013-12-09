@@ -244,8 +244,8 @@ namespace controller {
     commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
 
     //clamp the result to max force
-    commanded_effort = min( commanded_effort, max_force_demand );
-    commanded_effort = max( commanded_effort, -max_force_demand );
+    commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );
+    commanded_effort = max( commanded_effort, -(max_force_demand * max_force_factor_) );
 
     if( !in_deadband )
     {
