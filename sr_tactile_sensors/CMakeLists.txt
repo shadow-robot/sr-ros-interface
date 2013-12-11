@@ -1,5 +1,17 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+# Catkin User Guide: http://www.ros.org/doc/groovy/api/catkin/html/user_guide/user_guide.html
+# Catkin CMake Standard: http://www.ros.org/doc/groovy/api/catkin/html/user_guide/standards.html
+cmake_minimum_required(VERSION 2.8.3)
+project(sr_tactile_sensors)
+# Load catkin and all dependencies required for this package
+# TODO: remove all from COMPONENTS that are not catkin packages.
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_plugins)
+
+# include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+# CATKIN_MIGRATION: removed during catkin migration
+# cmake_minimum_required(VERSION 2.4.6)
+
+# CATKIN_MIGRATION: removed during catkin migration
+# include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -9,7 +21,9 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
 
-rosbuild_init()
+
+# CATKIN_MIGRATION: removed during catkin migration
+# rosbuild_init()
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -17,9 +31,15 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-#rosbuild_genmsg()
+#add_message_files(
+  FILES
+  # TODO: List your msg files here
+)
 #uncomment if you have defined services
-#rosbuild_gensrv()
+#add_service_files(
+  FILES
+  # TODO: List your msg files here
+)
 
 
 #Gazebo
@@ -43,9 +63,9 @@ ENDIF(real_hand)
 #############################
 #  VIRTUAL TACTILE SENSORS  #
 #############################
-rosbuild_add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
 IF(gazebo_support)
-  rosbuild_add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+  add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
 ENDIF(gazebo_support)
 
 
@@ -58,16 +78,29 @@ IF(real_hand)
   LINK_LIBRARIES(pthread)
   add_library(robot STATIC IMPORTED)
   set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
-  rosbuild_add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+  add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
   target_link_libraries(sr_tactile_real robot)
 ENDIF(real_hand)
 
 #############################
 #  RVIZ MARKER FOR TACTILES #
 #############################
-rosbuild_add_executable(sr_tactile_rviz_marker src/sr_tactile_rviz_marker.cpp)
-rosbuild_add_executable(sr_bumper_rviz_marker src/sr_bumper_rviz_marker.cpp)
+add_executable(sr_tactile_rviz_marker src/sr_tactile_rviz_marker.cpp)
+add_executable(sr_bumper_rviz_marker src/sr_bumper_rviz_marker.cpp)
 ###############
 #   EXAMPLES  #
 ###############
-rosbuild_add_executable(tactile_example examples/tactile.cpp)
+add_executable(tactile_example examples/tactile.cpp)
+## Generate added messages and services with any dependencies listed here
+generate_messages(
+    #TODO DEPENDENCIES geometry_msgs std_msgs
+)
+
+# catkin_package parameters: http://ros.org/doc/groovy/api/catkin/html/dev_guide/generated_cmake_api.html#catkin-package
+# TODO: fill in what other packages will need to use this package
+catkin_package(
+    DEPENDS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_plugins
+    CATKIN_DEPENDS # TODO
+    INCLUDE_DIRS # TODO include
+    LIBRARIES # TODO
+)
