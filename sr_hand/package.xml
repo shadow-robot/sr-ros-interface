@@ -1,0 +1,79 @@
+<package>
+  <name>sr_hand</name>
+  <version>1.2.0</version>
+  <description>This is a ROS interface to the Shadow Robot's robotic hand. It
+     contains both an interface to the real hand (communicating via
+     a CAN interface) and a simulated version of the hand. It also
+     contains an interface to Shadow Robot's muscle arm.</description>
+  <maintainer email=" ugo@shadowrobot.com">Ugo Cupcic </maintainer>
+  <maintainer email="">contact@shadowrobot.com</maintainer>
+
+  <license>GPL</license>
+
+  <url type="website">http://www.shadowrobot.com</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author email=" ugo@shadowrobot.com">Ugo Cupcic </author>
+  <author>contact@shadowrobot.com</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>roslib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>sr_robot_msgs</build_depend>
+  <build_depend>pr2_controllers_msgs</build_depend>
+  <build_depend>pr2_mechanism_msgs</build_depend>
+  <build_depend>sr_utilities</build_depend>
+  <build_depend>diagnostic_msgs</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>self_test</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>gazebo_msgs</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>roslib</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>std_srvs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>sr_robot_msgs</run_depend>
+  <run_depend>pr2_controllers_msgs</run_depend>
+  <run_depend>pr2_mechanism_msgs</run_depend>
+  <run_depend>sr_utilities</run_depend>
+  <run_depend>diagnostic_msgs</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>self_test</run_depend>
+  <run_depend>urdf</run_depend>
+  <run_depend>gazebo_msgs</run_depend>
+
+  <!-- Dependencies needed only for running tests. -->
+  <!-- <test_depend>roslib</test_depend> -->
+  <!-- <test_depend>roscpp</test_depend> -->
+  <!-- <test_depend>rospy</test_depend> -->
+  <!-- <test_depend>std_msgs</test_depend> -->
+  <!-- <test_depend>std_srvs</test_depend> -->
+  <!-- <test_depend>sensor_msgs</test_depend> -->
+  <!-- <test_depend>sr_robot_msgs</test_depend> -->
+  <!-- <test_depend>pr2_controllers_msgs</test_depend> -->
+  <!-- <test_depend>pr2_mechanism_msgs</test_depend> -->
+  <!-- <test_depend>sr_utilities</test_depend> -->
+  <!-- <test_depend>diagnostic_msgs</test_depend> -->
+  <!-- <test_depend>dynamic_reconfigure</test_depend> -->
+  <!-- <test_depend>self_test</test_depend> -->
+  <!-- <test_depend>urdf</test_depend> -->
+  <!-- <test_depend>gazebo_msgs</test_depend> -->
+
+<export>
+    <cpp lflags="-L${prefix}/lib -lSrVirtual -lHandCommander" cflags="-I${prefix}/include"/>
+    <python path="${prefix}/python_lib"/>
+    <python path="${prefix}/python_lib/grasp"/>
+</export>
+
+</package>

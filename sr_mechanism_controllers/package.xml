@@ -1,0 +1,86 @@
+<package>
+  <name>sr_mechanism_controllers</name>
+  <version>1.2.0</version>
+  <description>The sr_mechanism_controllers package contains different types of
+     controllers for the etherCAT hand:(fake) calibration controllers,
+     position controllers, velocity controllers, force controllers, ...</description>
+  <maintainer email=" ugo@shadowrobot.com ">Ugo Cupcic </maintainer>
+  <maintainer email="">contact@shadowrobot.com</maintainer>
+
+  <license>GPL</license>
+
+  <url type="website">http://ros.org/wiki/sr_mechanism_controllers</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author email=" ugo@shadowrobot.com ">Ugo Cupcic </author>
+  <author>contact@shadowrobot.com</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>std_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>actionlib</build_depend>
+  <build_depend>pr2_controllers_msgs</build_depend>
+  <build_depend>sr_robot_msgs</build_depend>
+  <build_depend>sr_utilities</build_depend>
+  <build_depend>pr2_controller_interface</build_depend>
+  <build_depend>pr2_mechanism_model</build_depend>
+  <build_depend>realtime_tools</build_depend>
+  <build_depend>robot_mechanism_controllers</build_depend>
+  <build_depend>pr2_mechanism_controllers</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>rosconsole</build_depend>
+  <build_depend>angles</build_depend>
+  <build_depend>control_toolbox</build_depend>
+  <build_depend>sr_hardware_interface</build_depend>
+  <build_depend>xmlrpcpp</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>std_msgs</run_depend>
+  <run_depend>std_srvs</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>actionlib</run_depend>
+  <run_depend>pr2_controllers_msgs</run_depend>
+  <run_depend>sr_robot_msgs</run_depend>
+  <run_depend>sr_utilities</run_depend>
+  <run_depend>pr2_controller_interface</run_depend>
+  <run_depend>pr2_mechanism_model</run_depend>
+  <run_depend>realtime_tools</run_depend>
+  <run_depend>robot_mechanism_controllers</run_depend>
+  <run_depend>pr2_mechanism_controllers</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>rosconsole</run_depend>
+  <run_depend>angles</run_depend>
+  <run_depend>control_toolbox</run_depend>
+  <run_depend>sr_hardware_interface</run_depend>
+  <run_depend>xmlrpcpp</run_depend>
+
+  <!-- Dependencies needed only for running tests. -->
+  <!-- <test_depend>std_msgs</test_depend> -->
+  <!-- <test_depend>std_srvs</test_depend> -->
+  <!-- <test_depend>roscpp</test_depend> -->
+  <!-- <test_depend>actionlib</test_depend> -->
+  <!-- <test_depend>pr2_controllers_msgs</test_depend> -->
+  <!-- <test_depend>sr_robot_msgs</test_depend> -->
+  <!-- <test_depend>sr_utilities</test_depend> -->
+  <!-- <test_depend>pr2_controller_interface</test_depend> -->
+  <!-- <test_depend>pr2_mechanism_model</test_depend> -->
+  <!-- <test_depend>realtime_tools</test_depend> -->
+  <!-- <test_depend>robot_mechanism_controllers</test_depend> -->
+  <!-- <test_depend>pr2_mechanism_controllers</test_depend> -->
+  <!-- <test_depend>pluginlib</test_depend> -->
+  <!-- <test_depend>rosconsole</test_depend> -->
+  <!-- <test_depend>angles</test_depend> -->
+  <!-- <test_depend>control_toolbox</test_depend> -->
+  <!-- <test_depend>sr_hardware_interface</test_depend> -->
+  <!-- <test_depend>xmlrpcpp</test_depend> -->
+
+<export>
+    <cpp lflags="-L${prefix}/lib" cflags="-I${prefix}/include"/>
+    <pr2_controller_interface plugin="${prefix}/controller_plugins.xml"/>
+</export>
+
+</package>

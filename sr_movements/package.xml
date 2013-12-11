@@ -1,0 +1,49 @@
+<package>
+  <name>sr_movements</name>
+  <version>1.2.0</version>
+  <description>Contains a node which can be used to take the hand through a series of movements (perfect for tuning
+    controllers for example).</description>
+  <maintainer email=" ugo@shadowrobot.com">Ugo Cupcic </maintainer>
+
+  <license>GPL</license>
+
+  <url type="website">http://ros.org/wiki/sr_movements</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author email=" ugo@shadowrobot.com">Ugo Cupcic </author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>pr2_controllers_msgs</build_depend>
+  <build_depend>sr_robot_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>sr_utilities</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sr_hand</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>pr2_controllers_msgs</run_depend>
+  <run_depend>sr_robot_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>sr_utilities</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>sr_hand</run_depend>
+
+  <!-- Dependencies needed only for running tests. -->
+  <!-- <test_depend>pr2_controllers_msgs</test_depend> -->
+  <!-- <test_depend>sr_robot_msgs</test_depend> -->
+  <!-- <test_depend>std_msgs</test_depend> -->
+  <!-- <test_depend>sensor_msgs</test_depend> -->
+  <!-- <test_depend>sr_utilities</test_depend> -->
+  <!-- <test_depend>roscpp</test_depend> -->
+  <!-- <test_depend>sr_hand</test_depend> -->
+
+<export>
+    <cpp lflags="-L${prefix}/lib -lsr_movement" cflags="-I${prefix}/include/"/>
+</export>
+
+</package>
