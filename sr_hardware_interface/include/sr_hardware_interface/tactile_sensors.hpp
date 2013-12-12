@@ -56,7 +56,7 @@ namespace tactiles
         pcb_version(pcb_version)
     {};
 
-    ~GenericTactileData() {};
+    virtual ~GenericTactileData() {};
 
     bool tactile_data_valid;
 

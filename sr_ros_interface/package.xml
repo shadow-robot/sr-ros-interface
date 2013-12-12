@@ -1,10 +1,9 @@
 <package>
-  <name>.</name>
+  <name>sr_ros_interface</name>
   <version>1.2.0</version>
   <description>This stack regroups the different ros interfaces developped for Shadow Robot's
   Hardware. It provides an interface to both simulated and real hardware.</description>
-  <maintainer email="">Maintained by Ugo Cupcic: ugo@shadowrobot.com</maintainer>
-  <maintainer email="">contact@shadowrobot.com</maintainer>
+  <maintainer email="software@shadowrobot.com">Maintained by Ugo Cupcic: ugo@shadowrobot.com</maintainer>
 
   <license>BSD</license>
   <license>GPL</license>
@@ -38,11 +37,8 @@
   <run_depend>sr_tactile_sensors</run_depend>
 
   <!-- Dependencies needed only for running tests. -->
-
-
-
-
-
-
-
+  
+  <export>
+    <metapackage/>
+  </export>
 </package>

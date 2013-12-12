@@ -4,15 +4,13 @@
   <description>sr_mechanism_model contains the transmissions used in the robot model. We needed specific
     transmission as we're using our own actuator. We also needed to take care of the joint 0s
     which combine the distal and middle phalanges.</description>
-  <maintainer email=" ugo@shadowrobot.com ">Ugo Cupcic </maintainer>
-  <maintainer email="">contact@shadowrobot.com</maintainer>
+  <maintainer email="ugo@shadowrobot.com">Ugo Cupcic </maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_mechanism_model</url>
-  <!-- <url type="bugtracker"></url> -->
 
-  <author email=" ugo@shadowrobot.com ">Ugo Cupcic </author>
+  <author email="ugo@shadowrobot.com">Ugo Cupcic </author>
   <author>contact@shadowrobot.com</author>
 
   <!-- Dependencies which this package needs to build itself. -->
@@ -22,16 +20,12 @@
   <build_depend>roscpp</build_depend>
   <build_depend>sr_hardware_interface</build_depend>
   <build_depend>pr2_mechanism_model</build_depend>
+  <build_depend>tinyxml</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
   <run_depend>sr_hardware_interface</run_depend>
   <run_depend>pr2_mechanism_model</run_depend>
-
-  <!-- Dependencies needed only for running tests. -->
-  <!-- <test_depend>roscpp</test_depend> -->
-  <!-- <test_depend>sr_hardware_interface</test_depend> -->
-  <!-- <test_depend>pr2_mechanism_model</test_depend> -->
 
 <export>
     <cpp lflags="-L${prefix}/lib -lsr_mechanism_model -Wl,-rpath,${prefix}/lib" cflags="-I${prefix}/include"/>

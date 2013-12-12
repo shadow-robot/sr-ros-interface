@@ -2,15 +2,11 @@
   <name>sr_gazebo_plugins</name>
   <version>1.2.0</version>
   <description>Gazebo Plugins for various Shadow Robot-specific sensors and actuators on the robot.</description>
-  <maintainer email="">adapted by Ugo(software@shadowrobot.com)</maintainer>
-  <maintainer email="">Sachin Chitta</maintainer>
-  <maintainer email="">Stu Glaser</maintainer>
-  <maintainer email="">John Hsu</maintainer>
+  <maintainer email="software@shadowrobot.com">adapted by Ugo(software@shadowrobot.com)</maintainer>
 
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/pr2_gazebo_plugins</url>
-  <!-- <url type="bugtracker"></url> -->
 
   <author>adapted by Ugo(software@shadowrobot.com)</author>
   <author>Sachin Chitta</author>
@@ -21,10 +17,9 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <!-- Dependencies needed to compile this package. -->
-  <build_depend>gazebo</build_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>gazebo_ros_control</build_depend>
   <build_depend>gazebo_plugins</build_depend>
-  <build_depend>gazebo_tools</build_depend>
-  <build_depend>opende</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
@@ -52,10 +47,9 @@
   <build_depend>sr_self_test</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
-  <run_depend>gazebo</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>gazebo_ros_control</run_depend>
   <run_depend>gazebo_plugins</run_depend>
-  <run_depend>gazebo_tools</run_depend>
-  <run_depend>opende</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>std_msgs</run_depend>
@@ -81,37 +75,6 @@
   <run_depend>sr_hardware_interface</run_depend>
   <run_depend>pr2_gazebo_plugins</run_depend>
   <run_depend>sr_self_test</run_depend>
-
-  <!-- Dependencies needed only for running tests. -->
-  <!-- <test_depend>gazebo</test_depend> -->
-  <!-- <test_depend>gazebo_plugins</test_depend> -->
-  <!-- <test_depend>gazebo_tools</test_depend> -->
-  <!-- <test_depend>opende</test_depend> -->
-  <!-- <test_depend>roscpp</test_depend> -->
-  <!-- <test_depend>rospy</test_depend> -->
-  <!-- <test_depend>std_msgs</test_depend> -->
-  <!-- <test_depend>nav_msgs</test_depend> -->
-  <!-- <test_depend>sensor_msgs</test_depend> -->
-  <!-- <test_depend>cv_bridge</test_depend> -->
-  <!-- <test_depend>pr2_msgs</test_depend> -->
-  <!-- <test_depend>geometry_msgs</test_depend> -->
-  <!-- <test_depend>opencv2</test_depend> -->
-  <!-- <test_depend>diagnostic_updater</test_depend> -->
-  <!-- <test_depend>cv_bridge</test_depend> -->
-  <!-- <test_depend>diagnostic_msgs</test_depend> -->
-  <!-- <test_depend>angles</test_depend> -->
-  <!-- <test_depend>pr2_hardware_interface</test_depend> -->
-  <!-- <test_depend>sr_hardware_interface</test_depend> -->
-  <!-- <test_depend>pr2_controller_manager</test_depend> -->
-  <!-- <test_depend>pr2_mechanism_model</test_depend> -->
-  <!-- <test_depend>bullet</test_depend> -->
-  <!-- <test_depend>urdf</test_depend> -->
-  <!-- <test_depend>polled_camera</test_depend> -->
-  <!-- <test_depend>image_transport</test_depend> -->
-  <!-- <test_depend>dynamic_reconfigure</test_depend> -->
-  <!-- <test_depend>sr_hardware_interface</test_depend> -->
-  <!-- <test_depend>pr2_gazebo_plugins</test_depend> -->
-  <!-- <test_depend>sr_self_test</test_depend> -->
 
 <export>
     <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib" cflags="-I${prefix}/include"/>
