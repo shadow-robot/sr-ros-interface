@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_ms
   pr2_msgs geometry_msgs diagnostic_updater diagnostic_msgs angles pr2_hardware_interface sr_hardware_interface pr2_controller_manager
   pr2_mechanism_model urdf dynamic_reconfigure sr_hardware_interface sr_self_test)
 
+find_package(gazebo)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 set(ROS_BUILD_TYPE Release)
@@ -16,8 +17,19 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 add_definitions(-fPIC)
 
-#find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
-#include_directories( ${ImageMagick_INCLUDE_DIRS})
+find_package(PkgConfig)
+
+# find Magick++, 
+#pkg_check_modules(Magick++_PKGCONF QUIET ImageMagick++)
+#set(Magick++__DEFINITIONS ${Magick++__CFLAGS_OTHER})
+#find_path(Magick++_INCLUDE_DIR Magick++.h HINTS ${Magick++_INCLUDEDIR} ${Magick++_INCLUDE_DIRS})
+#set(Magick++_PROCESS_INCLUDES Magick++_INCLUDE_DIR Magick_INCLUDE_DIRS)
+
+include_directories(/usr/include/gazebo-1.9/gazebo)
+include_directories(/usr/include/gazebo-1.9)
+include_directories(/usr/include/sdformat-1.4)
+
+find_package(gazebo REQUIRED)
 
 # if screw joint exists, remove hack for damping variable
 execute_process(COMMAND ode-config --version OUTPUT_VARIABLE ode_version)
@@ -28,18 +40,11 @@ else (${ode_version} VERSION_LESS "0.11.1.71")
   add_definitions(-DODE_SCREW_JOINT)
 endif (${ode_version} VERSION_LESS "0.11.1.71")
 
-# dynamic reconfigure for gazebo ros camera nodes
-# does not exist until simulator_gazebo 1.2.9
-#execute_process(COMMAND rosversion simulator_gazebo OUTPUT_VARIABLE simulator_gazebo_version)
-#if (${simulator_gazebo_version} VERSION_GREATER "1.2.8")
-#  message(STATUS "OUTPUT_VARIABLE: ${simulator_gazebo_version}Enabling gazebo ros camera dynamic reconfigure")
-#  add_definitions(-DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
-#else (${simulator_gazebo_version} VERSION_GREATER "1.2.8")
-#  message(STATUS "OUTPUT_VARIABLE: ${simulator_gazebo_version}Disabling gazebo ros camera dynamic reconfigure")
-#endif (${simulator_gazebo_version} VERSION_GREATER "1.2.8")
+# Enabling gazebo ros camera dynamic reconfigure
+add_definitions(-DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
 
 find_package(Boost REQUIRED COMPONENTS thread)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS} ${Magick++_INCLUDE_DIRS})
 add_library(sr_gazebo_ros_controller_manager src/gazebo_ros_controller_manager.cpp)
 target_link_libraries(sr_gazebo_ros_controller_manager ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 

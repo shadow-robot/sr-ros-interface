@@ -26,10 +26,13 @@ message(" ----- ")
 
 add_executable(joint_trajectory_action_controller src/joint_trajectory_action_controller.cpp)
 add_dependencies(joint_trajectory_action_controller sr_robot_msgs_gencpp)
+target_link_libraries(joint_trajectory_action_controller ${catkin_LIBRARIES})
 add_executable(joint_spline_trajectory_action_controller src/joint_spline_trajectory_action_controller.cpp)
 add_dependencies(joint_spline_trajectory_action_controller sr_robot_msgs_gencpp)
+target_link_libraries(joint_spline_trajectory_action_controller ${catkin_LIBRARIES})
 add_executable(simple_spline_trajectory example/simple_spline_trajectory.cpp)
 add_dependencies(simple_spline_trajectory sr_robot_msgs_gencpp)
+target_link_libraries(simple_spline_trajectory ${catkin_LIBRARIES})
 
 add_library(sr_mechanism_controllers
   src/srh_fake_joint_calibration_controller.cpp
@@ -44,11 +47,14 @@ add_library(sr_mechanism_controllers
   src/sr_controller.cpp
 )
 add_dependencies(sr_mechanism_controllers sr_robot_msgs_gencpp)
+target_link_libraries(sr_mechanism_controllers ${catkin_LIBRARIES})
 
 add_executable(simple_trajectory example/simple_trajectory.cpp)
 add_dependencies(simple_trajectory sr_robot_msgs_gencpp)
+target_link_libraries(simple_trajectory ${catkin_LIBRARIES})
 add_executable(simple_trajectory_compare example/simple_trajectory_compare.cpp)
 add_dependencies(simple_trajectory_compare sr_robot_msgs_gencpp)
+target_link_libraries(simple_trajectory_compare ${catkin_LIBRARIES})
 
 catkin_package(
   DEPENDS xmlrpcpp
