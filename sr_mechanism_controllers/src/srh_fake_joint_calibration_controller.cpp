@@ -38,8 +38,8 @@ using namespace std;
 namespace controller {
 
   SrhFakeJointCalibrationController::SrhFakeJointCalibrationController()
-    : robot_(NULL), last_publish_time_(0), state_(INITIALIZED),
-      actuator_(NULL), joint_(NULL), transmission_(NULL)
+    : robot_(NULL), last_publish_time_(0), state_(IS_INITIALIZED),
+      actuator_(NULL), joint_(NULL)
   {
   }
 
@@ -89,7 +89,8 @@ namespace controller {
       ROS_ERROR("No transmission given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    if (!(transmission_ = robot->model_->getTransmission(transmission_name)))
+    transmission_ = robot->model_->getTransmission(transmission_name);
+    if (!transmission_)
     {
       ROS_ERROR("Could not find transmission %s (namespace: %s)",
                 transmission_name.c_str(), node_.getNamespace().c_str());
@@ -111,7 +112,7 @@ namespace controller {
 
     switch(state_)
     {
-    case INITIALIZED:
+    case IS_INITIALIZED:
       state_ = BEGINNING;
       break;
     case BEGINNING:

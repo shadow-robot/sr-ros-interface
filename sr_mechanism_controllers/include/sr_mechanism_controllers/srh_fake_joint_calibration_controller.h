@@ -50,7 +50,7 @@ namespace controller
     bool calibrated() { return state_ == CALIBRATED; }
     void beginCalibration()
     {
-      if (state_ == INITIALIZED)
+      if (state_ == IS_INITIALIZED)
         state_ = BEGINNING;
     }
 
@@ -61,7 +61,7 @@ namespace controller
     boost::scoped_ptr<realtime_tools::RealtimePublisher<std_msgs::Empty> > pub_calibrated_;
     ros::Time last_publish_time_;
 
-    enum { INITIALIZED, BEGINNING, MOVING_TO_LOW, MOVING_TO_HIGH, CALIBRATED };
+    enum { IS_INITIALIZED, BEGINNING, MOVING_TO_LOW, MOVING_TO_HIGH, CALIBRATED };
     int state_;
     int countdown_;
 
@@ -70,7 +70,7 @@ namespace controller
 
     pr2_hardware_interface::Actuator *actuator_;
     pr2_mechanism_model::JointState *joint_;
-    pr2_mechanism_model::Transmission *transmission_;
+    boost::shared_ptr<pr2_mechanism_model::Transmission> transmission_;
 
     std::string joint_name_, actuator_name_;
 

@@ -19,11 +19,7 @@ add_definitions(-fPIC)
 
 find_package(PkgConfig)
 
-# find Magick++, 
-#pkg_check_modules(Magick++_PKGCONF QUIET ImageMagick++)
-#set(Magick++__DEFINITIONS ${Magick++__CFLAGS_OTHER})
-#find_path(Magick++_INCLUDE_DIR Magick++.h HINTS ${Magick++_INCLUDEDIR} ${Magick++_INCLUDE_DIRS})
-#set(Magick++_PROCESS_INCLUDES Magick++_INCLUDE_DIR Magick_INCLUDE_DIRS)
+find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 
 include_directories(/usr/include/gazebo-1.9/gazebo)
 include_directories(/usr/include/gazebo-1.9)
@@ -44,7 +40,7 @@ endif (${ode_version} VERSION_LESS "0.11.1.71")
 add_definitions(-DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
 
 find_package(Boost REQUIRED COMPONENTS thread)
-include_directories(${Boost_INCLUDE_DIRS} ${Magick++_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS})
 add_library(sr_gazebo_ros_controller_manager src/gazebo_ros_controller_manager.cpp)
 target_link_libraries(sr_gazebo_ros_controller_manager ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 

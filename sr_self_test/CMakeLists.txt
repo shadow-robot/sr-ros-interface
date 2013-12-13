@@ -12,7 +12,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
-include_directories( ${ImageMagick_INCLUDE_DIRS})
+include_directories(${ImageMagick_INCLUDE_DIRS})
 
 catkin_package(
     DEPENDS
@@ -23,15 +23,15 @@ catkin_package(
 
 if(COMMAND add_rostest_gtest)
   link_directories(/opt/ros/hydro/lib)
-  
+  include_directories(/usr/include/ImageMagick)
   find_package(Boost REQUIRED COMPONENTS thread system iostreams filesystem)
-  include_directories(${Boost_INCLUDE_DIRS})
+  include_directories(${Boost_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS})
   add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp src/test_joint_movement.cpp src/manual_test.cpp
     src/diagnostic_parser.cpp src/sensor_noise_test.cpp src/motor_test.cpp)
   add_dependencies(sr_self_test sr_robot_msgs_gencpp)
-  target_link_libraries(sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+  target_link_libraries(sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${ImageMagick_LIBRARIES})
 
   add_rostest_gtest(sr_self_test_test test/sr_self_test.test test/test_self_test.cpp)
   add_dependencies(sr_self_test_test sr_robot_msgs_gencpp)
-  target_link_libraries(sr_self_test_test sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+  target_link_libraries(sr_self_test_test sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${ImageMagick_LIBRARIES})
 endif(COMMAND add_rostest_gtest)

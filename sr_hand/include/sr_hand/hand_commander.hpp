@@ -41,7 +41,6 @@
 
 using namespace ros;
 
-
 namespace shadowhandRosLib
 {
   enum HandType
@@ -54,7 +53,6 @@ namespace shadowhandRosLib
 
 namespace shadowrobot
 {
-
 /**
  * This ROS subscriber is used to issue commands to the hand / arm, from sending a set of targets, to changing the
  * controller parameters.

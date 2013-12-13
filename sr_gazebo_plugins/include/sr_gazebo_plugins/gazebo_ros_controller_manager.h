@@ -41,7 +41,7 @@
 
 #include "pr2_hardware_interface/hardware_interface.h"
 #include "pr2_controller_manager/controller_manager.h"
-#include "pr2_gazebo_plugins/SetModelsJointsStates.h"
+//#include "pr2_gazebo_plugins/SetModelsJointsStates.h"
 #include "pr2_mechanism_model/robot.h"
 #include <tinyxml.h>
 #include <ros/ros.h>
@@ -98,8 +98,8 @@ private:
   private: ros::ServiceServer setModelsJointsStatesService;
 
   ///\brief ros service callback
-  private: bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
-                                      pr2_gazebo_plugins::SetModelsJointsStates::Response &res);
+  //private: bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
+  //                                    pr2_gazebo_plugins::SetModelsJointsStates::Response &res);
 
   ///\brief ros service callback
   /*

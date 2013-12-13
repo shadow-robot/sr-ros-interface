@@ -10,19 +10,19 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-#find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
-#include_directories( ${ImageMagick_INCLUDE_DIRS})
+find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
+include_directories(${ImageMagick_INCLUDE_DIRS})
+
+find_library(HandCommander libHandCommander.a)
 
 add_executable(sr_movements src/sr_movements.cpp src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
-add_dependencies(sr_movements sr_robot_msgs_gencpp)
-target_link_libraries(sr_movements ${ImageMagick_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(sr_movements ${ImageMagick_LIBRARIES} ${catkin_LIBRARIES} HandCommander)
 
 add_rostest(test/test_movements.test)
 add_rostest(test/test_joint_name_movement.test)
 
 add_library(sr_movement src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
-add_dependencies(sr_movement sr_robot_msgs_gencpp libmagick)
-target_link_libraries(sr_movement ${catkin_LIBRARIES} libmagick)
+target_link_libraries(sr_movement ${ImageMagick_LIBRARIES} ${catkin_LIBRARIES} HandCommander)
 
 catkin_package(
     DEPENDS libmagick

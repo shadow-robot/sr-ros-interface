@@ -12,6 +12,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 add_service_files(FILES getJointState.srv)
+generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 
 add_library(sr_calibration src/calibration.cpp)
 

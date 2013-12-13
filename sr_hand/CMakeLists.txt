@@ -72,7 +72,6 @@ add_executable(shadowarm_virtual src/hand/sr_articulated_robot.cpp src/hand/virt
   src/hand/virtual_arm_node.cpp src/sr_diagnosticer.cpp)
 find_package(Boost REQUIRED COMPONENTS thread)
 include_directories(${Boost_INCLUDE_DIRS})
-add_dependencies(shadowarm_virtual sr_robot_msgs_gencpp)
 target_link_libraries(shadowarm_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 
@@ -81,7 +80,6 @@ target_link_libraries(shadowarm_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 ##################
 add_executable(shadowhand_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
   src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp)
-add_dependencies(shadowhand_virtual sr_robot_msgs_gencpp)
 target_link_libraries(shadowhand_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 
@@ -90,7 +88,6 @@ target_link_libraries(shadowhand_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 ###########################
 
 add_library(SrVirtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand_library.cpp)
-add_dependencies(SrVirtual sr_robot_msgs_gencpp)
 target_link_libraries(SrVirtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 ##################
@@ -102,7 +99,6 @@ if(real_hand)
   set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
   add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
     src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
-  add_dependencies(shadowhand_real sr_robot_msgs_gencpp)
   target_link_libraries(shadowhand_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
 endif(real_hand)
 
@@ -112,7 +108,6 @@ endif(real_hand)
 if(ethercat_compat)
   add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp
     src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
-  add_dependencies(shadowhand_ethercat sr_robot_msgs_gencpp)
   target_link_libraries(shadowhand_ethercat ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 endif(ethercat_compat)
 
@@ -121,7 +116,6 @@ endif(ethercat_compat)
 ###################################
 add_executable(shadowarm_can src/hand/sr_articulated_robot.cpp src/hand/CAN_compatibility_arm.cpp src/sr_publisher.cpp
   src/sr_subscriber.cpp src/hand/CAN_compatibility_arm_node.cpp)
-add_dependencies(shadowarm_can sr_robot_msgs_gencpp)
 target_link_libraries(shadowarm_can ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 ##################
@@ -131,7 +125,6 @@ if(real_arm)
   include_directories(/usr/realtime/include/)
   add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
     src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
-  add_dependencies(shadowarm_real sr_robot_msgs_gencpp)
   target_link_libraries(shadowarm_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
 endif(real_arm)
 
@@ -141,15 +134,14 @@ endif(real_arm)
 if(valves)
   include_directories(/usr/realtime/include/)
   add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
-  add_dependencies(sr_valves sr_robot_msgs_gencpp)
   target_link_libraries(sr_valves ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
 endif(valves)
 
 ############################################################################
 #   Hand command library (gives compatibility with CAN and ethercat hand)  #
 ############################################################################
-add_library(HandCommander src/hand_commander.cpp)
-add_dependencies(HandCommander sr_robot_msgs_gencpp)
+add_definitions(-fPIC)
+add_library(HandCommander STATIC src/hand_commander.cpp)
 target_link_libraries(HandCommander ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
@@ -164,9 +156,7 @@ catkin_package(
 if(COMMAND add_rostest_gtest)
   link_directories(/opt/ros/hydro/lib)
   add_rostest_gtest(hand_commander_test test/hand_commander_test.test test/hand_commander_test.cpp)
-  add_dependencies(hand_commander_test sr_robot_msgs_gencpp)
   target_link_libraries(hand_commander_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
   add_rostest_gtest(hand_commander_arm_and_hand_test test/hand_commander_arm_and_hand_test.test test/hand_commander_test.cpp)
-  add_dependencies(hand_commander_arm_and_hand_test sr_robot_msgs_gencpp)
   target_link_libraries(hand_commander_arm_and_hand_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
 endif(COMMAND add_rostest_gtest)
