@@ -263,7 +263,7 @@ namespace controller {
     //loop rate.
     if(loop_count_ % 50 == 0)
     {
-      double commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
+      double commanded_effort = pid_controller_position_->computeCommand(-error_position, dt_);
 
       //clamp the result to max force
       commanded_effort = min( commanded_effort, max_force_demand );

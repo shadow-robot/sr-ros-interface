@@ -48,8 +48,7 @@ namespace shadowrobot
      * Initializes the necessary mappings with a static list of names.
      */
     ROS_DEPRECATED CANCompatibilityArm();
-    ///destructor
-    ~CANCompatibilityArm();
+    virtual ~CANCompatibilityArm();
 
     //virtual classes defined in Shadowhand
     /**

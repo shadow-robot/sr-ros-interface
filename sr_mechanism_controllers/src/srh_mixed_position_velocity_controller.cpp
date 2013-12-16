@@ -302,7 +302,7 @@ namespace controller {
     double commanded_effort = 0.0;
 
     //compute the velocity demand using the position pid loop
-    commanded_velocity = pid_controller_position_->updatePid(error_position, dt_);
+    commanded_velocity = pid_controller_position_->computeCommand(-error_position, dt_);
     //saturate the velocity demand
     commanded_velocity = max( commanded_velocity, min_velocity_ );
     commanded_velocity = min( commanded_velocity, max_velocity_ );
@@ -320,7 +320,7 @@ namespace controller {
       else
         error_velocity = commanded_velocity - joint_state_->velocity_;
     }
-    commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
+    commanded_effort = pid_controller_velocity_->computeCommand(-error_velocity, dt_);
 
     //clamp the result to max force
     commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );

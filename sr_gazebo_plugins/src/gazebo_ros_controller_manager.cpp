@@ -103,7 +103,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
 void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent model
-  std::string modelName = _sdf->GetParent()->GetValueString("name");
+  std::string modelName = _sdf->GetParent()->Get<std::string>("name");
 
   // Get the world name.
   this->world = _parent->GetWorld();
@@ -143,11 +143,11 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   // get parameter name
   this->robotNamespace = "";
   if (_sdf->HasElement("robotNamespace"))
-    this->robotNamespace = _sdf->GetElement("robotNamespace")->GetValueString();
+    this->robotNamespace = _sdf->GetElement("robotNamespace")->Get<std::string>();
 
   this->robotParam = "robot_description";
   if (_sdf->HasElement("robotParam"))
-    this->robotParam = _sdf->GetElement("robotParam")->GetValueString();
+    this->robotParam = _sdf->GetElement("robotParam")->Get<std::string>();
 
   this->robotParam = this->robotNamespace+"/" + this->robotParam;
 

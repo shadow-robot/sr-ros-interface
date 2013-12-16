@@ -33,6 +33,7 @@ target_link_libraries(sr_tactile_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 if(gazebo_support)
   add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
   target_link_libraries(sr_tactile_virtual_gazebo ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+  install(TARGETS sr_tactile_virtual_gazebo RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endif(gazebo_support)
 
 #############################
@@ -46,6 +47,10 @@ if(real_hand)
   set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
   add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
   target_link_libraries(sr_tactile_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} robot)
+  install(TARGETS sr_tactile_real robot
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 endif(real_hand)
 
 #############################
@@ -55,6 +60,7 @@ add_executable(sr_tactile_rviz_marker src/sr_tactile_rviz_marker.cpp)
 target_link_libraries(sr_tactile_rviz_marker ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 add_executable(sr_bumper_rviz_marker src/sr_bumper_rviz_marker.cpp)
 target_link_libraries(sr_bumper_rviz_marker ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+
 ###############
 #   EXAMPLES  #
 ###############
@@ -68,8 +74,7 @@ catkin_package(
     LIBRARIES
 )
 
-install(TARGETS sr_tactile_virtual sr_tactile_virtual_gazebo robot sr_tactile_real 
-  sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example
+install(TARGETS sr_tactile_virtual sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   OPTIONAL

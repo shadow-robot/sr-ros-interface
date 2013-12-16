@@ -93,6 +93,7 @@ if(real_hand)
   add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
     src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
   target_link_libraries(shadowhand_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
+  install(TARGETS shadowhand_real RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endif(real_hand)
 
 #########################################
@@ -102,6 +103,7 @@ if(ethercat_compat)
   add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp
     src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
   target_link_libraries(shadowhand_ethercat ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+  install(TARGETS shadowhand_ethercat RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endif(ethercat_compat)
 
 ###################################
@@ -119,6 +121,7 @@ if(real_arm)
   add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
     src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
   target_link_libraries(shadowarm_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
+  install(TARGETS shadowarm_real RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endif(real_arm)
 
 ##################
@@ -128,6 +131,7 @@ if(valves)
   include_directories(/usr/realtime/include/)
   add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
   target_link_libraries(sr_valves ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
+  install(TARGETS sr_valves RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endif(valves)
 
 ############################################################################
@@ -154,7 +158,7 @@ if(COMMAND add_rostest_gtest)
   target_link_libraries(hand_commander_arm_and_hand_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
 endif(COMMAND add_rostest_gtest)
 
-install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_real shadowhand_ethercat shadowarm_can shadowarm_real sr_valves HandCommander
+install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowarm_can
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   OPTIONAL
