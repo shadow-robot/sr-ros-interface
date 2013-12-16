@@ -10,16 +10,6 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 #  CONFIGURATION  #
 ###################
 
-#Gazebo
-set(gazebo_support $ENV{GAZEBO})
-message("--------- Shadow Robot Package Configuration:")
-if(gazebo_support)
-  set( CMAKE_CXX_FLAGS "-D GAZEBO")
-  message(" [x] Gazebo support")
-else(gazebo_support)
-  message(" [ ] Gazebo support")
-endif(gazebo_support)
-
 # Real Hand
 set(real_hand $ENV{REAL_HAND})
 if(real_hand)
@@ -49,13 +39,13 @@ else(real_hand)
 endif(real_hand)
 message("---------")
 
-#EtherCAT compatibility Interface
-set(ethercat_compat $ENV{ETHERCAT})
-if(ethercat_compat)
-  message(" [x] EtherCAT compatibility interface.")
-else(ethercat_compat)
-  message(" [ ] EtherCAT compatibility interface.")
-endif(ethercat_compat)
+#CAN compatibility Interface
+set(can_compat $ENV{CAN_COMPATIBILITY})
+if(can_compat)
+  message(" [x] CAN compatibility interface.")
+else(can_compat)
+  message(" [ ] CAN compatibility interface.")
+endif(can_compat)
 
 ##################
 #  VIRTUAL ARM  #
@@ -93,25 +83,24 @@ if(real_hand)
   add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
     src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
   target_link_libraries(shadowhand_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
-  install(TARGETS shadowhand_real RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endif(real_hand)
 
 #########################################
 #  ETHERCAT COMPATIBILITY WRAPPER HAND  #
 #########################################
-if(ethercat_compat)
-  add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp
-    src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
-  target_link_libraries(shadowhand_ethercat ${Boost_LIBRARIES} ${catkin_LIBRARIES})
-  install(TARGETS shadowhand_ethercat RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-endif(ethercat_compat)
+add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp
+  src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
+target_link_libraries(shadowhand_ethercat ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+message(" [x] EtherCAT compatibility interface.")
 
 ###################################
 #  CAN COMPATIBILITY WRAPPER ARM  #
 ###################################
-add_executable(shadowarm_can src/hand/sr_articulated_robot.cpp src/hand/CAN_compatibility_arm.cpp src/sr_publisher.cpp
-  src/sr_subscriber.cpp src/hand/CAN_compatibility_arm_node.cpp)
-target_link_libraries(shadowarm_can ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+if(can_compat)
+  add_executable(shadowarm_can src/hand/sr_articulated_robot.cpp src/hand/CAN_compatibility_arm.cpp src/sr_publisher.cpp
+    src/sr_subscriber.cpp src/hand/CAN_compatibility_arm_node.cpp)
+  target_link_libraries(shadowarm_can ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+endif(can_compat)
 
 ##################
 #    REAL ARM    #
@@ -121,7 +110,6 @@ if(real_arm)
   add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
     src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
   target_link_libraries(shadowarm_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
-  install(TARGETS shadowarm_real RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endif(real_arm)
 
 ##################
@@ -131,7 +119,6 @@ if(valves)
   include_directories(/usr/realtime/include/)
   add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
   target_link_libraries(sr_valves ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
-  install(TARGETS sr_valves RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endif(valves)
 
 ############################################################################
@@ -158,20 +145,24 @@ if(COMMAND add_rostest_gtest)
   target_link_libraries(hand_commander_arm_and_hand_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
 endif(COMMAND add_rostest_gtest)
 
-install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowarm_can
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  OPTIONAL
-)
+if(valves)
+  install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat sr_valves
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+else(valves)
+  install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )  
+endif()
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE
 )
 
 install(DIRECTORY scripts/
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   USE_SOURCE_PERMISSIONS
-  PATTERN ".svn" EXCLUDE
 )

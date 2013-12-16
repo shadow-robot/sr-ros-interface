@@ -28,13 +28,11 @@ target_link_libraries(test_math_utils pthread)
 install(DIRECTORY include/${PROJECT_NAME}/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
    FILES_MATCHING PATTERN "*.hpp"
-   PATTERN ".svn" EXCLUDE
 )
 
 install(DIRECTORY scripts/
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
    USE_SOURCE_PERMISSIONS
-   PATTERN ".svn" EXCLUDE
 )
 
 install(TARGETS sr_calibration
