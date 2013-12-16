@@ -4,8 +4,6 @@ find_package(catkin REQUIRED COMPONENTS sensor_msgs sr_robot_msgs rospy roscpp t
 
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
-set(ROS_BUILD_TYPE Release)
-
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
@@ -15,6 +13,7 @@ add_service_files(FILES getJointState.srv)
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 
 add_library(sr_calibration src/calibration.cpp)
+add_dependencies(sr_calibration sr_utilities_gencpp)
 
 catkin_package(
     DEPENDS
@@ -24,9 +23,9 @@ catkin_package(
 )
 
 catkin_add_gtest(test_calibration test/test_calibration.cpp src/calibration.cpp)
-add_dependencies(test_calibration sr_robot_msgs_gencpp)
+add_dependencies(test_calibration sr_utilities_gencpp)
 catkin_add_gtest(test_thread_safe_map test/test_thread_safe_map.cpp)
-add_dependencies(test_thread_safe_map sr_robot_msgs_gencpp)
+add_dependencies(test_thread_safe_map sr_utilities_gencpp)
 catkin_add_gtest(test_math_utils test/test_math_utils.cpp)
-add_dependencies(test_math_utils sr_robot_msgs_gencpp)
+add_dependencies(test_math_utils sr_utilities_gencpp)
 target_link_libraries(test_math_utils pthread)
