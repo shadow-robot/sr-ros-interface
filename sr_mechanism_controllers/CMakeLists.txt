@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_mechanism_controllers)
-find_package(catkin REQUIRED COMPONENTS std_msgs std_srvs roscpp actionlib pr2_controllers_msgs sr_robot_msgs
+find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp actionlib pr2_controllers_msgs sr_robot_msgs
   sr_utilities pr2_controller_interface pr2_mechanism_model realtime_tools robot_mechanism_controllers pr2_mechanism_controllers
   pluginlib rosconsole angles control_toolbox sr_hardware_interface xmlrpcpp)
 

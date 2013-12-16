@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_self_test)
-find_package(catkin REQUIRED COMPONENTS roscpp self_test sr_hand sr_movements sr_robot_msgs)
+find_package(catkin REQUIRED COMPONENTS rostest roscpp self_test sr_hand sr_movements sr_robot_msgs)
 
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 

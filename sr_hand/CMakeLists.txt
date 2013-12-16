@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_hand)
 
-find_package(catkin REQUIRED COMPONENTS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs
+find_package(catkin REQUIRED COMPONENTS rostest roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs
   sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs)
 
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
