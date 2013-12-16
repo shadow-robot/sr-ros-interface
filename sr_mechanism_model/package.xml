@@ -28,7 +28,6 @@
   <run_depend>pr2_mechanism_model</run_depend>
 
 <export>
-    <cpp lflags="-L${prefix}/lib -lsr_mechanism_model -Wl,-rpath,${prefix}/lib" cflags="-I${prefix}/include"/>
     <pr2_mechanism_model plugin="${prefix}/transmission_plugin.xml"/>
 </export>
 

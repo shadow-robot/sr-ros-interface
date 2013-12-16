@@ -146,12 +146,12 @@ if(COMMAND add_rostest_gtest)
 endif(COMMAND add_rostest_gtest)
 
 if(valves)
-  install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat sr_valves
+  install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat HandCommander sr_valves
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 else(valves)
-  install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat
+  install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat HandCommander
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )  

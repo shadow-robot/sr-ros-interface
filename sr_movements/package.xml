@@ -33,8 +33,4 @@
   <run_depend>roscpp</run_depend>
   <run_depend>sr_hand</run_depend>
 
-<export>
-    <cpp lflags="-L${prefix}/lib -lsr_movement" cflags="-I${prefix}/include/"/>
-</export>
-
 </package>

@@ -77,7 +77,6 @@
   <run_depend>sr_self_test</run_depend>
 
 <export>
-    <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib" cflags="-I${prefix}/include"/>
     <gazebo plugin_path="${prefix}/lib"/>
 </export>
 

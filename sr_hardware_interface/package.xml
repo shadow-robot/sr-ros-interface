@@ -21,8 +21,4 @@
   <run_depend>roscpp</run_depend>
   <run_depend>pr2_hardware_interface</run_depend>
 
-<export>
-    <cpp cflags="-I${prefix}/include"/>
-</export>
-
 </package>

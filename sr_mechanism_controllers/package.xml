@@ -62,7 +62,6 @@
   <test_depend>gtest</test_depend>
 
 <export>
-    <cpp lflags="-L${prefix}/lib" cflags="-I${prefix}/include"/>
     <pr2_controller_interface plugin="${prefix}/controller_plugins.xml"/>
 </export>
 

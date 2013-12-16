@@ -56,10 +56,4 @@
   <!-- Dependencies needed only for running tests. -->
   <test_depend>gtest</test_depend>
   
-<export>
-    <cpp lflags="-L${prefix}/lib -lSrVirtual -lHandCommander" cflags="-I${prefix}/include"/>
-    <python path="${prefix}/python_lib"/>
-    <python path="${prefix}/python_lib/grasp"/>
-</export>
-
 </package>

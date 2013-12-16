@@ -30,8 +30,4 @@
   <run_depend>sr_robot_msgs</run_depend>
   <run_depend>gtest</run_depend>
 
-<export>
-    <cpp lflags="-L${prefix}/lib -lsr_self_test" cflags="-I${prefix}/include"/>
-</export>
-
 </package>

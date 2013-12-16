@@ -17,13 +17,20 @@ catkin_package(
     LIBRARIES
 )
 
+find_package(Boost REQUIRED COMPONENTS thread)
+include_directories(${Boost_INCLUDE_DIRS})
+
 catkin_add_gtest(test_calibration test/test_calibration.cpp src/calibration.cpp)
+target_link_libraries(test_calibration ${catkin_LIBRARIES})
 add_dependencies(test_calibration sr_utilities_gencpp)
+
 catkin_add_gtest(test_thread_safe_map test/test_thread_safe_map.cpp)
 add_dependencies(test_thread_safe_map sr_utilities_gencpp)
+target_link_libraries(test_thread_safe_map ${catkin_LIBRARIES} pthread)
+
 catkin_add_gtest(test_math_utils test/test_math_utils.cpp)
 add_dependencies(test_math_utils sr_utilities_gencpp)
-target_link_libraries(test_math_utils pthread)
+target_link_libraries(test_math_utils ${catkin_LIBRARIES} pthread)
 
 install(DIRECTORY include/${PROJECT_NAME}/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
