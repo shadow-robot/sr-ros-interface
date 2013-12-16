@@ -4,11 +4,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp self_test sr_hand sr_movements sr
 
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
 find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 include_directories(${ImageMagick_INCLUDE_DIRS})
 
@@ -24,6 +19,7 @@ if(COMMAND add_rostest_gtest)
   include_directories(/usr/include/ImageMagick)
   find_package(Boost REQUIRED COMPONENTS thread system iostreams filesystem)
   include_directories(${Boost_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS})
+ 
   add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp src/test_joint_movement.cpp src/manual_test.cpp
     src/diagnostic_parser.cpp src/sensor_noise_test.cpp src/motor_test.cpp)
   target_link_libraries(sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${ImageMagick_LIBRARIES})

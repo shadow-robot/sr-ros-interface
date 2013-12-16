@@ -6,11 +6,6 @@ find_package(catkin REQUIRED COMPONENTS std_msgs std_srvs roscpp actionlib pr2_c
 
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
 #if you compile with "DEBUG=1 make", some debug data are going to be published
 set(debug $ENV{DEBUG})
 message(" ----- Shadow Robot EtherCAT driver configuration:")
@@ -65,3 +60,16 @@ if(COMMAND add_rostest_gtest)
     src/srh_joint_position_controller.cpp src/sr_controller.cpp)
   target_link_libraries(test_joint_pos_controller_with_fc sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml)
 endif(COMMAND add_rostest_gtest)
+
+install(TARGETS joint_trajectory_action_controller joint_spline_trajectory_action_controller simple_spline_trajectory
+  sr_mechanism_controllers simple_trajectory simple_trajectory_compare
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  OPTIONAL
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE
+)

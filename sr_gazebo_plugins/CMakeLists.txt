@@ -8,11 +8,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_ms
 find_package(gazebo)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
 add_definitions(-fPIC)
 
 find_package(PkgConfig)
@@ -56,4 +51,15 @@ catkin_package(
       pr2_mechanism_model polled_camera image_transport dynamic_reconfigure sr_hardware_interface sr_self_test 
     INCLUDE_DIRS include
     LIBRARIES
+)
+
+install(TARGETS sr_gazebo_ros_controller_manager
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  OPTIONAL
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE
 )

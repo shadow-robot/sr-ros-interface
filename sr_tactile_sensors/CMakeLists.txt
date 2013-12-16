@@ -7,11 +7,6 @@ include_directories(/usr/include/gazebo-1.9/gazebo)
 include_directories(/usr/include/gazebo-1.9)
 include_directories(/usr/include/sdformat-1.4)
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
 #Gazebo
 set(gazebo_support $ENV{GAZEBO})
 message("--------- Shadow Robot Tactiles Package Configuration:")
@@ -71,4 +66,23 @@ catkin_package(
     CATKIN_DEPENDS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_plugins
     INCLUDE_DIRS include
     LIBRARIES
+)
+
+install(TARGETS sr_tactile_virtual sr_tactile_virtual_gazebo robot sr_tactile_real 
+  sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  OPTIONAL
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE
+)
+
+install(DIRECTORY scripts/
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  USE_SOURCE_PERMISSIONS
+  PATTERN ".svn" EXCLUDE
 )
