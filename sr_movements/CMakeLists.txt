@@ -24,7 +24,7 @@ catkin_package(
     LIBRARIES
 )
 
-install(TARGETS sr_movements sr_movement 
+install(TARGETS sr_movements
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

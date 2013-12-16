@@ -8,7 +8,6 @@
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_movements</url>
-  <!-- <url type="bugtracker"></url> -->
 
   <author email="ugo@shadowrobot.com">Ugo Cupcic </author>
 
@@ -23,6 +22,7 @@
   <build_depend>sr_utilities</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sr_hand</build_depend>
+  <build_depend>rostest</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>pr2_controllers_msgs</run_depend>

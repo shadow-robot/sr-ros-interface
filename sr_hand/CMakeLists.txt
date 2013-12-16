@@ -125,7 +125,7 @@ endif(valves)
 #   Hand command library (gives compatibility with CAN and ethercat hand)  #
 ############################################################################
 add_definitions(-fPIC)
-add_library(HandCommander STATIC src/hand_commander.cpp)
+add_library(HandCommander src/hand_commander.cpp)
 target_link_libraries(HandCommander ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 

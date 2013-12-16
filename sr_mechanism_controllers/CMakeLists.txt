@@ -52,7 +52,6 @@ catkin_package(
 )
 
 if(COMMAND add_rostest_gtest)
-  link_directories(/opt/ros/hydro/lib)
   add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_position_controller.cpp test/test_controllers.cpp
     src/srh_joint_position_controller.cpp src/sr_controller.cpp)
   target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml)
