@@ -17,8 +17,10 @@ if(COMMAND add_rostest_gtest)
  
   add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp src/test_joint_movement.cpp src/manual_test.cpp
     src/diagnostic_parser.cpp src/sensor_noise_test.cpp src/motor_test.cpp)
+  add_dependencies(sr_self_test ${catkin_EXPORTED_TARGETS})
   target_link_libraries(sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${ImageMagick_LIBRARIES} HandCommander sr_movement)
 
   add_rostest_gtest(sr_self_test_test test/sr_self_test.test test/test_self_test.cpp)
+  add_dependencies(sr_self_test_test ${catkin_EXPORTED_TARGETS})
   target_link_libraries(sr_self_test_test sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${ImageMagick_LIBRARIES} HandCommander sr_movement)
 endif(COMMAND add_rostest_gtest)

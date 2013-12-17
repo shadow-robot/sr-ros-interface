@@ -5,6 +5,7 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(sr_mechanism_model src/joint_0_transmission.cpp src/simple_transmission.cpp
   src/joint_0_transmission_for_muscle.cpp src/simple_transmission_for_muscle.cpp)
+add_dependencies(sr_mechanism_model ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_mechanism_model tinyxml ${catkin_LIBRARIES})
 
 catkin_package(

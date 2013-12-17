@@ -26,9 +26,11 @@ endif(real_hand)
 #  VIRTUAL TACTILE SENSORS  #
 #############################
 add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+add_dependencies(sr_tactile_virtual src ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_tactile_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 if(gazebo_support)
   add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+  add_dependencies(sr_tactile_virtual_gazebo ${catkin_EXPORTED_TARGETS})
   target_link_libraries(sr_tactile_virtual_gazebo ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 endif(gazebo_support)
 
@@ -40,8 +42,10 @@ if(real_hand)
   include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
   include_directories(/usr/realtime/include/)
   add_library(robot STATIC IMPORTED)
+  add_dependencies(robot ${catkin_EXPORTED_TARGETS})
   set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
   add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+  add_dependencies(sr_tactile_real ${catkin_EXPORTED_TARGETS})
   target_link_libraries(sr_tactile_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} robot)
 endif(real_hand)
 
@@ -49,14 +53,17 @@ endif(real_hand)
 #  RVIZ MARKER FOR TACTILES #
 #############################
 add_executable(sr_tactile_rviz_marker src/sr_tactile_rviz_marker.cpp)
+add_dependencies(sr_tactile_rviz_marker ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_tactile_rviz_marker ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 add_executable(sr_bumper_rviz_marker src/sr_bumper_rviz_marker.cpp)
+add_dependencies(sr_bumper_rviz_marker ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_bumper_rviz_marker ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 ###############
 #   EXAMPLES  #
 ###############
 add_executable(tactile_example examples/tactile.cpp)
+add_dependencies(tactile_example ${catkin_EXPORTED_TARGETS})
 target_link_libraries(tactile_example ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 catkin_package(
