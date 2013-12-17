@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_mechanism_model)
 find_package(catkin REQUIRED COMPONENTS roscpp sr_hardware_interface pr2_mechanism_model)
-
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(sr_mechanism_model src/joint_0_transmission.cpp src/simple_transmission.cpp

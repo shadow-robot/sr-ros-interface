@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 2.8.3)
 project(sr_hand)
 
 find_package(catkin REQUIRED COMPONENTS rostest roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs
-  sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs)
-
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+  sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_ros)
+find_package(gazebo REQUIRED)
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
 ###################
 #  CONFIGURATION  #
@@ -132,7 +132,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 catkin_package(
     DEPENDS
     CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs sr_utilities
-      diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs
+      diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_ros
     INCLUDE_DIRS include
     LIBRARIES
 )

@@ -18,62 +18,42 @@
 
   <!-- Dependencies needed to compile this package. -->
   <build_depend>gazebo_ros</build_depend>
-  <build_depend>gazebo_ros_control</build_depend>
-  <build_depend>gazebo_plugins</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>nav_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
-  <build_depend>cv_bridge</build_depend>
   <build_depend>pr2_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
-  <build_depend>opencv2</build_depend>
   <build_depend>diagnostic_updater</build_depend>
-  <build_depend>cv_bridge</build_depend>
   <build_depend>diagnostic_msgs</build_depend>
   <build_depend>angles</build_depend>
   <build_depend>pr2_hardware_interface</build_depend>
   <build_depend>sr_hardware_interface</build_depend>
   <build_depend>pr2_controller_manager</build_depend>
   <build_depend>pr2_mechanism_model</build_depend>
-  <build_depend>bullet</build_depend>
   <build_depend>urdf</build_depend>
-  <build_depend>polled_camera</build_depend>
-  <build_depend>image_transport</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
-  <build_depend>sr_hardware_interface</build_depend>
-  <build_depend>pr2_gazebo_plugins</build_depend>
   <build_depend>sr_self_test</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>gazebo_ros</run_depend>
-  <run_depend>gazebo_ros_control</run_depend>
-  <run_depend>gazebo_plugins</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
-  <run_depend>cv_bridge</run_depend>
   <run_depend>pr2_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
-  <run_depend>opencv2</run_depend>
   <run_depend>diagnostic_updater</run_depend>
-  <run_depend>cv_bridge</run_depend>
   <run_depend>diagnostic_msgs</run_depend>
   <run_depend>angles</run_depend>
   <run_depend>pr2_hardware_interface</run_depend>
   <run_depend>sr_hardware_interface</run_depend>
   <run_depend>pr2_controller_manager</run_depend>
   <run_depend>pr2_mechanism_model</run_depend>
-  <run_depend>bullet</run_depend>
   <run_depend>urdf</run_depend>
-  <run_depend>polled_camera</run_depend>
-  <run_depend>image_transport</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
-  <run_depend>sr_hardware_interface</run_depend>
-  <run_depend>pr2_gazebo_plugins</run_depend>
   <run_depend>sr_self_test</run_depend>
 
 <export>

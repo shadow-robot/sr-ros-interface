@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_utilities)
 find_package(catkin REQUIRED COMPONENTS sensor_msgs sr_robot_msgs rospy roscpp tf)
-
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+find_package(Boost REQUIRED COMPONENTS thread)
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_service_files(FILES getJointState.srv)
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
@@ -16,9 +16,6 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES
 )
-
-find_package(Boost REQUIRED COMPONENTS thread)
-include_directories(${Boost_INCLUDE_DIRS})
 
 catkin_add_gtest(test_calibration test/test_calibration.cpp src/calibration.cpp)
 target_link_libraries(test_calibration ${catkin_LIBRARIES})

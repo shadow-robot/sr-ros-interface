@@ -9,7 +9,6 @@
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_mechanism_controllers</url>
-  <!-- <url type="bugtracker"></url> -->
 
   <author email="ugo@shadowrobot.com">Ugo Cupcic </author>
   <author>contact@shadowrobot.com</author>

@@ -3,7 +3,6 @@ project(sr_mechanism_controllers)
 find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp actionlib pr2_controllers_msgs sr_robot_msgs
   sr_utilities pr2_controller_interface pr2_mechanism_model realtime_tools robot_mechanism_controllers pr2_mechanism_controllers
   pluginlib rosconsole angles control_toolbox sr_hardware_interface xmlrpcpp)
-find_library(srcal sr_calibration)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 #if you compile with "DEBUG=1 make", some debug data are going to be published
@@ -54,10 +53,10 @@ catkin_package(
 if(COMMAND add_rostest_gtest)
   add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_position_controller.cpp test/test_controllers.cpp
     src/srh_joint_position_controller.cpp src/sr_controller.cpp)
-  target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml ${srcal})
+  target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml sr_calibration)
   add_rostest_gtest(test_joint_pos_controller_with_fc test/joint_pos_controller_with_fc.test test/test_joint_position_controller.cpp test/test_controllers.cpp
     src/srh_joint_position_controller.cpp src/sr_controller.cpp)
-  target_link_libraries(test_joint_pos_controller_with_fc sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml ${srcal})
+  target_link_libraries(test_joint_pos_controller_with_fc sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml sr_calibration)
 endif(COMMAND add_rostest_gtest)
 
 install(TARGETS joint_trajectory_action_controller joint_spline_trajectory_action_controller simple_spline_trajectory

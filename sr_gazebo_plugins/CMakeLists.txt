@@ -1,24 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_gazebo_plugins)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_msgs gazebo_plugins gazebo_ros gazebo_ros_control
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_msgs gazebo_ros
   pr2_msgs geometry_msgs diagnostic_updater diagnostic_msgs angles pr2_hardware_interface sr_hardware_interface pr2_controller_manager
   pr2_mechanism_model urdf dynamic_reconfigure sr_hardware_interface sr_self_test)
-
-find_package(gazebo)
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
-add_definitions(-fPIC)
-
 find_package(PkgConfig)
-
 find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
-
-include_directories(/usr/include/gazebo-1.9/gazebo)
-include_directories(/usr/include/gazebo-1.9)
-include_directories(/usr/include/sdformat-1.4)
-
 find_package(gazebo REQUIRED)
+find_package(Boost REQUIRED COMPONENTS thread)
+
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS})
+
+add_definitions(-fPIC -DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
 
 # if screw joint exists, remove hack for damping variable
 execute_process(COMMAND ode-config --version OUTPUT_VARIABLE ode_version)
@@ -29,11 +23,7 @@ else (${ode_version} VERSION_LESS "0.11.1.71")
   add_definitions(-DODE_SCREW_JOINT)
 endif (${ode_version} VERSION_LESS "0.11.1.71")
 
-# Enabling gazebo ros camera dynamic reconfigure
-add_definitions(-DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
 
-find_package(Boost REQUIRED COMPONENTS thread)
-include_directories(${Boost_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS})
 add_library(sr_gazebo_ros_controller_manager src/gazebo_ros_controller_manager.cpp)
 target_link_libraries(sr_gazebo_ros_controller_manager ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
@@ -45,21 +35,19 @@ else(${glx_out} EQUAL 0)
 endif(${glx_out} EQUAL 0)
 
 catkin_package(
-    DEPENDS python-numpy opende opencv2 bullet
-    CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs pr2_msgs geometry_msgs gazebo_plugins gazebo_ros gazebo_ros_control
+    DEPENDS python-numpy opende
+    CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs pr2_msgs geometry_msgs gazebo_ros
       diagnostic_updater diagnostic_msgs angles pr2_hardware_interface sr_hardware_interface pr2_controller_manager urdf
-      pr2_mechanism_model polled_camera image_transport dynamic_reconfigure sr_hardware_interface sr_self_test 
+      pr2_mechanism_model dynamic_reconfigure sr_hardware_interface sr_self_test 
     INCLUDE_DIRS include
     LIBRARIES
 )
 
 install(TARGETS sr_gazebo_ros_controller_manager
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  OPTIONAL
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE
 )
