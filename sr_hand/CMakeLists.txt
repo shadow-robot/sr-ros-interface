@@ -138,7 +138,6 @@ catkin_package(
 )
 
 if(COMMAND add_rostest_gtest)
-  link_directories(/opt/ros/hydro/lib)
   add_rostest_gtest(hand_commander_test test/hand_commander_test.test test/hand_commander_test.cpp)
   target_link_libraries(hand_commander_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
   add_rostest_gtest(hand_commander_arm_and_hand_test test/hand_commander_arm_and_hand_test.test test/hand_commander_test.cpp)
