@@ -98,6 +98,7 @@ class ShadowHand_ROS():
         #contains the ending for the topic depending on which controllers are loaded
         self.topic_ending = ""
 
+
         ##EtherCAT hand
         self.activate_etherCAT_hand()
 
@@ -117,6 +118,8 @@ class ShadowHand_ROS():
 
         self.sub_arm = rospy.Subscriber('sr_arm/shadowhand_data', joints_data,self.callback_arm)
         self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
+
+        self.hand_type = self.check_hand_type()
 
         threading.Thread(None, rospy.spin)
 
@@ -239,8 +242,9 @@ class ShadowHand_ROS():
         Sends new targets to the hand from a dictionnary
         """
         #print(dicti)
-        if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
+        if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             for join in dicti.keys():
+
                 if not self.eth_publishers.has_key(join):
                     topic = "sh_"+ join.lower() + self.topic_ending+"/command"
                     self.eth_publishers[join] = rospy.Publisher(topic, Float64, latch=True)
@@ -248,7 +252,7 @@ class ShadowHand_ROS():
                 msg_to_send = Float64()
                 msg_to_send.data = math.radians( float( dicti[join] ) )
                 self.eth_publishers[join].publish(msg_to_send)
-        elif self.check_hand_type() == "CANhand":
+        elif self.hand_type == "CANhand":
             message = []
             for join in dicti.keys():
                 message.append(joint(joint_name=join, joint_target=dicti[join]))
@@ -262,7 +266,7 @@ class ShadowHand_ROS():
         """
         self.sendupdate_lock.acquire()
 
-        if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
+        if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             if not self.eth_publishers.has_key(jointName):
                 topic = "sh_"+ jointName.lower() + self.topic_ending + "/command"
                 self.eth_publishers[jointName] = rospy.Publisher(topic, Float64, latch=True)
@@ -270,7 +274,7 @@ class ShadowHand_ROS():
             msg_to_send = Float64()
             msg_to_send.data = math.radians( float( angle ) )
             self.eth_publishers[jointName].publish(msg_to_send)
-        elif self.check_hand_type() == "CANhand":
+        elif self.hand_type == "CANhand":
             message = [joint(joint_name=jointName, joint_target=angle)]
             self.pub.publish(sendupdate(len(message), message))
 
@@ -416,6 +420,7 @@ class ShadowHand_ROS():
         check if something is being published to this topic, otherwise
         return false
         """
+
         try:
             rospy.wait_for_message("joint_states", JointState, timeout = 0.2)
         except:
@@ -430,6 +435,7 @@ class ShadowHand_ROS():
         check if something is being published to this topic, otherwise
         return false
         """
+
         try:
             rospy.wait_for_message("gazebo/joint_states", JointState, timeout = 0.2)
         except:
