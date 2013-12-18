@@ -94,7 +94,8 @@ namespace shadowrobot
     {
       if(controller_list.response.state[i]=="running")
       {
-        std::string controller = controller_list.response.controllers[i];
+        std::string controller = "/";
+        controller += controller_list.response.controllers[i];
         if (node_.getParam(controller+"/joint", controlled_joint_name))
         {
           ROS_DEBUG("controller %d:%s controls joint %s\n",
@@ -181,9 +182,9 @@ namespace shadowrobot
   std::vector<std::string> HandCommander::get_all_joints()
   {
     std::vector<std::string> all_joints_names;
-    std::map<std::string, std::string>::iterator it = sr_hand_sub_topics.begin();
+    std::map<std::string, std::string>::iterator it;
 
-    for( it; it != sr_hand_sub_topics.end(); ++it )
+    for( it = sr_hand_sub_topics.begin(); it != sr_hand_sub_topics.end(); ++it )
     {
       // all Hand joint names have a length of 4...
       //The other way would be to check if the name is in a list

@@ -4,6 +4,8 @@ find_package(catkin REQUIRED COMPONENTS sensor_msgs sr_robot_msgs rospy roscpp t
 find_package(Boost REQUIRED COMPONENTS thread)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
+catkin_python_setup()
+
 add_service_files(FILES getJointState.srv)
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 
@@ -32,11 +34,6 @@ target_link_libraries(test_math_utils ${catkin_LIBRARIES} pthread)
 install(DIRECTORY include/${PROJECT_NAME}/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
    FILES_MATCHING PATTERN "*.hpp"
-)
-
-install(DIRECTORY scripts/
-   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-   USE_SOURCE_PERMISSIONS
 )
 
 install(TARGETS sr_calibration

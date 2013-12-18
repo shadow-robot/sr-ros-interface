@@ -39,7 +39,7 @@ add_library(sr_mechanism_controllers
   src/sr_controller.cpp
 )
 add_dependencies(sr_mechanism_controllers ${catkin_EXPORTED_TARGETS})
-target_link_libraries(sr_mechanism_controllers ${catkin_LIBRARIES})
+target_link_libraries(sr_mechanism_controllers ${catkin_LIBRARIES} sr_calibration)
 
 add_executable(simple_trajectory example/simple_trajectory.cpp)
 add_dependencies(simple_trajectory ${catkin_EXPORTED_TARGETS})

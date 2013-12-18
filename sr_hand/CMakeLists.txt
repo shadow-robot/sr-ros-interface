@@ -6,6 +6,8 @@ find_package(catkin REQUIRED COMPONENTS rostest roslib roscpp rospy std_msgs std
 find_package(gazebo REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
+catkin_python_setup()
+
 ###################
 #  CONFIGURATION  #
 ###################
@@ -171,9 +173,4 @@ endif()
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.hpp"
-)
-
-install(DIRECTORY scripts/
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  USE_SOURCE_PERMISSIONS
 )

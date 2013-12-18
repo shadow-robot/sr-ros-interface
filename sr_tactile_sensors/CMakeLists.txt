@@ -4,6 +4,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sr_robot_msgs visualizat
 find_package(gazebo REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
+catkin_python_setup()
+
 #Gazebo
 set(gazebo_support $ENV{GAZEBO})
 message("--------- Shadow Robot Tactiles Package Configuration:")
@@ -88,9 +90,4 @@ endif(gazebo_support)
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.hpp"
-)
-
-install(DIRECTORY scripts/
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  USE_SOURCE_PERMISSIONS
 )
