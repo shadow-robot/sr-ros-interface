@@ -28,6 +28,8 @@
   <run_depend>sr_hand</run_depend>
   <run_depend>sr_movements</run_depend>
   <run_depend>sr_robot_msgs</run_depend>
-  <run_depend>gtest</run_depend>
+  <run_depend>sr_robot_msgs</run_depend>
+  
+  <test_depend>gtest</test_depend>
 
 </package>

@@ -117,7 +117,7 @@ public:
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "sr_self_test_test");
+  ros::init(argc, argv, "test_self_test");
 
   MyNode n;
   n.spin();

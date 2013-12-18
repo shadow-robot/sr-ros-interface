@@ -33,7 +33,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_DECLARE_CLASS(sr_mechanism_controllers, SrhMuscleJointPositionController, controller::SrhMuscleJointPositionController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhMuscleJointPositionController, pr2_controller_interface::Controller)
 
 using namespace std;
 

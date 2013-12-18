@@ -31,7 +31,7 @@
 #include <string>
 #include <std_srvs/Empty.h>
 
-PLUGINLIB_DECLARE_CLASS(sr_mechanism_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
 
 using namespace std;
 

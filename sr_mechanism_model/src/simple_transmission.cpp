@@ -46,10 +46,7 @@
 
 using namespace pr2_hardware_interface;
 
-PLUGINLIB_DECLARE_CLASS(sr_mechanism_model, SimpleTransmission,
-                        sr_mechanism_model::SimpleTransmission,
-                        pr2_mechanism_model::Transmission)
-
+PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmission, pr2_mechanism_model::Transmission)
 
 namespace sr_mechanism_model
 {
