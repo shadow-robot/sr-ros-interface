@@ -57,11 +57,11 @@ catkin_package(
 )
 
 if(COMMAND add_rostest_gtest)
-  add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_position_controller.cpp test/test_controllers.cpp
+  add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_pos_controller.cpp test/test_controllers.cpp
     src/srh_joint_position_controller.cpp src/sr_controller.cpp)
   add_dependencies(test_joint_pos_controller ${catkin_EXPORTED_TARGETS})
   target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml sr_calibration)
-  add_rostest_gtest(test_joint_pos_controller_with_fc test/joint_pos_controller_with_fc.test test/test_joint_position_controller.cpp test/test_controllers.cpp
+  add_rostest_gtest(test_joint_pos_controller_with_fc test/joint_pos_controller_with_fc.test test/test_joint_pos_controller.cpp test/test_controllers.cpp
     src/srh_joint_position_controller.cpp src/sr_controller.cpp)
   add_dependencies(test_joint_pos_controller_with_fc ${catkin_EXPORTED_TARGETS})
   target_link_libraries(test_joint_pos_controller_with_fc sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml sr_calibration)

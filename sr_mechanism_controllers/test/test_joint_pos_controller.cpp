@@ -169,7 +169,7 @@ TEST(SrhJointPositionController, TestPID)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "calibration_test");
+  ros::init(argc, argv, "test_joint_pos_controller");
 
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
