@@ -12,7 +12,7 @@ catkin_package(
     DEPENDS tinyxml
     CATKIN_DEPENDS roscpp sr_hardware_interface pr2_mechanism_model
     INCLUDE_DIRS include
-    LIBRARIES
+    LIBRARIES sr_mechanism_model
 )
 
 install(TARGETS sr_mechanism_model 

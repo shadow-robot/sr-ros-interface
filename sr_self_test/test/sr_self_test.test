@@ -4,6 +4,6 @@
 
     <node name="automatic_response" pkg="sr_self_test" type="automatic_manual_test_response.py" />
 
-    <test test-name="test_self_test" pkg="sr_self_test" type="test_self_test"/>
+    <test test-name="test_self_test" pkg="sr_self_test" type="test_self_test" time-limit="2400.0"/>
 
 </launch>

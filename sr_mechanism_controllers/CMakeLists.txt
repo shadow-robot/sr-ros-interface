@@ -39,7 +39,7 @@ add_library(sr_mechanism_controllers
   src/sr_controller.cpp
 )
 add_dependencies(sr_mechanism_controllers ${catkin_EXPORTED_TARGETS})
-target_link_libraries(sr_mechanism_controllers ${catkin_LIBRARIES} sr_calibration)
+target_link_libraries(sr_mechanism_controllers ${catkin_LIBRARIES})
 
 add_executable(simple_trajectory example/simple_trajectory.cpp)
 add_dependencies(simple_trajectory ${catkin_EXPORTED_TARGETS})
@@ -53,18 +53,18 @@ catkin_package(
   CATKIN_DEPENDS std_msgs std_srvs roscpp actionlib pr2_controllers_msgs sr_robot_msgs sr_utilities pr2_controller_interface pr2_mechanism_model
     realtime_tools robot_mechanism_controllers pr2_mechanism_controllers pluginlib rosconsole angles control_toolbox sr_hardware_interface
   INCLUDE_DIRS include
-  LIBRARIES
+  LIBRARIES sr_mechanism_controllers
 )
 
 if(COMMAND add_rostest_gtest)
   add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_pos_controller.cpp test/test_controllers.cpp
     src/srh_joint_position_controller.cpp src/sr_controller.cpp)
   add_dependencies(test_joint_pos_controller ${catkin_EXPORTED_TARGETS})
-  target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml sr_calibration)
+  target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml)
   add_rostest_gtest(test_joint_pos_controller_with_fc test/joint_pos_controller_with_fc.test test/test_joint_pos_controller.cpp test/test_controllers.cpp
     src/srh_joint_position_controller.cpp src/sr_controller.cpp)
   add_dependencies(test_joint_pos_controller_with_fc ${catkin_EXPORTED_TARGETS})
-  target_link_libraries(test_joint_pos_controller_with_fc sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml sr_calibration)
+  target_link_libraries(test_joint_pos_controller_with_fc sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} tinyxml)
 endif(COMMAND add_rostest_gtest)
 
 install(TARGETS joint_trajectory_action_controller joint_spline_trajectory_action_controller simple_spline_trajectory

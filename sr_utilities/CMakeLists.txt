@@ -16,7 +16,7 @@ catkin_package(
     DEPENDS
     CATKIN_DEPENDS sensor_msgs sr_robot_msgs rospy roscpp tf
     INCLUDE_DIRS include
-    LIBRARIES
+    LIBRARIES sr_calibration
 )
 
 catkin_add_gtest(test_calibration test/test_calibration.cpp src/calibration.cpp)
