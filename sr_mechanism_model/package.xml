@@ -4,13 +4,13 @@
   <description>sr_mechanism_model contains the transmissions used in the robot model. We needed specific
     transmission as we're using our own actuator. We also needed to take care of the joint 0s
     which combine the distal and middle phalanges.</description>
-  <maintainer email="ugo@shadowrobot.com">Ugo Cupcic </maintainer>
+  <maintainer email="software@shadowrobot.com">Ugo Cupcic </maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_mechanism_model</url>
 
-  <author email="ugo@shadowrobot.com">Ugo Cupcic </author>
+  <author email="software@shadowrobot.com">Ugo Cupcic </author>
   <author>contact@shadowrobot.com</author>
 
   <!-- Dependencies which this package needs to build itself. -->

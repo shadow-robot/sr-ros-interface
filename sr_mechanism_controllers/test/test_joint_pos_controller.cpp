@@ -46,7 +46,7 @@ public:
     init();
   }
 
-  ~TestJointPositionController()
+  virtual ~TestJointPositionController()
   {}
 
   void init_controller()

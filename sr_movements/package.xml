@@ -3,13 +3,13 @@
   <version>1.2.0</version>
   <description>Contains a node which can be used to take the hand through a series of movements (perfect for tuning
     controllers for example).</description>
-  <maintainer email="ugo@shadowrobot.com">Ugo Cupcic </maintainer>
+  <maintainer email="software@shadowrobot.com">Ugo Cupcic </maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_movements</url>
 
-  <author email="ugo@shadowrobot.com">Ugo Cupcic </author>
+  <author email="software@shadowrobot.com">Ugo Cupcic </author>
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>

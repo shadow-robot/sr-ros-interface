@@ -3,7 +3,7 @@
   <version>1.2.0</version>
   <description>This stack regroups the different ros interfaces developped for Shadow Robot's
   Hardware. It provides an interface to both simulated and real hardware.</description>
-  <maintainer email="software@shadowrobot.com">Maintained by Ugo Cupcic: ugo@shadowrobot.com</maintainer>
+  <maintainer email="software@shadowrobot.com">Maintained by Ugo Cupcic: software@shadowrobot.com</maintainer>
 
   <license>BSD</license>
   <license>GPL</license>
@@ -11,7 +11,7 @@
   <url type="website">http://ros.org/wiki/shadow_robot</url>
   <!-- <url type="bugtracker"></url> -->
 
-  <author>Maintained by Ugo Cupcic: ugo@shadowrobot.com</author>
+  <author>Maintained by Ugo Cupcic: software@shadowrobot.com</author>
   <author>contact@shadowrobot.com</author>
 
   <!-- Dependencies which this package needs to build itself. -->

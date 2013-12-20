@@ -2,6 +2,10 @@
 Changelog for package sr_ros_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.0 (2013-12-19)
+------------------
+* Port to hydro with catkin
+
 1.1.0 (2012-08-20)
 ------------------
 * New organisation: the urdf and descriptions are regrouped in the new sr\_description stack. Numerous bug fixes.

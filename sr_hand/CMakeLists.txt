@@ -87,7 +87,7 @@ if(real_hand)
   add_dependencies(robot ${catkin_EXPORTED_TARGETS})
   set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
   add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
-    src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)  
+    src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
   add_dependencies(shadowhand_real ${catkin_EXPORTED_TARGETS})
   target_link_libraries(shadowhand_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
 endif(real_hand)
@@ -142,9 +142,9 @@ target_link_libraries(HandCommander ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 catkin_package(
-    DEPENDS
+    DEPENDS orocos_kdl
     CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs sr_utilities
-      diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_ros
+      diagnostic_msgs dynamic_reconfigure self_test urdf
     INCLUDE_DIRS include
     LIBRARIES HandCommander SrVirtual
 )

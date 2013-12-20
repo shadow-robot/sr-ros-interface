@@ -4,13 +4,13 @@
   <description>The sr_mechanism_controllers package contains different types of
      controllers for the etherCAT hand:(fake) calibration controllers,
      position controllers, velocity controllers, force controllers, ...</description>
-  <maintainer email="ugo@shadowrobot.com">Ugo Cupcic </maintainer>
+  <maintainer email="software@shadowrobot.com">Ugo Cupcic </maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_mechanism_controllers</url>
 
-  <author email="ugo@shadowrobot.com">Ugo Cupcic </author>
+  <author email="software@shadowrobot.com">Ugo Cupcic </author>
   <author>contact@shadowrobot.com</author>
 
   <!-- Dependencies which this package needs to build itself. -->
