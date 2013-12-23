@@ -10,4 +10,16 @@
       This transmission is used to control the other joints of the Robot.
     </description>
   </class>
+
+  <class name="sr_mechanism_model/J0TransmissionForMuscle" type="sr_mechanism_model::J0TransmissionForMuscle" base_class_type="pr2_mechanism_model::Transmission">
+    <description>
+      This transmission is used to control the theoretical joint 0s in our hand: the joint 0 is the combination of the joint 1 (distal) and joint 2 (middle). Those 2 joints are controlled by one actuator only but have a sensor each.
+    </description>
+  </class>
+
+  <class name="sr_mechanism_model/SimpleTransmissionForMuscle" type="sr_mechanism_model::SimpleTransmissionForMuscle" base_class_type="pr2_mechanism_model::Transmission">
+    <description>
+      This transmission is used to control the other joints of the muscle Robot.
+    </description>
+  </class>
 </library>

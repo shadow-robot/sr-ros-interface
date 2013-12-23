@@ -4,6 +4,10 @@
   <arg name="use_sim_time" default="true"/>
   <arg name="gui" default="true"/>
   <arg name="throttled" default="false"/>
+  <node name="gazebo" pkg="gazebo" type="gazebo" args=" $(find sr_description)/other/worlds/empty.world" respawn="false" output="screen">
+    <remap from="joint_states" to="/gazebo/joint_states"/>
+    <param name="image_path" value="$(find sr_movements)/movements/test.png"/>
+  </node>
 
   <!-- set use_sim_time flag -->
   <group if="$(arg use_sim_time)">

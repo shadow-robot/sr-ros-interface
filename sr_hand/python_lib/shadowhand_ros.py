@@ -47,25 +47,25 @@ class ShadowHand_ROS():
         initializes the hand publisher and subscriber to the default
         values of shadowhand_data and sendupdate
         """
-        self.allJoints = [Joint("THJ1", "smart_motor_th1"),
-                           Joint("THJ2", "smart_motor_th2", -30, 30),
+        self.allJoints = [Joint("THJ1", "smart_motor_th1", 0, 90),
+                           Joint("THJ2", "smart_motor_th2", -40, 40),
                            Joint("THJ3", "smart_motor_th3",-15, 15),
                            Joint("THJ4", "smart_motor_th4",0, 75),
                            Joint("THJ5", "smart_motor_th5",-60, 60),
                            Joint("FFJ0", "smart_motor_ff2", 0, 180),
                            Joint("FFJ3", "smart_motor_ff3"),
-                           Joint("FFJ4", "smart_motor_ff4", -25, 25),
+                           Joint("FFJ4", "smart_motor_ff4", -20, 20),
                            Joint("MFJ0", "smart_motor_mf2", 0, 180),
                            Joint("MFJ3", "smart_motor_mf3"),
-                           Joint("MFJ4", "smart_motor_mf4", -25, 25),
+                           Joint("MFJ4", "smart_motor_mf4", -20, 20),
                            Joint("RFJ0", "smart_motor_rf2", 0, 180),
                            Joint("RFJ3", "smart_motor_rf3"),
-                           Joint("RFJ4", "smart_motor_rf4", -25,25),
+                           Joint("RFJ4", "smart_motor_rf4", -20,20),
                            Joint("LFJ0", "smart_motor_lf2", 0, 180),
                            Joint("LFJ3", "smart_motor_lf3"),
-                           Joint("LFJ4", "smart_motor_lf4", -25, 25),
+                           Joint("LFJ4", "smart_motor_lf4", -20, 20),
                            Joint("LFJ5", "smart_motor_lf5", 0, 45),
-                           Joint("WRJ1", "smart_motor_wr1", -30, 40),
+                           Joint("WRJ1", "smart_motor_wr1", -45, 30),
                            Joint("WRJ2", "smart_motor_wr2", -30, 10),
                            ]
         self.handJoints = []
@@ -98,6 +98,7 @@ class ShadowHand_ROS():
         #contains the ending for the topic depending on which controllers are loaded
         self.topic_ending = ""
 
+
         ##EtherCAT hand
         self.activate_etherCAT_hand()
 
@@ -112,11 +113,13 @@ class ShadowHand_ROS():
         self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasp/grasps.xml")
 
         self.grasp_interpoler = 0
-        self.pub = rospy.Publisher('srh/sendupdate',sendupdate)
-        self.pub_arm = rospy.Publisher('sr_arm/sendupdate',sendupdate)
+        self.pub = rospy.Publisher('srh/sendupdate',sendupdate, latch=True)
+        self.pub_arm = rospy.Publisher('sr_arm/sendupdate',sendupdate, latch=True)
 
         self.sub_arm = rospy.Subscriber('sr_arm/shadowhand_data', joints_data,self.callback_arm)
         self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
+
+        self.hand_type = self.check_hand_type()
 
         threading.Thread(None, rospy.spin)
 
@@ -231,7 +234,7 @@ class ShadowHand_ROS():
         Set the library to publish to a new topic
         """
         print 'Changing publisher to ' + topic
-        self.pub = rospy.Publisher(topic,sendupdate)
+        self.pub = rospy.Publisher(topic,sendupdate, latch=True)
 
     def sendupdate_from_dict(self, dicti):
         """
@@ -239,16 +242,17 @@ class ShadowHand_ROS():
         Sends new targets to the hand from a dictionnary
         """
         #print(dicti)
-        if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
+        if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             for join in dicti.keys():
+
                 if not self.eth_publishers.has_key(join):
-                    topic = "/sh_"+ join.lower() + self.topic_ending+"/command"
-                    self.eth_publishers[join] = rospy.Publisher(topic, Float64)
+                    topic = "sh_"+ join.lower() + self.topic_ending+"/command"
+                    self.eth_publishers[join] = rospy.Publisher(topic, Float64, latch=True)
 
                 msg_to_send = Float64()
                 msg_to_send.data = math.radians( float( dicti[join] ) )
                 self.eth_publishers[join].publish(msg_to_send)
-        elif self.check_hand_type() == "CANhand":
+        elif self.hand_type == "CANhand":
             message = []
             for join in dicti.keys():
                 message.append(joint(joint_name=join, joint_target=dicti[join]))
@@ -262,15 +266,15 @@ class ShadowHand_ROS():
         """
         self.sendupdate_lock.acquire()
 
-        if (self.check_hand_type() == "etherCAT") or (self.check_hand_type() == "gazebo"):
+        if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             if not self.eth_publishers.has_key(jointName):
-                topic = "/sh_"+ jointName.lower() + self.topic_ending + "/command"
-                self.eth_publishers[jointName] = rospy.Publisher(topic, Float64)
+                topic = "sh_"+ jointName.lower() + self.topic_ending + "/command"
+                self.eth_publishers[jointName] = rospy.Publisher(topic, Float64, latch=True)
 
             msg_to_send = Float64()
             msg_to_send.data = math.radians( float( angle ) )
             self.eth_publishers[jointName].publish(msg_to_send)
-        elif self.check_hand_type() == "CANhand":
+        elif self.hand_type == "CANhand":
             message = [joint(joint_name=jointName, joint_target=angle)]
             self.pub.publish(sendupdate(len(message), message))
 
@@ -416,10 +420,11 @@ class ShadowHand_ROS():
         check if something is being published to this topic, otherwise
         return false
         """
+
         try:
-            rospy.wait_for_message("/joint_states", JointState, timeout = 0.2)
+            rospy.wait_for_message("joint_states", JointState, timeout = 0.2)
         except:
-            rospy.logwarn("no message received from /joint_states")
+            rospy.logwarn("no message received from joint_states")
             return False
 
         return True
@@ -430,8 +435,9 @@ class ShadowHand_ROS():
         check if something is being published to this topic, otherwise
         return false
         """
+
         try:
-            rospy.wait_for_message("/gazebo/joint_states", JointState, timeout = 0.2)
+            rospy.wait_for_message("gazebo/joint_states", JointState, timeout = 0.2)
         except:
             return False
 
@@ -444,14 +450,14 @@ class ShadowHand_ROS():
         success = True
         for joint_all in self.allJoints :
             self.topic_ending = "_mixed_position_velocity_controller"
-            topic = "/sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
+            topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
             success = True
             try:
                 rospy.wait_for_message(topic, JointControllerState, timeout = 0.2)
             except:
                 try:
                     self.topic_ending = "_position_controller"
-                    topic = "/sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
+                    topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
                     rospy.wait_for_message(topic, pr2_controllers_msgs.msg.JointControllerState, timeout = 0.2)
                 except:
                     success = False

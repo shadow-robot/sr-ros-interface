@@ -141,14 +141,17 @@ namespace controller {
   void SrhFakeJointCalibrationController::initialize_pids()
   {
     ///Reset the motor to make sure we have the proper 0 + correct PID settings
-    std::string service_name = "/realtime_loop/reset_motor_" + boost::to_upper_copy(actuator_name_);
+    std::string service_name = "realtime_loop/reset_motor_" + boost::to_upper_copy(actuator_name_);
     if( ros::service::waitForService (service_name, ros::Duration(2.0)) )
     {
-      ros::ServiceClient client = node_.serviceClient<std_srvs::Empty>(service_name);
       std_srvs::Empty srv;
-      if( client.call(srv) )
+      if (ros::service::call(service_name, srv))
       {
         return;
+      }
+      else
+      {
+        ROS_WARN("Reset failed: %s", service_name.c_str());
       }
     }
   }

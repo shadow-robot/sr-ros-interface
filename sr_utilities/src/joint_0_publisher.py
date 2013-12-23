@@ -8,8 +8,8 @@ import thread
 class Joint0Publisher:
     def __init__(self):
         rospy.init_node('joint_0_publisher', anonymous=True)
-        self.subs_1 = rospy.Subscriber("/joint_states", JointState, self.callback)
-        self.pub = rospy.Publisher("/joint_0s/joint_states", JointState)
+        self.subs_1 = rospy.Subscriber("joint_states", JointState, self.callback)
+        self.pub = rospy.Publisher("joint_0s/joint_states", JointState)
         self.joint_state_msg = JointState()
 
         rospy.spin()

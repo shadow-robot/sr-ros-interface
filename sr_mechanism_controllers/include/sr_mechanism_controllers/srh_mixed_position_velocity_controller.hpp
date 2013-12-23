@@ -74,8 +74,8 @@ namespace controller
     ros::Publisher debug_pub;
 #endif
 
-    ros::Subscriber sub_command_;
-    void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+    //ros::Subscriber sub_command_;
+    //void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 
     ros::ServiceServer serve_set_gains_;
 

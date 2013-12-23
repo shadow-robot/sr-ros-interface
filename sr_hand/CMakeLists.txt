@@ -153,10 +153,6 @@ ENDIF(valves)
 #include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 #gencfg()
 
-###############
-#   EXAMPLES  #
-###############
-rosbuild_add_executable(examples/link_joints examples/link_joints.cpp)
 
 ############################################################################
 #   Hand command library (gives compatibility with CAN and ethercat hand)  #
@@ -169,3 +165,4 @@ rosbuild_add_executable(test/hand_commander_test test/hand_commander_test.cpp)
 rosbuild_add_gtest_build_flags(test/hand_commander_test)
 target_link_libraries(test/hand_commander_test HandCommander)
 rosbuild_add_rostest(test/hand_commander_test.launch)
+rosbuild_add_rostest(test/hand_commander_arm_and_hand_test.launch)
