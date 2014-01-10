@@ -29,7 +29,8 @@
 
 #include <ros/node_handle.h>
 
-#include <pr2_controller_interface/controller.h>
+#include <controller_interface/controller.h>
+#include <pr2_mechanism_model/robot.h>
 #include <control_toolbox/pid.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
@@ -50,7 +51,7 @@
 namespace controller
 {
 
-  class SrController : public pr2_controller_interface::Controller
+  class SrController : public controller_interface::Controller<pr2_mechanism_model::RobotState>
   {
   public:
 
@@ -72,16 +73,16 @@ namespace controller
      */
     void getCommand(double & cmd);
 
-    virtual void starting();
+    virtual void starting() {}
 
     /*!
      * \brief Issues commands to the joint. Should be called at regular intervals
      */
-    virtual void update();
+    virtual void update(const ros::Time&, const ros::Duration&) {}
 
     virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
 
-    virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
+    virtual void getGains(double &, double &, double &, double &, double &) {}
 
     std::string getJointName();
     pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */

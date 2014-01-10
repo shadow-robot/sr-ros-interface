@@ -25,13 +25,13 @@
  */
 
 #include "sr_mechanism_controllers/srh_fake_joint_calibration_controller.h"
-#include "ros/time.h"
-#include "pluginlib/class_list_macros.h"
+#include <ros/time.h>
+#include <pluginlib/class_list_macros.h>
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <std_srvs/Empty.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhFakeJointCalibrationController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -105,7 +105,7 @@ namespace controller {
   }
 
 
-  void SrhFakeJointCalibrationController::update()
+  void SrhFakeJointCalibrationController::update(const ros::Time&, const ros::Duration&)
   {
     assert(joint_);
     assert(actuator_);

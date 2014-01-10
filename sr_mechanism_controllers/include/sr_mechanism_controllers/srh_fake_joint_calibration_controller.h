@@ -27,17 +27,18 @@
 #ifndef _SRH_FAKE_JOINT_CALIBRATION_CONTROLLER_
 #define _SRH_FAKE_JOINT_CALIBRATION_CONTROLLER_
 
-#include "ros/node_handle.h"
-#include "pr2_mechanism_model/robot.h"
-#include "robot_mechanism_controllers/joint_velocity_controller.h"
-#include "realtime_tools/realtime_publisher.h"
-#include "std_msgs/Empty.h"
+#include <ros/node_handle.h>
+#include <controller_interface/controller.h>
+#include <pr2_mechanism_model/robot.h>
+#include <robot_mechanism_controllers/joint_velocity_controller.h>
+#include <realtime_tools/realtime_publisher.h>
+#include <std_msgs/Empty.h>
 
 
 namespace controller
 {
 
-  class SrhFakeJointCalibrationController : public pr2_controller_interface::Controller
+  class SrhFakeJointCalibrationController : public controller_interface::Controller<pr2_mechanism_model::RobotState>
   {
   public:
     SrhFakeJointCalibrationController();
@@ -45,7 +46,7 @@ namespace controller
 
     virtual bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
 
-    virtual void update();
+    virtual void update(const ros::Time&, const ros::Duration&);
 
     bool calibrated() { return state_ == CALIBRATED; }
     void beginCalibration()

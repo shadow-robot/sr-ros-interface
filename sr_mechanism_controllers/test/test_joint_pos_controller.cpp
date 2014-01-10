@@ -62,7 +62,7 @@ public:
     joint_state->position_ = current_position;
     controller->setCommand( input );
 
-    controller->update();
+    controller->update(ros::Time(), ros::Duration());
 
     return joint_state->commanded_effort_;
   }

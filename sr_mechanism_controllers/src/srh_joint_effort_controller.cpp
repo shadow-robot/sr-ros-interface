@@ -35,7 +35,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhEffortJointController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhEffortJointController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -165,7 +165,7 @@ namespace controller {
   {
   }
 
-  void SrhEffortJointController::update()
+  void SrhEffortJointController::update(const ros::Time&, const ros::Duration&)
   {
     if( !has_j2)
     {

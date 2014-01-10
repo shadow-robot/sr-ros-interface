@@ -35,7 +35,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhJointMuscleValveController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhJointMuscleValveController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -168,7 +168,7 @@ namespace controller {
   {
   }
 
-  void SrhJointMuscleValveController::update()
+  void SrhJointMuscleValveController::update(const ros::Time&, const ros::Duration&)
   {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];

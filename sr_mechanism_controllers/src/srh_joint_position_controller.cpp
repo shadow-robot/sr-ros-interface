@@ -33,7 +33,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhJointPositionController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhJointPositionController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -202,7 +202,7 @@ namespace controller {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhJointPositionController::update()
+  void SrhJointPositionController::update(const ros::Time&, const ros::Duration&)
   {
     if( !has_j2)
     {

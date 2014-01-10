@@ -31,7 +31,7 @@
 #include <sr_utilities/sr_math_utils.hpp>
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhSyntouchController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhSyntouchController, controller_interface::ControllerBase)
 
 using namespace std;
 

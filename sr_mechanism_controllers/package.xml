@@ -21,14 +21,11 @@
   <build_depend>std_srvs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>actionlib</build_depend>
-  <build_depend>pr2_controllers_msgs</build_depend>
   <build_depend>sr_robot_msgs</build_depend>
   <build_depend>sr_utilities</build_depend>
-  <build_depend>pr2_controller_interface</build_depend>
   <build_depend>pr2_mechanism_model</build_depend>
   <build_depend>realtime_tools</build_depend>
   <build_depend>robot_mechanism_controllers</build_depend>
-  <build_depend>pr2_mechanism_controllers</build_depend>
   <build_depend>pluginlib</build_depend>
   <build_depend>rosconsole</build_depend>
   <build_depend>angles</build_depend>
@@ -42,14 +39,11 @@
   <run_depend>std_srvs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>actionlib</run_depend>
-  <run_depend>pr2_controllers_msgs</run_depend>
   <run_depend>sr_robot_msgs</run_depend>
   <run_depend>sr_utilities</run_depend>
-  <run_depend>pr2_controller_interface</run_depend>
   <run_depend>pr2_mechanism_model</run_depend>
   <run_depend>realtime_tools</run_depend>
   <run_depend>robot_mechanism_controllers</run_depend>
-  <run_depend>pr2_mechanism_controllers</run_depend>
   <run_depend>pluginlib</run_depend>
   <run_depend>rosconsole</run_depend>
   <run_depend>angles</run_depend>

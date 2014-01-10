@@ -33,7 +33,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhMuscleJointPositionController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhMuscleJointPositionController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -202,7 +202,7 @@ namespace controller {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhMuscleJointPositionController::update()
+  void SrhMuscleJointPositionController::update(const ros::Time&, const ros::Duration&)
   {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];

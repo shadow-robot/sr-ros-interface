@@ -33,7 +33,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhJointVelocityController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhJointVelocityController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -197,7 +197,7 @@ namespace controller {
     pid_controller_velocity_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhJointVelocityController::update()
+  void SrhJointVelocityController::update(const ros::Time&, const ros::Duration&)
   {
     if( !has_j2 )
     {

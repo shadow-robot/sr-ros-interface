@@ -87,7 +87,7 @@ void TestControllers::init()
 
     //initialize the controller:
     joint_state->position_ = 0.0;
-    controller->update();
+    controller->update(ros::Time(), ros::Duration());
   }
 }
 
