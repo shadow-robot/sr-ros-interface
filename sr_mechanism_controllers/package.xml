@@ -33,6 +33,8 @@
   <build_depend>sr_hardware_interface</build_depend>
   <build_depend>xmlrpcpp</build_depend>
   <build_depend>rostest</build_depend>
+  <build_depend>controller_manager</build_depend> 
+  <build_depend>controller_interface</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>std_msgs</run_depend>
@@ -50,12 +52,14 @@
   <run_depend>control_toolbox</run_depend>
   <run_depend>sr_hardware_interface</run_depend>
   <run_depend>xmlrpcpp</run_depend>
+  <run_depend>controller_manager</run_depend> 
+  <run_depend>controller_interface</run_depend>
 
   <!-- Dependencies needed only for running tests. -->
   <test_depend>gtest</test_depend>
 
 <export>
-    <pr2_controller_interface plugin="${prefix}/controller_plugins.xml"/>
+    <controller_interface plugin="${prefix}/controller_plugins.xml"/>
 </export>
 
 </package>

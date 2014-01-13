@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(sr_mechanism_controllers)
 find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp actionlib sr_robot_msgs
   sr_utilities pr2_mechanism_model realtime_tools robot_mechanism_controllers
-  pluginlib rosconsole angles control_toolbox sr_hardware_interface xmlrpcpp)
+  pluginlib rosconsole angles control_toolbox sr_hardware_interface xmlrpcpp
+  controller_manager controller_interface)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 #if you compile with "DEBUG=1 make", some debug data are going to be published
@@ -52,6 +53,7 @@ catkin_package(
   DEPENDS xmlrpcpp
   CATKIN_DEPENDS std_msgs std_srvs roscpp actionlib sr_robot_msgs sr_utilities pr2_mechanism_model
     realtime_tools robot_mechanism_controllers pluginlib rosconsole angles control_toolbox sr_hardware_interface
+    controller_manager controller_interface
   INCLUDE_DIRS include
   LIBRARIES sr_mechanism_controllers
 )
