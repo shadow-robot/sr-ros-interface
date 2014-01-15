@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_movements)
-find_package(catkin REQUIRED COMPONENTS pr2_controllers_msgs sr_robot_msgs std_msgs sensor_msgs sr_utilities roscpp sr_hand rostest)
+find_package(catkin REQUIRED COMPONENTS sr_robot_msgs std_msgs sensor_msgs sr_utilities roscpp sr_hand rostest)
 find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS})
 
@@ -21,7 +21,7 @@ target_link_libraries(sr_movement ${ImageMagick_LIBRARIES} ${catkin_LIBRARIES})
 
 catkin_package(
     DEPENDS
-    CATKIN_DEPENDS pr2_controllers_msgs sr_robot_msgs std_msgs sensor_msgs sr_utilities roscpp sr_hand 
+    CATKIN_DEPENDS sr_robot_msgs std_msgs sensor_msgs sr_utilities roscpp sr_hand 
     INCLUDE_DIRS include
     LIBRARIES sr_movement
 )
