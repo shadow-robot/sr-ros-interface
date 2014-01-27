@@ -3,17 +3,32 @@
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
        xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
        xmlns:xacro="http://ros.org/wiki/xacro">
+  
+  <!-- muscle is true for muscle hand or false for motor hand -->
+  <!-- prefix can be anything but usually is "r_" or  "l_" for right and left hands distinction -->
+  <xacro:macro name="knuckle_transmission" params="muscle prefix joint_prefix" >
 
-  <xacro:macro name="knuckle_transmission">
-
-    <transmission type="sr_mechanism_model/SimpleTransmission" name="${link_prefix}knuckle_transmission">
-      <actuator name="${joint_prefix}J4" />
-      <joint name="${joint_prefix}J4" />
-      <mechanicalReduction>1</mechanicalReduction>
-      <motorTorqueConstant>1</motorTorqueConstant>
-      <pulsesPerRevolution>90000</pulsesPerRevolution>
-    </transmission>
-
+   <!-- muscle hand -->
+    <xacro:if value="${muscle}">
+      <transmission type="sr_mechanism_model/SimpleTransmissionForMuscle" name="${prefix}knuckle_transmission">
+      <actuator name="${prefix}${joint_prefix}J4" />
+      <joint name="${prefix}${joint_prefix}J4" />
+        <mechanicalReduction>1</mechanicalReduction>
+        <motorTorqueConstant>1</motorTorqueConstant>
+        <pulsesPerRevolution>90000</pulsesPerRevolution>
+      </transmission>
+    </xacro:if> 
+    <!-- motor hand -->
+    <xacro:unless value="${muscle}">
+      <transmission type="sr_mechanism_model/SimpleTransmission" name="${prefix}knuckle_transmission">
+      <actuator name="${prefix}${joint_prefix}J4" />
+      <joint name="${prefix}${joint_prefix}J4" />
+        <mechanicalReduction>1</mechanicalReduction>
+        <motorTorqueConstant>1</motorTorqueConstant>
+        <pulsesPerRevolution>90000</pulsesPerRevolution>
+      </transmission>
+    </xacro:unless> 
+  
   </xacro:macro>
 
 </robot>
