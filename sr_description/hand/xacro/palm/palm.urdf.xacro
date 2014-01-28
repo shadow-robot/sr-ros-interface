@@ -1,5 +1,5 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
-		 xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
        xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#slider"
        xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
@@ -9,11 +9,11 @@
   <xacro:include filename="$(find sr_description)/hand/xacro/palm/palm.gazebo.xacro" />
   <xacro:include filename="$(find sr_description)/hand/xacro/palm/palm.transmission.xacro" />
   
-  <!-- muscle is true for muscle hand or false for motor hand -->
+  <!-- muscletrans is true for muscle transmission or false for motor transmission -->
   <!-- prefix can be anything but usually is "r_" or  "l_" for right and left hands distinction -->
   <!-- reflect is either 1 (for right hand) or -1 (for left hand) -->
   <!-- parent is the parent link for the joint -->
-  <xacro:macro name="palm" params="muscle prefix reflect parent">
+  <xacro:macro name="palm" params="muscletrans prefix reflect parent">
     <link name="${prefix}palm">
       <inertial>
         <origin xyz="0 0 0.035" rpy="0 0 0" />
@@ -49,7 +49,7 @@
     </joint>
     
     <!-- extensions -->
-    <xacro:shadowhand_palm_transmission muscle="${muscle}" prefix="${prefix}" />
+    <xacro:shadowhand_palm_transmission muscletrans="${muscletrans}" prefix="${prefix}" />
     <xacro:shadowhand_palm_gazebo prefix="${prefix}" />
   </xacro:macro>
 

@@ -47,7 +47,7 @@
     </joint>
 
     <!-- extensions -->
-    <xacro:thbase_transmission muscle="${muscle}" prefix="${prefix}"/>
+    <xacro:thbase_transmission muscletrans="${muscle}" prefix="${prefix}"/>
     <xacro:thbase_gazebo prefix="${prefix}" />
 
   </xacro:macro>

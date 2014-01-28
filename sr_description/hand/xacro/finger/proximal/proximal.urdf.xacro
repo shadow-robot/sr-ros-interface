@@ -47,7 +47,7 @@
     </joint>
 
     <!-- extensions -->
-    <xacro:proximal_transmission muscle="${muscle}" prefix="${prefix}" joint_prefix="${joint_prefix}"/>
+    <xacro:proximal_transmission muscletrans="${muscle}" prefix="${prefix}" joint_prefix="${joint_prefix}"/>
     <xacro:proximal_gazebo prefix="${prefix}" />
   </xacro:macro>
 

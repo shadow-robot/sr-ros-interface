@@ -112,7 +112,7 @@
     </joint>
     </xacro:unless>
     <!-- extensions -->
-    <!--   <xacro:distal_transmission muscle="${muscle}" prefix="${prefix}" /> -->
+    <!--   <xacro:distal_transmission muscletrans="${muscle}" prefix="${prefix}" /> -->
     <xacro:distal_gazebo prefix="${prefix}" />
   </xacro:macro>
 

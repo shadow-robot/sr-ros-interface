@@ -195,7 +195,7 @@
 		</xacro:unless> 
   
 		<!-- extensions -->
-		<xacro:thdistal_transmission muscle="${muscle}" prefix="${prefix}"/>
+		<xacro:thdistal_transmission muscletrans="${muscle}" prefix="${prefix}"/>
 
   </xacro:macro>
 

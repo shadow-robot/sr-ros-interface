@@ -42,13 +42,13 @@
       <child link="${prefix}thhub"/>
       <origin xyz="0 0 0.038" rpy="0 0 0" />
       <axis xyz="1 0 0" />
-      <limit lower="${12/180*M_PI}" upper="${12/180*M_PI}" effort="10"
+      <limit lower="${-12/180*M_PI}" upper="${12/180*M_PI}" effort="10"
       velocity="1.0" />
       <dynamics damping="50.5"/>
     </joint>
 
 		<!-- extensions -->
-		<xacro:thhub_transmission muscle="${muscle}" prefix="${prefix}"/>
+		<xacro:thhub_transmission muscletrans="${muscle}" prefix="${prefix}"/>
 		<xacro:thhub_gazebo prefix="${prefix}" />
   </xacro:macro>
 

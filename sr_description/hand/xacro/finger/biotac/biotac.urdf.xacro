@@ -81,7 +81,7 @@
     </joint>
 
     
-    <xacro:middle_transmission muscle="${muscle}" prefix="${prefix}" joint_prefix="${joint_prefix}"/>
+    <xacro:middle_transmission muscletrans="${muscle}" prefix="${prefix}" joint_prefix="${joint_prefix}"/>
     
     <link name="${prefix}${link_prefix}biotac">
       <inertial>

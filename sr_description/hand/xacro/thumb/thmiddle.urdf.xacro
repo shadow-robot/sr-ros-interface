@@ -66,7 +66,7 @@
     </joint>
 
 		<!-- extensions -->
-		<xacro:thmiddle_transmission muscle="${muscle}" prefix="${prefix}"/>
+		<xacro:thmiddle_transmission muscletrans="${muscle}" prefix="${prefix}"/>
 		<xacro:thmiddle_gazebo prefix="${prefix}" />
   </xacro:macro>
 
