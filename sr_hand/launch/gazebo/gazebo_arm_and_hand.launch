@@ -22,7 +22,6 @@
 
   <node pkg="robot_state_publisher" type="state_publisher"
         name="robot_state_publisher_full_pos">
-    <remap from="joint_states" to="gazebo/joint_states" />
     <param name="publish_frequency" type="double" value="20.0" />
   </node>
 
