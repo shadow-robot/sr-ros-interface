@@ -47,8 +47,7 @@ public:
      * Initializes the necessary mappings with a static list of names.
      */
     VirtualShadowhand();
-    ///destructor
-    ~VirtualShadowhand();
+    virtual ~VirtualShadowhand();
 
     //virtual classes defined in Shadowhand
     /**

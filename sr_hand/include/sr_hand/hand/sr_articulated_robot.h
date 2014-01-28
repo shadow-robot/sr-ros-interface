@@ -266,7 +266,7 @@ namespace shadowrobot
     /**
      * empty destructor.
      */
-    ~SRArticulatedRobot()
+    virtual ~SRArticulatedRobot()
     {
     }
     ;

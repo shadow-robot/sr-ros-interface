@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
-#include <gazebo_plugins/ContactsState.h>
+#include <gazebo_msgs/ContactsState.h>
 //#include <geometry_msgs/Point.h>
 
 #include <string>
@@ -130,7 +130,7 @@ void publish_marker(unsigned int id, std::string framesuffix, float force)
 	}
 }
 
-void callback_ff(const gazebo_plugins::ContactsState& msg)
+void callback_ff(const gazebo_msgs::ContactsState& msg)
 {
   // Publish the marker
   // once every countdown
@@ -148,7 +148,7 @@ void callback_ff(const gazebo_plugins::ContactsState& msg)
   update_mutex.unlock();
 }
 
-void callback_mf(const gazebo_plugins::ContactsState& msg)
+void callback_mf(const gazebo_msgs::ContactsState& msg)
 {
   // Publish the marker
   // once every countdown
@@ -166,7 +166,7 @@ void callback_mf(const gazebo_plugins::ContactsState& msg)
   update_mutex.unlock();
 }
 
-void callback_rf(const gazebo_plugins::ContactsState& msg)
+void callback_rf(const gazebo_msgs::ContactsState& msg)
 {
   // Publish the marker
   // once every countdown
@@ -184,7 +184,7 @@ void callback_rf(const gazebo_plugins::ContactsState& msg)
   update_mutex.unlock();
 }
 
-void callback_lf(const gazebo_plugins::ContactsState& msg)
+void callback_lf(const gazebo_msgs::ContactsState& msg)
 {
   // Publish the marker
   // once every countdown
@@ -202,7 +202,7 @@ void callback_lf(const gazebo_plugins::ContactsState& msg)
   update_mutex.unlock();
 }
 
-void callback_th(const gazebo_plugins::ContactsState& msg)
+void callback_th(const gazebo_msgs::ContactsState& msg)
 {
   // Publish the marker
   // once every countdown

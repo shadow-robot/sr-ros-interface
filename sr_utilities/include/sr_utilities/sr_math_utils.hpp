@@ -77,15 +77,15 @@ namespace sr_math_utils
     return result;
   }
 
-  static inline bool is_bit_mask_index_true(int bit_mask, int index)
+  static inline bool is_bit_mask_index_true(long int bit_mask, int index)
   {
-    if ( bit_mask & (1<<index) )
+    if ( bit_mask & (((long int)1)<<index) )
       return true;
     else
       return false;
   }
 
-  static inline bool is_bit_mask_index_false(int bit_mask, int index)
+  static inline bool is_bit_mask_index_false(long int bit_mask, int index)
   {
     return !(is_bit_mask_index_true(bit_mask, index));
   }

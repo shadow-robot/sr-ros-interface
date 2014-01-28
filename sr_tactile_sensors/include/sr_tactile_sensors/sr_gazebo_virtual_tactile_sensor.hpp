@@ -35,7 +35,7 @@
 
 #include "sr_tactile_sensors/sr_generic_tactile_sensor.hpp"
 
-#include <gazebo_plugins/ContactsState.h>
+#include <gazebo_msgs/ContactsState.h>
 
 namespace shadowrobot
 {
@@ -43,7 +43,7 @@ namespace shadowrobot
   {
   public:
     SrGazeboVirtualTactileSensor(std::string name, std::string gazebo_topic);
-    ~SrGazeboVirtualTactileSensor();
+    virtual ~SrGazeboVirtualTactileSensor();
 
   protected:
     /**
@@ -66,7 +66,7 @@ namespace shadowrobot
      *
      * @param msg the message containing the contact data
      */
-    void callback(const gazebo_plugins::ContactsState& msg);
+    void callback(const gazebo_msgs::ContactsState& msg);
   };
 
   class SrGazeboVirtualTactileSensorManager : public SrTactileSensorManager

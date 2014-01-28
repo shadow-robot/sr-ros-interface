@@ -39,8 +39,8 @@
 #include "physics/World.hh"
 #include "physics/HingeJoint.hh"
 #include "sensors/Sensor.hh"
-#include "sdf/interface/SDF.hh"
-#include "sdf/interface/Param.hh"
+#include "sdf/sdf.hh"
+#include "sdf/Param.hh"
 #include "common/Exception.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Base.hh"
@@ -61,12 +61,12 @@ GazeboRosControllerManager::GazeboRosControllerManager()
 
 
 /// \brief callback for setting models joints states
-bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
-                           pr2_gazebo_plugins::SetModelsJointsStates::Response &res)
-{
-
-  return true;
-}
+//bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
+//                           pr2_gazebo_plugins::SetModelsJointsStates::Response &res)
+//{
+//
+//  return true;
+//}
 
 
 GazeboRosControllerManager::~GazeboRosControllerManager()
@@ -75,7 +75,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
 
   //pr2_hardware_interface::ActuatorMap::const_iterator it;
   //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
-  //  delete it->second; // why is this causing double free corrpution?
+  //  delete it->second; // why is this causing double free corruption?
   this->cm_->~ControllerManager();
   this->rosnode_->shutdown();
 #ifdef USE_CBQ
@@ -93,7 +93,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
 
   if (this->fake_state_)
   {
-    // why does this cause double free corrpution in destruction of RobotState?
+    // why does this cause double free corruption in destruction of RobotState?
     //this->fake_state_->~RobotState();
     delete this->fake_state_;
   }
@@ -103,7 +103,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
 void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent model
-  std::string modelName = _sdf->GetParent()->GetValueString("name");
+  std::string modelName = _sdf->GetParent()->Get<std::string>("name");
 
   // Get the world name.
   this->world = _parent->GetWorld();
@@ -117,7 +117,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GazeboRosControllerManager::UpdateChild, this));
   gzdbg << "plugin model name: " << modelName << "\n";
 
@@ -143,11 +143,11 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   // get parameter name
   this->robotNamespace = "";
   if (_sdf->HasElement("robotNamespace"))
-    this->robotNamespace = _sdf->GetElement("robotNamespace")->GetValueString();
+    this->robotNamespace = _sdf->GetElement("robotNamespace")->Get<std::string>();
 
   this->robotParam = "robot_description";
   if (_sdf->HasElement("robotParam"))
-    this->robotParam = _sdf->GetElement("robotParam")->GetValueString();
+    this->robotParam = _sdf->GetElement("robotParam")->Get<std::string>();
 
   this->robotParam = this->robotNamespace+"/" + this->robotParam;
 
@@ -242,7 +242,7 @@ void GazeboRosControllerManager::UpdateChild()
     {
       gazebo::physics::JointPtr hj = this->joints_[i];
       this->fake_state_->joint_states_[i].position_ = this->fake_state_->joint_states_[i].position_ +
-                    angles::shortest_angular_distance(this->fake_state_->joint_states_[i].position_,hj->GetAngle(0).GetAsRadian());
+                    angles::shortest_angular_distance(this->fake_state_->joint_states_[i].position_,hj->GetAngle(0).Radian());
       this->fake_state_->joint_states_[i].velocity_ = hj->GetVelocity(0);
       //if (this->joints_[i]->GetName() == "torso_lift_motor_screw_joint")
       //  ROS_WARN("joint[%s] [%f]",this->joints_[i]->GetName().c_str(), this->fake_state_->joint_states_[i].position_);
@@ -251,7 +251,7 @@ void GazeboRosControllerManager::UpdateChild()
     {
       gazebo::physics::JointPtr sj = this->joints_[i];
       {
-        this->fake_state_->joint_states_[i].position_ = sj->GetAngle(0).GetAsRadian();
+        this->fake_state_->joint_states_[i].position_ = sj->GetAngle(0).Radian();
         this->fake_state_->joint_states_[i].velocity_ = sj->GetVelocity(0);
       }
       //ROS_ERROR("joint[%s] is a slider [%f]",this->joints_[i]->GetName().c_str(),sj->GetAngle(0).GetAsRadian());

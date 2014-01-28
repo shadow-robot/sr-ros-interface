@@ -55,9 +55,6 @@ namespace controller
     //publish our joint controller state
     boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointControllerState> > controller_state_publisher_;
 
-    ros::Subscriber sub_command_;
-    void setCommandCB(const std_msgs::Float64ConstPtr& msg);
-
     sr_actuator::SrActuator* actuator_;
   };
 } // namespace

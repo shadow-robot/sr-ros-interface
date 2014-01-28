@@ -31,7 +31,7 @@
 #include <std_msgs/Float64.h>
 
 //Register the controller to be able to load it with the controller manager.
-PLUGINLIB_DECLARE_CLASS(sr_mechanism_controllers, SrhExampleController, controller::SrhExampleController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhExampleController, pr2_controller_interface::Controller)
 
 using namespace std;
 

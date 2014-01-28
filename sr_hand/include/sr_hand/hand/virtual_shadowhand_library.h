@@ -20,7 +20,7 @@ class VirtualShadowhandLibrary : public virtual SRArticulatedRobot
 {
 public:
     VirtualShadowhandLibrary();
-    ~VirtualShadowhandLibrary(){};
+    virtual ~VirtualShadowhandLibrary(){};
 
     virtual short sendupdate( std::string joint_name, double target );
     virtual JointData getJointData( std::string joint_name );

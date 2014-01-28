@@ -1,172 +1,176 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(sr_hand)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+find_package(catkin REQUIRED COMPONENTS rostest roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs
+  sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_ros)
+find_package(gazebo REQUIRED)
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
-rosbuild_init()
-
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
-
-rosbuild_add_boost_directories()
+catkin_python_setup()
 
 ###################
 #  CONFIGURATION  #
 ###################
 
-#Gazebo
-SET(gazebo_support $ENV{GAZEBO})
-MESSAGE("--------- Shadow Robot Package Configuration:")
-IF(gazebo_support)
-  SET( CMAKE_CXX_FLAGS "-D GAZEBO")
-  MESSAGE(" [x] Gazebo support")
-ELSE(gazebo_support)
-  MESSAGE(" [ ] Gazebo support")
-ENDIF(gazebo_support)
-
 # Real Hand
-SET(real_hand $ENV{REAL_HAND})
-IF(real_hand)
-  MESSAGE(" [x] Real Hand.")
-ELSE(real_hand)
-  MESSAGE(" [ ] Real Hand.")
-ENDIF(real_hand)
+set(real_hand $ENV{REAL_HAND})
+if(real_hand)
+  message(" [x] Real Hand.")
+else(real_hand)
+  message(" [ ] Real Hand.")
+endif(real_hand)
 
 #Real Arm
-SET(real_arm $ENV{REAL_ARM})
-IF(real_arm)
-  MESSAGE(" [x] Real Arm.")
-ELSE(real_arm)
-  MESSAGE(" [ ] Real Arm.")
-ENDIF(real_arm)
+set(real_arm $ENV{REAL_ARM})
+if(real_arm)
+  message(" [x] Real Arm.")
+else(real_arm)
+  message(" [ ] Real Arm.")
+endif(real_arm)
 
 #Valves
-SET(muscle $ENV{MUSCLE})
-IF(real_hand)
-  IF(muscle)
-    MESSAGE(" [x] Valves.")
-  ELSE(muscle)
-    MESSAGE(" [ ] Valves.")
-  ENDIF(muscle)
-ELSE(real_hand)
-  MESSAGE(" [ ] Valves.")
-ENDIF(real_hand)
-MESSAGE("---------")
+set(muscle $ENV{MUSCLE})
+if(real_hand)
+  if(muscle)
+    message(" [x] Valves.")
+  else(muscle)
+    message(" [ ] Valves.")
+  endif(muscle)
+else(real_hand)
+  message(" [ ] Valves.")
+endif(real_hand)
+message("---------")
 
-#EtherCAT compatibility Interface
-SET(ethercat_compat $ENV{ETHERCAT})
-IF(ethercat_compat)
-  MESSAGE(" [x] EtherCAT compatibility interface.")
-ELSE(ethercat_compat)
-  MESSAGE(" [ ] EtherCAT compatibility interface.")
-ENDIF(ethercat_compat)
+#CAN compatibility Interface
+set(can_compat $ENV{CAN_COMPATIBILITY})
+if(can_compat)
+  message(" [x] CAN compatibility interface.")
+else(can_compat)
+  message(" [ ] CAN compatibility interface.")
+endif(can_compat)
 
 ##################
 #  VIRTUAL ARM  #
 ##################
 
-rosbuild_add_executable(shadowarm_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_arm_node.cpp src/sr_diagnosticer.cpp)
-rosbuild_link_boost(shadowarm_virtual thread)
+add_executable(shadowarm_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
+  src/hand/virtual_arm_node.cpp src/sr_diagnosticer.cpp)
+add_dependencies(shadowarm_virtual ${catkin_EXPORTED_TARGETS})
+find_package(Boost REQUIRED COMPONENTS thread)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(shadowarm_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 
 ##################
 #  VIRTUAL HAND  #
 ##################
-rosbuild_add_executable(shadowhand_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp)
-rosbuild_link_boost(shadowhand_virtual thread)
+add_executable(shadowhand_virtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
+  src/hand/virtual_shadowhand_node.cpp src/sr_diagnosticer.cpp)
+add_dependencies(shadowhand_virtual ${catkin_EXPORTED_TARGETS})
+target_link_libraries(shadowhand_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 
 ###########################
 #  VIRTUAL HAND  LIBRARY  #
 ###########################
 
-rosbuild_add_library(SrVirtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand_library.cpp)
-rosbuild_link_boost(shadowhand_virtual thread)
+add_library(SrVirtual src/hand/sr_articulated_robot.cpp src/hand/virtual_shadowhand_library.cpp)
+add_dependencies(SrVirtual ${catkin_EXPORTED_TARGETS})
+target_link_libraries(SrVirtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 ##################
 #    REAL HAND   #
 ##################
-IF(real_hand)
+if(real_hand)
   include_directories(/usr/realtime/include/)
-  LINK_LIBRARIES(pthread)
   add_library(robot STATIC IMPORTED)
+  add_dependencies(robot ${catkin_EXPORTED_TARGETS})
   set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
-  rosbuild_add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
-  rosbuild_link_boost(shadowhand_real thread)
-  target_link_libraries(shadowhand_real robot)
-ENDIF(real_hand)
+  add_executable(shadowhand_real src/hand/sr_articulated_robot.cpp src/hand/real_shadowhand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
+    src/hand/real_shadowhand_node.cpp src/sr_diagnosticer.cpp)
+  add_dependencies(shadowhand_real ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(shadowhand_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
+endif(real_hand)
 
 #########################################
 #  ETHERCAT COMPATIBILITY WRAPPER HAND  #
 #########################################
-IF(ethercat_compat)
-  rosbuild_add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
-  rosbuild_link_boost(shadowhand_virtual thread)
-ENDIF(ethercat_compat)
+add_executable(shadowhand_ethercat src/hand/sr_articulated_robot.cpp src/hand/etherCAT_compatibility_hand.cpp src/sr_publisher.cpp
+  src/sr_subscriber.cpp src/hand/etherCAT_compatibility_hand_node.cpp src/sr_diagnosticer.cpp)
+add_dependencies(shadowhand_ethercat ${catkin_EXPORTED_TARGETS})
+target_link_libraries(shadowhand_ethercat ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+message(" [x] EtherCAT compatibility interface.")
 
 ###################################
 #  CAN COMPATIBILITY WRAPPER ARM  #
 ###################################
-rosbuild_add_executable(shadowarm_can src/hand/sr_articulated_robot.cpp src/hand/CAN_compatibility_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/CAN_compatibility_arm_node.cpp)
-
+if(can_compat)
+  add_executable(shadowarm_can src/hand/sr_articulated_robot.cpp src/hand/CAN_compatibility_arm.cpp src/sr_publisher.cpp
+    src/sr_subscriber.cpp src/hand/CAN_compatibility_arm_node.cpp)
+  add_dependencies(shadowarm_can ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(shadowarm_can ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+endif(can_compat)
 
 ##################
 #    REAL ARM    #
 ##################
-IF(real_arm)
+if(real_arm)
   include_directories(/usr/realtime/include/)
-  LINK_LIBRARIES(pthread)
-  rosbuild_add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
-  rosbuild_link_boost(shadowarm_real thread)
-  target_link_libraries(shadowarm_real robot)
-ENDIF(real_arm)
+  add_executable(shadowarm_real src/hand/sr_articulated_robot.cpp src/hand/real_arm.cpp src/sr_publisher.cpp src/sr_subscriber.cpp
+    src/hand/real_arm_node.cpp src/sr_diagnosticer.cpp)
+  add_dependencies(shadowarm_real ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(shadowarm_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
+endif(real_arm)
 
 ##################
 #     VALVES     #
 ##################
-IF(valves)
+if(valves)
   include_directories(/usr/realtime/include/)
-  LINK_LIBRARIES(pthread)
-  rosbuild_add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
-  rosbuild_link_boost(sr_valves thread)
-  target_link_libraries(sr_valves robot)
-ENDIF(valves)
-
-#####################################
-#   dynamic parameters reconfigure  #
-#####################################
-
-#rosbuild_find_ros_package(dynamic_reconfigure)
-#include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
-#gencfg()
-
-###############
-#   EXAMPLES  #
-###############
-rosbuild_add_executable(examples/link_joints examples/link_joints.cpp)
+  add_executable(sr_valves src/hand/valves.cpp src/hand/valves_node.cpp)
+  add_dependencies(sr_valves ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(sr_valves ${Boost_LIBRARIES} ${catkin_LIBRARIES} pthread robot)
+endif(valves)
 
 ############################################################################
 #   Hand command library (gives compatibility with CAN and ethercat hand)  #
 ############################################################################
-rosbuild_add_library(HandCommander src/hand_commander.cpp)
-rosbuild_link_boost(HandCommander thread)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-#rosbuild_add_gtest(test/hand_commander_test test/hand_commander_test.cpp)
-rosbuild_add_executable(test/hand_commander_test test/hand_commander_test.cpp)
-rosbuild_add_gtest_build_flags(test/hand_commander_test)
-target_link_libraries(test/hand_commander_test HandCommander)
-rosbuild_add_rostest(test/hand_commander_test.launch)
-rosbuild_add_rostest(test/hand_commander_arm_and_hand_test.launch)
+add_definitions(-fPIC)
+add_library(HandCommander src/hand_commander.cpp)
+add_dependencies(HandCommander ${catkin_EXPORTED_TARGETS})
+target_link_libraries(HandCommander ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
+catkin_package(
+    DEPENDS orocos_kdl
+    CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs sr_utilities
+      diagnostic_msgs dynamic_reconfigure self_test urdf
+    INCLUDE_DIRS include
+    LIBRARIES HandCommander SrVirtual
+)
+
+if(COMMAND add_rostest_gtest)
+  add_rostest_gtest(hand_commander_test test/hand_commander_test.test test/hand_commander_test.cpp)
+  add_dependencies(hand_commander_test ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(hand_commander_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
+  add_rostest_gtest(hand_commander_arm_and_hand_test test/hand_commander_arm_and_hand_test.test test/hand_commander_test.cpp)
+  add_dependencies(hand_commander_arm_and_hand_test ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(hand_commander_arm_and_hand_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
+endif(COMMAND add_rostest_gtest)
+
+if(valves)
+  install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat HandCommander sr_valves
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+else(valves)
+  install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat HandCommander
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )  
+endif()
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.hpp"
+)

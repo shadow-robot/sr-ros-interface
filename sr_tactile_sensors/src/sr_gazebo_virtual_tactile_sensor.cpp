@@ -47,7 +47,7 @@ namespace shadowrobot
   SrGazeboVirtualTactileSensor::~SrGazeboVirtualTactileSensor()
   {}
 
-  void SrGazeboVirtualTactileSensor::callback(const gazebo_plugins::ContactsState& msg)
+  void SrGazeboVirtualTactileSensor::callback(const gazebo_msgs::ContactsState& msg)
   {
     double tmp_value;
     ::geometry_msgs::Vector3 v;

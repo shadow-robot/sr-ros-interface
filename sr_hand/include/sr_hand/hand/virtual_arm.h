@@ -38,8 +38,7 @@ public:
      * Initializes the necessary mappings with a static list of names.
      */
     VirtualArm();
-    ///destructor
-    ~VirtualArm();
+    virtual ~VirtualArm();
 
     //virtual classes defined in SRArticulatedRobot
     /**

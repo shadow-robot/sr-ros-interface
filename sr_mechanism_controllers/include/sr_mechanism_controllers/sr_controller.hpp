@@ -65,7 +65,7 @@ namespace controller
      * \param command
      */
     void setCommand(double cmd);
-    void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+    virtual void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 
     /*!
      * \brief Get latest position command to the joint: revolute (angle) and prismatic (position).

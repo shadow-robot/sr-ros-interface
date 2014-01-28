@@ -1,7 +1,0 @@
-<launch>
-    <!-- Start simulated hand for testing -->
-    <include file="$(find sr_hand)/launch/gazebo/gazebo_hand.launch" />
-
-    <node name="hand_posture_execution" pkg="sr_move_arm" type="hand_posture_execution" />
-    <test test-name="hand_posture_execution_test" pkg="sr_move_arm" type="hand_posture_execution_test" />
-</launch>

@@ -47,8 +47,7 @@ namespace shadowrobot
      * Initializes the necessary mappings with a static list of names.
      */
     ROS_DEPRECATED EtherCATCompatibilityHand();
-    ///destructor
-    ~EtherCATCompatibilityHand();
+    virtual ~EtherCATCompatibilityHand();
 
     //virtual classes defined in Shadowhand
     /**

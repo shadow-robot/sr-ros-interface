@@ -44,7 +44,7 @@ namespace shadowrobot
   {
   public:
     SrRealTactileSensor(std::string name, std::string touch_name);
-    ~SrRealTactileSensor();
+    virtual ~SrRealTactileSensor();
 
     /**
      * Reads the value from the sensor

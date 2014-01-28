@@ -1,73 +1,93 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(sr_tactile_sensors)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_ros rviz)
+find_package(gazebo REQUIRED)
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
-
-rosbuild_init()
-
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
-
+catkin_python_setup()
 
 #Gazebo
-SET(gazebo_support $ENV{GAZEBO})
-MESSAGE("--------- Shadow Robot Tactiles Package Configuration:")
-IF(gazebo_support)
-  SET( CMAKE_CXX_FLAGS "-D GAZEBO")
-  MESSAGE(" [x] Gazebo support")
-ELSE(gazebo_support)
-  MESSAGE(" [ ] Gazebo support")
-ENDIF(gazebo_support)
+set(gazebo_support $ENV{GAZEBO})
+message("--------- Shadow Robot Tactiles Package Configuration:")
+if(gazebo_support)
+  set( CMAKE_CXX_FLAGS "-D GAZEBO")
+  message(" [x] Gazebo support")
+else(gazebo_support)
+  message(" [ ] Gazebo support")
+endif(gazebo_support)
 
 # Real Hand
-SET(real_hand $ENV{REAL_HAND})
-IF(real_hand)
-  MESSAGE(" [x] Real Hand.")
-ELSE(real_hand)
-  MESSAGE(" [ ] Real Hand.")
-ENDIF(real_hand)
+set(real_hand $ENV{REAL_HAND})
+if(real_hand)
+  message(" [x] Real Hand.")
+else(real_hand)
+  message(" [ ] Real Hand.")
+endif(real_hand)
 
 #############################
 #  VIRTUAL TACTILE SENSORS  #
 #############################
-rosbuild_add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
-IF(gazebo_support)
-  rosbuild_add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
-ENDIF(gazebo_support)
-
+add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+add_dependencies(sr_tactile_virtual src ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sr_tactile_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+if(gazebo_support)
+  add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+  add_dependencies(sr_tactile_virtual_gazebo ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(sr_tactile_virtual_gazebo ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+endif(gazebo_support)
 
 #############################
 #   REAL TACTILE SENSORS    #
 #############################
 # Uncomment the following lines if you want access to the real tactile sensors
-IF(real_hand)
+if(real_hand)
+  include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
   include_directories(/usr/realtime/include/)
-  LINK_LIBRARIES(pthread)
   add_library(robot STATIC IMPORTED)
+  add_dependencies(robot ${catkin_EXPORTED_TARGETS})
   set_property(TARGET robot PROPERTY IMPORTED_LOCATION /usr/lib/robot.a)
-  rosbuild_add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
-  target_link_libraries(sr_tactile_real robot)
-ENDIF(real_hand)
+  add_executable(sr_tactile_real src/sr_real_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+  add_dependencies(sr_tactile_real ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(sr_tactile_real ${Boost_LIBRARIES} ${catkin_LIBRARIES} robot)
+endif(real_hand)
 
 #############################
 #  RVIZ MARKER FOR TACTILES #
 #############################
-rosbuild_add_executable(sr_tactile_rviz_marker src/sr_tactile_rviz_marker.cpp)
-rosbuild_add_executable(sr_bumper_rviz_marker src/sr_bumper_rviz_marker.cpp)
+add_executable(sr_tactile_rviz_marker src/sr_tactile_rviz_marker.cpp)
+add_dependencies(sr_tactile_rviz_marker ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sr_tactile_rviz_marker ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+add_executable(sr_bumper_rviz_marker src/sr_bumper_rviz_marker.cpp)
+add_dependencies(sr_bumper_rviz_marker ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sr_bumper_rviz_marker ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+
 ###############
 #   EXAMPLES  #
 ###############
-rosbuild_add_executable(tactile_example examples/tactile.cpp)
+add_executable(tactile_example examples/tactile.cpp)
+add_dependencies(tactile_example ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tactile_example ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+
+catkin_package(
+    DEPENDS
+    CATKIN_DEPENDS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_ros
+    INCLUDE_DIRS include
+    LIBRARIES
+)
+
+if(gazebo_support)
+  install(TARGETS sr_tactile_virtual sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example sr_tactile_virtual_gazebo
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+else(gazebo_support)
+  install(TARGETS sr_tactile_virtual sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+endif(gazebo_support)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.hpp"
+)

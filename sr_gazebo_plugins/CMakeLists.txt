@@ -1,51 +1,54 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(sr_gazebo_plugins)
 
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-set(ROS_BUILD_TYPE RelWithDeb)
-rosbuild_init()
-
-rosbuild_genmsg()
-rosbuild_gensrv()
-
-add_definitions(-fPIC)
-
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_msgs gazebo_ros
+  pr2_msgs geometry_msgs diagnostic_updater diagnostic_msgs angles pr2_hardware_interface sr_hardware_interface pr2_controller_manager
+  pr2_mechanism_model urdf dynamic_reconfigure sr_hardware_interface sr_self_test)
+find_package(PkgConfig)
 find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
-include_directories( ${ImageMagick_INCLUDE_DIRS})
+find_package(gazebo REQUIRED)
+find_package(Boost REQUIRED COMPONENTS thread)
 
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS})
 
-#
+add_definitions(-fPIC -DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
+
 # if screw joint exists, remove hack for damping variable
-#
-execute_process(COMMAND rosrun opende ode-config --version OUTPUT_VARIABLE ode_version)
+execute_process(COMMAND ode-config --version OUTPUT_VARIABLE ode_version)
 if (${ode_version} VERSION_LESS "0.11.1.71")
-  MESSAGE(STATUS "OUTPUT_VARIABLE: ${ode_version} no screw joint")
+  message(STATUS "OUTPUT_VARIABLE: ${ode_version} no screw joint")
 else (${ode_version} VERSION_LESS "0.11.1.71")
-  MESSAGE(STATUS "OUTPUT_VARIABLE: ${ode_version} screw joint exists, removing hack")
+  message(STATUS "OUTPUT_VARIABLE: ${ode_version} screw joint exists, removing hack")
   add_definitions(-DODE_SCREW_JOINT)
 endif (${ode_version} VERSION_LESS "0.11.1.71")
 
 
+add_library(sr_gazebo_ros_controller_manager src/gazebo_ros_controller_manager.cpp)
+add_dependencies(sr_gazebo_ros_controller_manager ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sr_gazebo_ros_controller_manager ${Boost_LIBRARIES} ${catkin_LIBRARIES} sr_self_test)
 
-
-# dynamic reconfigure for gazebo ros camera nodes
-# does not exist until simulator_gazebo 1.2.9
-execute_process(COMMAND rosversion simulator_gazebo OUTPUT_VARIABLE simulator_gazebo_version)
-if (${simulator_gazebo_version} VERSION_GREATER "1.2.8")
-  MESSAGE(STATUS "OUTPUT_VARIABLE: ${simulator_gazebo_version}Enabling gazebo ros camera dynamic reconfigure")
-  add_definitions(-DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
-else (${simulator_gazebo_version} VERSION_GREATER "1.2.8")
-  MESSAGE(STATUS "OUTPUT_VARIABLE: ${simulator_gazebo_version}Disabling gazebo ros camera dynamic reconfigure")
-endif (${simulator_gazebo_version} VERSION_GREATER "1.2.8")
-
-rosbuild_add_boost_directories()
-
-rosbuild_add_library(sr_gazebo_ros_controller_manager src/gazebo_ros_controller_manager.cpp)
-rosbuild_link_boost(sr_gazebo_ros_controller_manager thread)
-
-exec_program("glxinfo" OUTPUT_VARIABLE glx_out RETURN_VALUE glx_val)
-if(${glx_val} EQUAL 0)
+execute_process(COMMAND glxinfo OUTPUT_VARIABLE glx_out)
+if(${glx_out} EQUAL 0)
   message(STATUS "run test here")
-else(${glx_val} EQUAL 0)
+else(${glx_out} EQUAL 0)
   message(STATUS "no test here")
-endif(${glx_val} EQUAL 0)
+endif(${glx_out} EQUAL 0)
 
+catkin_package(
+    DEPENDS python-numpy opende
+    CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs pr2_msgs geometry_msgs gazebo_ros
+      diagnostic_updater diagnostic_msgs angles pr2_hardware_interface sr_hardware_interface pr2_controller_manager urdf
+      pr2_mechanism_model dynamic_reconfigure sr_hardware_interface sr_self_test 
+    INCLUDE_DIRS include
+    LIBRARIES 
+)
+
+install(TARGETS sr_gazebo_ros_controller_manager
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.hpp"
+)

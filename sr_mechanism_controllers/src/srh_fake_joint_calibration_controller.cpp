@@ -31,15 +31,15 @@
 #include <string>
 #include <std_srvs/Empty.h>
 
-PLUGINLIB_DECLARE_CLASS(sr_mechanism_controllers, SrhFakeJointCalibrationController, controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
 
 using namespace std;
 
 namespace controller {
 
   SrhFakeJointCalibrationController::SrhFakeJointCalibrationController()
-    : robot_(NULL), last_publish_time_(0), state_(INITIALIZED),
-      actuator_(NULL), joint_(NULL), transmission_(NULL)
+    : robot_(NULL), last_publish_time_(0), state_(IS_INITIALIZED),
+      actuator_(NULL), joint_(NULL)
   {
   }
 
@@ -89,7 +89,8 @@ namespace controller {
       ROS_ERROR("No transmission given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    if (!(transmission_ = robot->model_->getTransmission(transmission_name)))
+    transmission_ = robot->model_->getTransmission(transmission_name);
+    if (!transmission_)
     {
       ROS_ERROR("Could not find transmission %s (namespace: %s)",
                 transmission_name.c_str(), node_.getNamespace().c_str());
@@ -111,7 +112,7 @@ namespace controller {
 
     switch(state_)
     {
-    case INITIALIZED:
+    case IS_INITIALIZED:
       state_ = BEGINNING;
       break;
     case BEGINNING:
@@ -141,14 +142,17 @@ namespace controller {
   void SrhFakeJointCalibrationController::initialize_pids()
   {
     ///Reset the motor to make sure we have the proper 0 + correct PID settings
-    std::string service_name = "/realtime_loop/reset_motor_" + boost::to_upper_copy(actuator_name_);
+    std::string service_name = "realtime_loop/reset_motor_" + boost::to_upper_copy(actuator_name_);
     if( ros::service::waitForService (service_name, ros::Duration(2.0)) )
     {
-      ros::ServiceClient client = node_.serviceClient<std_srvs::Empty>(service_name);
       std_srvs::Empty srv;
-      if( client.call(srv) )
+      if (ros::service::call(service_name, srv))
       {
         return;
+      }
+      else
+      {
+        ROS_WARN("Reset failed: %s", service_name.c_str());
       }
     }
   }

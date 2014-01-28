@@ -596,8 +596,8 @@ void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTraj
   ros::Time time = ros::Time::now()-ros::Duration(0.05);
   last_time_ = time;
 
-  ROS_ERROR("Figuring out new trajectory at %.3lf, with data from %.3lf with %d waypoints",
-          time.toSec(), msg->header.stamp.toSec(),msg->points.size());
+  ROS_ERROR("Figuring out new trajectory at %.3lf, with data from %.3lf with %zu waypoints",
+          time.toSec(), msg->header.stamp.toSec(), msg->points.size());
 
   boost::shared_ptr<SpecifiedTrajectory> new_traj_ptr(new SpecifiedTrajectory);
   SpecifiedTrajectory &traj = *new_traj_ptr;
@@ -648,7 +648,7 @@ void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTraj
     if(msg->header.stamp == ros::Time(0.0))
     {
       seg.start_time = (time + msg->points[i].time_from_start).toSec() - durations[i];
-      ROS_DEBUG("Segment %d start time A %f,time_from_start %f, duration, %f",i,seg.start_time,msg->points[i].time_from_start.toSec(),durations[i]);
+      ROS_DEBUG("Segment %zu start time A %f,time_from_start %f, duration, %f", i, seg.start_time,msg->points[i].time_from_start.toSec(), durations[i]);
     }
     else
     {

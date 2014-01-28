@@ -60,8 +60,7 @@ namespace shadowrobot
      */
     RealShadowhand();
 
-    ///Destructor
-    ~RealShadowhand();
+    virtual ~RealShadowhand();
 
     /**
      * Send a new target to a given joint on the robot. The command will be issued to the robot which will move if

@@ -33,7 +33,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_DECLARE_CLASS(sr_mechanism_controllers, SrhJointPositionController, controller::SrhJointPositionController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhJointPositionController, pr2_controller_interface::Controller)
 
 using namespace std;
 
@@ -241,7 +241,7 @@ namespace controller {
     if( in_deadband )
       error_position = 0.0;
 
-    commanded_effort = pid_controller_position_->updatePid(error_position, dt_);
+    commanded_effort = pid_controller_position_->computeCommand(-error_position, dt_);
 
     //clamp the result to max force
     commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );

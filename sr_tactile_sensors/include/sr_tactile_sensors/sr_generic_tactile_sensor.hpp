@@ -44,7 +44,7 @@ namespace shadowrobot
   {
   public:
     SrGenericTactileSensor(std::string name, std::string touch_name);
-    ~SrGenericTactileSensor();
+    virtual ~SrGenericTactileSensor();
 
     /**
      * publish the current values to the

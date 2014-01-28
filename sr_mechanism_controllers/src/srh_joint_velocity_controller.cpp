@@ -33,7 +33,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_DECLARE_CLASS(sr_mechanism_controllers, SrhJointVelocityController, controller::SrhJointVelocityController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhJointVelocityController, pr2_controller_interface::Controller)
 
 using namespace std;
 
@@ -231,7 +231,7 @@ namespace controller {
     //don't compute the error if we're in the deadband.
     if( !hysteresis_deadband.is_in_deadband(command_, error_velocity, velocity_deadband) )
     {
-      commanded_effort = pid_controller_velocity_->updatePid(error_velocity, dt_);
+      commanded_effort = pid_controller_velocity_->computeCommand(-error_velocity, dt_);
 
       //clamp the result to max force
       commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );

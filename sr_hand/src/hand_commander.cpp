@@ -71,7 +71,7 @@ namespace shadowrobot
     else
     {
       hand_type = shadowhandRosLib::CAN;
-      sr_hand_target_pub = node_.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
+      sr_hand_target_pub = node_.advertise<sr_robot_msgs::sendupdate>("srh/sendupdate", 2);
       ROS_INFO("HandCommander library: CAN hand detected");
     }
   }
@@ -94,15 +94,16 @@ namespace shadowrobot
     {
       if(controller_list.response.state[i]=="running")
       {
-        std::string controller = controller_list.response.controllers[i];
-        if (node_.getParam("/"+controller+"/joint", controlled_joint_name))
+        std::string controller = "/";
+        controller += controller_list.response.controllers[i];
+        if (node_.getParam(controller+"/joint", controlled_joint_name))
         {
           ROS_DEBUG("controller %d:%s controls joint %s\n",
                     (int)i,controller.c_str(),controlled_joint_name.c_str());
           sr_hand_target_pub_map[controlled_joint_name]
             = node_.advertise<std_msgs::Float64>(controller+"/command", 2);
           ethercat_controllers_found = true;
-          sr_hand_sub_topics[controlled_joint_name] = "/"+ controller+"/state";
+          sr_hand_sub_topics[controlled_joint_name] = controller+"/state";
         }
       }
     }
@@ -181,9 +182,9 @@ namespace shadowrobot
   std::vector<std::string> HandCommander::get_all_joints()
   {
     std::vector<std::string> all_joints_names;
-    std::map<std::string, std::string>::iterator it = sr_hand_sub_topics.begin();
+    std::map<std::string, std::string>::iterator it;
 
-    for( it; it != sr_hand_sub_topics.end(); ++it )
+    for( it = sr_hand_sub_topics.begin(); it != sr_hand_sub_topics.end(); ++it )
     {
       // all Hand joint names have a length of 4...
       //The other way would be to check if the name is in a list
@@ -215,7 +216,7 @@ namespace shadowrobot
     }
     else
     {
-      topic = "/shadowhand_data";
+      topic = "shadowhand_data";
     }
 
     return topic;
