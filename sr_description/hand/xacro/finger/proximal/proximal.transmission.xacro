@@ -6,11 +6,13 @@
 
   <!-- muscletrans is true for muscle transmission or false for motor transmission -->
   <!-- prefix can be anything but usually is "r_" or  "l_" for right and left hands distinction -->
-  <xacro:macro name="proximal_transmission" params="muscletrans prefix joint_prefix" >
+  <!-- link_prefix prepends fingername to the link names -->
+  <!-- joint_prefix prepends fingername to the joint names -->
+  <xacro:macro name="proximal_transmission" params="muscletrans prefix joint_prefix link_prefix" >
 
    <!-- muscle hand -->
     <xacro:if value="${muscletrans}">
-      <transmission type="sr_mechanism_model/SimpleTransmissionForMuscle" name="${prefix}proximal_transmission">
+      <transmission type="sr_mechanism_model/SimpleTransmissionForMuscle" name="${prefix}${link_prefix}proximal_transmission">
       <actuator name="${prefix}${joint_prefix}J3" />
       <joint name="${prefix}${joint_prefix}J3" />
         <mechanicalReduction>1</mechanicalReduction>
@@ -20,7 +22,7 @@
     </xacro:if> 
     <!-- motor hand -->
     <xacro:unless value="${muscletrans}">
-      <transmission type="sr_mechanism_model/SimpleTransmission" name="${prefix}proximal_transmission">
+      <transmission type="sr_mechanism_model/SimpleTransmission" name="${prefix}${link_prefix}proximal_transmission">
       <actuator name="${prefix}${joint_prefix}J3" />
       <joint name="${prefix}${joint_prefix}J3" />
         <mechanicalReduction>1</mechanicalReduction>
