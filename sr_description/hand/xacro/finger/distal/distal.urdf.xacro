@@ -35,7 +35,7 @@
           <xacro:unless value="${ubi}">
             <!-- Ellispoid distal  -->
             <xacro:if value="${eli}">
-							<mesh filename="package://sr_description/hand/model/distal_ellipsoid_visual.dae" scale="0.001 0.001 0.001" />
+							<mesh filename="package://sr_description/hand/model/ellipsoids/distal_ellipsoid_visual.dae" scale="0.001 0.001 0.001" />
             </xacro:if> 
             <!-- Check for biotac distal -->
             <xacro:unless value="${eli}">
@@ -63,7 +63,7 @@
           <xacro:unless value="${ubi}">
             <!-- Ellispoid distal  -->
             <xacro:if value="${eli}">
-               <mesh filename="package://sr_description/hand/model/distal_ellipsoid.dae" scale="0.001 0.001 0.001" />
+               <mesh filename="package://sr_description/hand/model/ellipsoids/distal_ellipsoid.dae" scale="0.001 0.001 0.001" />
             </xacro:if> 
             <!-- Check for biotac distal -->
             <xacro:unless value="${eli}">

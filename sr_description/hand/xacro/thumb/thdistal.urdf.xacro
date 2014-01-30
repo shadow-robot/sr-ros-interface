@@ -126,7 +126,7 @@
 					<geometry name="${prefix}thdistal_visual">
 						<!-- Ellispoid distal  -->
 						<xacro:if value="${eli}">
-							<mesh filename="package://sr_description/hand/model/thdistal_ellipsoid_visual.dae" scale="0.001 0.001 0.001" />
+							<mesh filename="package://sr_description/hand/model/ellipsoids/thdistal_ellipsoid_visual.dae" scale="0.001 0.001 0.001" />
 						</xacro:if> 
 						<!-- Check for uni distal -->
 						<xacro:unless value="${eli}">
@@ -149,7 +149,7 @@
 					<geometry name="${prefix}thmiddle_collision_geom">
 					<!-- Ellispoid distal  -->
 						<xacro:if value="${eli}">
-						  <mesh filename="package://sr_description/hand/model/thdistal_ellipsoid.dae" scale="0.001 0.001 0.001" />
+						  <mesh filename="package://sr_description/hand/model/ellipsoids/thdistal_ellipsoid.dae" scale="0.001 0.001 0.001" />
 						</xacro:if> 
 						<!-- Check for uni distal -->
 						<xacro:unless value="${eli}">
