@@ -15,11 +15,11 @@
         <geometry name="${prefix}forearm_visual">
           
           <xacro:if value="${muscle}">
-          <mesh filename="package://agni_description/shadow/meshes/forearm_muscle.dae" 
+          <mesh filename="package://sr_description/hand/model/forearm_muscle.dae" 
             scale="1.0 1.0 1.0"/>
           </xacro:if> 
           <xacro:unless value="${muscle}">
-             <mesh filename="package://agni_description/shadow/meshes/forearm.dae" 
+             <mesh filename="package://sr_description/hand/model/forearm.dae" 
              scale="0.001 0.001 0.001"/>
           </xacro:unless> 
           
