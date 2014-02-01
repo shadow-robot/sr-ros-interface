@@ -32,11 +32,14 @@ namespace shadow_robot
 {
   const double SrSelfTest::MAX_MSE_CONST_ = 0.18;
 
-  SrSelfTest::SrSelfTest(bool simulated)
+  SrSelfTest::SrSelfTest(bool simulated, std::string name_space)
     : nh_tilde_("~")
   {
     simulated_ = simulated;
-    
+    ns_=name_space;
+    if (ns_!="")
+			ns_="/"+ns_;
+			
     std::string home = getenv("HOME");
 		if (home=="")
         home="/tmp";
@@ -90,12 +93,12 @@ namespace shadow_robot
   void SrSelfTest::test_services_()
   {
     std::vector<std::string> services_to_test;
-    services_to_test.push_back("pr2_controller_manager/list_controller_types");
-    services_to_test.push_back("pr2_controller_manager/list_controllers");
-    services_to_test.push_back("pr2_controller_manager/load_controller");
-    services_to_test.push_back("pr2_controller_manager/reload_controller_libraries");
-    services_to_test.push_back("pr2_controller_manager/switch_controller");
-    services_to_test.push_back("pr2_controller_manager/unload_controller");
+    services_to_test.push_back(ns_+"pr2_controller_manager/list_controller_types");
+    services_to_test.push_back(ns_+"pr2_controller_manager/list_controllers");
+    services_to_test.push_back(ns_+"pr2_controller_manager/load_controller");
+    services_to_test.push_back(ns_+"pr2_controller_manager/reload_controller_libraries");
+    services_to_test.push_back(ns_+"pr2_controller_manager/switch_controller");
+    services_to_test.push_back(ns_+"pr2_controller_manager/unload_controller");
 
     test_runner_.addServicesTest(services_to_test);
   }
@@ -108,7 +111,7 @@ namespace shadow_robot
     if(simulated_)
     {
       if( hand_commander_ == NULL )
-        hand_commander_.reset(new shadowrobot::HandCommander());
+        hand_commander_.reset(new shadowrobot::HandCommander(ns_));
 
       joints_to_test_ = hand_commander_->get_all_joints();
     }
@@ -163,7 +166,7 @@ namespace shadow_robot
   void SrSelfTest::test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
     if( hand_commander_ == NULL )
-      hand_commander_.reset(new shadowrobot::HandCommander());
+      hand_commander_.reset(new shadowrobot::HandCommander(ns_));
 
     if(index_joints_to_test_ == 0)
     {
