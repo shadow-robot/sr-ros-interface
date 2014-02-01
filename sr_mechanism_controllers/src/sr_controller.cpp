@@ -101,11 +101,14 @@ namespace controller {
 
   void SrController::get_min_max( urdf::Model model, std::string joint_name )
   {
-    if( joint_name.substr(3,1).compare("0") == 0)
+		size_t posJ0str = 0;
+		if((posJ0str=joint_name.find("J0"))!=std::string::npos)
     {
-      std::string j1 = joint_name.substr(0,3) + "1";
-      std::string j2 = joint_name.substr(0,3) + "2";
-
+      std::string j1(joint_name);
+      j1.replace (posJ0str, 2, "J1");  
+      std::string j2(joint_name);
+      j2.replace (posJ0str, 2, "J2");  
+		
       boost::shared_ptr<const urdf::Joint> joint1 = model.getJoint( j1 );
       boost::shared_ptr<const urdf::Joint> joint2 = model.getJoint( j2 );
 
