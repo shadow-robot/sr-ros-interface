@@ -22,5 +22,7 @@ install(TARGETS sr_mechanism_model
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.hpp"
 )
+
+install(FILES transmission_plugin.xml
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
