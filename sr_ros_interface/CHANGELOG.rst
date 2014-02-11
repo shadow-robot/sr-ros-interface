@@ -2,6 +2,10 @@
 Changelog for package sr_ros_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* first hydro release
+
 1.2.0 (2013-12-19)
 ------------------
 * Port to hydro with catkin
