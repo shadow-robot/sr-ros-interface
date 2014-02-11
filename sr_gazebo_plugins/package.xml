@@ -2,11 +2,13 @@
   <name>sr_gazebo_plugins</name>
   <version>1.2.0</version>
   <description>Gazebo Plugins for various Shadow Robot-specific sensors and actuators on the robot.</description>
-  <maintainer email="software@shadowrobot.com">adapted by Ugo(software@shadowrobot.com)</maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/pr2_gazebo_plugins</url>
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
   <author>adapted by Ugo(software@shadowrobot.com)</author>
   <author>Sachin Chitta</author>

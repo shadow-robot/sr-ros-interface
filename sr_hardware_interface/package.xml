@@ -2,13 +2,15 @@
   <name>sr_hardware_interface</name>
   <version>1.2.0</version>
   <description>This package contains the actuator used in the hand model.</description>
-  <maintainer email="software@shadowrobot.com">Ugo Cupcic </maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/sr_hardware_interface</url>
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
-  <author email="software@shadowrobot.com">Ugo Cupcic </author>
+  <author>Ugo Cupcic</author>
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>

@@ -5,14 +5,15 @@
      contains both an interface to the real hand (communicating via
      a CAN interface) and a simulated version of the hand. It also
      contains an interface to Shadow Robot's muscle arm.</description>
-  <maintainer email="software@shadowrobot.com">Ugo Cupcic </maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://www.shadowrobot.com</url>
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
-  <author email="software@shadowrobot.com">Ugo Cupcic </author>
-  <author>contact@shadowrobot.com</author>
+  <author>Ugo Cupcic</author>
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>

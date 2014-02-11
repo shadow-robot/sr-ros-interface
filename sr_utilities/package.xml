@@ -2,11 +2,13 @@
   <name>sr_utilities</name>
   <version>1.2.0</version>
   <description>sr_utilities contains different useful header libraries (math libraries, etc...).</description>
-  <maintainer email="software@shadowrobot.com">Ugo Cupcic</maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_utilities</url>
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
   <author>Ugo Cupcic</author>
 
