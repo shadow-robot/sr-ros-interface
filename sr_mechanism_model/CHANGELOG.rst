@@ -2,8 +2,8 @@
 Changelog for package sr_mechanism_model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.0 (2014-02-11)
+------------------
 * fixed sr_kinematics
 * modified how library dependencies are forwarded
 * used world files from sr_grasp_stabilization. resolved deprecation messages
