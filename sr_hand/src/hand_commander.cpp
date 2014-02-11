@@ -38,7 +38,8 @@ namespace shadowrobot
 
   const double HandCommander::TIMEOUT_TO_DETECT_CONTROLLER_MANAGER = 3.0;
 
-  HandCommander::HandCommander():
+  HandCommander::HandCommander(const std::string& ns):
+    node_(ns),
     hand_type(shadowhandRosLib::UNKNOWN),
     ethercat_controllers_found(false)
   {
@@ -62,7 +63,8 @@ namespace shadowrobot
     all_joints = robot_model.joints_;
 
     //We use the presence of the pr2_controller_manager/list_controllers service to detect that the hand is ethercat
-    if(ros::service::waitForService("pr2_controller_manager/list_controllers", ros::Duration(TIMEOUT_TO_DETECT_CONTROLLER_MANAGER)))
+    //We look for the manager in the robots namespace (that of node_ not the process).
+    if(ros::service::waitForService(node_.getNamespace() + "/pr2_controller_manager/list_controllers", ros::Duration(TIMEOUT_TO_DETECT_CONTROLLER_MANAGER)))
     {
       hand_type = shadowhandRosLib::ETHERCAT;
       initializeEthercatHand();

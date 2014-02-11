@@ -32,10 +32,17 @@ namespace shadow_robot
 {
   const double SrSelfTest::MAX_MSE_CONST_ = 0.18;
 
-  SrSelfTest::SrSelfTest(bool simulated)
-    : nh_tilde_("~")
+  SrSelfTest::SrSelfTest(bool simulated, const std::string& ns)
+    : nh_()
+    , nh_tilde_("~")
   {
     simulated_ = simulated;
+    if (ns != "")
+    {
+      // Private handle for params but normal handle for the HandCommander
+      nh_ = NodeHandle(ns);
+      nh_tilde_ = NodeHandle(nh_, this_node::getName());
+    }
 
     //rename existing folder if it exists
     if( boost::filesystem::exists("/tmp/self_tests") )
@@ -104,7 +111,7 @@ namespace shadow_robot
     if(simulated_)
     {
       if( hand_commander_ == NULL )
-        hand_commander_.reset(new shadowrobot::HandCommander());
+        hand_commander_.reset(new shadowrobot::HandCommander(nh_.getNamespace()));
 
       joints_to_test_ = hand_commander_->get_all_joints();
     }
@@ -159,7 +166,7 @@ namespace shadow_robot
   void SrSelfTest::test_movement_(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
     if( hand_commander_ == NULL )
-      hand_commander_.reset(new shadowrobot::HandCommander());
+      hand_commander_.reset(new shadowrobot::HandCommander(nh_.getNamespace()));
 
     if(index_joints_to_test_ == 0)
     {

@@ -60,7 +60,7 @@ namespace shadowrobot
   class HandCommander
   {
   public:
-    HandCommander();
+    HandCommander(const std::string& ns = "");
 
     /// Destructor
     ~HandCommander();
