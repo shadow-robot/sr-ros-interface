@@ -54,7 +54,7 @@ namespace shadowrobot
       node_.param("robot_description", robot_desc_string, std::string());
       if (!robot_model.initString(robot_desc_string))
       {
-        ROS_ERROR("Couldn't parse the urdf file on sh_description or on robot_description.");
+        ROS_ERROR_STREAM("Couldn't parse the urdf file on sh_description or on robot_description (ns=" << node_.getNamespace() << ")");
         return;
       }
     }
