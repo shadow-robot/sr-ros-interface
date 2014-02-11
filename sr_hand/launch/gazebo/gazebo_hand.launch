@@ -3,18 +3,20 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find sr_description)/other/worlds/shadowhand.world"/>
   </include>
-  
-  <include file="$(find sr_description)/loaders/load_hand_model_robot_description.launch"/>
 
-  <node name="spawn_hand" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -z 0.01 -model shadow_model" respawn="false" output="screen" />
+  <group ns="rh">
+      <include file="$(find sr_description)/loaders/load_hand_model_robot_description.launch">
+      </include>
 
-  <!-- Controllers for the hand -->
-  <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
+      <node name="spawn_hand" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -z 0.01 -model shadow_model" respawn="false" output="screen" />
 
-  <node pkg="robot_state_publisher" type="state_publisher"
-        name="robot_state_publisher_full_pos">
-    <remap from="joint_states" to="gazebo/joint_states" />
-    <param name="publish_frequency" type="double" value="20.0" />
-  </node>
+      <!-- Controllers for the hand -->
+      <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
+
+      <node pkg="robot_state_publisher" type="state_publisher"
+            name="robot_state_publisher_full_pos">
+        <param name="publish_frequency" type="double" value="20.0" />
+      </node>
+  </group>
 
 </launch>
