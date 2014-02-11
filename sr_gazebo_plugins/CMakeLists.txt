@@ -50,5 +50,4 @@ install(TARGETS sr_gazebo_ros_controller_manager
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.hpp"
 )

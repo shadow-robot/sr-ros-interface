@@ -39,3 +39,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(TARGETS sr_calibration
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
+
+install(PROGRAMS nodes/temperature_monitor.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

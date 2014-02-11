@@ -75,5 +75,14 @@ install(TARGETS joint_trajectory_action_controller joint_spline_trajectory_actio
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+install(DIRECTORY example/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.hpp"
 )
+
+install(FILES controller_plugins.xml
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+

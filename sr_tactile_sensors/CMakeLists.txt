@@ -87,7 +87,15 @@ else(gazebo_support)
   )
 endif(gazebo_support)
 
+
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.hpp"
 )
+
+install(DIRECTORY params/
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/params)
+
+install(DIRECTORY launch/
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+
