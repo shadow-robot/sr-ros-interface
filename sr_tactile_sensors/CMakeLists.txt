@@ -1,20 +1,16 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_tactile_sensors)
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_ros rviz)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_ros)
 find_package(gazebo REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
 catkin_python_setup()
 
 #Gazebo
-set(gazebo_support $ENV{GAZEBO})
 message("--------- Shadow Robot Tactiles Package Configuration:")
-if(gazebo_support)
-  set( CMAKE_CXX_FLAGS "-D GAZEBO")
-  message(" [x] Gazebo support")
-else(gazebo_support)
-  message(" [ ] Gazebo support")
-endif(gazebo_support)
+set( CMAKE_CXX_FLAGS "-D GAZEBO")
+message(" [x] Gazebo support")
+
 
 # Real Hand
 set(real_hand $ENV{REAL_HAND})
@@ -30,11 +26,11 @@ endif(real_hand)
 add_executable(sr_tactile_virtual src/sr_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
 add_dependencies(sr_tactile_virtual src ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_tactile_virtual ${Boost_LIBRARIES} ${catkin_LIBRARIES})
-if(gazebo_support)
-  add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
-  add_dependencies(sr_tactile_virtual_gazebo ${catkin_EXPORTED_TARGETS})
-  target_link_libraries(sr_tactile_virtual_gazebo ${Boost_LIBRARIES} ${catkin_LIBRARIES})
-endif(gazebo_support)
+
+add_executable(sr_tactile_virtual_gazebo src/sr_gazebo_virtual_tactile_sensor.cpp src/sr_generic_tactile_sensor.cpp)
+add_dependencies(sr_tactile_virtual_gazebo ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sr_tactile_virtual_gazebo ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+
 
 #############################
 #   REAL TACTILE SENSORS    #
@@ -75,18 +71,10 @@ catkin_package(
     LIBRARIES
 )
 
-if(gazebo_support)
-  install(TARGETS sr_tactile_virtual sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example sr_tactile_virtual_gazebo
+install(TARGETS sr_tactile_virtual sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example sr_tactile_virtual_gazebo
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
-else(gazebo_support)
-  install(TARGETS sr_tactile_virtual sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
-endif(gazebo_support)
-
+)
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
