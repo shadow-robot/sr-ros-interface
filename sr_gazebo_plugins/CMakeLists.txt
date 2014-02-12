@@ -6,12 +6,11 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_ms
   pr2_mechanism_model urdf dynamic_reconfigure sr_hardware_interface sr_self_test cmake_modules)
 find_package(TinyXML REQUIRED)
 find_package(PkgConfig)
-find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 find_package(gazebo REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread)
 
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
+  ${Boost_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
 add_definitions(-fPIC -DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
 

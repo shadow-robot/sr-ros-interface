@@ -20,7 +20,7 @@ add_dependencies(sr_movement ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_movement ${ImageMagick_LIBRARIES} ${catkin_LIBRARIES})
 
 catkin_package(
-    DEPENDS
+    DEPENDS ImageMagick
     CATKIN_DEPENDS pr2_controllers_msgs sr_robot_msgs std_msgs sensor_msgs sr_utilities roscpp sr_hand 
     INCLUDE_DIRS include
     LIBRARIES sr_movement
