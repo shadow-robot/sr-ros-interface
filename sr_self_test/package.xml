@@ -32,5 +32,6 @@
   <run_depend>sr_robot_msgs</run_depend>
   
   <test_depend>gtest</test_depend>
+  <test_depend>gnuplot</test_depend>
 
 </package>

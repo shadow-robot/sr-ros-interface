@@ -9,10 +9,6 @@ add_library(sr_self_test src/sr_self_test.cpp src/sr_test_runner.cpp src/test_jo
 add_dependencies(sr_self_test ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
 
-add_executable(test_self_test test/test_self_test.cpp)
-add_dependencies(test_self_test ${catkin_EXPORTED_TARGETS})
-target_link_libraries(test_self_test sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
-
 catkin_package(
     DEPENDS
     CATKIN_DEPENDS roscpp self_test sr_hand sr_movements sr_robot_msgs
@@ -20,7 +16,11 @@ catkin_package(
     LIBRARIES sr_self_test
 )
 
-add_rostest(test/sr_self_test.test)
+if(COMMAND add_rostest_gtest)
+  add_rostest_gtest(sr_self_test_test test/sr_self_test.test test/test_self_test.cpp)
+  add_dependencies(sr_self_test_test ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(sr_self_test_test  sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+endif(COMMAND add_rostest_gtest)
 
 
 install(TARGETS sr_self_test

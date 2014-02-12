@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 
-import roslib; roslib.load_manifest("sr_self_test")
 import rospy
 from sr_robot_msgs.srv import ManualSelfTest, ManualSelfTestResponse
 
