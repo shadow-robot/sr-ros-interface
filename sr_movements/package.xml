@@ -25,7 +25,6 @@
   <build_depend>roscpp</build_depend>
   <build_depend>sr_hand</build_depend>
   <build_depend>rostest</build_depend>
-  <build_depend>imagemagick</build_depend>
   <build_depend>libmagick</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
@@ -36,7 +35,6 @@
   <run_depend>sr_utilities</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sr_hand</run_depend>
-  <run_depend>imagemagick</run_depend>
   <run_depend>libmagick</run_depend>
 
 </package>
