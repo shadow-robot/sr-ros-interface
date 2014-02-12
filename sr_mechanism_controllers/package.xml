@@ -62,7 +62,6 @@
 
   <!-- Dependencies needed only for running tests. -->
   <test_depend>gtest</test_depend>
-  <test_depend>tinyxml</test_depend>
 
 <export>
     <pr2_controller_interface plugin="${prefix}/controller_plugins.xml"/>
