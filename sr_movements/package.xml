@@ -26,7 +26,7 @@
   <build_depend>sr_hand</build_depend>
   <build_depend>rostest</build_depend>
   <build_depend>imagemagick</build_depend>
-  <build_depend>libmagick++-dev</build_depend>
+  <build_depend>libmagick</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>pr2_controllers_msgs</run_depend>
@@ -37,5 +37,6 @@
   <run_depend>roscpp</run_depend>
   <run_depend>sr_hand</run_depend>
   <run_depend>imagemagick</run_depend>
+  <run_depend>libmagick</run_depend>
 
 </package>
