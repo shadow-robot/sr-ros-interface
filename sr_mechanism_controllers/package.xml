@@ -37,6 +37,7 @@
   <build_depend>sr_hardware_interface</build_depend>
   <build_depend>xmlrpcpp</build_depend>
   <build_depend>rostest</build_depend>
+  <build_depend>cmake_modules</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>std_msgs</run_depend>
@@ -60,6 +61,7 @@
 
   <!-- Dependencies needed only for running tests. -->
   <test_depend>gtest</test_depend>
+  <test_depend>tinyxml</test_depend>
 
 <export>
     <pr2_controller_interface plugin="${prefix}/controller_plugins.xml"/>

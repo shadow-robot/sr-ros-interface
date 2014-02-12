@@ -37,6 +37,8 @@
   <build_depend>urdf</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>sr_self_test</build_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>tinyxml</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>gazebo_ros</run_depend>
@@ -57,6 +59,7 @@
   <run_depend>urdf</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>sr_self_test</run_depend>
+  <run_depend>tinyxml</run_depend>
 
 <export>
     <gazebo plugin_path="${prefix}/lib"/>

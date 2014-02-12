@@ -21,12 +21,14 @@
   <build_depend>roscpp</build_depend>
   <build_depend>sr_hardware_interface</build_depend>
   <build_depend>pr2_mechanism_model</build_depend>
+  <build_depend>cmake_modules</build_depend>
   <build_depend>tinyxml</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
   <run_depend>sr_hardware_interface</run_depend>
   <run_depend>pr2_mechanism_model</run_depend>
+  <run_depend>tinyxml</run_depend>
 
 <export>
     <pr2_mechanism_model plugin="${prefix}/transmission_plugin.xml"/>
