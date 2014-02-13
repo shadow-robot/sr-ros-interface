@@ -54,7 +54,7 @@ namespace sr_math_utils
   /**
    * Convert an angle in degrees to an angle in degrees.
    *
-   * @param degrees the value in radians.
+   * @param rad the value in radians.
    *
    * @return the value in degrees.
    */
@@ -104,16 +104,16 @@ namespace sr_math_utils
   static inline uint64_t counter_with_overflow(uint64_t full_value, uint16_t new_value)
   {
     uint16_t last_value = full_value &    0xFFFF;       // Split the full value into the lower part
-    full_value   &= (uint64_t)0xFFFFFFFFFFFF0000LL;     // and the overflow part 
-    
+    full_value   &= (uint64_t)0xFFFFFFFFFFFF0000LL;     // and the overflow part
+
     if( new_value < last_value)                         // if we overflowed
       full_value += (uint64_t)0x0000000000010000LL;     // then count the overflow
-    
+
     full_value   |= (uint64_t)new_value;                // replace the bottom 16 bits with their new value
-    
+
     return full_value;
   }
-    
+
 
   /**
    * Interpolate linearly between the 2 points, for the given value
@@ -166,7 +166,7 @@ namespace sr_math_utils
     {
     public:
       LowPassFilter(double tau= 0.05)
-	: is_first(true), dt(0.0), 
+	: is_first(true), dt(0.0),
 	  timestamp_1(0.0), q_prev(0.0)
       {
 	this->tau = tau;
@@ -209,7 +209,7 @@ namespace sr_math_utils
 
         return value_derivative;
       };
-      
+
     private:
       bool is_first;
       double tau, dt, timestamp_1, q_prev;
