@@ -62,7 +62,7 @@ namespace controller
     /*!
      * \brief Give set position of the joint for next update: revolute (angle) and prismatic (position)
      *
-     * \param command
+     * \param cmd the received angle
      */
     void setCommand(double cmd);
     virtual void setCommandCB(const std_msgs::Float64ConstPtr& msg);

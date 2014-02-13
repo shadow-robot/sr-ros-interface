@@ -39,11 +39,11 @@ static const std::string FK_INFO_SERVICE = "get_fk_solver_info";
     }
     //ROS_DEBUG("Discriminant: %f\n",discriminant);
     if (discriminant >= 0)
-    {      
-      *x1 = (-b + sqrt(discriminant))/(2*a); 
+    {
+      *x1 = (-b + sqrt(discriminant))/(2*a);
       *x2 = (-b - sqrt(discriminant))/(2*a);
       return true;
-    } 
+    }
     else if(fabs(discriminant) < IK_EPS)
     {
       *x1 = -b/(2*a);
@@ -95,32 +95,32 @@ class Kinematics {
 
         /**
          * @brief This is the basic IK service method that will compute and return an IK solution.
-         * @param A request message. See service definition for GetPositionIK for more information on this message.
-         * @param The response message. See service definition for GetPositionIK for more information on this message.
+         * @param request message. See service definition for GetPositionIK for more information on this message.
+         * @param response message. See service definition for GetPositionIK for more information on this message.
          */
         bool getPositionIK(kinematics_msgs::GetPositionIK::Request &request,
                            kinematics_msgs::GetPositionIK::Response &response);
 
         /**
          * @brief This is the basic kinematics info service that will return information about the kinematics node.
-         * @param A request message. See service definition for GetKinematicSolverInfo for more information on this message.
-         * @param The response message. See service definition for GetKinematicSolverInfo for more information on this message.
+         * @param request message. See service definition for GetKinematicSolverInfo for more information on this message.
+         * @param response message. See service definition for GetKinematicSolverInfo for more information on this message.
          */
         bool getIKSolverInfo(kinematics_msgs::GetKinematicSolverInfo::Request &request,
                              kinematics_msgs::GetKinematicSolverInfo::Response &response);
 
         /**
          * @brief This is the basic kinematics info service that will return information about the kinematics node.
-         * @param A request message. See service definition for GetKinematicSolverInfo for more information on this message.
-         * @param The response message. See service definition for GetKinematicSolverInfo for more information on this message.
+         * @param request message. See service definition for GetKinematicSolverInfo for more information on this message.
+         * @param response message. See service definition for GetKinematicSolverInfo for more information on this message.
          */
         bool getFKSolverInfo(kinematics_msgs::GetKinematicSolverInfo::Request &request,
                              kinematics_msgs::GetKinematicSolverInfo::Response &response);
 
         /**
          * @brief This is the basic forward kinematics service that will return information about the kinematics node.
-         * @param A request message. See service definition for GetPositionFK for more information on this message.
-         * @param The response message. See service definition for GetPositionFK for more information on this message.
+         * @param request message. See service definition for GetPositionFK for more information on this message.
+         * @param response message. See service definition for GetPositionFK for more information on this message.
          */
         bool getPositionFK(kinematics_msgs::GetPositionFK::Request &request,
                            kinematics_msgs::GetPositionFK::Response &response);
@@ -167,7 +167,7 @@ bool Kinematics::init() {
 		ROS_INFO("Computing LF IK not considering J5");
 		J5_idx_offset=1;
 	}
-	else	
+	else
 		J5_idx_offset=0;
 
 
@@ -175,7 +175,7 @@ bool Kinematics::init() {
 		ROS_FATAL("Current solver cannot resolve to the thdistal frame");
 		return false;
 	}
-    
+
 	finger_base_name=tip_name.substr(0,2);
 	finger_base_name.append("knuckle");
     ROS_INFO("base_finger name %s",finger_base_name.c_str());
@@ -245,11 +245,11 @@ bool Kinematics::readJoints(urdf::Model &robot_model) {
 			if(link->getParent()->name=="palm") // FF,MF,RF
 			{
 				link_offset.push_back(link->parent_joint->parent_to_joint_origin_transform);
-				link_offset_name.push_back(link->name);	
+				link_offset_name.push_back(link->name);
 				knuckle_axis.push_back(link->parent_joint->axis);
 			}
 			else // LF
-			{	
+			{
 				//temp store the first offset
 				urdf::Pose first_offset = link->parent_joint->parent_to_joint_origin_transform;
 				std::string link_name = link->name;
@@ -353,7 +353,7 @@ int Kinematics::getJointIndex(const std::string &name) {
 }
 
 int Kinematics::getKDLSegmentIndex(const std::string &name) {
-    int i=0; 
+    int i=0;
     while (i < (int)chain.getNrOfSegments()) {
         if (chain.getSegment(i).getName() == name) {
             return i+1;
@@ -371,7 +371,7 @@ bool Kinematics::getPositionIK(kinematics_msgs::GetPositionIK::Request &request,
 	point_msg_in.header.frame_id = request.ik_request.pose_stamped.header.frame_id;
 	point_msg_in.header.stamp = ros::Time::now()-ros::Duration(1);
 	point_msg_in.point=request.ik_request.pose_stamped.pose.position;
-	
+
 	tf::Stamped<tf::Point> transform;
 	tf::Stamped<tf::Point> transform_root;
     tf::Stamped<tf::Point> transform_finger_base;
@@ -382,7 +382,7 @@ bool Kinematics::getPositionIK(kinematics_msgs::GetPositionIK::Request &request,
 	float J4_dir;
    	tf::Point p; //local req_point coordinates
 	tf::Point pbis; //with different coordinate system
-	
+
 	// IK computation variables
 	double l1=length_proximal,l2=length_middle;
 	double L=0.0;
@@ -390,14 +390,14 @@ bool Kinematics::getPositionIK(kinematics_msgs::GetPositionIK::Request &request,
 	double thetap,thetam,l2p;
 	double alpha2;
     float b,c,delta=0.01;
-  
+
     //Do the IK
     KDL::JntArray jnt_pos_in;
     KDL::JntArray jnt_pos_out;
     jnt_pos_in.resize(num_joints);
-	jnt_pos_out.resize(num_joints); 
+	jnt_pos_out.resize(num_joints);
 
-    //Convert F to our root_frame	
+    //Convert F to our root_frame
 	ROS_DEBUG("sr_kin: Get point in root frame");
     try {
         tf_listener.transformPoint(root_name, transform, transform_root);
@@ -426,17 +426,17 @@ bool Kinematics::getPositionIK(kinematics_msgs::GetPositionIK::Request &request,
 	p.setValue(-knuckle_offset.position.x,-knuckle_offset.position.y,-knuckle_offset.position.z);
 	p+=transform_root;
     ROS_DEBUG("x,y,z:%f,%f,%f",p.x(),p.y(),p.z());
-    
+
 	// Change frame to the one where maths have been done :-)
     pbis=p;
     pbis.setValue(p.z(),p.x(),-p.y());
 	ROS_DEBUG("p2bis %f,%f,%f",pbis.x(),pbis.y(),pbis.z());
-	
-	// because J4 are not the same direction for each finger 
+
+	// because J4 are not the same direction for each finger
 	// we need to change it according to knuckle axis direction
 	ROS_DEBUG("sr_kin: Compute J4");
 	J4_dir=J4_axis.y>0?1.0:-1.0;
-	
+
 	jnt_pos_out(0)=0; //to solve the case of LF;
 	if(fabs(pbis.x())-epsilon>0.0){
             jnt_pos_out(0+J5_idx_offset)=J4_dir*atan( pbis.y()/pbis.x());
@@ -526,7 +526,7 @@ bool Kinematics::getPositionIK(kinematics_msgs::GetPositionIK::Request &request,
             return 0;
         }
     }
-	
+
     int ik_valid = 1;
 
     if (ik_valid >= 0) {
@@ -615,4 +615,3 @@ int main(int argc, char **argv) {
     ros::spin();
     return 0;
 }
-

@@ -1,5 +1,5 @@
 /**
- * @file   CAN_compatibility_hand.hpp
+ * @file   CAN_compatibility_arm.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @author Guillaume Walck (UPMC)
  * @date   Sun Nov 20 2011
