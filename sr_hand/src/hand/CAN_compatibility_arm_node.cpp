@@ -1,5 +1,5 @@
 /**
- * @file   CAN_compatibility_hand_node.cpp
+ * @file   CAN_compatibility_arm_node.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Mon Aug 22 11:17:33 2011
  *
