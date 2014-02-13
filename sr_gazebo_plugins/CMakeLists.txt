@@ -34,7 +34,7 @@ catkin_package(
 
 add_library(sr_gazebo_ros_controller_manager src/gazebo_ros_controller_manager.cpp)
 add_dependencies(sr_gazebo_ros_controller_manager ${catkin_EXPORTED_TARGETS})
-target_link_libraries(sr_gazebo_ros_controller_manager ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES} sr_self_test)
+target_link_libraries(sr_gazebo_ros_controller_manager ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
 
 execute_process(COMMAND glxinfo OUTPUT_VARIABLE glx_out)
 if(${glx_out} EQUAL 0)
