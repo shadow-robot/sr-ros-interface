@@ -1,8 +1,0 @@
-moveit_setup_assistant_config:
-  URDF:
-    package: ""
-    relative_path: /home/liyi/sr_moveit_ws/shadowhand.urdf
-  SRDF:
-    relative_path: config/shadowhand_motor.srdf
-  CONFIG:
-    generated_timestamp: 1391777569
