@@ -33,8 +33,6 @@
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>self_test</build_depend>
   <build_depend>urdf</build_depend>
-  <build_depend>orocos_kdl</build_depend>
-  <build_depend>moveit_core</build_depend>  
   <build_depend>gazebo_ros</build_depend>
   <build_depend>rostest</build_depend>
 
@@ -53,9 +51,8 @@
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>self_test</run_depend>
   <run_depend>urdf</run_depend>
-  <run_depend>orocos_kdl</run_depend>
-  <run_depend>moveit_core</run_depend>
   <run_depend>gazebo_ros</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
 
   <!-- Dependencies needed only for running tests. -->
   <test_depend>gtest</test_depend>
