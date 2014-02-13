@@ -379,3 +379,83 @@ sh_wrj2_mixed_position_velocity_controller:
     p: -20.0
 
 
+
+r_hand_joint_trajectory_controller:
+  type: "sr_mechanism_controllers/JointTrajectoryActionController"
+  joints:
+    - FFJ4
+    - FFJ3
+    - FFJ0
+    - MFJ4
+    - MFJ3
+    - MFJ0
+    - RFJ4
+    - RFJ3
+    - RFJ0
+    - LFJ5
+    - LFJ4
+    - LFJ3
+    - LFJ0
+    - THJ5
+    - THJ4
+    - THJ3
+    - THJ2
+    - THJ1
+  joint_trajectory_action_node:
+    joints:
+    - FFJ4
+    - FFJ3
+    - FFJ0
+    - MFJ4
+    - MFJ3
+    - MFJ0
+    - RFJ4
+    - RFJ3
+    - RFJ0
+    - LFJ5
+    - LFJ4
+    - LFJ3
+    - LFJ0
+    - THJ5
+    - THJ4
+    - THJ3
+    - THJ2
+    - THJ1
+    constraints:
+      goal_time: 30.0
+      FFJ4:
+        goal: 0.1
+      FFJ3:
+        goal: 0.1
+      FFJ0:
+        goal: 0.1
+      MFJ4:
+        goal: 0.1
+      MFJ3:
+        goal: 0.1
+      MFJ0:
+        goal: 0.1
+      RFJ4:
+        goal: 0.1
+      RFJ3:
+        goal: 0.1
+      RFJ0:
+        goal: 0.1
+      LFJ5:
+        goal: 0.1
+      LFJ4:
+        goal: 0.1
+      LFJ3:
+        goal: 0.1
+      LFJ0:
+        goal: 0.1
+      THJ5:
+        goal: 0.1
+      THJ4:
+        goal: 0.1
+      THJ3:
+        goal: 0.1
+      THJ2:
+        goal: 0.1
+      THJ1:
+        goal: 0.1

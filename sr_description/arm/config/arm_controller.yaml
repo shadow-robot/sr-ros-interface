@@ -2,28 +2,28 @@ sa_sr_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ShoulderJRotate
   pid:
-    p: 60.5
-    i: 31.0
+    p: 160.5
+    i: 91.0
     d: 8.0
-    i_clamp: 30
+    i_clamp: 90
 
 sa_ss_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ShoulderJSwing
   pid:
     p: 300.0
-    i: 160.0
-    d: 400.0
-    i_clamp: 90.0
+    i: 100.0
+    d: 150.0
+    i_clamp: 100.0
 
 sa_es_position_controller:
   type: robot_mechanism_controllers/JointPositionController
   joint: ElbowJSwing
   pid:
-    p: 130.0
+    p: 230.0
     i: 150.0
     d: 150.0
-    i_clamp: 90.0
+    i_clamp: 120.0
 
 sa_er_position_controller:
   type: robot_mechanism_controllers/JointPositionController
@@ -50,7 +50,7 @@ r_arm_cartesian_pose_controller:
     i_clamp: 0.2
 
 r_arm_joint_trajectory_controller:
-  type: robot_mechanism_controllers/JointSplineTrajectoryController
+  type: "sr_mechanism_controllers/JointTrajectoryActionController"
   joints:
     - ShoulderJRotate
     - ShoulderJSwing
@@ -58,10 +58,25 @@ r_arm_joint_trajectory_controller:
     - ElbowJRotate
     - WRJ2
     - WRJ1
-  gains:
-    ShoulderJRotate: {p: 140.0, d: 30.0}
-    ShoulderJSwing: {p: 140.0, d: 30.0}
-    ElbowJSwing: {p: 140.0, d: 30.0}
-    ElbowJRotate: {p: 140.0, d: 30.0}
-    WRJ2: {p: 140.0, d: 30.0}
-    WRJ1: {p: 140.0, d: 30.0}
+  joint_trajectory_action_node:
+    joints:
+      - ShoulderJRotate
+      - ShoulderJSwing
+      - ElbowJSwing
+      - ElbowJRotate
+      - WRJ2
+      - WRJ1
+    constraints:
+      goal_time: 30.0
+      ShoulderJRotate:
+        goal: 0.1
+      ShoulderJSwing:
+        goal: 0.1
+      ElbowJSwing:
+        goal: 0.1
+      ElbowJRotate:
+        goal: 0.1
+      WRJ2:
+        goal: 0.1
+      WRJ1:
+        goal: 0.1
