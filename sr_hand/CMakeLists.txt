@@ -8,6 +8,14 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO
 
 catkin_python_setup()
 
+catkin_package(
+    DEPENDS
+    CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs sr_utilities
+      diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_ros robot_state_publisher
+    INCLUDE_DIRS include
+    LIBRARIES HandCommander SrVirtual
+)
+
 ###################
 #  CONFIGURATION  #
 ###################
@@ -141,13 +149,6 @@ add_dependencies(HandCommander ${catkin_EXPORTED_TARGETS})
 target_link_libraries(HandCommander ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
-catkin_package(
-    DEPENDS orocos_kdl
-    CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs sr_utilities
-      diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_ros robot_state_publisher
-    INCLUDE_DIRS include
-    LIBRARIES HandCommander SrVirtual
-)
 
 if(COMMAND add_rostest_gtest)
   add_rostest_gtest(hand_commander_test test/hand_commander_test.test test/hand_commander_test.cpp)

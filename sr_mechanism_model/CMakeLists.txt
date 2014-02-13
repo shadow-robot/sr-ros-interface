@@ -4,17 +4,17 @@ find_package(catkin REQUIRED COMPONENTS roscpp sr_hardware_interface pr2_mechani
 find_package(TinyXML REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
-add_library(sr_mechanism_model src/joint_0_transmission.cpp src/simple_transmission.cpp
-  src/joint_0_transmission_for_muscle.cpp src/simple_transmission_for_muscle.cpp)
-add_dependencies(sr_mechanism_model ${catkin_EXPORTED_TARGETS})
-target_link_libraries(sr_mechanism_model ${TinyXML_LIBRARIES} ${catkin_LIBRARIES})
-
 catkin_package(
     DEPENDS TinyXML
     CATKIN_DEPENDS roscpp sr_hardware_interface pr2_mechanism_model
     INCLUDE_DIRS include
     LIBRARIES sr_mechanism_model
 )
+
+add_library(sr_mechanism_model src/joint_0_transmission.cpp src/simple_transmission.cpp
+  src/joint_0_transmission_for_muscle.cpp src/simple_transmission_for_muscle.cpp)
+add_dependencies(sr_mechanism_model ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sr_mechanism_model ${TinyXML_LIBRARIES} ${catkin_LIBRARIES})
 
 install(TARGETS sr_mechanism_model 
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

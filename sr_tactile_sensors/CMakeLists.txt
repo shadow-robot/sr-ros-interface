@@ -6,6 +6,13 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO
 
 catkin_python_setup()
 
+catkin_package(
+    DEPENDS
+    CATKIN_DEPENDS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_ros
+    INCLUDE_DIRS include
+    LIBRARIES
+)
+
 #Gazebo
 message("--------- Shadow Robot Tactiles Package Configuration:")
 set( CMAKE_CXX_FLAGS "-D GAZEBO")
@@ -64,12 +71,6 @@ add_executable(tactile_example examples/tactile.cpp)
 add_dependencies(tactile_example ${catkin_EXPORTED_TARGETS})
 target_link_libraries(tactile_example ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
-catkin_package(
-    DEPENDS
-    CATKIN_DEPENDS roscpp std_msgs sr_robot_msgs visualization_msgs gazebo_ros
-    INCLUDE_DIRS include
-    LIBRARIES
-)
 
 install(TARGETS sr_tactile_virtual sr_tactile_rviz_marker sr_bumper_rviz_marker tactile_example sr_tactile_virtual_gazebo
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

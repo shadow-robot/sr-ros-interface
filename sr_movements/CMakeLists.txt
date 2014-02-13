@@ -4,6 +4,13 @@ find_package(catkin REQUIRED COMPONENTS pr2_controllers_msgs sr_robot_msgs std_m
 find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${ImageMagick_INCLUDE_DIRS})
 
+catkin_package(
+    DEPENDS ImageMagick
+    CATKIN_DEPENDS pr2_controllers_msgs sr_robot_msgs std_msgs sensor_msgs sr_utilities roscpp sr_hand 
+    INCLUDE_DIRS include
+    LIBRARIES sr_movement
+)
+
 add_executable(sr_movements src/sr_movements.cpp src/movement_from_image.cpp src/partial_movement.cpp src/movement_publisher.cpp)
 add_dependencies(sr_movements ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_movements ${ImageMagick_LIBRARIES} ${catkin_LIBRARIES})
@@ -19,12 +26,6 @@ add_library(sr_movement src/movement_from_image.cpp src/partial_movement.cpp src
 add_dependencies(sr_movement ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_movement ${ImageMagick_LIBRARIES} ${catkin_LIBRARIES})
 
-catkin_package(
-    DEPENDS ImageMagick
-    CATKIN_DEPENDS pr2_controllers_msgs sr_robot_msgs std_msgs sensor_msgs sr_utilities roscpp sr_hand 
-    INCLUDE_DIRS include
-    LIBRARIES sr_movement
-)
 
 install(TARGETS sr_movement sr_movements
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
