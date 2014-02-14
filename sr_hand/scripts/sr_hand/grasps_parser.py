@@ -16,7 +16,7 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 import xml.etree.ElementTree as ET
-from sr_hand.grasp.Grasp import Grasp
+from sr_hand.Grasp import Grasp
 
 DEBUG = 0
 
