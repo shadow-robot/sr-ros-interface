@@ -6,6 +6,14 @@ find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp actionl
 find_package(TinyXML REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
+catkin_package(
+  DEPENDS xmlrpcpp
+  CATKIN_DEPENDS std_msgs std_srvs roscpp actionlib pr2_controllers_msgs sr_robot_msgs sr_utilities pr2_controller_interface pr2_mechanism_model
+    realtime_tools robot_mechanism_controllers pr2_mechanism_controllers pluginlib rosconsole angles control_toolbox sr_hardware_interface
+  INCLUDE_DIRS include
+  LIBRARIES sr_mechanism_controllers
+)
+
 #if you compile with "DEBUG=1 make", some debug data are going to be published
 set(debug $ENV{DEBUG})
 message(" ----- Shadow Robot EtherCAT driver configuration:")
@@ -54,13 +62,6 @@ add_executable(simple_trajectory_compare example/simple_trajectory_compare.cpp)
 add_dependencies(simple_trajectory_compare ${catkin_EXPORTED_TARGETS})
 target_link_libraries(simple_trajectory_compare ${catkin_LIBRARIES})
 
-catkin_package(
-  DEPENDS xmlrpcpp
-  CATKIN_DEPENDS std_msgs std_srvs roscpp actionlib pr2_controllers_msgs sr_robot_msgs sr_utilities pr2_controller_interface pr2_mechanism_model
-    realtime_tools robot_mechanism_controllers pr2_mechanism_controllers pluginlib rosconsole angles control_toolbox sr_hardware_interface
-  INCLUDE_DIRS include
-  LIBRARIES sr_mechanism_controllers
-)
 
 #if(COMMAND add_rostest_gtest)
 #  add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_pos_controller.cpp test/test_controllers.cpp

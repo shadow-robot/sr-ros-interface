@@ -23,18 +23,6 @@ else (${ode_version} VERSION_LESS "0.11.1.71")
   add_definitions(-DODE_SCREW_JOINT)
 endif (${ode_version} VERSION_LESS "0.11.1.71")
 
-
-add_library(sr_gazebo_ros_controller_manager src/gazebo_ros_controller_manager.cpp)
-add_dependencies(sr_gazebo_ros_controller_manager ${catkin_EXPORTED_TARGETS})
-target_link_libraries(sr_gazebo_ros_controller_manager ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES} sr_self_test)
-
-execute_process(COMMAND glxinfo OUTPUT_VARIABLE glx_out)
-if(${glx_out} EQUAL 0)
-  message(STATUS "run test here")
-else(${glx_out} EQUAL 0)
-  message(STATUS "no test here")
-endif(${glx_out} EQUAL 0)
-
 catkin_package(
     DEPENDS python-numpy opende TinyXML
     CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs pr2_msgs geometry_msgs gazebo_ros
@@ -43,6 +31,18 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES 
 )
+
+add_library(sr_gazebo_ros_controller_manager src/gazebo_ros_controller_manager.cpp)
+add_dependencies(sr_gazebo_ros_controller_manager ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sr_gazebo_ros_controller_manager ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
+
+execute_process(COMMAND glxinfo OUTPUT_VARIABLE glx_out)
+if(${glx_out} EQUAL 0)
+  message(STATUS "run test here")
+else(${glx_out} EQUAL 0)
+  message(STATUS "no test here")
+endif(${glx_out} EQUAL 0)
+
 
 install(TARGETS sr_gazebo_ros_controller_manager
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

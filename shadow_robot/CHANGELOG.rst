@@ -1,5 +1,5 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package sr_ros_interface
+Changelog for package shadow_robot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1.3.0 (2014-02-11)
