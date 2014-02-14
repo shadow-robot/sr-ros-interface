@@ -68,13 +68,13 @@ namespace shadowrobot
     {
       hand_type = shadowhandRosLib::ETHERCAT;
       initializeEthercatHand();
-      ROS_INFO("HandCommander library: ETHERCAT hand detected");
+      ROS_INFO_STREAM("HandCommander library: ETHERCAT hand detected in " << node_.getNamespace());
     }
     else
     {
       hand_type = shadowhandRosLib::CAN;
       sr_hand_target_pub = node_.advertise<sr_robot_msgs::sendupdate>("srh/sendupdate", 2);
-      ROS_INFO("HandCommander library: CAN hand detected");
+      ROS_INFO_STREAM("HandCommander library: CAN hand detected in " << node_.getNamespace());
     }
   }
 
@@ -96,8 +96,7 @@ namespace shadowrobot
     {
       if(controller_list.response.state[i]=="running")
       {
-        std::string controller = "/";
-        controller += controller_list.response.controllers[i];
+        std::string controller = node_.resolveName(controller_list.response.controllers[i]);
         if (node_.getParam(controller+"/joint", controlled_joint_name))
         {
           ROS_DEBUG("controller %d:%s controls joint %s\n",
