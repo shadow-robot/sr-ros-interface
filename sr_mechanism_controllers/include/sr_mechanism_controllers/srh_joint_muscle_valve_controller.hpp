@@ -1,5 +1,5 @@
 /**
- * @file   srh_effort_joint_controller.hpp
+ * @file   srh_joint_muscle_valve_controller.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Wed Aug 17 12:32:01 2011
  *

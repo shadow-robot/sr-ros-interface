@@ -1,18 +1,18 @@
 <package>
   <name>sr_ros_interface</name>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
   <description>This stack regroups the different ros interfaces developped for Shadow Robot's
   Hardware. It provides an interface to both simulated and real hardware.</description>
-  <maintainer email="software@shadowrobot.com">Maintained by Ugo Cupcic: software@shadowrobot.com</maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>BSD</license>
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/shadow_robot</url>
-  <!-- <url type="bugtracker"></url> -->
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
-  <author>Maintained by Ugo Cupcic: software@shadowrobot.com</author>
-  <author>contact@shadowrobot.com</author>
+  <author>Ugo Cupcic</author>
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
@@ -21,20 +21,19 @@
 
 
   <!-- Dependencies needed after this package is compiled. -->
-  <run_depend>sr_kinematics</run_depend>
-  <run_depend>sr_mechanism_controllers</run_depend>
-  <run_depend>sr_gazebo_plugins</run_depend>
-  <run_depend>sr_hardware_interface</run_depend>
-  <run_depend>sr_movements</run_depend>
-  <run_depend>sr_mechanism_model</run_depend>
-  <run_depend>sr_robot_msgs</run_depend>
-  <run_depend>sr_example</run_depend>
-  <run_depend>sr_utilities</run_depend>
   <run_depend>sr_description</run_depend>
-  <run_depend>sr_move_arm</run_depend>
-  <run_depend>sr_self_test</run_depend>
+  <run_depend>sr_example</run_depend>
+  <run_depend>sr_gazebo_plugins</run_depend>
   <run_depend>sr_hand</run_depend>
+  <run_depend>sr_hardware_interface</run_depend>
+  <run_depend>sr_mechanism_controllers</run_depend>
+  <run_depend>sr_mechanism_model</run_depend>
+  <run_depend>sr_movements</run_depend>
+  <run_depend>sr_robot_msgs</run_depend>
+  <run_depend>sr_self_test</run_depend>
   <run_depend>sr_tactile_sensors</run_depend>
+  <run_depend>sr_utilities</run_depend>
+  
 
   <!-- Dependencies needed only for running tests. -->
   

@@ -68,6 +68,7 @@ namespace sr_friction_compensation
      * by interpolating those values, one for each direction.
      *
      * @param position the current joint position.
+     * @param velocity the current joint velocity.
      * @param force_demand the force demand is used to know in which direction
      *                     we want to move:
      *                          if > 0 -> forward

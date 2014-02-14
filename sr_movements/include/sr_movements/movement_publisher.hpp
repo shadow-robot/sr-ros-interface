@@ -52,6 +52,7 @@ namespace shadowrobot
      * @param nb_mvt_step number of steps we take in the image
      * @param controller_type the type of controller ("sr" or "pr2")
      * @param testing set to true when running a gazebo test (just adds a long sleep).
+     * @param hand_commander helper for controlling the shadow hand
      */
     MovementPublisher( std::string joint_name, double rate=100.0,
                        unsigned int repetition = 1, unsigned int nb_mvt_step = 1000 ,
@@ -71,7 +72,7 @@ namespace shadowrobot
      * Used to listen to a sr_robot_msgs::JointControllerState
      * and calculate the mean square error of every movement repetition
      *
-     * @msg the current state of the controller.
+     * @param msg the current state of the controller.
      */
     void calculateErrorCallback(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
 
@@ -79,7 +80,7 @@ namespace shadowrobot
      * Used to listen to a pr2_controller_msgs::JointControllerState
      * and calculate the mean square error of every movement repetition
      *
-     * @msg the current state of the controller.
+     * @param msg the current state of the controller.
      */
     void pr2_calculateErrorCallback(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg);
 

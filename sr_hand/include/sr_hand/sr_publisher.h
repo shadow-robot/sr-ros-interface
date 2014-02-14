@@ -2,7 +2,7 @@
  * @file   sr_publisher.h
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Thu Apr 22 10:26:41 2010
- * 
+ *
 *
 * Copyright 2011 Shadow Robot Company Ltd.
 *
@@ -21,13 +21,9 @@
 *
  * @brief  This class reads and publishes data concerning the
  * shadowhand / shadowarm. To publish those data, just call the publish()
- * function. 
- * 
- * 
- */
-
-/** \example ../../examples/shadowhand_subscriber.py
- * This is a python example on how to interact with this ROS publisher to read data published by the hand.
+ * function.
+ *
+ *
  */
 
 #ifndef SHADOWHAND_PUBLISHER_H_
@@ -59,7 +55,7 @@ public:
      * Constructor initializing the ROS node, and setting the topic to which it publishes.
      * The frequency at which this node will publish data is set by a parameter, read from ROS parameter server.
      *
-     * @param sh A Shadowhand or Shadowarm object, where the information to be published comes from.
+     * @param sr_art_robot A Shadowhand or Shadowarm object, where the information to be published comes from.
      */
     SRPublisher( boost::shared_ptr<SRArticulatedRobot> sr_art_robot );
 

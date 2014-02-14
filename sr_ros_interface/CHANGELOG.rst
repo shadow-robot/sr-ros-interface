@@ -2,8 +2,8 @@
 Changelog for package sr_ros_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.0 (2014-02-11)
+------------------
 * first hydro release
 
 1.2.0 (2013-12-19)

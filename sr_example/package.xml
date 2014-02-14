@@ -1,12 +1,14 @@
 <package>
   <name>sr_example</name>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
   <description>sr_example is an example of a real package interfaced with our robot. Please refer to the tutorial Creating a package to interact with our robots.</description>
-  <maintainer email="software@shadowrobot.com">Ugo Cupcic</maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_example</url>
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
   <author>Ugo Cupcic</author>
 
@@ -19,6 +21,7 @@
   <build_depend>sr_robot_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>pr2_controllers_msgs</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
@@ -26,5 +29,6 @@
   <run_depend>sr_robot_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>std_msgs</run_depend>
+  <run_depend>pr2_controllers_msgs</run_depend>
 
 </package>

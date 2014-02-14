@@ -25,10 +25,6 @@
  *
  */
 
-/** \example ../../examples/shadowhand_publisher.py
- * This is a python example on how to interact with this ROS subscriber to send commands to the hand.
- */
-
 #ifndef SHADOWHAND_SUBSCRIBER_H_
 #define SHADOWHAND_SUBSCRIBER_H_
 
@@ -65,7 +61,7 @@ public:
     /**
      * Constructor initializing the ROS node, and setting the topic to which it subscribes.
      *
-     * @param sh A Shadowhand object, where the information to be published comes from.
+     * @param sr_art_robot A Shadowhand object, where the information to be published comes from.
      */
     SRSubscriber( boost::shared_ptr<SRArticulatedRobot> sr_art_robot );
 

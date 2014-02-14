@@ -9,15 +9,16 @@ catkin_python_setup()
 add_service_files(FILES getJointState.srv)
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 
-add_library(sr_calibration src/calibration.cpp)
-add_dependencies(sr_calibration sr_utilities_gencpp ${catkin_EXPORTED_TARGETS})
-
 catkin_package(
     DEPENDS
     CATKIN_DEPENDS sensor_msgs sr_robot_msgs rospy roscpp tf
     INCLUDE_DIRS include
     LIBRARIES sr_calibration
 )
+
+add_library(sr_calibration src/calibration.cpp)
+add_dependencies(sr_calibration sr_utilities_gencpp ${catkin_EXPORTED_TARGETS})
+
 
 catkin_add_gtest(test_calibration test/test_calibration.cpp src/calibration.cpp)
 target_link_libraries(test_calibration ${catkin_LIBRARIES})
