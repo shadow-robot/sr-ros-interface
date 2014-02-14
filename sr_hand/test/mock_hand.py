@@ -47,10 +47,6 @@ if __name__ == "__main__":
         rospy.init_node("mock_hand")
         node = MockHand()
         rospy.spin();
-        #while not rospy.is_shutdown():
-        #    str = "hello world %s" % rospy.get_time()
-        #    rospy.loginfo(str)
-        #    rospy.sleep(1.0)
     except rospy.ROSInterruptException:
         pass
 
