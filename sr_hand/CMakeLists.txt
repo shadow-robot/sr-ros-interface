@@ -180,5 +180,5 @@ install(DIRECTORY examples/
 
 install(DIRECTORY launch/
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
-
-
+   
+install(FILES scripts/sr_hand/grasps.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/sr_hand)
