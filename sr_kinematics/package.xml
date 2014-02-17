@@ -3,7 +3,7 @@
   <version>1.2.0</version>
   <description>A specific shadowhand package derived from arm_kinematics, for computing both forward and backward kinematics for the fingers except thumb.
     Solution is analytic. Developed as an alternative to arm_kinematics that cannot solve coupled joints.</description>
-  <maintainer email="software@shadowrobot.com">Ugo Cupcic</maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>BSD</license>
 
