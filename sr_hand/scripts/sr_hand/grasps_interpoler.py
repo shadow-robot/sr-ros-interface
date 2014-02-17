@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-from sr_hand.grasp.Grasp import Grasp
+from sr_hand.Grasp import Grasp
 
 class GraspInterpoler:
 	def __init__(self, grasp_from, grasp_to="current"):
