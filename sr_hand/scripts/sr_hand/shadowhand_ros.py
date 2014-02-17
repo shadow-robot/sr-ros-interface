@@ -20,7 +20,7 @@ import time
 import os
 import math
 import rospy
-import subprocess
+import rospkg
 import threading
 import rosgraph.masterapi
 import pr2_controllers_msgs.msg
@@ -105,11 +105,8 @@ class ShadowHand_ROS():
         ###
         # Grasps
         self.grasp_parser = GraspParser()
-        process = subprocess.Popen("rospack find sr_hand".split(), stdout=subprocess.PIPE)
-        self.rootPath = process.communicate()[0]
-        self.rootPath = self.rootPath.split('\n')
-        self.rootPath = self.rootPath[0]
-        #print "path : "+self.rootPath
+
+        self.rootPath = rospkg.RosPack().get_path('sr_hand')
         self.grasp_parser.parse_tree(self.rootPath+"/scripts/sr_hand/grasps.xml")
 
         self.grasp_interpoler = 0
