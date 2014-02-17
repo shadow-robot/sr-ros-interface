@@ -14,14 +14,6 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO
 
 add_definitions(-fPIC -DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
 
-# if screw joint exists, remove hack for damping variable
-execute_process(COMMAND ode-config --version OUTPUT_VARIABLE ode_version)
-if (${ode_version} VERSION_LESS "0.11.1.71")
-  message(STATUS "OUTPUT_VARIABLE: ${ode_version} no screw joint")
-else (${ode_version} VERSION_LESS "0.11.1.71")
-  message(STATUS "OUTPUT_VARIABLE: ${ode_version} screw joint exists, removing hack")
-  add_definitions(-DODE_SCREW_JOINT)
-endif (${ode_version} VERSION_LESS "0.11.1.71")
 
 catkin_package(
     DEPENDS python-numpy opende TinyXML
