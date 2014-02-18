@@ -56,7 +56,6 @@ namespace gazebo {
 
 GazeboRosControllerManager::GazeboRosControllerManager()
 {
-  self_test_.reset(new shadow_robot::SrSelfTest(true));
 }
 
 
@@ -159,6 +158,9 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   }
   this->rosnode_ = new ros::NodeHandle(this->robotNamespace);
   ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
+
+  // Use the robots namespace, not gazebos
+  self_test_.reset(new shadow_robot::SrSelfTest(true, this->robotNamespace));
 
   // pr2_etherCAT calls ros::spin(), we'll thread out one spinner here to mimic that
   this->ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );

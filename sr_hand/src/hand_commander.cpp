@@ -38,7 +38,8 @@ namespace shadowrobot
 
   const double HandCommander::TIMEOUT_TO_DETECT_CONTROLLER_MANAGER = 3.0;
 
-  HandCommander::HandCommander():
+  HandCommander::HandCommander(const std::string& ns):
+    node_(ns),
     hand_type(shadowhandRosLib::UNKNOWN),
     ethercat_controllers_found(false)
   {
@@ -54,7 +55,7 @@ namespace shadowrobot
       node_.param("robot_description", robot_desc_string, std::string());
       if (!robot_model.initString(robot_desc_string))
       {
-        ROS_ERROR("Couldn't parse the urdf file on sh_description or on robot_description.");
+        ROS_ERROR_STREAM("Couldn't parse the urdf file on sh_description or on robot_description (namespace=" << node_.getNamespace() << ")");
         return;
       }
     }
@@ -62,17 +63,18 @@ namespace shadowrobot
     all_joints = robot_model.joints_;
 
     //We use the presence of the pr2_controller_manager/list_controllers service to detect that the hand is ethercat
-    if(ros::service::waitForService("pr2_controller_manager/list_controllers", ros::Duration(TIMEOUT_TO_DETECT_CONTROLLER_MANAGER)))
+    //We look for the manager in the robots namespace (that of node_ not the process).
+    if(ros::service::waitForService(node_.getNamespace() + "/pr2_controller_manager/list_controllers", ros::Duration(TIMEOUT_TO_DETECT_CONTROLLER_MANAGER)))
     {
       hand_type = shadowhandRosLib::ETHERCAT;
       initializeEthercatHand();
-      ROS_INFO("HandCommander library: ETHERCAT hand detected");
+      ROS_INFO_STREAM("HandCommander library: ETHERCAT hand detected in " << node_.getNamespace());
     }
     else
     {
       hand_type = shadowhandRosLib::CAN;
       sr_hand_target_pub = node_.advertise<sr_robot_msgs::sendupdate>("srh/sendupdate", 2);
-      ROS_INFO("HandCommander library: CAN hand detected");
+      ROS_INFO_STREAM("HandCommander library: CAN hand detected in " << node_.getNamespace());
     }
   }
 
@@ -94,8 +96,7 @@ namespace shadowrobot
     {
       if(controller_list.response.state[i]=="running")
       {
-        std::string controller = "/";
-        controller += controller_list.response.controllers[i];
+        std::string controller = node_.resolveName(controller_list.response.controllers[i]);
         if (node_.getParam(controller+"/joint", controlled_joint_name))
         {
           ROS_DEBUG("controller %d:%s controls joint %s\n",

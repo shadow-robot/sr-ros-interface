@@ -1,8 +1,15 @@
 <launch>
-  <!-- We reuse the logic in empty_world.launch, changing only the name of the world to be launched -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find sr_description)/other/worlds/shadowhand.world"/>
-  </include>
+  <!-- Gazebo world file to load. -->
+  <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world" />
+
+  <!-- We want gazebo to stay in the root namespace but the nodes below to be
+  relative. Can then launch this inside a namespace to namespace the hand. -->
+  <group ns="/">
+      <!-- We reuse the logic in empty_world.launch, changing only the name of the world to be launched -->
+      <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)"/>
+      </include>
+  </group>
 
   <!-- spawn the support model -->
   <include file="$(find sr_description)/loaders/load_support_model.launch" />

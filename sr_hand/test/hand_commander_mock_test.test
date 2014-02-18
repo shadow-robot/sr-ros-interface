@@ -1,0 +1,12 @@
+<launch>
+
+  <!-- Mock Hand -->
+  <include file="$(find sr_description)/loaders/load_hand_model.launch">
+      <arg name="robot_param" value="sh_description" />
+  </include>
+  <node name="mock_hand" pkg="sr_hand" type="mock_hand.py" output="screen"/>
+  <!-- Controllers for the hand. HandCommander reads these params direct. -->
+  <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
+
+  <test test-name="hand_commander_test" pkg="sr_hand" type="hand_commander_test"/>
+</launch>
