@@ -1,7 +1,7 @@
 <launch>
 
   <!-- Mock Hand -->
-  <include file="$(find sr_description)/loaders/load_hand_model_robot_description.launch">
+  <include file="$(find sr_description)/loaders/load_hand_model.launch">
       <arg name="robot_param" value="sh_description" />
   </include>
   <node name="mock_hand" pkg="sr_hand" type="mock_hand.py" output="screen"/>

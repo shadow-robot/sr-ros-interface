@@ -9,10 +9,10 @@
       properly with that is a pain as it needs robotParam set in the urdf and
       various bits of mapping. The arm uses robot_description as does that arm
       and hand. So we just set both params and stop fighting! -->
-      <include file="$(find sr_description)/loaders/load_hand_model_robot_description.launch">
+      <include file="$(find sr_description)/loaders/load_hand_model.launch">
           <arg name="robot_param" value="sh_description" />
       </include>
-      <include file="$(find sr_description)/loaders/load_hand_model_robot_description.launch">
+      <include file="$(find sr_description)/loaders/load_hand_model.launch">
           <arg name="robot_param" value="robot_description" />
       </include>
 
