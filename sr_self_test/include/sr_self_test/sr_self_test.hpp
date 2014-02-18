@@ -44,7 +44,7 @@ namespace shadow_robot
 {
   class SrSelfTest {
   public:
-    SrSelfTest(bool simulated);
+    SrSelfTest(bool simulated, const std::string& ns = "");
     ~SrSelfTest() {};
 
     void checkTest()
@@ -59,6 +59,7 @@ namespace shadow_robot
 
   private:
     ros::NodeHandle nh_tilde_;
+    ros::NodeHandle nh_;
     // self_test::TestRunner is the handles sequencing driver self-tests.
     shadow_robot::SrTestRunner test_runner_;
     ///The hand commander is used for getting a list of all controlled joints

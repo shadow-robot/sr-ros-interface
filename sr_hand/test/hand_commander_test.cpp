@@ -8,6 +8,7 @@
 // Gtest
 #include <gtest/gtest.h>
 
+using namespace std;
 using namespace shadowrobot;
 
 TEST(HandCommander, constructor)
@@ -20,11 +21,14 @@ TEST(HandCommander, topic_state)
 {
     HandCommander handcmd = HandCommander();
 
+    // get_controller_state_topic returns fully resolved topics
+    ros::NodeHandle nh;
+
     std::string topic = handcmd.get_controller_state_topic("ffj3");
-    EXPECT_EQ("/sh_ffj3_position_controller/state", topic);
+    EXPECT_EQ(nh.resolveName("sh_ffj3_position_controller/state"), topic);
 
     topic = handcmd.get_controller_state_topic("ffj0");
-    EXPECT_EQ("/sh_ffj0_position_controller/state", topic);
+    EXPECT_EQ(nh.resolveName("sh_ffj0_position_controller/state"), topic);
 
     topic = handcmd.get_controller_state_topic("unknown joint");
     EXPECT_EQ("", topic);
