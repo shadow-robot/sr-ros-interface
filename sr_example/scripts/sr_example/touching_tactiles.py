@@ -17,7 +17,8 @@
 #
 # -*- coding: utf-8 -*-
 """
-This is an example showing how to publish command messages to the hand.
+This is an example showing how to get the data from the tactiles. We first touch the first
+finger and the thumb together to create a contact.
 """
 
 
@@ -33,33 +34,29 @@ controller_type = "_position_controller"
 
 def talker():
     """
-    The Publisher publishes two commands to move joint FFJ0 and RFJ0
-
+    The Publisher publishes a few commands to touch the first finger and the thumb
     """
-    joint1 = 'ffj0'
-    joint2 = 'rfj0'
+    joints = ["ffj0", "ffj3", "thj4", "thj5"]
+    #the fingers are touching with the following targets
+    targets = [math.radians(80), #ffj0
+               math.radians(44), #ffj3
+               math.radians(46), #thj4
+               math.radians(48)]  #thj5
 
     #Initalize the ROS node
-    rospy.init_node('shadowhand_command_publisher_python')
+    rospy.init_node('shadowhand_tactile_example_python')
 
-    pub1 = rospy.Publisher('sh_'+ joint1 + controller_type + '/command', Float64, latch=True)
-    pub2 = rospy.Publisher('sh_'+ joint2 + controller_type + '/command', Float64, latch=True)
+    #initializing the publishers we'll use
+    pubs = []
+    for joint in joints:
+        pubs.append( rospy.Publisher('sh_'+ joint + controller_type + '/command', Float64, latch=True) )
 
+    #This will move the first finger and the thumb to touch
+    for pub,target in zip(pubs,targets):
+        print "sending: ",math.degrees(target)
+        pub.publish(target)
 
-    # define a new target value for the joint position.
-    # The position controllers expect their commands in radians
-    new_target_1 = math.radians(0.0)
-    new_target_2 = math.radians(0.0)
-
-    time.sleep(1)
-    print "publishing"
-
-    #This will move the joint ffj0 to the defined target (0 degrees)
-    pub1.publish(new_target_1)
-
-    #This will move the joint rfj0 to the defined target (0 degrees)
-    pub2.publish(new_target_2)
-
+    rospy.spin()
 
 if __name__ == '__main__':
     try:

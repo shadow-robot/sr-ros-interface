@@ -20,15 +20,15 @@ import time
 import os
 import math
 import rospy
-import subprocess
+import rospkg
 import threading
 import rosgraph.masterapi
 import pr2_controllers_msgs.msg
 from sr_robot_msgs.msg import sendupdate, joint, joints_data, JointControllerState
 from sensor_msgs.msg import *
 from std_msgs.msg import Float64
-from sr_hand.grasp.grasps_parser import GraspParser
-from sr_hand.grasp.grasps_interpoler import GraspInterpoler
+from sr_hand.grasps_parser import GraspParser
+from sr_hand.grasps_interpoler import GraspInterpoler
 
 class Joint():
     def __init__(self, name="", motor="", min=0, max=90):
@@ -105,12 +105,9 @@ class ShadowHand_ROS():
         ###
         # Grasps
         self.grasp_parser = GraspParser()
-        process = subprocess.Popen("rospack find sr_hand".split(), stdout=subprocess.PIPE)
-        self.rootPath = process.communicate()[0]
-        self.rootPath = self.rootPath.split('\n')
-        self.rootPath = self.rootPath[0]
-        #print "path : "+self.rootPath
-        self.grasp_parser.parse_tree(self.rootPath+"/scripts/sr_hand/grasp/grasps.xml")
+
+        self.rootPath = rospkg.RosPack().get_path('sr_hand')
+        self.grasp_parser.parse_tree(self.rootPath+"/scripts/sr_hand/grasps.xml")
 
         self.grasp_interpoler = 0
         self.pub = rospy.Publisher('srh/sendupdate',sendupdate, latch=True)
