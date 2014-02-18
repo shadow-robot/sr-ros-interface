@@ -1,10 +1,15 @@
 <launch>
+  <!-- Gazebo world file to load. -->
+  <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world" />
+  <!-- Namespace to run the hand under. -->
+  <arg name="hand_ns" default="rh" />
+
   <!-- We reuse the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find sr_description)/other/worlds/shadowhand.world"/>
+    <arg name="world_name" value="$(arg world_name)"/>
   </include>
 
-  <group ns="rh">
+  <group ns="$(arg hand_ns)">
       <!-- The real hand uses sr_description but getting gazebo to work
       properly with that is a pain as it needs robotParam set in the urdf and
       various bits of mapping. The arm uses robot_description as does that arm
