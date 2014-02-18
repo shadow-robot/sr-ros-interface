@@ -1,35 +1,35 @@
 <launch>
   <!-- Gazebo world file to load. -->
   <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world" />
-  <!-- Namespace to run the hand under. -->
-  <arg name="hand_ns" default="rh" />
 
-  <!-- We reuse the logic in empty_world.launch, changing only the name of the world to be launched -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(arg world_name)"/>
-  </include>
+  <!-- We want gazebo to stay in the root namespace but the nodes below to be
+  relative. Can then launch this inside a namespace to namespace the hand. -->
+  <group ns="/">
+      <!-- We reuse the logic in empty_world.launch, changing only the name of the world to be launched -->
+      <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)"/>
+      </include>
+  </group>
 
   <!-- spawn the support model -->
   <include file="$(find sr_description)/loaders/load_support_model.launch" />
   <node name="spawn_support" pkg="gazebo_ros" type="spawn_model" args="-urdf -param support_description -z 0.0 -model support_model" respawn="false" output="screen" />
 
   <!-- spawn the arm and hand model -->
-  <group ns="$(arg hand_ns)">
-    <include file="$(find sr_description)/loaders/load_arm_and_hand_model.launch" />
-    <include file="$(find sr_description)/loaders/load_hand_model.launch" />
-    <node name="spawn_hand" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -z 0.0 -model shadow_model -J ShoulderJSwing 0.78 -J ElbowJSwing 2.0" respawn="false" output="screen" />
+  <include file="$(find sr_description)/loaders/load_arm_and_hand_model.launch" />
+  <include file="$(find sr_description)/loaders/load_hand_model.launch" />
+  <node name="spawn_hand" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -z 0.0 -model shadow_model -J ShoulderJSwing 0.78 -J ElbowJSwing 2.0" respawn="false" output="screen" />
 
-    <!-- Controllers for the arm and hand -->
-    <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
-    <include file="$(find sr_hand)/launch/gazebo/loaders/arm_controllers.launch"/>
+  <!-- Controllers for the arm and hand -->
+  <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
+  <include file="$(find sr_hand)/launch/gazebo/loaders/arm_controllers.launch"/>
 
-    <!-- launch more exotic controllers (trajectory, cartesian, etc...) -->
-    <include file="$(find sr_hand)/launch/gazebo/loaders/arm_controllers_extended.launch"/>
+  <!-- launch more exotic controllers (trajectory, cartesian, etc...) -->
+  <include file="$(find sr_hand)/launch/gazebo/loaders/arm_controllers_extended.launch"/>
 
-    <node pkg="robot_state_publisher" type="state_publisher"
-          name="robot_state_publisher_full_pos">
-      <param name="publish_frequency" type="double" value="20.0" />
-    </node>
-  </group>
+  <node pkg="robot_state_publisher" type="state_publisher"
+        name="robot_state_publisher_full_pos">
+    <param name="publish_frequency" type="double" value="20.0" />
+  </node>
 
 </launch>
