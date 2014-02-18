@@ -10,26 +10,26 @@
   </include>
 
   <group ns="$(arg hand_ns)">
-      <!-- The real hand uses sr_description but getting gazebo to work
-      properly with that is a pain as it needs robotParam set in the urdf and
-      various bits of mapping. The arm uses robot_description as does that arm
-      and hand. So we just set both params and stop fighting! -->
-      <include file="$(find sr_description)/loaders/load_hand_model.launch">
-          <arg name="robot_param" value="sh_description" />
-      </include>
-      <include file="$(find sr_description)/loaders/load_hand_model.launch">
-          <arg name="robot_param" value="robot_description" />
-      </include>
+    <!-- The real hand uses sr_description but getting gazebo to work
+    properly with that is a pain as it needs robotParam set in the urdf and
+    various bits of mapping. The arm uses robot_description as does that arm
+    and hand. So we just set both params and stop fighting! -->
+    <include file="$(find sr_description)/loaders/load_hand_model.launch">
+        <arg name="robot_param" value="sh_description" />
+    </include>
+    <include file="$(find sr_description)/loaders/load_hand_model.launch">
+        <arg name="robot_param" value="robot_description" />
+    </include>
 
-      <node name="spawn_hand" pkg="gazebo_ros" type="spawn_model" args="-urdf -param sh_description -z 0.01 -model shadow_model" respawn="false" output="screen" />
+    <node name="spawn_hand" pkg="gazebo_ros" type="spawn_model" args="-urdf -param sh_description -z 0.01 -model shadow_model" respawn="false" output="screen" />
 
-      <!-- Controllers for the hand -->
-      <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
+    <!-- Controllers for the hand -->
+    <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
 
-      <node pkg="robot_state_publisher" type="state_publisher"
-            name="robot_state_publisher_full_pos">
-        <param name="publish_frequency" type="double" value="20.0" />
-      </node>
+    <node pkg="robot_state_publisher" type="state_publisher"
+          name="robot_state_publisher_full_pos">
+      <param name="publish_frequency" type="double" value="20.0" />
+    </node>
   </group>
 
 </launch>
