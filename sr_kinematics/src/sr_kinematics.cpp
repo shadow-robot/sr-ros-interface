@@ -638,7 +638,7 @@ bool Kinematics::getPositionFK(moveit_msgs::GetPositionFK::Request &request,
     {
       tf_pose.frame_id_ = root_name;
       tf_pose.stamp_ = ros::Time();
-      tf::PoseKDLToTF(p_out, tf_pose);
+      tf::poseKDLToTF(p_out, tf_pose);
       try
       {
         tf_listener.transformPose(request.header.frame_id, tf_pose, tf_pose);
