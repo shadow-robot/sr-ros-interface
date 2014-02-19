@@ -13,12 +13,6 @@ catkin_package(
     LIBRARIES
 )
 
-#Gazebo
-message("--------- Shadow Robot Tactiles Package Configuration:")
-set( CMAKE_CXX_FLAGS "-D GAZEBO")
-message(" [x] Gazebo support")
-
-
 # Real Hand
 set(real_hand $ENV{REAL_HAND})
 if(real_hand)
@@ -87,4 +81,3 @@ install(DIRECTORY params/
 
 install(DIRECTORY launch/
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
-
