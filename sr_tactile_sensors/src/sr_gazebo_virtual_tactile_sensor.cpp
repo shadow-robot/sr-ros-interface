@@ -112,7 +112,7 @@ namespace shadowrobot
       tactile_sensors.push_back(
         boost::shared_ptr<SrGazeboVirtualTactileSensor>(
           new SrGazeboVirtualTactileSensor(all_names[0][i],
-                                           "/"+all_names[0][i]+"distal_bumper")
+                                           "contacts/"+all_names[0][i]+"/distal")
         )
       );
     }
