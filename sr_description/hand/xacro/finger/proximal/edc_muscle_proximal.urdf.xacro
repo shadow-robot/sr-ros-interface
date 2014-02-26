@@ -6,7 +6,7 @@
        xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
        xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
 
-  <include filename="$(find sr_description)/hand/xacro/finger/proximal/edc_muscle_proximal.transmission.xacro" />
+  <xacro:include filename="$(find sr_description)/hand/xacro/finger/proximal/edc_muscle_proximal.transmission.xacro" />
 
   <xacro:macro name="proximal" params="link_prefix joint_prefix parent">
 
@@ -31,21 +31,22 @@
 	</geometry>
       </collision>
     </link>
+
     <gazebo reference="${link_prefix}proximal">
-      <sensor type="contact" name="${link_prefix}proximal_contact_sensor">
-        <update_rate>100.0</update_rate>
+      <sensor type="contact" name="${link_prefix}proximal_contact" >
+        <always_on>1</always_on>
+        <update_rate>1000.0</update_rate>
         <contact>
-          <collision>${link_prefix}proximal_collision_geom</collision>
+          <collision>${link_prefix}proximal_collision</collision>
+          <topic>${link_prefix}proximal_collision</topic>
         </contact>
         <plugin name="${link_prefix}proximal_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
-          <alwaysOn>true</alwaysOn>
-          <frameName>${link_prefix}proximal</frameName>
           <updateRate>100.0</updateRate>
-          <bumperTopicName>${link_prefix}proximal_bumper</bumperTopicName>
+	  <frameName>${link_prefix}proximal</frameName>
+	  <bumperTopicName>contacts/${link_prefix}/proximal</bumperTopicName>
         </plugin>
       </sensor>
-      <material>Gazebo/Grey</material>
-      <selfCollide>true</selfCollide>
+      <material>LightGrey</material>
     </gazebo>
 
     <joint name="${joint_prefix}J3" type="revolute">
@@ -53,9 +54,9 @@
       <child link="${link_prefix}proximal"/>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <axis xyz="1 0 0" />
-      <limit lower="0" upper="${M_PI/2}" effort="10"
-      velocity="1.0"/>
-      <dynamics damping="50.5"/>
+      <limit lower="0" upper="${M_PI/2}" effort="1000.0"
+      velocity="10.0"/>
+      <dynamics damping="10.0"/>
     </joint>
 
     <xacro:proximal_transmission />

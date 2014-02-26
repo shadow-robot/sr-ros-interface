@@ -1,7 +1,9 @@
 <launch>
+  <!-- Gazebo world file to load. -->
+  <group ns="/">
+    <include file="$(find sr_hand)/launch/gazebo/loaders/empty_world.launch"/>
+  </group>
 
-  <!-- start gazebo with an empty plane -->
-  <include file="$(find sr_hand)/launch/gazebo/loaders/empty_world.launch"/>
   <!-- spawn the support model -->
   <include file="$(find sr_description)/loaders/load_support_model.launch" />
   <node name="spawn_support" pkg="gazebo" type="spawn_model" args="-urdf -param support_description -z 0.0 -model support_model" respawn="false" output="screen" />
@@ -20,7 +22,6 @@
 
   <node pkg="robot_state_publisher" type="state_publisher"
         name="robot_state_publisher_full_pos">
-    <remap from="joint_states" to="gazebo/joint_states" />
     <param name="publish_frequency" type="double" value="20.0" />
   </node>
 
