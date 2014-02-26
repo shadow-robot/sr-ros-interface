@@ -110,6 +110,6 @@ sr_hand/gtest/
 sr_self_test/bin/
 sr_self_test/build/
 sr_self_test/lib/
-
-
+*.backup
+*~
 

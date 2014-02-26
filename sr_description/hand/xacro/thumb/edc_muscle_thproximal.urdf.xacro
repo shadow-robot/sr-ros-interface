@@ -6,7 +6,7 @@
        xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
        xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
 
-  <include filename="$(find sr_description)/hand/xacro/thumb/edc_muscle_thproximal.transmission.xacro" />
+  <xacro:include filename="$(find sr_description)/hand/xacro/thumb/edc_muscle_thproximal.transmission.xacro" />
 
   <!-- Right Hand -->
   <xacro:macro name="thproximal" params="parent">
@@ -44,21 +44,22 @@
 	</geometry>
       </collision>
     </link>
+
     <gazebo reference="thproximal">
-      <sensor type="contact" name="thproximal_contact_sensor">
-        <update_rate>100.0</update_rate>
+      <sensor type="contact" name="thproximal_contact" >
+        <always_on>1</always_on>
+        <update_rate>1000.0</update_rate>
         <contact>
-          <collision>thproximal_collision_geom</collision>
+          <collision>thproximal_collision</collision>
+          <topic>thproximal_collision</topic>
         </contact>
         <plugin name="thproximal_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
-          <alwaysOn>true</alwaysOn>
-          <frameName>thproximal</frameName>
           <updateRate>100.0</updateRate>
-          <bumperTopicName>thproximal_bumper</bumperTopicName>
+	  <frameName>thproximal</frameName>
+	  <bumperTopicName>contacts/th/proximal</bumperTopicName>
         </plugin>
       </sensor>
-
-      <material>Gazebo/Grey</material>
+      <material>LightGrey</material>
     </gazebo>
 
     <joint name="THJ4" type="revolute">
@@ -66,9 +67,9 @@
       <child link="thproximal"/>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <axis xyz="${reflect*1} 0 0" />
-      <limit lower="0" upper="1.309" effort="10"
-      velocity="1.0" />
-      <dynamics damping="50.5"/>
+      <limit lower="0" upper="1.309" effort="1000.0"
+      velocity="10.0" />
+      <dynamics damping="10.0"/>
     </joint>
 
     <xacro:thproximal_transmission />
