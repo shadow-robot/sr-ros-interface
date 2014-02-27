@@ -112,4 +112,4 @@ sr_self_test/build/
 sr_self_test/lib/
 *.backup
 *~
-
+*.pyc
