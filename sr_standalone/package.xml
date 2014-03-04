@@ -6,7 +6,7 @@
 
   <license>GPL</license>
 
-  <url type="website">http://ros.org/wiki/sr_utilities</url>
+  <url type="website">http://ros.org/wiki/sr_ros_interface</url>
   <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
   <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
@@ -16,9 +16,11 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <!-- Dependencies needed to compile this package. -->
-  <build_depend>sr_hand</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
-  <run_depend>sr_hand</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>roscpp</run_depend>
   
 </package>
