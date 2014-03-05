@@ -90,6 +90,7 @@ public:
   std::vector<std::string> get_list_of_joints() const;
 
 private:
+  // Pimpl idiom
   class SrRosWrapper;
   SrRosWrapper *srw;
 };

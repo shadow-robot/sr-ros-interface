@@ -5,5 +5,7 @@ using namespace shadow_robot_standalone;
 int main(int argc, char** argv)
 {
   ShadowHand hand;
+  JointStates joint_states = hand.get_joint_states();
+
   return 0;
 }
