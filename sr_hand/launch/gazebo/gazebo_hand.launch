@@ -1,6 +1,7 @@
 <launch>
   <!-- Gazebo world file to load. -->
   <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world" />
+  <arg name="gui" default="true"/>
 
   <!-- Gazebo world file to load. -->
   <!-- We want gazebo to stay in the root namespace but the nodes below to be
@@ -9,6 +10,7 @@
       <!-- We reuse the logic in empty_world.launch, changing only the name of the world to be launched -->
       <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(arg world_name)"/>
+        <arg name="gui" value="$(arg gui)"/>
       </include>
   </group>
 
