@@ -5,9 +5,10 @@
   <!-- prefix can be anything but usually is "r_" or  "l_" for right and left hands distinction -->
   <gazebo reference="${prefix}thdistal">
       <sensor type="contact" name="${prefix}thdistal_contact_sensor">
+        <always_on>true</always_on>
         <update_rate>100.0</update_rate>
         <contact>
-          <collision>${prefix}thdistal_collision_geom</collision>
+          <collision>${prefix}thdistal_geom</collision>
         </contact>
         <plugin name="${prefix}thdistal_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
           <alwaysOn>true</alwaysOn>
@@ -20,7 +21,7 @@
       <mu2 value="500.0" />
       <kp  value="10000000.0" />
       <kd  value="1.0" />
-      <material>Gazebo/Grey</material>
+      <material>LightGrey</material>
       <selfCollide>true</selfCollide>
     </gazebo>
   </xacro:macro>
