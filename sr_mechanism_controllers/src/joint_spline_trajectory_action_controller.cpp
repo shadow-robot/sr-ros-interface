@@ -184,7 +184,7 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
     {
       if(controller_list.response.state[i]=="running")
       {
-        if (nh.getParam("/"+controller_list.response.controllers[i]+"/joint", controlled_joint_name))
+        if (nh.getParam(controller_list.response.controllers[i]+"/joint", controlled_joint_name))
         {
           ROS_DEBUG("controller %d:%s controls joint %s\n",i,controller_list.response.controllers[i].c_str(),controlled_joint_name.c_str());
           jointControllerMap[controlled_joint_name]= controller_list.response.controllers[i] ;
@@ -199,7 +199,7 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
 
       if(controller_name.compare("")!=0) //if exist, set idx to controller number + 1
       {
-        controller_publishers.push_back(nh.advertise<std_msgs::Float64>("/"+jointControllerMap[joint_labels[i]]+"/command", 2));
+        controller_publishers.push_back(nh.advertise<std_msgs::Float64>(jointControllerMap[joint_labels[i]]+"/command", 2));
         jointPubIdxMap[joint_labels[i]]=controller_publishers.size(); //we want the index to be above zero all the time
       }
       else // else put a zero in order to detect when this is empty
@@ -213,8 +213,8 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
   {
     ROS_WARN("sr_controller_manager not found, switching back to sendupdates");
     use_sendupdate=true;
-    sr_arm_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/sr_arm/sendupdate", 2);
-    sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);
+    sr_arm_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("sr_arm/sendupdate", 2);
+    sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("srh/sendupdate", 2);
   }
 
   ROS_INFO("waiting for getJointState");
@@ -236,7 +236,7 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
   qd.resize(joint_names_.size());
   qdd.resize(joint_names_.size());
 
-  desired_joint_state_pusblisher = nh.advertise<sensor_msgs::JointState> ("/desired_joint_states", 2);
+  desired_joint_state_pusblisher = nh.advertise<sensor_msgs::JointState> ("desired_joint_states", 2);
   
   command_sub = nh.subscribe("command", 1, &JointTrajectoryActionController::commandCB, this);
   ROS_INFO("Listening to commands");
@@ -873,7 +873,7 @@ void JointTrajectoryActionController::commandCB(const trajectory_msgs::JointTraj
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "sr_joint_trajectory_action_controller");
+  ros::init(argc, argv, "arm_joint_spline_trajectory_action_controller");
 
   ros::AsyncSpinner spinner(1); //Use 1 thread
   spinner.start();
