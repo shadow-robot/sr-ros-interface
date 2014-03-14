@@ -6,6 +6,7 @@
        xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
        xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
 
+  <xacro:include filename="$(find sr_description)/hand/xacro/thumb/thdistal.gazebo.xacro" />
   <xacro:include filename="$(find sr_description)/hand/xacro/thumb/thdistal.transmission.xacro" />
   <!-- muscle is true for muscle hand or false for motor hand -->
 	<!-- bio is true for biotac finger or false for standard finger -->
