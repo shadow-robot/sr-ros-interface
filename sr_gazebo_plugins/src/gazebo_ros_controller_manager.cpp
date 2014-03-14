@@ -56,7 +56,7 @@ namespace gazebo {
 
 GazeboRosControllerManager::GazeboRosControllerManager()
 {
-  self_test_.reset(new shadow_robot::SrSelfTest(true));
+  
 }
 
 
@@ -158,6 +158,11 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     ros::init(argc,argv,"gazebo",ros::init_options::NoSigintHandler|ros::init_options::AnonymousName);
   }
   this->rosnode_ = new ros::NodeHandle(this->robotNamespace);
+  
+  
+  self_test_.reset(new shadow_robot::SrSelfTest(true,this->robotNamespace));
+	
+  
   ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
 
   // pr2_etherCAT calls ros::spin(), we'll thread out one spinner here to mimic that
@@ -202,11 +207,12 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     }
   }
 
+
 #ifdef USE_CBQ
   // start custom queue for controller manager
   this->controller_manager_callback_queue_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerQueueThread,this ) );
 #endif
-
+	
 }
 
 

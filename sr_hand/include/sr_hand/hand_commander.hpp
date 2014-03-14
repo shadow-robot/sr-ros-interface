@@ -62,7 +62,7 @@ namespace shadowrobot
   class HandCommander
   {
   public:
-    HandCommander();
+    HandCommander(std::string name_space="");
 
     /// Destructor
     ~HandCommander();
@@ -99,6 +99,7 @@ namespace shadowrobot
   private:
     ///ros node handle
     NodeHandle node_;
+    std::string ns;
 
     ///stores data about the hand (read from urdf)
     std::map<std::string, boost::shared_ptr<urdf::Joint> > all_joints;

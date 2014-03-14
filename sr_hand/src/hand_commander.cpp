@@ -38,31 +38,52 @@ namespace shadowrobot
 
   const double HandCommander::TIMEOUT_TO_DETECT_CONTROLLER_MANAGER = 3.0;
 
-  HandCommander::HandCommander():
+  HandCommander::HandCommander(std::string name_space):
     hand_type(shadowhandRosLib::UNKNOWN),
     ethercat_controllers_found(false)
   {
     //Get the urdf model from the parameter server
     // this is used for returning min and max for joints for example.
+    
+    // get Namespace first 
+    ns = name_space;//ros::this_node::getNamespace();   
+    if (ns!= "")
+				ns=ns+"/";
+    
     std::string robot_desc_string;
-    node_.param("sh_description", robot_desc_string, std::string());
     urdf::Model robot_model;
-    if (!robot_model.initString(robot_desc_string))
+    if (node_.hasParam(ns+"sh_description") )
     {
-      ROS_WARN("Failed to parse urdf file - trying with robot_description instead of sh_description.");
-
-      node_.param("robot_description", robot_desc_string, std::string());
-      if (!robot_model.initString(robot_desc_string))
-      {
-        ROS_ERROR("Couldn't parse the urdf file on sh_description or on robot_description.");
-        return;
-      }
-    }
+			node_.param(ns+"sh_description", robot_desc_string, std::string());
+			
+			if (!robot_model.initString(robot_desc_string))
+			{
+				ROS_ERROR("Couldn't  to parse urdf file on sh_description.");
+				return;
+			}
+		}
+		else
+		{
+			if (node_.hasParam(ns+"robot_description") )
+			{
+				node_.param(ns+"robot_description", robot_desc_string, std::string());
+				if (!robot_model.initString(robot_desc_string))
+				{
+					ROS_ERROR("Couldn't parse the urdf file on robot_description.");
+					return;
+				}
+			}
+			else
+			{
+				ROS_ERROR("Failed to find sh_description or robot_description.");
+				return;
+			}
+		}
 
     all_joints = robot_model.joints_;
 
     //We use the presence of the pr2_controller_manager/list_controllers service to detect that the hand is ethercat
-    if(ros::service::waitForService("pr2_controller_manager/list_controllers", ros::Duration(TIMEOUT_TO_DETECT_CONTROLLER_MANAGER)))
+    if(ros::service::waitForService(ns+"pr2_controller_manager/list_controllers", ros::Duration(TIMEOUT_TO_DETECT_CONTROLLER_MANAGER)))
     {
       hand_type = shadowhandRosLib::ETHERCAT;
       initializeEthercatHand();
@@ -71,7 +92,7 @@ namespace shadowrobot
     else
     {
       hand_type = shadowhandRosLib::CAN;
-      sr_hand_target_pub = node_.advertise<sr_robot_msgs::sendupdate>("srh/sendupdate", 2);
+      sr_hand_target_pub = node_.advertise<sr_robot_msgs::sendupdate>(ns+"srh/sendupdate", 2);
       ROS_INFO("HandCommander library: CAN hand detected");
     }
   }
@@ -84,7 +105,7 @@ namespace shadowrobot
   {
     sr_hand_target_pub_map.clear();
 
-    ros::ServiceClient controller_list_client = node_.serviceClient<pr2_mechanism_msgs::ListControllers>("pr2_controller_manager/list_controllers");
+    ros::ServiceClient controller_list_client = node_.serviceClient<pr2_mechanism_msgs::ListControllers>(ns+"pr2_controller_manager/list_controllers");
 
     pr2_mechanism_msgs::ListControllers controller_list;
     std::string controlled_joint_name;
@@ -95,14 +116,14 @@ namespace shadowrobot
       if(controller_list.response.state[i]=="running")
       {
         std::string controller = controller_list.response.controllers[i];
-        if (node_.getParam(controller+"/joint", controlled_joint_name))
+        if (node_.getParam(ns+controller+"/joint", controlled_joint_name))
         {
           ROS_DEBUG("controller %d:%s controls joint %s\n",
                     (int)i,controller.c_str(),controlled_joint_name.c_str());
           sr_hand_target_pub_map[controlled_joint_name]
-            = node_.advertise<std_msgs::Float64>(controller+"/command", 2);
+            = node_.advertise<std_msgs::Float64>(ns+controller+"/command", 2);
           ethercat_controllers_found = true;
-          sr_hand_sub_topics[controlled_joint_name] = controller+"/state";
+          sr_hand_sub_topics[controlled_joint_name] = ns+controller+"/state";
         }
       }
     }
@@ -188,7 +209,8 @@ namespace shadowrobot
       // all Hand joint names have a length of 4...
       //The other way would be to check if the name is in a list
       // of possible names. Not sure what's best.
-      if(it->first.size() == 4)
+      //TODO:GuiHome: See why this is needed, it FAILS joints with prefix if(it->first.size() == 4)
+				ROS_DEBUG("HandCommander get_all_joints: joint %s found ",it->first.c_str());
         all_joints_names.push_back(it->first);
     }
 
