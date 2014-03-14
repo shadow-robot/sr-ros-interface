@@ -1,22 +1,23 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="thmiddle_gazebo" params="prefix">
+  <xacro:macro name="thbase_gazebo" params="prefix">
 
   <!-- prefix can be anything but usually is "r_" or  "l_" for right and left hands distinction -->
-  <gazebo reference="${prefix}thmiddle">
-      <sensor type="contact" name="${prefix}thmiddle_contact_sensor">
+  <gazebo reference="${prefix}thbase">
+      <sensor type="contact" name="${prefix}thbase_contact_sensor">
+        <always_on>true</always_on>
         <update_rate>100.0</update_rate>
         <contact>
-          <collision>${prefix}thmiddle_collision_geom</collision>
+          <collision>${prefix}thbase_geom</collision>
         </contact>
-        <plugin name="${prefix}thmiddle_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
+        <plugin name="${prefix}thbase_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
           <alwaysOn>true</alwaysOn>
-          <frameName>${prefix}thmiddle</frameName>
+          <frameName>${prefix}thbase</frameName>
           <updateRate>100.0</updateRate>
-          <bumperTopicName>${prefix}thmiddle_bumper</bumperTopicName>
+          <bumperTopicName>${prefix}thbase_bumper</bumperTopicName>
         </plugin>
       </sensor>
-      <material>Gazebo/Grey</material>
+      <material>LightGrey</material>
     </gazebo>
   </xacro:macro>
 </robot>

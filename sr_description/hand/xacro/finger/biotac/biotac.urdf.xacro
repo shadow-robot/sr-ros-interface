@@ -38,9 +38,10 @@
 
     <gazebo reference="${prefix}${link_prefix}adapter">
       <sensor type="contact" name="${prefix}${link_prefix}adapter_contact_sensor">
+        <always_on>true</always_on>
         <update_rate>100.0</update_rate>
         <contact>
-          <collision>${prefix}${link_prefix}adapter_collision_geom</collision>
+          <collision>${prefix}${link_prefix}adapter_geom</collision>
         </contact>
         <plugin name="${prefix}${link_prefix}adapter_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
           <alwaysOn>true</alwaysOn>
@@ -107,9 +108,10 @@
 
     <gazebo reference="${prefix}${link_prefix}biotac">
       <sensor type="contact" name="${prefix}${link_prefix}biotac_contact_sensor">
+        <always_on>true</always_on>
         <update_rate>100.0</update_rate>
         <contact>
-          <collision>${prefix}${link_prefix}biotac_collision_geom</collision>
+          <collision>${prefix}${link_prefix}biotac_geom</collision>
         </contact>
         <plugin name="${prefix}${link_prefix}biotac_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
           <alwaysOn>true</alwaysOn>

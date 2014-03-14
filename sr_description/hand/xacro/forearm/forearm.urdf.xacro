@@ -45,7 +45,7 @@
       </link>
 
       <gazebo reference="${prefix}forearm">
-        <material>Gazebo/Grey</material>
+        <material>LightGrey</material>
         <selfCollide>false</selfCollide>
       </gazebo>
    

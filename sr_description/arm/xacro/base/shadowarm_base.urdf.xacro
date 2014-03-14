@@ -15,7 +15,7 @@
       <geometry name="shadowarm_base_visual">
         <mesh filename="package://sr_description/arm/model/arm_base.dae" scale="0.001 0.001 0.001" />
       </geometry>
-      <material name="LightGrey" />
+      <material name="Grey" />
     </visual>
     <collision>
       <origin xyz="0 0 0.005" rpy="0 0 0" />

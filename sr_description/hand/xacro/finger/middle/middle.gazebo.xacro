@@ -5,9 +5,10 @@
   <!-- prefix can be anything but usually is "r_" or  "l_" for right and left hands distinction -->
   <gazebo reference="${prefix}${link_prefix}middle">
       <sensor type="contact" name="${prefix}${link_prefix}middle_contact_sensor">
+        <always_on>true</always_on>
         <update_rate>100.0</update_rate>
         <contact>
-          <collision>${prefix}${link_prefix}middle_collision_geom</collision>
+          <collision>${prefix}${link_prefix}middle_geom</collision>
         </contact>
         <plugin name="${prefix}${link_prefix}proximal_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
           <alwaysOn>true</alwaysOn>
@@ -16,7 +17,7 @@
           <bumperTopicName>${prefix}${link_prefix}middle_bumper</bumperTopicName>
         </plugin>
       </sensor>
-      <material>Gazebo/Grey</material>
+      <material>LightGrey</material>
       <selfCollide>true</selfCollide>
     </gazebo>
   </xacro:macro>

@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="middle_gazebo" params="prefix">
+  <xacro:macro name="distal_gazebo" params="prefix">
 
   <!-- prefix can be anything but usually is "r_" or  "l_" for right and left hands distinction -->
   <gazebo reference="${prefix}${link_prefix}distal">
-      <sensor type="contact" name="${prefix}${link_prefix}distal_contact_sensor">
+      <sensor type="contact" name="${prefix}${link_prefix}distal_contact">
+				<always_on>true</always_on>
         <update_rate>100.0</update_rate>
         <contact>
-          <collision>${prefix}${link_prefix}distal_collision_geom</collision>
+          <collision>${prefix}${link_prefix}distal_geom</collision>
         </contact>
         <plugin name="${prefix}${link_prefix}distal_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
           <alwaysOn>true</alwaysOn>
@@ -20,8 +21,8 @@
       <mu2 value="500.0" />
       <kp  value="10000000.0" />
       <kd  value="1.0" />
-      <material>Gazebo/Grey</material>
+      <material>LightGrey</material>
       <selfCollide>true</selfCollide>
-    </gazebo>
+    </gazebo>    
   </xacro:macro>
 </robot>

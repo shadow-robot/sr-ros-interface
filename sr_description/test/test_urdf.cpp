@@ -32,7 +32,9 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/** \author Ioan Sucan */
+/** \author Ioan Sucan 
+ *  \author Guillaume Walck
+ * */
 
 #include <gtest/gtest.h>
 #include <cstdlib>
@@ -109,7 +111,11 @@ int walker( char *result, int& test_result)
         printf("python `rospack find xacro`/xacro.py %s/robots/%s  > `rospack find sr_description`/test/tmp.urdf", package_path.c_str(), dir_name.c_str() );
         runExternalProcess("python `rospack find xacro`/xacro.py", package_path+"/robots/"+dir_name+" > `rospack find sr_description`/test/tmp.urdf" );
 
+				// check urdf structure
         test_result = test_result || runExternalProcess("`rospack find urdfdom`/check_urdf", "`rospack find sr_description`/test/tmp.urdf");
+        printf("\n looking for unexpanded xacro tags\n");
+        // check for unexpanded xacros
+        test_result = test_result || not runExternalProcess("grep","'<xacro:' `rospack find sr_description`/test/tmp.urdf");
       }
       if (test_result!=0)
 				return *result == 0;

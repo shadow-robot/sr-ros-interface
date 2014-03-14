@@ -5,7 +5,7 @@
        xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
        xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
        xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
-
+  <xacro:include filename="$(find sr_description)/hand/xacro/finger/distal/distal.gazebo.xacro" />
   <xacro:include filename="$(find sr_description)/hand/xacro/finger/distal/distal.transmission.xacro" />
   
   <!-- muscle is true for muscle hand or false for motor hand -->
@@ -27,24 +27,23 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry name="${prefix}${link_prefix}distal_visual">
-          <!-- Ubi distal -->
           <xacro:if value="${ubi}">
+						<!-- Ubi distal -->
             <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
           </xacro:if> 
-          <!-- Check for ellispoid distal -->
           <xacro:unless value="${ubi}">
-            <!-- Ellispoid distal  -->
             <xacro:if value="${eli}">
+							<!-- Ellispoid distal  -->
 							<mesh filename="package://sr_description/hand/model/ellipsoids/distal_ellipsoid_visual.dae" scale="0.001 0.001 0.001" />
             </xacro:if> 
-            <!-- Check for biotac distal -->
             <xacro:unless value="${eli}">
-              <!-- biotac distal  -->
               <xacro:if value="${bio}">
-                 <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
+								<!-- biotac distal  -->
+                <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
               </xacro:if> 
-              <!-- Standard distal  -->
+             
               <xacro:unless value="${bio}">
+								 <!-- Standard distal  -->
                  <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
               </xacro:unless> 
             </xacro:unless> 
@@ -55,25 +54,23 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry name="${prefix}${link_prefix}distal_collision_geom">
-            <!-- Ubi distal -->
           <xacro:if value="${ubi}">
+						<!-- Ubi distal -->
             <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
           </xacro:if> 
-          <!-- Check for ellispoid distal -->
           <xacro:unless value="${ubi}">
-            <!-- Ellispoid distal  -->
             <xacro:if value="${eli}">
-               <mesh filename="package://sr_description/hand/model/ellipsoids/distal_ellipsoid.dae" scale="0.001 0.001 0.001" />
+							<!-- Ellispoid distal  -->
+              <mesh filename="package://sr_description/hand/model/ellipsoids/distal_ellipsoid.dae" scale="0.001 0.001 0.001" />
             </xacro:if> 
-            <!-- Check for biotac distal -->
             <xacro:unless value="${eli}">
-              <!-- biotac distal  -->
               <xacro:if value="${bio}">
-                 <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
+								<!-- biotac distal  -->
+                <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
               </xacro:if> 
-              <!-- Standard distal  -->
               <xacro:unless value="${bio}">
-                 <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
+								<!-- Standard distal  -->
+                <mesh filename="package://sr_description/hand/model/F1.dae" scale="0.001 0.001 0.001" />
               </xacro:unless> 
             </xacro:unless> 
           </xacro:unless> 
@@ -86,14 +83,14 @@
       <child link="${prefix}${link_prefix}distal"/>
       <origin xyz="0 0 0.025" rpy="0 0 0" />
       <axis xyz="1 0 0" />
-       <!-- biotac fixed distal joint -->
       <xacro:if value="${bio}">
+				<!-- biotac fixed distal joint -->
         <limit lower="${20/180*M_PI}" upper="${20/180*M_PI}" effort="10"
           velocity="1.0" />
       </xacro:if> 
-      <!-- standard distal joint -->
       <xacro:unless value="${bio}">
-          <limit lower="0" upper="${M_PI/2}" effort="10"
+				<!-- standard distal joint -->
+        <limit lower="0" upper="${M_PI/2}" effort="10"
           velocity="1.0" />
       </xacro:unless>  
       <dynamics damping="50.5"/>

@@ -6,6 +6,7 @@
        xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
        xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom">
 
+  <xacro:include filename="$(find sr_description)/hand/xacro/thumb/thdistal.gazebo.xacro" />
   <xacro:include filename="$(find sr_description)/hand/xacro/thumb/thdistal.transmission.xacro" />
   <!-- muscle is true for muscle hand or false for motor hand -->
 	<!-- bio is true for biotac finger or false for standard finger -->
@@ -15,8 +16,9 @@
   <!-- parent is the parent link for the first joint -->
   <xacro:macro name="thdistal" params="muscle bio ubi eli prefix parent">  
     
-		<!--	BIOTAC -->
+		
 		<xacro:if value="${bio}">
+			<!--	BIOTAC -->
 			<link name="${prefix}thbiotac_J1_dummy">
 				<inertial>
 					<origin xyz="0 0 0" rpy="0 0 0" />
@@ -110,9 +112,8 @@
 				<origin xyz="-0.009 0.0 ${0.01+0.044}" rpy="0 0 ${-M_PI/2}" /> <!-- approximated only FIXME -->
 			</joint>	
 		</xacro:if>
-		 <!-- Check for other distal -->
+		
 			<xacro:unless value="${bio}">
-				
 				<!-- common -->
 				<link name="${prefix}thdistal">
 				<inertial>
@@ -124,14 +125,13 @@
 				<visual>
 					<origin xyz="0 0 0" rpy="0 0 0" />
 					<geometry name="${prefix}thdistal_visual">
-						<!-- Ellispoid distal  -->
 						<xacro:if value="${eli}">
+							<!-- Ellispoid distal  -->
 							<mesh filename="package://sr_description/hand/model/ellipsoids/thdistal_ellipsoid_visual.dae" scale="0.001 0.001 0.001" />
 						</xacro:if> 
-						<!-- Check for uni distal -->
 						<xacro:unless value="${eli}">
-							 <!-- Ubi distal -->
 							<xacro:if value="${ubi}">
+								<!-- Ubi distal -->
 								<mesh filename="package://sr_description/hand/model/TH1_z.dae" scale="0.001 0.001 0.001" />
 							</xacro:if> 
 							<!-- Standard distal  -->
@@ -147,18 +147,17 @@
 				<collision>
 					<origin xyz="0 0 0" rpy="0 0 0 " />
 					<geometry name="${prefix}thmiddle_collision_geom">
-					<!-- Ellispoid distal  -->
 						<xacro:if value="${eli}">
+							<!-- Ellispoid distal  -->
 						  <mesh filename="package://sr_description/hand/model/ellipsoids/thdistal_ellipsoid.dae" scale="0.001 0.001 0.001" />
 						</xacro:if> 
-						<!-- Check for uni distal -->
 						<xacro:unless value="${eli}">
-							 <!-- Ubi distal -->
 							<xacro:if value="${ubi}">
+								<!-- Ubi distal -->
 								<mesh filename="package://sr_description/hand/model/TH1_z.dae" scale="0.001 0.001 0.001" />
 							</xacro:if> 
-							<!-- Standard distal  -->
 							<xacro:unless value="${ubi}">
+								<!-- Standard distal  -->
 								<mesh filename="package://sr_description/hand/model/TH1_z.dae" scale="0.001 0.001 0.001" />
 							</xacro:unless> 
 						</xacro:unless> 						
