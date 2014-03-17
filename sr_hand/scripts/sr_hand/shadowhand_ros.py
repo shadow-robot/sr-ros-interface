@@ -476,11 +476,4 @@ class ShadowHand_ROS():
             return True
 
         return False
-    
-    def get_joint_positions(self):
-        joint_positions = {}
-        
-        for joint_name in self.dict_ethercat_joints.keys() :
-            joint_positions[joint_name] = self.dict_ethercat_joints[joint_name].joint_position
-        
-        return joint_positions
+

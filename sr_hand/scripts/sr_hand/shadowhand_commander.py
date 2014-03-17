@@ -147,4 +147,4 @@ class Commander(object):
             rospy.logdebug("end interpol")
 
     def get_hand_position(self):
-        return self.hand.get_joint_positions()
+        return self.hand.read_all_current_positions()
