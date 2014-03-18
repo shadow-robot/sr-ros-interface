@@ -54,7 +54,7 @@ See the examples directory in the package sr_examples.
 
 class Commander(object):
     def __init__(self):
-        # Mutex to avoid two calls of self.move_hand to be active at the same time
+        # Mutex to control thread access to certain operations 
         self.mutex = threading.Lock()
 
         # This is used to store the grasp interpolators for the different threads.
