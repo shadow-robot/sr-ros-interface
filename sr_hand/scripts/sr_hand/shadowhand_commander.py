@@ -50,11 +50,6 @@ Basic script will look like:
     
 
 See the examples directory in the package sr_examples.
-
-Take note that the blocking behaviour of move_pos and move_axis (return when
-move is complete) is different to move_hand (returns before motion completes).
-Therefore when scripting motions for the arm and hand together you are advised
-to move the hand, then the arm and then add a sleep if needed to syncronise.
 """
 
 class Commander(object):
