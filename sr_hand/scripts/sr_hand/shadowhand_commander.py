@@ -94,6 +94,7 @@ class Commander(object):
         interpolation_time = 0.0
         if 'interpolation_time' in joints:
             interpolation_time = joints['interpolation_time']
+            del joints['interpolation_time']
 
         if interpolation_time == 0.0:
             self.mutex.acquire()
