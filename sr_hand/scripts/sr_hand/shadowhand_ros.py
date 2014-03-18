@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-import roslib; roslib.load_manifest('sr_hand')
 import time
 import os
 import math

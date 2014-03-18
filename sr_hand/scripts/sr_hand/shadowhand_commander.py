@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import roslib;
 import rospy
 import threading
 
@@ -32,7 +31,6 @@ methods on the commander to script the motion.
 Basic script will look like:
 
     #!/usr/bin/python
-    import roslib;
     import rospy
     from sr_hand.shadowhand_commander import Commander
 
