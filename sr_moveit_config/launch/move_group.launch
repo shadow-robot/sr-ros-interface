@@ -1,8 +1,10 @@
 <launch>
-  <arg name="gsc_hand" default="false"/>
+  <arg name="hand_urdf" default="$(find sr_description)/robots/shadowhand_motor.urdf.xacro" />
+  <arg name="hand_srdf" default="$(find sr_moveit_config)/config/shadowhand_motor.srdf" />
 
   <include file="$(find sr_moveit_config)/launch/planning_context.launch">
-    <arg name="gsc_hand" value="$(arg gsc_hand)" />
+    <arg name="hand_urdf" value="$(arg hand_urdf)" />
+    <arg name="hand_srdf" value="$(arg hand_srdf)" />
   </include>
 
   <!-- GDB Debug Option -->

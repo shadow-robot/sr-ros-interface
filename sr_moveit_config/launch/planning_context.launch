@@ -1,23 +1,17 @@
 <launch>
   <!-- By default we do not overwrite the URDF. Change the following to true to change the default behavior -->
   <arg name="load_robot_description" default="false"/>
-  <arg name="gsc_hand" default="false"/>
+  <arg name="hand_urdf" default="$(find sr_description)/robots/shadowhand_motor.urdf.xacro" />
+  <arg name="hand_srdf" default="$(find sr_moveit_config)/config/shadowhand_motor.srdf" />
 
   <!-- The name of the parameter under which the URDF is loaded -->
   <arg name="robot_description" default="robot_description"/>
 
   <!-- Load universal robot description format (URDF) -->
-  <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="$(find xacro)/xacro.py '$(find sr_description)/robots/shadowhand_motor.urdf.xacro'"/>
+  <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="$(find xacro)/xacro.py $(arg hand_urdf)"/>
 
-
-  <group if="$(arg gsc_hand)">
-    <!-- The semantic description that corresponds to the URDF -->
-    <param name="$(arg robot_description)_semantic" textfile="$(find sr_moveit_config)/config/shadowhand_motor_th_ff_rf_ellipsoid.srdf" />
-  </group>
-  <group unless="$(arg gsc_hand)">
-    <!-- The semantic description that corresponds to the URDF -->
-    <param name="$(arg robot_description)_semantic" textfile="$(find sr_moveit_config)/config/shadowhand_motor.srdf" />
-  </group>
+  <!-- The semantic description that corresponds to the URDF -->
+  <param name="$(arg robot_description)_semantic" textfile="$(arg hand_srdf)" />
 
   <!-- Load updated joint limits (override information from URDF) -->
   <group ns="$(arg robot_description)_planning">
