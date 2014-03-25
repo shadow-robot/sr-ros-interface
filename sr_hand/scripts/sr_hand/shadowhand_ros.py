@@ -24,7 +24,7 @@ import threading
 import rosgraph.masterapi
 import pr2_controllers_msgs.msg
 from sr_robot_msgs.msg import sendupdate, joint, joints_data, JointControllerState
-from sensor_msgs.msg import *
+from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64
 from sr_hand.grasps_parser import GraspParser
 from sr_hand.grasps_interpoler import GraspInterpoler
@@ -118,6 +118,12 @@ class ShadowHand_ROS():
         self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
 
         self.hand_type = self.check_hand_type()
+        
+        self.hand_velocity = {}
+        self.hand_effort = {}
+        
+        if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
+            self.joint_states_listener = rospy.Subscriber("joint_states", JointState, self.joint_states_callback)
 
         threading.Thread(None, rospy.spin)
 
@@ -378,6 +384,18 @@ class ShadowHand_ROS():
             self.dict_tar[joint.joint_name] = joint.joint_target
         return self.dict_tar
 
+    def read_all_current_velocities(self):
+        """
+        @return: dictionary mapping joint names to current velocities
+        """
+        return dict(self.hand_velocity)
+    
+    def read_all_current_efforts(self):
+        """
+        @return: dictionary mapping joint names to current efforts
+        """
+        return dict(self.hand_effort)
+    
     def read_all_current_arm_positions(self):
         """
         @return: dictionnary mapping joint names to actual positions
@@ -476,3 +494,52 @@ class ShadowHand_ROS():
 
         return False
 
+    def joint_states_callback(self, joint_state):
+        """
+        The callback function for the topic joint_states.
+        It will store the received joint velocity and effort information in two dictionaries
+        Velocity will be converted to degrees/s.
+        Effort units are kept as they are (currently ADC units, as no calibration is performed on the strain gauges)
+        
+        @param joint_state: the message containing the joints data.
+        """
+        tmp_vel = {}
+        tmp_effort = {}
+        for joint_name, position, velocity, effort in zip(joint_state.name, joint_state.position, joint_state.velocity, joint_state.effort):
+            tmp_vel[joint_name] = math.degrees(velocity)
+            tmp_effort[joint_name] = effort
+
+        tmp_vel['FFJ0'] = tmp_vel['FFJ1'] + tmp_vel['FFJ2']
+        del tmp_vel['FFJ1']
+        del tmp_vel['FFJ2']
+
+        tmp_vel['MFJ0'] = tmp_vel['MFJ1'] + tmp_vel['MFJ2']
+        del tmp_vel['MFJ1']
+        del tmp_vel['MFJ2']
+
+        tmp_vel['RFJ0'] = tmp_vel['RFJ1'] + tmp_vel['RFJ2']
+        del tmp_vel['RFJ1']
+        del tmp_vel['RFJ2']
+
+        tmp_vel['LFJ0'] = tmp_vel['LFJ1'] + tmp_vel['LFJ2']
+        del tmp_vel['LFJ1']
+        del tmp_vel['LFJ2']
+
+        tmp_effort['FFJ0'] = tmp_effort['FFJ1'] + tmp_effort['FFJ2']
+        del tmp_effort['FFJ1']
+        del tmp_effort['FFJ2']
+
+        tmp_effort['MFJ0'] = tmp_effort['MFJ1'] + tmp_effort['MFJ2']
+        del tmp_effort['MFJ1']
+        del tmp_effort['MFJ2']
+
+        tmp_effort['RFJ0'] = tmp_effort['RFJ1'] + tmp_effort['RFJ2']
+        del tmp_effort['RFJ1']
+        del tmp_effort['RFJ2']
+
+        tmp_effort['LFJ0'] = tmp_effort['LFJ1'] + tmp_effort['LFJ2']
+        del tmp_effort['LFJ1']
+        del tmp_effort['LFJ2']
+
+        self.hand_velocity = dict(tmp_vel)
+        self.hand_effort = dict(tmp_effort)
