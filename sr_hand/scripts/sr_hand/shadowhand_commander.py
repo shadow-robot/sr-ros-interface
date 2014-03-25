@@ -169,3 +169,10 @@ class Commander(object):
     
     def get_hand_effort(self):
         return self.hand.read_all_current_efforts()
+    
+    def get_tactile_type(self):
+        return self.hand.get_tactile_type()
+    
+    def get_tactile_state(self):
+        return self.hand.get_tactile_state()
+    
