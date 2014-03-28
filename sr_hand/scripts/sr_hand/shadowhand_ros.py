@@ -96,6 +96,8 @@ class ShadowHand_ROS():
         self.eth_subscribers = {}
         #rospy.init_node('python_hand_library')
         self.sendupdate_lock = threading.Lock()
+        
+        self.joint_states_lock = threading.Lock()
 
         #contains the ending for the topic depending on which controllers are loaded
         self.topic_ending = ""
@@ -391,13 +393,15 @@ class ShadowHand_ROS():
         """
         @return: dictionary mapping joint names to current velocities
         """
-        return dict(self.hand_velocity)
+        with self.joint_states_lock:
+            return self.hand_velocity
     
     def read_all_current_efforts(self):
         """
         @return: dictionary mapping joint names to current efforts
         """
-        return dict(self.hand_effort)
+        with self.joint_states_lock:
+            return self.hand_effort
     
     def read_all_current_arm_positions(self):
         """
@@ -506,50 +510,44 @@ class ShadowHand_ROS():
         
         @param joint_state: the message containing the joints data.
         """
-        tmp_vel = {}
-        tmp_effort = {}
-        for joint_name, position, velocity, effort in zip(joint_state.name, joint_state.position, joint_state.velocity, joint_state.effort):
-            tmp_vel[joint_name] = math.degrees(velocity)
-            tmp_effort[joint_name] = effort
-
-        tmp_vel['FFJ0'] = tmp_vel['FFJ1'] + tmp_vel['FFJ2']
-        del tmp_vel['FFJ1']
-        del tmp_vel['FFJ2']
-
-        tmp_vel['MFJ0'] = tmp_vel['MFJ1'] + tmp_vel['MFJ2']
-        del tmp_vel['MFJ1']
-        del tmp_vel['MFJ2']
-
-        tmp_vel['RFJ0'] = tmp_vel['RFJ1'] + tmp_vel['RFJ2']
-        del tmp_vel['RFJ1']
-        del tmp_vel['RFJ2']
-
-        tmp_vel['LFJ0'] = tmp_vel['LFJ1'] + tmp_vel['LFJ2']
-        del tmp_vel['LFJ1']
-        del tmp_vel['LFJ2']
-
-        tmp_effort['FFJ0'] = tmp_effort['FFJ1'] + tmp_effort['FFJ2']
-        del tmp_effort['FFJ1']
-        del tmp_effort['FFJ2']
-
-        tmp_effort['MFJ0'] = tmp_effort['MFJ1'] + tmp_effort['MFJ2']
-        del tmp_effort['MFJ1']
-        del tmp_effort['MFJ2']
-
-        tmp_effort['RFJ0'] = tmp_effort['RFJ1'] + tmp_effort['RFJ2']
-        del tmp_effort['RFJ1']
-        del tmp_effort['RFJ2']
-
-        tmp_effort['LFJ0'] = tmp_effort['LFJ1'] + tmp_effort['LFJ2']
-        del tmp_effort['LFJ1']
-        del tmp_effort['LFJ2']
-
-        self.hand_velocity = dict(tmp_vel)
-        self.hand_effort = dict(tmp_effort)
+        with self.joint_states_lock:  
+            self.hand_velocity = {n:math.degrees(v) for n,v in zip(joint_state.name, joint_state.velocity)}
+            self.hand_effort = {n:e for n,e in zip(joint_state.name, joint_state.effort)}
     
+            self.hand_velocity['FFJ0'] = self.hand_velocity['FFJ1'] + self.hand_velocity['FFJ2']
+            del self.hand_velocity['FFJ1']
+            del self.hand_velocity['FFJ2']
+    
+            self.hand_velocity['MFJ0'] = self.hand_velocity['MFJ1'] + self.hand_velocity['MFJ2']
+            del self.hand_velocity['MFJ1']
+            del self.hand_velocity['MFJ2']
+    
+            self.hand_velocity['RFJ0'] = self.hand_velocity['RFJ1'] + self.hand_velocity['RFJ2']
+            del self.hand_velocity['RFJ1']
+            del self.hand_velocity['RFJ2']
+    
+            self.hand_velocity['LFJ0'] = self.hand_velocity['LFJ1'] + self.hand_velocity['LFJ2']
+            del self.hand_velocity['LFJ1']
+            del self.hand_velocity['LFJ2']
+    
+            self.hand_effort['FFJ0'] = self.hand_effort['FFJ1'] + self.hand_effort['FFJ2']
+            del self.hand_effort['FFJ1']
+            del self.hand_effort['FFJ2']
+    
+            self.hand_effort['MFJ0'] = self.hand_effort['MFJ1'] + self.hand_effort['MFJ2']
+            del self.hand_effort['MFJ1']
+            del self.hand_effort['MFJ2']
+    
+            self.hand_effort['RFJ0'] = self.hand_effort['RFJ1'] + self.hand_effort['RFJ2']
+            del self.hand_effort['RFJ1']
+            del self.hand_effort['RFJ2']
+    
+            self.hand_effort['LFJ0'] = self.hand_effort['LFJ1'] + self.hand_effort['LFJ2']
+            del self.hand_effort['LFJ1']
+            del self.hand_effort['LFJ2']
+
     def get_tactile_type(self):
         return self.tactile_receiver.get_tactile_type()
     
     def get_tactile_state(self):
         return self.tactile_receiver.get_tactile_state()
-    
