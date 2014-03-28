@@ -4,7 +4,7 @@ project(sr_mechanism_controllers)
 find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp actionlib sr_robot_msgs
   sr_utilities pr2_mechanism_model realtime_tools robot_mechanism_controllers
   pluginlib rosconsole angles control_toolbox sr_hardware_interface xmlrpcpp
-  controller_manager controller_interface)
+  controller_manager controller_interface cmake_modules)
 find_package(TinyXML REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 

@@ -13,9 +13,6 @@ catkin_package(
 )
 
 add_executable(sr_kinematics src/sr_kinematics.cpp)
-target_link_libraries(sr_kinematics ${catkin_LIBRARIES})
-
-add_executable(sr_kinematics src/sr_kinematics.cpp)
 target_link_libraries(sr_kinematics ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
 install(TARGETS sr_kinematics
