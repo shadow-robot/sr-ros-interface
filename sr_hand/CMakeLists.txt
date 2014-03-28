@@ -2,11 +2,19 @@ cmake_minimum_required(VERSION 2.8.3)
 project(sr_hand)
 
 find_package(catkin REQUIRED COMPONENTS rostest roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs
-  sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_ros)
+  sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs)
 find_package(gazebo REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
 catkin_python_setup()
+
+catkin_package(
+    DEPENDS orocos_kdl
+    CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs sr_utilities
+      diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs
+    INCLUDE_DIRS include
+    LIBRARIES HandCommander SrVirtual
+)
 
 ###################
 #  CONFIGURATION  #
@@ -141,18 +149,11 @@ add_dependencies(HandCommander ${catkin_EXPORTED_TARGETS})
 target_link_libraries(HandCommander ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
-catkin_package(
-    DEPENDS orocos_kdl
-    CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs sr_utilities
-      diagnostic_msgs dynamic_reconfigure self_test urdf
-    INCLUDE_DIRS include
-    LIBRARIES HandCommander SrVirtual
-)
-
 if(COMMAND add_rostest_gtest)
   add_rostest_gtest(hand_commander_test test/hand_commander_test.test test/hand_commander_test.cpp)
   add_dependencies(hand_commander_test ${catkin_EXPORTED_TARGETS})
   target_link_libraries(hand_commander_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
+  add_rostest(test/hand_commander_mock_test.test)
   add_rostest_gtest(hand_commander_arm_and_hand_test test/hand_commander_arm_and_hand_test.test test/hand_commander_test.cpp)
   add_dependencies(hand_commander_arm_and_hand_test ${catkin_EXPORTED_TARGETS})
   target_link_libraries(hand_commander_arm_and_hand_test HandCommander ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
@@ -172,5 +173,12 @@ endif()
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.hpp"
 )
+
+install(DIRECTORY examples/
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/examples)
+
+install(DIRECTORY launch/
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+   
+install(FILES scripts/sr_hand/grasps.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/sr_hand)

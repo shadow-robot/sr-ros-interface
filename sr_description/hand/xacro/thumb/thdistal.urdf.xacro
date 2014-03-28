@@ -34,27 +34,22 @@
 	</geometry>
       </collision>
     </link>
+
     <gazebo reference="thdistal">
-      <sensor type="contact" name="thdistal_contact_sensor">
-        <update_rate>100.0</update_rate>
+      <sensor type="contact" name="thdistal_contact" >
+        <always_on>1</always_on>
+        <update_rate>1000.0</update_rate>
         <contact>
-          <collision>thdistal_collision_geom</collision>
+          <collision>thdistal_collision</collision>
+          <topic>thdistal_collision</topic>
         </contact>
         <plugin name="thdistal_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
-          <alwaysOn>true</alwaysOn>
-          <frameName>thdistal</frameName>
           <updateRate>100.0</updateRate>
-          <bumperTopicName>thdistal_bumper</bumperTopicName>
+	  <frameName>thdistal</frameName>
+	  <bumperTopicName>contacts/th/distal</bumperTopicName>
         </plugin>
       </sensor>
-      <material>Gazebo/Grey</material>
-
-      <mu1 value="500.0" />
-      <mu2 value="500.0" />
-      <kp  value="10000000.0" />
-      <kd  value="1.0" />
-
-      <material>Gazebo/Grey</material>
+      <material>LightGrey</material>
       <selfCollide>true</selfCollide>
     </gazebo>
 
@@ -63,9 +58,9 @@
       <child link="thdistal"/>
       <origin xyz="0 0 0.032" rpy="0 0 -1.570796327" />
       <axis xyz="1 0 0" />
-      <limit lower="0" upper="1.571" effort="10"
-	     velocity="1.0" />
-      <dynamics damping="50.5"/>
+      <limit lower="0" upper="1.571" effort="1000.0"
+	     velocity="10.0" />
+      <dynamics damping="10.0"/>
     </joint>
 
     <link name="thtip">

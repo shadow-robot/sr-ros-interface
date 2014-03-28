@@ -1,5 +1,5 @@
 /**
- * @file   srh_effort_joint_controller.cpp
+ * @file   srh_joint_muscle_valve_controller.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Wed Aug 17 12:32:01 2011
  *
@@ -351,5 +351,3 @@ Local Variables:
    c-basic-offset: 2
 End:
 */
-
-

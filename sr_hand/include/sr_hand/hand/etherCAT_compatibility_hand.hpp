@@ -35,6 +35,8 @@
 
 namespace shadowrobot
 {
+// THIS CLASS IS CONSIDERED DEPRECATED AND SHOULD NOT BE USED FOR ANY NEW PACKAGE.
+// IT IS NOT MARKED AS DEPRECATED THOUGH, AS IT IS STILL USED IN SOME OLD NODES
 /**
  * @brief This compatibility interface is a wrapper around the new etherCAT Hand
  * ROS driver. It is used to present the same interface as the CAN hand.
@@ -46,7 +48,7 @@ namespace shadowrobot
     /**
      * Initializes the necessary mappings with a static list of names.
      */
-    ROS_DEPRECATED EtherCATCompatibilityHand();
+    EtherCATCompatibilityHand();
     virtual ~EtherCATCompatibilityHand();
 
     //virtual classes defined in Shadowhand

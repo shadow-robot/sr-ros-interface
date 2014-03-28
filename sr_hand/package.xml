@@ -1,18 +1,19 @@
 <package>
   <name>sr_hand</name>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
   <description>This is a ROS interface to the Shadow Robot's robotic hand. It
      contains both an interface to the real hand (communicating via
      a CAN interface) and a simulated version of the hand. It also
      contains an interface to Shadow Robot's muscle arm.</description>
-  <maintainer email="software@shadowrobot.com">Ugo Cupcic </maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://www.shadowrobot.com</url>
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
-  <author email="software@shadowrobot.com">Ugo Cupcic </author>
-  <author>contact@shadowrobot.com</author>
+  <author>Ugo Cupcic</author>
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
@@ -30,9 +31,7 @@
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>self_test</build_depend>
   <build_depend>urdf</build_depend>
-  <build_depend>orocos_kdl</build_depend>
-  <build_depend>moveit_core</build_depend>  
-  <build_depend>gazebo_ros</build_depend>
+  <build_depend>gazebo_msgs</build_depend>
   <build_depend>rostest</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
@@ -48,9 +47,8 @@
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>self_test</run_depend>
   <run_depend>urdf</run_depend>
-  <run_depend>orocos_kdl</run_depend>
-  <run_depend>moveit_core</run_depend>
-  <run_depend>gazebo_ros</run_depend>
+  <run_depend>gazebo_msgs</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
 
   <!-- Dependencies needed only for running tests. -->
   <test_depend>gtest</test_depend>

@@ -8,11 +8,11 @@
     <param name="publish_rate" value="100"/>
     <param name="repetition" value="5"/>
     <param name="nb_step" value="1000"/>
-    <param name="msg_type" value="sr"/>
+    <param name="msg_type" value="pr2"/>
     <param name="testing" value="true"/>
   </node>
   <test test-name="hztest_test" pkg="rostest" type="hztest" name="hztest1">
-    <param name="topic" value="/sh_ffj3_mixed_position_velocity_controller/command" />
+    <param name="topic" value="/sh_ffj3_position_controller/command" />
     <param name="hz" value="100.0" />
     <param name="hzerror" value="0.5" />
     <param name="test_duration" value="5.0" />

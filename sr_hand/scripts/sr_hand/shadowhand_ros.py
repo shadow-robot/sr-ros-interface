@@ -15,20 +15,21 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-import roslib; roslib.load_manifest('sr_hand')
 import time
 import os
 import math
 import rospy
-import subprocess
+import rospkg
 import threading
 import rosgraph.masterapi
 import pr2_controllers_msgs.msg
 from sr_robot_msgs.msg import sendupdate, joint, joints_data, JointControllerState
 from sensor_msgs.msg import *
 from std_msgs.msg import Float64
-from grasps_parser import GraspParser
-from grasps_interpoler import GraspInterpoler
+from sr_hand.grasps_parser import GraspParser
+from sr_hand.grasps_interpoler import GraspInterpoler
+# this is only used to detect if the hand is a Gazebo hand, not to actually reconfigure anything
+from dynamic_reconfigure.msg import Config
 
 class Joint():
     def __init__(self, name="", motor="", min=0, max=90):
@@ -105,12 +106,9 @@ class ShadowHand_ROS():
         ###
         # Grasps
         self.grasp_parser = GraspParser()
-        process = subprocess.Popen("rospack find sr_hand".split(), stdout=subprocess.PIPE)
-        self.rootPath = process.communicate()[0]
-        self.rootPath = self.rootPath.split('\n')
-        self.rootPath = self.rootPath[0]
-        #print "path : "+self.rootPath
-        self.grasp_parser.parse_tree(self.rootPath+"/python_lib/grasp/grasps.xml")
+
+        self.rootPath = rospkg.RosPack().get_path('sr_hand')
+        self.grasp_parser.parse_tree(self.rootPath+"/scripts/sr_hand/grasps.xml")
 
         self.grasp_interpoler = 0
         self.pub = rospy.Publisher('srh/sendupdate',sendupdate, latch=True)
@@ -198,10 +196,10 @@ class ShadowHand_ROS():
         """
         @return : true if some hand is detected
         """
-        if self.check_etherCAT_hand_presence():
-            return "etherCAT"
-        elif self.check_gazebo_hand_presence():
+        if self.check_gazebo_hand_presence():
             return "gazebo"
+        elif self.check_etherCAT_hand_presence():
+            return "etherCAT"
         elif self.check_CAN_hand_presence():
             return "CANhand"
         return None
@@ -241,7 +239,8 @@ class ShadowHand_ROS():
         @param dicti: Dictionnary containing all the targets to send, mapping the name of the joint to the value of its target
         Sends new targets to the hand from a dictionnary
         """
-        #print(dicti)
+        self.sendupdate_lock.acquire()
+        
         if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             for join in dicti.keys():
 
@@ -257,6 +256,8 @@ class ShadowHand_ROS():
             for join in dicti.keys():
                 message.append(joint(joint_name=join, joint_target=dicti[join]))
             self.pub.publish(sendupdate(len(message), message))
+            
+        self.sendupdate_lock.release()
 
     def sendupdate(self, jointName, angle=0):
         """
@@ -419,6 +420,8 @@ class ShadowHand_ROS():
         Only used to check if a real etherCAT hand is detected in the system
         check if something is being published to this topic, otherwise
         return false
+        Bear in mind that the gazebo hand also publishes the joint_states topic,
+        so we need to check for the gazebo hand first
         """
 
         try:
@@ -437,7 +440,7 @@ class ShadowHand_ROS():
         """
 
         try:
-            rospy.wait_for_message("gazebo/joint_states", JointState, timeout = 0.2)
+            rospy.wait_for_message("gazebo/parameter_updates", Config, timeout = 0.2)
         except:
             return False
 
@@ -472,3 +475,4 @@ class ShadowHand_ROS():
             return True
 
         return False
+

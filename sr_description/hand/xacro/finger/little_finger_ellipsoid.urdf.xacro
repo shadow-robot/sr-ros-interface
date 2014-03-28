@@ -12,7 +12,7 @@
   <xacro:include filename="$(find sr_description)/hand/xacro/finger/distal/distal_ellipsoid.urdf.xacro" />
   <xacro:include filename="$(find sr_description)/hand/xacro/finger/lfmetacarpal/lfmetacarpal.urdf.xacro" />
 
-  <xacro:macro name="little_finger" params="link_prefix joint_prefix parent">
+  <xacro:macro name="little_finger_ellipsoid" params="link_prefix joint_prefix parent">
 
     <xacro:lfmetacarpal parent="${parent}" >
     </xacro:lfmetacarpal>
@@ -38,20 +38,21 @@
 	</geometry>
       </collision>
     </link>
+
     <gazebo reference="lfknuckle">
-      <sensor type="contact" name="lfknuckle_contact_sensor">
-        <update_rate>100.0</update_rate>
+      <sensor type="contact" name="lfknuckle_contact" >
+        <always_on>1</always_on>
+        <update_rate>1000.0</update_rate>
         <contact>
-          <collision>lfknuckle_collision_geom</collision>
+          <collision>lfknuckle_collision</collision>
+          <topic>lfknuckle_collision</topic>
         </contact>
         <plugin name="lfknuckle_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
-          <alwaysOn>true</alwaysOn>
-          <frameName>lfknuckle</frameName>
           <updateRate>100.0</updateRate>
-          <bumperTopicName>lfknuckle_bumper</bumperTopicName>
+	  <frameName>lfknuckle</frameName>
+	  <bumperTopicName>contacts/lf/knuckle</bumperTopicName>
         </plugin>
       </sensor>
-
       <material>Gazebo/Grey</material>
     </gazebo>
 
@@ -61,8 +62,8 @@
       <origin xyz="0 0 0.06579" rpy="0 0 0" />
       <axis xyz="0 1 0" />
       <limit lower="-0.3491" upper="0.3491"
-      effort="10" velocity="1.0"/>
-      <dynamics damping="50.5"/>
+      effort="1000.0" velocity="10.0"/>
+      <dynamics damping="10.0"/>
     </joint>
 
     <transmission type="sr_mechanism_model/SimpleTransmission" name="lfknuckle_transmission">

@@ -4,13 +4,8 @@ find_package(catkin REQUIRED COMPONENTS sensor_msgs sr_robot_msgs rospy roscpp t
 find_package(Boost REQUIRED COMPONENTS thread)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-catkin_python_setup()
-
 add_service_files(FILES getJointState.srv)
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
-
-add_library(sr_calibration src/calibration.cpp)
-add_dependencies(sr_calibration sr_utilities_gencpp ${catkin_EXPORTED_TARGETS})
 
 catkin_package(
     DEPENDS
@@ -18,6 +13,10 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES sr_calibration
 )
+
+add_library(sr_calibration src/calibration.cpp)
+add_dependencies(sr_calibration sr_utilities_gencpp ${catkin_EXPORTED_TARGETS})
+
 
 catkin_add_gtest(test_calibration test/test_calibration.cpp src/calibration.cpp)
 target_link_libraries(test_calibration ${catkin_LIBRARIES})
@@ -39,3 +38,13 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(TARGETS sr_calibration
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
+
+install(PROGRAMS nodes/temperature_monitor.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+
+install(DIRECTORY scripts/
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        USE_SOURCE_PERMISSIONS)
+
+

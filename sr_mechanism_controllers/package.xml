@@ -1,17 +1,18 @@
 <package>
   <name>sr_mechanism_controllers</name>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
   <description>The sr_mechanism_controllers package contains different types of
      controllers for the etherCAT hand:(fake) calibration controllers,
      position controllers, velocity controllers, force controllers, ...</description>
-  <maintainer email="software@shadowrobot.com">Ugo Cupcic </maintainer>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
   <license>GPL</license>
 
   <url type="website">http://ros.org/wiki/sr_mechanism_controllers</url>
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
-  <author email="software@shadowrobot.com">Ugo Cupcic </author>
-  <author>contact@shadowrobot.com</author>
+  <author>Ugo Cupcic</author>
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
@@ -35,6 +36,8 @@
   <build_depend>rostest</build_depend>
   <build_depend>controller_manager</build_depend> 
   <build_depend>controller_interface</build_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>tinyxml</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>std_msgs</run_depend>

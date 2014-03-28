@@ -60,7 +60,7 @@ namespace shadowrobot
   class HandCommander
   {
   public:
-    HandCommander();
+    HandCommander(const std::string& ns = "");
 
     /// Destructor
     ~HandCommander();
@@ -71,9 +71,9 @@ namespace shadowrobot
      * Returns the topic name for the controller state of a given joint. Useful for
      * easily subscribing to the corresponding state topic in another node.
      *
-     * @param joint_name the joint for which you want the topic
+     * @param joint_name the joint for which you want the topic.
      *
-     * @return the full name of the topic to which you need to subscribe
+     * @return the full name (fully resolved) of the topic to which you need to subscribe.
      */
     std::string get_controller_state_topic(std::string joint_name);
 

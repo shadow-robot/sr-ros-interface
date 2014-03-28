@@ -103,7 +103,7 @@ protected:
 
     /**
      * Convert an angle in radian to an angle in degrees.
-     * @param deg the angle in rads
+     * @param rad the angle in rads
      * @return the value in degrees.
      */
     inline double toDegrees( double rad )

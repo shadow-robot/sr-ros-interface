@@ -1,5 +1,5 @@
 /**
- * @file   shadowhand.cpp
+ * @file   sr_articulated_robot.cpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:51:19 2010
  *
