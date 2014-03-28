@@ -24,7 +24,7 @@ import threading
 import rosgraph.masterapi
 import pr2_controllers_msgs.msg
 from sr_robot_msgs.msg import sendupdate, joint, joints_data, JointControllerState
-from sensor_msgs.msg import *
+from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64
 from sr_hand.grasps_parser import GraspParser
 from sr_hand.grasps_interpoler import GraspInterpoler
@@ -95,6 +95,8 @@ class ShadowHand_ROS():
         self.eth_subscribers = {}
         #rospy.init_node('python_hand_library')
         self.sendupdate_lock = threading.Lock()
+        
+        self.joint_states_lock = threading.Lock()
 
         #contains the ending for the topic depending on which controllers are loaded
         self.topic_ending = ""
@@ -118,6 +120,12 @@ class ShadowHand_ROS():
         self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
 
         self.hand_type = self.check_hand_type()
+        
+        self.hand_velocity = {}
+        self.hand_effort = {}
+        
+        if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
+            self.joint_states_listener = rospy.Subscriber("joint_states", JointState, self.joint_states_callback)
 
         threading.Thread(None, rospy.spin)
 
@@ -378,6 +386,20 @@ class ShadowHand_ROS():
             self.dict_tar[joint.joint_name] = joint.joint_target
         return self.dict_tar
 
+    def read_all_current_velocities(self):
+        """
+        @return: dictionary mapping joint names to current velocities
+        """
+        with self.joint_states_lock:
+            return self.hand_velocity
+    
+    def read_all_current_efforts(self):
+        """
+        @return: dictionary mapping joint names to current efforts
+        """
+        with self.joint_states_lock:
+            return self.hand_effort
+    
     def read_all_current_arm_positions(self):
         """
         @return: dictionnary mapping joint names to actual positions
@@ -476,3 +498,47 @@ class ShadowHand_ROS():
 
         return False
 
+    def joint_states_callback(self, joint_state):
+        """
+        The callback function for the topic joint_states.
+        It will store the received joint velocity and effort information in two dictionaries
+        Velocity will be converted to degrees/s.
+        Effort units are kept as they are (currently ADC units, as no calibration is performed on the strain gauges)
+        
+        @param joint_state: the message containing the joints data.
+        """
+        with self.joint_states_lock:  
+            self.hand_velocity = {n:math.degrees(v) for n,v in zip(joint_state.name, joint_state.velocity)}
+            self.hand_effort = {n:e for n,e in zip(joint_state.name, joint_state.effort)}
+    
+            self.hand_velocity['FFJ0'] = self.hand_velocity['FFJ1'] + self.hand_velocity['FFJ2']
+            del self.hand_velocity['FFJ1']
+            del self.hand_velocity['FFJ2']
+    
+            self.hand_velocity['MFJ0'] = self.hand_velocity['MFJ1'] + self.hand_velocity['MFJ2']
+            del self.hand_velocity['MFJ1']
+            del self.hand_velocity['MFJ2']
+    
+            self.hand_velocity['RFJ0'] = self.hand_velocity['RFJ1'] + self.hand_velocity['RFJ2']
+            del self.hand_velocity['RFJ1']
+            del self.hand_velocity['RFJ2']
+    
+            self.hand_velocity['LFJ0'] = self.hand_velocity['LFJ1'] + self.hand_velocity['LFJ2']
+            del self.hand_velocity['LFJ1']
+            del self.hand_velocity['LFJ2']
+    
+            self.hand_effort['FFJ0'] = self.hand_effort['FFJ1'] + self.hand_effort['FFJ2']
+            del self.hand_effort['FFJ1']
+            del self.hand_effort['FFJ2']
+    
+            self.hand_effort['MFJ0'] = self.hand_effort['MFJ1'] + self.hand_effort['MFJ2']
+            del self.hand_effort['MFJ1']
+            del self.hand_effort['MFJ2']
+    
+            self.hand_effort['RFJ0'] = self.hand_effort['RFJ1'] + self.hand_effort['RFJ2']
+            del self.hand_effort['RFJ1']
+            del self.hand_effort['RFJ2']
+    
+            self.hand_effort['LFJ0'] = self.hand_effort['LFJ1'] + self.hand_effort['LFJ2']
+            del self.hand_effort['LFJ1']
+            del self.hand_effort['LFJ2']
