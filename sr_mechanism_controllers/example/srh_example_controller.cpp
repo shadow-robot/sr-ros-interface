@@ -68,7 +68,7 @@ namespace controller {
     // Feel free to create a different message type, to publish more meaningful
     // information for your controller (cf srh_mixed_position_velocity_controller.cpp)
     controller_state_publisher_.reset(
-      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
+      new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
       (node_, "state", 1));
 
     //Calls the 2nd init function to finish initializing

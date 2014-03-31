@@ -28,7 +28,7 @@ namespace shadowrobot
     //Create a map of joint names to their command publishers
     //Hand joints
     //TODO: this could be read from the controller manager
-    // rosservice call /pr2_controller_manager/list_controllers
+    // rosservice call /controller_manager/list_controllers
     std::string hand_names[] = {
       "ffj0", "ffj3", "ffj4",
       "lfj0", "lfj3", "lfj4", "lfj5",

@@ -93,12 +93,12 @@ namespace shadow_robot
   void SrSelfTest::test_services_()
   {
     std::vector<std::string> services_to_test;
-    services_to_test.push_back("pr2_controller_manager/list_controller_types");
-    services_to_test.push_back("pr2_controller_manager/list_controllers");
-    services_to_test.push_back("pr2_controller_manager/load_controller");
-    services_to_test.push_back("pr2_controller_manager/reload_controller_libraries");
-    services_to_test.push_back("pr2_controller_manager/switch_controller");
-    services_to_test.push_back("pr2_controller_manager/unload_controller");
+    services_to_test.push_back("controller_manager/list_controller_types");
+    services_to_test.push_back("controller_manager/list_controllers");
+    services_to_test.push_back("controller_manager/load_controller");
+    services_to_test.push_back("controller_manager/reload_controller_libraries");
+    services_to_test.push_back("controller_manager/switch_controller");
+    services_to_test.push_back("controller_manager/unload_controller");
 
     test_runner_.addServicesTest(services_to_test);
   }

@@ -37,7 +37,7 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Float64.h>
 #include <std_srvs/Empty.h>
-#include <pr2_controllers_msgs/JointControllerState.h>
+#include <control_msgs/JointControllerState.h>
 
 #include <utility>
 
@@ -126,7 +126,7 @@ namespace controller
 
     boost::scoped_ptr<
       realtime_tools::RealtimePublisher<
-        pr2_controllers_msgs::JointControllerState> > controller_state_publisher_ ;
+        control_msgs::JointControllerState> > controller_state_publisher_ ;
 
     boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator> friction_compensator;
 

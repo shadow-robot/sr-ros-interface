@@ -140,7 +140,7 @@ namespace sr_mechanism_model
         js[1]->velocity_ = static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.velocity_ / 2.0;
 
         //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
-        //ethercat_hardware and pr2_etherCAT main loop
+        //ethercat_hardware and ros_etherCAT main loop
         // So we will encode the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
         // have any measured effort in the muscle hand anyway).
         // Then in the joint controller we will decode that back into uint16.
@@ -220,7 +220,7 @@ namespace sr_mechanism_model
     assert(js.size() == 2);
     static_cast<sr_actuator::SrMuscleActuator*>(as[0])->command_.enable_ = true;
     //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
-    //ethercat_hardware and pr2_etherCAT main loop
+    //ethercat_hardware and ros_etherCAT main loop
     // So the controller encodes the two int16 that contain the valve commands into the double effort_. (We don't
     // have any real commanded_effort_ in the muscle hand anyway).
     // Here we decode them back into two int16.

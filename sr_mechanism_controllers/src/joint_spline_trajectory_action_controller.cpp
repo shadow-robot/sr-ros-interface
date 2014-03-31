@@ -4,14 +4,14 @@
  * @date   Fri Mar  4 13:08:22 2011
  *
  * @brief  Implement an actionlib server to execute a
- * pr2_controllers_msgs::JointTrajectoryAction. Follows the
+ * control_msgs::JointTrajectoryAction. Follows the
  * given trajectory with the arm.
  *
  *
  */
 
 #include "sr_mechanism_controllers/joint_spline_trajectory_action_controller.hpp"
-#include <pr2_mechanism_msgs/ListControllers.h>
+#include <controller_manager_msgs/ListControllers.h>
 #include <sr_utilities/getJointState.h>
 #include <std_msgs/Float64.h>
 #include <sr_robot_msgs/sendupdate.h>
@@ -170,11 +170,11 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
     }
 
   //look for controllers and build controller name to joint map
-  if( ros::service::waitForService("sr_controller_manager/list_controllers",20000) )
+  if( ros::service::waitForService("controller_manager/list_controllers",20000) )
   {
     use_sendupdate=false;
-    ros::ServiceClient controller_list_client = nh.serviceClient<pr2_mechanism_msgs::ListControllers>("sr_controller_manager/list_controllers");
-    pr2_mechanism_msgs::ListControllers controller_list;
+    ros::ServiceClient controller_list_client = nh.serviceClient<controller_manager_msgs::ListControllers>("controller_manager/list_controllers");
+    controller_manager_msgs::ListControllers controller_list;
     std::string controlled_joint_name;
 
 	// query the list
@@ -211,7 +211,7 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
   }
   else
   {
-    ROS_WARN("sr_controller_manager not found, switching back to sendupdates");
+    ROS_WARN("controller_manager not found, switching back to sendupdates");
     use_sendupdate=true;
     sr_arm_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/sr_arm/sendupdate", 2);
     sr_hand_target_pub = nh.advertise<sr_robot_msgs::sendupdate>("/srh/sendupdate", 2);

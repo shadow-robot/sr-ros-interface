@@ -136,7 +136,7 @@ namespace controller {
       return false;
 
     controller_state_publisher_.reset(
-      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
+      new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
       (node_, "state", 1));
 
     return init(robot, joint_name, pid_position);

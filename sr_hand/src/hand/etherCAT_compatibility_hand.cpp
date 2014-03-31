@@ -31,7 +31,7 @@
 #include <ros/ros.h>
 #include <ros/topic.h>
 #include <std_msgs/Float64.h>
-#include <pr2_controllers_msgs/JointControllerState.h>
+#include <control_msgs/JointControllerState.h>
 #include <sr_robot_msgs/JointControllerState.h>
 
 namespace shadowrobot
@@ -237,7 +237,7 @@ namespace shadowrobot
       ROS_WARN("Mixed controller state not received for joint: %s", joint_name.c_str());
       controller_suffix = "position_controller";
       topic = "/sh_"+ joint_name + "_" + controller_suffix + "/state";
-      pr2_controllers_msgs::JointControllerState::ConstPtr msg_received_2 = ros::topic::waitForMessage<pr2_controllers_msgs::JointControllerState>(topic, max_wait);
+      control_msgs::JointControllerState::ConstPtr msg_received_2 = ros::topic::waitForMessage<control_msgs::JointControllerState>(topic, max_wait);
       if(!msg_received_2)
       {
         ROS_WARN("Position controller state not received for joint: %s", joint_name.c_str());

@@ -230,7 +230,7 @@ namespace controller {
 
     //IGNORE the following  lines if we don't want to use the pressure sensors data
     //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
-    //ethercat_hardware and pr2_etherCAT main loop
+    //ethercat_hardware and ros_etherCAT main loop
     // So we heve encoded the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
     // have any measured effort in the muscle hand anyway).
     // Here we extract the pressure values from joint_state_->measured_effort_ and decode that back into uint16.
@@ -312,7 +312,7 @@ namespace controller {
     //************************************************
     // After doing any computation we consider, we encode the obtained valve commands into joint_state_->commanded_effort_
     //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
-    //ethercat_hardware and pr2_etherCAT main loop
+    //ethercat_hardware and ros_etherCAT main loop
     // So the controller encodes the two int8 (that are in fact int4) that contain the valve commands into the double commanded_effort_. (We don't
     // have any real commanded_effort_ in the muscle hand anyway).
 

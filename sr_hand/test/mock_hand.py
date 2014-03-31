@@ -18,7 +18,7 @@
 # ####################################################################
 
 import rospy;
-from pr2_mechanism_msgs.srv import *
+from controller_manager_msgs.srv import *
 
 class MockHand(object):
     """
@@ -27,11 +27,11 @@ class MockHand(object):
     List controller service so it looks like a ethercat hand to HandCommander.
     """
 
-    def __init__(self, ):
+    def __init__(self,):
         """
         @brief Construct a new MockHand, setting up ros connections.
         """
-        self.list_srv = rospy.Service('pr2_controller_manager/list_controllers',
+        self.list_srv = rospy.Service('controller_manager/list_controllers',
                 ListControllers, self.list_controllers_cb)
         rospy.loginfo("Started MockHand")
 
