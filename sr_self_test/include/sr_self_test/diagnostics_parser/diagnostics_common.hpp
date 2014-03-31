@@ -115,7 +115,7 @@ namespace shadow_robot
       : name(name), test_runner_(test_runner)
     {}
 
-    ~BaseDiagnostics()
+    virtual ~BaseDiagnostics()
     {}
 
     virtual void parse_diagnostics(std::vector<diagnostic_msgs::KeyValue> values,

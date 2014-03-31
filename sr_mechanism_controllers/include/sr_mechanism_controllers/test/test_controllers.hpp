@@ -40,7 +40,7 @@ class TestControllers
 {
 public:
   TestControllers();
-  ~TestControllers();
+  virtual ~TestControllers();
 
   void init();
 

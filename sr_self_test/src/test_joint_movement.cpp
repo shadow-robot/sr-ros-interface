@@ -60,18 +60,9 @@ namespace shadow_robot
     std::string controller_state_topic = hand_commander_->get_controller_state_topic(joint_name);
     std::string controller_state_topic_type = get_ROS_topic_type(controller_state_topic);
     std::string controller_type = "";
-    if(controller_state_topic_type.compare("control_msgs/JointControllerState") == 0)
-    {
-      controller_type = "pr2";
-    }
-    else if(controller_state_topic_type.compare("sr_robot_msgs/JointControllerState") == 0)
+    if(controller_state_topic_type.compare("sr_robot_msgs/JointControllerState") == 0)
     {
       controller_type = "sr";
-    }
-    else
-    {
-      ROS_ERROR_STREAM("Unknown controller state type: " << controller_state_topic_type << " trying to use pr2 type instead");
-      controller_type = "pr2";
     }
 
     mvt_pub_.reset(new shadowrobot::MovementPublisher(joint_name, publish_rate, repetition,
@@ -93,7 +84,7 @@ namespace shadow_robot
     mvt_pub_->start();
   }
 
-  void TestJointMovement::state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
+  void TestJointMovement::sr_state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
   {
     values[joint_name_ +" position"].push_back(msg->process_value);
     values[joint_name_ +" target"].push_back(msg->set_point);

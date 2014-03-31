@@ -101,17 +101,17 @@ namespace shadow_robot
     controller_manager_msgs::ListControllers list_ctrl;
     if( ros::service::call("controller_manager/list_controllers", list_ctrl))
     {
-      for (size_t i = 0; i < list_ctrl.response.controllers.size(); ++i)
+      for (size_t i = 0; i < list_ctrl.response.controller.size(); ++i)
       {
-        if( list_ctrl.response.controllers[i].find( joint_name_ ) != std::string::npos )
+        if( list_ctrl.response.controller[i].name.find( joint_name_ ) != std::string::npos )
         {
-          if( list_ctrl.response.state[i].compare( "running" ) == 0 )
+          if( list_ctrl.response.controller[i].state.compare( "running" ) == 0 )
           {
-            current_ctrl = list_ctrl.response.controllers[i];
+            current_ctrl = list_ctrl.response.controller[i].name;
           }
-          if( list_ctrl.response.controllers[i].find( "_effort_controller" ) != std::string::npos )
+          if( list_ctrl.response.controller[i].name.find( "_effort_controller" ) != std::string::npos )
           {
-            effort_ctrl = list_ctrl.response.controllers[i];
+            effort_ctrl = list_ctrl.response.controller[i].name;
           }
         }
       }

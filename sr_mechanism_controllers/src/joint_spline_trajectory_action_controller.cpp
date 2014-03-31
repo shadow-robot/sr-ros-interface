@@ -180,14 +180,14 @@ JointTrajectoryActionController::JointTrajectoryActionController() :
 	// query the list
     controller_list_client.call(controller_list);
 	// build the map
-    for (unsigned int i=0; i<controller_list.response.controllers.size() ; i++ )
+    for (unsigned int i=0; i<controller_list.response.controller.size() ; i++ )
     {
-      if(controller_list.response.state[i]=="running")
+      if(controller_list.response.controller[i].state=="running")
       {
-        if (nh.getParam("/"+controller_list.response.controllers[i]+"/joint", controlled_joint_name))
+        if (nh.getParam("/"+controller_list.response.controller[i].name+"/joint", controlled_joint_name))
         {
-          ROS_DEBUG("controller %d:%s controls joint %s\n",i,controller_list.response.controllers[i].c_str(),controlled_joint_name.c_str());
-          jointControllerMap[controlled_joint_name]= controller_list.response.controllers[i] ;
+          ROS_DEBUG("controller %d:%s controls joint %s\n",i,controller_list.response.controller[i].name.c_str(),controlled_joint_name.c_str());
+          jointControllerMap[controlled_joint_name]= controller_list.response.controller[i].name ;
         }
       }
     }
