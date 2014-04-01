@@ -1,18 +1,16 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_mechanism_controllers)
 
-find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp actionlib sr_robot_msgs
-  sr_utilities pr2_mechanism_model realtime_tools robot_mechanism_controllers
-  pluginlib rosconsole angles control_toolbox sr_hardware_interface xmlrpcpp
-  controller_manager controller_interface cmake_modules)
+find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp actionlib control_msgs sr_robot_msgs
+  sr_utilities controller_interface pr2_mechanism_model realtime_tools robot_mechanism_controllers
+  pluginlib rosconsole angles control_toolbox sr_hardware_interface xmlrpcpp cmake_modules controller_manager_msgs)
 find_package(TinyXML REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
 catkin_package(
   DEPENDS xmlrpcpp
-  CATKIN_DEPENDS std_msgs std_srvs roscpp actionlib sr_robot_msgs sr_utilities pr2_mechanism_model
-    realtime_tools robot_mechanism_controllers pluginlib rosconsole angles control_toolbox sr_hardware_interface
-    controller_manager controller_interface
+  CATKIN_DEPENDS std_msgs std_srvs roscpp actionlib control_msgs sr_robot_msgs sr_utilities controller_interface pr2_mechanism_model
+    realtime_tools robot_mechanism_controllers pluginlib rosconsole angles control_toolbox sr_hardware_interface controller_manager_msgs
   INCLUDE_DIRS include
   LIBRARIES sr_mechanism_controllers
 )

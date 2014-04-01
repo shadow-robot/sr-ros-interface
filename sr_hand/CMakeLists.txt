@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_hand)
 
-find_package(catkin REQUIRED COMPONENTS rostest roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs
+find_package(catkin REQUIRED COMPONENTS rostest roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs control_msgs controller_manager_msgs
   sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs)
 find_package(gazebo REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
@@ -10,7 +10,7 @@ catkin_python_setup()
 
 catkin_package(
     DEPENDS
-    CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs sr_utilities
+    CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs control_msgs controller_manager_msgs sr_utilities
       diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs
     INCLUDE_DIRS include
     LIBRARIES HandCommander SrVirtual
