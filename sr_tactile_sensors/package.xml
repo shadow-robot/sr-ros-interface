@@ -21,6 +21,7 @@
   <build_depend>sr_robot_msgs</build_depend>
   <build_depend>visualization_msgs</build_depend>
   <build_depend>gazebo_msgs</build_depend>
+  <build_depend>gazebo</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
@@ -28,5 +29,6 @@
   <run_depend>sr_robot_msgs</run_depend>
   <run_depend>visualization_msgs</run_depend>
   <run_depend>gazebo_msgs</run_depend>
+  <run_depend>gazebo</run_depend>
 
 </package>
