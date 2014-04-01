@@ -65,6 +65,7 @@ add_executable(simple_trajectory_compare example/simple_trajectory_compare.cpp)
 add_dependencies(simple_trajectory_compare ${catkin_EXPORTED_TARGETS})
 target_link_libraries(simple_trajectory_compare ${catkin_LIBRARIES})
 
+
 #if(COMMAND add_rostest_gtest)
 #  add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_pos_controller.cpp test/test_controllers.cpp
 #    src/srh_joint_position_controller.cpp src/sr_controller.cpp)

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_kinematics)
 
-find_package(catkin REQUIRED COMPONENTS roscpp tf urdf kdl_parser sensor_msgs tf_conversions moveit_core orocos_kdl)
+find_package(catkin REQUIRED COMPONENTS roscpp tf urdf kdl_parser sensor_msgs tf_conversions moveit_core)
 find_package(orocos_kdl REQUIRED)
 include_directories(${catkin_INCLUDE_DIRS} ${orocos_kdl_INCLUDE_DIRS})
 

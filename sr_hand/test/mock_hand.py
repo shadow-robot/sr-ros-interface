@@ -27,7 +27,7 @@ class MockHand(object):
     List controller service so it looks like a ethercat hand to HandCommander.
     """
 
-    def __init__(self,):
+    def __init__(self, ):
         """
         @brief Construct a new MockHand, setting up ros connections.
         """

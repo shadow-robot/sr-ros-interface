@@ -9,7 +9,7 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO
 catkin_python_setup()
 
 catkin_package(
-    DEPENDS orocos_kdl
+    DEPENDS
     CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs sr_utilities
       diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs
     INCLUDE_DIRS include
@@ -148,6 +148,7 @@ add_library(HandCommander src/hand_commander.cpp)
 add_dependencies(HandCommander ${catkin_EXPORTED_TARGETS})
 target_link_libraries(HandCommander ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
 
 if(COMMAND add_rostest_gtest)
   add_rostest_gtest(hand_commander_test test/hand_commander_test.test test/hand_commander_test.cpp)

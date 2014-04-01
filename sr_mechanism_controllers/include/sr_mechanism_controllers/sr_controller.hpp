@@ -73,16 +73,16 @@ namespace controller
      */
     void getCommand(double & cmd);
 
-    virtual void starting() {}
+    virtual void starting();
 
     /*!
      * \brief Issues commands to the joint. Should be called at regular intervals
      */
-    virtual void update(const ros::Time&, const ros::Duration&) {}
+    virtual void update(const ros::Time&, const ros::Duration&);
 
     virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
 
-    virtual void getGains(double &, double &, double &, double &, double &) {}
+    virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
 
     std::string getJointName();
     pr2_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
