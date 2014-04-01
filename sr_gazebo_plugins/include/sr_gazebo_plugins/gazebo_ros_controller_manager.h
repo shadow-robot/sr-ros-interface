@@ -33,11 +33,11 @@
 #include <vector>
 #include <map>
 
-#include "physics/World.hh"
-#include "physics/Model.hh"
-#include "physics/physics.hh"
-#include "common/Time.hh"
-#include "common/Plugin.hh"
+#include <gazebo/physics/World.hh>
+#include <gazebo/physics/Model.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/common/Time.hh>
+#include <gazebo/common/Plugin.hh>
 
 #include "pr2_hardware_interface/hardware_interface.h"
 #include "pr2_controller_manager/controller_manager.h"
