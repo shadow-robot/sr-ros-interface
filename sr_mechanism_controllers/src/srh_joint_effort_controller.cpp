@@ -51,7 +51,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhEffortJointController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name)
+  bool SrhEffortJointController::init(ros_ethercat_mechanism_model::RobotState *robot, const std::string &joint_name)
   {
     ROS_DEBUG(" --------- ");
     ROS_DEBUG_STREAM("Init: " << joint_name);
@@ -109,7 +109,7 @@ namespace controller {
     return true;
   }
 
-  bool SrhEffortJointController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhEffortJointController::init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;

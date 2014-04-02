@@ -49,7 +49,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
+  bool SrhJointVelocityController::init(ros_ethercat_mechanism_model::RobotState *robot, const std::string &joint_name,
                                         boost::shared_ptr<control_toolbox::Pid> pid_velocity)
   {
     ROS_DEBUG(" --------- ");
@@ -115,7 +115,7 @@ namespace controller {
     return true;
   }
 
-  bool SrhJointVelocityController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhJointVelocityController::init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;

@@ -39,10 +39,10 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/Plugin.hh>
 
-#include "pr2_hardware_interface/hardware_interface.h"
+#include "ros_ethercat/hardware_interface.hpp"
 #include "controller_manager/controller_manager.h"
 //#include "pr2_gazebo_plugins/SetModelsJointsStates.h"
-#include "pr2_mechanism_model/robot.h"
+#include "ros_ethercat/robot.h"
 #include <tinyxml.h>
 #include <ros/ros.h>
 #undef USE_CBQ
@@ -71,13 +71,13 @@ protected:
 private:
 
   gazebo::physics::ModelPtr parent_model_;
-  pr2_hardware_interface::HardwareInterface hw_;
+  ros_ethercat_hardware_interface::HardwareInterface hw_;
   controller_manager::ControllerManager *cm_;
 
   /// @todo The fake state helps Gazebo run the transmissions backwards, so
   ///       that it can figure out what its joints should do based on the
   ///       actuator values.
-  pr2_mechanism_model::RobotState *fake_state_;
+  ros_ethercat_mechanism_model::RobotState *fake_state_;
   std::vector<gazebo::physics::JointPtr>  joints_;
 
   /// \brief Service Call Name

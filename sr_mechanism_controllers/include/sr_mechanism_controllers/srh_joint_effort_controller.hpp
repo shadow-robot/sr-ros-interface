@@ -41,8 +41,8 @@ namespace controller
     SrhEffortJointController();
     ~SrhEffortJointController();
 
-    bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name);
-    bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
+    bool init( ros_ethercat_mechanism_model::RobotState *robot, const std::string &joint_name);
+    bool init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting();
 

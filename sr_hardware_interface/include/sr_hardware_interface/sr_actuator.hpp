@@ -28,15 +28,15 @@
 #define _SR_ACTUATOR_HPP_
 
 #include "sr_hardware_interface/tactile_sensors.hpp"
-#include <pr2_hardware_interface/hardware_interface.h>
+#include <ros_ethercat/hardware_interface.hpp>
 
 namespace sr_actuator
 {
-  class SrActuatorState : public pr2_hardware_interface::ActuatorState
+  class SrActuatorState : public ros_ethercat_hardware_interface::ActuatorState
   {
   public:
     SrActuatorState() :
-      pr2_hardware_interface::ActuatorState(),
+      ros_ethercat_hardware_interface::ActuatorState(),
       temperature_(0),
       position_unfiltered_(0.0),
       can_msgs_received_(0),
@@ -175,11 +175,11 @@ namespace sr_actuator
     int8_t last_commanded_valve_[2];
   }; //end class SrMuscleActuatorState
 
-  class SrMuscleActuatorCommand : public pr2_hardware_interface::ActuatorCommand
+  class SrMuscleActuatorCommand : public ros_ethercat_hardware_interface::ActuatorCommand
   {
   public:
     SrMuscleActuatorCommand() :
-      pr2_hardware_interface::ActuatorCommand()
+      ros_ethercat_hardware_interface::ActuatorCommand()
     {
       valve_[0] = 0;
       valve_[1] = 0;
@@ -189,15 +189,15 @@ namespace sr_actuator
   }; //end class SrMuscleActuatorCommand
 
 
-  class SrGenericActuator : public pr2_hardware_interface::Actuator
+  class SrGenericActuator : public ros_ethercat_hardware_interface::Actuator
   {
   public:
     SrGenericActuator()
-      : pr2_hardware_interface::Actuator()
+      : ros_ethercat_hardware_interface::Actuator()
     {}
 
     SrGenericActuator(std::string name)
-      : pr2_hardware_interface::Actuator(name)
+      : ros_ethercat_hardware_interface::Actuator(name)
     {}
 
     //A virtual destructor to make the class polymorphic (the compiler is picky about trying to dynamic_cast non-polymorphic classes)

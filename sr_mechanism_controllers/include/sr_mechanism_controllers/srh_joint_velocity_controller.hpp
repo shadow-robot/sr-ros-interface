@@ -41,9 +41,9 @@ namespace controller
     SrhJointVelocityController();
     ~SrhJointVelocityController();
 
-    bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
+    bool init( ros_ethercat_mechanism_model::RobotState *robot, const std::string &joint_name,
                boost::shared_ptr<control_toolbox::Pid> pid_velocity);
-    bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
+    bool init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting();
 

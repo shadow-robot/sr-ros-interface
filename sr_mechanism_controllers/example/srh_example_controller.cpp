@@ -50,7 +50,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhExampleController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhExampleController::init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;
@@ -75,7 +75,7 @@ namespace controller {
     return init(robot, joint_name);
   }
 
-  bool SrhExampleController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name)
+  bool SrhExampleController::init(ros_ethercat_mechanism_model::RobotState *robot, const std::string &joint_name)
   {
     assert(robot);
     robot_ = robot;

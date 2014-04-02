@@ -30,40 +30,40 @@
 #define _JOINT_0_TRANSMISSION_HPP_
 
 #include <tinyxml.h>
-#include "pr2_mechanism_model/transmission.h"
-#include "pr2_mechanism_model/joint.h"
-#include "pr2_hardware_interface/hardware_interface.h"
-#include "pr2_mechanism_model/joint_calibration_simulator.h"
+#include "ros_ethercat/transmission.h"
+#include "ros_ethercat/joint.h"
+#include "ros_ethercat/hardware_interface.hpp"
+#include "ros_ethercat/joint_calibration_simulator.h"
 
 namespace sr_mechanism_model
 {
-  class J0Transmission : public pr2_mechanism_model::Transmission
+  class J0Transmission : public ros_ethercat_mechanism_model::Transmission
   {
   public:
     J0Transmission() {}
     ~J0Transmission() {}
 
-    bool initXml(TiXmlElement *config, pr2_mechanism_model::Robot *robot);
+    bool initXml(TiXmlElement *config, ros_ethercat_mechanism_model::Robot *robot);
     bool initXml(TiXmlElement *config);
 
     double mechanical_reduction_;
 
-    void propagatePosition(std::vector<pr2_hardware_interface::Actuator*>&,
-                           std::vector<pr2_mechanism_model::JointState*>&);
-    void propagatePositionBackwards(std::vector<pr2_mechanism_model::JointState*>&,
-                                    std::vector<pr2_hardware_interface::Actuator*>&);
-    void propagateEffort(std::vector<pr2_mechanism_model::JointState*>&,
-                         std::vector<pr2_hardware_interface::Actuator*>&);
-    void propagateEffortBackwards(std::vector<pr2_hardware_interface::Actuator*>&,
-                                  std::vector<pr2_mechanism_model::JointState*>&);
+    void propagatePosition(std::vector<ros_ethercat_hardware_interface::Actuator*>&,
+                           std::vector<ros_ethercat_mechanism_model::JointState*>&);
+    void propagatePositionBackwards(std::vector<ros_ethercat_mechanism_model::JointState*>&,
+                                    std::vector<ros_ethercat_hardware_interface::Actuator*>&);
+    void propagateEffort(std::vector<ros_ethercat_mechanism_model::JointState*>&,
+                         std::vector<ros_ethercat_hardware_interface::Actuator*>&);
+    void propagateEffortBackwards(std::vector<ros_ethercat_hardware_interface::Actuator*>&,
+                                  std::vector<ros_ethercat_mechanism_model::JointState*>&);
 
   private:
     int simulated_actuator_timestamp_initialized_;
     ros::Time simulated_actuator_start_time_;
 
-    pr2_mechanism_model::JointCalibrationSimulator joint_calibration_simulator_;
+    ros_ethercat_mechanism_model::JointCalibrationSimulator joint_calibration_simulator_;
 
-    bool init_joint(TiXmlElement *jel, pr2_mechanism_model::Robot *robot);
+    bool init_joint(TiXmlElement *jel, ros_ethercat_mechanism_model::Robot *robot);
   };
 
 } //end namespace sr_mechanism_model

@@ -69,7 +69,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
 {
   ROS_DEBUG("Calling FiniChild in GazeboRosControllerManager");
 
-  //pr2_hardware_interface::ActuatorMap::const_iterator it;
+  //ros_ethercat_hardware_interface::ActuatorMap::const_iterator it;
   //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
   //  delete it->second; // why is this causing double free corruption?
   this->cm_->~ControllerManager();
@@ -175,7 +175,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   ReadPr2Xml();
 
   // Initializes the fake state (for running the transmissions backwards).
-  this->fake_state_ = new pr2_mechanism_model::RobotState(&this->cm_->model_);
+  this->fake_state_ = new ros_ethercat_mechanism_model::RobotState(&this->cm_->model_);
 
   // The gazebo joints and mechanism joints should match up.
   if (this->cm_->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
@@ -393,7 +393,7 @@ void GazeboRosControllerManager::ReadPr2Xml()
     for (it = get_actuators.actuators.begin(); it != get_actuators.actuators.end(); ++it)
     {
       //std::cout << " adding actuator " << (*it) << std::endl;
-      pr2_hardware_interface::Actuator* pr2_actuator = new sr_actuator::SrActuator(*it);
+      ros_ethercat_hardware_interface::Actuator* pr2_actuator = new sr_actuator::SrActuator(*it);
       pr2_actuator->state_.is_enabled_ = true;
       this->hw_.addActuator(pr2_actuator);
     }

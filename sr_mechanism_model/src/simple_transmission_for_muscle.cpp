@@ -39,18 +39,18 @@
 
 #include <math.h>
 #include <pluginlib/class_list_macros.h>
-#include "pr2_mechanism_model/robot.h"
+#include "ros_ethercat/robot.h"
 #include "sr_mechanism_model/simple_transmission_for_muscle.hpp"
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
-using namespace pr2_hardware_interface;
+using namespace ros_ethercat_hardware_interface;
 
-PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmissionForMuscle, pr2_mechanism_model::Transmission)
+PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmissionForMuscle, ros_ethercat_mechanism_model::Transmission)
 
 namespace sr_mechanism_model
 {
-  bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, pr2_mechanism_model::Robot *robot)
+  bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, ros_ethercat_mechanism_model::Robot *robot)
   {
     const char *name = elt->Attribute("name");
     name_ = name ? name : "";
@@ -73,7 +73,7 @@ namespace sr_mechanism_model
 
     TiXmlElement *ael = elt->FirstChildElement("actuator");
     const char *actuator_name = ael ? ael->Attribute("name") : NULL;
-    pr2_hardware_interface::Actuator *a;
+    ros_ethercat_hardware_interface::Actuator *a;
     if (!actuator_name || (a = robot->getActuator(actuator_name)) == NULL )
     {
       ROS_ERROR("SimpleTransmissionForMuscle could not find actuator named \"%s\"", actuator_name);
@@ -116,7 +116,7 @@ namespace sr_mechanism_model
   }
 
   void SimpleTransmissionForMuscle::propagatePosition(
-    std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
+    std::vector<ros_ethercat_hardware_interface::Actuator*>& as, std::vector<ros_ethercat_mechanism_model::JointState*>& js)
   {
     ROS_DEBUG(" propagate position");
 
@@ -136,7 +136,7 @@ namespace sr_mechanism_model
   }
 
   void SimpleTransmissionForMuscle::propagatePositionBackwards(
-    std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
+    std::vector<ros_ethercat_mechanism_model::JointState*>& js, std::vector<ros_ethercat_hardware_interface::Actuator*>& as)
   {
     ROS_DEBUG(" propagate position bw");
 
@@ -174,7 +174,7 @@ namespace sr_mechanism_model
   }
 
   void SimpleTransmissionForMuscle::propagateEffort(
-    std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
+    std::vector<ros_ethercat_mechanism_model::JointState*>& js, std::vector<ros_ethercat_hardware_interface::Actuator*>& as)
   {
     ROS_DEBUG(" propagate effort");
 
@@ -208,7 +208,7 @@ namespace sr_mechanism_model
   }
 
   void SimpleTransmissionForMuscle::propagateEffortBackwards(
-    std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
+    std::vector<ros_ethercat_hardware_interface::Actuator*>& as, std::vector<ros_ethercat_mechanism_model::JointState*>& js)
   {
     ROS_DEBUG(" propagate effort bw");
 
