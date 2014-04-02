@@ -9,7 +9,7 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO
 catkin_python_setup()
 
 catkin_package(
-    DEPENDS
+    DEPENDS gazebo
     CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs pr2_controllers_msgs pr2_mechanism_msgs sr_utilities
       diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs
     INCLUDE_DIRS include

@@ -34,6 +34,7 @@
   <build_depend>self_test</build_depend>
   <build_depend>urdf</build_depend>
   <build_depend>gazebo_msgs</build_depend>
+  <build_depend>gazebo</build_depend>
   <build_depend>rostest</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
@@ -52,6 +53,8 @@
   <run_depend>self_test</run_depend>
   <run_depend>urdf</run_depend>
   <run_depend>gazebo_msgs</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>gazebo</run_depend>
   <run_depend>robot_state_publisher</run_depend>
 
   <!-- Dependencies needed only for running tests. -->
