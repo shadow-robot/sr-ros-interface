@@ -69,7 +69,7 @@ class Commander(object):
             self.hand_interpolation_period = 0.1
 
 
-    def move_hand(self, joints):
+    def move_hand(self, command):
         """
         Move the Shadow Hand.
 
@@ -86,10 +86,13 @@ class Commander(object):
         the new call will override only the conciding joints. The others will keep moving
         to their previous targets at their previous velocity.
 
-        @param joints - Dictionary of joint names in the keys and angles in
+        @param command - Dictionary of joint names in the keys and angles in
         degrees in the values. The key interpolation_time gives the time in seconds that 
         the movement will last.
         """
+        
+        # Copy the dictionary, so that we will not affect the original user command
+        joints = dict(command)
         
         interpolation_time = 0.0
         if 'interpolation_time' in joints:
@@ -156,9 +159,11 @@ class Commander(object):
         @param joints - Dictionary of joint names in the keys and angles in
         degrees in the values.
         """
+        rospy.logdebug("Call prune from thread %s", threading.current_thread().name )
         for thread_id in self.grasp_interpolators.keys():
             for joint_name in joints.keys():
                 self.grasp_interpolators[thread_id].grasp_to.joints_and_positions.pop(joint_name, None)
+                rospy.logdebug("Prune joint %s thread %s", joint_name, thread_id )
 
 
     def get_hand_position(self):
