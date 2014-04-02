@@ -163,3 +163,9 @@ class Commander(object):
 
     def get_hand_position(self):
         return self.hand.read_all_current_positions()
+    
+    def get_hand_velocity(self):
+        return self.hand.read_all_current_velocities()
+    
+    def get_hand_effort(self):
+        return self.hand.read_all_current_efforts()
