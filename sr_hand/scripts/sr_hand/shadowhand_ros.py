@@ -127,7 +127,11 @@ class ShadowHand_ROS():
         
         if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             self.joint_states_listener = rospy.Subscriber("joint_states", JointState, self.joint_states_callback)
-
+            # Initialize the command publishers here, to avoid the delay caused when initializing them in the sendupdate
+            for joint in self.allJoints:
+                if not self.eth_publishers.has_key(joint.name):
+                    topic = "sh_"+ joint.name.lower() + self.topic_ending+"/command"
+                    self.eth_publishers[joint.name] = rospy.Publisher(topic, Float64, latch=True)
         self.tactile_receiver = TactileReceiver()
         
         threading.Thread(None, rospy.spin)
