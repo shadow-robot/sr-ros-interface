@@ -37,7 +37,7 @@
 #include "sdf/sdf.hh"
 #include "sdf/Param.hh"
 
-#include <gazebo/physics/HingeJoint.hh>
+#include <gazebo/physics/Hingejoint.hpph>
 #include <gazebo/sensors/Sensor.hh>
 #include <gazebo/common/Exception.hh>
 #include <gazebo/physics/PhysicsTypes.hh>

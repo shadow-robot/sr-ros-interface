@@ -40,10 +40,10 @@
 #define _SR_SIMPLE_TRANSMISSION_H_
 
 #include <tinyxml.h>
-#include "ros_ethercat/transmission.h"
-#include "ros_ethercat/joint.h"
-#include "ros_ethercat/hardware_interface.hpp"
-#include "ros_ethercat/joint_calibration_simulator.h"
+#include "ros_ethercat_mechanism_model/transmission.hpp"
+#include "ros_ethercat_mechanism_model/joint.hpp"
+#include "ros_ethercat_hardware_interface/hardware_interface.hpp"
+#include "ros_ethercat_mechanism_model/joint_calibration_simulator.hpp"
 
 namespace sr_mechanism_model {
 

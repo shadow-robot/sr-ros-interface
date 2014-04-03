@@ -31,8 +31,8 @@
 #include <boost/smart_ptr.hpp>
 
 #include <control_toolbox/pid.h>
-#include <ros_ethercat/hardware_interface.hpp>
-#include <ros_ethercat/robot.h>
+#include <ros_ethercat_hardware_interface/hardware_interface.hpp>
+#include <ros_ethercat_mechanism_model/robot.hpp>
 #include <tinyxml.h>
 #include <sr_hardware_interface/sr_actuator.hpp>
 

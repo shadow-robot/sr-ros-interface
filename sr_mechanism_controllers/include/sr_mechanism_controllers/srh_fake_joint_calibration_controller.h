@@ -28,7 +28,7 @@
 #define _SRH_FAKE_JOINT_CALIBRATION_CONTROLLER_
 
 #include "ros/node_handle.h"
-#include "ros_ethercat/robot.h"
+#include "ros_ethercat_mechanism_model/robot.hpp"
 #include "velocity_controllers/joint_velocity_controller.h"
 #include "realtime_tools/realtime_publisher.h"
 #include "std_msgs/Empty.h"

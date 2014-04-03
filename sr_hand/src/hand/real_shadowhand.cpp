@@ -29,7 +29,7 @@
 #include "sr_hand/hand/real_shadowhand.h"
 //our robot code
 #include <robot/config.h>
-#include <robot/robot.h>
+#include <robot/robot.hpp>
 #include <robot/hand_protocol.h>
 #include <robot/hand.h>
 #ifdef FINGER

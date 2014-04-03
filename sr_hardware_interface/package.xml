@@ -17,10 +17,16 @@
 
   <!-- Dependencies needed to compile this package. -->
   <build_depend>roscpp</build_depend>
-  <build_depend>ros_ethercat</build_depend>
+  <build_depend>ros_ethercat_hardware_interface</build_depend>
+  <build_depend>ros_ethercat_hardware</build_depend>
+  <build_depend>ros_ethercat_loop</build_depend>
+  <build_depend>ros_ethercat_mechanism_model</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
-  <run_depend>ros_ethercat</run_depend>
+  <run_depend>ros_ethercat_hardware_interface</run_depend>
+  <run_depend>ros_ethercat_hardware</run_depend>
+  <run_depend>ros_ethercat_loop</run_depend>
+  <run_depend>ros_ethercat_mechanism_model</run_depend>
 
 </package>

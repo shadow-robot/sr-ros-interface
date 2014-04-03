@@ -42,7 +42,7 @@
 #include "ros_ethercat/hardware_interface.hpp"
 #include "controller_manager/controller_manager.h"
 //#include "pr2_gazebo_plugins/SetModelsJointsStates.h"
-#include "ros_ethercat/robot.h"
+#include "ros_ethercat/robot.hpp"
 #include <tinyxml.h>
 #include <ros/ros.h>
 #undef USE_CBQ

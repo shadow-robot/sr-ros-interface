@@ -28,7 +28,7 @@
 #define _SR_ACTUATOR_HPP_
 
 #include "sr_hardware_interface/tactile_sensors.hpp"
-#include <ros_ethercat/hardware_interface.hpp>
+#include <ros_ethercat_hardware_interface/hardware_interface.hpp>
 
 namespace sr_actuator
 {
