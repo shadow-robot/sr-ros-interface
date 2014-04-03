@@ -185,8 +185,14 @@ class Commander(object):
         return self.hand.read_all_current_efforts()
     
     def get_tactile_type(self):
+        """
+        Returns a string indicating the type of tactile sensors present. Possible values are: PST, biotac, UBI0 .
+        """
         return self.hand.get_tactile_type()
     
     def get_tactile_state(self):
+        """
+        Returns an object containing tactile data. The structure of the data is different for every tactile_type .
+        """
         return self.hand.get_tactile_state()
     
