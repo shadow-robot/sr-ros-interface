@@ -53,6 +53,7 @@
   <run_depend>self_test</run_depend>
   <run_depend>urdf</run_depend>
   <run_depend>gazebo_msgs</run_depend>
+  <run_depend>gazebo_ros</run_depend>
   <run_depend>gazebo</run_depend>
   <run_depend>robot_state_publisher</run_depend>
 

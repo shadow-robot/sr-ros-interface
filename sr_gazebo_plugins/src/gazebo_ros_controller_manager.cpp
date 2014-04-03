@@ -34,14 +34,17 @@
 #include <unistd.h>
 #include <set>
 
-#include "sdf/sdf.hh"
-#include "sdf/Param.hh"
-
-#include <gazebo/physics/Hingejoint.hpph>
+//#include <gazebo/XMLConfig.hh>
+//#include "physics/physics.h"
+#include <gazebo/physics/World.hh>
+#include <gazebo/physics/HingeJoint.hh>
 #include <gazebo/sensors/Sensor.hh>
 #include <gazebo/common/Exception.hh>
 #include <gazebo/physics/PhysicsTypes.hh>
 #include <gazebo/physics/Base.hh>
+
+#include <sdf/sdf.hh>
+#include <sdf/Param.hh>
 
 #include <angles/angles.h>
 #include <urdf/model.h>

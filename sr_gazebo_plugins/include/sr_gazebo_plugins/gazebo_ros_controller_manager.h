@@ -39,10 +39,10 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/Plugin.hh>
 
-#include "ros_ethercat/hardware_interface.hpp"
+#include "ros_ethercat_hardware_interface/hardware_interface.hpp"
 #include "controller_manager/controller_manager.h"
 //#include "pr2_gazebo_plugins/SetModelsJointsStates.h"
-#include "ros_ethercat/robot.hpp"
+#include "ros_ethercat_mechanism_model/robot.hpp"
 #include <tinyxml.h>
 #include <ros/ros.h>
 #undef USE_CBQ

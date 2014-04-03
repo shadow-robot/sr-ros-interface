@@ -347,7 +347,7 @@ namespace shadowrobot
 
   protected:
     ///this is the handle for the self tests.
-    boost::shared_ptr<self_test::TestRunner> self_test;
+    boost::shared_ptr<self_test::TestRunner> self_test_;
 #ifdef GAZEBO
     std::vector<ros::Publisher> gazebo_publishers;
     ros::Subscriber gazebo_subscriber;
