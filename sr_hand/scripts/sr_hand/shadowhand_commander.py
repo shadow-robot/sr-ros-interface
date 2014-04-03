@@ -69,7 +69,7 @@ class Commander(object):
             self.hand_interpolation_period = 0.1
 
 
-    def move_hand(self, joints):
+    def move_hand(self, command):
         """
         Move the Shadow Hand.
 
@@ -86,10 +86,13 @@ class Commander(object):
         the new call will override only the conciding joints. The others will keep moving
         to their previous targets at their previous velocity.
 
-        @param joints - Dictionary of joint names in the keys and angles in
+        @param command - Dictionary of joint names in the keys and angles in
         degrees in the values. The key interpolation_time gives the time in seconds that 
         the movement will last.
         """
+        
+        # Copy the dictionary, so that we will not affect the original user command
+        joints = dict(command)
         
         interpolation_time = 0.0
         if 'interpolation_time' in joints:
@@ -156,16 +159,40 @@ class Commander(object):
         @param joints - Dictionary of joint names in the keys and angles in
         degrees in the values.
         """
+        rospy.logdebug("Call prune from thread %s", threading.current_thread().name )
         for thread_id in self.grasp_interpolators.keys():
             for joint_name in joints.keys():
                 self.grasp_interpolators[thread_id].grasp_to.joints_and_positions.pop(joint_name, None)
+                rospy.logdebug("Prune joint %s thread %s", joint_name, thread_id )
 
 
     def get_hand_position(self):
+        """
+        Returns a dictionary with the position of each joint in degrees.
+        """
         return self.hand.read_all_current_positions()
     
     def get_hand_velocity(self):
+        """
+        Returns a dictionary with the velocity of each joint in degrees/s.
+        """
         return self.hand.read_all_current_velocities()
     
     def get_hand_effort(self):
+        """
+        Returns a dictionary with the effort of each joint. Currently in ADC units, as no calibration is performed on the strain gauges.
+        """
         return self.hand.read_all_current_efforts()
+    
+    def get_tactile_type(self):
+        """
+        Returns a string indicating the type of tactile sensors present. Possible values are: PST, biotac, UBI0 .
+        """
+        return self.hand.get_tactile_type()
+    
+    def get_tactile_state(self):
+        """
+        Returns an object containing tactile data. The structure of the data is different for every tactile_type .
+        """
+        return self.hand.get_tactile_state()
+    

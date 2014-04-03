@@ -28,6 +28,7 @@ from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64
 from sr_hand.grasps_parser import GraspParser
 from sr_hand.grasps_interpoler import GraspInterpoler
+from sr_hand.tactile_receiver import TactileReceiver
 # this is only used to detect if the hand is a Gazebo hand, not to actually reconfigure anything
 from dynamic_reconfigure.msg import Config
 
@@ -126,7 +127,13 @@ class ShadowHand_ROS():
         
         if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             self.joint_states_listener = rospy.Subscriber("joint_states", JointState, self.joint_states_callback)
-
+            # Initialize the command publishers here, to avoid the delay caused when initializing them in the sendupdate
+            for joint in self.allJoints:
+                if not self.eth_publishers.has_key(joint.name):
+                    topic = "sh_"+ joint.name.lower() + self.topic_ending+"/command"
+                    self.eth_publishers[joint.name] = rospy.Publisher(topic, Float64, latch=True)
+        self.tactile_receiver = TactileReceiver()
+        
         threading.Thread(None, rospy.spin)
 
     def create_grasp_interpoler(self, current_step, next_step):
@@ -542,3 +549,9 @@ class ShadowHand_ROS():
             self.hand_effort['LFJ0'] = self.hand_effort['LFJ1'] + self.hand_effort['LFJ2']
             del self.hand_effort['LFJ1']
             del self.hand_effort['LFJ2']
+
+    def get_tactile_type(self):
+        return self.tactile_receiver.get_tactile_type()
+    
+    def get_tactile_state(self):
+        return self.tactile_receiver.get_tactile_state()
