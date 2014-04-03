@@ -40,8 +40,8 @@
 #include <gazebo/common/Plugin.hh>
 
 #include "ros_ethercat_hardware_interface/hardware_interface.hpp"
+#include "ros_ethercat_loop/ros_ethercat.hpp"
 #include "controller_manager/controller_manager.h"
-//#include "pr2_gazebo_plugins/SetModelsJointsStates.h"
 #include "ros_ethercat_mechanism_model/robot.hpp"
 #include <tinyxml.h>
 #include <ros/ros.h>
@@ -50,6 +50,7 @@
 #include <ros/callback_queue.h>
 #endif
 
+#include <boost/scoped_ptr.hpp>
 #include "boost/thread/mutex.hpp"
 
 #include <sr_self_test/sr_self_test.hpp>
@@ -64,79 +65,58 @@ public:
   void Load( physics::ModelPtr _parent, sdf::ElementPtr _sdf );
 
 protected:
-  // Inherited from gazebo::Controller
-  virtual void UpdateChild();
+  boost::scoped_ptr<shadow_robot::SrSelfTest> self_test_;
+  boost::scoped_ptr<ros_ethercat> robot_hw_;
+  boost::scoped_ptr<controller_manager::ControllerManager> cm_;
+  boost::scoped_ptr<ros::NodeHandle> rosnode_;
 
-  boost::shared_ptr<shadow_robot::SrSelfTest> self_test_;
-private:
+  // fake state helps Gazebo run the transmissions backwards, so
+  // that it can figure out what its joints should do based on the
+  // actuator values.
+  boost::scoped_ptr<ros_ethercat_mechanism_model::RobotState> fake_state_;
+  std::vector<gazebo::physics::JointPtr> joints_;
 
   gazebo::physics::ModelPtr parent_model_;
   ros_ethercat_hardware_interface::HardwareInterface hw_;
-  controller_manager::ControllerManager *cm_;
-
-  /// @todo The fake state helps Gazebo run the transmissions backwards, so
-  ///       that it can figure out what its joints should do based on the
-  ///       actuator values.
-  ros_ethercat_mechanism_model::RobotState *fake_state_;
-  std::vector<gazebo::physics::JointPtr>  joints_;
-
-  /// \brief Service Call Name
-  //private: ParamT<std::string> *setModelsJointsStatesServiceNameP;
-  //private: std::string setModelsJointsStatesServiceName;
-
-  /*
-   * \brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
-   */
-  void ReadPr2Xml();
-
-  /*
-   *  \brief pointer to ros node
-   */
-  ros::NodeHandle* rosnode_;
 
   /// \brief ros service
-  private: ros::ServiceServer setModelsJointsStatesService;
+  ros::ServiceServer setModelsJointsStatesService;
 
-  ///\brief ros service callback
-  //private: bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
-  //                                    pr2_gazebo_plugins::SetModelsJointsStates::Response &res);
-
-  ///\brief ros service callback
-  /*
-   *  \brief tmp vars for performance checking
-   */
+  ///\brief tmp vars for performance checking
   double wall_start_, sim_start_;
 
   /// \brief set topic name of robot description parameter
-  //ParamT<std::string> *robotParamP;
-  //ParamT<std::string> *robotNamespaceP;
   std::string robotParam;
   std::string robotNamespace;
 
   bool fake_calibration_;
 
-#ifdef USE_CBQ
-  private: ros::CallbackQueue controller_manager_queue_;
-  private: void ControllerManagerQueueThread();
-  private: boost::thread controller_manager_callback_queue_thread_;
-#endif
-  private: void ControllerManagerROSThread();
-  private: boost::thread ros_spinner_thread_;
+  boost::thread ros_spinner_thread_;
 
   // Pointer to the model
-  private: physics::WorldPtr world;
+  physics::WorldPtr world;
 
   // Pointer to the update event connection
-  private: event::ConnectionPtr updateConnection;
+  event::ConnectionPtr updateConnection;
 
   // subscribe to world stats
-  private: transport::NodePtr node;
-  private: transport::SubscriberPtr statsSub;
-  private: common::Time simTime;
-};
+  transport::NodePtr node;
+  transport::SubscriberPtr statsSub;
+  common::Time simTime;
 
-/** \} */
-/// @}
+  ///\brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
+  void ReadPr2Xml();
+
+  // Inherited from gazebo::Controller
+  virtual void UpdateChild();
+
+  void ControllerManagerROSThread();
+#ifdef USE_CBQ
+   ros::CallbackQueue controller_manager_queue_;
+   void ControllerManagerQueueThread();
+   boost::thread controller_manager_callback_queue_thread_;
+#endif
+};
 
 }
 

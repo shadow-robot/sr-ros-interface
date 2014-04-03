@@ -44,7 +44,7 @@ namespace controller
     /**
      * Destructor.
      */
-    ~SrhExampleController();
+    virtual ~SrhExampleController();
 
     /**
      * The first init is used to read which joint is being controlled
