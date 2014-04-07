@@ -47,7 +47,7 @@ namespace controller {
   {
   }
 
-  bool SrhFakeJointCalibrationController::init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhFakeJointCalibrationController::init(ros_ethercat_mechanism_model::Robot *robot, ros::NodeHandle &n)
   {
     robot_ = robot;
     node_ = n;
@@ -74,7 +74,7 @@ namespace controller {
       ROS_ERROR("No actuator given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    if (!(actuator_ = robot->model_->getActuator(actuator_name)))
+    if (!(actuator_ = robot->getActuator(actuator_name)))
     {
       ROS_ERROR("Could not find actuator %s (namespace: %s)",
                 actuator_name.c_str(), node_.getNamespace().c_str());
@@ -89,7 +89,7 @@ namespace controller {
       ROS_ERROR("No transmission given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    transmission_ = robot->model_->getTransmission(transmission_name);
+    transmission_ = robot->getTransmission(transmission_name);
     if (!transmission_)
     {
       ROS_ERROR("Could not find transmission %s (namespace: %s)",

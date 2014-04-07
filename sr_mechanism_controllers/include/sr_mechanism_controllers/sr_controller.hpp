@@ -51,14 +51,14 @@
 namespace controller
 {
 
-  class SrController : public controller_interface::Controller<ros_ethercat_mechanism_model::RobotState>
+  class SrController : public controller_interface::Controller<ros_ethercat_mechanism_model::Robot>
   {
   public:
 
     SrController();
     virtual ~SrController();
 
-    virtual bool init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n);
+    virtual bool init(ros_ethercat_mechanism_model::Robot *robot, ros::NodeHandle &n);
 
     /*!
      * \brief Give set position of the joint for next update: revolute (angle) and prismatic (position)
@@ -119,7 +119,7 @@ namespace controller
 
     int loop_count_;
     bool initialized_;
-    ros_ethercat_mechanism_model::RobotState *robot_;              /**< Pointer to robot structure. */
+    ros_ethercat_mechanism_model::Robot *robot_;              /**< Pointer to robot structure. */
     ros::Time last_time_;                          /**< Last time stamp of update. */
 
     ros::NodeHandle node_, n_tilde_;

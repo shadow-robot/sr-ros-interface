@@ -77,7 +77,7 @@ void TestControllers::init()
   {
     robot->initXml( model->RootElement() );
 
-    robot_state = boost::shared_ptr<ros_ethercat_mechanism_model::RobotState>( new ros_ethercat_mechanism_model::RobotState(robot.get()) );
+    robot_state = boost::shared_ptr<ros_ethercat_mechanism_model::Robot>( new ros_ethercat_mechanism_model::Robot(robot.get()) );
 
     joint_state = robot_state->getJointState("FFJ3");
     joint_state->calibrated_ = true;

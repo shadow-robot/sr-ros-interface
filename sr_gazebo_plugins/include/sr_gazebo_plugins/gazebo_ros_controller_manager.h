@@ -73,7 +73,7 @@ protected:
   // fake state helps Gazebo run the transmissions backwards, so
   // that it can figure out what its joints should do based on the
   // actuator values.
-  boost::scoped_ptr<ros_ethercat_mechanism_model::RobotState> fake_state_;
+  boost::scoped_ptr<ros_ethercat_mechanism_model::Robot> fake_state_;
   std::vector<gazebo::physics::JointPtr> joints_;
 
   gazebo::physics::ModelPtr parent_model_;

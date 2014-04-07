@@ -53,7 +53,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhMixedPositionVelocityJointController::init(ros_ethercat_mechanism_model::RobotState *robot, const std::string &joint_name,
+  bool SrhMixedPositionVelocityJointController::init(ros_ethercat_mechanism_model::Robot *robot, const std::string &joint_name,
                                                      boost::shared_ptr<control_toolbox::Pid> pid_position,
                                                      boost::shared_ptr<control_toolbox::Pid> pid_velocity)
   {
@@ -113,7 +113,7 @@ namespace controller {
     friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
 
     //get the min and max value for the current joint:
-    get_min_max( robot_->model_->robot_model_, joint_name );
+    get_min_max( robot_->robot_model_, joint_name );
 
     pid_controller_position_ = pid_position;
     pid_controller_velocity_ = pid_velocity;
@@ -139,7 +139,7 @@ namespace controller {
     return true;
   }
 
-  bool SrhMixedPositionVelocityJointController::init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhMixedPositionVelocityJointController::init(ros_ethercat_mechanism_model::Robot *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;

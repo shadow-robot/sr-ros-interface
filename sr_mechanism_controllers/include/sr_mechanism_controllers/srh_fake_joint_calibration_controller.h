@@ -39,13 +39,13 @@
 namespace controller
 {
 
-  class SrhFakeJointCalibrationController : public controller_interface::Controller<ros_ethercat_mechanism_model::RobotState>
+  class SrhFakeJointCalibrationController : public controller_interface::Controller<ros_ethercat_mechanism_model::Robot>
   {
   public:
     SrhFakeJointCalibrationController();
     virtual ~SrhFakeJointCalibrationController();
 
-    virtual bool init(ros_ethercat_mechanism_model::RobotState *robot, ros::NodeHandle &n);
+    virtual bool init(ros_ethercat_mechanism_model::Robot *robot, ros::NodeHandle &n);
 
     virtual void update(const ros::Time&, const ros::Duration&);
 
@@ -58,7 +58,7 @@ namespace controller
 
   protected:
 
-    ros_ethercat_mechanism_model::RobotState* robot_;
+    ros_ethercat_mechanism_model::Robot* robot_;
     ros::NodeHandle node_;
     boost::scoped_ptr<realtime_tools::RealtimePublisher<std_msgs::Empty> > pub_calibrated_;
     ros::Time last_publish_time_;

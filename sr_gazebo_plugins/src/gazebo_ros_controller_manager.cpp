@@ -124,7 +124,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   // ros_ethercat calls ros::spin(), we'll thread out one spinner here to mimic that
   ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );
 
-  robot_hw_.reset(new ros_ethercat(&hw_, *rosnode_));
+  robot_hw_.reset(new ros_ethercat(*rosnode_, "eth0", true, ));
 
   // load a controller manager
   cm_.reset(new controller_manager::ControllerManager(robot_hw_.get(), *rosnode_));
@@ -140,29 +140,27 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   ReadPr2Xml();
 
   // Initializes the fake state (for running the transmissions backwards).
-  fake_state_.reset(new ros_ethercat_mechanism_model::RobotState(&robot_hw_->model_));
+  fake_state_.reset(new ros_ethercat_mechanism_model::Robot(&robot_hw_->model_));
 
   // The gazebo joints and mechanism joints should match up.
-  if (robot_hw_->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
+  for (boost::unordered_map<std::string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin();
+      it != robot_hw_->model_.joint_states_.end();
+      ++it)
   {
-    for (unsigned int i = 0; i < robot_hw_->state_->joint_states_.size(); ++i)
+    // fill in gazebo joints pointer
+    gazebo::physics::JointPtr joint = parent_model_->GetJoint(it->first);
+    if (joint)
     {
-      std::string joint_name = robot_hw_->state_->joint_states_[i].joint_->name;
-
-      // fill in gazebo joints pointer
-      gazebo::physics::JointPtr joint = parent_model_->GetJoint(joint_name);
-      if (joint)
-      {
-        joints_.push_back(joint);
-      }
-      else
-      {
-        joints_.push_back(gazebo::physics::JointPtr());
-        ROS_ERROR("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", joint_name.c_str());
-      }
-
+      joints_.push_back(joint);
     }
+    else
+    {
+      joints_.push_back(gazebo::physics::JointPtr());
+      ROS_ERROR("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", it->first.c_str());
+    }
+
   }
+
 
 #ifdef USE_CBQ
   // start custom queue for controller manager

@@ -50,7 +50,7 @@ public:
   boost::shared_ptr<controller::SrController> controller;
   boost::shared_ptr<ros_ethercat_hardware_interface::HardwareInterface> hw;
   boost::shared_ptr<ros_ethercat_mechanism_model::Robot> robot;
-  boost::shared_ptr<ros_ethercat_mechanism_model::RobotState> robot_state;
+  boost::shared_ptr<ros_ethercat_mechanism_model::Robot> robot_state;
   boost::shared_ptr<TiXmlDocument> model;
   boost::shared_ptr<sr_actuator::SrActuator> actuator;
   ros_ethercat_mechanism_model::JointState* joint_state;
