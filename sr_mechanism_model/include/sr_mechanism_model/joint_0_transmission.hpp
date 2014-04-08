@@ -32,8 +32,7 @@
 #include <tinyxml.h>
 #include "ros_ethercat_mechanism_model/transmission.hpp"
 #include "ros_ethercat_mechanism_model/joint.hpp"
-#include "ros_ethercat_hardware_interface/hardware_interface.hpp"
-#include "ros_ethercat_mechanism_model/joint_calibration_simulator.hpp"
+#include "ros_ethercat_mechanism_model/hardware_interface.hpp"
 
 namespace sr_mechanism_model
 {
@@ -48,20 +47,16 @@ namespace sr_mechanism_model
 
     double mechanical_reduction_;
 
-    void propagatePosition(std::vector<ros_ethercat_hardware_interface::Actuator*>&,
+    void propagatePosition(std::vector<ros_ethercat_mechanism_model::Actuator*>&,
                            std::vector<ros_ethercat_mechanism_model::JointState*>&);
     void propagatePositionBackwards(std::vector<ros_ethercat_mechanism_model::JointState*>&,
-                                    std::vector<ros_ethercat_hardware_interface::Actuator*>&);
+                                    std::vector<ros_ethercat_mechanism_model::Actuator*>&);
     void propagateEffort(std::vector<ros_ethercat_mechanism_model::JointState*>&,
-                         std::vector<ros_ethercat_hardware_interface::Actuator*>&);
-    void propagateEffortBackwards(std::vector<ros_ethercat_hardware_interface::Actuator*>&,
+                         std::vector<ros_ethercat_mechanism_model::Actuator*>&);
+    void propagateEffortBackwards(std::vector<ros_ethercat_mechanism_model::Actuator*>&,
                                   std::vector<ros_ethercat_mechanism_model::JointState*>&);
 
   private:
-    int simulated_actuator_timestamp_initialized_;
-    ros::Time simulated_actuator_start_time_;
-
-    ros_ethercat_mechanism_model::JointCalibrationSimulator joint_calibration_simulator_;
 
     bool init_joint(TiXmlElement *jel, ros_ethercat_mechanism_model::Robot *robot);
   };

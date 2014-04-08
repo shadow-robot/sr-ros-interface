@@ -33,13 +33,13 @@
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
-using namespace ros_ethercat_hardware_interface;
+using namespace ros_ethercat_mechanism_model;
 
-PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::J0TransmissionForMuscle, ros_ethercat_mechanism_model::Transmission)
+PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::J0TransmissionForMuscle, Transmission)
 
 namespace sr_mechanism_model
 {
-  bool J0TransmissionForMuscle::initXml(TiXmlElement *elt, ros_ethercat_mechanism_model::Robot *robot)
+  bool J0TransmissionForMuscle::initXml(TiXmlElement *elt, Robot *robot)
   {
     const char *name = elt->Attribute("name");
     name_ = name ? name : "";
@@ -90,7 +90,7 @@ namespace sr_mechanism_model
     return true;
   }
 
-  bool J0TransmissionForMuscle::init_joint(TiXmlElement *jel, ros_ethercat_mechanism_model::Robot *robot)
+  bool J0TransmissionForMuscle::init_joint(TiXmlElement *jel, Robot *robot)
   {
     const char *joint_name = jel ? jel->Attribute("name") : NULL;
     if (!joint_name)
@@ -114,7 +114,7 @@ namespace sr_mechanism_model
   }
 
   void J0TransmissionForMuscle::propagatePosition(
-    std::vector<ros_ethercat_hardware_interface::Actuator*>& as, std::vector<ros_ethercat_mechanism_model::JointState*>& js)
+    std::vector<Actuator*>& as, std::vector<JointState*>& js)
   {
     ROS_DEBUG(" propagate position for j0");
 
@@ -171,7 +171,7 @@ namespace sr_mechanism_model
   }
 
   void J0TransmissionForMuscle::propagatePositionBackwards(
-    std::vector<ros_ethercat_mechanism_model::JointState*>& js, std::vector<ros_ethercat_hardware_interface::Actuator*>& as)
+    std::vector<JointState*>& js, std::vector<Actuator*>& as)
   {
     ROS_DEBUG("propagate pos backward for j0");
 
@@ -183,35 +183,11 @@ namespace sr_mechanism_model
     static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.velocity_ = js[0]->velocity_ + js[1]->velocity_;
     static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.last_measured_effort_ = js[0]->measured_effort_ + js[1]->measured_effort_;
 
-    // Update the timing (making sure it's initialized).
-    if (! simulated_actuator_timestamp_initialized_)
-    {
-      // Set the time stamp to zero (it is measured relative to the start time).
-      static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.sample_timestamp_ = ros::Duration(0);
-
-      // Try to set the start time.  Only then do we claim initialized.
-      if (ros::isStarted())
-      {
-        simulated_actuator_start_time_ = ros::Time::now();
-        simulated_actuator_timestamp_initialized_ = true;
-      }
-    }
-    else
-    {
-      // Measure the time stamp relative to the start time.
-      static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.sample_timestamp_ = ros::Time::now() - simulated_actuator_start_time_;
-    }
-    // Set the historical (double) timestamp accordingly.
-    static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.timestamp_ = static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.sample_timestamp_.toSec();
-
-    // simulate calibration sensors by filling out actuator states
-    this->joint_calibration_simulator_.simulateJointCalibration(js[0],static_cast<sr_actuator::SrMuscleActuator*>(as[0]));
-
     ROS_DEBUG(" end propagate pos backward for j0");
   }
 
   void J0TransmissionForMuscle::propagateEffort(
-    std::vector<ros_ethercat_mechanism_model::JointState*>& js, std::vector<ros_ethercat_hardware_interface::Actuator*>& as)
+    std::vector<JointState*>& js, std::vector<Actuator*>& as)
   {
     ROS_DEBUG(" propagate effort for j0");
 
@@ -245,7 +221,7 @@ namespace sr_mechanism_model
   }
 
   void J0TransmissionForMuscle::propagateEffortBackwards(
-    std::vector<ros_ethercat_hardware_interface::Actuator*>& as, std::vector<ros_ethercat_mechanism_model::JointState*>& js)
+    std::vector<Actuator*>& as, std::vector<JointState*>& js)
   {
     ROS_DEBUG("propagate effort backward for j0");
 

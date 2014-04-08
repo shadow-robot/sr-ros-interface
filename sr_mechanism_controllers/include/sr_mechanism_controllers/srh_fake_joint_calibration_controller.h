@@ -70,7 +70,7 @@ namespace controller
     double search_velocity_, reference_position_;
     bool original_switch_state_;
 
-    ros_ethercat_hardware_interface::Actuator *actuator_;
+    ros_ethercat_mechanism_model::Actuator *actuator_;
     ros_ethercat_mechanism_model::JointState *joint_;
     boost::shared_ptr<ros_ethercat_mechanism_model::Transmission> transmission_;
 

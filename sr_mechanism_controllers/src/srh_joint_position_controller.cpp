@@ -59,7 +59,7 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
+    last_time_ = robot->current_time_;
 
     if( joint_name.substr(3,1).compare("0") == 0)
     {
@@ -211,7 +211,7 @@ namespace controller {
     }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
+    ros::Time time = robot_->current_time_;
     assert(joint_state_->joint_);
     dt_= time - last_time_;
 

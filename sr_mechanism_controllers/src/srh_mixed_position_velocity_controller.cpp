@@ -62,7 +62,7 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
+    last_time_ = robot->current_time_;
 
     //joint 0s
     if( joint_name.substr(3,1).compare("0") == 0)
@@ -177,7 +177,7 @@ namespace controller {
     pid_controller_velocity_->reset();
     read_parameters();
     ROS_WARN("Reseting PID");
-    last_time_ = robot_->getTime();
+    last_time_ = robot_->current_time_;
   }
 
   bool SrhMixedPositionVelocityJointController::setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req,
@@ -259,7 +259,7 @@ namespace controller {
     }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
+    ros::Time time = robot_->current_time_;
     assert(joint_state_->joint_);
     dt_= time - last_time_;
 

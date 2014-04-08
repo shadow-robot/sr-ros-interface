@@ -44,13 +44,13 @@
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
-using namespace ros_ethercat_hardware_interface;
+using namespace ros_ethercat_mechanism_model;
 
-PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmission, ros_ethercat_mechanism_model::Transmission)
+PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmission, Transmission)
 
 namespace sr_mechanism_model
 {
-  bool SimpleTransmission::initXml(TiXmlElement *elt, ros_ethercat_mechanism_model::Robot *robot)
+  bool SimpleTransmission::initXml(TiXmlElement *elt, Robot *robot)
   {
     const char *name = elt->Attribute("name");
     name_ = name ? name : "";
@@ -73,7 +73,7 @@ namespace sr_mechanism_model
 
     TiXmlElement *ael = elt->FirstChildElement("actuator");
     const char *actuator_name = ael ? ael->Attribute("name") : NULL;
-    ros_ethercat_hardware_interface::Actuator *a;
+    Actuator *a;
     if (!actuator_name || (a = robot->getActuator(actuator_name)) == NULL )
     {
       ROS_ERROR("SimpleTransmission could not find actuator named \"%s\"", actuator_name);
@@ -116,7 +116,7 @@ namespace sr_mechanism_model
   }
 
   void SimpleTransmission::propagatePosition(
-    std::vector<ros_ethercat_hardware_interface::Actuator*>& as, std::vector<ros_ethercat_mechanism_model::JointState*>& js)
+    std::vector<Actuator*>& as, std::vector<JointState*>& js)
   {
     ROS_DEBUG(" propagate position");
 
@@ -130,7 +130,7 @@ namespace sr_mechanism_model
   }
 
   void SimpleTransmission::propagatePositionBackwards(
-    std::vector<ros_ethercat_mechanism_model::JointState*>& js, std::vector<ros_ethercat_hardware_interface::Actuator*>& as)
+    std::vector<JointState*>& js, std::vector<Actuator*>& as)
   {
     ROS_DEBUG(" propagate position bw");
 
@@ -140,35 +140,11 @@ namespace sr_mechanism_model
     static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ = js[0]->velocity_;
     static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ = js[0]->measured_effort_;
 
-    // Update the timing (making sure it's initialized).
-    if (! simulated_actuator_timestamp_initialized_)
-    {
-      // Set the time stamp to zero (it is measured relative to the start time).
-      static_cast<sr_actuator::SrActuator*>(as[0])->state_.sample_timestamp_ = ros::Duration(0);
-
-      // Try to set the start time.  Only then do we claim initialized.
-      if (ros::isStarted())
-      {
-        simulated_actuator_start_time_ = ros::Time::now();
-        simulated_actuator_timestamp_initialized_ = true;
-      }
-    }
-    else
-    {
-      // Measure the time stamp relative to the start time.
-      static_cast<sr_actuator::SrActuator*>(as[0])->state_.sample_timestamp_ = ros::Time::now() - simulated_actuator_start_time_;
-    }
-    // Set the historical (double) timestamp accordingly.
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.timestamp_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.sample_timestamp_.toSec();
-
-    // simulate calibration sensors by filling out actuator states
-    this->joint_calibration_simulator_.simulateJointCalibration(js[0],static_cast<sr_actuator::SrActuator*>(as[0]));
-
     ROS_DEBUG(" end propagate position bw");
   }
 
   void SimpleTransmission::propagateEffort(
-    std::vector<ros_ethercat_mechanism_model::JointState*>& js, std::vector<ros_ethercat_hardware_interface::Actuator*>& as)
+    std::vector<JointState*>& js, std::vector<Actuator*>& as)
   {
     ROS_DEBUG(" propagate effort");
 
@@ -181,7 +157,7 @@ namespace sr_mechanism_model
   }
 
   void SimpleTransmission::propagateEffortBackwards(
-    std::vector<ros_ethercat_hardware_interface::Actuator*>& as, std::vector<ros_ethercat_mechanism_model::JointState*>& js)
+    std::vector<Actuator*>& as, std::vector<JointState*>& js)
   {
     ROS_DEBUG(" propagate effort bw");
 

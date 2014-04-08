@@ -54,7 +54,7 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
+    last_time_ = robot->current_time_;
 
     joint_state_ = robot_->getJointState(joint_name);
     if (!joint_state_)
@@ -70,7 +70,7 @@ namespace controller {
     }
 
     //init the pointer to the biotacs data, updated at 1kHz
-    actuator_ = static_cast<sr_actuator::SrActuator*>( robot->model_->getActuator( joint_name ) );
+    actuator_ = static_cast<sr_actuator::SrActuator*>( robot->getActuator( joint_name ) );
 
     after_init();
     return true;
@@ -104,7 +104,7 @@ namespace controller {
       return;
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
+    ros::Time time = robot_->current_time_;
     assert(joint_state_->joint_);
     dt_= time - last_time_;
 

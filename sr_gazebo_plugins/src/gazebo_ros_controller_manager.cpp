@@ -124,7 +124,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   // ros_ethercat calls ros::spin(), we'll thread out one spinner here to mimic that
   ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );
 
-  robot_hw_.reset(new ros_ethercat(*rosnode_, "eth0", true, ));
+  robot_hw_.reset(new ros_ethercat(*rosnode_, "", true, ));
 
   // load a controller manager
   cm_.reset(new controller_manager::ControllerManager(robot_hw_.get(), *rosnode_));
@@ -330,7 +330,6 @@ void GazeboRosControllerManager::ReadPr2Xml()
     for (it = get_actuators.actuators.begin(); it != get_actuators.actuators.end(); ++it)
     {
       ros_ethercat_hardware_interface::Actuator* pr2_actuator = new sr_actuator::SrActuator(*it);
-      pr2_actuator->state_.is_enabled_ = true;
       hw_.addActuator(pr2_actuator);
     }
 

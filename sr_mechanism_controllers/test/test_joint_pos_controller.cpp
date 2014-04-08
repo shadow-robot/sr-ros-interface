@@ -53,12 +53,12 @@ public:
   {
     controller::SrController* control_tmp = controller.get();
     controller::SrhJointPositionController* sr_control_tmp = dynamic_cast< controller::SrhJointPositionController* >( control_tmp );
-    sr_control_tmp->init(robot_state.get(), "FFJ3", pid);
+    sr_control_tmp->init(robot.get(), "FFJ3", pid);
   }
 
   double compute_output(double input, double current_position)
   {
-    hw->current_time_ = ros::Time::now();
+    robot->current_time_ = ros::Time::now();
     joint_state->position_ = current_position;
     controller->setCommand( input );
 
