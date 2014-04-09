@@ -115,8 +115,13 @@ private:
   std::string robotNamespace;
 
   bool fake_calibration_;
-
-  boost::thread ros_spinner_thread_;
+#ifdef USE_CBQ
+   ros::CallbackQueue controller_manager_queue_;
+   void ControllerManagerQueueThread();
+   boost::thread controller_manager_callback_queue_thread_;
+#endif
+  void ControllerManagerROSThread();
+  private: boost::thread ros_spinner_thread_;
 
   // Pointer to the model
   private: physics::WorldPtr world;
@@ -128,22 +133,17 @@ private:
   private: transport::NodePtr node;
   private: transport::SubscriberPtr statsSub;
   private: common::Time simTime;
+};
+
+/** \} */
+/// @}
 
   ///\brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
   void ReadPr2Xml();
 
   // Inherited from gazebo::Controller
   virtual void UpdateChild();
-
-  void ControllerManagerROSThread();
-#ifdef USE_CBQ
-   ros::CallbackQueue controller_manager_queue_;
-   void ControllerManagerQueueThread();
-   boost::thread controller_manager_callback_queue_thread_;
-#endif
 };
-
-}
 
 #endif
 
