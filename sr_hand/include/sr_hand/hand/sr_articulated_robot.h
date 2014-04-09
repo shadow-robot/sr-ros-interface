@@ -1,5 +1,5 @@
 /**
- * @file   sr_articulated_robot.hpp
+ * @file   sr_articulated_robot.h
  * @author Ugo Cupcic <ugo@shadowrobot.com>, Contact <contact@shadowrobot.com>
  * @date   Tue May 25 17:50:47 2010
  *
@@ -347,7 +347,7 @@ namespace shadowrobot
 
   protected:
     ///this is the handle for the self tests.
-    boost::shared_ptr<self_test::TestRunner> self_test_;
+    boost::shared_ptr<self_test::TestRunner> self_test;
 #ifdef GAZEBO
     std::vector<ros::Publisher> gazebo_publishers;
     ros::Subscriber gazebo_subscriber;

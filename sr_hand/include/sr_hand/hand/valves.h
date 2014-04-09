@@ -28,7 +28,7 @@
 #define VALVES_H_
 
 #include <robot/config.h>
-#include <robot/robot.hpp>
+#include <robot/robot.h>
 #include <robot/hand.h>
 #include <robot/hand_protocol.h>
 #include <ros/ros.h>
