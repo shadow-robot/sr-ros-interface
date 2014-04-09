@@ -143,7 +143,6 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     char** argv = NULL;
     ros::init(argc,argv,"gazebo",ros::init_options::NoSigintHandler|ros::init_options::AnonymousName);
   }
-
   rosnode_.reset(new ros::NodeHandle(robotNamespace));
   ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
 
@@ -160,25 +159,27 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   ReadPr2Xml();
 
   // The gazebo joints and mechanism joints should match up.
-  for (boost::unordered_map<std::string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin(); it != robot_hw_->model_.joint_states_.end(); ++it)
+  if (this->cm_->robot_hw_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
   {
+    for (boost::unordered_map<std::string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin(); it != robot_hw_->model_.joint_states_.end(); ++it)
+    {
 
 
-    // fill in gazebo joints pointer
-    gazebo::physics::JointPtr joint = parent_model_->GetJoint(it->first);
-    if (joint)
-    {
-      this->joints_.push_back(joint);
-    }
-    else
-    {
-      //ROS_WARN("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", joint_name.c_str());
-      //this->joints_.push_back(NULL);  // FIXME: cannot be null, must be an empty boost shared pointer
-      this->joints_.push_back(gazebo::physics::JointPtr());
-      ROS_ERROR("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", it->first.c_str());
+      // fill in gazebo joints pointer
+      gazebo::physics::JointPtr joint = parent_model_->GetJoint(it->first);
+      if (joint)
+      {
+        this->joints_.push_back(joint);
+      }
+      else
+      {
+        //ROS_WARN("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", joint_name.c_str());
+        //this->joints_.push_back(NULL);  // FIXME: cannot be null, must be an empty boost shared pointer
+        this->joints_.push_back(gazebo::physics::JointPtr());
+        ROS_ERROR("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", it->first.c_str());
+      }
     }
   }
-
 
 #ifdef USE_CBQ
   // start custom queue for controller manager
@@ -186,6 +187,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
 #endif
 
 }
+
 
 void GazeboRosControllerManager::UpdateChild()
 {
@@ -200,7 +202,7 @@ void GazeboRosControllerManager::UpdateChild()
               << "  speed up: " <<  sim_elapsed / wall_elapsed
               << std::endl;
   }
-  assert(this->joints_.size() == fake_state_->joint_states_.size());
+  assert(this->joints_.size() == this->fake_state_->joint_states_.size());
 
   //--------------------------------------------------
   //  Pushes out simulation state
@@ -237,7 +239,7 @@ void GazeboRosControllerManager::UpdateChild()
   //--------------------------------------------------
   //  Runs Mechanism Control
   //--------------------------------------------------
-  fake_state_->current_time_ = ros::Time(world->GetSimTime().Double());
+  this->fake_state_->current_time_ = ros::Time(this->world->GetSimTime().Double());
   try
   {
     cm_->update(fake_state_->current_time_, ros::Duration(1e+6));
