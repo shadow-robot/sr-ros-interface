@@ -115,10 +115,11 @@ private:
   std::string robotNamespace;
 
   bool fake_calibration_;
+
 #ifdef USE_CBQ
-   ros::CallbackQueue controller_manager_queue_;
-   void ControllerManagerQueueThread();
-   boost::thread controller_manager_callback_queue_thread_;
+  private: ros::CallbackQueue controller_manager_queue_;
+  private: void ControllerManagerQueueThread();
+  private: boost::thread controller_manager_callback_queue_thread_;
 #endif
   private: void ControllerManagerROSThread();
   private: boost::thread ros_spinner_thread_;
