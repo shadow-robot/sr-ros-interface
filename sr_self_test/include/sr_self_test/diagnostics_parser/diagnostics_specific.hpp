@@ -54,7 +54,7 @@ namespace shadow_robot
       values_->insert( std::pair<std::string, DiagnosticTest>("Avg Loop Jitter (us)", jitter) );
     }
 
-    ~RTLoopDiagnostics()
+    virtual ~RTLoopDiagnostics()
     {}
 
     virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
