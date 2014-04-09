@@ -88,7 +88,7 @@ private:
   /*
    * \brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
    */
-  //void ReadPr2Xml();
+  void ReadPr2Xml();
 
   /*
    *  \brief pointer to ros node
@@ -120,7 +120,7 @@ private:
    void ControllerManagerQueueThread();
    boost::thread controller_manager_callback_queue_thread_;
 #endif
-  void ControllerManagerROSThread();
+  private: void ControllerManagerROSThread();
   private: boost::thread ros_spinner_thread_;
 
   // Pointer to the model
@@ -137,13 +137,6 @@ private:
 
 /** \} */
 /// @}
-
-  ///\brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
-  void ReadPr2Xml();
-
-  // Inherited from gazebo::Controller
-  virtual void UpdateChild();
-};
 
 #endif
 
