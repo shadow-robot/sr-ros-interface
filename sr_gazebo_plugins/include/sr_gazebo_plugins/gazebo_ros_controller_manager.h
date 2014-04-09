@@ -67,27 +67,40 @@ public:
 protected:
   // Inherited from gazebo::Controller
   virtual void UpdateChild();
-  boost::scoped_ptr<shadow_robot::SrSelfTest> self_test_;
-  boost::scoped_ptr<ros::NodeHandle> rosnode_;
 
+  boost::scoped_ptr<shadow_robot::SrSelfTest> self_test_;
 private:
   gazebo::physics::ModelPtr parent_model_;
   boost::scoped_ptr<ros_ethercat> robot_hw_;
   boost::scoped_ptr<controller_manager::ControllerManager> cm_;
 
-  // @todo The fake state helps Gazebo run the transmissions backwards, so
+  /// @todo The fake state helps Gazebo run the transmissions backwards, so
   ///       that it can figure out what its joints should do based on the
   ///       actuator values.
   boost::scoped_ptr<ros_ethercat_mechanism_model::Robot> fake_state_;
-  std::vector<gazebo::physics::JointPtr> joints_;
+  std::vector<gazebo::physics::JointPtr>  joints_;
+
+  /*
+   *  \brief pointer to ros node
+   */
+  boost::scoped_ptr<ros::NodeHandle> rosnode_;
 
   /// \brief ros service
-  ros::ServiceServer setModelsJointsStatesService;
+  private: ros::ServiceServer setModelsJointsStatesService;
 
-  ///\brief tmp vars for performance checking
+  ///\brief ros service callback
+  //private: bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
+  //                                    pr2_gazebo_plugins::SetModelsJointsStates::Response &res);
+
+  ///\brief ros service callback
+  /*
+   *  \brief tmp vars for performance checking
+   */
   double wall_start_, sim_start_;
 
   /// \brief set topic name of robot description parameter
+  //ParamT<std::string> *robotParamP;
+  //ParamT<std::string> *robotNamespaceP;
   std::string robotParam;
   std::string robotNamespace;
 
@@ -96,15 +109,15 @@ private:
   boost::thread ros_spinner_thread_;
 
   // Pointer to the model
-  physics::WorldPtr world;
+  private: physics::WorldPtr world;
 
   // Pointer to the update event connection
-  event::ConnectionPtr updateConnection;
+  private: event::ConnectionPtr updateConnection;
 
   // subscribe to world stats
-  transport::NodePtr node;
-  transport::SubscriberPtr statsSub;
-  common::Time simTime;
+  private: transport::NodePtr node;
+  private: transport::SubscriberPtr statsSub;
+  private: common::Time simTime;
 
   ///\brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
   void ReadPr2Xml();
