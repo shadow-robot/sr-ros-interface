@@ -49,11 +49,11 @@ namespace controller
 
     virtual void update(const ros::Time&, const ros::Duration&);
 
-    bool calibrated() { return state_ == CALIBRATED; }
+    bool calibrated() { return calibration_state_ == CALIBRATED; }
     void beginCalibration()
     {
-      if (state_ == IS_INITIALIZED)
-        state_ = BEGINNING;
+      if (calibration_state_ == IS_INITIALIZED)
+        calibration_state_ = BEGINNING;
     }
 
   protected:
@@ -64,7 +64,7 @@ namespace controller
     ros::Time last_publish_time_;
 
     enum { IS_INITIALIZED, BEGINNING, MOVING_TO_LOW, MOVING_TO_HIGH, CALIBRATED };
-    int state_;
+    int calibration_state_;
     int countdown_;
 
     double search_velocity_, reference_position_;
@@ -72,7 +72,7 @@ namespace controller
 
     ros_ethercat_mechanism_model::Actuator *actuator_;
     ros_ethercat_mechanism_model::JointState *joint_;
-    boost::shared_ptr<ros_ethercat_mechanism_model::Transmission> transmission_;
+    ros_ethercat_mechanism_model::Transmission *transmission_;
 
     std::string joint_name_, actuator_name_;
 

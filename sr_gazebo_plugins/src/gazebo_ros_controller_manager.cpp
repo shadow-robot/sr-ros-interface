@@ -50,6 +50,10 @@
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
+using namespace ros_ethercat_mechanism_model;
+using namespace std;
+using boost::unordered_map;
+
 namespace gazebo {
 
 GazeboRosControllerManager::GazeboRosControllerManager()
@@ -73,7 +77,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
 void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent model
-  std::string modelName = _sdf->GetParent()->Get<std::string>("name");
+  string modelName = _sdf->GetParent()->Get<string>("name");
 
   // Get the world name.
   world = _parent->GetWorld();
@@ -100,11 +104,11 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   // get parameter name
   robotNamespace.clear();
   if (_sdf->HasElement("robotNamespace"))
-    robotNamespace = _sdf->GetElement("robotNamespace")->Get<std::string>();
+    robotNamespace = _sdf->GetElement("robotNamespace")->Get<string>();
 
   robotParam = "robot_description";
   if (_sdf->HasElement("robotParam"))
-    robotParam = _sdf->GetElement("robotParam")->Get<std::string>();
+    robotParam = _sdf->GetElement("robotParam")->Get<string>();
 
   robotParam = robotNamespace+"/" + robotParam;
 
@@ -124,26 +128,14 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   // ros_ethercat calls ros::spin(), we'll thread out one spinner here to mimic that
   ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );
 
-  robot_hw_.reset(new ros_ethercat(*rosnode_, "", true, ));
-
-  // load a controller manager
-  cm_.reset(new controller_manager::ControllerManager(robot_hw_.get(), *rosnode_));
-
-  hw_.current_time_ = ros::Time(world->GetSimTime().Double());
-  if (hw_.current_time_ < ros::Time(0.001))
-    hw_.current_time_ = ros::Time(0.001); // hardcoded to minimum of 1ms on start up
-
   rosnode_->param("gazebo/start_robot_calibrated",fake_calibration_,true);
 
   // read pr2 urdf
   // setup actuators, then setup mechanism control node
   ReadPr2Xml();
 
-  // Initializes the fake state (for running the transmissions backwards).
-  fake_state_.reset(new ros_ethercat_mechanism_model::Robot(&robot_hw_->model_));
-
   // The gazebo joints and mechanism joints should match up.
-  for (boost::unordered_map<std::string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin();
+  for (unordered_map<string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin();
       it != robot_hw_->model_.joint_states_.end();
       ++it)
   {
@@ -177,10 +169,10 @@ void GazeboRosControllerManager::UpdateChild()
   {
     double wall_elapsed = world->GetRealTime().Double() - wall_start_;
     double sim_elapsed  = world->GetSimTime().Double()  - sim_start_;
-    std::cout << " real time: " <<  wall_elapsed
+    cout << " real time: " <<  wall_elapsed
               << "  sim time: " <<  sim_elapsed
               << "  speed up: " <<  sim_elapsed / wall_elapsed
-              << std::endl;
+              << endl;
   }
   assert(joints_.size() == fake_state_->joint_states_.size());
 
@@ -189,27 +181,26 @@ void GazeboRosControllerManager::UpdateChild()
   //--------------------------------------------------
 
   // Copies the state from the gazebo joints into the mechanism joints.
-  for (unsigned int i = 0; i < joints_.size(); ++i)
+  vector<gazebo::physics::JointPtr>::iterator git = joints_.begin();
+  unordered_map<string, JointState>::iterator fit = fake_state_->joint_states_.begin();
+  while (git != joints_.end() &&
+         fit != fake_state_->joint_states_.end())
   {
-    if (!joints_[i])
+    if (!(*git))
       continue;
 
-    fake_state_->joint_states_[i].measured_effort_ = fake_state_->joint_states_[i].commanded_effort_;
+    fit->second.measured_effort_ = fit->second.commanded_effort_;
 
-    if (joints_[i]->HasType(gazebo::physics::Base::HINGE_JOINT))
+    if ((*git)->HasType(gazebo::physics::Base::HINGE_JOINT))
     {
-      gazebo::physics::JointPtr hj = joints_[i];
-      fake_state_->joint_states_[i].position_ = fake_state_->joint_states_[i].position_ +
-                    angles::shortest_angular_distance(fake_state_->joint_states_[i].position_,hj->GetAngle(0).Radian());
-      fake_state_->joint_states_[i].velocity_ = hj->GetVelocity(0);
+      fit->second.position_ = fit->second.position_ +
+                    angles::shortest_angular_distance(fit->second.position_, (*git)->GetAngle(0).Radian());
+      fit->second.velocity_ = (*git)->GetVelocity(0);
     }
-    else if (joints_[i]->HasType(gazebo::physics::Base::SLIDER_JOINT))
+    else if ((*git)->HasType(gazebo::physics::Base::SLIDER_JOINT))
     {
-      gazebo::physics::JointPtr sj = joints_[i];
-      {
-        fake_state_->joint_states_[i].position_ = sj->GetAngle(0).Radian();
-        fake_state_->joint_states_[i].velocity_ = sj->GetVelocity(0);
-      }
+        fit->second.position_ = (*git)->GetAngle(0).Radian();
+        fit->second.velocity_ = (*git)->GetVelocity(0);
     }
   }
 
@@ -219,13 +210,10 @@ void GazeboRosControllerManager::UpdateChild()
   //--------------------------------------------------
   //  Runs Mechanism Control
   //--------------------------------------------------
-  hw_.current_time_ = ros::Time(world->GetSimTime().Double());
+  fake_state_->current_time_ = ros::Time(world->GetSimTime().Double());
   try
   {
-    if (robot_hw_->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
-    {
-      cm_->update(hw_.current_time_, ros::Duration(1e+6));
-    }
+    cm_->update(fake_state_->current_time_, ros::Duration(1e+6));
   }
   catch (const char* c)
   {
@@ -243,44 +231,41 @@ void GazeboRosControllerManager::UpdateChild()
   fake_state_->propagateActuatorEffortToJointEffort();
 
   // Copies the commands from the mechanism joints into the gazebo joints.
-  for (unsigned int i = 0; i < joints_.size(); ++i)
+  git = joints_.begin();
+  fit = fake_state_->joint_states_.begin();
+  unordered_map<string, JointState>::iterator rit = robot_hw_->model_.joint_states_.begin();
+
+  while (git != joints_.end() &&
+         fit != fake_state_->joint_states_.end() &&
+         rit != robot_hw_->model_.joint_states_.end())
   {
-    if (!joints_[i])
+    if (!*git)
       continue;
 
-    double effort = fake_state_->joint_states_[i].commanded_effort_;
+    double effort = fit->second.commanded_effort_;
 
     double damping_coef = 0;
-    if (robot_hw_->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
-    {
-      if (robot_hw_->state_->joint_states_[i].joint_->dynamics)
-        damping_coef = robot_hw_->state_->joint_states_[i].joint_->dynamics->damping;
-    }
+    if (rit->second.joint_->dynamics)
+      damping_coef = rit->second.joint_->dynamics->damping;
 
-    if (joints_[i]->HasType(gazebo::physics::Base::HINGE_JOINT))
+    if ((*git)->HasType(gazebo::physics::Base::HINGE_JOINT) || (*git)->HasType(gazebo::physics::Base::SLIDER_JOINT))
     {
-      gazebo::physics::JointPtr hj = joints_[i];
-      double current_velocity = hj->GetVelocity(0);
+      double current_velocity = (*git)->GetVelocity(0);
       double damping_force = damping_coef * current_velocity;
       double effort_command = effort - damping_force;
-      hj->SetForce(0,effort_command);
+      (*git)->SetForce(0,effort_command);
     }
-    else if (joints_[i]->HasType(gazebo::physics::Base::SLIDER_JOINT))
-    {
-      gazebo::physics::JointPtr sj = joints_[i];
-      double current_velocity = sj->GetVelocity(0);
-      double damping_force = damping_coef * current_velocity;
-      double effort_command = effort-damping_force;
-      sj->SetForce(0,effort_command);
-    }
+    ++git;
+    ++fit;
+    ++rit;
   }
 }
 
 void GazeboRosControllerManager::ReadPr2Xml()
 {
 
-  std::string urdf_param_name;
-  std::string urdf_string;
+  string urdf_param_name;
+  string urdf_string;
   // search and wait for robot_description on param server
   while(urdf_string.empty())
   {
@@ -311,33 +296,44 @@ void GazeboRosControllerManager::ReadPr2Xml()
     // Pulls out the list of actuators used in the robot configuration.
     struct GetActuators : public TiXmlVisitor
     {
-      std::set<std::string> actuators;
+      set<string> actuators;
       virtual bool VisitEnter(const TiXmlElement &elt, const TiXmlAttribute *)
       {
-        if (elt.ValueStr() == std::string("actuator") && elt.Attribute("name"))
+        if (elt.ValueStr() == string("actuator") && elt.Attribute("name"))
           actuators.insert(elt.Attribute("name"));
-        else if (elt.ValueStr() == std::string("rightActuator") && elt.Attribute("name"))
+        else if (elt.ValueStr() == string("rightActuator") && elt.Attribute("name"))
           actuators.insert(elt.Attribute("name"));
-        else if (elt.ValueStr() == std::string("leftActuator") && elt.Attribute("name"))
+        else if (elt.ValueStr() == string("leftActuator") && elt.Attribute("name"))
           actuators.insert(elt.Attribute("name"));
         return true;
       }
     } get_actuators;
     doc.RootElement()->Accept(&get_actuators);
 
+    robot_hw_.reset(new ros_ethercat(*rosnode_, "", true, doc.RootElement()));
+    fake_state_.reset(new Robot(doc.RootElement()));
+
+    // load a controller manager
+    cm_.reset(new controller_manager::ControllerManager(robot_hw_.get(), *rosnode_));
+
+    fake_state_->current_time_ = ros::Time(world->GetSimTime().Double());
+    if (fake_state_->current_time_ < ros::Time(0.001))
+      fake_state_->current_time_ = ros::Time(0.001); // hardcoded to minimum of 1ms on start up
+
     // Places the found actuators into the hardware interface.
-    std::set<std::string>::iterator it;
-    for (it = get_actuators.actuators.begin(); it != get_actuators.actuators.end(); ++it)
+    set<string>::iterator sit = get_actuators.actuators.begin();
+    while (sit != get_actuators.actuators.end())
     {
-      ros_ethercat_hardware_interface::Actuator* pr2_actuator = new sr_actuator::SrActuator(*it);
-      hw_.addActuator(pr2_actuator);
+      fake_state_->actuators_[*sit];
+      ++sit;
     }
 
-    // Setup mechanism control node
-    robot_hw_->initXml(doc.RootElement());
-
-    for (unsigned int i = 0; i < robot_hw_->state_->joint_states_.size(); ++i)
-      robot_hw_->state_->joint_states_[i].calibrated_ = fake_calibration_;
+    unordered_map<string, JointState>::iterator jit = robot_hw_->model_.joint_states_.begin();
+    while (jit != robot_hw_->model_.joint_states_.end())
+    {
+      jit->second.calibrated_ = fake_calibration_;
+      ++jit;
+    }
   }
 
 }

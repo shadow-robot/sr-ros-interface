@@ -38,7 +38,7 @@ using namespace std;
 namespace controller {
 
   SrhFakeJointCalibrationController::SrhFakeJointCalibrationController()
-    : robot_(NULL), last_publish_time_(0), state_(IS_INITIALIZED),
+    : robot_(NULL), last_publish_time_(0), calibration_state_(IS_INITIALIZED),
       actuator_(NULL), joint_(NULL)
   {
   }
@@ -110,15 +110,15 @@ namespace controller {
     assert(joint_);
     assert(actuator_);
 
-    switch(state_)
+    switch(calibration_state_)
     {
     case IS_INITIALIZED:
-      state_ = BEGINNING;
+      calibration_state_ = BEGINNING;
       break;
     case BEGINNING:
       initialize_pids();
       joint_->calibrated_ = true;
-      state_ = CALIBRATED;
+      calibration_state_ = CALIBRATED;
       //We add the following line to delay for some time the first publish and allow the correct initialization of the subscribers in calibrate.py
       last_publish_time_ = robot_->current_time_;
       break;
