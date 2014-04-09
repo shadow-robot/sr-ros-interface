@@ -82,7 +82,7 @@ namespace shadow_robot
       values_->insert( std::pair<std::string, DiagnosticTest>("Dropped Packets", dropped_packet) );
     }
 
-    ~EtherCATMasterDiagnostics()
+    virtual ~EtherCATMasterDiagnostics()
     {};
 
     virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
@@ -110,7 +110,7 @@ namespace shadow_robot
       values_->insert( std::pair<std::string, DiagnosticTest>("Temperature", temperature) );
     };
 
-    ~MotorDiagnostics() {};
+    virtual ~MotorDiagnostics() {};
 
     virtual std::auto_ptr<BaseDiagnostics> shallow_clone(std::string name)
     {
