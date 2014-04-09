@@ -34,6 +34,8 @@
 #include <unistd.h>
 #include <set>
 
+//#include <gazebo/XMLConfig.hh>
+//#include "physics/physics.h"
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/HingeJoint.hh>
 #include <gazebo/sensors/Sensor.hh>
@@ -60,10 +62,22 @@ GazeboRosControllerManager::GazeboRosControllerManager()
 {
 }
 
+/// \brief callback for setting models joints states
+//bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
+//                           pr2_gazebo_plugins::SetModelsJointsStates::Response &res)
+//{
+//
+//  return true;
+//}
+
+
 GazeboRosControllerManager::~GazeboRosControllerManager()
 {
   ROS_DEBUG("Calling FiniChild in GazeboRosControllerManager");
 
+  //pr2_hardware_interface::ActuatorMap::const_iterator it;
+  //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
+  //  delete it->second; // why is this causing double free corruption?
   if (rosnode_)
     rosnode_->shutdown();
 #ifdef USE_CBQ
