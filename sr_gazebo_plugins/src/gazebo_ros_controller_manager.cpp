@@ -53,13 +53,13 @@
 #include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_mechanism_model;
-using boost::unordered_map;
 
 namespace gazebo {
 
 GazeboRosControllerManager::GazeboRosControllerManager()
 {
 }
+
 
 /// \brief callback for setting models joints states
 //bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
@@ -77,8 +77,6 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
   //pr2_hardware_interface::ActuatorMap::const_iterator it;
   //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
   //  delete it->second; // why is this causing double free corruption?
-  if (rosnode_)
-    this->rosnode_->shutdown();
 #ifdef USE_CBQ
   this->controller_manager_queue_.clear();
   this->controller_manager_queue_.disable();
@@ -86,6 +84,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
 #endif
   this->ros_spinner_thread_.join();
 }
+
 
 void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
@@ -108,6 +107,9 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
       boost::bind(&GazeboRosControllerManager::UpdateChild, this));
   gzdbg << "plugin model name: " << modelName << "\n";
 
+
+
+
   if (getenv("CHECK_SPEEDUP"))
   {
     wall_start_ = this->world->GetRealTime().Double();
@@ -125,7 +127,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
 
 
   // get parameter name
-  this->robotNamespace.clear();
+  this->robotNamespace = "";
   if (_sdf->HasElement("robotNamespace"))
     this->robotNamespace = _sdf->GetElement("robotNamespace")->Get<std::string>();
 
@@ -133,7 +135,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   if (_sdf->HasElement("robotParam"))
     this->robotParam = _sdf->GetElement("robotParam")->Get<std::string>();
 
-  this->robotParam = this->robotNamespace+"/" + robotParam;
+  this->robotParam = this->robotNamespace+"/" + this->robotParam;
 
   if (!ros::isInitialized())
   {
@@ -142,70 +144,72 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     ros::init(argc,argv,"gazebo",ros::init_options::NoSigintHandler|ros::init_options::AnonymousName);
   }
 
-  this->rosnode_.reset(new ros::NodeHandle(robotNamespace));
+  rosnode_.reset(new ros::NodeHandle(robotNamespace));
   ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
 
   // Use the robots namespace, not gazebos
   self_test_.reset(new shadow_robot::SrSelfTest(true, this->robotNamespace));
 
   // ros_ethercat calls ros::spin(), we'll thread out one spinner here to mimic that
-  ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );
+  this->ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );
 
-  rosnode_->param("gazebo/start_robot_calibrated",fake_calibration_,true);
+  this->rosnode_->param("gazebo/start_robot_calibrated",this->fake_calibration_,true);
 
   // read pr2 urdf
   // setup actuators, then setup mechanism control node
   ReadPr2Xml();
 
   // The gazebo joints and mechanism joints should match up.
-  for (unordered_map<std::string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin();
-      it != robot_hw_->model_.joint_states_.end();
-      ++it)
+  for (boost::unordered_map<std::string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin(); it != robot_hw_->model_.joint_states_.end(); ++it)
   {
+
+
     // fill in gazebo joints pointer
     gazebo::physics::JointPtr joint = parent_model_->GetJoint(it->first);
     if (joint)
     {
-      joints_.push_back(joint);
+      this->joints_.push_back(joint);
     }
     else
     {
-      joints_.push_back(gazebo::physics::JointPtr());
+      //ROS_WARN("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", joint_name.c_str());
+      //this->joints_.push_back(NULL);  // FIXME: cannot be null, must be an empty boost shared pointer
+      this->joints_.push_back(gazebo::physics::JointPtr());
       ROS_ERROR("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", it->first.c_str());
     }
-
   }
 
 
 #ifdef USE_CBQ
   // start custom queue for controller manager
-  controller_manager_callback_queue_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerQueueThread,this ) );
+  this->controller_manager_callback_queue_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerQueueThread,this ) );
 #endif
 
 }
 
 void GazeboRosControllerManager::UpdateChild()
 {
-  if (world->IsPaused()) return;
+  if (this->world->IsPaused()) return;
 
   if (getenv("CHECK_SPEEDUP"))
   {
-    double wall_elapsed = world->GetRealTime().Double() - wall_start_;
-    double sim_elapsed  = world->GetSimTime().Double()  - sim_start_;
-    cout << " real time: " <<  wall_elapsed
+    double wall_elapsed = this->world->GetRealTime().Double() - wall_start_;
+    double sim_elapsed  = this->world->GetSimTime().Double()  - sim_start_;
+    std::cout << " real time: " <<  wall_elapsed
               << "  sim time: " <<  sim_elapsed
               << "  speed up: " <<  sim_elapsed / wall_elapsed
-              << endl;
+              << std::endl;
   }
-  assert(joints_.size() == fake_state_->joint_states_.size());
+  assert(this->joints_.size() == fake_state_->joint_states_.size());
 
   //--------------------------------------------------
   //  Pushes out simulation state
   //--------------------------------------------------
 
+  //ROS_ERROR("joints_.size()[%d]",(int)this->joints_.size());
   // Copies the state from the gazebo joints into the mechanism joints.
   vector<gazebo::physics::JointPtr>::iterator git = joints_.begin();
-  unordered_map<std::string, JointState>::iterator fit = fake_state_->joint_states_.begin();
+  boost::unordered_map<std::string, JointState>::iterator fit = fake_state_->joint_states_.begin();
   while (git != joints_.end() &&
          fit != fake_state_->joint_states_.end())
   {
@@ -228,7 +232,7 @@ void GazeboRosControllerManager::UpdateChild()
   }
 
   // Reverses the transmissions to propagate the joint position into the actuators.
-  fake_state_->propagateJointPositionToActuatorPosition();
+  this->fake_state_->propagateJointPositionToActuatorPosition();
 
   //--------------------------------------------------
   //  Runs Mechanism Control
@@ -251,12 +255,12 @@ void GazeboRosControllerManager::UpdateChild()
   //--------------------------------------------------
 
   // Reverses the transmissions to propagate the actuator commands into the joints.
-  fake_state_->propagateActuatorEffortToJointEffort();
+  this->fake_state_->propagateActuatorEffortToJointEffort();
 
   // Copies the commands from the mechanism joints into the gazebo joints.
   git = joints_.begin();
   fit = fake_state_->joint_states_.begin();
-  unordered_map<std::string, JointState>::iterator rit = robot_hw_->model_.joint_states_.begin();
+  boost::unordered_map<std::string, JointState>::iterator rit = robot_hw_->model_.joint_states_.begin();
 
   while (git != joints_.end() &&
          fit != fake_state_->joint_states_.end() &&
@@ -292,22 +296,22 @@ void GazeboRosControllerManager::ReadPr2Xml()
   // search and wait for robot_description on param server
   while(urdf_string.empty())
   {
-    ROS_DEBUG("gazebo controller manager plugin is waiting for urdf: %s on the param server.", robotParam.c_str());
-    if (rosnode_->searchParam(robotParam,urdf_param_name))
+    ROS_DEBUG("gazebo controller manager plugin is waiting for urdf: %s on the param server.", this->robotParam.c_str());
+    if (this->rosnode_->searchParam(this->robotParam,urdf_param_name))
     {
-      rosnode_->getParam(urdf_param_name,urdf_string);
-      ROS_DEBUG("found upstream\n%s\n------\n%s\n------\n%s",robotParam.c_str(),urdf_param_name.c_str(),urdf_string.c_str());
+      this->rosnode_->getParam(urdf_param_name,urdf_string);
+      ROS_DEBUG("found upstream\n%s\n------\n%s\n------\n%s",this->robotParam.c_str(),urdf_param_name.c_str(),urdf_string.c_str());
     }
     else
     {
-      rosnode_->getParam(robotParam,urdf_string);
-      ROS_DEBUG("found in node namespace\n%s\n------\n%s\n------\n%s",robotParam.c_str(),urdf_param_name.c_str(),urdf_string.c_str());
+      this->rosnode_->getParam(this->robotParam,urdf_string);
+      ROS_DEBUG("found in node namespace\n%s\n------\n%s\n------\n%s",this->robotParam.c_str(),urdf_param_name.c_str(),urdf_string.c_str());
     }
     usleep(100000);
   }
   ROS_DEBUG("gazebo controller manager got pr2.xml from param server, parsing it...");
 
-  // initialize TiXmlDocument doc with a std::string
+  // initialize TiXmlDocument doc with a string
   TiXmlDocument doc;
   if (!doc.Parse(urdf_string.c_str()) && doc.Error())
   {
@@ -316,6 +320,9 @@ void GazeboRosControllerManager::ReadPr2Xml()
   }
   else
   {
+    //doc.Print();
+    //std::cout << *(doc.RootElement()) << std::endl;
+
     // Pulls out the list of actuators used in the robot configuration.
     struct GetActuators : public TiXmlVisitor
     {
@@ -344,14 +351,13 @@ void GazeboRosControllerManager::ReadPr2Xml()
       fake_state_->current_time_ = ros::Time(0.001); // hardcoded to minimum of 1ms on start up
 
     // Places the found actuators into the hardware interface.
-    std::set<std::string>::iterator sit = get_actuators.actuators.begin();
-    while (sit != get_actuators.actuators.end())
+    std::set<std::string>::iterator it;
+    for (it = get_actuators.actuators.begin(); it != get_actuators.actuators.end(); ++it)
     {
-      fake_state_->actuators_[*sit];
-      ++sit;
+      fake_state_->actuators_[*it];
     }
 
-    unordered_map<std::string, JointState>::iterator jit = robot_hw_->model_.joint_states_.begin();
+    boost::unordered_map<std::string, JointState>::iterator jit = robot_hw_->model_.joint_states_.begin();
     while (jit != robot_hw_->model_.joint_states_.end())
     {
       jit->second.calibrated_ = fake_calibration_;
@@ -370,9 +376,9 @@ void GazeboRosControllerManager::ControllerManagerQueueThread()
 
   static const double timeout = 0.01;
 
-  while (rosnode_->ok())
+  while (this->rosnode_->ok())
   {
-    controller_manager_queue_.callAvailable(ros::WallDuration(timeout));
+    this->controller_manager_queue_.callAvailable(ros::WallDuration(timeout));
   }
 }
 #endif
@@ -381,7 +387,9 @@ void GazeboRosControllerManager::ControllerManagerROSThread()
 {
   ROS_INFO_STREAM("Callback thread id=" << boost::this_thread::get_id());
 
-  while (rosnode_->ok())
+  //ros::Rate rate(1000);
+
+  while (this->rosnode_->ok())
   {
     self_test_->checkTest();
     //rate.sleep(); // using rosrate gets stuck on model delete
