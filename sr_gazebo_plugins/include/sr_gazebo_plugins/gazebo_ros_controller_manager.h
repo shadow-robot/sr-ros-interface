@@ -70,6 +70,7 @@ protected:
 
   boost::scoped_ptr<shadow_robot::SrSelfTest> self_test_;
 private:
+
   gazebo::physics::ModelPtr parent_model_;
   boost::scoped_ptr<ros_ethercat> robot_hw_;
   boost::scoped_ptr<controller_manager::ControllerManager> cm_;
@@ -79,6 +80,15 @@ private:
   ///       actuator values.
   boost::scoped_ptr<ros_ethercat_mechanism_model::Robot> fake_state_;
   std::vector<gazebo::physics::JointPtr>  joints_;
+
+  /// \brief Service Call Name
+  //private: ParamT<std::string> *setModelsJointsStatesServiceNameP;
+  //private: std::string setModelsJointsStatesServiceName;
+
+  /*
+   * \brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
+   */
+  //void ReadPr2Xml();
 
   /*
    *  \brief pointer to ros node
