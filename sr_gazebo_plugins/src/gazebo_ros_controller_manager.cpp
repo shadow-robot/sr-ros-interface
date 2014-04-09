@@ -242,7 +242,8 @@ void GazeboRosControllerManager::UpdateChild()
   this->fake_state_->current_time_ = ros::Time(this->world->GetSimTime().Double());
   try
   {
-    cm_->update(fake_state_->current_time_, ros::Duration(1e+6));
+    if (this->cm_->robot_hw_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
+      this->cm_->update(fake_state_->current_time_, ros::Duration(1e+6));
   }
   catch (const char* c)
   {

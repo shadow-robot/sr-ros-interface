@@ -1,5 +1,5 @@
 /**
- * @file   joint_0_transmission.hpppp
+ * @file   joint_0_transmission.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Tue Jun 28 11:35:05 2011
  *

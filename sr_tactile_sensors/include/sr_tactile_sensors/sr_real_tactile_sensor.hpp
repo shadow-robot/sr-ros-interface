@@ -32,7 +32,7 @@
 #include <ros/ros.h>
 
 //our robot code
-#include <robot/robot.hpp>
+#include <robot/robot.h>
 #include <robot/hand.h>
 #include <robot/hand_protocol.h>
 

@@ -23,11 +23,12 @@
   <build_depend>roscpp</build_depend>
   <build_depend>actionlib</build_depend>
   <build_depend>control_msgs</build_depend>
-  <build_depend>controller_manager_msgs</build_depend>
   <build_depend>sr_robot_msgs</build_depend>
   <build_depend>sr_utilities</build_depend>
   <build_depend>controller_interface</build_depend>
+  <build_depend>controller_manager_msgs</build_depend>
   <build_depend>realtime_tools</build_depend>
+  <build_depend>velocity_controllers</build_depend>
   <build_depend>pluginlib</build_depend>
   <build_depend>rosconsole</build_depend>
   <build_depend>angles</build_depend>
@@ -37,7 +38,6 @@
   <build_depend>rostest</build_depend>
   <build_depend>cmake_modules</build_depend>
   <build_depend>tinyxml</build_depend>
-  <build_depend>velocity_controllers</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>std_msgs</run_depend>
@@ -45,18 +45,18 @@
   <run_depend>roscpp</run_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>control_msgs</run_depend>
-  <run_depend>controller_manager_msgs</run_depend>
   <run_depend>sr_robot_msgs</run_depend>
   <run_depend>sr_utilities</run_depend>
   <run_depend>controller_interface</run_depend>
+  <run_depend>controller_manager_msgs</run_depend>
   <run_depend>realtime_tools</run_depend>
+  <run_depend>velocity_controllers</run_depend>
   <run_depend>pluginlib</run_depend>
   <run_depend>rosconsole</run_depend>
   <run_depend>angles</run_depend>
   <run_depend>control_toolbox</run_depend>
   <run_depend>sr_hardware_interface</run_depend>
   <run_depend>xmlrpcpp</run_depend>
-  <run_depend>velocity_controllers</run_depend> 
 
   <!-- Dependencies needed only for running tests. -->
   <test_depend>gtest</test_depend>
