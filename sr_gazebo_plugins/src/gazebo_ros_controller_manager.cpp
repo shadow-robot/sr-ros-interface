@@ -53,7 +53,6 @@
 #include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_mechanism_model;
-using namespace std;
 using boost::unordered_map;
 
 namespace gazebo {
@@ -79,52 +78,62 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
   //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
   //  delete it->second; // why is this causing double free corruption?
   if (rosnode_)
-    rosnode_->shutdown();
+    this->rosnode_->shutdown();
 #ifdef USE_CBQ
-  controller_manager_queue_.clear();
-  controller_manager_queue_.disable();
-  controller_manager_callback_queue_thread_.join();
+  this->controller_manager_queue_.clear();
+  this->controller_manager_queue_.disable();
+  this->controller_manager_callback_queue_thread_.join();
 #endif
-  ros_spinner_thread_.join();
+  this->ros_spinner_thread_.join();
 }
 
 void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent model
-  string modelName = _sdf->GetParent()->Get<string>("name");
+  std::string modelName = _sdf->GetParent()->Get<std::string>("name");
 
   // Get the world name.
-  world = _parent->GetWorld();
+  this->world = _parent->GetWorld();
 
   // Get a pointer to the model
-  parent_model_ = _parent;
+  this->parent_model_ = _parent;
 
   // Error message if the model couldn't be found
-  if (!parent_model_)
+  if (!this->parent_model_)
     gzerr << "Unable to get parent model\n";
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
-  updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GazeboRosControllerManager::UpdateChild, this));
   gzdbg << "plugin model name: " << modelName << "\n";
 
   if (getenv("CHECK_SPEEDUP"))
   {
-    wall_start_ = world->GetRealTime().Double();
-    sim_start_  = world->GetSimTime().Double();
+    wall_start_ = this->world->GetRealTime().Double();
+    sim_start_  = this->world->GetSimTime().Double();
   }
 
+  // check update rate against world physics update rate
+  // should be equal or higher to guarantee the wrench applied is not "diluted"
+  //if (this->updatePeriod > 0 &&
+  //    (this->world->GetPhysicsEngine()->GetUpdateRate() > 1.0/this->updatePeriod))
+  //  ROS_ERROR("gazebo_ros_force controller update rate is less than physics update rate, wrench applied will be diluted (applied intermittently)");
+
+
+
+
+
   // get parameter name
-  robotNamespace.clear();
+  this->robotNamespace.clear();
   if (_sdf->HasElement("robotNamespace"))
-    robotNamespace = _sdf->GetElement("robotNamespace")->Get<string>();
+    this->robotNamespace = _sdf->GetElement("robotNamespace")->Get<std::string>();
 
-  robotParam = "robot_description";
+  this->robotParam = "robot_description";
   if (_sdf->HasElement("robotParam"))
-    robotParam = _sdf->GetElement("robotParam")->Get<string>();
+    this->robotParam = _sdf->GetElement("robotParam")->Get<std::string>();
 
-  robotParam = robotNamespace+"/" + robotParam;
+  this->robotParam = this->robotNamespace+"/" + robotParam;
 
   if (!ros::isInitialized())
   {
@@ -133,11 +142,11 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     ros::init(argc,argv,"gazebo",ros::init_options::NoSigintHandler|ros::init_options::AnonymousName);
   }
 
-  rosnode_.reset(new ros::NodeHandle(robotNamespace));
-  ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",robotNamespace.c_str());
+  this->rosnode_.reset(new ros::NodeHandle(robotNamespace));
+  ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
 
   // Use the robots namespace, not gazebos
-  self_test_.reset(new shadow_robot::SrSelfTest(true, robotNamespace));
+  self_test_.reset(new shadow_robot::SrSelfTest(true, this->robotNamespace));
 
   // ros_ethercat calls ros::spin(), we'll thread out one spinner here to mimic that
   ros_spinner_thread_ = boost::thread( boost::bind( &GazeboRosControllerManager::ControllerManagerROSThread,this ) );
@@ -149,7 +158,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   ReadPr2Xml();
 
   // The gazebo joints and mechanism joints should match up.
-  for (unordered_map<string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin();
+  for (unordered_map<std::string, JointState>::iterator it = robot_hw_->model_.joint_states_.begin();
       it != robot_hw_->model_.joint_states_.end();
       ++it)
   {
@@ -196,7 +205,7 @@ void GazeboRosControllerManager::UpdateChild()
 
   // Copies the state from the gazebo joints into the mechanism joints.
   vector<gazebo::physics::JointPtr>::iterator git = joints_.begin();
-  unordered_map<string, JointState>::iterator fit = fake_state_->joint_states_.begin();
+  unordered_map<std::string, JointState>::iterator fit = fake_state_->joint_states_.begin();
   while (git != joints_.end() &&
          fit != fake_state_->joint_states_.end())
   {
@@ -247,7 +256,7 @@ void GazeboRosControllerManager::UpdateChild()
   // Copies the commands from the mechanism joints into the gazebo joints.
   git = joints_.begin();
   fit = fake_state_->joint_states_.begin();
-  unordered_map<string, JointState>::iterator rit = robot_hw_->model_.joint_states_.begin();
+  unordered_map<std::string, JointState>::iterator rit = robot_hw_->model_.joint_states_.begin();
 
   while (git != joints_.end() &&
          fit != fake_state_->joint_states_.end() &&
@@ -278,8 +287,8 @@ void GazeboRosControllerManager::UpdateChild()
 void GazeboRosControllerManager::ReadPr2Xml()
 {
 
-  string urdf_param_name;
-  string urdf_string;
+  std::string urdf_param_name;
+  std::string urdf_string;
   // search and wait for robot_description on param server
   while(urdf_string.empty())
   {
@@ -298,7 +307,7 @@ void GazeboRosControllerManager::ReadPr2Xml()
   }
   ROS_DEBUG("gazebo controller manager got pr2.xml from param server, parsing it...");
 
-  // initialize TiXmlDocument doc with a string
+  // initialize TiXmlDocument doc with a std::string
   TiXmlDocument doc;
   if (!doc.Parse(urdf_string.c_str()) && doc.Error())
   {
@@ -310,14 +319,14 @@ void GazeboRosControllerManager::ReadPr2Xml()
     // Pulls out the list of actuators used in the robot configuration.
     struct GetActuators : public TiXmlVisitor
     {
-      set<string> actuators;
+      std::set<std::string> actuators;
       virtual bool VisitEnter(const TiXmlElement &elt, const TiXmlAttribute *)
       {
-        if (elt.ValueStr() == string("actuator") && elt.Attribute("name"))
+        if (elt.ValueStr() == std::string("actuator") && elt.Attribute("name"))
           actuators.insert(elt.Attribute("name"));
-        else if (elt.ValueStr() == string("rightActuator") && elt.Attribute("name"))
+        else if (elt.ValueStr() == std::string("rightActuator") && elt.Attribute("name"))
           actuators.insert(elt.Attribute("name"));
-        else if (elt.ValueStr() == string("leftActuator") && elt.Attribute("name"))
+        else if (elt.ValueStr() == std::string("leftActuator") && elt.Attribute("name"))
           actuators.insert(elt.Attribute("name"));
         return true;
       }
@@ -335,14 +344,14 @@ void GazeboRosControllerManager::ReadPr2Xml()
       fake_state_->current_time_ = ros::Time(0.001); // hardcoded to minimum of 1ms on start up
 
     // Places the found actuators into the hardware interface.
-    set<string>::iterator sit = get_actuators.actuators.begin();
+    std::set<std::string>::iterator sit = get_actuators.actuators.begin();
     while (sit != get_actuators.actuators.end())
     {
       fake_state_->actuators_[*sit];
       ++sit;
     }
 
-    unordered_map<string, JointState>::iterator jit = robot_hw_->model_.joint_states_.begin();
+    unordered_map<std::string, JointState>::iterator jit = robot_hw_->model_.joint_states_.begin();
     while (jit != robot_hw_->model_.joint_states_.end())
     {
       jit->second.calibrated_ = fake_calibration_;
