@@ -54,7 +54,7 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->current_time_;
+    last_time_ = robot_->getTime();
 
     joint_state_ = robot_->getJointState(joint_name);
     if (!joint_state_)
