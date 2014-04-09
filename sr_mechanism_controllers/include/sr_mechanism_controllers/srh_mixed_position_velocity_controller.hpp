@@ -41,7 +41,7 @@ namespace controller
   public:
 
     SrhMixedPositionVelocityJointController();
-    ~SrhMixedPositionVelocityJointController();
+    virtual ~SrhMixedPositionVelocityJointController();
 
     bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
                boost::shared_ptr<control_toolbox::Pid> pid_position,
