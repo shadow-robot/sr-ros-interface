@@ -65,18 +65,21 @@ public:
   void Load( physics::ModelPtr _parent, sdf::ElementPtr _sdf );
 
 protected:
+  // Inherited from gazebo::Controller
+  virtual void UpdateChild();
   boost::scoped_ptr<shadow_robot::SrSelfTest> self_test_;
-  boost::scoped_ptr<ros_ethercat> robot_hw_;
-  boost::scoped_ptr<controller_manager::ControllerManager> cm_;
   boost::scoped_ptr<ros::NodeHandle> rosnode_;
 
-  // fake state helps Gazebo run the transmissions backwards, so
-  // that it can figure out what its joints should do based on the
-  // actuator values.
+private:
+  gazebo::physics::ModelPtr parent_model_;
+  boost::scoped_ptr<ros_ethercat> robot_hw_;
+  boost::scoped_ptr<controller_manager::ControllerManager> cm_;
+
+  // @todo The fake state helps Gazebo run the transmissions backwards, so
+  ///       that it can figure out what its joints should do based on the
+  ///       actuator values.
   boost::scoped_ptr<ros_ethercat_mechanism_model::Robot> fake_state_;
   std::vector<gazebo::physics::JointPtr> joints_;
-
-  gazebo::physics::ModelPtr parent_model_;
 
   /// \brief ros service
   ros::ServiceServer setModelsJointsStatesService;
