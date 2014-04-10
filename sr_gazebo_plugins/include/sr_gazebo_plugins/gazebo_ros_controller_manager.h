@@ -50,7 +50,6 @@
 #include <ros/callback_queue.h>
 #endif
 
-#include <boost/scoped_ptr.hpp>
 #include "boost/thread/mutex.hpp"
 
 #include <sr_self_test/sr_self_test.hpp>
@@ -68,17 +67,17 @@ protected:
   // Inherited from gazebo::Controller
   virtual void UpdateChild();
 
-  boost::scoped_ptr<shadow_robot::SrSelfTest> self_test_;
+  boost::shared_ptr<shadow_robot::SrSelfTest> self_test_;
 private:
 
   gazebo::physics::ModelPtr parent_model_;
-  boost::scoped_ptr<ros_ethercat> robot_hw_;
-  boost::scoped_ptr<controller_manager::ControllerManager> cm_;
+  ros_ethercat *robot_hw_;
+  controller_manager::ControllerManager *cm_;
 
   /// @todo The fake state helps Gazebo run the transmissions backwards, so
   ///       that it can figure out what its joints should do based on the
   ///       actuator values.
-  boost::scoped_ptr<ros_ethercat_mechanism_model::Robot> fake_state_;
+  ros_ethercat_mechanism_model::Robot *fake_state_;
   std::vector<gazebo::physics::JointPtr>  joints_;
 
   /// \brief Service Call Name
@@ -93,7 +92,7 @@ private:
   /*
    *  \brief pointer to ros node
    */
-  boost::scoped_ptr<ros::NodeHandle> rosnode_;
+  ros::NodeHandle* rosnode_;
 
   /// \brief ros service
   private: ros::ServiceServer setModelsJointsStatesService;

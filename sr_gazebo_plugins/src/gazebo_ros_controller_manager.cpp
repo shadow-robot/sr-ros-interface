@@ -53,7 +53,6 @@
 #include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_mechanism_model;
-
 namespace gazebo {
 
 GazeboRosControllerManager::GazeboRosControllerManager()
@@ -83,6 +82,14 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
   this->controller_manager_callback_queue_thread_.join();
 #endif
   this->ros_spinner_thread_.join();
+
+
+
+
+  delete this->cm_;
+  delete this->rosnode_;
+  delete this->fake_state_;
+  delete robot_hw_;
 }
 
 
