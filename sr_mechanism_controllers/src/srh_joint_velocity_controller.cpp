@@ -57,7 +57,7 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot_->getTime();
+    last_time_ = robot->getTime();
 
     if( joint_name.substr(3,1).compare("0") == 0)
     {

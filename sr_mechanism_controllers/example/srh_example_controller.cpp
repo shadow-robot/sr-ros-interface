@@ -79,7 +79,7 @@ namespace controller {
   {
     assert(robot);
     robot_ = robot;
-    last_time_ = robot_->getTime();
+    last_time_ = robot->getTime();
 
     //We need to store 2 different joint states for the joint 0s:
     // They control the distal and the middle joint with the same control.
