@@ -76,6 +76,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
   //pr2_hardware_interface::ActuatorMap::const_iterator it;
   //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
   //  delete it->second; // why is this causing double free corruption?
+  delete robot_hw_;
 #ifdef USE_CBQ
   this->controller_manager_queue_.clear();
   this->controller_manager_queue_.disable();
@@ -89,7 +90,6 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
   delete this->cm_;
   delete this->rosnode_;
   delete this->fake_state_;
-  delete robot_hw_;
 }
 
 
