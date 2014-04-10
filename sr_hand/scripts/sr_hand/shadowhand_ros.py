@@ -518,37 +518,12 @@ class ShadowHand_ROS():
             self.hand_velocity = {n:math.degrees(v) for n,v in zip(joint_state.name, joint_state.velocity)}
             self.hand_effort = {n:e for n,e in zip(joint_state.name, joint_state.effort)}
     
-            self.hand_velocity['FFJ0'] = self.hand_velocity['FFJ1'] + self.hand_velocity['FFJ2']
-            del self.hand_velocity['FFJ1']
-            del self.hand_velocity['FFJ2']
-    
-            self.hand_velocity['MFJ0'] = self.hand_velocity['MFJ1'] + self.hand_velocity['MFJ2']
-            del self.hand_velocity['MFJ1']
-            del self.hand_velocity['MFJ2']
-    
-            self.hand_velocity['RFJ0'] = self.hand_velocity['RFJ1'] + self.hand_velocity['RFJ2']
-            del self.hand_velocity['RFJ1']
-            del self.hand_velocity['RFJ2']
-    
-            self.hand_velocity['LFJ0'] = self.hand_velocity['LFJ1'] + self.hand_velocity['LFJ2']
-            del self.hand_velocity['LFJ1']
-            del self.hand_velocity['LFJ2']
-    
-            self.hand_effort['FFJ0'] = self.hand_effort['FFJ1'] + self.hand_effort['FFJ2']
-            del self.hand_effort['FFJ1']
-            del self.hand_effort['FFJ2']
-    
-            self.hand_effort['MFJ0'] = self.hand_effort['MFJ1'] + self.hand_effort['MFJ2']
-            del self.hand_effort['MFJ1']
-            del self.hand_effort['MFJ2']
-    
-            self.hand_effort['RFJ0'] = self.hand_effort['RFJ1'] + self.hand_effort['RFJ2']
-            del self.hand_effort['RFJ1']
-            del self.hand_effort['RFJ2']
-    
-            self.hand_effort['LFJ0'] = self.hand_effort['LFJ1'] + self.hand_effort['LFJ2']
-            del self.hand_effort['LFJ1']
-            del self.hand_effort['LFJ2']
+            for finger in ['FF', 'MF', 'RF', 'LF']:
+                for dic in [self.hand_velocity, self.hand_effort]:
+                    if (finger + 'J1') in dic and (finger + 'J2') in dic:
+                        dic[finger + 'J0'] = dic[finger + 'J1'] + dic[finger + 'J2']
+                        del dic[finger + 'J1']
+                        del dic[finger + 'J2']
 
     def get_tactile_type(self):
         return self.tactile_receiver.get_tactile_type()
