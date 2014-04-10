@@ -43,9 +43,6 @@ namespace sr_mechanism_model
     ~J0Transmission() {}
 
     bool initXml(TiXmlElement *config, ros_ethercat_mechanism_model::Robot *robot);
-    bool initXml(TiXmlElement *config);
-
-    double mechanical_reduction_;
 
     void propagatePosition(std::vector<ros_ethercat_mechanism_model::Actuator*>&,
                            std::vector<ros_ethercat_mechanism_model::JointState*>&);

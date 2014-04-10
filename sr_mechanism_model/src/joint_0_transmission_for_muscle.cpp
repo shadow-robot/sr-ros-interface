@@ -51,41 +51,14 @@ namespace sr_mechanism_model
 
     TiXmlElement *ael = elt->FirstChildElement("actuator");
     const char *actuator_name = ael ? ael->Attribute("name") : NULL;
-    Actuator *a;
-    if (!actuator_name || (a = robot->getActuator(actuator_name)) == NULL )
+    Actuator *a = robot->getActuator(actuator_name);
+    if (!actuator_name || !a)
     {
       ROS_ERROR("J0TransmissionForMuscle could not find actuator named \"%s\"", actuator_name);
       return false;
     }
     a->command_.enable_ = true;
     actuator_names_.push_back(actuator_name);
-
-    mechanical_reduction_ = atof(elt->FirstChildElement("mechanicalReduction")->GetText());
-
-    return true;
-  }
-
-  bool J0TransmissionForMuscle::initXml(TiXmlElement *elt)
-  {
-    const char *name = elt->Attribute("name");
-    name_ = name ? name : "";
-
-    TiXmlElement *jel = elt->FirstChildElement("joint1");
-    init_joint(jel, NULL);
-    TiXmlElement *jel2 = elt->FirstChildElement("joint2");
-    init_joint(jel2, NULL);
-
-
-    TiXmlElement *ael = elt->FirstChildElement("actuator");
-    const char *actuator_name = ael ? ael->Attribute("name") : NULL;
-    if (!actuator_name)
-    {
-      ROS_ERROR("J0TransmissionForMuscle could not find actuator named \"%s\"", actuator_name);
-      return false;
-    }
-    actuator_names_.push_back(actuator_name);
-
-    mechanical_reduction_ = atof(elt->FirstChildElement("mechanicalReduction")->GetText());
 
     return true;
   }

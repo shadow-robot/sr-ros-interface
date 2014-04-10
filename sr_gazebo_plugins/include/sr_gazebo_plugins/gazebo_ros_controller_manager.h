@@ -40,7 +40,7 @@
 #include <gazebo/common/Plugin.hh>
 
 #include "ros_ethercat_mechanism_model/hardware_interface.hpp"
-#include "ros_ethercat_loop/ros_ethercat.hpp"
+#include "ros_ethercat_mechanism_model/ros_ethercat.hpp"
 #include "controller_manager/controller_manager.h"
 #include "ros_ethercat_mechanism_model/robot.hpp"
 #include <tinyxml.h>

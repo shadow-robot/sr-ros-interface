@@ -72,7 +72,6 @@ namespace controller
 
     ros_ethercat_mechanism_model::Actuator *actuator_;
     ros_ethercat_mechanism_model::JointState *joint_;
-    ros_ethercat_mechanism_model::Transmission *transmission_;
 
     std::string joint_name_, actuator_name_;
 

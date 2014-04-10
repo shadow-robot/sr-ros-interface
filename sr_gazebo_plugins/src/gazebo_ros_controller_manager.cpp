@@ -166,7 +166,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   ReadPr2Xml();
 
   // The gazebo joints and mechanism joints should match up.
-  if (this->cm_->robot_hw_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
+  if (this->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
   {
     for (boost::unordered_map<std::string, JointState>::iterator it = state_->model_.joint_states_.begin(); it != state_->model_.joint_states_.end(); ++it)
     {
@@ -217,7 +217,7 @@ void GazeboRosControllerManager::UpdateChild()
 
   //ROS_ERROR("joints_.size()[%d]",(int)this->joints_.size());
   // Copies the state from the gazebo joints into the mechanism joints.
-  vector<gazebo::physics::JointPtr>::iterator git = joints_.begin();
+  std::vector<gazebo::physics::JointPtr>::iterator git = joints_.begin();
   boost::unordered_map<std::string, JointState>::iterator fit = fake_state_->joint_states_.begin();
   while (git != joints_.end() &&
          fit != fake_state_->joint_states_.end())
@@ -249,7 +249,7 @@ void GazeboRosControllerManager::UpdateChild()
   this->fake_state_->current_time_ = ros::Time(this->world->GetSimTime().Double());
   try
   {
-    if (this->cm_->robot_hw_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
+    if (this->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
       this->cm_->update(fake_state_->current_time_, ros::Duration(1e+6));
   }
   catch (const char* c)

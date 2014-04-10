@@ -3,7 +3,7 @@ project(sr_gazebo_plugins)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_msgs ros_ethercat_mechanism_model
   geometry_msgs diagnostic_updater diagnostic_msgs angles sr_hardware_interface controller_manager
-  urdf dynamic_reconfigure sr_hardware_interface sr_self_test cmake_modules ros_ethercat_loop)
+  urdf dynamic_reconfigure sr_hardware_interface sr_self_test cmake_modules)
 find_package(TinyXML REQUIRED)
 find_package(PkgConfig)
 find_package(gazebo REQUIRED)
@@ -19,7 +19,7 @@ catkin_package(
     DEPENDS python-numpy opende TinyXML
     CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs geometry_msgs ros_ethercat_mechanism_model
       diagnostic_updater diagnostic_msgs angles sr_hardware_interface controller_manager urdf
-      dynamic_reconfigure sr_hardware_interface sr_self_test ros_ethercat_loop
+      dynamic_reconfigure sr_hardware_interface sr_self_test
     INCLUDE_DIRS include
     LIBRARIES 
 )

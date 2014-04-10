@@ -89,13 +89,6 @@ namespace controller {
       ROS_ERROR("No transmission given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    transmission_ = robot->getTransmission(transmission_name);
-    if (!transmission_)
-    {
-      ROS_ERROR("Could not find transmission %s (namespace: %s)",
-                transmission_name.c_str(), node_.getNamespace().c_str());
-      return false;
-    }
 
     // "Calibrated" topic
     pub_calibrated_.reset(
