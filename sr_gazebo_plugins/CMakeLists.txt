@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_gazebo_plugins)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_msgs
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_msgs ros_ethercat_mechanism_model
   geometry_msgs diagnostic_updater diagnostic_msgs angles sr_hardware_interface controller_manager
-  urdf dynamic_reconfigure sr_hardware_interface sr_self_test cmake_modules)
+  urdf dynamic_reconfigure sr_hardware_interface sr_self_test cmake_modules ros_ethercat_loop)
 find_package(TinyXML REQUIRED)
 find_package(PkgConfig)
 find_package(gazebo REQUIRED)
@@ -17,9 +17,9 @@ add_definitions(-fPIC -DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
 
 catkin_package(
     DEPENDS python-numpy opende TinyXML
-    CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs geometry_msgs
+    CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs geometry_msgs ros_ethercat_mechanism_model
       diagnostic_updater diagnostic_msgs angles sr_hardware_interface controller_manager urdf
-      dynamic_reconfigure sr_hardware_interface sr_self_test
+      dynamic_reconfigure sr_hardware_interface sr_self_test ros_ethercat_loop
     INCLUDE_DIRS include
     LIBRARIES 
 )

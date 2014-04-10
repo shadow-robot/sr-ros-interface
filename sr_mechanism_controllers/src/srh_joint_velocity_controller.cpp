@@ -206,7 +206,7 @@ namespace controller {
     }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->current_time_;
+    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
     dt_= time - last_time_;
 

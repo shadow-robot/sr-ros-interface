@@ -79,7 +79,7 @@ namespace controller {
   {
     assert(robot);
     robot_ = robot;
-    last_time_ = robot_->current_time_;
+    last_time_ = robot_->getTime();
 
     //We need to store 2 different joint states for the joint 0s:
     // They control the distal and the middle joint with the same control.
@@ -144,7 +144,7 @@ namespace controller {
     assert(joint_state_->joint_);
 
     //compute the time difference since last iteration
-    ros::Time time = robot_->current_time_;
+    ros::Time time = robot_->getTime();
     dt_= time - last_time_;
 
     //make sure the controller has been initialised,
