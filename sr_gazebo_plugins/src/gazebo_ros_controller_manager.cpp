@@ -55,7 +55,7 @@
 using namespace ros_ethercat_mechanism_model;
 namespace gazebo {
 
-GazeboRosControllerManager::GazeboRosControllerManager()
+GazeboRosControllerManager::GazeboRosControllerManager() : state_(NULL), cm_(NULL), fake_state_(NULL), rosnode_(NULL)
 {
 }
 
@@ -176,7 +176,6 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
       if (joint)
       {
         this->joints_.push_back(joint);
-        cout << "gazebo joint " << it->first << '\n';
       }
       else
       {
@@ -198,7 +197,8 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
 
 void GazeboRosControllerManager::UpdateChild()
 {
-  if (this->world->IsPaused()) return;
+  if (world->IsPaused() || !fake_state_ || !state_ || !cm_)
+    return;
 
   if (getenv("CHECK_SPEEDUP"))
   {
@@ -238,6 +238,8 @@ void GazeboRosControllerManager::UpdateChild()
         fit->second.position_ = (*git)->GetAngle(0).Radian();
         fit->second.velocity_ = (*git)->GetVelocity(0);
     }
+    ++git;
+    ++fit;
   }
 
   // Reverses the transmissions to propagate the joint position into the actuators.
@@ -249,8 +251,7 @@ void GazeboRosControllerManager::UpdateChild()
   this->fake_state_->current_time_ = ros::Time(this->world->GetSimTime().Double());
   try
   {
-    if (this->state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
-      this->cm_->update(fake_state_->current_time_, ros::Duration(1e+6));
+    this->cm_->update(fake_state_->current_time_, ros::Duration(1e+6));
   }
   catch (const char* c)
   {
@@ -351,13 +352,10 @@ void GazeboRosControllerManager::ReadPr2Xml()
     doc.RootElement()->Accept(&get_actuators);
 
     state_ = new ros_ethercat(*rosnode_, "", true, doc.RootElement());
-    cout << "state_ " << state_ << '\n';
     fake_state_ = &state_->model_;
-    cout << "fake_state_ " << fake_state_ << '\n';
 
     // load a controller manager
     cm_ = new controller_manager::ControllerManager(state_, *rosnode_);
-    cout << "cm_ " << cm_ << '\n';
 
     fake_state_->current_time_ = ros::Time(world->GetSimTime().Double());
     if (fake_state_->current_time_ < ros::Time(0.001))

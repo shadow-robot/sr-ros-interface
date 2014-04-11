@@ -70,7 +70,6 @@ namespace sr_mechanism_model
       return false;
     }
     joint_names_.push_back(joint_name);
-    std::cout << "Wired transmission for joint " << joint_name << '\n';
 
     TiXmlElement *ael = elt->FirstChildElement("actuator");
     std::string actuator_name = ael ? ael->Attribute("name") : "";
@@ -81,10 +80,8 @@ namespace sr_mechanism_model
       return false;
     }
     robot->actuators_.insert(actuator_name, a);
-    std::cout << "Loaded actuator " << actuator_name << '\n';
     a->command_.enable_ = true;
     actuator_names_.push_back(actuator_name);
-    std::cout << "Successfully loaded transmission " << name_ << '\n';
     return true;
   }
 

@@ -42,6 +42,16 @@
     <!-- Load the file you made above -->
     <rosparam command="load"  file="$(find sr_hand)/shadowhand_analyzer.yaml"/>
   </node>
+
+  <!-- publishes joint states with ros_control -->
+  <node name="joint_state_controller">
+	pkg="controller_manager" type="spawner" respawn="false" output="screen"
+	args="joint_state_controller"
+  	<rosparam ns="">
+      joint_state_controller:
+        type: joint_state_controller/JointStateController
+        publish_rate: 100
+    </rosparam>
+  </node>
+
 </launch>
-
-
