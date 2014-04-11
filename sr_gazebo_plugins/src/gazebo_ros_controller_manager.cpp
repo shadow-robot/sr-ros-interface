@@ -48,7 +48,7 @@
 
 #include <angles/angles.h>
 #include <urdf/model.h>
-#include <map>
+#include <boost/unordered_map.hpp>
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
@@ -76,7 +76,6 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
   //pr2_hardware_interface::ActuatorMap::const_iterator it;
   //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
   //  delete it->second; // why is this causing double free corruption?
-  delete state_;
 #ifdef USE_CBQ
   this->controller_manager_queue_.clear();
   this->controller_manager_queue_.disable();
@@ -89,7 +88,7 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
 
   delete this->cm_;
   delete this->rosnode_;
-  delete this->fake_state_;
+  delete this->state_;
 }
 
 
@@ -151,7 +150,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     ros::init(argc,argv,"gazebo",ros::init_options::NoSigintHandler|ros::init_options::AnonymousName);
   }
   this->rosnode_ = new ros::NodeHandle(this->robotNamespace);
-  ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
+  ROS_DEBUG("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
 
   // Use the robots namespace, not gazebos
   self_test_.reset(new shadow_robot::SrSelfTest(true, this->robotNamespace));
@@ -177,6 +176,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
       if (joint)
       {
         this->joints_.push_back(joint);
+        cout << "gazebo joint " << it->first << '\n';
       }
       else
       {
@@ -351,21 +351,24 @@ void GazeboRosControllerManager::ReadPr2Xml()
     doc.RootElement()->Accept(&get_actuators);
 
     state_ = new ros_ethercat(*rosnode_, "", true, doc.RootElement());
-    fake_state_ = new Robot(doc.RootElement());
+    cout << "state_ " << state_ << '\n';
+    fake_state_ = &state_->model_;
+    cout << "fake_state_ " << fake_state_ << '\n';
 
     // load a controller manager
     cm_ = new controller_manager::ControllerManager(state_, *rosnode_);
+    cout << "cm_ " << cm_ << '\n';
 
     fake_state_->current_time_ = ros::Time(world->GetSimTime().Double());
     if (fake_state_->current_time_ < ros::Time(0.001))
       fake_state_->current_time_ = ros::Time(0.001); // hardcoded to minimum of 1ms on start up
 
     // Places the found actuators into the hardware interface.
-    std::set<std::string>::iterator it;
-    for (it = get_actuators.actuators.begin(); it != get_actuators.actuators.end(); ++it)
-    {
-      fake_state_->actuators_[*it];
-    }
+//    std::set<std::string>::iterator it;
+//    for (it = get_actuators.actuators.begin(); it != get_actuators.actuators.end(); ++it)
+//    {
+//      fake_state_->actuators_[*it];
+//    }
 
     boost::unordered_map<std::string, JointState>::iterator jit = state_->model_.joint_states_.begin();
     while (jit != state_->model_.joint_states_.end())
@@ -382,7 +385,7 @@ void GazeboRosControllerManager::ReadPr2Xml()
 // custom callback queue
 void GazeboRosControllerManager::ControllerManagerQueueThread()
 {
-  ROS_INFO_STREAM("Callback thread id=" << boost::this_thread::get_id());
+  ROS_DEBUG_STREAM("Callback thread id=" << boost::this_thread::get_id());
 
   static const double timeout = 0.01;
 
@@ -395,7 +398,7 @@ void GazeboRosControllerManager::ControllerManagerQueueThread()
 
 void GazeboRosControllerManager::ControllerManagerROSThread()
 {
-  ROS_INFO_STREAM("Callback thread id=" << boost::this_thread::get_id());
+  ROS_DEBUG_STREAM("Callback thread id=" << boost::this_thread::get_id());
 
   //ros::Rate rate(1000);
 

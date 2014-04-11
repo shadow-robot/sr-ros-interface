@@ -51,16 +51,18 @@ namespace sr_mechanism_model
     init_joint(jel2, robot);
 
     TiXmlElement *ael = elt->FirstChildElement("actuator");
-    const char *actuator_name = ael ? ael->Attribute("name") : NULL;
-    Actuator *a = robot->getActuator(actuator_name);
-    if (!actuator_name || !a)
+    std::string actuator_name = ael ? ael->Attribute("name") : "";
+    Actuator *a = new sr_actuator::SrActuator();
+    if (actuator_name.empty() || !a)
     {
-      ROS_ERROR("J0Transmission could not find actuator named \"%s\"", actuator_name);
+      ROS_ERROR_STREAM("J0Transmission could not find actuator named : " << actuator_name);
       return false;
     }
+    robot->actuators_.insert(actuator_name, a);
+    std::cout << "Loaded actuator " << actuator_name << '\n';
     a->command_.enable_ = true;
     actuator_names_.push_back(actuator_name);
-
+    std::cout << "Successfully loaded transmission " << name_ << '\n';
     return true;
   }
 
@@ -83,7 +85,7 @@ namespace sr_mechanism_model
       }
     }
     joint_names_.push_back(joint_name);
-
+    std::cout << "Wired J0transmission for joint " << joint_name << '\n';
     return true;
   }
 
