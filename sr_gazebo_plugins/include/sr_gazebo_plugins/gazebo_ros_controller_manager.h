@@ -71,7 +71,7 @@ protected:
 private:
 
   gazebo::physics::ModelPtr parent_model_;
-  ros_ethercat *state_;
+  RosEthercat *state_;
   controller_manager::ControllerManager *cm_;
 
   /// @todo The fake state helps Gazebo run the transmissions backwards, so

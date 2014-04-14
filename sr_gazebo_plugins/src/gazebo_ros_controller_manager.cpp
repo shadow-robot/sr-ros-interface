@@ -351,7 +351,7 @@ void GazeboRosControllerManager::ReadPr2Xml()
     } get_actuators;
     doc.RootElement()->Accept(&get_actuators);
 
-    state_ = new ros_ethercat(*rosnode_, "", true, doc.RootElement());
+    state_ = new RosEthercat(*rosnode_, "", true, doc.RootElement());
     fake_state_ = &state_->model_;
 
     // load a controller manager
