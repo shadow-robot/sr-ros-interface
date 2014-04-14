@@ -31,7 +31,7 @@
 #include <boost/smart_ptr.hpp>
 
 #include <control_toolbox/pid.h>
-#include <ros_ethercat_mechanism_model/robot.hpp>
+#include <ros_ethercat_model/robot.hpp>
 #include <tinyxml.h>
 #include <sr_hardware_interface/sr_actuator.hpp>
 
@@ -47,10 +47,10 @@ public:
   virtual double compute_output(double input, double current_position) = 0;
 
   boost::shared_ptr<controller::SrController> controller;
-  boost::shared_ptr<ros_ethercat_mechanism_model::Robot> robot;
+  boost::shared_ptr<ros_ethercat_model::Robot> robot;
   boost::shared_ptr<TiXmlDocument> model;
   boost::shared_ptr<sr_actuator::SrActuator> actuator;
-  ros_ethercat_mechanism_model::JointState* joint_state;
+  ros_ethercat_model::JointState* joint_state;
 };
 
 

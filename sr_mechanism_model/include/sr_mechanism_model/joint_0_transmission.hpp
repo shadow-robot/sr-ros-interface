@@ -30,32 +30,32 @@
 #define _JOINT_0_TRANSMISSION_HPP_
 
 #include <tinyxml.h>
-#include "ros_ethercat_mechanism_model/transmission.hpp"
-#include "ros_ethercat_mechanism_model/joint.hpp"
-#include "ros_ethercat_mechanism_model/hardware_interface.hpp"
+#include "ros_ethercat_model/transmission.hpp"
+#include "ros_ethercat_model/joint.hpp"
+#include "ros_ethercat_model/hardware_interface.hpp"
 
 namespace sr_mechanism_model
 {
-  class J0Transmission : public ros_ethercat_mechanism_model::Transmission
+  class J0Transmission : public ros_ethercat_model::Transmission
   {
   public:
     J0Transmission() {}
     ~J0Transmission() {}
 
-    bool initXml(TiXmlElement *config, ros_ethercat_mechanism_model::Robot *robot);
+    bool initXml(TiXmlElement *config, ros_ethercat_model::Robot *robot);
 
-    void propagatePosition(std::vector<ros_ethercat_mechanism_model::Actuator*>&,
-                           std::vector<ros_ethercat_mechanism_model::JointState*>&);
-    void propagatePositionBackwards(std::vector<ros_ethercat_mechanism_model::JointState*>&,
-                                    std::vector<ros_ethercat_mechanism_model::Actuator*>&);
-    void propagateEffort(std::vector<ros_ethercat_mechanism_model::JointState*>&,
-                         std::vector<ros_ethercat_mechanism_model::Actuator*>&);
-    void propagateEffortBackwards(std::vector<ros_ethercat_mechanism_model::Actuator*>&,
-                                  std::vector<ros_ethercat_mechanism_model::JointState*>&);
+    void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
+                           std::vector<ros_ethercat_model::JointState*>&);
+    void propagatePositionBackwards(std::vector<ros_ethercat_model::JointState*>&,
+                                    std::vector<ros_ethercat_model::Actuator*>&);
+    void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
+                         std::vector<ros_ethercat_model::Actuator*>&);
+    void propagateEffortBackwards(std::vector<ros_ethercat_model::Actuator*>&,
+                                  std::vector<ros_ethercat_model::JointState*>&);
 
   private:
 
-    bool init_joint(TiXmlElement *jel, ros_ethercat_mechanism_model::Robot *robot);
+    bool init_joint(TiXmlElement *jel, ros_ethercat_model::Robot *robot);
   };
 
 } //end namespace sr_mechanism_model

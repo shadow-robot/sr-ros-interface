@@ -30,7 +30,7 @@
 #include <ros/node_handle.h>
 
 #include <controller_interface/controller.h>
-#include <ros_ethercat_mechanism_model/robot.hpp>
+#include <ros_ethercat_model/robot.hpp>
 #include <control_toolbox/pid.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
@@ -51,14 +51,14 @@
 namespace controller
 {
 
-  class SrController : public controller_interface::Controller<ros_ethercat_mechanism_model::Robot>
+  class SrController : public controller_interface::Controller<ros_ethercat_model::Robot>
   {
   public:
 
     SrController();
     virtual ~SrController();
 
-    virtual bool init(ros_ethercat_mechanism_model::Robot *robot, ros::NodeHandle &n);
+    virtual bool init(ros_ethercat_model::Robot *robot, ros::NodeHandle &n);
 
     /*!
      * \brief Give set position of the joint for next update: revolute (angle) and prismatic (position)
@@ -85,8 +85,8 @@ namespace controller
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
 
     std::string getJointName();
-    ros_ethercat_mechanism_model::JointState *joint_state_;        /**< Joint we're controlling. */
-    ros_ethercat_mechanism_model::JointState *joint_state_2;        /**< 2ndJoint we're controlling if joint 0. */
+    ros_ethercat_model::JointState *joint_state_;        /**< Joint we're controlling. */
+    ros_ethercat_model::JointState *joint_state_2;        /**< 2ndJoint we're controlling if joint 0. */
     bool has_j2;         /**< true if this is a joint 0. */
     ros::Duration dt_;
     double command_;                            /**< Last commanded position. */
@@ -119,7 +119,7 @@ namespace controller
 
     int loop_count_;
     bool initialized_;
-    ros_ethercat_mechanism_model::Robot *robot_;              /**< Pointer to robot structure. */
+    ros_ethercat_model::Robot *robot_;              /**< Pointer to robot structure. */
     ros::Time last_time_;                          /**< Last time stamp of update. */
 
     ros::NodeHandle node_, n_tilde_;

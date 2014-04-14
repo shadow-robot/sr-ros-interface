@@ -28,15 +28,15 @@
 #define _SR_ACTUATOR_HPP_
 
 #include "sr_hardware_interface/tactile_sensors.hpp"
-#include <ros_ethercat_mechanism_model/robot.hpp>
+#include <ros_ethercat_model/robot.hpp>
 
 namespace sr_actuator
 {
-  class SrActuatorState : public ros_ethercat_mechanism_model::ActuatorState
+  class SrActuatorState : public ros_ethercat_model::ActuatorState
   {
   public:
     SrActuatorState() :
-      ros_ethercat_mechanism_model::ActuatorState(),
+      ros_ethercat_model::ActuatorState(),
       temperature_(0),
       position_unfiltered_(0.0),
       can_msgs_received_(0),
@@ -175,11 +175,11 @@ namespace sr_actuator
     int8_t last_commanded_valve_[2];
   }; //end class SrMuscleActuatorState
 
-  class SrMuscleActuatorCommand : public ros_ethercat_mechanism_model::ActuatorCommand
+  class SrMuscleActuatorCommand : public ros_ethercat_model::ActuatorCommand
   {
   public:
     SrMuscleActuatorCommand() :
-      ros_ethercat_mechanism_model::ActuatorCommand()
+      ros_ethercat_model::ActuatorCommand()
     {
       valve_[0] = 0;
       valve_[1] = 0;
@@ -189,11 +189,11 @@ namespace sr_actuator
   }; //end class SrMuscleActuatorCommand
 
 
-  class SrGenericActuator : public ros_ethercat_mechanism_model::Actuator
+  class SrGenericActuator : public ros_ethercat_model::Actuator
   {
   public:
     SrGenericActuator()
-      : ros_ethercat_mechanism_model::Actuator()
+      : ros_ethercat_model::Actuator()
     {}
 
     //A virtual destructor to make the class polymorphic (the compiler is picky about trying to dynamic_cast non-polymorphic classes)

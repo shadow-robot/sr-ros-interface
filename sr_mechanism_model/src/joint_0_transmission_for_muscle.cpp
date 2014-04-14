@@ -29,11 +29,11 @@
 
 #include <math.h>
 #include <pluginlib/class_list_macros.h>
-#include "ros_ethercat_mechanism_model/robot.hpp"
+#include "ros_ethercat_model/robot.hpp"
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
-using namespace ros_ethercat_mechanism_model;
+using namespace ros_ethercat_model;
 
 PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::J0TransmissionForMuscle, Transmission)
 

@@ -52,7 +52,7 @@
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
-using namespace ros_ethercat_mechanism_model;
+using namespace ros_ethercat_model;
 namespace gazebo {
 
 GazeboRosControllerManager::GazeboRosControllerManager() : state_(NULL), cm_(NULL), fake_state_(NULL), rosnode_(NULL)

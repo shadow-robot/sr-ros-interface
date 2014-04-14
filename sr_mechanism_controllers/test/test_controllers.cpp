@@ -66,7 +66,7 @@ void TestControllers::init()
   }
   else
   {
-    robot.reset( new ros_ethercat_mechanism_model::Robot(model->RootElement()) );
+    robot.reset( new ros_ethercat_model::Robot(model->RootElement()) );
 
     //add a fake FFJ3 actuator
     actuator = boost::shared_ptr<sr_actuator::SrActuator>( new sr_actuator::SrActuator() );

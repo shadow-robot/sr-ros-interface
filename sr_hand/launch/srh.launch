@@ -47,7 +47,7 @@
   <node name="joint_state_controller">
 	pkg="controller_manager" type="spawner" respawn="false" output="screen"
 	args="joint_state_controller"
-  	<rosparam ns="">
+  	<rosparam>
       joint_state_controller:
         type: joint_state_controller/JointStateController
         publish_rate: 100

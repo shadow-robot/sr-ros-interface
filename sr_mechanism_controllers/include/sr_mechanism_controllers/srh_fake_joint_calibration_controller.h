@@ -28,7 +28,7 @@
 #define _SRH_FAKE_JOINT_CALIBRATION_CONTROLLER_
 
 #include "ros/node_handle.h"
-#include "ros_ethercat_mechanism_model/robot.hpp"
+#include "ros_ethercat_model/robot.hpp"
 #include "velocity_controllers/joint_velocity_controller.h"
 #include "realtime_tools/realtime_publisher.h"
 #include "std_msgs/Empty.h"
@@ -39,13 +39,13 @@
 namespace controller
 {
 
-  class SrhFakeJointCalibrationController : public controller_interface::Controller<ros_ethercat_mechanism_model::Robot>
+  class SrhFakeJointCalibrationController : public controller_interface::Controller<ros_ethercat_model::Robot>
   {
   public:
     SrhFakeJointCalibrationController();
     virtual ~SrhFakeJointCalibrationController();
 
-    virtual bool init(ros_ethercat_mechanism_model::Robot *robot, ros::NodeHandle &n);
+    virtual bool init(ros_ethercat_model::Robot *robot, ros::NodeHandle &n);
 
     virtual void update(const ros::Time&, const ros::Duration&);
 
@@ -58,7 +58,7 @@ namespace controller
 
   protected:
 
-    ros_ethercat_mechanism_model::Robot* robot_;
+    ros_ethercat_model::Robot* robot_;
     ros::NodeHandle node_;
     boost::scoped_ptr<realtime_tools::RealtimePublisher<std_msgs::Empty> > pub_calibrated_;
     ros::Time last_publish_time_;
@@ -70,8 +70,8 @@ namespace controller
     double search_velocity_, reference_position_;
     bool original_switch_state_;
 
-    ros_ethercat_mechanism_model::Actuator *actuator_;
-    ros_ethercat_mechanism_model::JointState *joint_;
+    ros_ethercat_model::Actuator *actuator_;
+    ros_ethercat_model::JointState *joint_;
 
     std::string joint_name_, actuator_name_;
 

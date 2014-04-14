@@ -40,30 +40,30 @@
 #define _SR_SIMPLE_TRANSMISSION_H_
 
 #include <tinyxml.h>
-#include "ros_ethercat_mechanism_model/transmission.hpp"
-#include "ros_ethercat_mechanism_model/joint.hpp"
-#include "ros_ethercat_mechanism_model/hardware_interface.hpp"
+#include "ros_ethercat_model/transmission.hpp"
+#include "ros_ethercat_model/joint.hpp"
+#include "ros_ethercat_model/hardware_interface.hpp"
 
 namespace sr_mechanism_model {
 
-        class SimpleTransmission : public ros_ethercat_mechanism_model::Transmission
+        class SimpleTransmission : public ros_ethercat_model::Transmission
         {
         public:
                 SimpleTransmission() {}
                 ~SimpleTransmission() {}
 
-                bool initXml(TiXmlElement *config, ros_ethercat_mechanism_model::Robot *robot);
+                bool initXml(TiXmlElement *config, ros_ethercat_model::Robot *robot);
 
-                void propagatePosition(std::vector<ros_ethercat_mechanism_model::Actuator*>&,
-                                       std::vector<ros_ethercat_mechanism_model::JointState*>&);
-                void propagatePositionBackwards(std::vector<ros_ethercat_mechanism_model::JointState*>&,
-                                                std::vector<ros_ethercat_mechanism_model::Actuator*>&);
-                void propagateEffort(std::vector<ros_ethercat_mechanism_model::JointState*>&,
-                                     std::vector<ros_ethercat_mechanism_model::Actuator*>&);
-                void propagateEffortBackwards(std::vector<ros_ethercat_mechanism_model::Actuator*>&,
-                                              std::vector<ros_ethercat_mechanism_model::JointState*>&);
+                void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
+                                       std::vector<ros_ethercat_model::JointState*>&);
+                void propagatePositionBackwards(std::vector<ros_ethercat_model::JointState*>&,
+                                                std::vector<ros_ethercat_model::Actuator*>&);
+                void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
+                                     std::vector<ros_ethercat_model::Actuator*>&);
+                void propagateEffortBackwards(std::vector<ros_ethercat_model::Actuator*>&,
+                                              std::vector<ros_ethercat_model::JointState*>&);
         };
 
-} // namespace ros_ethercat_mechanism_model
+} // namespace ros_ethercat_model
 
 #endif

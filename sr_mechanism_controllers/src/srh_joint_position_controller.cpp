@@ -49,7 +49,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhJointPositionController::init(ros_ethercat_mechanism_model::Robot *robot, const std::string &joint_name,
+  bool SrhJointPositionController::init(ros_ethercat_model::Robot *robot, const std::string &joint_name,
                                         boost::shared_ptr<control_toolbox::Pid> pid_position)
   {
     ROS_DEBUG(" --------- ");
@@ -120,7 +120,7 @@ namespace controller {
     return true;
   }
 
-  bool SrhJointPositionController::init(ros_ethercat_mechanism_model::Robot *robot, ros::NodeHandle &n)
+  bool SrhJointPositionController::init(ros_ethercat_model::Robot *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;
