@@ -79,7 +79,7 @@ namespace controller {
     command_ = msg->data;
   }
 
-  bool SrController::init(ros_ethercat_model::Robot *robot, ros::NodeHandle &n)
+  bool SrController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     return true;
   }

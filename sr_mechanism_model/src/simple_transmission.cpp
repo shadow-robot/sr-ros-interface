@@ -50,7 +50,7 @@ PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmission, Transmission)
 
 namespace sr_mechanism_model
 {
-  bool SimpleTransmission::initXml(TiXmlElement *elt, Robot *robot)
+  bool SimpleTransmission::initXml(TiXmlElement *elt, RobotState *robot)
   {
     const char *name = elt->Attribute("name");
     name_ = name ? name : "";

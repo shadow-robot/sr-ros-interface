@@ -77,7 +77,7 @@ private:
   /// @todo The fake state helps Gazebo run the transmissions backwards, so
   ///       that it can figure out what its joints should do based on the
   ///       actuator values.
-  ros_ethercat_model::Robot *fake_state_;
+  ros_ethercat_model::RobotState *fake_state_;
   std::vector<gazebo::physics::JointPtr>  joints_;
 
   /// \brief Service Call Name

@@ -47,7 +47,7 @@ public:
   virtual double compute_output(double input, double current_position) = 0;
 
   boost::shared_ptr<controller::SrController> controller;
-  boost::shared_ptr<ros_ethercat_model::Robot> robot;
+  boost::shared_ptr<ros_ethercat_model::RobotState> robot;
   boost::shared_ptr<TiXmlDocument> model;
   boost::shared_ptr<sr_actuator::SrActuator> actuator;
   ros_ethercat_model::JointState* joint_state;

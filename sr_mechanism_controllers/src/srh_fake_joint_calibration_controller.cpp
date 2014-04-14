@@ -47,7 +47,7 @@ namespace controller {
   {
   }
 
-  bool SrhFakeJointCalibrationController::init(ros_ethercat_model::Robot *robot, ros::NodeHandle &n)
+  bool SrhFakeJointCalibrationController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     robot_ = robot;
     node_ = n;

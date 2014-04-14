@@ -52,7 +52,7 @@ namespace sr_mechanism_model {
                 SimpleTransmission() {}
                 ~SimpleTransmission() {}
 
-                bool initXml(TiXmlElement *config, ros_ethercat_model::Robot *robot);
+                bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
 
                 void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
                                        std::vector<ros_ethercat_model::JointState*>&);

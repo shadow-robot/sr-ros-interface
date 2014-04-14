@@ -53,7 +53,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhMixedPositionVelocityJointController::init(ros_ethercat_model::Robot *robot, const std::string &joint_name,
+  bool SrhMixedPositionVelocityJointController::init(ros_ethercat_model::RobotState *robot, const std::string &joint_name,
                                                      boost::shared_ptr<control_toolbox::Pid> pid_position,
                                                      boost::shared_ptr<control_toolbox::Pid> pid_velocity)
   {
@@ -139,7 +139,7 @@ namespace controller {
     return true;
   }
 
-  bool SrhMixedPositionVelocityJointController::init(ros_ethercat_model::Robot *robot, ros::NodeHandle &n)
+  bool SrhMixedPositionVelocityJointController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;

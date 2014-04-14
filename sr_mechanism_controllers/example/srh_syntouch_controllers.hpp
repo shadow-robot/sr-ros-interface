@@ -41,8 +41,8 @@ namespace controller
     SrhSyntouchController();
     ~SrhSyntouchController();
 
-    bool init( ros_ethercat_model::Robot *robot, const std::string &joint_name );
-    bool init(ros_ethercat_model::Robot *robot, ros::NodeHandle &n);
+    bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name );
+    bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting();
 

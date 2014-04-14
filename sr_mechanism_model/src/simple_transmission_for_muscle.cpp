@@ -50,7 +50,7 @@ PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmissionForMuscle, Transmis
 
 namespace sr_mechanism_model
 {
-  bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, Robot *robot)
+  bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, RobotState *robot)
   {
     const char *name = elt->Attribute("name");
     name_ = name ? name : "";

@@ -40,7 +40,7 @@ PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::J0Transmission, Transmission)
 
 namespace sr_mechanism_model
 {
-  bool J0Transmission::initXml(TiXmlElement *elt, Robot *robot)
+  bool J0Transmission::initXml(TiXmlElement *elt, RobotState *robot)
   {
     const char *name = elt->Attribute("name");
     name_ = name ? name : "";
@@ -64,7 +64,7 @@ namespace sr_mechanism_model
     return true;
   }
 
-  bool J0Transmission::init_joint(TiXmlElement *jel, Robot *robot)
+  bool J0Transmission::init_joint(TiXmlElement *jel, RobotState *robot)
   {
     const char *joint_name = jel ? jel->Attribute("name") : NULL;
     if (!joint_name)

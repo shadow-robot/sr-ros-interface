@@ -41,7 +41,7 @@ namespace sr_mechanism_model
     J0TransmissionForMuscle() {}
     ~J0TransmissionForMuscle() {}
 
-    bool initXml(TiXmlElement *config, ros_ethercat_model::Robot *robot);
+    bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
 
     void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
                            std::vector<ros_ethercat_model::JointState*>&);
@@ -54,7 +54,7 @@ namespace sr_mechanism_model
 
   private:
 
-    bool init_joint(TiXmlElement *jel, ros_ethercat_model::Robot *robot);
+    bool init_joint(TiXmlElement *jel, ros_ethercat_model::RobotState *robot);
   };
 
 } //end namespace sr_mechanism_model
