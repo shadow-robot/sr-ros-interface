@@ -35,8 +35,6 @@ TestControllers::~TestControllers()
 
 void TestControllers::init()
 {
-  model = boost::shared_ptr<TiXmlDocument>( new TiXmlDocument() );
-
   ros::NodeHandle rosnode;
   std::string urdf_param_name;
   std::string urdf_string;
@@ -59,18 +57,19 @@ void TestControllers::init()
   ROS_DEBUG("Parsing xml...");
 
   // initialize TiXmlDocument doc with a string
-  if (!model->Parse(urdf_string.c_str()) && model->Error())
+  TiXmlDocument model;
+  if (!model.Parse(urdf_string.c_str()) && model.Error())
   {
     ROS_ERROR("Failed to parse urdf: %s\n",
             urdf_string.c_str());
   }
   else
   {
-    robot.reset( new ros_ethercat_model::RobotState(model->RootElement()) );
+    robot.reset( new ros_ethercat_model::RobotState(model.RootElement()) );
 
     //add a fake FFJ3 actuator
-    actuator = boost::shared_ptr<sr_actuator::SrActuator>( new sr_actuator::SrActuator() );
-    robot["FFJ3"] = actuator.get();
+    std::string act = "FFJ3";
+    robot->actuators_.insert(act, new sr_actuator::SrActuator() );
 
     joint_state = robot->getJointState("FFJ3");
     joint_state->calibrated_ = true;

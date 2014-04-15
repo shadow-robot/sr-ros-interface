@@ -83,6 +83,7 @@ namespace sr_mechanism_model
       }
     }
     joint_names_.push_back(joint_name);
+
     return true;
   }
 

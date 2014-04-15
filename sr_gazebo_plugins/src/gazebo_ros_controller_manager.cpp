@@ -150,7 +150,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     ros::init(argc,argv,"gazebo",ros::init_options::NoSigintHandler|ros::init_options::AnonymousName);
   }
   this->rosnode_ = new ros::NodeHandle(this->robotNamespace);
-  ROS_DEBUG("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
+  ROS_INFO("starting gazebo_ros_controller_manager plugin in ns: %s",this->robotNamespace.c_str());
 
   // Use the robots namespace, not gazebos
   self_test_.reset(new shadow_robot::SrSelfTest(true, this->robotNamespace));
@@ -361,13 +361,6 @@ void GazeboRosControllerManager::ReadPr2Xml()
     if (fake_state_->current_time_ < ros::Time(0.001))
       fake_state_->current_time_ = ros::Time(0.001); // hardcoded to minimum of 1ms on start up
 
-    // Places the found actuators into the hardware interface.
-//    std::set<std::string>::iterator it;
-//    for (it = get_actuators.actuators.begin(); it != get_actuators.actuators.end(); ++it)
-//    {
-//      fake_state_->actuators_[*it];
-//    }
-
     boost::unordered_map<std::string, JointState>::iterator jit = state_->model_.joint_states_.begin();
     while (jit != state_->model_.joint_states_.end())
     {
@@ -383,7 +376,7 @@ void GazeboRosControllerManager::ReadPr2Xml()
 // custom callback queue
 void GazeboRosControllerManager::ControllerManagerQueueThread()
 {
-  ROS_DEBUG_STREAM("Callback thread id=" << boost::this_thread::get_id());
+  ROS_INFO_STREAM("Callback thread id=" << boost::this_thread::get_id());
 
   static const double timeout = 0.01;
 
@@ -396,7 +389,7 @@ void GazeboRosControllerManager::ControllerManagerQueueThread()
 
 void GazeboRosControllerManager::ControllerManagerROSThread()
 {
-  ROS_DEBUG_STREAM("Callback thread id=" << boost::this_thread::get_id());
+  ROS_INFO_STREAM("Callback thread id=" << boost::this_thread::get_id());
 
   //ros::Rate rate(1000);
 

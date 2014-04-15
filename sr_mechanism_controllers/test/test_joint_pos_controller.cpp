@@ -41,7 +41,7 @@ public:
     TestControllers()
   {
     this->pid = pid;
-    controller = boost::shared_ptr<SrhJointPositionController>( new SrhJointPositionController() );
+    controller.reset( new SrhJointPositionController() );
 
     init();
   }
@@ -51,16 +51,16 @@ public:
 
   void init_controller()
   {
-    controller::SrController* control_tmp = controller.get();
-    controller::SrhJointPositionController* sr_control_tmp = dynamic_cast< controller::SrhJointPositionController* >( control_tmp );
+    controller::SrhJointPositionController* sr_control_tmp =
+        dynamic_cast< controller::SrhJointPositionController* >( controller.get() );
     sr_control_tmp->init(robot.get(), "FFJ3", pid);
   }
 
   double compute_output(double input, double current_position)
   {
-    robot_->getTime() = ros::Time::now();
     joint_state->position_ = current_position;
     controller->setCommand( input );
+    robot.get()->current_time_ = ros::Time::now();
 
     controller->update(ros::Time(), ros::Duration());
 
@@ -71,11 +71,9 @@ public:
 TEST(SrhJointPositionController, TestPID)
 {
   //TESTING A PURE P CONTROLLER
-  boost::shared_ptr<control_toolbox::Pid> pid;
-  pid = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid(1.0, 0.0, 0.0, 0.0, 0.0) );
+  boost::shared_ptr<control_toolbox::Pid> pid( new control_toolbox::Pid(1.0, 0.0, 0.0, 0.0, 0.0) );
 
-  boost::shared_ptr<TestJointPositionController> test_jpc;
-  test_jpc = boost::shared_ptr<TestJointPositionController>( new TestJointPositionController( pid ) );
+  boost::shared_ptr<TestJointPositionController> test_jpc( new TestJointPositionController( pid ) );
 
   const unsigned int nb_values = 7;
 

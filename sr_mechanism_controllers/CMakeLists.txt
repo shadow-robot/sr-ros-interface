@@ -69,7 +69,7 @@ target_link_libraries(simple_trajectory_compare ${catkin_LIBRARIES})
 #    src/srh_joint_position_controller.cpp src/sr_controller.cpp)
 #  add_dependencies(test_joint_pos_controller ${catkin_EXPORTED_TARGETS})
 #  target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
-
+#
 #  add_rostest_gtest(test_joint_pos_controller_with_fc test/joint_pos_controller_with_fc.test test/test_joint_pos_controller.cpp test/test_controllers.cpp
 #    src/srh_joint_position_controller.cpp src/sr_controller.cpp)
 #  add_dependencies(test_joint_pos_controller_with_fc ${catkin_EXPORTED_TARGETS})

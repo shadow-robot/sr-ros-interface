@@ -64,6 +64,6 @@ namespace sr_mechanism_model {
                                               std::vector<ros_ethercat_model::JointState*>&);
         };
 
-} // namespace ros_ethercat_model
+} // namespace sr_mechanism_model
 
 #endif
