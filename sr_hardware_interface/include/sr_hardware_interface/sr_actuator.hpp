@@ -28,7 +28,7 @@
 #define _SR_ACTUATOR_HPP_
 
 #include "sr_hardware_interface/tactile_sensors.hpp"
-#include <ros_ethercat_model/robot.hpp>
+#include <ros_ethercat_model/hardware_interface.hpp>
 
 namespace sr_actuator
 {
@@ -36,7 +36,6 @@ namespace sr_actuator
   {
   public:
     SrActuatorState() :
-      ros_ethercat_model::ActuatorState(),
       temperature_(0),
       position_unfiltered_(0.0),
       can_msgs_received_(0),
@@ -123,7 +122,6 @@ namespace sr_actuator
   {
   public:
     SrMotorActuatorState() :
-      SrActuatorState(),
       strain_gauge_left_(0),
       strain_gauge_right_(0),
       force_unfiltered_(0.0),
@@ -167,7 +165,7 @@ namespace sr_actuator
   {
   public:
     SrMuscleActuatorState() :
-      SrActuatorState()
+      pressure_(), last_commanded_valve_()
     {}
 
     ///Pressure sensors for each of the two muscles of the actuator
@@ -179,42 +177,18 @@ namespace sr_actuator
   {
   public:
     SrMuscleActuatorCommand() :
-      ros_ethercat_model::ActuatorCommand()
-    {
-      valve_[0] = 0;
-      valve_[1] = 0;
-    }
+      valve_()
+    {}
 
     int8_t valve_[2];
   }; //end class SrMuscleActuatorCommand
 
-
-  class SrGenericActuator : public ros_ethercat_model::Actuator
-  {
-  public:
-    SrGenericActuator()
-      : ros_ethercat_model::Actuator()
-    {}
-
-    //A virtual destructor to make the class polymorphic (the compiler is picky about trying to dynamic_cast non-polymorphic classes)
-    virtual ~SrGenericActuator()
-    {}
-
-    //SrActuatorState state_;
-  }; //end class SrGenericActuator
-
   /**
    * This class defines a Motor actuator (it should be renamed to SrMotorActuator)
    */
-  class SrActuator : public SrGenericActuator
+  class SrActuator : public ros_ethercat_model::Actuator
   {
   public:
-    SrActuator()
-      : SrGenericActuator()
-    {}
-
-    virtual ~SrActuator()
-    {}
 
     SrMotorActuatorState state_;
   }; //end class SrActuator
@@ -222,15 +196,9 @@ namespace sr_actuator
   /**
    * This class defines a Muscle actuator
    */
-  class SrMuscleActuator : public SrGenericActuator
+  class SrMuscleActuator : public ros_ethercat_model::Actuator
   {
   public:
-    SrMuscleActuator()
-      : SrGenericActuator()
-    {}
-
-    virtual ~SrMuscleActuator()
-    {}
 
     SrMuscleActuatorState state_;
     SrMuscleActuatorCommand command_;
