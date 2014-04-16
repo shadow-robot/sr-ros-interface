@@ -11,15 +11,4 @@
     <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen"/>
   </group>
 
-  <!-- publishes joint states with ros_control -->
-  <node name="joint_state_controller">
-	pkg="controller_manager" type="spawner" respawn="false" output="screen"
-	args="joint_state_controller"
-  	<rosparam>
-      joint_state_controller:
-        type: joint_state_controller/JointStateController
-        publish_rate: 100
-    </rosparam>
-  </node>
-
 </launch>
