@@ -170,19 +170,19 @@ class Commander(object):
         """
         Returns a dictionary with the position of each joint in degrees.
         """
-        return self.hand.read_all_current_positions()
+        return dict(self.hand.read_all_current_positions())
     
     def get_hand_velocity(self):
         """
         Returns a dictionary with the velocity of each joint in degrees/s.
         """
-        return self.hand.read_all_current_velocities()
+        return dict(self.hand.read_all_current_velocities())
     
     def get_hand_effort(self):
         """
         Returns a dictionary with the effort of each joint. Currently in ADC units, as no calibration is performed on the strain gauges.
         """
-        return self.hand.read_all_current_efforts()
+        return dict(self.hand.read_all_current_efforts())
     
     def get_tactile_type(self):
         """
@@ -196,3 +196,4 @@ class Commander(object):
         """
         return self.hand.get_tactile_state()
     
+
