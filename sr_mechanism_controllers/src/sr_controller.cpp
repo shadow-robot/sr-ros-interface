@@ -84,7 +84,7 @@ namespace controller {
     return true;
   }
 
-  void SrController::update(const ros::Time&, const ros::Duration&)
+  void SrController::update()
   {
   }
 

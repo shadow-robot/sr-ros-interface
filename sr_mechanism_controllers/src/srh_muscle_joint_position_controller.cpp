@@ -202,7 +202,7 @@ namespace controller {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhMuscleJointPositionController::update(const ros::Time&, const ros::Duration&)
+  void SrhMuscleJointPositionController::update()
   {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];

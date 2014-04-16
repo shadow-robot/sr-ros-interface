@@ -168,7 +168,7 @@ namespace controller {
   {
   }
 
-  void SrhJointMuscleValveController::update(const ros::Time&, const ros::Duration&)
+  void SrhJointMuscleValveController::update()
   {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];

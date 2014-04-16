@@ -13,6 +13,9 @@
     <param name="publish_frequency_diagnostics" type="double" value="1.0" />
     <param name="publish_frequency" type="double" value="20.0" />
   </node>
+  
+  <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch"/>
+  
   <!-- Robot state publisher: publishes tf information regarding the
        positions of the arm -->
   <node pkg="robot_state_publisher" type="state_publisher"

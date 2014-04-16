@@ -202,7 +202,7 @@ namespace controller {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhJointPositionController::update(const ros::Time&, const ros::Duration&)
+  void SrhJointPositionController::update()
   {
     if( !has_j2)
     {

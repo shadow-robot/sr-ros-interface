@@ -197,7 +197,7 @@ namespace controller {
     pid_controller_velocity_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhJointVelocityController::update(const ros::Time&, const ros::Duration&)
+  void SrhJointVelocityController::update()
   {
     if( !has_j2 )
     {

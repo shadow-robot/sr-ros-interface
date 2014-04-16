@@ -49,7 +49,7 @@ namespace controller
     /*!
      * \brief Issues commands to the joint. Should be called at regular intervals
      */
-    virtual void update(const ros::Time&, const ros::Duration&);
+    virtual void update();
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
     virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);

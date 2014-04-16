@@ -165,7 +165,7 @@ namespace controller {
   {
   }
 
-  void SrhEffortJointController::update(const ros::Time&, const ros::Duration&)
+  void SrhEffortJointController::update()
   {
     if( !has_j2)
     {

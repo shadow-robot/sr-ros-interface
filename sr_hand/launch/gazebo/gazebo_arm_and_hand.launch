@@ -27,6 +27,8 @@
   <!-- launch more exotic controllers (trajectory, cartesian, etc...) -->
   <include file="$(find sr_hand)/launch/gazebo/loaders/arm_controllers_extended.launch"/>
 
+  <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch"/>
+  
   <node pkg="robot_state_publisher" type="state_publisher"
         name="robot_state_publisher_full_pos">
     <param name="publish_frequency" type="double" value="20.0" />
