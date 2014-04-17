@@ -105,20 +105,6 @@ namespace sr_mechanism_model
     ROS_DEBUG("end propagate position");
   }
 
-  void SimpleTransmissionForMuscle::propagatePositionBackwards(
-    std::vector<JointState*>& js, std::vector<Actuator*>& as)
-  {
-    ROS_DEBUG(" propagate position bw");
-
-    assert(as.size() == 1);
-    assert(js.size() == 1);
-    static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.position_ = js[0]->position_;
-    static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.velocity_ = js[0]->velocity_;
-    static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.last_measured_effort_ = js[0]->measured_effort_;
-
-    ROS_DEBUG(" end propagate position bw");
-  }
-
   void SimpleTransmissionForMuscle::propagateEffort(
     std::vector<JointState*>& js, std::vector<Actuator*>& as)
   {
@@ -151,18 +137,6 @@ namespace sr_mechanism_model
     static_cast<sr_actuator::SrMuscleActuator*>(as[0])->command_.valve_[1] = valve_1_tmp;
 
     ROS_DEBUG("end propagate effort");
-  }
-
-  void SimpleTransmissionForMuscle::propagateEffortBackwards(
-    std::vector<Actuator*>& as, std::vector<JointState*>& js)
-  {
-    ROS_DEBUG(" propagate effort bw");
-
-    assert(as.size() == 1);
-    assert(js.size() == 1);
-    js[0]->commanded_effort_ = static_cast<sr_actuator::SrMuscleActuator*>(as[0])->command_.effort_;
-
-    ROS_DEBUG("end propagate effort bw");
   }
 
 } //end namespace

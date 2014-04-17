@@ -82,10 +82,6 @@ private:
   ros_ethercat_model::RobotState *fake_state_;
   std::vector<gazebo::physics::JointPtr>  joints_;
 
-  /// \brief Service Call Name
-  //private: ParamT<std::string> *setModelsJointsStatesServiceNameP;
-  //private: std::string setModelsJointsStatesServiceName;
-
   /*
    * \brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
    */
@@ -100,18 +96,12 @@ private:
   private: ros::ServiceServer setModelsJointsStatesService;
 
   ///\brief ros service callback
-  //private: bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
-  //                                    pr2_gazebo_plugins::SetModelsJointsStates::Response &res);
-
-  ///\brief ros service callback
   /*
    *  \brief tmp vars for performance checking
    */
   double wall_start_, sim_start_;
 
   /// \brief set topic name of robot description parameter
-  //ParamT<std::string> *robotParamP;
-  //ParamT<std::string> *robotNamespaceP;
   std::string robotParam;
   std::string robotNamespace;
 

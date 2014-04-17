@@ -34,8 +34,6 @@
 #include <unistd.h>
 #include <set>
 
-//#include <gazebo/XMLConfig.hh>
-//#include "physics/physics.h"
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/HingeJoint.hh>
 #include <gazebo/sensors/Sensor.hh>
@@ -59,32 +57,16 @@ GazeboRosControllerManager::GazeboRosControllerManager() : state_(NULL), cm_(NUL
 {
 }
 
-
-/// \brief callback for setting models joints states
-//bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
-//                           pr2_gazebo_plugins::SetModelsJointsStates::Response &res)
-//{
-//
-//  return true;
-//}
-
-
 GazeboRosControllerManager::~GazeboRosControllerManager()
 {
   ROS_DEBUG("Calling FiniChild in GazeboRosControllerManager");
 
-  //pr2_hardware_interface::ActuatorMap::const_iterator it;
-  //for (it = hw_.actuators_.begin(); it != hw_.actuators_.end(); ++it)
-  //  delete it->second; // why is this causing double free corruption?
 #ifdef USE_CBQ
   this->controller_manager_queue_.clear();
   this->controller_manager_queue_.disable();
   this->controller_manager_callback_queue_thread_.join();
 #endif
   this->ros_spinner_thread_.join();
-
-
-
 
   delete this->cm_;
   delete this->rosnode_;
@@ -113,24 +95,11 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
       boost::bind(&GazeboRosControllerManager::UpdateChild, this));
   gzdbg << "plugin model name: " << modelName << "\n";
 
-
-
-
   if (getenv("CHECK_SPEEDUP"))
   {
     wall_start_ = this->world->GetRealTime().Double();
     sim_start_  = this->world->GetSimTime().Double();
   }
-
-  // check update rate against world physics update rate
-  // should be equal or higher to guarantee the wrench applied is not "diluted"
-  //if (this->updatePeriod > 0 &&
-  //    (this->world->GetPhysicsEngine()->GetUpdateRate() > 1.0/this->updatePeriod))
-  //  ROS_ERROR("gazebo_ros_force controller update rate is less than physics update rate, wrench applied will be diluted (applied intermittently)");
-
-
-
-
 
   // get parameter name
   this->robotNamespace = "";
@@ -169,8 +138,6 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   {
     for (boost::unordered_map<std::string, JointState>::iterator it = state_->model_.joint_states_.begin(); it != state_->model_.joint_states_.end(); ++it)
     {
-
-
       // fill in gazebo joints pointer
       gazebo::physics::JointPtr joint = this->parent_model_->GetJoint(it->first);
       if (joint)
@@ -179,9 +146,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
       }
       else
       {
-        //ROS_WARN("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", joint_name.c_str());
-        //this->joints_.push_back(NULL);  // FIXME: cannot be null, must be an empty boost shared pointer
-        this->joints_.push_back(gazebo::physics::JointPtr());  // FIXME: cannot be null, must be an empty boost shared pointer
+        this->joints_.push_back(gazebo::physics::JointPtr());
         ROS_ERROR("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", it->first.c_str());
       }
     }
@@ -198,19 +163,19 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     // Check the period against the simulation period
     if( control_period_ < gazebo_period )
     {
-      ROS_ERROR_STREAM_NAMED("gazebo_ros_control","Desired controller update period ("<<control_period_
+      ROS_DEBUG_STREAM("Desired controller update period ("<<control_period_
         <<" s) is faster than the gazebo simulation period ("<<gazebo_period<<" s).");
     }
     else if( control_period_ > gazebo_period )
     {
-      ROS_WARN_STREAM_NAMED("gazebo_ros_control","Desired controller update period ("<<control_period_
+      ROS_DEBUG_STREAM("Desired controller update period ("<<control_period_
         <<" s) is slower than the gazebo simulation period ("<<gazebo_period<<" s).");
     }
   }
   else
   {
     control_period_ = gazebo_period;
-    ROS_DEBUG_STREAM_NAMED("gazebo_ros_control","Control period not found in URDF/SDF, defaulting to Gazebo period of "
+    ROS_DEBUG_STREAM("Control period not found in URDF/SDF, defaulting to Gazebo period of "
       << control_period_);
   }
 
@@ -261,28 +226,23 @@ void GazeboRosControllerManager::UpdateChild()
     //  Pushes out simulation state
     //--------------------------------------------------
 
-    //ROS_ERROR("joints_.size()[%d]",(int)this->joints_.size());
     // Copies the state from the gazebo joints into the mechanism joints.
-    std::vector<gazebo::physics::JointPtr>::iterator gmgit = joints_.begin();
-    boost::unordered_map<std::string, JointState>::iterator gmfit = fake_state_->joint_states_.begin();
-    while (gmgit != joints_.end() && gmfit != fake_state_->joint_states_.end())
+    for (size_t i = 0; i < joints_.size(); ++i)
     {
-      if (!(*gmgit))
+      if (!joints_[i])
+        continue;
+      std::string name = joints_[i]->GetName();
+      JointState *fst = fake_state_->getJointState(name);
+      if (!fst)
         continue;
 
-      gmfit->second.measured_effort_ = gmfit->second.commanded_effort_;
-      if ((*gmgit)->HasType(gazebo::physics::Base::HINGE_JOINT))
-        gmfit->second.position_ += angles::shortest_angular_distance(gmfit->second.position_, (*gmgit)->GetAngle(0).Radian());
-      else if ((*gmgit)->HasType(gazebo::physics::Base::SLIDER_JOINT))
-        gmfit->second.position_ = (*gmgit)->GetAngle(0).Radian();
+      if (joints_[i]->HasType(gazebo::physics::Base::HINGE_JOINT))
+        fst->position_ += angles::shortest_angular_distance(fst->position_, joints_[i]->GetAngle(0).Radian());
+      else if (joints_[i]->HasType(gazebo::physics::Base::SLIDER_JOINT))
+        fst->position_ = joints_[i]->GetAngle(0).Radian();
 
-      gmfit->second.velocity_ = (*gmgit)->GetVelocity(0);
-      ++gmgit;
-      ++gmfit;
+      fst->velocity_ = joints_[i]->GetVelocity(0);
     }
-
-    // Reverses the transmissions to propagate the joint position into the actuators.
-    this->fake_state_->propagateJointPositionToActuatorPosition();
 
     //--------------------------------------------------
     //  Runs Mechanism Control
@@ -305,32 +265,29 @@ void GazeboRosControllerManager::UpdateChild()
   //  Takes in actuation commands
   //--------------------------------------------------
 
-  // Reverses the transmissions to propagate the actuator commands into the joints.
-  this->fake_state_->propagateActuatorEffortToJointEffort();
-
   // Copies the commands from the mechanism joints into the gazebo joints.
-  std::vector<gazebo::physics::JointPtr>::iterator mggit = joints_.begin();
-  boost::unordered_map<std::string, JointState>::iterator mgfit = fake_state_->joint_states_.begin();
-  while (mggit != joints_.end() && mgfit != fake_state_->joint_states_.end())
+  for (size_t i = 0; i < joints_.size(); ++i)
   {
-    if (!*mggit)
+    if (!joints_[i])
+      continue;
+    std::string name = joints_[i]->GetName();
+    JointState *fst = fake_state_->getJointState(name);
+    if (!fst)
       continue;
 
-    double effort = mgfit->second.commanded_effort_;
+    double effort = fst->commanded_effort_;
 
     double damping_coef = 0;
-    if (mgfit->second.joint_->dynamics)
-      damping_coef = mgfit->second.joint_->dynamics->damping;
+    if (fst->joint_->dynamics)
+      damping_coef = fst->joint_->dynamics->damping;
 
-    if ((*mggit)->HasType(gazebo::physics::Base::HINGE_JOINT) || (*mggit)->HasType(gazebo::physics::Base::SLIDER_JOINT))
+    if (joints_[i]->HasType(gazebo::physics::Base::HINGE_JOINT) || joints_[i]->HasType(gazebo::physics::Base::SLIDER_JOINT))
     {
-      double current_velocity = (*mggit)->GetVelocity(0);
+      double current_velocity = joints_[i]->GetVelocity(0);
       double damping_force = damping_coef * current_velocity;
       double effort_command = effort - damping_force;
-      (*mggit)->SetForce(0,effort_command);
+      joints_[i]->SetForce(0,effort_command);
     }
-    ++mggit;
-    ++mgfit;
   }
   last_write_sim_time_ros_ = sim_time_ros;
 }
@@ -367,9 +324,6 @@ void GazeboRosControllerManager::ReadPr2Xml()
   }
   else
   {
-    //doc.Print();
-    //std::cout << *(doc.RootElement()) << std::endl;
-
     // Pulls out the list of actuators used in the robot configuration.
     struct GetActuators : public TiXmlVisitor
     {
@@ -394,8 +348,6 @@ void GazeboRosControllerManager::ReadPr2Xml()
     cm_ = new controller_manager::ControllerManager(state_, *rosnode_);
 
     fake_state_->current_time_ = ros::Time(world->GetSimTime().Double());
-//    if (fake_state_->current_time_ < ros::Time(0.001))
-//      fake_state_->current_time_ = ros::Time(0.001); // hardcoded to minimum of 1ms on start up
 
     boost::unordered_map<std::string, JointState>::iterator jit = state_->model_.joint_states_.begin();
     while (jit != state_->model_.joint_states_.end())
@@ -427,13 +379,9 @@ void GazeboRosControllerManager::ControllerManagerROSThread()
 {
   ROS_INFO_STREAM("Callback thread id=" << boost::this_thread::get_id());
 
-  //ros::Rate rate(1000);
-
   while (this->rosnode_->ok())
   {
-    //self_test_->checkTest();
-    //rate.sleep(); // using rosrate gets stuck on model delete
-    //usleep(1000);
+    usleep(1000);
     ros::spinOnce();
   }
 }

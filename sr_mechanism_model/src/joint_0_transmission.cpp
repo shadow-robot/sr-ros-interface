@@ -137,22 +137,6 @@ namespace sr_mechanism_model
     ROS_DEBUG("end propagate position for j0");
   }
 
-  void J0Transmission::propagatePositionBackwards(
-    std::vector<JointState*>& js, std::vector<Actuator*>& as)
-  {
-    ROS_DEBUG("propagate pos backward for j0");
-
-    assert(as.size() == 1);
-    assert(js.size() == 2);
-
-    ROS_DEBUG_STREAM("  pos = " << js[0]->position_ << " + " << js[1]->position_ << " = " << static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_);
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ = js[0]->position_ + js[1]->position_;
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ = js[0]->velocity_ + js[1]->velocity_;
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ = js[0]->measured_effort_ + js[1]->measured_effort_;
-
-    ROS_DEBUG(" end propagate pos backward for j0");
-  }
-
   void J0Transmission::propagateEffort(
     std::vector<JointState*>& js, std::vector<Actuator*>& as)
   {
@@ -164,19 +148,6 @@ namespace sr_mechanism_model
     static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ = (js[0]->commanded_effort_ + js[1]->commanded_effort_);
 
     ROS_DEBUG("end propagate effort for j0");
-  }
-
-  void J0Transmission::propagateEffortBackwards(
-    std::vector<Actuator*>& as, std::vector<JointState*>& js)
-  {
-    ROS_DEBUG("propagate effort backward for j0");
-
-    assert(as.size() == 1);
-    assert(js.size() == 2);
-    js[0]->commanded_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_;
-    js[1]->commanded_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_;
-
-    ROS_DEBUG("end propagate effort backward for j0");
   }
 
 } //end namespace sr_mechanism_model
