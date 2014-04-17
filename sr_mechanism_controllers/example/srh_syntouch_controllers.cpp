@@ -54,7 +54,6 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     joint_state_ = robot_->getJointState(joint_name);
     if (!joint_state_)
@@ -91,22 +90,20 @@ namespace controller {
   }
 
 
-  void SrhSyntouchController::starting()
+  void SrhSyntouchController::starting(const ros::Time& time)
   {
     command_ = joint_state_->position_;
 
     ROS_WARN("Reseting PID");
   }
 
-  void SrhSyntouchController::update()
+  void SrhSyntouchController::update(const ros::Time& time, const ros::Duration& period)
   {
     if (!joint_state_->calibrated_)
       return;
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -152,7 +149,7 @@ namespace controller {
         controller_state_publisher_->msg_.process_value_dot = joint_state_->velocity_;
 
         controller_state_publisher_->msg_.error = error_position;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
 
         controller_state_publisher_->msg_.command = commanded_effort;
         controller_state_publisher_->msg_.measured_effort = joint_state_->measured_effort_;
@@ -161,8 +158,6 @@ namespace controller {
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 }
 

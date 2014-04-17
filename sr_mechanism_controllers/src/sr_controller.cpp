@@ -39,7 +39,7 @@ namespace controller {
   SrController::SrController()
     : joint_state_(NULL), command_(0),
       min_(0.0), max_(sr_math_utils::pi),
-      loop_count_(0),  initialized_(false), robot_(NULL), last_time_(0),
+      loop_count_(0),  initialized_(false), robot_(NULL),
       n_tilde_("~"),
       max_force_demand(1023.), friction_deadband(5), max_force_factor_(1.0)
   {
@@ -84,11 +84,11 @@ namespace controller {
     return true;
   }
 
-  void SrController::update()
+  void SrController::update(const ros::Time& time, const ros::Duration& period)
   {
   }
 
-  void SrController::starting()
+  void SrController::starting(const ros::Time& time)
   {}
 
   bool SrController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)

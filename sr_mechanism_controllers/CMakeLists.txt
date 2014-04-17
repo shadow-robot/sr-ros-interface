@@ -64,17 +64,15 @@ add_dependencies(simple_trajectory_compare ${catkin_EXPORTED_TARGETS})
 target_link_libraries(simple_trajectory_compare ${catkin_LIBRARIES})
 
 
-#if(COMMAND add_rostest_gtest)
-#  add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_pos_controller.cpp test/test_controllers.cpp
-#    src/srh_joint_position_controller.cpp src/sr_controller.cpp)
-#  add_dependencies(test_joint_pos_controller ${catkin_EXPORTED_TARGETS})
-#  target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
-#
-#  add_rostest_gtest(test_joint_pos_controller_with_fc test/joint_pos_controller_with_fc.test test/test_joint_pos_controller.cpp test/test_controllers.cpp
-#    src/srh_joint_position_controller.cpp src/sr_controller.cpp)
-#  add_dependencies(test_joint_pos_controller_with_fc ${catkin_EXPORTED_TARGETS})
-#  target_link_libraries(test_joint_pos_controller_with_fc sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
-#endif(COMMAND add_rostest_gtest)
+if(COMMAND add_rostest_gtest)
+  add_rostest_gtest(test_joint_pos_controller test/joint_pos_controller.test test/test_joint_pos_controller.cpp)
+  add_dependencies(test_joint_pos_controller ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(test_joint_pos_controller sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
+
+  add_rostest_gtest(test_joint_pos_controller_with_fc test/joint_pos_controller_with_fc.test test/test_joint_pos_controller.cpp)
+  add_dependencies(test_joint_pos_controller_with_fc ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(test_joint_pos_controller_with_fc sr_mechanism_controllers ${GTEST_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
+endif(COMMAND add_rostest_gtest)
 
 install(TARGETS joint_trajectory_action_controller joint_spline_trajectory_action_controller simple_spline_trajectory
   sr_mechanism_controllers simple_trajectory simple_trajectory_compare

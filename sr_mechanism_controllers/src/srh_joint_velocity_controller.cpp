@@ -57,7 +57,6 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     if( joint_name.substr(3,1).compare("0") == 0)
     {
@@ -139,7 +138,7 @@ namespace controller {
   }
 
 
-  void SrhJointVelocityController::starting()
+  void SrhJointVelocityController::starting(const ros::Time& time)
   {
     if( has_j2 )
       command_ = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
@@ -197,7 +196,7 @@ namespace controller {
     pid_controller_velocity_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhJointVelocityController::update()
+  void SrhJointVelocityController::update(const ros::Time& time, const ros::Duration& period)
   {
     if( !has_j2 )
     {
@@ -206,9 +205,7 @@ namespace controller {
     }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -231,7 +228,7 @@ namespace controller {
     //don't compute the error if we're in the deadband.
     if( !hysteresis_deadband.is_in_deadband(command_, error_velocity, velocity_deadband) )
     {
-      commanded_effort = pid_controller_velocity_->computeCommand(-error_velocity, dt_);
+      commanded_effort = pid_controller_velocity_->computeCommand(-error_velocity, period);
 
       //clamp the result to max force
       commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );
@@ -258,7 +255,7 @@ namespace controller {
         else
           controller_state_publisher_->msg_.process_value = joint_state_->velocity_;
         controller_state_publisher_->msg_.error = error_velocity;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
         double dummy;
@@ -271,8 +268,6 @@ namespace controller {
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 
   void SrhJointVelocityController::read_parameters()

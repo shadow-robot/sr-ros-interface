@@ -58,7 +58,6 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     //joint 0s
     if( joint_name.substr(3,1).compare("0") == 0)
@@ -128,7 +127,7 @@ namespace controller {
   }
 
 
-  void SrhEffortJointController::starting()
+  void SrhEffortJointController::starting(const ros::Time& time)
   {
     command_ = 0.0;
     read_parameters();
@@ -165,7 +164,7 @@ namespace controller {
   {
   }
 
-  void SrhEffortJointController::update()
+  void SrhEffortJointController::update(const ros::Time& time, const ros::Duration& period)
   {
     if( !has_j2)
     {
@@ -174,9 +173,7 @@ namespace controller {
     }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -214,7 +211,7 @@ namespace controller {
         //TODO: compute the derivative of the effort.
         controller_state_publisher_->msg_.process_value_dot = -1.0;
         controller_state_publisher_->msg_.error = commanded_effort - joint_state_->measured_effort_;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
         double dummy;
@@ -227,8 +224,6 @@ namespace controller {
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 
   void SrhEffortJointController::read_parameters()

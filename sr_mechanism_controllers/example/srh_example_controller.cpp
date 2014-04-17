@@ -79,7 +79,6 @@ namespace controller {
   {
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     //We need to store 2 different joint states for the joint 0s:
     // They control the distal and the middle joint with the same control.
@@ -129,7 +128,7 @@ namespace controller {
   }
 
 
-  void SrhExampleController::starting()
+  void SrhExampleController::starting(const ros::Time& time)
   {
     //Here we set the command to be = to the current position
     if( has_j2 ) //if it's *J0, then pos = *J1->pos + *J2->pos
@@ -138,20 +137,16 @@ namespace controller {
       command_ = joint_state_->position_;
   }
 
-  void SrhExampleController::update()
+  void SrhExampleController::update(const ros::Time& time, const ros::Duration& period)
   {
     assert(robot_ != NULL);
     assert(joint_state_->joint_);
-
-    //compute the time difference since last iteration
-    ros::Time time = robot_->getTime();
-    dt_= time - last_time_;
 
     //make sure the controller has been initialised,
     // to avoid sending a crazy command.
     if (!initialized_)
     {
-      starting();
+      starting(time);
 
       initialized_ = true;
     }
@@ -203,15 +198,13 @@ namespace controller {
         }
 
         controller_state_publisher_->msg_.error = error_position;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
         controller_state_publisher_->unlockAndPublish();
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 }
 

@@ -74,13 +74,13 @@ namespace controller
      * you're controlling), so that the first command won't move the joint.
      *
      */
-    virtual void starting();
+    virtual void starting(const ros::Time& time);
 
     /**
-     * Issues commands to the joint. This method is called at 1kHz by the
+     * Issues commands to the joint. This method is called at the specified rate by the
      * main loop.
      */
-    virtual void update();
+    virtual void update(const ros::Time& time, const ros::Duration& period);
   };
 } // namespace
 

@@ -73,15 +73,12 @@ namespace controller
      */
     void getCommand(double & cmd);
 
-    void starting(const ros::Time& time) { starting(); }
-    void update(const ros::Time& time, const ros::Duration& period) { update(); }
-
-    virtual void starting();
+    virtual void starting(const ros::Time& time);
 
     /*!
      * \brief Issues commands to the joint. Should be called at regular intervals
      */
-    virtual void update();
+    virtual void update(const ros::Time& time, const ros::Duration& period);
 
     virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
 
@@ -91,7 +88,6 @@ namespace controller
     ros_ethercat_model::JointState *joint_state_;        /**< Joint we're controlling. */
     ros_ethercat_model::JointState *joint_state_2;        /**< 2ndJoint we're controlling if joint 0. */
     bool has_j2;         /**< true if this is a joint 0. */
-    ros::Duration dt_;
     double command_;                            /**< Last commanded position. */
 
   protected:
@@ -123,7 +119,6 @@ namespace controller
     int loop_count_;
     bool initialized_;
     ros_ethercat_model::RobotState *robot_;              /**< Pointer to robot structure. */
-    ros::Time last_time_;                          /**< Last time stamp of update. */
 
     ros::NodeHandle node_, n_tilde_;
 

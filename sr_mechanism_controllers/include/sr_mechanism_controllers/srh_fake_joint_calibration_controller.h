@@ -47,7 +47,7 @@ namespace controller
 
     virtual bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
-    virtual void update();
+    virtual void update(const ros::Time& time, const ros::Duration& period);
 
     bool calibrated() { return calibration_state_ == CALIBRATED; }
     void beginCalibration()

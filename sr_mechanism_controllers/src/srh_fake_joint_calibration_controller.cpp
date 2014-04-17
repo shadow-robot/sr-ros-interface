@@ -98,7 +98,7 @@ namespace controller {
   }
 
 
-  void SrhFakeJointCalibrationController::update()
+  void SrhFakeJointCalibrationController::update(const ros::Time& time, const ros::Duration& period)
   {
     assert(joint_);
     assert(actuator_);

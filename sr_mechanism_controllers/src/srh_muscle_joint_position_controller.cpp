@@ -59,7 +59,6 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     if( joint_name.substr(3,1).compare("0") == 0)
     {
@@ -143,7 +142,7 @@ namespace controller {
   }
 
 
-  void SrhMuscleJointPositionController::starting()
+  void SrhMuscleJointPositionController::starting(const ros::Time& time)
   {
     if( has_j2 )
       command_ = joint_state_->position_ + joint_state_2->position_;
@@ -202,7 +201,7 @@ namespace controller {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhMuscleJointPositionController::update()
+  void SrhMuscleJointPositionController::update(const ros::Time& time, const ros::Duration& period)
   {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];
@@ -214,9 +213,7 @@ namespace controller {
 //    }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -263,7 +260,7 @@ namespace controller {
     //loop rate.
     if(loop_count_ % 50 == 0)
     {
-      double commanded_effort = pid_controller_position_->computeCommand(-error_position, dt_);
+      double commanded_effort = pid_controller_position_->computeCommand(-error_position, period);
 
       //clamp the result to max force
       commanded_effort = min( commanded_effort, max_force_demand );
@@ -278,9 +275,6 @@ namespace controller {
       }
 
       command_acc_ = commanded_effort;
-
-      //We want the last time we updated the PID loop not sent commands.
-      last_time_ = time;
     }
 
     // Drive the joint from the accumulator. This runs at full update speed so
@@ -356,7 +350,7 @@ namespace controller {
         }
 
         controller_state_publisher_->msg_.error = error_position;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.pseudo_command = command_acc_;
         controller_state_publisher_->msg_.valve_muscle_0 = valve[0];
         controller_state_publisher_->msg_.valve_muscle_1 = valve[1];

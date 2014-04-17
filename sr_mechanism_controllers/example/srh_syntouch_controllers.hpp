@@ -44,12 +44,12 @@ namespace controller
     bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name );
     bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
-    virtual void starting();
+    virtual void starting(const ros::Time& time);
 
     /*!
      * \brief Issues commands to the joint. Should be called at regular intervals
      */
-    virtual void update();
+    virtual void update(const ros::Time& time, const ros::Duration& period);
 
   private:
     //publish our joint controller state

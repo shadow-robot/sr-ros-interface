@@ -40,7 +40,7 @@ using namespace std;
 namespace controller {
 
   SrhJointPositionController::SrhJointPositionController()
-    : SrController(), position_deadband(0.015)
+    : position_deadband(0.015)
   {
   }
 
@@ -59,7 +59,6 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     if( joint_name.substr(3,1).compare("0") == 0)
     {
@@ -143,7 +142,7 @@ namespace controller {
   }
 
 
-  void SrhJointPositionController::starting()
+  void SrhJointPositionController::starting(const ros::Time& time)
   {
     if( has_j2 )
       command_ = joint_state_->position_ + joint_state_2->position_;
@@ -202,7 +201,7 @@ namespace controller {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhJointPositionController::update()
+  void SrhJointPositionController::update(const ros::Time& time, const ros::Duration& period)
   {
     if( !has_j2)
     {
@@ -211,9 +210,7 @@ namespace controller {
     }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -241,7 +238,7 @@ namespace controller {
     if( in_deadband )
       error_position = 0.0;
 
-    commanded_effort = pid_controller_position_->computeCommand(-error_position, dt_);
+    commanded_effort = pid_controller_position_->computeCommand(-error_position, period);
 
     //clamp the result to max force
     commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );
@@ -278,7 +275,7 @@ namespace controller {
         }
 
         controller_state_publisher_->msg_.error = error_position;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
         double dummy;
@@ -291,8 +288,6 @@ namespace controller {
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 
   void SrhJointPositionController::read_parameters()

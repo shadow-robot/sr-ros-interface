@@ -60,7 +60,6 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     //joint 0s
     if( joint_name.substr(3,1).compare("0") == 0)
@@ -131,7 +130,7 @@ namespace controller {
   }
 
 
-  void SrhJointMuscleValveController::starting()
+  void SrhJointMuscleValveController::starting(const ros::Time& time)
   {
     command_ = 0.0;
     read_parameters();
@@ -168,7 +167,7 @@ namespace controller {
   {
   }
 
-  void SrhJointMuscleValveController::update()
+  void SrhJointMuscleValveController::update(const ros::Time& time, const ros::Duration& period)
   {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];
@@ -181,9 +180,7 @@ namespace controller {
 //    }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -306,14 +303,12 @@ namespace controller {
         controller_state_publisher_->msg_.packed_valve = joint_state_->commanded_effort_;
         controller_state_publisher_->msg_.muscle_pressure_0 = pressure_0;
         controller_state_publisher_->msg_.muscle_pressure_1 = pressure_1;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
 
         controller_state_publisher_->unlockAndPublish();
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 
   void SrhJointMuscleValveController::read_parameters()
