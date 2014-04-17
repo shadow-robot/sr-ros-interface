@@ -52,24 +52,8 @@ namespace sr_mechanism_model
 {
   bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, RobotState *robot)
   {
-    const char *name = elt->Attribute("name");
-    name_ = name ? name : "";
-
-    TiXmlElement *jel = elt->FirstChildElement("joint");
-    const char *joint_name = jel ? jel->Attribute("name") : NULL;
-    if (!joint_name)
-    {
-      ROS_ERROR("SimpleTransmissionForMuscle did not specify joint name");
+    if (!ros_ethercat_model::Transmission::initXml(elt, robot))
       return false;
-    }
-
-    const boost::shared_ptr<const urdf::Joint> joint = robot->robot_model_.getJoint(joint_name);
-    if (!joint)
-    {
-      ROS_ERROR("SimpleTransmissionForMuscle could not find joint named \"%s\"", joint_name);
-      return false;
-    }
-    joint_names_.push_back(joint_name);
 
     TiXmlElement *ael = elt->FirstChildElement("actuator");
     std::string actuator_name = ael ? ael->Attribute("name") : "";

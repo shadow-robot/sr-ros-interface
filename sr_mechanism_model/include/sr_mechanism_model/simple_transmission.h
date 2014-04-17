@@ -46,23 +46,19 @@
 
 namespace sr_mechanism_model {
 
-        class SimpleTransmission : public ros_ethercat_model::Transmission
-        {
-        public:
-                SimpleTransmission() {}
-                ~SimpleTransmission() {}
+  class SimpleTransmission : public ros_ethercat_model::Transmission
+  {
+  public:
+    SimpleTransmission() {}
+    ~SimpleTransmission() {}
 
-                bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
+    bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
 
-                void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
-                                       std::vector<ros_ethercat_model::JointState*>&);
-                void propagatePositionBackwards(std::vector<ros_ethercat_model::JointState*>&,
-                                                std::vector<ros_ethercat_model::Actuator*>&);
-                void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
-                                     std::vector<ros_ethercat_model::Actuator*>&);
-                void propagateEffortBackwards(std::vector<ros_ethercat_model::Actuator*>&,
-                                              std::vector<ros_ethercat_model::JointState*>&);
-        };
+    void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
+                           std::vector<ros_ethercat_model::JointState*>&);
+    void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
+                         std::vector<ros_ethercat_model::Actuator*>&);
+  };
 
 } // namespace sr_mechanism_model
 

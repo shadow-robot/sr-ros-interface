@@ -35,7 +35,7 @@ class MockHand(object):
         self.list_srv = rospy.Service('controller_manager/list_controllers',
                 ListControllers, self.list_controllers_cb)
         rospy.loginfo("Started MockHand")
-                
+
     def list_controllers_cb(self, req):
         cons = ('sh_ffj0_position_controller',
                 'sh_ffj3_position_controller',

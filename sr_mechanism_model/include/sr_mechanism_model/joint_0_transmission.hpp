@@ -46,12 +46,8 @@ namespace sr_mechanism_model
 
     void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
                            std::vector<ros_ethercat_model::JointState*>&);
-    void propagatePositionBackwards(std::vector<ros_ethercat_model::JointState*>&,
-                                    std::vector<ros_ethercat_model::Actuator*>&);
     void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
                          std::vector<ros_ethercat_model::Actuator*>&);
-    void propagateEffortBackwards(std::vector<ros_ethercat_model::Actuator*>&,
-                                  std::vector<ros_ethercat_model::JointState*>&);
 
   private:
 

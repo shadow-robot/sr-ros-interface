@@ -31,7 +31,6 @@
 #define GAZEBO_CONTROLLER_MANAGER_H
 
 #include <vector>
-#include <map>
 
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/Model.hh>
@@ -76,9 +75,9 @@ private:
   RosEthercat *state_;
   controller_manager::ControllerManager *cm_;
 
-  /// @todo The fake state helps Gazebo run the transmissions backwards, so
-  ///       that it can figure out what its joints should do based on the
-  ///       actuator values.
+  /// The fake state helps Gazebo run the transmissions backwards, so
+  /// that it can figure out what its joints should do based on the
+  /// actuator values.
   ros_ethercat_model::RobotState *fake_state_;
   std::vector<gazebo::physics::JointPtr>  joints_;
 
@@ -91,9 +90,6 @@ private:
    *  \brief pointer to ros node
    */
   ros::NodeHandle* rosnode_;
-
-  /// \brief ros service
-  private: ros::ServiceServer setModelsJointsStatesService;
 
   ///\brief ros service callback
   /*
@@ -112,19 +108,19 @@ private:
   private: void ControllerManagerQueueThread();
   private: boost::thread controller_manager_callback_queue_thread_;
 #endif
-  private: void ControllerManagerROSThread();
-  private: boost::thread ros_spinner_thread_;
+  void ControllerManagerROSThread();
+  boost::thread ros_spinner_thread_;
 
   // Pointer to the model
-  private: physics::WorldPtr world;
+  physics::WorldPtr world;
 
   // Pointer to the update event connection
-  private: event::ConnectionPtr updateConnection;
+  event::ConnectionPtr updateConnection;
 
   // subscribe to world stats
-  private: transport::NodePtr node;
-  private: transport::SubscriberPtr statsSub;
-  private: common::Time simTime;
+  transport::NodePtr node;
+  transport::SubscriberPtr statsSub;
+  common::Time simTime;
 
   // Timing
   ros::Duration control_period_;
