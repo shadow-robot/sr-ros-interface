@@ -29,9 +29,7 @@
 #define _JOINT_0_TRANSMISSION_FOR_MUSCLE_HPP_
 
 #include <tinyxml.h>
-#include "ros_ethercat_model/transmission.hpp"
-#include "ros_ethercat_model/joint.hpp"
-#include "ros_ethercat_model/hardware_interface.hpp"
+#include <ros_ethercat_model/robot.hpp>
 
 namespace sr_mechanism_model
 {
