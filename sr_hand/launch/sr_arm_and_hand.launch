@@ -107,7 +107,6 @@
     <rosparam command="load"
               file="$(find sr_hand)/shadowhand_analyzer.yaml" />
   </node>
-
 </launch>
 
 

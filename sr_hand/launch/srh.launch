@@ -44,5 +44,4 @@
     <!-- Load the file you made above -->
     <rosparam command="load"  file="$(find sr_hand)/shadowhand_analyzer.yaml"/>
   </node>
-
 </launch>
