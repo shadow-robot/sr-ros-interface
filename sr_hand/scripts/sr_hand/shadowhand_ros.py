@@ -481,16 +481,16 @@ class ShadowHand_ROS():
         """
         success = True
         for joint_all in self.allJoints :
-            self.topic_ending = "_mixed_position_velocity_controller"
+            self.topic_ending = "_position_controller"
             topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
             success = True
             try:
-                rospy.wait_for_message(topic, JointControllerState, timeout = 0.2)
+                rospy.wait_for_message(topic, pr2_controllers_msgs.msg.JointControllerState, timeout = 0.2)
             except:
                 try:
-                    self.topic_ending = "_position_controller"
+                    self.topic_ending = "_mixed_position_velocity_controller"
                     topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
-                    rospy.wait_for_message(topic, pr2_controllers_msgs.msg.JointControllerState, timeout = 0.2)
+                    rospy.wait_for_message(topic, JointControllerState, timeout = 0.2)
                 except:
                     success = False
 
