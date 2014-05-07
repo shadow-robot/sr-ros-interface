@@ -1,9 +1,6 @@
 language: cpp
 compiler: gcc
 
-git:
-  depth: 0
-  
 before_install:
   - sudo pip install cpplint rosdep
   - sudo rosdep init && rosdep update 
