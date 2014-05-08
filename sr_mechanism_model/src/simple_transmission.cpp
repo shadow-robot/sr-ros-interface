@@ -39,7 +39,7 @@
 
 #include <math.h>
 #include <pluginlib/class_list_macros.h>
-#include "ros_ethercat_model/robot.hpp"
+#include "ros_ethercat_model/robot_state.hpp"
 #include "sr_mechanism_model/simple_transmission.h"
 
 #include <sr_hardware_interface/sr_actuator.hpp>

@@ -41,7 +41,7 @@
 #include "ros_ethercat_model/hardware_interface.hpp"
 #include "ros_ethercat_model/ros_ethercat.hpp"
 #include "controller_manager/controller_manager.h"
-#include "ros_ethercat_model/robot.hpp"
+#include "ros_ethercat_model/robot_state.hpp"
 #include <tinyxml.h>
 #include <ros/ros.h>
 #undef USE_CBQ

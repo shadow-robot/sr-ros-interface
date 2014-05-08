@@ -40,7 +40,7 @@
 #define _SR_SIMPLE_TRANSMISSION_H_
 
 #include <tinyxml.h>
-#include <ros_ethercat_model/robot.hpp>
+#include <ros_ethercat_model/robot_state.hpp>
 
 namespace sr_mechanism_model {
 
