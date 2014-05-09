@@ -58,11 +58,11 @@ public:
 
   double compute_output(double input, double current_position)
   {
-    hw->current_time_ = ros::Time::now();
+    robot_state->current_time_ = ros::Time::now();
     joint_state->position_ = current_position;
     controller->setCommand( input );
 
-    controller->update();
+    controller->update(robot_state->current_time_, ros::Duration(0.001));
 
     return joint_state->commanded_effort_;
   }
