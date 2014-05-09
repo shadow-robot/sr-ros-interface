@@ -31,8 +31,8 @@
 #include <boost/smart_ptr.hpp>
 
 #include <control_toolbox/pid.h>
-#include <hardware_interface/hardware_interface.h>
-#include <ros_ethercat_model/robot_state.hpp>
+#include <pr2_hardware_interface/hardware_interface.h>
+#include <pr2_mechanism_model/robot.h>
 #include <tinyxml.h>
 #include <sr_hardware_interface/sr_actuator.hpp>
 
@@ -48,11 +48,12 @@ public:
   virtual double compute_output(double input, double current_position) = 0;
 
   boost::shared_ptr<controller::SrController> controller;
-  boost::shared_ptr<hardware_interface::HardwareInterface> hw;
-  boost::shared_ptr<ros_ethercat_model::RobotState> robot_state;
+  boost::shared_ptr<pr2_hardware_interface::HardwareInterface> hw;
+  boost::shared_ptr<pr2_mechanism_model::Robot> robot;
+  boost::shared_ptr<pr2_mechanism_model::RobotState> robot_state;
   boost::shared_ptr<TiXmlDocument> model;
   boost::shared_ptr<sr_actuator::SrActuator> actuator;
-  ros_ethercat_model::JointState* joint_state;
+  pr2_mechanism_model::JointState* joint_state;
 };
 
 

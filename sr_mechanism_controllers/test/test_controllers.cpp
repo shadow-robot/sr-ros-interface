@@ -35,7 +35,14 @@ TestControllers::~TestControllers()
 
 void TestControllers::init()
 {
-  hw = boost::shared_ptr<hardware_interface::HardwareInterface>( new hardware_interface::HardwareInterface() );
+  hw = boost::shared_ptr<pr2_hardware_interface::HardwareInterface>( new pr2_hardware_interface::HardwareInterface() );
+
+  //add a fake FFJ3 actuator
+  actuator = boost::shared_ptr<sr_actuator::SrActuator>( new sr_actuator::SrActuator("FFJ3") );
+  actuator->state_.is_enabled_ = true;
+  hw->addActuator( actuator.get() );
+
+  robot = boost::shared_ptr<pr2_mechanism_model::Robot>( new pr2_mechanism_model::Robot( hw.get()) );
 
   model = boost::shared_ptr<TiXmlDocument>( new TiXmlDocument() );
 
@@ -68,20 +75,19 @@ void TestControllers::init()
   }
   else
   {
-    robot_state = boost::shared_ptr<pr2_mechanism_model::RobotState>( new ros_ethercat_model::RobotState(model->RootElement()));
-    std::string joint_name("FFJ3");
-    robot_state->actuators_.insert(joint_name, new sr_actuator::SrActuator());
-    actuator = robot_state->getActuator(joint_name);
+    robot->initXml( model->RootElement() );
 
-    joint_state = robot_state->getJointState(joint_name);
+    robot_state = boost::shared_ptr<pr2_mechanism_model::RobotState>( new pr2_mechanism_model::RobotState(robot.get()) );
+
+    joint_state = robot_state->getJointState("FFJ3");
     joint_state->calibrated_ = true;
 
     init_controller();
-    controller->starting(ros::Time::now());
+    controller->starting();
 
     //initialize the controller:
     joint_state->position_ = 0.0;
-    controller->update(ros::Time::now(), ros::Duration(0.001));
+    controller->update();
   }
 }
 
