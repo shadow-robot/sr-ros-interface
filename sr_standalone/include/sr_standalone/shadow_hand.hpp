@@ -80,14 +80,14 @@ public:
    * @return A vector of tactiles in the following order:
    *         FF, MF, RF, LF, TH
    */
-  std::vector<Tactile> get_tactiles() const;
+  const std::vector<Tactile> & get_tactiles() const;
 
   /**
    * Get a list of all the joint names in the hand.
    *
    * @return vector containing all the hand joint names
    */
-  std::vector<std::string> get_list_of_joints() const;
+  const std::vector<std::string> & get_list_of_joints() const;
 
 private:
   /*

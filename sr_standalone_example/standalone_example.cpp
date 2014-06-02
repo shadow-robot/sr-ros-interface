@@ -16,11 +16,19 @@ int main(int argc, char** argv)
 
     std::cout << "Joint state names:" << std::endl;
     for (std::size_t i = 0; i < jss.names.size(); ++i)
-      std::cout << jss.names[i] << std::endl;
+      std::cout << jss.names[i] << ", ";
+    std::cout << std::endl << std::endl;
 
     std::cout << "Joint state positions:" << std::endl;
     for (std::size_t i = 0; i < jss.positions.size(); ++i)
-      std::cout << jss.positions[i] << std::endl;
+      std::cout << jss.positions[i] << ", ";
+    std::cout << std::endl << std::endl;
+
+    std::cout << "List of joints:" << std::endl;
+    const std::vector<std::string> & joints = hand.get_list_of_joints();
+    for (std::size_t i = 0; i < joints.size(); ++i)
+      std::cout << joints[i] << ", ";
+    std::cout << std::endl << std::endl;
 
     std::cout << "Sleeping..." << std::endl << std::endl;
     boost::posix_time::seconds dura(1);

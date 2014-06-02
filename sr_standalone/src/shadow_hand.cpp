@@ -35,12 +35,12 @@ const JointStates & ShadowHand::get_joint_states() const
   return wrapper_->joint_states_;
 }
 
-vector<Tactile> ShadowHand::get_tactiles() const
+const vector<Tactile> & ShadowHand::get_tactiles() const
 {
   return wrapper_->tactiles_;
 }
 
-vector<string> ShadowHand::get_list_of_joints() const
+const vector<string> & ShadowHand::get_list_of_joints() const
 {
   return wrapper_->joint_states_.names;
 }
