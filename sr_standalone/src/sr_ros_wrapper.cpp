@@ -5,11 +5,10 @@ using namespace std;
 namespace shadow_robot_standalone
 {
 
-ShadowHand::SrRosWrapper::SrRosWrapper()
-  : control_type_(POSITION_PWM),
-    n_tilde_("~")
+ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
+  : control_type_(POSITION_PWM)
 {
-  init();
+  init(argc, argv);
 }
 
 ShadowHand::SrRosWrapper::~SrRosWrapper()
@@ -17,19 +16,20 @@ ShadowHand::SrRosWrapper::~SrRosWrapper()
 }
 
 // fire up the ROS node
-void ShadowHand::SrRosWrapper::init(void)
+void ShadowHand::SrRosWrapper::init(int argc, char **argv)
 {
-  const string name = "standalone_example";
-  int argc = 1;
-  char **argv = (char**) calloc(2, sizeof(char*) );
-  argv[0] = const_cast<char*>(name.c_str());
-  ros::init(argc, argv, name);
+  const string node_name = "sh_standalone_node";
+  ros::init(argc, argv, node_name);
+
+  // Must call ros::init() before creating the first NodeHandle.
+  nh_.reset(new ros::NodeHandle());
+  n_tilde_.reset(new ros::NodeHandle("~"));
 
   string joint_states_topic;
-  n_tilde_.searchParam("prefix", joint_states_topic);
+  n_tilde_->searchParam("prefix", joint_states_topic);
   joint_states_topic += "position/joint_states";
 
-  joint_states_sub_ = nh_.subscribe(joint_states_topic, 2, &SrRosWrapper::callback, this);
+  joint_states_sub_ = nh_->subscribe(joint_states_topic, 2, &SrRosWrapper::callback, this);
 
   while( ros::ok() )
     ros::spin();

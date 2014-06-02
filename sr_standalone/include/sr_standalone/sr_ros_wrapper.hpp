@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sr_standalone/standalone.hpp"
+#include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 
@@ -12,12 +13,12 @@ namespace shadow_robot_standalone
 class ShadowHand::SrRosWrapper
 {
 public:
-  SrRosWrapper();
+  SrRosWrapper(int argc, char **argv);
   ~SrRosWrapper();
 
 protected:
   // fire up the ROS node
-  void init(void);
+  void init(int argc, char **argv);
 
   void callback(const sensor_msgs::JointStateConstPtr& msg);
 
@@ -27,8 +28,8 @@ public:
 
   ControlType control_type_;
 
-  ros::NodeHandle nh_;
-  ros::NodeHandle n_tilde_;
+  boost::scoped_ptr<ros::NodeHandle> nh_;
+  boost::scoped_ptr<ros::NodeHandle> n_tilde_;
   ros::Subscriber joint_states_sub_;
 };
 

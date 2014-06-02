@@ -7,8 +7,8 @@ using namespace std;
 namespace shadow_robot_standalone
 {
 
-ShadowHand::ShadowHand()
-  : wrapper_(new SrRosWrapper())
+ShadowHand::ShadowHand(int argc, char** argv)
+  : wrapper_(new SrRosWrapper(argc, argv))
 {
 }
 

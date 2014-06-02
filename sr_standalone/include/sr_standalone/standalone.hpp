@@ -36,7 +36,7 @@ enum ControlType
 class ShadowHand
 {
 public:
-  ShadowHand();
+  ShadowHand(int argc, char** argv);
   ~ShadowHand();
 
   /**
