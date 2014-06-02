@@ -14,6 +14,10 @@ ShadowHand::~ShadowHand()
 {
 }
 
+// *** YI LI ***
+// sr_robot_msgs/msg/ControlType.msg
+// sr_self_test/src/motor_test.cpp
+// void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
 bool ShadowHand::set_control_type(ControlType control_type)
 {
   wrapper_->control_type_ = control_type;
