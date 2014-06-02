@@ -10,7 +10,7 @@ catkin_package(
     LIBRARIES sr_standalone
 )
 
-add_library(sr_standalone src/standalone.cpp src/sr_ros_wrapper.cpp)
+add_library(sr_standalone src/shadow_hand.cpp src/sr_ros_wrapper.cpp)
 target_link_libraries(sr_standalone ${catkin_LIBRARIES})
 add_dependencies(sr_standalone ${catkin_EXPORTED_TARGETS})
 

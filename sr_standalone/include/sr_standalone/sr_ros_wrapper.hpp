@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sr_standalone/standalone.hpp"
+#include "sr_standalone/shadow_hand.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>

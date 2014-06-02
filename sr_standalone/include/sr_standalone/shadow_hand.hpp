@@ -73,7 +73,7 @@ public:
    * @return Struct containing all the joints positions,
    *         velocity and effort.
    */
-  JointStates get_joint_states() const;
+  const JointStates & get_joint_states() const;
   /**
    * Retrieves the tactile data from the biotacs.
    *

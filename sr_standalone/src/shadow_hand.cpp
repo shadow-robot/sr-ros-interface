@@ -1,4 +1,4 @@
-#include "sr_standalone/standalone.hpp"
+#include "sr_standalone/shadow_hand.hpp"
 #include "sr_standalone/sr_ros_wrapper.hpp"
 #include <algorithm>
 
@@ -30,7 +30,7 @@ void ShadowHand::send_torque(const string &joint_name, double target)
 {
 }
 
-JointStates ShadowHand::get_joint_states() const
+const JointStates & ShadowHand::get_joint_states() const
 {
   return wrapper_->joint_states_;
 }
