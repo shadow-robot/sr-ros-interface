@@ -7,7 +7,8 @@ namespace shadow_robot_standalone
 
 ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
   : control_type_(POSITION_PWM),
-    time_to_quit_(false)
+    time_to_quit_(false),
+    ros_spin_rate_(100) // 100 hz
 {
   init(argc, argv);
   spin_thread_.reset(new boost::thread(&ShadowHand::SrRosWrapper::spin, this));
@@ -21,11 +22,11 @@ ShadowHand::SrRosWrapper::~SrRosWrapper()
 
 void ShadowHand::SrRosWrapper::spin(void)
 {
-  ros::Rate r(100);
+  ros::Rate rate(ros_spin_rate_);
   while( ros::ok() && !time_to_quit_ )
   {
     ros::spinOnce();
-    r.sleep();
+    rate.sleep();
   }
 }
 

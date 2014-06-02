@@ -41,6 +41,8 @@ public:
   boost::scoped_ptr<boost::thread> spin_thread_;
 
   bool time_to_quit_;
+
+  double ros_spin_rate_;
 };
 
 } // namespace
