@@ -1,7 +1,6 @@
-#ifndef _SR_ROS_WRAPPER_HPP_
-#define _SR_ROS_WRAPPER_HPP_
+#pragma once
 
-#include "standalone.hpp"
+#include "sr_standalone/standalone.hpp"
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 
@@ -57,5 +56,3 @@ public:
 };
 
 } // namespace
-
-#endif // _SR_ROS_WRAPPER_HPP_

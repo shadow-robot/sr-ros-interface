@@ -1,8 +1,8 @@
-#include <vector>
-#include <string>
+#pragma once
 
-#ifndef _STANDALONE_HPP_
-#define _STANDALONE_HPP_
+#include <string>
+#include <vector>
+#include <boost/scoped_ptr.hpp>
 
 namespace shadow_robot_standalone
 {
@@ -28,16 +28,16 @@ struct Tactile
 };
 
 enum ControlType
-{
-  POSITION_PWM,
-  EFFORT_TORQUE
-};
+  {
+    POSITION_PWM,
+    EFFORT_TORQUE
+  };
 
 class ShadowHand
 {
 public:
   ShadowHand();
-  ~ShadowHand() {}
+  ~ShadowHand();
 
   /**
    * Set the control type to be used on the hand.
@@ -90,11 +90,12 @@ public:
   std::vector<std::string> get_list_of_joints() const;
 
 private:
-  // Pimpl idiom
-  class SrRosWrapper;
-  SrRosWrapper *srw;
+  /*
+   * Pimpl idiom (also called Handle/Body idiom):
+   * for hiding implementation details in the header file.
+   */
+  class SrRosWrapper; // fwd declaration
+  boost::scoped_ptr<SrRosWrapper> wrapper_;
 };
 
 } // namespace
-
-#endif // _STANDALONE_HPP_
