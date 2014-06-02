@@ -44,9 +44,6 @@ void ShadowHand::SrRosWrapper::init(int argc, char **argv)
   ROS_INFO_STREAM("joint_states_topic = " << joint_states_topic);
 
   joint_states_sub_ = nh_->subscribe(joint_states_topic, 2, &SrRosWrapper::callback, this);
-
-  // while( ros::ok() )
-  //  ros::spin();
 }
 
 void ShadowHand::SrRosWrapper::callback(const sensor_msgs::JointStateConstPtr& msg)
