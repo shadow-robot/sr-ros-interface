@@ -7,8 +7,6 @@
 #include <sensor_msgs/JointState.h>
 #include <sr_robot_msgs/ShadowPST.h>
 
-using namespace std;
-
 namespace shadow_robot_standalone
 {
 
@@ -28,7 +26,7 @@ protected:
 
 public:
   JointStates joint_states_;
-  vector<Tactile> tactiles_;
+  std::vector<Tactile> tactiles_;
 
   ControlType control_type_;
 

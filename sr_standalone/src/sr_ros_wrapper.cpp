@@ -1,7 +1,5 @@
 #include "sr_standalone/sr_ros_wrapper.hpp"
 
-using namespace std;
-
 namespace shadow_robot_standalone
 {
 
@@ -32,19 +30,19 @@ void ShadowHand::SrRosWrapper::spin(void)
 
 void ShadowHand::SrRosWrapper::init(int argc, char **argv)
 {
-  const string node_name = "sh_standalone_node";
+  const std::string node_name = "sh_standalone_node";
   ros::init(argc, argv, node_name);
 
   // Must call ros::init() before creating the first NodeHandle.
   nh_.reset(new ros::NodeHandle());
   n_tilde_.reset(new ros::NodeHandle("~"));
 
-  string joint_states_topic;
+  std::string joint_states_topic;
   n_tilde_->searchParam("prefix", joint_states_topic);
   joint_states_topic += "/joint_states";
   ROS_INFO_STREAM("joint_states_topic = " << joint_states_topic);
 
-  string tactile_topic;
+  std::string tactile_topic;
   n_tilde_->searchParam("prefix", tactile_topic);
   tactile_topic += "/tactile";
   ROS_INFO_STREAM("tactile_topic = " << tactile_topic);
