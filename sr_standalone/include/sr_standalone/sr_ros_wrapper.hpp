@@ -4,6 +4,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
+#include <boost/thread.hpp>
 
 using namespace std;
 
@@ -22,6 +23,8 @@ protected:
 
   void callback(const sensor_msgs::JointStateConstPtr& msg);
 
+  void spin(void);
+
 public:
   JointStates joint_states_;
   vector<Tactile> tactiles_;
@@ -30,7 +33,12 @@ public:
 
   boost::scoped_ptr<ros::NodeHandle> nh_;
   boost::scoped_ptr<ros::NodeHandle> n_tilde_;
+
   ros::Subscriber joint_states_sub_;
+
+  boost::scoped_ptr<boost::thread> spin_thread_;
+
+  bool time_to_quit_;
 };
 
 } // namespace
