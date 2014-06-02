@@ -43,15 +43,37 @@ void ShadowHand::SrRosWrapper::init(int argc, char **argv)
   joint_states_topic += "/joint_states";
   ROS_INFO_STREAM("joint_states_topic = " << joint_states_topic);
 
-  joint_states_sub_ = nh_->subscribe(joint_states_topic, 2, &SrRosWrapper::callback, this);
+  string tactile_topic;
+  n_tilde_->searchParam("prefix", tactile_topic);
+  tactile_topic += "/tactile";
+  ROS_INFO_STREAM("tactile_topic = " << tactile_topic);
+
+  joint_states_sub_ = nh_->subscribe(joint_states_topic, 1, &SrRosWrapper::joint_state_cb, this);
+  tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
 }
 
-void ShadowHand::SrRosWrapper::callback(const sensor_msgs::JointStateConstPtr& msg)
+void ShadowHand::SrRosWrapper::joint_state_cb(const sensor_msgs::JointStateConstPtr& msg)
 {
   joint_states_.names      = msg->name;
   joint_states_.positions  = msg->position;
   joint_states_.velocities = msg->velocity;
   joint_states_.efforts    = msg->effort;
+}
+
+void ShadowHand::SrRosWrapper::tactile_cb(const sr_robot_msgs::ShadowPSTConstPtr& msg)
+{
+  tactiles_.clear();
+
+  Tactile tactile;
+  tactile.pac0 = msg->pressure[0];
+  tactile.pac1 = msg->pressure[1];
+  tactile.pdc  = msg->pressure[2];
+  tactile.tac  = msg->pressure[3];
+  tactile.tdc  = msg->pressure[4];
+  // ??? How to set ???
+  // tactile.electrodes[19];
+
+  tactiles_.push_back(tactile);
 }
 
 } // namespace

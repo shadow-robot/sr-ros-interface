@@ -16,11 +16,13 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <!-- Dependencies needed to compile this package. -->
+  <build_depend>sr_robot_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>roscpp</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>sr_robot_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roscpp</run_depend>
-  
+
 </package>

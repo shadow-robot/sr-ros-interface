@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_standalone)
-find_package(catkin REQUIRED COMPONENTS sensor_msgs roscpp)
+find_package(catkin REQUIRED COMPONENTS sr_robot_msgs sensor_msgs roscpp)
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 catkin_package(

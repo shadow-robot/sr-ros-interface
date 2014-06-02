@@ -30,6 +30,16 @@ int main(int argc, char** argv)
       std::cout << joints[i] << ", ";
     std::cout << std::endl << std::endl;
 
+    std::cout << "Tactiles:" << std::endl;
+    const std::vector<Tactile> & tactiles = hand.get_tactiles();
+    for (std::size_t i = 0; i < tactiles.size(); ++i)
+      std::cout << tactiles[i].pac0 << ", "
+                << tactiles[i].pac1 << ", "
+                << tactiles[i].pdc  << ", "
+                << tactiles[i].tac  << ", "
+                << tactiles[i].tdc  << std::endl;
+    std::cout << std::endl << std::endl;
+
     std::cout << "Sleeping..." << std::endl << std::endl;
     boost::posix_time::seconds dura(1);
     boost::this_thread::sleep(dura);
