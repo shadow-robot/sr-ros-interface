@@ -5,7 +5,7 @@
 #include <boost/thread.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
-#include <sr_robot_msgs/ShadowPST.h>
+#include <sr_robot_msgs/BiotacAll.h>
 
 namespace shadow_robot_standalone
 {
@@ -21,7 +21,7 @@ protected:
   void init(int argc, char **argv);
 
   void joint_state_cb(const sensor_msgs::JointStateConstPtr& msg);
-  void tactile_cb(const sr_robot_msgs::ShadowPSTConstPtr& msg);
+  void tactile_cb(const sr_robot_msgs::BiotacAllConstPtr& msg);
   void spin(void);
 
 public:

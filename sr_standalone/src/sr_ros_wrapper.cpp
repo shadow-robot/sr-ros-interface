@@ -59,20 +59,25 @@ void ShadowHand::SrRosWrapper::joint_state_cb(const sensor_msgs::JointStateConst
   joint_states_.efforts    = msg->effort;
 }
 
-void ShadowHand::SrRosWrapper::tactile_cb(const sr_robot_msgs::ShadowPSTConstPtr& msg)
+void ShadowHand::SrRosWrapper::tactile_cb(const sr_robot_msgs::BiotacAllConstPtr& msg)
 {
-  tactiles_.clear();
+  //initialise the vector to the correct size if empty (first time)
+  if( tactiles_.empty() )
+    tactiles_.resize( msg->tactiles.size() );
 
-  Tactile tactile;
-  tactile.pac0 = msg->pressure[0];
-  tactile.pac1 = msg->pressure[1];
-  tactile.pdc  = msg->pressure[2];
-  tactile.tac  = msg->pressure[3];
-  tactile.tdc  = msg->pressure[4];
-  // ??? How to set ???
-  // tactile.electrodes[19];
+  //fills the data with the incoming biotacs
+  for( size_t i=0; i < tactiles_.size(); ++i )
+  {
+    tactiles_[i].pac0 = msg->tactiles[i].pac0;
+    tactiles_[i].pac0 = msg->tactiles[i].pac1;
+    tactiles_[i].pac0 = msg->tactiles[i].pdc;
 
-  tactiles_.push_back(tactile);
+    tactiles_[i].pac0 = msg->tactiles[i].tac;
+    tactiles_[i].pac0 = msg->tactiles[i].tdc;
+
+    for( size_t elec_i = 0; elec_i < msg->tactiles[i].electrodes.size(); ++elec_i )
+      tactiles_[i].electrodes[elec_i] = msg->tactiles[i].electrodes[elec_i];
+  }
 }
 
 } // namespace
