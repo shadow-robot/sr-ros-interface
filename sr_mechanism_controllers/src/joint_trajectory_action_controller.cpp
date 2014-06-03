@@ -20,7 +20,7 @@ namespace shadowrobot
   JointTrajectoryActionController::JointTrajectoryActionController()
   {
     action_server = boost::shared_ptr<JTAS> (
-        new JTAS("/r_arm_controller/joint_trajectory_action",
+        new JTAS("r_arm_controller/joint_trajectory_action",
         boost::bind(&JointTrajectoryActionController::execute_trajectory, this, _1),
         false)
     );
@@ -29,6 +29,7 @@ namespace shadowrobot
     //Hand joints
     //TODO: this could be read from the controller manager
     // rosservice call /pr2_controller_manager/list_controllers
+    //the way the controllers publiser are currently advertized works also for prefixed jointnames.
     std::string hand_names[] = {
       "ffj0", "ffj3", "ffj4",
       "lfj0", "lfj3", "lfj4", "lfj5",
@@ -40,10 +41,10 @@ namespace shadowrobot
     for (size_t i = 0; i < 20; i++)
     {
       joint_pub[hand_names[i]] = nh.advertise<std_msgs::Float64>(
-          "/sh_"+hand_names[i]+"_mixed_position_velocity_controller/command", 2);
+          "sh_"+hand_names[i]+"_mixed_position_velocity_controller/command", 2);
 
       joint_pub[ boost::to_upper_copy(hand_names[i]) ] = nh.advertise<std_msgs::Float64>(
-          "/sh_"+hand_names[i]+"_mixed_position_velocity_controller/command", 2);
+          "sh_"+hand_names[i]+"_mixed_position_velocity_controller/command", 2);
     }
 
     //Arm joints
@@ -51,7 +52,7 @@ namespace shadowrobot
     for (size_t i = 0; i < 4; i++)
     {
       joint_pub[arm_names[i]] = nh.advertise<std_msgs::Float64>(
-          "/sa_"+arm_names[i]+"_position_controller/command", 2);
+          "sa_"+arm_names[i]+"_position_controller/command", 2);
     }
 
     //Arm joints: 2 naming conventions
@@ -59,7 +60,7 @@ namespace shadowrobot
     for (size_t i = 0; i < 4; i++)
     {
       joint_pub[arm_names_2[i]] = nh.advertise<std_msgs::Float64>(
-          "/sa_"+arm_names[i]+"_position_controller/command", 2);
+          "sa_"+arm_names[i]+"_position_controller/command", 2);
     }
 
     ROS_DEBUG("Starting JointTrajectoryActionController server");
