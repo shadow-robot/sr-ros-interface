@@ -61,11 +61,16 @@ namespace controller {
     robot_ = robot;
     last_time_ = robot->getTime();
 
-    if( joint_name.substr(3,1).compare("0") == 0)
+    //joint 0s
+    size_t posJ0str = 0;
+    if((posJ0str=joint_name.find("J0"))!=std::string::npos)
     {
       has_j2 = true;
-      std::string j1 = joint_name.substr(0,3) + "1";
-      std::string j2 = joint_name.substr(0,3) + "2";
+      std::string j1(joint_name);
+      j1.replace (posJ0str, 2, "J1");
+      std::string j2(joint_name);
+      j2.replace (posJ0str, 2, "J2");
+
       ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
 
       joint_state_ = robot_->getJointState(j1);
