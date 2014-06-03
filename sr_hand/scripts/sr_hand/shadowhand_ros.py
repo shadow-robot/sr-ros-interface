@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-import roslib; roslib.load_manifest('sr_hand')
 import time
 import os
 import math
@@ -25,10 +24,13 @@ import threading
 import rosgraph.masterapi
 import pr2_controllers_msgs.msg
 from sr_robot_msgs.msg import sendupdate, joint, joints_data, JointControllerState
-from sensor_msgs.msg import *
+from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64
 from sr_hand.grasps_parser import GraspParser
 from sr_hand.grasps_interpoler import GraspInterpoler
+from sr_hand.tactile_receiver import TactileReceiver
+# this is only used to detect if the hand is a Gazebo hand, not to actually reconfigure anything
+from dynamic_reconfigure.msg import Config
 
 class Joint():
     def __init__(self, name="", motor="", min=0, max=90):
@@ -94,6 +96,8 @@ class ShadowHand_ROS():
         self.eth_subscribers = {}
         #rospy.init_node('python_hand_library')
         self.sendupdate_lock = threading.Lock()
+        
+        self.joint_states_lock = threading.Lock()
 
         #contains the ending for the topic depending on which controllers are loaded
         self.topic_ending = ""
@@ -117,7 +121,19 @@ class ShadowHand_ROS():
         self.sub = rospy.Subscriber('srh/shadowhand_data', joints_data ,self.callback)
 
         self.hand_type = self.check_hand_type()
-
+        
+        self.hand_velocity = {}
+        self.hand_effort = {}
+        
+        if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
+            self.joint_states_listener = rospy.Subscriber("joint_states", JointState, self.joint_states_callback)
+            # Initialize the command publishers here, to avoid the delay caused when initializing them in the sendupdate
+            for joint in self.allJoints:
+                if not self.eth_publishers.has_key(joint.name):
+                    topic = "sh_"+ joint.name.lower() + self.topic_ending+"/command"
+                    self.eth_publishers[joint.name] = rospy.Publisher(topic, Float64, latch=True)
+        self.tactile_receiver = TactileReceiver()
+        
         threading.Thread(None, rospy.spin)
 
     def create_grasp_interpoler(self, current_step, next_step):
@@ -195,10 +211,10 @@ class ShadowHand_ROS():
         """
         @return : true if some hand is detected
         """
-        if self.check_etherCAT_hand_presence():
-            return "etherCAT"
-        elif self.check_gazebo_hand_presence():
+        if self.check_gazebo_hand_presence():
             return "gazebo"
+        elif self.check_etherCAT_hand_presence():
+            return "etherCAT"
         elif self.check_CAN_hand_presence():
             return "CANhand"
         return None
@@ -238,7 +254,8 @@ class ShadowHand_ROS():
         @param dicti: Dictionnary containing all the targets to send, mapping the name of the joint to the value of its target
         Sends new targets to the hand from a dictionnary
         """
-        #print(dicti)
+        self.sendupdate_lock.acquire()
+        
         if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             for join in dicti.keys():
 
@@ -254,6 +271,8 @@ class ShadowHand_ROS():
             for join in dicti.keys():
                 message.append(joint(joint_name=join, joint_target=dicti[join]))
             self.pub.publish(sendupdate(len(message), message))
+            
+        self.sendupdate_lock.release()
 
     def sendupdate(self, jointName, angle=0):
         """
@@ -374,6 +393,20 @@ class ShadowHand_ROS():
             self.dict_tar[joint.joint_name] = joint.joint_target
         return self.dict_tar
 
+    def read_all_current_velocities(self):
+        """
+        @return: dictionary mapping joint names to current velocities
+        """
+        with self.joint_states_lock:
+            return self.hand_velocity
+    
+    def read_all_current_efforts(self):
+        """
+        @return: dictionary mapping joint names to current efforts
+        """
+        with self.joint_states_lock:
+            return self.hand_effort
+    
     def read_all_current_arm_positions(self):
         """
         @return: dictionnary mapping joint names to actual positions
@@ -416,6 +449,8 @@ class ShadowHand_ROS():
         Only used to check if a real etherCAT hand is detected in the system
         check if something is being published to this topic, otherwise
         return false
+        Bear in mind that the gazebo hand also publishes the joint_states topic,
+        so we need to check for the gazebo hand first
         """
 
         try:
@@ -434,7 +469,7 @@ class ShadowHand_ROS():
         """
 
         try:
-            rospy.wait_for_message("gazebo/joint_states", JointState, timeout = 0.2)
+            rospy.wait_for_message("gazebo/parameter_updates", Config, timeout = 0.2)
         except:
             return False
 
@@ -446,16 +481,16 @@ class ShadowHand_ROS():
         """
         success = True
         for joint_all in self.allJoints :
-            self.topic_ending = "_mixed_position_velocity_controller"
+            self.topic_ending = "_position_controller"
             topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
             success = True
             try:
-                rospy.wait_for_message(topic, JointControllerState, timeout = 0.2)
+                rospy.wait_for_message(topic, pr2_controllers_msgs.msg.JointControllerState, timeout = 0.2)
             except:
                 try:
-                    self.topic_ending = "_position_controller"
+                    self.topic_ending = "_mixed_position_velocity_controller"
                     topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
-                    rospy.wait_for_message(topic, pr2_controllers_msgs.msg.JointControllerState, timeout = 0.2)
+                    rospy.wait_for_message(topic, JointControllerState, timeout = 0.2)
                 except:
                     success = False
 
@@ -469,3 +504,29 @@ class ShadowHand_ROS():
             return True
 
         return False
+
+    def joint_states_callback(self, joint_state):
+        """
+        The callback function for the topic joint_states.
+        It will store the received joint velocity and effort information in two dictionaries
+        Velocity will be converted to degrees/s.
+        Effort units are kept as they are (currently ADC units, as no calibration is performed on the strain gauges)
+        
+        @param joint_state: the message containing the joints data.
+        """
+        with self.joint_states_lock:  
+            self.hand_velocity = {n:math.degrees(v) for n,v in zip(joint_state.name, joint_state.velocity)}
+            self.hand_effort = {n:e for n,e in zip(joint_state.name, joint_state.effort)}
+    
+            for finger in ['FF', 'MF', 'RF', 'LF']:
+                for dic in [self.hand_velocity, self.hand_effort]:
+                    if (finger + 'J1') in dic and (finger + 'J2') in dic:
+                        dic[finger + 'J0'] = dic[finger + 'J1'] + dic[finger + 'J2']
+                        del dic[finger + 'J1']
+                        del dic[finger + 'J2']
+
+    def get_tactile_type(self):
+        return self.tactile_receiver.get_tactile_type()
+    
+    def get_tactile_state(self):
+        return self.tactile_receiver.get_tactile_state()
