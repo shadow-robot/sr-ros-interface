@@ -127,8 +127,17 @@ void ShadowHand::SrRosWrapper::tactile_cb(const sr_robot_msgs::BiotacAllConstPtr
     tactiles_[i].tac  = msg->tactiles[i].tac;
     tactiles_[i].tdc  = msg->tactiles[i].tdc;
 
-    for( size_t elec_i = 0; elec_i < msg->tactiles[i].electrodes.size(); ++elec_i )
-      tactiles_[i].electrodes[elec_i] = msg->tactiles[i].electrodes[elec_i];
+    if ( Tactile::no_of_electrodes == msg->tactiles[i].electrodes.size() )
+    {
+      for( size_t elec_i = 0; elec_i < msg->tactiles[i].electrodes.size(); ++elec_i )
+        tactiles_[i].electrodes[elec_i] = msg->tactiles[i].electrodes[elec_i];
+    }
+    else
+    {
+      ROS_ERROR_STREAM("Verify the size of msg->tactiles[i].electrodes. \n"
+                       << "It is " << msg->tactiles[i].electrodes.size()
+                       << ", but it should be " << Tactile::no_of_electrodes << ".");
+    }
   }
 }
 
