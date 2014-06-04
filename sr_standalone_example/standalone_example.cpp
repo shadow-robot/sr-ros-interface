@@ -69,11 +69,13 @@ int main(int argc, char** argv)
     }
     std::cout << std::endl << std::endl;
 
+    const std::string joint_name("LFJ0");
+    const double joint_position_target(0.0);
+    hand.send_position(joint_name, joint_position_target);
+
     std::cout << "Sleeping..." << std::endl << std::endl;
     boost::this_thread::sleep( boost::posix_time::seconds(1) );
   }
-
-
 
   return 0;
 }

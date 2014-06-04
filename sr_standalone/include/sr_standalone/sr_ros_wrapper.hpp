@@ -5,11 +5,13 @@
 #include <boost/thread.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
+#include <sr_hand/hand_commander.hpp>
 #include <sr_robot_msgs/ControlType.h>
 #include <sr_robot_msgs/ChangeControlType.h>
 #include <sr_robot_msgs/ChangeControlTypeRequest.h>
 #include <sr_robot_msgs/ChangeControlTypeResponse.h>
 #include <sr_robot_msgs/BiotacAll.h>
+#include <sr_robot_msgs/joint.h>
 
 namespace shadow_robot_standalone
 {
@@ -35,11 +37,14 @@ protected:
   void spin(void);
 
 public:
+
   JointStates joint_states_;
   std::vector<Tactile> tactiles_;
 
   boost::scoped_ptr<ros::NodeHandle> nh_;
   boost::scoped_ptr<ros::NodeHandle> n_tilde_;
+
+  boost::scoped_ptr<shadowrobot::HandCommander> hand_commander_;
 
   ros::Subscriber joint_states_sub_;
   ros::Subscriber tactile_sub_;

@@ -46,6 +46,9 @@ void ShadowHand::SrRosWrapper::init(int argc, char **argv)
   tactile_topic += "/tactile";
   ROS_INFO_STREAM("tactile_topic = " << tactile_topic);
 
+  const std::string ns("");
+  hand_commander_.reset(new shadowrobot::HandCommander(ns));
+
   joint_states_sub_ = nh_->subscribe(joint_states_topic, 1, &SrRosWrapper::joint_state_cb, this);
 
   // The test finger uses a different touch sensor (sr_robot_msgs/ShadowPST).
@@ -105,28 +108,17 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
 
 void ShadowHand::SrRosWrapper::send_position(const std::string &joint_name, double target)
 {
-  for (size_t i = 0; i < joint_states_.names.size(); ++i)
-  {
-    if (joint_states_.names[i] == joint_name)
-    {
-      ROS_INFO_STREAM("Send position target " << target << " to " << joint_name);
-      return;
-    }
-  }
-  ROS_ERROR_STREAM("Failed to send position target " << target << " to " << joint_name);
+  std::vector<sr_robot_msgs::joint> joint_commands;
+  sr_robot_msgs::joint joint_command;
+  joint_command.joint_name   = joint_name;
+  joint_command.joint_target = target;
+  joint_commands.push_back(joint_command);
+  hand_commander_->sendCommands(joint_commands);
 }
 
 void ShadowHand::SrRosWrapper::send_torque(const std::string &joint_name, double target)
 {
-  for (size_t i = 0; i < joint_states_.names.size(); ++i)
-  {
-    if (joint_states_.names[i] == joint_name)
-    {
-      ROS_INFO_STREAM("Send torque target " << target << " to " << joint_name);
-      return;
-    }
-  }
-  ROS_ERROR_STREAM("Failed to send torque target " << target << " to " << joint_name);
+  ROS_INFO_STREAM("ShadowHand::SrRosWrapper::send_torque not yet implemented.");
 }
 
 void ShadowHand::SrRosWrapper::joint_state_cb(const sensor_msgs::JointStateConstPtr& msg)
