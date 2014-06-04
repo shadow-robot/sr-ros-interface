@@ -5,6 +5,10 @@
 #include <boost/thread.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
+#include <sr_robot_msgs/ControlType.h>
+#include <sr_robot_msgs/ChangeControlType.h>
+#include <sr_robot_msgs/ChangeControlTypeRequest.h>
+#include <sr_robot_msgs/ChangeControlTypeResponse.h>
 #include <sr_robot_msgs/BiotacAll.h>
 
 namespace shadow_robot_standalone
@@ -15,6 +19,9 @@ class ShadowHand::SrRosWrapper
 public:
   SrRosWrapper(int argc, char **argv);
   ~SrRosWrapper();
+
+  bool get_control_type(ControlType & current_ctrl_type);
+  bool set_control_type(const ControlType & new_ctrl_type);
 
 protected:
   // fire up the ROS node
@@ -27,8 +34,6 @@ protected:
 public:
   JointStates joint_states_;
   std::vector<Tactile> tactiles_;
-
-  ControlType control_type_;
 
   boost::scoped_ptr<ros::NodeHandle> nh_;
   boost::scoped_ptr<ros::NodeHandle> n_tilde_;

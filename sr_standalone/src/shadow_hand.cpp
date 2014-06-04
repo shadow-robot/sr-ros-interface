@@ -14,14 +14,14 @@ ShadowHand::~ShadowHand()
 {
 }
 
-// *** YI LI ***
-// sr_robot_msgs/msg/ControlType.msg
-// sr_self_test/src/motor_test.cpp
-// void MotorTest::run_test(diagnostic_updater::DiagnosticStatusWrapper& status)
+bool ShadowHand::get_control_type(ControlType & control_type)
+{
+  return ( wrapper_->get_control_type(control_type) );
+}
+
 bool ShadowHand::set_control_type(ControlType control_type)
 {
-  wrapper_->control_type_ = control_type;
-  return true;  // TODO check if control_type was actually set at the ROS side of things
+  return ( wrapper_->set_control_type(control_type) );
 }
 
 void ShadowHand::send_position(const std::string &joint_name, double target)

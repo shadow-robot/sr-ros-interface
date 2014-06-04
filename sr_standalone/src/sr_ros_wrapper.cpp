@@ -4,8 +4,7 @@ namespace shadow_robot_standalone
 {
 
 ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
-  : control_type_(POSITION_PWM),
-    time_to_quit_(false),
+  : time_to_quit_(false),
     ros_spin_rate_(100) // 100 hz
 {
   init(argc, argv);
@@ -49,6 +48,57 @@ void ShadowHand::SrRosWrapper::init(int argc, char **argv)
 
   joint_states_sub_ = nh_->subscribe(joint_states_topic, 1, &SrRosWrapper::joint_state_cb, this);
   tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
+}
+
+bool ShadowHand::SrRosWrapper::get_control_type(ControlType & current_ctrl_type)
+{
+  sr_robot_msgs::ChangeControlType change_ctrl_type;
+  change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::QUERY;
+  if( ros::service::call("realtime_loop/change_control_type", change_ctrl_type) )
+  {
+    if (change_ctrl_type.response.result.control_type == sr_robot_msgs::ControlType::PWM)
+    {
+      current_ctrl_type = POSITION_PWM;
+      return true;
+    }
+    else if (change_ctrl_type.response.result.control_type == sr_robot_msgs::ControlType::FORCE)
+    {
+      current_ctrl_type = EFFORT_TORQUE;
+      return true;
+    }
+  }
+
+  ROS_ERROR_STREAM("Failed to get current control type.");
+  return false;
+}
+
+bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_type)
+{
+  sr_robot_msgs::ChangeControlType change_ctrl_type;
+  if ( new_ctrl_type == POSITION_PWM )
+    change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::PWM;
+  else if ( new_ctrl_type == EFFORT_TORQUE )
+    change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::FORCE;
+  else
+  {
+    ROS_ERROR_STREAM("Unknown control type: " << new_ctrl_type);
+    return false;
+  }
+  if( !ros::service::call("realtime_loop/change_control_type", change_ctrl_type) )
+  {
+    ROS_ERROR_STREAM("Failed to change control type to " << new_ctrl_type);
+    return false;
+  }
+
+  ControlType current_ctrl_type;
+  if ( get_control_type(current_ctrl_type) )
+  {
+    if (current_ctrl_type == new_ctrl_type)
+      return true;
+  }
+
+  ROS_ERROR_STREAM("Failed to change control type to " << new_ctrl_type);
+  return false;
 }
 
 void ShadowHand::SrRosWrapper::joint_state_cb(const sensor_msgs::JointStateConstPtr& msg)

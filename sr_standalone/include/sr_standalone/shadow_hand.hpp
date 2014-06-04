@@ -40,6 +40,16 @@ public:
   ~ShadowHand();
 
   /**
+   * Get the control type currently used on the hand.
+   *
+   * @param control_type Either position control over PWM, or
+   *        effort control over Torque.
+   *
+   * @return true if success.
+   */
+  bool get_control_type(ControlType & control_type);
+
+  /**
    * Set the control type to be used on the hand.
    *
    * @param control_type Either position control over PWM, or
