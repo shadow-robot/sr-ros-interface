@@ -103,6 +103,32 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
   return false;
 }
 
+void ShadowHand::SrRosWrapper::send_position(const std::string &joint_name, double target)
+{
+  for (size_t i = 0; i < joint_states_.names.size(); ++i)
+  {
+    if (joint_states_.names[i] == joint_name)
+    {
+      ROS_INFO_STREAM("Send position target " << target << " to " << joint_name);
+      return;
+    }
+  }
+  ROS_ERROR_STREAM("Failed to send position target " << target << " to " << joint_name);
+}
+
+void ShadowHand::SrRosWrapper::send_torque(const std::string &joint_name, double target)
+{
+  for (size_t i = 0; i < joint_states_.names.size(); ++i)
+  {
+    if (joint_states_.names[i] == joint_name)
+    {
+      ROS_INFO_STREAM("Send torque target " << target << " to " << joint_name);
+      return;
+    }
+  }
+  ROS_ERROR_STREAM("Failed to send torque target " << target << " to " << joint_name);
+}
+
 void ShadowHand::SrRosWrapper::joint_state_cb(const sensor_msgs::JointStateConstPtr& msg)
 {
   joint_states_.names      = msg->name;

@@ -23,6 +23,9 @@ public:
   bool get_control_type(ControlType & current_ctrl_type);
   bool set_control_type(const ControlType & new_ctrl_type);
 
+  void send_position(const std::string &joint_name, double target);
+  void send_torque(const std::string &joint_name, double target);
+
 protected:
   // fire up the ROS node
   void init(int argc, char **argv);
