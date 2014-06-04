@@ -40,6 +40,18 @@ int main(int argc, char** argv)
                 << tactiles[i].tdc  << std::endl;
     std::cout << std::endl << std::endl;
 
+    ControlType ctrl_type = EFFORT_TORQUE;
+    if (hand.set_control_type(ctrl_type))
+      std::cout << "Set control type to EFFORT_TORQUE." << std::endl;
+    else
+      std::cout << "Failed to set control type to EFFORT_TORQUE." << std::endl;
+
+    ctrl_type = POSITION_PWM;
+    if (hand.set_control_type(ctrl_type))
+      std::cout << "Set control type to POSITION_PWM." << std::endl;
+    else
+      std::cout << "Failed to set control type to POSITION_PWM." << std::endl;
+
     std::cout << "Sleeping..." << std::endl << std::endl;
     boost::posix_time::seconds dura(1);
     boost::this_thread::sleep(dura);
