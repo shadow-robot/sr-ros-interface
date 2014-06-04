@@ -34,7 +34,7 @@ int main(int argc, char** argv)
   }
 
   unsigned int counter;
-  for (counter = 0; counter < 10; ++counter);
+  for (counter = 0; counter < 10; ++counter)
   {
     const JointStates & jss = hand.get_joint_states();
 
