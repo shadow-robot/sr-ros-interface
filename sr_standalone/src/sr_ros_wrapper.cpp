@@ -69,11 +69,11 @@ void ShadowHand::SrRosWrapper::tactile_cb(const sr_robot_msgs::BiotacAllConstPtr
   for( size_t i=0; i < tactiles_.size(); ++i )
   {
     tactiles_[i].pac0 = msg->tactiles[i].pac0;
-    tactiles_[i].pac0 = msg->tactiles[i].pac1;
-    tactiles_[i].pac0 = msg->tactiles[i].pdc;
+    tactiles_[i].pac1 = msg->tactiles[i].pac1;
+    tactiles_[i].pdc  = msg->tactiles[i].pdc;
 
-    tactiles_[i].pac0 = msg->tactiles[i].tac;
-    tactiles_[i].pac0 = msg->tactiles[i].tdc;
+    tactiles_[i].tac  = msg->tactiles[i].tac;
+    tactiles_[i].tdc  = msg->tactiles[i].tdc;
 
     for( size_t elec_i = 0; elec_i < msg->tactiles[i].electrodes.size(); ++elec_i )
       tactiles_[i].electrodes[elec_i] = msg->tactiles[i].electrodes[elec_i];
