@@ -47,7 +47,9 @@ void ShadowHand::SrRosWrapper::init(int argc, char **argv)
   ROS_INFO_STREAM("tactile_topic = " << tactile_topic);
 
   joint_states_sub_ = nh_->subscribe(joint_states_topic, 1, &SrRosWrapper::joint_state_cb, this);
-  tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
+
+  // The test finger uses a different touch sensor (sr_robot_msgs/ShadowPST).
+  // tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
 }
 
 bool ShadowHand::SrRosWrapper::get_control_type(ControlType & current_ctrl_type)
