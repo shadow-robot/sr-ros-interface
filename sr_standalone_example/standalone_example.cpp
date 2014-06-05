@@ -15,6 +15,7 @@ int main(int argc, char** argv)
   else
     std::cout << "Failed to set control type to POSITION_PWM." << std::endl;
 
+  // It takes a few seconds to change the control type.
   std::cout << "Sleeping..." << std::endl << std::endl;
   boost::this_thread::sleep( boost::posix_time::seconds(6) );
 
