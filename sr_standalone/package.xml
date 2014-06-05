@@ -10,7 +10,8 @@
   <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
   <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
 
-  <author>Manos Nikolaidis</author>
+  <author email="manos@shadowrobot.com">Manos Nikolaidis</author>
+  <author email="yi@shadowrobot.com">Yi Li</author>
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
