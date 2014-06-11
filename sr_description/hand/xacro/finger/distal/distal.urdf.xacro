@@ -20,9 +20,9 @@
     <link name="${prefix}${link_prefix}distal">
       <inertial>
         <mass value="0.010" />
-        <origin xyz="0 0 0.013" />
-        <inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0"
-        izz="0.0" />
+        <origin xyz="0 0 0.012" />
+        <inertia  ixx="0.001" ixy="0.0"  ixz="0.0"  iyy="0.001"  iyz="0.0"
+        izz="0.00025" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -90,10 +90,10 @@
       </xacro:if> 
       <xacro:unless value="${bio}">
 				<!-- standard distal joint -->
-        <limit lower="0" upper="${M_PI/2}" effort="10"
+        <limit lower="0" upper="${M_PI/2}" effort="2"
           velocity="1.0" />
       </xacro:unless>  
-      <dynamics damping="50.5"/>
+      <dynamics damping="0.1"/>
     </joint>       
             
     <link name="${prefix}${link_prefix}tip">

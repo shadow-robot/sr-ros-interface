@@ -18,8 +18,8 @@
     <link name="${prefix}lfmetacarpal">
       <inertial>
         <origin xyz="0 0 0.04" rpy="0 0 0" />
-        <mass value="0.075" />
-	    <inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0" izz="0.1" />
+        <mass value="0.030" />
+	    <inertia  ixx="0.00545" ixy="0.0"  ixz="0.0"  iyy="0.0056352"  iyz="0.0" izz="0.0004272" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -43,9 +43,9 @@
       <child link="${prefix}lfmetacarpal"/>
       <origin xyz="${reflect*-0.033} 0 0.02071" rpy="0 0 0" />
       <axis xyz="0.573576436 0 ${reflect*0.819152044}" />
-        <limit lower="0" upper="${45/180*M_PI}" effort="10"
+        <limit lower="0" upper="${45/180*M_PI}" effort="2"
       velocity="1.0" />
-      <dynamics damping="50.5"/>
+      <dynamics damping="0.1"/>
     </joint>
 
     <!-- extensions -->

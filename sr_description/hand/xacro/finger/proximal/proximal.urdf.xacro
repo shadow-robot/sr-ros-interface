@@ -17,10 +17,10 @@
   <xacro:macro name="proximal" params="muscle prefix link_prefix joint_prefix parent">
     <link name="${prefix}${link_prefix}proximal">
       <inertial>
-        <mass value="0.014" />
+        <mass value="0.030" />
         <origin xyz="0 0 0.0225" />
-        <inertia  ixx="0.1" ixy="0.0"  ixz="0.0"  iyy="0.1"  iyz="0.0"
-        izz="0.0" />
+        <inertia  ixx="0.003" ixy="0.0"  ixz="0.0"  iyy="0.003"  iyz="0.0"
+        izz="0.0003" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -42,9 +42,9 @@
       <child link="${prefix}${link_prefix}proximal"/>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <axis xyz="1 0 0" />
-      <limit lower="0" upper="${M_PI/2}" effort="10"
+      <limit lower="0" upper="${M_PI/2}" effort="2"
       velocity="1.0"/>
-      <dynamics damping="50.5"/>
+      <dynamics damping="0.1"/>
     </joint>
 
     <!-- extensions -->
