@@ -3,12 +3,11 @@
   <xacro:include filename="$(find sr_description)/arm/xacro/upper_arm/shadowarm_upperarm.transmission.xacro" />
 
   <xacro:macro name="shadowarm_upperarm" params="parent">
-
     <link name="shadowarm_upperarm">
       <inertial>
 	<origin xyz="0 0 0.1845" rpy="0 0 0" />
 	<mass value="2" />
-	<inertia  ixx="0.5" ixy="0.0"  ixz="0.0"  iyy="0.5"  iyz="0.0"  izz="0.1" />
+	<inertia  ixx="0.4" ixy="0.0"  ixz="0.0"  iyy="0.4"  iyz="0.0"  izz="0.05" />
       </inertial>
       <visual>
 	<origin xyz="0 0.067 0" rpy="0 0 0" />
@@ -18,9 +17,9 @@
 	<material name="Grey" />
       </visual>
       <collision>
-	<origin xyz="0 0 0.1845" rpy="0 -${M_PI} 0"/>
+	<origin xyz="0 0 0.16" rpy="0 -${M_PI} 0"/>
 	<geometry name="shadowarm_upperarm_collision">
-	  <box size="0.03 0.03 0.369"/>
+	  <box size="0.170 0.133 0.470"/>
 	</geometry>
       </collision>
     </link>
@@ -35,7 +34,7 @@
       <origin xyz="0 -0.134 0.5305" rpy="0 -${M_PI} 0.0" /> <!-- yaw=-0.026 -->
       <axis xyz="0 -1 0" />
       <limit lower="0" upper="${M_PI/2}" effort="100" velocity="1.0"/>
-      <dynamics damping="50.5"/>
+      <dynamics damping="5.3"/>
     </joint>
 
     <xacro:shadowarm_upperarm_transmission />
