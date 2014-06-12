@@ -8,7 +8,7 @@
         <always_on>1</always_on>
         <update_rate>1000.0</update_rate>
         <contact>
-          <collision>${prefix}thbase_geom</collision>
+          <collision>${prefix}thbase_collision</collision>
           <topic>${prefix}thbase_collision</topic>
         </contact>
         <plugin name="${prefix}thbase_gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">
