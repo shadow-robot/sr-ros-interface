@@ -2,16 +2,16 @@ cmake_minimum_required(VERSION 2.8.3)
 project(sr_hand)
 
 find_package(catkin REQUIRED COMPONENTS rostest roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs control_msgs controller_manager_msgs
-  sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf )#gazebo_msgs)
-#find_package(gazebo REQUIRED)
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} )#${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
+  sr_utilities diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs)
+find_package(gazebo REQUIRED)
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
 catkin_python_setup()
 
 catkin_package(
-    #DEPENDS gazebo
+    DEPENDS gazebo
     CATKIN_DEPENDS roslib roscpp rospy std_msgs std_srvs sensor_msgs sr_robot_msgs control_msgs controller_manager_msgs sr_utilities
-      diagnostic_msgs dynamic_reconfigure self_test urdf #gazebo_msgs
+      diagnostic_msgs dynamic_reconfigure self_test urdf gazebo_msgs
     INCLUDE_DIRS include
     LIBRARIES HandCommander SrVirtual
 )
@@ -169,7 +169,7 @@ else(valves)
   install(TARGETS shadowhand_virtual shadowarm_virtual SrVirtual shadowhand_ethercat HandCommander
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )  
+  )
 endif()
 
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -181,5 +181,5 @@ install(DIRECTORY examples/
 
 install(DIRECTORY launch/
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
-   
+
 install(FILES scripts/sr_hand/grasps.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/sr_hand)
