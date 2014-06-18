@@ -6,22 +6,18 @@ namespace shadow_robot_standalone
 {
 
 ShadowHand::ShadowHand(int argc, char** argv)
-  : wrapper_(new SrRosWrapper(argc, argv))
-{
-}
+  : wrapper_(new SrRosWrapper(argc, argv)){ }
 
-ShadowHand::~ShadowHand()
-{
-}
+ShadowHand::~ShadowHand(){ }
 
 bool ShadowHand::get_control_type(ControlType & control_type)
 {
-  return ( wrapper_->get_control_type(control_type) );
+  return ( wrapper_->get_control_type(control_type));
 }
 
 bool ShadowHand::set_control_type(ControlType control_type)
 {
-  return ( wrapper_->set_control_type(control_type) );
+  return ( wrapper_->set_control_type(control_type));
 }
 
 void ShadowHand::send_position(const std::string &joint_name, double target)
