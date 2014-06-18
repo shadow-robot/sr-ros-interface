@@ -102,8 +102,7 @@ public:
 
 private:
   /*
-   * Pimpl idiom (also called Handle/Body idiom):
-   * for hiding implementation details in the header file.
+   * Pimpl idiom for hiding implementation details in the header file
    */
   class SrRosWrapper; // fwd declaration
   boost::scoped_ptr<SrRosWrapper> wrapper_;
