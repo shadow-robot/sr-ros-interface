@@ -4,6 +4,7 @@
 #include <boost/thread.hpp>
 
 using namespace shadow_robot_standalone;
+using namespace std;
 
 int main(int argc, char** argv)
 {
@@ -11,12 +12,12 @@ int main(int argc, char** argv)
 
   const ControlType new_ctrl_type = POSITION_PWM;
   if (hand.set_control_type(new_ctrl_type))
-    std::cout << "Set control type to POSITION_PWM." << std::endl;
+    cout << "Set control type to POSITION_PWM.\n";
   else
-    std::cout << "Failed to set control type to POSITION_PWM." << std::endl;
+    cout << "Failed to set control type to POSITION_PWM.\n";
 
   // It takes a few seconds to change the control type.
-  std::cout << "Sleeping..." << std::endl << std::endl;
+  cout << "Sleeping...\n\n";
   boost::this_thread::sleep( boost::posix_time::seconds(6) );
 
   ControlType curr_ctrl_type;
@@ -24,13 +25,13 @@ int main(int argc, char** argv)
   {
     if (curr_ctrl_type != new_ctrl_type)
     {
-      std::cout << "Failed to set control type to POSITION_PWM." << std::endl;
+      cout << "Failed to set control type to POSITION_PWM.\n";
       return -1;
     }
   }
   else
   {
-    std::cout << "Failed to get control type." << std::endl;
+    cout << "Failed to get control type.\n";
     return -1;
   }
 
@@ -39,42 +40,42 @@ int main(int argc, char** argv)
   {
     const JointStates & jss = hand.get_joint_states();
 
-    std::cout << "Joint state names:" << std::endl;
-    for (std::size_t i = 0; i < jss.names.size(); ++i)
-      std::cout << jss.names[i] << ", ";
-    std::cout << std::endl << std::endl;
+    cout << "Joint state names:\n";
+    for (size_t i = 0; i < jss.names.size(); ++i)
+      cout << jss.names[i] << ", ";
+    cout << "\n\n";
 
-    std::cout << "Joint state positions:" << std::endl;
-    for (std::size_t i = 0; i < jss.positions.size(); ++i)
-      std::cout << jss.positions[i] << ", ";
-    std::cout << std::endl << std::endl;
+    cout << "Joint state positions:\n";
+    for (size_t i = 0; i < jss.positions.size(); ++i)
+      cout << jss.positions[i] << ", ";
+    cout << "\n\n";
 
-    std::cout << "List of joints:" << std::endl;
-    const std::vector<std::string> & joints = hand.get_list_of_joints();
-    for (std::size_t i = 0; i < joints.size(); ++i)
-      std::cout << joints[i] << ", ";
-    std::cout << std::endl << std::endl;
+    cout << "List of joints:\n";
+    const vector<string> & joints = hand.get_list_of_joints();
+    for (size_t i = 0; i < joints.size(); ++i)
+      cout << joints[i] << ", ";
+    cout << "\n\n";
 
-    std::cout << "Tactiles:" << std::endl;
-    const std::vector<Tactile> & tactiles = hand.get_tactiles();
-    for (std::size_t i = 0; i < tactiles.size(); ++i)
+    cout << "Tactiles:\n";
+    const vector<Tactile> & tactiles = hand.get_tactiles();
+    for (size_t i = 0; i < tactiles.size(); ++i)
     {
-      std::cout << tactiles[i].pac0 << ", "
+      cout << tactiles[i].pac0 << ", "
                 << tactiles[i].pac1 << ", "
                 << tactiles[i].pdc  << ", "
                 << tactiles[i].tac  << ", "
-                << tactiles[i].tdc  << std::endl;
-      for( std::size_t elec_i = 0; elec_i < Tactile::no_of_electrodes; ++elec_i )
-        std::cout << tactiles[i].electrodes[elec_i] << ", ";
-      std::cout << std::endl;
+                << tactiles[i].tdc  << "\n";
+      for( size_t elec_i = 0; elec_i < Tactile::no_of_electrodes; ++elec_i )
+        cout << tactiles[i].electrodes[elec_i] << ", ";
+      cout << "\n";
     }
-    std::cout << std::endl << std::endl;
+    cout << "\n\n";
 
-    const std::string joint_name("LFJ0");
+    const string joint_name("LFJ0");
     const double joint_position_target(0.0);
     hand.send_position(joint_name, joint_position_target);
 
-    std::cout << "Sleeping..." << std::endl << std::endl;
+    cout << "Sleeping...\n\n";
     boost::this_thread::sleep( boost::posix_time::seconds(1) );
   }
 
