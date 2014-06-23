@@ -38,7 +38,6 @@ class ShadowHand
 {
 public:
   ShadowHand(int argc, char** argv);
-  ~ShadowHand();
 
   /**
    * Get the control type currently used on the hand.

@@ -5,30 +5,6 @@ namespace shadow_robot_standalone
 {
 
 ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
-  : time_to_quit_(false),
-  ros_spin_rate_(100) // 100 hz
-{
-  init(argc, argv);
-  spin_thread_.reset(new boost::thread(&ShadowHand::SrRosWrapper::spin, this));
-}
-
-ShadowHand::SrRosWrapper::~SrRosWrapper()
-{
-  time_to_quit_ = true;
-  spin_thread_->join();
-}
-
-void ShadowHand::SrRosWrapper::spin(void)
-{
-  ros::Rate rate(ros_spin_rate_);
-  while (ros::ok() && !time_to_quit_)
-  {
-    ros::spinOnce();
-    rate.sleep();
-  }
-}
-
-void ShadowHand::SrRosWrapper::init(int argc, char **argv)
 {
   const string node_name = "sh_standalone_node";
   ros::init(argc, argv, node_name);
@@ -55,8 +31,15 @@ void ShadowHand::SrRosWrapper::init(int argc, char **argv)
   tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
 }
 
+void ShadowHand::SrRosWrapper::spin(void)
+{
+  if (ros::ok())
+    ros::spinOnce();
+}
+
 bool ShadowHand::SrRosWrapper::get_control_type(ControlType & current_ctrl_type)
 {
+  ros::spinOnce();
   sr_robot_msgs::ChangeControlType change_ctrl_type;
   change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::QUERY;
   if (ros::service::call("realtime_loop/change_control_type", change_ctrl_type))
@@ -94,7 +77,7 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
     ROS_ERROR_STREAM("Failed to change control type to " << new_ctrl_type);
     return false;
   }
-
+  spin();
   ControlType current_ctrl_type;
   if (get_control_type(current_ctrl_type) && current_ctrl_type == new_ctrl_type)
     return true;

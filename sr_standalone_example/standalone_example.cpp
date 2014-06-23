@@ -1,7 +1,6 @@
 #include <sr_standalone/shadow_hand.hpp>
 #include <iostream>
-#include <boost/date_time.hpp>
-#include <boost/thread.hpp>
+#include <time.h>
 
 using namespace shadow_robot_standalone;
 using namespace std;
@@ -18,7 +17,7 @@ int main(int argc, char** argv)
 
   // It takes a few seconds to change the control type.
   cout << "Sleeping...\n\n";
-  boost::this_thread::sleep(boost::posix_time::seconds(6));
+  sleep(6);
 
   ControlType curr_ctrl_type;
   if (!hand.get_control_type(curr_ctrl_type))
@@ -72,7 +71,7 @@ int main(int argc, char** argv)
     hand.send_position(joint_name, joint_position_target);
 
     cout << "Sleeping...\n\n";
-    boost::this_thread::sleep(boost::posix_time::seconds(1));
+    sleep(1);
   }
 
   return 0;
