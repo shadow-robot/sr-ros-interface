@@ -8,6 +8,11 @@ namespace shadow_robot_standalone
 ShadowHand::ShadowHand(int argc, char** argv)
   : wrapper_(new SrRosWrapper(argc, argv)) {}
 
+ShadowHand::~ShadowHand()
+{
+  delete wrapper_;
+}
+
 bool ShadowHand::get_control_type(ControlType & control_type)
 {
   return wrapper_->get_control_type(control_type);
