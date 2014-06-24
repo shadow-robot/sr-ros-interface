@@ -28,10 +28,10 @@ struct Tactile
 };
 
 enum ControlType
-  {
-    POSITION_PWM,
-    EFFORT_TORQUE
-  };
+{
+  POSITION_PWM,
+  EFFORT_TORQUE
+};
 
 class ShadowHand
 {

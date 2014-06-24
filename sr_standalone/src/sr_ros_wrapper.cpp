@@ -1,6 +1,10 @@
 #include "sr_standalone/sr_ros_wrapper.hpp"
 #include <std_msgs/Float64.h>
+#include <pr2_mechanism_msgs/LoadController.h>
+#include <pr2_mechanism_msgs/SwitchController.h>
+#include <boost/algorithm/string/case_conv.hpp>
 using namespace std;
+using boost::algorithm::to_lower_copy;
 
 namespace shadow_robot_standalone
 {
@@ -29,7 +33,17 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv) :
 
   for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
   {
-    string topic_name = "/sh_" + *it + "_effort_controller/command";
+    string pos_ctrl_name = "/sh_" + to_lower_copy(*it) + "_position_controller";
+    pr2_mechanism_msgs::LoadController pos_to_load;
+    pos_to_load.request.name = pos_ctrl_name;
+    ros::service::call("pr2_controller_manager/load_controller", pos_to_load);
+
+    string eff_ctrl_name = "/sh_" + to_lower_copy(*it) + "_effort_controller";
+    pr2_mechanism_msgs::LoadController eff_to_load;
+    eff_to_load.request.name = eff_ctrl_name;
+    ros::service::call("pr2_controller_manager/load_controller", eff_to_load);
+
+    string topic_name = eff_ctrl_name + "/command";
     torque_pubs_[*it] = nh_->advertise<std_msgs::Float64>(topic_name, 1, true);
   }
 }
@@ -81,9 +95,31 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
     return false;
   }
 
+  sleep(3);
+
   ControlType current_ctrl_type;
   if (get_control_type(current_ctrl_type) && current_ctrl_type == new_ctrl_type)
+  {
+    pr2_mechanism_msgs::SwitchController cswitch;
+
+    for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
+    {
+      string pos_ctrl_name = "/sh_" + to_lower_copy(*it) + "_position_controller";
+      string eff_ctrl_name = "/sh_" + to_lower_copy(*it) + "_effort_controller";
+      if (current_ctrl_type == POSITION_PWM)
+      {
+        cswitch.request.start_controllers.push_back(pos_ctrl_name);
+        cswitch.request.stop_controllers.push_back(eff_ctrl_name);
+      }
+      else if (current_ctrl_type == EFFORT_TORQUE)
+      {
+        cswitch.request.start_controllers.push_back(eff_ctrl_name);
+        cswitch.request.stop_controllers.push_back(pos_ctrl_name);
+      }
+      ros::service::call("pr2_controller_manager/switch_controller", cswitch);
+    }
     return true;
+  }
 
   ROS_ERROR_STREAM("Failed to change control type to " << new_ctrl_type);
   return false;
