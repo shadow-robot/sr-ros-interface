@@ -15,10 +15,6 @@ int main(int argc, char** argv)
   else
     cout << "Failed to set control type to POSITION_PWM.\n";
 
-  // It takes a few seconds to change the control type.
-  cout << "Sleeping...\n\n";
-  sleep(6);
-
   ControlType curr_ctrl_type;
   if (!hand.get_control_type(curr_ctrl_type))
   {
