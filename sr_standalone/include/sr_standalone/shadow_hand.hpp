@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/scoped_ptr.hpp>
 
 namespace shadow_robot_standalone
 {
@@ -38,6 +37,7 @@ class ShadowHand
 {
 public:
   ShadowHand(int argc, char** argv);
+  ~ShadowHand();
 
   /**
    * Get the control type currently used on the hand.
@@ -104,7 +104,7 @@ private:
    * Pimpl idiom for hiding implementation details in the header file
    */
   class SrRosWrapper; // fwd declaration
-  boost::scoped_ptr<SrRosWrapper> wrapper_;
+  SrRosWrapper *wrapper_;
 };
 
 } // namespace
