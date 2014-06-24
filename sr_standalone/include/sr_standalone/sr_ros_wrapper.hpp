@@ -2,6 +2,7 @@
 
 #include "sr_standalone/shadow_hand.hpp"
 #include <boost/scoped_ptr.hpp>
+#include <boost/unordered_map.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 #include <sr_hand/hand_commander.hpp>
@@ -17,6 +18,7 @@ namespace shadow_robot_standalone
 
 class ShadowHand::SrRosWrapper
 {
+  friend class ShadowHand;
 public:
   SrRosWrapper(int argc, char **argv);
 
@@ -31,18 +33,17 @@ protected:
   void joint_state_cb(const sensor_msgs::JointStateConstPtr& msg);
   void tactile_cb(const sr_robot_msgs::BiotacAllConstPtr& msg);
 
-public:
-
   JointStates joint_states_;
   std::vector<Tactile> tactiles_;
 
   boost::scoped_ptr<ros::NodeHandle> nh_;
   boost::scoped_ptr<ros::NodeHandle> n_tilde_;
 
-  boost::scoped_ptr<shadowrobot::HandCommander> hand_commander_;
+  shadowrobot::HandCommander hand_commander_;
 
   ros::Subscriber joint_states_sub_;
   ros::Subscriber tactile_sub_;
+  boost::unordered_map<std::string, ros::Publisher> torque_pubs_;
 };
 
 } // namespace

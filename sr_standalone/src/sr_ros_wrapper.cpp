@@ -1,15 +1,15 @@
 #include "sr_standalone/sr_ros_wrapper.hpp"
+#include <std_msgs/Float64.h>
 using namespace std;
 
 namespace shadow_robot_standalone
 {
 
-ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
+ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv) :
+  hand_commander_("")
 {
-  const string node_name = "sh_standalone_node";
-  ros::init(argc, argv, node_name);
-
   // Must call ros::init() before creating the first NodeHandle.
+  ros::init(argc, argv, "sh_standalone_node");
   nh_.reset(new ros::NodeHandle());
   n_tilde_.reset(new ros::NodeHandle("~"));
 
@@ -23,12 +23,15 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
   tactile_topic += "/tactile";
   ROS_INFO_STREAM("tactile_topic = " << tactile_topic);
 
-  const string ns("");
-  hand_commander_.reset(new shadowrobot::HandCommander(ns));
-
   joint_states_sub_ = nh_->subscribe(joint_states_topic, 1, &SrRosWrapper::joint_state_cb, this);
 
   tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
+
+  for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
+  {
+    string topic_name = "/sh_" + *it + "_effort_controller/command";
+    torque_pubs_[*it] = nh_->advertise<std_msgs::Float64>(topic_name, 1, true);
+  }
 }
 
 void ShadowHand::SrRosWrapper::spin(void)
@@ -39,7 +42,7 @@ void ShadowHand::SrRosWrapper::spin(void)
 
 bool ShadowHand::SrRosWrapper::get_control_type(ControlType & current_ctrl_type)
 {
-  ros::spinOnce();
+  spin();
   sr_robot_msgs::ChangeControlType change_ctrl_type;
   change_ctrl_type.request.control_type.control_type = sr_robot_msgs::ControlType::QUERY;
   if (ros::service::call("realtime_loop/change_control_type", change_ctrl_type))
@@ -77,7 +80,7 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
     ROS_ERROR_STREAM("Failed to change control type to " << new_ctrl_type);
     return false;
   }
-  spin();
+
   ControlType current_ctrl_type;
   if (get_control_type(current_ctrl_type) && current_ctrl_type == new_ctrl_type)
     return true;
@@ -93,12 +96,19 @@ void ShadowHand::SrRosWrapper::send_position(const string &joint_name, double ta
   joint_command.joint_name = joint_name;
   joint_command.joint_target = target;
   joint_commands.push_back(joint_command);
-  hand_commander_->sendCommands(joint_commands);
+  hand_commander_.sendCommands(joint_commands);
+  spin();
 }
 
 void ShadowHand::SrRosWrapper::send_torque(const string &joint_name, double target)
 {
-  ROS_INFO_STREAM("ShadowHand::SrRosWrapper::send_torque not yet implemented.");
+  if (torque_pubs_.count(joint_name))
+  {
+    std_msgs::Float64 msg;
+    msg.data = target;
+    torque_pubs_[joint_name].publish(msg);
+  }
+  spin();
 }
 
 void ShadowHand::SrRosWrapper::joint_state_cb(const sensor_msgs::JointStateConstPtr& msg)

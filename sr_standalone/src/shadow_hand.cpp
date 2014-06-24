@@ -10,7 +10,6 @@ ShadowHand::ShadowHand(int argc, char** argv)
 
 bool ShadowHand::get_control_type(ControlType & control_type)
 {
-  wrapper_->spin();
   return wrapper_->get_control_type(control_type);
 }
 
@@ -22,13 +21,11 @@ bool ShadowHand::set_control_type(ControlType control_type)
 void ShadowHand::send_position(const std::string &joint_name, double target)
 {
   wrapper_->send_position(joint_name, target);
-  wrapper_->spin();
 }
 
 void ShadowHand::send_torque(const std::string &joint_name, double target)
 {
   wrapper_->send_torque(joint_name, target);
-  wrapper_->spin();
 }
 
 const JointStates & ShadowHand::get_joint_states() const
