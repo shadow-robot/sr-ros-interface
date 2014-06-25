@@ -39,7 +39,7 @@ protected:
   boost::scoped_ptr<ros::NodeHandle> nh_;
   boost::scoped_ptr<ros::NodeHandle> n_tilde_;
 
-  shadowrobot::HandCommander hand_commander_;
+  boost::scoped_ptr<shadowrobot::HandCommander> hand_commander_;
 
   ros::Subscriber joint_states_sub_;
   ros::Subscriber tactile_sub_;

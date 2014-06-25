@@ -9,8 +9,7 @@ using boost::algorithm::to_lower_copy;
 namespace shadow_robot_standalone
 {
 
-ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv) :
-  hand_commander_("")
+ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
 {
   // Must call ros::init() before creating the first NodeHandle.
   ros::init(argc, argv, "sh_standalone_node");
@@ -30,6 +29,8 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv) :
   joint_states_sub_ = nh_->subscribe(joint_states_topic, 1, &SrRosWrapper::joint_state_cb, this);
 
   tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
+
+  hand_commander_.reset(new shadowrobot::HandCommander());
 
   for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
   {
@@ -51,7 +52,10 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv) :
 void ShadowHand::SrRosWrapper::spin(void)
 {
   if (ros::ok())
+  {
+    ros::Duration(0.01).sleep();
     ros::spinOnce();
+  }
 }
 
 bool ShadowHand::SrRosWrapper::get_control_type(ControlType & current_ctrl_type)
@@ -101,6 +105,7 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
   if (get_control_type(current_ctrl_type) && current_ctrl_type == new_ctrl_type)
   {
     pr2_mechanism_msgs::SwitchController cswitch;
+    cswitch.request.strictness = pr2_mechanism_msgs::SwitchController::Request::STRICT;
 
     for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
     {
@@ -132,7 +137,7 @@ void ShadowHand::SrRosWrapper::send_position(const string &joint_name, double ta
   joint_command.joint_name = joint_name;
   joint_command.joint_target = target;
   joint_commands.push_back(joint_command);
-  hand_commander_.sendCommands(joint_commands);
+  hand_commander_->sendCommands(joint_commands);
   spin();
 }
 
