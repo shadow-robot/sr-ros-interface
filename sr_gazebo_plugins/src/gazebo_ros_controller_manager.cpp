@@ -139,7 +139,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   // The gazebo joints and mechanism joints should match up.
   if (state_ != NULL) // could be NULL if ReadPr2Xml is unsuccessful
   {
-    for (unordered_map<string, JointState>::iterator it = state_->model_.joint_states_.begin(); it != state_->model_.joint_states_.end(); ++it)
+    for (ptr_unordered_map<string, JointState>::iterator it = state_->model_.joint_states_.begin(); it != state_->model_.joint_states_.end(); ++it)
     {
       // fill in gazebo joints pointer
       physics::JointPtr joint = parent_model_->GetJoint(it->first);
@@ -352,10 +352,10 @@ void GazeboRosControllerManager::ReadPr2Xml()
 
     fake_state_->current_time_ = ros::Time(world->GetSimTime().Double());
 
-    unordered_map<string, JointState>::iterator jit = state_->model_.joint_states_.begin();
+    ptr_unordered_map<string, JointState>::iterator jit = state_->model_.joint_states_.begin();
     while (jit != state_->model_.joint_states_.end())
     {
-      jit->second.calibrated_ = fake_calibration_;
+      jit->second->calibrated_ = fake_calibration_;
       ++jit;
     }
   }
