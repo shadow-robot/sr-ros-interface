@@ -29,7 +29,6 @@ public:
   void send_torque(const std::string &joint_name, double target);
   void spin(void);
 
-protected:
   void joint_state_cb(const sensor_msgs::JointStateConstPtr& msg);
   void tactile_cb(const sr_robot_msgs::BiotacAllConstPtr& msg);
 
@@ -39,7 +38,7 @@ protected:
   boost::scoped_ptr<ros::NodeHandle> nh_;
   boost::scoped_ptr<ros::NodeHandle> n_tilde_;
 
-  shadowrobot::HandCommander hand_commander_;
+  boost::scoped_ptr<shadowrobot::HandCommander> hand_commander_;
 
   ros::Subscriber joint_states_sub_;
   ros::Subscriber tactile_sub_;
