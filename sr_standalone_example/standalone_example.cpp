@@ -1,7 +1,6 @@
 #include <sr_standalone/shadow_hand.hpp>
 #include <iostream>
-#include <boost/date_time.hpp>
-#include <boost/thread.hpp>
+#include <time.h>
 
 using namespace shadow_robot_standalone;
 using namespace std;
@@ -16,27 +15,19 @@ int main(int argc, char** argv)
   else
     cout << "Failed to set control type to POSITION_PWM.\n";
 
-  // It takes a few seconds to change the control type.
-  cout << "Sleeping...\n\n";
-  boost::this_thread::sleep( boost::posix_time::seconds(6) );
-
   ControlType curr_ctrl_type;
-  if (hand.get_control_type(curr_ctrl_type))
-  {
-    if (curr_ctrl_type != new_ctrl_type)
-    {
-      cout << "Failed to set control type to POSITION_PWM.\n";
-      return -1;
-    }
-  }
-  else
+  if (!hand.get_control_type(curr_ctrl_type))
   {
     cout << "Failed to get control type.\n";
     return -1;
   }
+  else if (curr_ctrl_type != new_ctrl_type)
+  {
+    cout << "Failed to set control type to POSITION_PWM.\n";
+    return -1;
+  }
 
-  unsigned int counter;
-  for (counter = 0; counter < 10; ++counter)
+  for (size_t counter = 0; counter < 5; ++counter)
   {
     const JointStates & jss = hand.get_joint_states();
 
@@ -61,22 +52,20 @@ int main(int argc, char** argv)
     for (size_t i = 0; i < tactiles.size(); ++i)
     {
       cout << tactiles[i].pac0 << ", "
-                << tactiles[i].pac1 << ", "
-                << tactiles[i].pdc  << ", "
-                << tactiles[i].tac  << ", "
-                << tactiles[i].tdc  << "\n";
-      for( size_t elec_i = 0; elec_i < Tactile::no_of_electrodes; ++elec_i )
+           << tactiles[i].pac1 << ", "
+           << tactiles[i].pdc << ", "
+           << tactiles[i].tac << ", "
+           << tactiles[i].tdc << "\n";
+      for (size_t elec_i = 0; elec_i < Tactile::no_of_electrodes; ++elec_i)
         cout << tactiles[i].electrodes[elec_i] << ", ";
       cout << "\n";
     }
     cout << "\n\n";
 
-    const string joint_name("LFJ0");
-    const double joint_position_target(0.0);
-    hand.send_position(joint_name, joint_position_target);
+    hand.send_position("FFJ3", 0.0);
 
     cout << "Sleeping...\n\n";
-    boost::this_thread::sleep( boost::posix_time::seconds(1) );
+    sleep(1);
   }
 
   return 0;

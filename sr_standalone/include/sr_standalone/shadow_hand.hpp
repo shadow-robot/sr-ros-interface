@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/scoped_ptr.hpp>
 
 namespace shadow_robot_standalone
 {
@@ -29,10 +28,10 @@ struct Tactile
 };
 
 enum ControlType
-  {
-    POSITION_PWM,
-    EFFORT_TORQUE
-  };
+{
+  POSITION_PWM,
+  EFFORT_TORQUE
+};
 
 class ShadowHand
 {
@@ -105,7 +104,7 @@ private:
    * Pimpl idiom for hiding implementation details in the header file
    */
   class SrRosWrapper; // fwd declaration
-  boost::scoped_ptr<SrRosWrapper> wrapper_;
+  SrRosWrapper *wrapper_;
 };
 
 } // namespace
