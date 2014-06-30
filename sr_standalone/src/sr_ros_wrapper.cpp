@@ -30,6 +30,7 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
 
   tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
 
+
   hand_commander_.reset(new shadowrobot::HandCommander());
   
   const char joints[24][5] = {"WRJ2", "WRJ1", "FFJ4", "FFJ3", "FFJ1", "FFJ2", "MFJ4", "MFJ3", "MFJ1",
@@ -47,6 +48,7 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
       ROS_INFO_STREAM("failed " << pos_ctrl_name);
 
     string eff_ctrl_name = "/sh_" + to_lower_copy(joint) + "_effort_controller";
+
     pr2_mechanism_msgs::LoadController eff_to_load;
     eff_to_load.request.name = eff_ctrl_name;
     ros::service::call("pr2_controller_manager/load_controller", eff_to_load);
