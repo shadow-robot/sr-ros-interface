@@ -60,7 +60,7 @@ public:
   bool set_control_type(ControlType control_type);
 
   /**
-   * Send a position target, in radians, to the given joints
+   * Send a position target, in radians, to the given joint's
    * position controller.
    *
    * @param joint_name Name of the joint to control
@@ -69,6 +69,15 @@ public:
   void send_position(const std::string &joint_name, double target);
 
   /**
+   * Send position targets, in radians, to position controllers
+   * of all joints. The order in targets is the same
+   * as in get_list_of_joints()
+   *
+   * @param positions in radians for all joints
+   */
+  void send_all_positions(const std::vector<double> targets);
+  
+  /**
    * Send a torque target, to the given joint.
    *
    * @param joint_name Name of the joint to control
@@ -76,6 +85,14 @@ public:
    */
   void send_torque(const std::string &joint_name, double target);
 
+  /**
+   * Send torque targets, to all joints. The order in targets is the same
+   * as in get_list_of_joints()
+   *
+   * @param torque targets.
+   */
+  void send_all_torques(const std::vector<double> targets);
+  
   /**
    * Retrieves the latest information about the joints.
    * vectors will be empty if nothing has been published

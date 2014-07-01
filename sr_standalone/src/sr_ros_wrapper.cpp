@@ -30,31 +30,25 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
 
   tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
 
-
   hand_commander_.reset(new shadowrobot::HandCommander());
   
-  const char joints[24][5] = {"WRJ2", "WRJ1", "FFJ4", "FFJ3", "FFJ1", "FFJ2", "MFJ4", "MFJ3", "MFJ1",
-                              "MFJ2", "RFJ4", "RFJ3", "RFJ1", "RFJ2", "LFJ5", "LFJ4", "LFJ3", "LFJ1",
-                              "LFJ2", "THJ5", "THJ4", "THJ3", "THJ2", "THJ1"};
-  for (size_t i = 0; i < 24; ++i)
+  for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
   {
-    string joint = joints[i];
-    string pos_ctrl_name = "/sh_" + to_lower_copy(joint) + "_position_controller";
+    if (it->find("J1") != string::npos)
+      continue;
+    
+    string pos_ctrl_name = "/sh_" + to_lower_copy(*it) + "_position_controller";
     pr2_mechanism_msgs::LoadController pos_to_load;
     pos_to_load.request.name = pos_ctrl_name;
-    if (ros::service::call("pr2_controller_manager/load_controller", pos_to_load))
-      ROS_INFO_STREAM("loaded " << pos_ctrl_name);
-    else
-      ROS_INFO_STREAM("failed " << pos_ctrl_name);
+    ros::service::call("pr2_controller_manager/load_controller", pos_to_load);
 
-    string eff_ctrl_name = "/sh_" + to_lower_copy(joint) + "_effort_controller";
-
+    string eff_ctrl_name = "/sh_" + to_lower_copy(*it) + "_effort_controller";
     pr2_mechanism_msgs::LoadController eff_to_load;
     eff_to_load.request.name = eff_ctrl_name;
     ros::service::call("pr2_controller_manager/load_controller", eff_to_load);
 
     string topic_name = eff_ctrl_name + "/command";
-    torque_pubs_[joint] = nh_->advertise<std_msgs::Float64>(topic_name, 1, true);
+    torque_pubs_[*it] = nh_->advertise<std_msgs::Float64>(topic_name, 1, true);
   }
 }
 
@@ -144,22 +138,81 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
 
 void ShadowHand::SrRosWrapper::send_position(const string &joint_name, double target)
 {
-  vector<sr_robot_msgs::joint> joint_commands;
+  if (torque_pubs_.count(joint_name) == 0)
+  {
+    ROS_ERROR_STREAM("Unknown joint name : " << joint_name);
+    return;
+  }
+
   sr_robot_msgs::joint joint_command;
   joint_command.joint_name = joint_name;
-  joint_command.joint_target = target;
-  joint_commands.push_back(joint_command);
-  hand_commander_->sendCommands(joint_commands);
+  joint_command.joint_target = target*(180/M_PI); // convert to degrees
+  hand_commander_->sendCommands(vector<sr_robot_msgs::joint>(1, joint_command));
+  spin();
+}
+
+void ShadowHand::SrRosWrapper::send_all_positions(const vector<double> &targets)
+{
+  if (targets.size() != joint_states_.names.size())
+  {
+    ROS_ERROR_STREAM("targets size should be " << joint_states_.names.size());
+    return;
+  }
+
+  vector<sr_robot_msgs::joint> joint_commands;
+  sr_robot_msgs::joint joint_command;
+
+  vector<string>::const_iterator jit = joint_states_.names.begin();
+  vector<double>::const_iterator tit = targets.begin();
+  while (jit != joint_states_.names.end())
+  {
+    if (jit->substr(2, 2) == "J1")
+      continue;
+
+    joint_command.joint_name = *jit;
+    joint_command.joint_target = *tit*(180/M_PI); // convert to degrees
+    joint_commands.push_back(joint_command);
+    
+    ++jit; ++tit;
+  }
+  hand_commander_->sendCommands(joint_commands); 
   spin();
 }
 
 void ShadowHand::SrRosWrapper::send_torque(const string &joint_name, double target)
 {
-  if (torque_pubs_.count(joint_name))
+  if (!torque_pubs_.count(joint_name))
   {
+    ROS_ERROR_STREAM("Unknown joint name : " << joint_name);
+    return;
+  }
+
+  std_msgs::Float64 msg;
+  msg.data = target;
+  torque_pubs_[joint_name].publish(msg);
+  spin();
+}
+
+void ShadowHand::SrRosWrapper::send_all_torques(const vector<double> &targets)
+{
+  if (targets.size() != joint_states_.names.size())
+  {
+    ROS_ERROR_STREAM("targets size should be " << joint_states_.names.size());
+    return;
+  }
+  
+  vector<string>::const_iterator jit = joint_states_.names.begin();
+  vector<double>::const_iterator tit = targets.begin();
+  while (jit != joint_states_.names.end())
+  {
+    if (jit->substr(2, 2) == "J1")
+      continue;
+    
     std_msgs::Float64 msg;
-    msg.data = target;
-    torque_pubs_[joint_name].publish(msg);
+    msg.data = *tit;
+    torque_pubs_[*jit].publish(msg);
+    
+    ++jit; ++tit;
   }
   spin();
 }

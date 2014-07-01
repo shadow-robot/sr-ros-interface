@@ -22,15 +22,18 @@ class ShadowHand::SrRosWrapper
 public:
   SrRosWrapper(int argc, char **argv);
 
-  bool get_control_type(ControlType & current_ctrl_type);
-  bool set_control_type(const ControlType & new_ctrl_type);
+  bool get_control_type(ControlType &current_ctrl_type);
+  bool set_control_type(const ControlType &new_ctrl_type);
 
   void send_position(const std::string &joint_name, double target);
+  void send_all_positions(const std::vector<double> &targets);
   void send_torque(const std::string &joint_name, double target);
+  void send_all_torques(const std::vector<double> &targets);
   void spin(void);
 
-  void joint_state_cb(const sensor_msgs::JointStateConstPtr& msg);
-  void tactile_cb(const sr_robot_msgs::BiotacAllConstPtr& msg);
+protected:
+  void joint_state_cb(const sensor_msgs::JointStateConstPtr &msg);
+  void tactile_cb(const sr_robot_msgs::BiotacAllConstPtr &msg);
 
   JointStates joint_states_;
   std::vector<Tactile> tactiles_;

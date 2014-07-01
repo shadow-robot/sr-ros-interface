@@ -28,9 +28,19 @@ void ShadowHand::send_position(const std::string &joint_name, double target)
   wrapper_->send_position(joint_name, target);
 }
 
+void ShadowHand::send_all_positions(const std::vector<double> targets)
+{
+  wrapper_->send_all_positions(targets);
+}
+
 void ShadowHand::send_torque(const std::string &joint_name, double target)
 {
   wrapper_->send_torque(joint_name, target);
+}
+
+void ShadowHand::send_all_torques(const std::vector<double> targets)
+{
+  wrapper_->send_all_torques(targets);
 }
 
 const JointStates & ShadowHand::get_joint_states() const
