@@ -31,9 +31,12 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
   tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
 
   hand_commander_.reset(new shadowrobot::HandCommander());
-
+  
   for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
   {
+    if (it->find("J1") != string::npos)
+      continue;
+    
     string pos_ctrl_name = "/sh_" + to_lower_copy(*it) + "_position_controller";
     pr2_mechanism_msgs::LoadController pos_to_load;
     pos_to_load.request.name = pos_ctrl_name;
@@ -121,7 +124,10 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
         cswitch.request.start_controllers.push_back(eff_ctrl_name);
         cswitch.request.stop_controllers.push_back(pos_ctrl_name);
       }
-      ros::service::call("pr2_controller_manager/switch_controller", cswitch);
+      if (ros::service::call("pr2_controller_manager/switch_controller", cswitch))
+        ROS_INFO("switched controllers");
+      else
+        ROS_INFO("failed on switching");
     }
     return true;
   }
@@ -132,22 +138,81 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
 
 void ShadowHand::SrRosWrapper::send_position(const string &joint_name, double target)
 {
-  vector<sr_robot_msgs::joint> joint_commands;
+  if (torque_pubs_.count(joint_name) == 0)
+  {
+    ROS_ERROR_STREAM("Unknown joint name : " << joint_name);
+    return;
+  }
+
   sr_robot_msgs::joint joint_command;
   joint_command.joint_name = joint_name;
-  joint_command.joint_target = target;
-  joint_commands.push_back(joint_command);
-  hand_commander_->sendCommands(joint_commands);
+  joint_command.joint_target = target*(180/M_PI); // convert to degrees
+  hand_commander_->sendCommands(vector<sr_robot_msgs::joint>(1, joint_command));
+  spin();
+}
+
+void ShadowHand::SrRosWrapper::send_all_positions(const vector<double> &targets)
+{
+  if (targets.size() != joint_states_.names.size())
+  {
+    ROS_ERROR_STREAM("targets size should be " << joint_states_.names.size());
+    return;
+  }
+
+  vector<sr_robot_msgs::joint> joint_commands;
+  sr_robot_msgs::joint joint_command;
+
+  vector<string>::const_iterator jit = joint_states_.names.begin();
+  vector<double>::const_iterator tit = targets.begin();
+  while (jit != joint_states_.names.end())
+  {
+    if (jit->substr(2, 2) == "J1")
+      continue;
+
+    joint_command.joint_name = *jit;
+    joint_command.joint_target = *tit*(180/M_PI); // convert to degrees
+    joint_commands.push_back(joint_command);
+    
+    ++jit; ++tit;
+  }
+  hand_commander_->sendCommands(joint_commands); 
   spin();
 }
 
 void ShadowHand::SrRosWrapper::send_torque(const string &joint_name, double target)
 {
-  if (torque_pubs_.count(joint_name))
+  if (!torque_pubs_.count(joint_name))
   {
+    ROS_ERROR_STREAM("Unknown joint name : " << joint_name);
+    return;
+  }
+
+  std_msgs::Float64 msg;
+  msg.data = target;
+  torque_pubs_[joint_name].publish(msg);
+  spin();
+}
+
+void ShadowHand::SrRosWrapper::send_all_torques(const vector<double> &targets)
+{
+  if (targets.size() != joint_states_.names.size())
+  {
+    ROS_ERROR_STREAM("targets size should be " << joint_states_.names.size());
+    return;
+  }
+  
+  vector<string>::const_iterator jit = joint_states_.names.begin();
+  vector<double>::const_iterator tit = targets.begin();
+  while (jit != joint_states_.names.end())
+  {
+    if (jit->substr(2, 2) == "J1")
+      continue;
+    
     std_msgs::Float64 msg;
-    msg.data = target;
-    torque_pubs_[joint_name].publish(msg);
+    msg.data = *tit;
+    torque_pubs_[*jit].publish(msg);
+    
+    ++jit; ++tit;
   }
   spin();
 }

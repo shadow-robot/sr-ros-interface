@@ -62,9 +62,7 @@ int main(int argc, char** argv)
     }
     cout << "\n\n";
 
-    const string joint_name("LFJ0");
-    const double joint_position_target(0.0);
-    hand.send_position(joint_name, joint_position_target);
+    hand.send_position("FFJ3", 0.0);
 
     cout << "Sleeping...\n\n";
     sleep(1);
