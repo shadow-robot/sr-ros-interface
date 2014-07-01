@@ -46,13 +46,12 @@
 
 #include <angles/angles.h>
 #include <urdf/model.h>
-#include <boost/unordered_map.hpp>
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_model;
 using namespace std;
-using boost::unordered_map;
+using boost::ptr_unordered_map;
 
 namespace gazebo {
 
