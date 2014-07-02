@@ -4,7 +4,7 @@
 #include <pr2_mechanism_msgs/SwitchController.h>
 #include <boost/algorithm/string/case_conv.hpp>
 using namespace std;
-using boost::algorithm::to_lower_copy;
+using boost::algorithm::to_upper_copy;
 
 namespace shadow_robot_standalone
 {
@@ -21,34 +21,46 @@ ShadowHand::SrRosWrapper::SrRosWrapper(int argc, char **argv)
   joint_states_topic += "/joint_states";
   ROS_INFO_STREAM("joint_states_topic = " << joint_states_topic);
 
+  string joint0_states_topic;
+  n_tilde_->searchParam("prefix", joint0_states_topic);
+  joint0_states_topic += "joint_0s/joint_states";
+  ROS_INFO_STREAM("joint0_states_topic = " << joint0_states_topic);
+  
   string tactile_topic;
   n_tilde_->searchParam("prefix", tactile_topic);
   tactile_topic += "/tactile";
   ROS_INFO_STREAM("tactile_topic = " << tactile_topic);
 
   joint_states_sub_ = nh_->subscribe(joint_states_topic, 1, &SrRosWrapper::joint_state_cb, this);
+  joint0_states_sub_ = nh_->subscribe(joint0_states_topic, 1, &SrRosWrapper::joint0_state_cb, this);
 
   tactile_sub_ = nh_->subscribe(tactile_topic, 1, &SrRosWrapper::tactile_cb, this);
 
   hand_commander_.reset(new shadowrobot::HandCommander());
   
-  for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
+  string ctrl_joints[] = {
+    "ffj0", "ffj3", "ffj4",
+    "lfj0", "lfj3", "lfj4", "lfj5",
+    "mfj0", "mfj3", "mfj4",
+    "rfj0", "rfj3", "rfj4",
+    "thj1", "thj2", "thj3", "thj4", "thj5",
+    "wrj1", "wrj2"
+  };
+  
+  for (size_t i = 0; i < 20; ++i)
   {
-    if (it->find("J1") != string::npos)
-      continue;
-    
-    string pos_ctrl_name = "/sh_" + to_lower_copy(*it) + "_position_controller";
+    string pos_ctrl_name = "/sh_" + ctrl_joints[i] + "_position_controller";
     pr2_mechanism_msgs::LoadController pos_to_load;
     pos_to_load.request.name = pos_ctrl_name;
     ros::service::call("pr2_controller_manager/load_controller", pos_to_load);
 
-    string eff_ctrl_name = "/sh_" + to_lower_copy(*it) + "_effort_controller";
+    string eff_ctrl_name = "/sh_" + ctrl_joints[i] + "_effort_controller";
     pr2_mechanism_msgs::LoadController eff_to_load;
     eff_to_load.request.name = eff_ctrl_name;
     ros::service::call("pr2_controller_manager/load_controller", eff_to_load);
 
     string topic_name = eff_ctrl_name + "/command";
-    torque_pubs_[*it] = nh_->advertise<std_msgs::Float64>(topic_name, 1, true);
+    torque_pubs_[to_upper_copy(ctrl_joints[i])] = nh_->advertise<std_msgs::Float64>(topic_name, 1, true);
   }
 }
 
@@ -61,7 +73,7 @@ void ShadowHand::SrRosWrapper::spin(void)
   }
 }
 
-bool ShadowHand::SrRosWrapper::get_control_type(ControlType & current_ctrl_type)
+bool ShadowHand::SrRosWrapper::get_control_type(ControlType &current_ctrl_type)
 {
   spin();
   sr_robot_msgs::ChangeControlType change_ctrl_type;
@@ -84,7 +96,7 @@ bool ShadowHand::SrRosWrapper::get_control_type(ControlType & current_ctrl_type)
   return false;
 }
 
-bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_type)
+bool ShadowHand::SrRosWrapper::set_control_type(const ControlType &new_ctrl_type)
 {
   sr_robot_msgs::ChangeControlType change_ctrl_type;
   if (new_ctrl_type == POSITION_PWM)
@@ -110,7 +122,8 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
     pr2_mechanism_msgs::SwitchController cswitch;
     cswitch.request.strictness = pr2_mechanism_msgs::SwitchController::Request::STRICT;
 
-    for (vector<string>::const_iterator it = joint_states_.names.begin(); it != joint_states_.names.end(); ++it)
+    vector<string>::const_iterator it = joint_states_.names.begin();
+    while (it != joint_states_.names.end())
     {
       string pos_ctrl_name = "/sh_" + to_lower_copy(*it) + "_position_controller";
       string eff_ctrl_name = "/sh_" + to_lower_copy(*it) + "_effort_controller";
@@ -128,6 +141,8 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType & new_ctrl_typ
         ROS_INFO("switched controllers");
       else
         ROS_INFO("failed on switching");
+    
+      ++it;
     }
     return true;
   }
@@ -173,7 +188,8 @@ void ShadowHand::SrRosWrapper::send_all_positions(const vector<double> &targets)
     joint_command.joint_target = *tit*(180/M_PI); // convert to degrees
     joint_commands.push_back(joint_command);
     
-    ++jit; ++tit;
+    ++jit;
+    ++tit;
   }
   hand_commander_->sendCommands(joint_commands); 
   spin();
@@ -212,7 +228,8 @@ void ShadowHand::SrRosWrapper::send_all_torques(const vector<double> &targets)
     msg.data = *tit;
     torque_pubs_[*jit].publish(msg);
     
-    ++jit; ++tit;
+    ++jit;
+    ++tit;
   }
   spin();
 }

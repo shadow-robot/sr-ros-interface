@@ -47,7 +47,7 @@ public:
    *
    * @return true if success.
    */
-  bool get_control_type(ControlType & control_type);
+  bool get_control_type(ControlType &control_type);
 
   /**
    * Set the control type to be used on the hand.
@@ -75,7 +75,7 @@ public:
    *
    * @param positions in radians for all joints
    */
-  void send_all_positions(const std::vector<double> targets);
+  void send_all_positions(const std::vector<double> &targets);
   
   /**
    * Send a torque target, to the given joint.
@@ -91,7 +91,7 @@ public:
    *
    * @param torque targets.
    */
-  void send_all_torques(const std::vector<double> targets);
+  void send_all_torques(const std::vector<double> &targets);
   
   /**
    * Retrieves the latest information about the joints.
