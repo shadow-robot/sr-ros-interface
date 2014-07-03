@@ -75,7 +75,7 @@ public:
   /**
    * Send position targets, in radians, to position controllers
    * of all joints. The order in targets is the same
-   * as in get_list_of_joints()
+   * as in response from get_controlled_joints()
    *
    * @param positions in radians for all joints
    */
@@ -91,7 +91,7 @@ public:
 
   /**
    * Send torque targets, to all joints. The order in targets is the same
-   * as in get_list_of_joints()
+   * as in response from get_controlled_joints()
    *
    * @param torque targets.
    */
