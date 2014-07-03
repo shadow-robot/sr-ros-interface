@@ -2,16 +2,20 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace shadow_robot_standalone
 {
 
-struct JointStates
+struct JointState
 {
-  std::vector<std::string> names;
-  std::vector<double> positions;
-  std::vector<double> velocities;
-  std::vector<double> efforts;
+  JointState() :
+    position(), velocity(), effort() {}
+  JointState(double _position, double _velocity, double _effort) :
+    position(_position), velocity(_velocity), effort(_effort) {}
+  double position;
+  double velocity;
+  double effort;
 };
 
 struct Tactile
@@ -36,7 +40,7 @@ enum ControlType
 class ShadowHand
 {
 public:
-  ShadowHand(int argc, char** argv);
+  ShadowHand();
   ~ShadowHand();
 
   /**
@@ -47,7 +51,7 @@ public:
    *
    * @return true if success.
    */
-  bool get_control_type(ControlType &control_type);
+  bool get_control_type(ControlType & control_type);
 
   /**
    * Set the control type to be used on the hand.
@@ -76,7 +80,7 @@ public:
    * @param positions in radians for all joints
    */
   void send_all_positions(const std::vector<double> &targets);
-  
+
   /**
    * Send a torque target, to the given joint.
    *
@@ -92,29 +96,38 @@ public:
    * @param torque targets.
    */
   void send_all_torques(const std::vector<double> &targets);
-  
+
   /**
    * Retrieves the latest information about the joints.
-   * vectors will be empty if nothing has been published
+   * will be empty if nothing has been published
    *
-   * @return Struct containing all the joints positions,
-   *         velocity and effort.
+   * @return map from joint names to struct containing
+   *         joint's position, velocity and effort.
    */
-  const JointStates & get_joint_states() const;
+  std::map<std::string, JointState> & get_joint_states() const;
   /**
    * Retrieves the tactile data from the biotacs.
    *
    * @return A vector of tactiles in the following order:
    *         FF, MF, RF, LF, TH
    */
-  const std::vector<Tactile> & get_tactiles() const;
+  std::vector<Tactile> & get_tactiles() const;
 
   /**
-   * Get a list of all the joint names in the hand.
+   * Get a list of joint names in the hand
+   * that can be controlled
    *
-   * @return vector containing all the hand joint names
+   * @return vector containing joint names
    */
-  const std::vector<std::string> & get_list_of_joints() const;
+  std::vector<std::string> get_controlled_joints() const;
+
+  /**
+   * Get a list of joint names in the hand
+   * for which state is reported
+   *
+   * @return vector containing joint names
+   */
+  std::vector<std::string> get_joints_with_state() const;
 
 private:
   /*
@@ -122,6 +135,10 @@ private:
    */
   class SrRosWrapper; // fwd declaration
   SrRosWrapper *wrapper_;
+  ShadowHand(const ShadowHand& other) {
+  }
+  ShadowHand& operator=(const ShadowHand& other) {
+  }
 };
 
 } // namespace

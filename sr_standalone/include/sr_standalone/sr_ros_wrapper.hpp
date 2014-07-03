@@ -18,9 +18,9 @@ namespace shadow_robot_standalone
 
 class ShadowHand::SrRosWrapper
 {
-  friend class ShadowHand;
+  friend ShadowHand;
 public:
-  SrRosWrapper(int argc, char **argv);
+  SrRosWrapper();
 
   bool get_control_type(ControlType &current_ctrl_type);
   bool set_control_type(const ControlType &new_ctrl_type);
@@ -31,11 +31,12 @@ public:
   void send_all_torques(const std::vector<double> &targets);
   void spin(void);
 
-protected:
   void joint_state_cb(const sensor_msgs::JointStateConstPtr &msg);
+  void joint0_state_cb(const sensor_msgs::JointStateConstPtr &msg);
   void tactile_cb(const sr_robot_msgs::BiotacAllConstPtr &msg);
 
-  JointStates joint_states_;
+protected:
+  std::map<std::string, JointState> joint_states_;
   std::vector<Tactile> tactiles_;
 
   boost::scoped_ptr<ros::NodeHandle> nh_;
@@ -43,7 +44,7 @@ protected:
 
   boost::scoped_ptr<shadowrobot::HandCommander> hand_commander_;
 
-  ros::Subscriber joint_states_sub_;
+  ros::Subscriber joint_states_sub_, joint0_states_sub_;
   ros::Subscriber tactile_sub_;
   boost::unordered_map<std::string, ros::Publisher> torque_pubs_;
 };
