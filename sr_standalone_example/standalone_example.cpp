@@ -1,13 +1,13 @@
 #include <sr_standalone/shadow_hand.hpp>
 #include <iostream>
-#include <time.h>
+#include <unistd.h>
 
 using namespace shadow_robot_standalone;
 using namespace std;
 
 int main(int argc, char** argv)
 {
-  ShadowHand hand(argc, argv);
+  ShadowHand hand;
 
   const ControlType new_ctrl_type = POSITION_PWM;
   if (hand.set_control_type(new_ctrl_type))
@@ -27,46 +27,54 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  for (size_t counter = 0; counter < 10; ++counter)
+  cout << "names of joints with states:\n";
+  vector<string> joints = hand.get_joints_with_state();
+  cout << joints[0];
+  for (size_t i = 1; i < joints.size(); ++i)
+    cout << ", " << joints[i];
+  cout << "\n\n";
+
+  cout << "names of joints that can be controlled:\n";
+  vector<string> controlled_joints = hand.get_controlled_joints();
+  cout << controlled_joints[0];
+  for (size_t i = 1; i < controlled_joints.size(); ++i)
+    cout << ", " << controlled_joints[i];
+  cout << "\n\n";
+
+  for (size_t counter = 0; counter < 5; ++counter)
   {
-    const JointStates & jss = hand.get_joint_states();
+    map<string, JointState> & jss = hand.get_joint_states();
 
-    cout << "Joint state names:\n";
-    for (size_t i = 0; i < jss.names.size(); ++i)
-      cout << jss.names[i] << ", ";
-    cout << "\n\n";
-
-    cout << "Joint state positions:\n";
-    for (size_t i = 0; i < jss.positions.size(); ++i)
-      cout << jss.positions[i] << ", ";
-    cout << "\n\n";
-
-    cout << "List of joints:\n";
-    const vector<string> & joints = hand.get_list_of_joints();
     for (size_t i = 0; i < joints.size(); ++i)
-      cout << joints[i] << ", ";
-    cout << "\n\n";
+    {
+      cout << "Joint with name : " << joints[i] << "\n"
+        << "has position : " << jss[joints[i]].position << "\n"
+        << "velocity : " << jss[joints[i]].velocity << "\n"
+        << "and effort : " << jss[joints[i]].effort << "\n\n";
+    }
 
     cout << "Tactiles:\n";
-    const vector<Tactile> & tactiles = hand.get_tactiles();
+    vector<Tactile> & tactiles = hand.get_tactiles();
     for (size_t i = 0; i < tactiles.size(); ++i)
     {
       cout << tactiles[i].pac0 << ", "
-           << tactiles[i].pac1 << ", "
-           << tactiles[i].pdc << ", "
-           << tactiles[i].tac << ", "
-           << tactiles[i].tdc << "\n";
+        << tactiles[i].pac1 << ", "
+        << tactiles[i].pdc << ", "
+        << tactiles[i].tac << ", "
+        << tactiles[i].tdc << "\n";
       for (size_t elec_i = 0; elec_i < Tactile::no_of_electrodes; ++elec_i)
         cout << tactiles[i].electrodes[elec_i] << ", ";
       cout << "\n";
     }
     cout << "\n\n";
 
-    hand.send_position("FFJ3", 0.0);
-
     cout << "Sleeping...\n\n";
     sleep(1);
   }
+
+  hand.send_position("FFJ3", 0.5);
+  sleep(1);
+  hand.send_position("FFJ3", 0.0);
 
   return 0;
 }
