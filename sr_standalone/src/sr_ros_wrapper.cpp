@@ -7,16 +7,17 @@
 
 using namespace std;
 using boost::algorithm::to_upper_copy;
+static const size_t JOINTS_WITH_STATE = 20;
 
 namespace shadow_robot_standalone
 {
 
-static const string ctrl_joints[] = {"ffj0", "ffj3", "ffj4",
-                                     "lfj0", "lfj3", "lfj4", "lfj5",
-                                     "mfj0", "mfj3", "mfj4",
-                                     "rfj0", "rfj3", "rfj4",
-                                     "thj1", "thj2", "thj3", "thj4", "thj5",
-                                     "wrj1", "wrj2"};
+static const string ctrl_joints[JOINTS_WITH_STATE] = {"ffj0", "ffj3", "ffj4",
+                                                      "lfj0", "lfj3", "lfj4", "lfj5",
+                                                      "mfj0", "mfj3", "mfj4",
+                                                      "rfj0", "rfj3", "rfj4",
+                                                      "thj1", "thj2", "thj3", "thj4", "thj5",
+                                                      "wrj1", "wrj2"};
 
 ShadowHand::SrRosWrapper::SrRosWrapper()
 {
@@ -35,7 +36,7 @@ ShadowHand::SrRosWrapper::SrRosWrapper()
 
   hand_commander_.reset(new shadowrobot::HandCommander());
 
-  for (size_t i = 0; i < sizeof(ctrl_joints); ++i)
+  for (size_t i = 0; i < JOINTS_WITH_STATE; ++i)
   {
     pr2_mechanism_msgs::LoadController pos_to_load;
     pos_to_load.request.name = string("/sh_") + ctrl_joints[i] + "_position_controller";
@@ -108,7 +109,7 @@ bool ShadowHand::SrRosWrapper::set_control_type(const ControlType &new_ctrl_type
     pr2_mechanism_msgs::SwitchController cswitch;
     cswitch.request.strictness = pr2_mechanism_msgs::SwitchController::Request::STRICT;
 
-    for (size_t i = 0; i < sizeof (ctrl_joints); ++i)
+    for (size_t i = 0; i < JOINTS_WITH_STATE; ++i)
     {
       string pos_ctrl_name = "/sh_" + ctrl_joints[i] + "_position_controller";
       string eff_ctrl_name = "/sh_" + ctrl_joints[i] + "_effort_controller";

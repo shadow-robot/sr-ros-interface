@@ -18,7 +18,7 @@ namespace shadow_robot_standalone
 
 class ShadowHand::SrRosWrapper
 {
-  friend ShadowHand;
+  friend class ShadowHand;
 public:
   SrRosWrapper();
 
