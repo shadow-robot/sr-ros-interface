@@ -31,7 +31,7 @@
 import roslib; roslib.load_manifest('sr_example')
 import rospy
 from std_msgs.msg import Float64
-from pr2_controllers_msgs.msg import JointControllerState
+from control_msgs.msg import JointControllerState
 
 parent_name = "ffj3"
 child_name = "mfj3"

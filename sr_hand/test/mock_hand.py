@@ -17,8 +17,9 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ####################################################################
 
-import rospy;
-from pr2_mechanism_msgs.srv import *
+import rospy
+from controller_manager_msgs.srv import ListControllers, ListControllersResponse
+from controller_manager_msgs.msg import ControllerState
 
 class MockHand(object):
     """
@@ -31,14 +32,33 @@ class MockHand(object):
         """
         @brief Construct a new MockHand, setting up ros connections.
         """
-        self.list_srv = rospy.Service('pr2_controller_manager/list_controllers',
+        self.list_srv = rospy.Service('controller_manager/list_controllers',
                 ListControllers, self.list_controllers_cb)
         rospy.loginfo("Started MockHand")
 
     def list_controllers_cb(self, req):
+        cons = ('sh_ffj0_position_controller',
+                'sh_ffj3_position_controller',
+                'sh_ffj4_position_controller',
+                'sh_lfj0_position_controller',
+                'sh_lfj3_position_controller',
+                'sh_lfj4_position_controller',
+                'sh_lfj5_position_controller',
+                'sh_mfj0_position_controller',
+                'sh_mfj3_position_controller',
+                'sh_mfj4_position_controller',
+                'sh_rfj0_position_controller',
+                'sh_rfj3_position_controller',
+                'sh_rfj4_position_controller',
+                'sh_thj1_position_controller',
+                'sh_thj2_position_controller',
+                'sh_thj3_position_controller',
+                'sh_thj4_position_controller',
+                'sh_thj5_position_controller',
+                'sh_wrj1_position_controller',
+                'sh_wrj2_position_controller')
         res = ListControllersResponse()
-        res.controllers = ['sh_ffj0_position_controller', 'sh_ffj3_position_controller', 'sh_ffj4_position_controller', 'sh_lfj0_position_controller', 'sh_lfj3_position_controller', 'sh_lfj4_position_controller', 'sh_lfj5_position_controller', 'sh_mfj0_position_controller', 'sh_mfj3_position_controller', 'sh_mfj4_position_controller', 'sh_rfj0_position_controller', 'sh_rfj3_position_controller', 'sh_rfj4_position_controller', 'sh_thj1_position_controller', 'sh_thj2_position_controller', 'sh_thj3_position_controller', 'sh_thj4_position_controller', 'sh_thj5_position_controller', 'sh_wrj1_position_controller', 'sh_wrj2_position_controller']
-        res.state = ['running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running', 'running']
+        res.controller = [ControllerState(name=c, state='running') for c in cons]
         return res
 
 

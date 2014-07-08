@@ -33,14 +33,14 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhJointPositionController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhJointPositionController, controller_interface::ControllerBase)
 
 using namespace std;
 
 namespace controller {
 
   SrhJointPositionController::SrhJointPositionController()
-    : SrController(), position_deadband(0.015)
+    : position_deadband(0.015)
   {
   }
 
@@ -49,7 +49,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhJointPositionController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
+  bool SrhJointPositionController::init(ros_ethercat_model::RobotState *robot, const std::string &joint_name,
                                         boost::shared_ptr<control_toolbox::Pid> pid_position)
   {
     ROS_DEBUG(" --------- ");
@@ -59,7 +59,6 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     if( joint_name.substr(3,1).compare("0") == 0)
     {
@@ -107,7 +106,7 @@ namespace controller {
     }
 
     //get the min and max value for the current joint:
-    get_min_max( robot_->model_->robot_model_, joint_name );
+    get_min_max( robot_->robot_model_, joint_name );
 
     friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
 
@@ -120,7 +119,7 @@ namespace controller {
     return true;
   }
 
-  bool SrhJointPositionController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhJointPositionController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;
@@ -136,14 +135,14 @@ namespace controller {
       return false;
 
     controller_state_publisher_.reset(
-      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
+      new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
       (node_, "state", 1));
 
     return init(robot, joint_name, pid_position);
   }
 
 
-  void SrhJointPositionController::starting()
+  void SrhJointPositionController::starting(const ros::Time& time)
   {
     if( has_j2 )
       command_ = joint_state_->position_ + joint_state_2->position_;
@@ -202,7 +201,7 @@ namespace controller {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhJointPositionController::update()
+  void SrhJointPositionController::update(const ros::Time& time, const ros::Duration& period)
   {
     if( !has_j2)
     {
@@ -211,9 +210,7 @@ namespace controller {
     }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -241,7 +238,7 @@ namespace controller {
     if( in_deadband )
       error_position = 0.0;
 
-    commanded_effort = pid_controller_position_->computeCommand(-error_position, dt_);
+    commanded_effort = pid_controller_position_->computeCommand(-error_position, period);
 
     //clamp the result to max force
     commanded_effort = min( commanded_effort, (max_force_demand * max_force_factor_) );
@@ -278,7 +275,7 @@ namespace controller {
         }
 
         controller_state_publisher_->msg_.error = error_position;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
         double dummy;
@@ -291,8 +288,6 @@ namespace controller {
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 
   void SrhJointPositionController::read_parameters()

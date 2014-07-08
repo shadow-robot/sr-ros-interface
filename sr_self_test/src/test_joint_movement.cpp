@@ -60,18 +60,9 @@ namespace shadow_robot
     std::string controller_state_topic = hand_commander_->get_controller_state_topic(joint_name);
     std::string controller_state_topic_type = get_ROS_topic_type(controller_state_topic);
     std::string controller_type = "";
-    if(controller_state_topic_type.compare("pr2_controllers_msgs/JointControllerState") == 0)
-    {
-      controller_type = "pr2";
-    }
-    else if(controller_state_topic_type.compare("sr_robot_msgs/JointControllerState") == 0)
+    if(controller_state_topic_type.compare("sr_robot_msgs/JointControllerState") == 0)
     {
       controller_type = "sr";
-    }
-    else
-    {
-      ROS_ERROR_STREAM("Unknown controller state type: " << controller_state_topic_type << " trying to use pr2 type instead");
-      controller_type = "pr2";
     }
 
     mvt_pub_.reset(new shadowrobot::MovementPublisher(joint_name, publish_rate, repetition,
@@ -79,10 +70,10 @@ namespace shadow_robot
                                                       hand_commander ));
     mvt_pub_->add_movement( *mvt_from_img_.get() );
 
-    if(controller_type.compare("pr2") == 0)
+    if(controller_type.compare("sr") == 0)
     {
-      pr2_sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
-                                            &TestJointMovement::pr2_state_cb_, this );
+      sr_sub_state_ = nh_tilde_.subscribe( mvt_pub_->get_subscriber_topic(), nb_mvt_step,
+                                           &TestJointMovement::sr_state_cb_, this );
     }
     else
     {
@@ -93,14 +84,14 @@ namespace shadow_robot
     mvt_pub_->start();
   }
 
-  void TestJointMovement::state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
+  void TestJointMovement::sr_state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
   {
     values[joint_name_ +" position"].push_back(msg->process_value);
     values[joint_name_ +" target"].push_back(msg->set_point);
     values[joint_name_ +" error"].push_back(msg->error);
   }
 
-  void TestJointMovement::pr2_state_cb_(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg)
+  void TestJointMovement::state_cb_(const control_msgs::JointControllerState::ConstPtr& msg)
   {
     values[joint_name_ +" position"].push_back(msg->process_value);
     values[joint_name_ +" target"].push_back(msg->set_point);

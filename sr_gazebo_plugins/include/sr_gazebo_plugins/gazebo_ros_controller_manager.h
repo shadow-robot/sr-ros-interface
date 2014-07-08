@@ -31,7 +31,6 @@
 #define GAZEBO_CONTROLLER_MANAGER_H
 
 #include <vector>
-#include <map>
 
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/Model.hh>
@@ -39,10 +38,10 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/Plugin.hh>
 
-#include "pr2_hardware_interface/hardware_interface.h"
-#include "pr2_controller_manager/controller_manager.h"
-//#include "pr2_gazebo_plugins/SetModelsJointsStates.h"
-#include "pr2_mechanism_model/robot.h"
+#include "ros_ethercat_model/hardware_interface.hpp"
+#include "ros_ethercat_model/ros_ethercat.hpp"
+#include "controller_manager/controller_manager.h"
+#include "ros_ethercat_model/robot_state.hpp"
 #include <tinyxml.h>
 #include <ros/ros.h>
 #undef USE_CBQ
@@ -67,22 +66,20 @@ protected:
   // Inherited from gazebo::Controller
   virtual void UpdateChild();
 
+  virtual void ResetChild();
+
   boost::shared_ptr<shadow_robot::SrSelfTest> self_test_;
 private:
 
   gazebo::physics::ModelPtr parent_model_;
-  pr2_hardware_interface::HardwareInterface hw_;
-  pr2_controller_manager::ControllerManager *cm_;
+  RosEthercat *state_;
+  controller_manager::ControllerManager *cm_;
 
-  /// @todo The fake state helps Gazebo run the transmissions backwards, so
-  ///       that it can figure out what its joints should do based on the
-  ///       actuator values.
-  pr2_mechanism_model::RobotState *fake_state_;
+  /// The fake state helps Gazebo run the transmissions backwards, so
+  /// that it can figure out what its joints should do based on the
+  /// actuator values.
+  ros_ethercat_model::RobotState *fake_state_;
   std::vector<gazebo::physics::JointPtr>  joints_;
-
-  /// \brief Service Call Name
-  //private: ParamT<std::string> *setModelsJointsStatesServiceNameP;
-  //private: std::string setModelsJointsStatesServiceName;
 
   /*
    * \brief read pr2.xml for actuators, and pass tinyxml node to mechanism control node's initXml.
@@ -94,13 +91,6 @@ private:
    */
   ros::NodeHandle* rosnode_;
 
-  /// \brief ros service
-  private: ros::ServiceServer setModelsJointsStatesService;
-
-  ///\brief ros service callback
-  //private: bool setModelsJointsStates(pr2_gazebo_plugins::SetModelsJointsStates::Request &req,
-  //                                    pr2_gazebo_plugins::SetModelsJointsStates::Response &res);
-
   ///\brief ros service callback
   /*
    *  \brief tmp vars for performance checking
@@ -108,8 +98,6 @@ private:
   double wall_start_, sim_start_;
 
   /// \brief set topic name of robot description parameter
-  //ParamT<std::string> *robotParamP;
-  //ParamT<std::string> *robotNamespaceP;
   std::string robotParam;
   std::string robotNamespace;
 
@@ -120,19 +108,24 @@ private:
   private: void ControllerManagerQueueThread();
   private: boost::thread controller_manager_callback_queue_thread_;
 #endif
-  private: void ControllerManagerROSThread();
-  private: boost::thread ros_spinner_thread_;
+  void ControllerManagerROSThread();
+  boost::thread ros_spinner_thread_;
 
   // Pointer to the model
-  private: physics::WorldPtr world;
+  physics::WorldPtr world;
 
   // Pointer to the update event connection
-  private: event::ConnectionPtr updateConnection;
+  event::ConnectionPtr updateConnection;
 
   // subscribe to world stats
-  private: transport::NodePtr node;
-  private: transport::SubscriberPtr statsSub;
-  private: common::Time simTime;
+  transport::NodePtr node;
+  transport::SubscriberPtr statsSub;
+  common::Time simTime;
+
+  // Timing
+  ros::Duration control_period_;
+  ros::Time last_update_sim_time_ros_;
+  ros::Time last_write_sim_time_ros_;
 };
 
 /** \} */

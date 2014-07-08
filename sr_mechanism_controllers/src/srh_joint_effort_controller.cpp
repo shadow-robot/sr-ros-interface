@@ -35,7 +35,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhEffortJointController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhEffortJointController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -51,14 +51,13 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhEffortJointController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name)
+  bool SrhEffortJointController::init(ros_ethercat_model::RobotState *robot, const std::string &joint_name)
   {
     ROS_DEBUG(" --------- ");
     ROS_DEBUG_STREAM("Init: " << joint_name);
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     //joint 0s
     if( joint_name.substr(3,1).compare("0") == 0)
@@ -109,7 +108,7 @@ namespace controller {
     return true;
   }
 
-  bool SrhEffortJointController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhEffortJointController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;
@@ -121,14 +120,14 @@ namespace controller {
     }
 
     controller_state_publisher_.reset(
-      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
+      new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
       (node_, "state", 1));
 
     return init(robot, joint_name);
   }
 
 
-  void SrhEffortJointController::starting()
+  void SrhEffortJointController::starting(const ros::Time& time)
   {
     command_ = 0.0;
     read_parameters();
@@ -165,7 +164,7 @@ namespace controller {
   {
   }
 
-  void SrhEffortJointController::update()
+  void SrhEffortJointController::update(const ros::Time& time, const ros::Duration& period)
   {
     if( !has_j2)
     {
@@ -174,9 +173,7 @@ namespace controller {
     }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -214,7 +211,7 @@ namespace controller {
         //TODO: compute the derivative of the effort.
         controller_state_publisher_->msg_.process_value_dot = -1.0;
         controller_state_publisher_->msg_.error = commanded_effort - joint_state_->measured_effort_;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
         double dummy;
@@ -227,8 +224,6 @@ namespace controller {
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 
   void SrhEffortJointController::read_parameters()

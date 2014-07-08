@@ -27,6 +27,7 @@
 #define _SR_DEADBAND_HPP_
 
 #include <sr_utilities/sr_math_utils.hpp>
+#include <deque>
 
 namespace sr_deadband
 {

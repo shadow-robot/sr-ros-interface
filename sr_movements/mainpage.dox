@@ -28,6 +28,6 @@ Subscribe to \b /sr_movements/inputs to receive the data to calculate MSE.
 - \b publish_rate
 - \b repetition (number of times the movement is repeated)
 - \b nb_step (number of samples taken from the image)
-- \b msg_type (choose from "sr" or "pr2" to indicate whether it's a sr_robot_msgs or pr2_controllers_msgs state topic type)
+- \b msg_type (choose from "sr" or "pr2" to indicate whether it's a sr_robot_msgs or control_msgs state topic type)
 
 */

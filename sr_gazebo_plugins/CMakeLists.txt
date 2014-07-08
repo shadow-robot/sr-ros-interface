@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_gazebo_plugins)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_msgs
-  pr2_msgs geometry_msgs diagnostic_updater diagnostic_msgs angles pr2_hardware_interface sr_hardware_interface pr2_controller_manager
-  pr2_mechanism_model urdf dynamic_reconfigure sr_hardware_interface sr_self_test cmake_modules)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs nav_msgs sensor_msgs ros_ethercat_model
+  geometry_msgs diagnostic_updater diagnostic_msgs angles sr_hardware_interface controller_manager
+  urdf dynamic_reconfigure sr_hardware_interface sr_self_test cmake_modules)
 find_package(TinyXML REQUIRED)
 find_package(PkgConfig)
 find_package(gazebo REQUIRED)
@@ -16,10 +16,10 @@ add_definitions(-fPIC -DSIMULATOR_GAZEBO_GAZEBO_ROS_CAMERA_DYNAMIC_RECONFIGURE)
 
 
 catkin_package(
-    DEPENDS python-numpy opende TinyXML gazebo
-    CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs pr2_msgs geometry_msgs
-      diagnostic_updater diagnostic_msgs angles pr2_hardware_interface sr_hardware_interface pr2_controller_manager urdf
-      pr2_mechanism_model dynamic_reconfigure sr_hardware_interface sr_self_test
+    DEPENDS python-numpy opende TinyXML
+    CATKIN_DEPENDS roscpp rospy std_msgs nav_msgs sensor_msgs geometry_msgs ros_ethercat_model
+      diagnostic_updater diagnostic_msgs angles sr_hardware_interface controller_manager urdf
+      dynamic_reconfigure sr_hardware_interface sr_self_test
     INCLUDE_DIRS include
     LIBRARIES 
 )

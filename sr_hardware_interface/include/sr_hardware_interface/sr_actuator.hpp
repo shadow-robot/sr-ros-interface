@@ -28,15 +28,14 @@
 #define _SR_ACTUATOR_HPP_
 
 #include "sr_hardware_interface/tactile_sensors.hpp"
-#include <pr2_hardware_interface/hardware_interface.h>
+#include <ros_ethercat_model/hardware_interface.hpp>
 
 namespace sr_actuator
 {
-  class SrActuatorState : public pr2_hardware_interface::ActuatorState
+  class SrActuatorState : public ros_ethercat_model::ActuatorState
   {
   public:
     SrActuatorState() :
-      pr2_hardware_interface::ActuatorState(),
       temperature_(0),
       position_unfiltered_(0.0),
       can_msgs_received_(0),
@@ -123,7 +122,6 @@ namespace sr_actuator
   {
   public:
     SrMotorActuatorState() :
-      SrActuatorState(),
       strain_gauge_left_(0),
       strain_gauge_right_(0),
       force_unfiltered_(0.0),
@@ -167,7 +165,7 @@ namespace sr_actuator
   {
   public:
     SrMuscleActuatorState() :
-      SrActuatorState()
+      pressure_(), last_commanded_valve_()
     {}
 
     ///Pressure sensors for each of the two muscles of the actuator
@@ -175,54 +173,22 @@ namespace sr_actuator
     int8_t last_commanded_valve_[2];
   }; //end class SrMuscleActuatorState
 
-  class SrMuscleActuatorCommand : public pr2_hardware_interface::ActuatorCommand
+  class SrMuscleActuatorCommand : public ros_ethercat_model::ActuatorCommand
   {
   public:
     SrMuscleActuatorCommand() :
-      pr2_hardware_interface::ActuatorCommand()
-    {
-      valve_[0] = 0;
-      valve_[1] = 0;
-    }
+      valve_()
+    {}
 
     int8_t valve_[2];
   }; //end class SrMuscleActuatorCommand
 
-
-  class SrGenericActuator : public pr2_hardware_interface::Actuator
-  {
-  public:
-    SrGenericActuator()
-      : pr2_hardware_interface::Actuator()
-    {}
-
-    SrGenericActuator(std::string name)
-      : pr2_hardware_interface::Actuator(name)
-    {}
-
-    //A virtual destructor to make the class polymorphic (the compiler is picky about trying to dynamic_cast non-polymorphic classes)
-    virtual ~SrGenericActuator()
-    {}
-
-    //SrActuatorState state_;
-  }; //end class SrGenericActuator
-
   /**
    * This class defines a Motor actuator (it should be renamed to SrMotorActuator)
    */
-  class SrActuator : public SrGenericActuator
+  class SrActuator : public ros_ethercat_model::Actuator
   {
   public:
-    SrActuator()
-      : SrGenericActuator()
-    {}
-
-    SrActuator(std::string name)
-      : SrGenericActuator(name)
-    {}
-
-    virtual ~SrActuator()
-    {}
 
     SrMotorActuatorState state_;
   }; //end class SrActuator
@@ -230,19 +196,9 @@ namespace sr_actuator
   /**
    * This class defines a Muscle actuator
    */
-  class SrMuscleActuator : public SrGenericActuator
+  class SrMuscleActuator : public ros_ethercat_model::Actuator
   {
   public:
-    SrMuscleActuator()
-      : SrGenericActuator()
-    {}
-
-    SrMuscleActuator(std::string name)
-      : SrGenericActuator(name)
-    {}
-
-    virtual ~SrMuscleActuator()
-    {}
 
     SrMuscleActuatorState state_;
     SrMuscleActuatorCommand command_;

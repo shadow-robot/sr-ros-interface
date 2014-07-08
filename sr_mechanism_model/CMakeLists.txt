@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_mechanism_model)
-find_package(catkin REQUIRED COMPONENTS roscpp sr_hardware_interface pr2_mechanism_model cmake_modules)
+find_package(catkin REQUIRED COMPONENTS roscpp sr_hardware_interface cmake_modules ros_ethercat_model)
 find_package(TinyXML REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
 catkin_package(
     DEPENDS TinyXML
-    CATKIN_DEPENDS roscpp sr_hardware_interface pr2_mechanism_model
+    CATKIN_DEPENDS roscpp sr_hardware_interface ros_ethercat_model
     INCLUDE_DIRS include
     LIBRARIES sr_mechanism_model
 )

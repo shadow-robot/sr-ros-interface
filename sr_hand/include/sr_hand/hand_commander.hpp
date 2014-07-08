@@ -114,7 +114,7 @@ namespace shadowrobot
 
     /**
      * init function for the ethercat hand
-     * It can be called if we know that there's an ethercat hand (pr2_controller_manager running)
+     * It can be called if we know that there's an ethercat hand (controller_manager running)
      */
     void initializeEthercatHand();
 

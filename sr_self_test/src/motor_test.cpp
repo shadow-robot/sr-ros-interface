@@ -27,9 +27,9 @@
 
 #include <boost/algorithm/string.hpp>
 #include "sr_self_test/motor_test.hpp"
-#include <pr2_mechanism_msgs/ListControllers.h>
-#include <pr2_mechanism_msgs/SwitchController.h>
-#include <pr2_mechanism_msgs/LoadController.h>
+#include <controller_manager_msgs/ListControllers.h>
+#include <controller_manager_msgs/SwitchController.h>
+#include <controller_manager_msgs/LoadController.h>
 #include <sr_robot_msgs/ChangeControlType.h>
 #include <std_msgs/Float64.h>
 #include <sstream>
@@ -98,20 +98,20 @@ namespace shadow_robot
 
     std::string current_ctrl, effort_ctrl;
     //list currently running controllers and find the one for effort control
-    pr2_mechanism_msgs::ListControllers list_ctrl;
-    if( ros::service::call("pr2_controller_manager/list_controllers", list_ctrl))
+    controller_manager_msgs::ListControllers list_ctrl;
+    if( ros::service::call("controller_manager/list_controllers", list_ctrl))
     {
-      for (size_t i = 0; i < list_ctrl.response.controllers.size(); ++i)
+      for (size_t i = 0; i < list_ctrl.response.controller.size(); ++i)
       {
-        if( list_ctrl.response.controllers[i].find( joint_name_ ) != std::string::npos )
+        if( list_ctrl.response.controller[i].name.find( joint_name_ ) != std::string::npos )
         {
-          if( list_ctrl.response.state[i].compare( "running" ) == 0 )
+          if( list_ctrl.response.controller[i].state.compare( "running" ) == 0 )
           {
-            current_ctrl = list_ctrl.response.controllers[i];
+            current_ctrl = list_ctrl.response.controller[i].name;
           }
-          if( list_ctrl.response.controllers[i].find( "_effort_controller" ) != std::string::npos )
+          if( list_ctrl.response.controller[i].name.find( "_effort_controller" ) != std::string::npos )
           {
-            effort_ctrl = list_ctrl.response.controllers[i];
+            effort_ctrl = list_ctrl.response.controller[i].name;
           }
         }
       }
@@ -127,9 +127,9 @@ namespace shadow_robot
     if( effort_ctrl.compare("") == 0 )
     {
       effort_ctrl = "sh_"+joint_name_+"_effort_controller";
-      pr2_mechanism_msgs::LoadController load_ctrl;
+      controller_manager_msgs::LoadController load_ctrl;
       load_ctrl.request.name = effort_ctrl;
-      if( !ros::service::call("pr2_controller_manager/load_controller", load_ctrl))
+      if( !ros::service::call("controller_manager/load_controller", load_ctrl))
       {
         status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
                         "Failed to load controller "+load_ctrl.request.name+" - aborting test." );
@@ -137,11 +137,11 @@ namespace shadow_robot
     }
 
     //switching to effort controllers (in PWM -> send direct PWM demand)
-    pr2_mechanism_msgs::SwitchController switch_ctrl;
+    controller_manager_msgs::SwitchController switch_ctrl;
     switch_ctrl.request.start_controllers.push_back(effort_ctrl);
     switch_ctrl.request.stop_controllers.push_back(current_ctrl);
-    switch_ctrl.request.strictness = pr2_mechanism_msgs::SwitchController::Request::BEST_EFFORT;
-    if( !ros::service::call("pr2_controller_manager/switch_controller", switch_ctrl))
+    switch_ctrl.request.strictness = controller_manager_msgs::SwitchController::Request::BEST_EFFORT;
+    if( !ros::service::call("controller_manager/switch_controller", switch_ctrl))
     {
       status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
                       "Failed to switch from controller "+current_ctrl+" to controller "+effort_ctrl +" - aborting test." );
@@ -195,8 +195,8 @@ namespace shadow_robot
 
     switch_ctrl.request.start_controllers.push_back(current_ctrl);
     switch_ctrl.request.stop_controllers.push_back(effort_ctrl);
-    switch_ctrl.request.strictness = pr2_mechanism_msgs::SwitchController::Request::BEST_EFFORT;
-    if( !ros::service::call("pr2_controller_manager/switch_controller", switch_ctrl))
+    switch_ctrl.request.strictness = controller_manager_msgs::SwitchController::Request::BEST_EFFORT;
+    if( !ros::service::call("controller_manager/switch_controller", switch_ctrl))
     {
       status.summary( diagnostic_msgs::DiagnosticStatus::ERROR,
                       "Failed to switch from controller "+effort_ctrl+" to controller "+current_ctrl +" - aborting test." );

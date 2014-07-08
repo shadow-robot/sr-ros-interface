@@ -32,7 +32,7 @@
 
 #include <std_msgs/Float64.h>
 #include "sr_movements/partial_movement.hpp"
-#include <pr2_controllers_msgs/JointControllerState.h>
+#include <control_msgs/JointControllerState.h>
 #include <sr_robot_msgs/JointControllerState.h>
 #include <math.h>
 #include <sr_hand/hand_commander.hpp>
@@ -74,15 +74,15 @@ namespace shadowrobot
      *
      * @param msg the current state of the controller.
      */
-    void calculateErrorCallback(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
+    void sr_calculateErrorCallback(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
 
     /**
-     * Used to listen to a pr2_controller_msgs::JointControllerState
+     * Used to listen to a control_msgs::JointControllerState
      * and calculate the mean square error of every movement repetition
      *
      * @param msg the current state of the controller.
      */
-    void pr2_calculateErrorCallback(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg);
+    void calculateErrorCallback(const control_msgs::JointControllerState::ConstPtr& msg);
 
     /**
      * Allows the user to control the movement step by

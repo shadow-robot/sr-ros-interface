@@ -33,7 +33,7 @@
 
 #include <std_msgs/Float64.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhMuscleJointPositionController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhMuscleJointPositionController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -49,7 +49,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhMuscleJointPositionController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name,
+  bool SrhMuscleJointPositionController::init(ros_ethercat_model::RobotState *robot, const std::string &joint_name,
                                         boost::shared_ptr<control_toolbox::Pid> pid_position)
   {
     ROS_DEBUG(" --------- ");
@@ -59,7 +59,6 @@ namespace controller {
 
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     if( joint_name.substr(3,1).compare("0") == 0)
     {
@@ -107,7 +106,7 @@ namespace controller {
     }
 
     //get the min and max value for the current joint:
-    get_min_max( robot_->model_->robot_model_, joint_name );
+    get_min_max( robot_->robot_model_, joint_name );
 
     friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
 
@@ -120,7 +119,7 @@ namespace controller {
     return true;
   }
 
-  bool SrhMuscleJointPositionController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhMuscleJointPositionController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;
@@ -143,7 +142,7 @@ namespace controller {
   }
 
 
-  void SrhMuscleJointPositionController::starting()
+  void SrhMuscleJointPositionController::starting(const ros::Time& time)
   {
     if( has_j2 )
       command_ = joint_state_->position_ + joint_state_2->position_;
@@ -202,7 +201,7 @@ namespace controller {
     pid_controller_position_->getGains(p,i,d,i_max,i_min);
   }
 
-  void SrhMuscleJointPositionController::update()
+  void SrhMuscleJointPositionController::update(const ros::Time& time, const ros::Duration& period)
   {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];
@@ -214,9 +213,7 @@ namespace controller {
 //    }
 
     assert(robot_ != NULL);
-    ros::Time time = robot_->getTime();
     assert(joint_state_->joint_);
-    dt_= time - last_time_;
 
     if (!initialized_)
     {
@@ -229,8 +226,8 @@ namespace controller {
     }
 
     //IGNORE the following  lines if we don't want to use the pressure sensors data
-    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
-    //ethercat_hardware and pr2_etherCAT main loop
+    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot_state.hpp, controller manager,
+    //ethercat_hardware and ros_etherCAT main loop
     // So we heve encoded the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
     // have any measured effort in the muscle hand anyway).
     // Here we extract the pressure values from joint_state_->measured_effort_ and decode that back into uint16.
@@ -263,7 +260,7 @@ namespace controller {
     //loop rate.
     if(loop_count_ % 50 == 0)
     {
-      double commanded_effort = pid_controller_position_->computeCommand(-error_position, dt_);
+      double commanded_effort = pid_controller_position_->computeCommand(-error_position, period);
 
       //clamp the result to max force
       commanded_effort = min( commanded_effort, max_force_demand );
@@ -278,9 +275,6 @@ namespace controller {
       }
 
       command_acc_ = commanded_effort;
-
-      //We want the last time we updated the PID loop not sent commands.
-      last_time_ = time;
     }
 
     // Drive the joint from the accumulator. This runs at full update speed so
@@ -311,8 +305,8 @@ namespace controller {
 
     //************************************************
     // After doing any computation we consider, we encode the obtained valve commands into joint_state_->commanded_effort_
-    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot.h, controller manager,
-    //ethercat_hardware and pr2_etherCAT main loop
+    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot_state.hpp, controller manager,
+    //ethercat_hardware and ros_etherCAT main loop
     // So the controller encodes the two int8 (that are in fact int4) that contain the valve commands into the double commanded_effort_. (We don't
     // have any real commanded_effort_ in the muscle hand anyway).
 
@@ -356,7 +350,7 @@ namespace controller {
         }
 
         controller_state_publisher_->msg_.error = error_position;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.pseudo_command = command_acc_;
         controller_state_publisher_->msg_.valve_muscle_0 = valve[0];
         controller_state_publisher_->msg_.valve_muscle_1 = valve[1];

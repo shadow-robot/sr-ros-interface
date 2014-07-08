@@ -2,29 +2,29 @@
 
   <class name="sr_mechanism_controllers/SrhFakeJointCalibrationController"
          type="controller::SrhFakeJointCalibrationController"
-         base_class_type="pr2_controller_interface::Controller" />
+         base_class_type="controller_interface::ControllerBase" />
 
   <class name="sr_mechanism_controllers/SrhJointPositionController"
          type="controller::SrhJointPositionController"
-         base_class_type="pr2_controller_interface::Controller" />
+         base_class_type="controller_interface::ControllerBase" />
 
   <class name="sr_mechanism_controllers/SrhEffortJointController"
          type="controller::SrhEffortJointController"
-         base_class_type="pr2_controller_interface::Controller" />
+         base_class_type="controller_interface::ControllerBase" />
 
   <class name="sr_mechanism_controllers/SrhJointVelocityController"
          type="controller::SrhJointVelocityController"
-         base_class_type="pr2_controller_interface::Controller" />
+         base_class_type="controller_interface::ControllerBase" />
 
   <class name="sr_mechanism_controllers/SrhMixedPositionVelocityJointController"
          type="controller::SrhMixedPositionVelocityJointController"
-         base_class_type="pr2_controller_interface::Controller" />
+         base_class_type="controller_interface::ControllerBase" />
 
   <class name="sr_mechanism_controllers/SrhMuscleJointPositionController"
          type="controller::SrhMuscleJointPositionController"
-         base_class_type="pr2_controller_interface::Controller" />
+         base_class_type="controller_interface::ControllerBase" />
          
   <class name="sr_mechanism_controllers/SrhJointMuscleValveController"
          type="controller::SrhJointMuscleValveController"
-         base_class_type="pr2_controller_interface::Controller" />
+         base_class_type="controller_interface::ControllerBase" />
 </library>

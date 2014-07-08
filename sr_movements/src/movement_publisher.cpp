@@ -80,15 +80,10 @@ namespace shadowrobot
     if(controller_type.compare("sr")==0)
     {
       //nb_mvt_step is used to set the size of the buffer
-      sub_ = nh_tilde.subscribe(input, nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
-    }
-    else if(controller_type.compare("pr2")==0)
-    {
-      sub_ = nh_tilde.subscribe(input, nb_mvt_step, &MovementPublisher::pr2_calculateErrorCallback, this);
+      sub_ = nh_tilde.subscribe(input, nb_mvt_step, &MovementPublisher::sr_calculateErrorCallback, this);
     }
     else
     {
-      ROS_WARN_STREAM("Warning: You didn't choose a msg_type to listen. sr_robot_msgs was chosen by default");
       //nb_mvt_step is used to set the size of the buffer
       sub_ = nh_tilde.subscribe(input, nb_mvt_step, &MovementPublisher::calculateErrorCallback, this);
     }
@@ -147,7 +142,7 @@ namespace shadowrobot
     }
   }
 
-  void MovementPublisher::calculateErrorCallback(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
+  void MovementPublisher::sr_calculateErrorCallback(const sr_robot_msgs::JointControllerState::ConstPtr& msg)
   {
     double error = msg->set_point - msg->process_value;
     ROS_DEBUG_STREAM("Error: " << error);
@@ -159,7 +154,7 @@ namespace shadowrobot
     ROS_DEBUG_STREAM("MSe: " << MSError_);
   }
 
-  void MovementPublisher::pr2_calculateErrorCallback(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg)
+  void MovementPublisher::calculateErrorCallback(const control_msgs::JointControllerState::ConstPtr& msg)
   {
     double error = msg->set_point - msg->process_value;
     ROS_DEBUG_STREAM("Error: " << error);

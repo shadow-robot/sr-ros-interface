@@ -50,10 +50,10 @@ namespace shadow_robot
     ros::Subscriber sub_;
     ros::Publisher pub_;
 
+    ros::Subscriber sr_sub_state_;
     ros::Subscriber sub_state_;
-    ros::Subscriber pr2_sub_state_;
-    void state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
-    void pr2_state_cb_(const pr2_controllers_msgs::JointControllerState::ConstPtr& msg);
+    void sr_state_cb_(const sr_robot_msgs::JointControllerState::ConstPtr& msg);
+    void state_cb_(const control_msgs::JointControllerState::ConstPtr& msg);
 
     ros::Subscriber mse_sub_;
     void mse_cb_(const std_msgs::Float64::ConstPtr& msg);

@@ -39,84 +39,38 @@
 
 #include <math.h>
 #include <pluginlib/class_list_macros.h>
-#include "pr2_mechanism_model/robot.h"
+#include "ros_ethercat_model/robot_state.hpp"
 #include "sr_mechanism_model/simple_transmission.h"
 
 #include <sr_hardware_interface/sr_actuator.hpp>
 
-using namespace pr2_hardware_interface;
+using namespace ros_ethercat_model;
 
-PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmission, pr2_mechanism_model::Transmission)
+PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmission, Transmission)
 
 namespace sr_mechanism_model
 {
-  bool SimpleTransmission::initXml(TiXmlElement *elt, pr2_mechanism_model::Robot *robot)
+  bool SimpleTransmission::initXml(TiXmlElement *elt, RobotState *robot)
   {
-    const char *name = elt->Attribute("name");
-    name_ = name ? name : "";
-
-    TiXmlElement *jel = elt->FirstChildElement("joint");
-    const char *joint_name = jel ? jel->Attribute("name") : NULL;
-    if (!joint_name)
-    {
-      ROS_ERROR("SimpleTransmission did not specify joint name");
+    if (!ros_ethercat_model::Transmission::initXml(elt, robot))
       return false;
-    }
-
-    const boost::shared_ptr<const urdf::Joint> joint = robot->robot_model_.getJoint(joint_name);
-    if (!joint)
-    {
-      ROS_ERROR("SimpleTransmission could not find joint named \"%s\"", joint_name);
-      return false;
-    }
-    joint_names_.push_back(joint_name);
 
     TiXmlElement *ael = elt->FirstChildElement("actuator");
-    const char *actuator_name = ael ? ael->Attribute("name") : NULL;
-    pr2_hardware_interface::Actuator *a;
-    if (!actuator_name || (a = robot->getActuator(actuator_name)) == NULL )
+    std::string actuator_name = ael ? ael->Attribute("name") : "";
+    Actuator *a = new sr_actuator::SrActuator();
+    if (actuator_name.empty() || !a)
     {
-      ROS_ERROR("SimpleTransmission could not find actuator named \"%s\"", actuator_name);
+      ROS_ERROR_STREAM("SimpleTransmission could not find actuator named : " << actuator_name);
       return false;
     }
+    robot->actuators_.insert(actuator_name, a);
     a->command_.enable_ = true;
     actuator_names_.push_back(actuator_name);
-
-    mechanical_reduction_ = atof(elt->FirstChildElement("mechanicalReduction")->GetText());
-
-    return true;
-  }
-
-  bool SimpleTransmission::initXml(TiXmlElement *elt)
-  {
-    const char *name = elt->Attribute("name");
-    name_ = name ? name : "";
-
-    TiXmlElement *jel = elt->FirstChildElement("joint");
-    const char *joint_name = jel ? jel->Attribute("name") : NULL;
-    if (!joint_name)
-    {
-      ROS_ERROR("SimpleTransmission did not specify joint name");
-      return false;
-    }
-    joint_names_.push_back(joint_name);
-
-    TiXmlElement *ael = elt->FirstChildElement("actuator");
-    const char *actuator_name = ael ? ael->Attribute("name") : NULL;
-    if (!actuator_name)
-    {
-      ROS_ERROR("SimpleTransmission could not find actuator named \"%s\"", actuator_name);
-      return false;
-    }
-    actuator_names_.push_back(actuator_name);
-
-    mechanical_reduction_ = atof(elt->FirstChildElement("mechanicalReduction")->GetText());
-
     return true;
   }
 
   void SimpleTransmission::propagatePosition(
-    std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
+    std::vector<Actuator*>& as, std::vector<JointState*>& js)
   {
     ROS_DEBUG(" propagate position");
 
@@ -129,46 +83,8 @@ namespace sr_mechanism_model
     ROS_DEBUG("end propagate position");
   }
 
-  void SimpleTransmission::propagatePositionBackwards(
-    std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
-  {
-    ROS_DEBUG(" propagate position bw");
-
-    assert(as.size() == 1);
-    assert(js.size() == 1);
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.position_ = js[0]->position_;
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.velocity_ = js[0]->velocity_;
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.last_measured_effort_ = js[0]->measured_effort_;
-
-    // Update the timing (making sure it's initialized).
-    if (! simulated_actuator_timestamp_initialized_)
-    {
-      // Set the time stamp to zero (it is measured relative to the start time).
-      static_cast<sr_actuator::SrActuator*>(as[0])->state_.sample_timestamp_ = ros::Duration(0);
-
-      // Try to set the start time.  Only then do we claim initialized.
-      if (ros::isStarted())
-      {
-        simulated_actuator_start_time_ = ros::Time::now();
-        simulated_actuator_timestamp_initialized_ = true;
-      }
-    }
-    else
-    {
-      // Measure the time stamp relative to the start time.
-      static_cast<sr_actuator::SrActuator*>(as[0])->state_.sample_timestamp_ = ros::Time::now() - simulated_actuator_start_time_;
-    }
-    // Set the historical (double) timestamp accordingly.
-    static_cast<sr_actuator::SrActuator*>(as[0])->state_.timestamp_ = static_cast<sr_actuator::SrActuator*>(as[0])->state_.sample_timestamp_.toSec();
-
-    // simulate calibration sensors by filling out actuator states
-    this->joint_calibration_simulator_.simulateJointCalibration(js[0],static_cast<sr_actuator::SrActuator*>(as[0]));
-
-    ROS_DEBUG(" end propagate position bw");
-  }
-
   void SimpleTransmission::propagateEffort(
-    std::vector<pr2_mechanism_model::JointState*>& js, std::vector<pr2_hardware_interface::Actuator*>& as)
+    std::vector<JointState*>& js, std::vector<Actuator*>& as)
   {
     ROS_DEBUG(" propagate effort");
 
@@ -178,18 +94,6 @@ namespace sr_mechanism_model
     static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_ = js[0]->commanded_effort_;
 
     ROS_DEBUG("end propagate effort");
-  }
-
-  void SimpleTransmission::propagateEffortBackwards(
-    std::vector<pr2_hardware_interface::Actuator*>& as, std::vector<pr2_mechanism_model::JointState*>& js)
-  {
-    ROS_DEBUG(" propagate effort bw");
-
-    assert(as.size() == 1);
-    assert(js.size() == 1);
-    js[0]->commanded_effort_ = static_cast<sr_actuator::SrActuator*>(as[0])->command_.effort_;
-
-    ROS_DEBUG("end propagate effort bw");
   }
 
 } //end namespace

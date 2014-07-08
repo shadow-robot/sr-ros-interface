@@ -34,12 +34,10 @@
 
 
 
-#include <pr2_controller_interface/controller.h>
 #include <control_toolbox/pid.h>
 #include <boost/thread/condition.hpp>
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Float64.h>
-#include <pr2_controllers_msgs/JointControllerState.h>
 
 
 #include <sr_robot_msgs/SetMixedPositionVelocityPidGains.h>

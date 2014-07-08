@@ -55,7 +55,7 @@ namespace controller
      *
      * @return True if the 2nd init function succeeds.
      */
-    bool init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n);
+    bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
     /**
      * This init funciton is called by the previous init function. It
@@ -66,7 +66,7 @@ namespace controller
      *
      * @return true if initialized.
      */
-    bool init( pr2_mechanism_model::RobotState *robot, const std::string &joint_name);
+    bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name);
 
     /**
      * This method is called when the controller is started. The command is then
@@ -74,13 +74,13 @@ namespace controller
      * you're controlling), so that the first command won't move the joint.
      *
      */
-    virtual void starting();
+    virtual void starting(const ros::Time& time);
 
     /**
-     * Issues commands to the joint. This method is called at 1kHz by the
+     * Issues commands to the joint. This method is called at the specified rate by the
      * main loop.
      */
-    virtual void update();
+    virtual void update(const ros::Time& time, const ros::Duration& period);
   };
 } // namespace
 

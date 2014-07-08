@@ -22,7 +22,7 @@ import rospy
 import rospkg
 import threading
 import rosgraph.masterapi
-import pr2_controllers_msgs.msg
+import control_msgs.msg
 from sr_robot_msgs.msg import sendupdate, joint, joints_data, JointControllerState
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64
@@ -498,7 +498,7 @@ class ShadowHand_ROS():
                 if self.topic_ending == "_mixed_position_velocity_controller":
                     self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, JointControllerState, self.callback_ethercat_states, joint_all.name)
                 else:
-                    self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, pr2_controllers_msgs.msg.JointControllerState, self.callback_ethercat_states, joint_all.name)
+                    self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, control_msgs.msg.JointControllerState, self.callback_ethercat_states, joint_all.name)
 
         if len(self.eth_subscribers) > 0:
             return True

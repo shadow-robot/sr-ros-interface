@@ -31,14 +31,14 @@
 #include <string>
 #include <std_srvs/Empty.h>
 
-PLUGINLIB_EXPORT_CLASS( controller::SrhFakeJointCalibrationController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhFakeJointCalibrationController, controller_interface::ControllerBase)
 
 using namespace std;
 
 namespace controller {
 
   SrhFakeJointCalibrationController::SrhFakeJointCalibrationController()
-    : robot_(NULL), last_publish_time_(0), state_(IS_INITIALIZED),
+    : robot_(NULL), last_publish_time_(0), calibration_state_(IS_INITIALIZED),
       actuator_(NULL), joint_(NULL)
   {
   }
@@ -47,7 +47,7 @@ namespace controller {
   {
   }
 
-  bool SrhFakeJointCalibrationController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhFakeJointCalibrationController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     robot_ = robot;
     node_ = n;
@@ -74,7 +74,7 @@ namespace controller {
       ROS_ERROR("No actuator given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    if (!(actuator_ = robot->model_->getActuator(actuator_name)))
+    if (!(actuator_ = robot->getActuator(actuator_name)))
     {
       ROS_ERROR("Could not find actuator %s (namespace: %s)",
                 actuator_name.c_str(), node_.getNamespace().c_str());
@@ -89,13 +89,6 @@ namespace controller {
       ROS_ERROR("No transmission given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    transmission_ = robot->model_->getTransmission(transmission_name);
-    if (!transmission_)
-    {
-      ROS_ERROR("Could not find transmission %s (namespace: %s)",
-                transmission_name.c_str(), node_.getNamespace().c_str());
-      return false;
-    }
 
     // "Calibrated" topic
     pub_calibrated_.reset(
@@ -105,20 +98,20 @@ namespace controller {
   }
 
 
-  void SrhFakeJointCalibrationController::update()
+  void SrhFakeJointCalibrationController::update(const ros::Time& time, const ros::Duration& period)
   {
     assert(joint_);
     assert(actuator_);
 
-    switch(state_)
+    switch(calibration_state_)
     {
     case IS_INITIALIZED:
-      state_ = BEGINNING;
+      calibration_state_ = BEGINNING;
       break;
     case BEGINNING:
       initialize_pids();
       joint_->calibrated_ = true;
-      state_ = CALIBRATED;
+      calibration_state_ = CALIBRATED;
       //We add the following line to delay for some time the first publish and allow the correct initialization of the subscribers in calibrate.py
       last_publish_time_ = robot_->getTime();
       break;

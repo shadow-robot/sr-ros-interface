@@ -28,7 +28,7 @@
  */
 
 #include <sr_hand/hand_commander.hpp>
-#include <pr2_mechanism_msgs/ListControllers.h>
+#include <controller_manager_msgs/ListControllers.h>
 #include <sr_robot_msgs/sendupdate.h>
 #include <std_msgs/Float64.h>
 #include <boost/algorithm/string.hpp>
@@ -62,9 +62,9 @@ namespace shadowrobot
 
     all_joints = robot_model.joints_;
 
-    //We use the presence of the pr2_controller_manager/list_controllers service to detect that the hand is ethercat
+    //We use the presence of the controller_manager/list_controllers service to detect that the hand is ethercat
     //We look for the manager in the robots namespace (that of node_ not the process).
-    if(ros::service::waitForService(node_.getNamespace() + "/pr2_controller_manager/list_controllers", ros::Duration(TIMEOUT_TO_DETECT_CONTROLLER_MANAGER)))
+    if(ros::service::waitForService(node_.getNamespace() + "/controller_manager/list_controllers", ros::Duration(TIMEOUT_TO_DETECT_CONTROLLER_MANAGER)))
     {
       hand_type = shadowhandRosLib::ETHERCAT;
       initializeEthercatHand();
@@ -86,17 +86,17 @@ namespace shadowrobot
   {
     sr_hand_target_pub_map.clear();
 
-    ros::ServiceClient controller_list_client = node_.serviceClient<pr2_mechanism_msgs::ListControllers>("pr2_controller_manager/list_controllers");
+    ros::ServiceClient controller_list_client = node_.serviceClient<controller_manager_msgs::ListControllers>("controller_manager/list_controllers");
 
-    pr2_mechanism_msgs::ListControllers controller_list;
+    controller_manager_msgs::ListControllers controller_list;
     std::string controlled_joint_name;
 
     controller_list_client.call(controller_list);
-    for (size_t i=0;i<controller_list.response.controllers.size() ;i++ )
+    for (size_t i=0;i<controller_list.response.controller.size() ;i++ )
     {
-      if(controller_list.response.state[i]=="running")
+      if(controller_list.response.controller[i].state=="running")
       {
-        std::string controller = node_.resolveName(controller_list.response.controllers[i]);
+        std::string controller = node_.resolveName(controller_list.response.controller[i].name);
         if (node_.getParam(controller+"/joint", controlled_joint_name))
         {
           ROS_DEBUG("controller %d:%s controls joint %s\n",

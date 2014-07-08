@@ -31,7 +31,7 @@
 #include <std_msgs/Float64.h>
 
 //Register the controller to be able to load it with the controller manager.
-PLUGINLIB_EXPORT_CLASS( controller::SrhExampleController, pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( controller::SrhExampleController, controller_interface::ControllerBase)
 
 using namespace std;
 
@@ -50,7 +50,7 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhExampleController::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n)
+  bool SrhExampleController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     assert(robot);
     node_ = n;
@@ -68,18 +68,17 @@ namespace controller {
     // Feel free to create a different message type, to publish more meaningful
     // information for your controller (cf srh_mixed_position_velocity_controller.cpp)
     controller_state_publisher_.reset(
-      new realtime_tools::RealtimePublisher<pr2_controllers_msgs::JointControllerState>
+      new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
       (node_, "state", 1));
 
     //Calls the 2nd init function to finish initializing
     return init(robot, joint_name);
   }
 
-  bool SrhExampleController::init(pr2_mechanism_model::RobotState *robot, const std::string &joint_name)
+  bool SrhExampleController::init(ros_ethercat_model::RobotState *robot, const std::string &joint_name)
   {
     assert(robot);
     robot_ = robot;
-    last_time_ = robot->getTime();
 
     //We need to store 2 different joint states for the joint 0s:
     // They control the distal and the middle joint with the same control.
@@ -129,7 +128,7 @@ namespace controller {
   }
 
 
-  void SrhExampleController::starting()
+  void SrhExampleController::starting(const ros::Time& time)
   {
     //Here we set the command to be = to the current position
     if( has_j2 ) //if it's *J0, then pos = *J1->pos + *J2->pos
@@ -138,20 +137,16 @@ namespace controller {
       command_ = joint_state_->position_;
   }
 
-  void SrhExampleController::update()
+  void SrhExampleController::update(const ros::Time& time, const ros::Duration& period)
   {
     assert(robot_ != NULL);
     assert(joint_state_->joint_);
-
-    //compute the time difference since last iteration
-    ros::Time time = robot_->getTime();
-    dt_= time - last_time_;
 
     //make sure the controller has been initialised,
     // to avoid sending a crazy command.
     if (!initialized_)
     {
-      starting();
+      starting(time);
 
       initialized_ = true;
     }
@@ -176,7 +171,7 @@ namespace controller {
     //Here I'm simply doing a dummy P controller, with a fixed gain.
     // It can't be used in the real life obviously. That's where you
     // should WRITE YOUR ALGORITHM
-    commanded_effort = 10* error_position;
+    double commanded_effort = 10* error_position;
 
     //Update the commanded effort.
     if( has_j2 ) //The motor in *J0 is attached to the *J2
@@ -203,15 +198,13 @@ namespace controller {
         }
 
         controller_state_publisher_->msg_.error = error_position;
-        controller_state_publisher_->msg_.time_step = dt_.toSec();
+        controller_state_publisher_->msg_.time_step = period.toSec();
         controller_state_publisher_->msg_.command = commanded_effort;
 
         controller_state_publisher_->unlockAndPublish();
       }
     }
     loop_count_++;
-
-    last_time_ = time;
   }
 }
 
