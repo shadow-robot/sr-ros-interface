@@ -283,8 +283,8 @@
   </joint>
   <transmission name="ffmiddle_transmission" type="sr_mechanism_model/J0Transmission">
     <actuator name="FFJ0"/>
-    <joint1 name="FFJ1"/>
-    <joint2 name="FFJ2"/>
+    <joint name="FFJ1"/>
+    <joint name="FFJ2"/>
   </transmission>
   <link name="ffdistal">
     <inertial>
@@ -488,8 +488,8 @@
   </joint>
   <transmission name="mfmiddle_transmission" type="sr_mechanism_model/J0Transmission">
     <actuator name="MFJ0"/>
-    <joint1 name="MFJ1"/>
-    <joint2 name="MFJ2"/>
+    <joint name="MFJ1"/>
+    <joint name="MFJ2"/>
   </transmission>
   <link name="mfdistal">
     <inertial>
@@ -693,8 +693,8 @@
   </joint>
   <transmission name="rfmiddle_transmission" type="sr_mechanism_model/J0Transmission">
     <actuator name="RFJ0"/>
-    <joint1 name="RFJ1"/>
-    <joint2 name="RFJ2"/>
+    <joint name="RFJ1"/>
+    <joint name="RFJ2"/>
   </transmission>
   <link name="rfdistal">
     <inertial>
@@ -945,8 +945,8 @@
   </joint>
   <transmission name="lfmiddle_transmission" type="sr_mechanism_model/J0Transmission">
     <actuator name="LFJ0"/>
-    <joint1 name="LFJ1"/>
-    <joint2 name="LFJ2"/>
+    <joint name="LFJ1"/>
+    <joint name="LFJ2"/>
   </transmission>
   <link name="lfdistal">
     <inertial>
