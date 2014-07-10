@@ -186,14 +186,14 @@ public:
 }; //end class SrMuscleActuatorCommand
 
 /**
- * This class defines a Motor actuator (it should be renamed to SrMotorActuator)
+ * This class defines a Motor actuator
  */
-class SrActuator : public ros_ethercat_model::Actuator
+class SrMotorActuator : public ros_ethercat_model::Actuator
 {
 public:
 
   SrMotorActuatorState state_;
-}; //end class SrActuator
+}; //end class SrMotorActuator
 
 /**
  * This class defines a Muscle actuator
@@ -204,7 +204,7 @@ public:
 
   SrMuscleActuatorState state_;
   SrMuscleActuatorCommand command_;
-}; //end class SrActuator
+}; //end class SrMotorActuator
 }
 
 /* For the emacs weenies in the crowd.

@@ -52,7 +52,7 @@ public:
   boost::shared_ptr<pr2_mechanism_model::Robot> robot;
   boost::shared_ptr<pr2_mechanism_model::RobotState> robot_state;
   boost::shared_ptr<TiXmlDocument> model;
-  boost::shared_ptr<sr_actuator::SrActuator> actuator;
+  boost::shared_ptr<sr_actuator::SrMotorActuator> actuator;
   pr2_mechanism_model::JointState* joint_state;
 };
 

@@ -38,7 +38,7 @@ void TestControllers::init()
   hw = boost::shared_ptr<pr2_hardware_interface::HardwareInterface>( new pr2_hardware_interface::HardwareInterface() );
 
   //add a fake FFJ3 actuator
-  actuator = boost::shared_ptr<sr_actuator::SrActuator>( new sr_actuator::SrActuator("FFJ3") );
+  actuator = boost::shared_ptr<sr_actuator::SrMotorActuator>( new sr_actuator::SrMotorActuator("FFJ3") );
   actuator->state_.is_enabled_ = true;
   hw->addActuator( actuator.get() );
 

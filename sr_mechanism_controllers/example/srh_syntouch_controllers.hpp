@@ -55,7 +55,7 @@ namespace controller
     //publish our joint controller state
     boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointControllerState> > controller_state_publisher_;
 
-    sr_actuator::SrActuator* actuator_;
+    sr_actuator::SrMotorActuator* actuator_;
   };
 } // namespace
 

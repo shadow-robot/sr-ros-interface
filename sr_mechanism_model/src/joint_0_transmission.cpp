@@ -52,7 +52,7 @@ void J0Transmission::propagatePosition(vector<Actuator*>& as, vector<JointState*
   //the size is either 2 or 0 when the joint hasn't been updated yet
   // (joint 0 is composed of the 2 calibrated values: joint 1 and joint 2)
 
-  const SrMotorActuatorState &state = static_cast<SrActuator*>(as[0])->state_;
+  const SrMotorActuatorState &state = static_cast<SrMotorActuator*>(as[0])->state_;
   size_t size = state.calibrated_sensor_values_.size();
   if (size == 2)
   {

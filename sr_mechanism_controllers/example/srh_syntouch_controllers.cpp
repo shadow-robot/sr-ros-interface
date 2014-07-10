@@ -69,7 +69,7 @@ namespace controller {
     }
 
     //init the pointer to the biotacs data, updated at 1kHz
-    actuator_ = static_cast<sr_actuator::SrActuator*>( robot->getActuator( joint_name ) );
+    actuator_ = static_cast<sr_actuator::SrMotorActuator*>( robot->getActuator( joint_name ) );
 
     after_init();
     return true;

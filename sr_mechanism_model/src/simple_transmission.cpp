@@ -60,7 +60,7 @@ bool SimpleTransmission::initXml(TiXmlElement *elt, RobotState *robot)
 
   TiXmlElement *ael = elt->FirstChildElement("actuator");
   string actuator_name = ael ? ael->Attribute("name") : "";
-  Actuator *a = new SrActuator();
+  Actuator *a = new SrMotorActuator();
   if (actuator_name.empty() || !a)
   {
     ROS_ERROR_STREAM("SimpleTransmission could not find actuator named : " << actuator_name);
