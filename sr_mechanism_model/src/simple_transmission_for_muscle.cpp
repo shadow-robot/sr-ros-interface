@@ -45,83 +45,87 @@
 #include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_model;
+using namespace std;
+using namespace sr_actuator;
 
 PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmissionForMuscle, Transmission)
 
 namespace sr_mechanism_model
 {
-  bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, RobotState *robot)
-  {
-    if (!ros_ethercat_model::Transmission::initXml(elt, robot))
-      return false;
 
-    TiXmlElement *ael = elt->FirstChildElement("actuator");
-    std::string actuator_name = ael ? ael->Attribute("name") : "";
-    Actuator *a = new sr_actuator::SrMuscleActuator();
-    if (actuator_name.empty() || !a)
-    {
-      ROS_ERROR_STREAM("SimpleTransmissionForMuscle could not find actuator named : " << actuator_name);
-      return false;
-    }
-    robot->actuators_.insert(actuator_name, a);
-    a->command_.enable_ = true;
-    actuator_names_.push_back(actuator_name);
-    return true;
+bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, RobotState *robot)
+{
+  if (!ros_ethercat_model::Transmission::initXml(elt, robot))
+    return false;
+
+  TiXmlElement *ael = elt->FirstChildElement("actuator");
+  string actuator_name = ael ? ael->Attribute("name") : "";
+  Actuator *a = new SrMuscleActuator();
+  if (actuator_name.empty() || !a)
+  {
+    ROS_ERROR_STREAM("SimpleTransmissionForMuscle could not find actuator named : " << actuator_name);
+    return false;
+  }
+  robot->actuators_.insert(actuator_name, a);
+  a->command_.enable_ = true;
+  actuator_names_.push_back(actuator_name);
+  return true;
+}
+
+void SimpleTransmissionForMuscle::propagatePosition(vector<Actuator*>& as, vector<JointState*>& js)
+{
+  ROS_DEBUG(" propagate position");
+  ROS_ASSERT(as.size() == 1);
+  ROS_ASSERT(js.size() == 1);
+
+  const SrMuscleActuatorState &state = static_cast<SrMuscleActuator*>(as[0])->state_;
+  js[0]->position_ = state.position_;
+  js[0]->velocity_ = state.velocity_;
+
+  // We don't want to define a modified version of JointState, as that would imply using a modified version
+  // of robot_state.hpp, controller manager, ethercat_hardware and ros_etherCAT main loop
+  // So we will encode the two uint16_t that contain the data from the muscle pressure sensors
+  // into the double measured_effort_. (We don't have any measured effort in the muscle hand anyway).
+  // Then in the joint controller we will decode that back into uint16_t.
+  js[0]->measured_effort_ = ((double) (state.pressure_[1]) * 0x10000) + (double) (state.pressure_[0]);
+
+  ROS_DEBUG("end propagate position");
+}
+
+void SimpleTransmissionForMuscle::propagateEffort(vector<JointState*>& js, vector<Actuator*>& as)
+{
+  ROS_DEBUG(" propagate effort");
+  ROS_ASSERT(as.size() == 1);
+  ROS_ASSERT(js.size() == 1);
+
+  SrMuscleActuatorCommand &command = static_cast<SrMuscleActuator*>(as[0])->command_;
+  command.enable_ = true;
+
+  // We don't want to define a modified version of JointState, as that would imply using a modified version
+  // of robot_state.hpp, controller manager, ethercat_hardware and ros_etherCAT main loop
+  // So the controller encodes the two int16 that contain the valve commands into the double effort_.
+  // (We don't have any real commanded_effort_ in the muscle hand anyway).
+  // Here we decode them back into two int16_t.
+  double valve_0 = fmod(js[0]->commanded_effort_, 0x10);
+  int8_t valve_0_tmp = (int8_t) (valve_0 + 0.5);
+  if (valve_0_tmp >= 8)
+  {
+    valve_0_tmp -= 8;
+    valve_0_tmp *= (-1);
   }
 
-  void SimpleTransmissionForMuscle::propagatePosition(
-    std::vector<Actuator*>& as, std::vector<JointState*>& js)
+  int8_t valve_1_tmp = (int8_t) (((fmod(js[0]->commanded_effort_, 0x100) - valve_0) / 0x10) + 0.5);
+  if (valve_1_tmp >= 8)
   {
-    ROS_DEBUG(" propagate position");
-
-    assert(as.size() == 1);
-    assert(js.size() == 1);
-    js[0]->position_ = static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.position_;
-    js[0]->velocity_ = static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.velocity_;
-    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot_state.hpp, controller manager,
-    //ethercat_hardware and ros_etherCAT main loop
-    // So we will encode the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
-    // have any measured effort in the muscle hand anyway).
-    // Then in the joint controller we will decode that back into uint16.
-    js[0]->measured_effort_ = (static_cast<double>(static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.pressure_[1]) * 0x10000) +
-                              static_cast<double>(static_cast<sr_actuator::SrMuscleActuator*>(as[0])->state_.pressure_[0]);
-
-    ROS_DEBUG("end propagate position");
+    valve_1_tmp -= 8;
+    valve_1_tmp *= (-1);
   }
 
-  void SimpleTransmissionForMuscle::propagateEffort(
-    std::vector<JointState*>& js, std::vector<Actuator*>& as)
-  {
-    ROS_DEBUG(" propagate effort");
+  command.valve_[0] = valve_0_tmp;
+  command.valve_[1] = valve_1_tmp;
 
-    assert(as.size() == 1);
-    assert(js.size() == 1);
-    static_cast<sr_actuator::SrMuscleActuator*>(as[0])->command_.enable_ = true;
-    //We don't want to define a modified version of JointState, as that would imply using a modified version of robot_state.hpp, controller manager,
-    //ethercat_hardware and ros_etherCAT main loop
-    // So the controller encodes the two int16 that contain the valve commands into the double effort_. (We don't
-    // have any real commanded_effort_ in the muscle hand anyway).
-    // Here we decode them back into two int16.
-    double valve_0 = fmod(js[0]->commanded_effort_, 0x10);
-    int8_t valve_0_tmp = static_cast<int8_t>(valve_0 + 0.5);
-    if (valve_0_tmp >= 8)
-    {
-      valve_0_tmp -= 8;
-      valve_0_tmp *= (-1);
-    }
-
-    int8_t valve_1_tmp = static_cast<int8_t>(((fmod(js[0]->commanded_effort_, 0x100) - valve_0) / 0x10) + 0.5);
-    if (valve_1_tmp >= 8)
-    {
-      valve_1_tmp -= 8;
-      valve_1_tmp *= (-1);
-    }
-
-    static_cast<sr_actuator::SrMuscleActuator*>(as[0])->command_.valve_[0] = valve_0_tmp;
-    static_cast<sr_actuator::SrMuscleActuator*>(as[0])->command_.valve_[1] = valve_1_tmp;
-
-    ROS_DEBUG("end propagate effort");
-  }
+  ROS_DEBUG("end propagate effort");
+}
 
 } //end namespace
 
@@ -129,4 +133,4 @@ namespace sr_mechanism_model
 Local Variables:
    c-basic-offset: 2
 End:
-*/
+ */

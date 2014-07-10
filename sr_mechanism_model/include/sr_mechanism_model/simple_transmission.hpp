@@ -36,73 +36,26 @@
  *
  * modified by Ugo Cupcic
  */
+#ifndef _SR_SIMPLE_TRANSMISSION_H_
+#define _SR_SIMPLE_TRANSMISSION_H_
 
-#include <math.h>
-#include <pluginlib/class_list_macros.h>
-#include "ros_ethercat_model/robot_state.hpp"
-#include "sr_mechanism_model/simple_transmission.hpp"
-
-#include <sr_hardware_interface/sr_actuator.hpp>
-
-using namespace ros_ethercat_model;
-using namespace std;
-using namespace sr_actuator;
-
-PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::SimpleTransmission, Transmission)
+#include <tinyxml.h>
+#include <ros_ethercat_model/robot_state.hpp>
 
 namespace sr_mechanism_model
 {
 
-bool SimpleTransmission::initXml(TiXmlElement *elt, RobotState *robot)
+class SimpleTransmission : public ros_ethercat_model::Transmission
 {
-  if (!ros_ethercat_model::Transmission::initXml(elt, robot))
-    return false;
+public:
+  bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
 
-  TiXmlElement *ael = elt->FirstChildElement("actuator");
-  string actuator_name = ael ? ael->Attribute("name") : "";
-  Actuator *a = new SrActuator();
-  if (actuator_name.empty() || !a)
-  {
-    ROS_ERROR_STREAM("SimpleTransmission could not find actuator named : " << actuator_name);
-    return false;
-  }
-  robot->actuators_.insert(actuator_name, a);
-  a->command_.enable_ = true;
-  actuator_names_.push_back(actuator_name);
-  return true;
-}
+  void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
+                         std::vector<ros_ethercat_model::JointState*>&);
+  void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
+                       std::vector<ros_ethercat_model::Actuator*>&);
+};
 
-void SimpleTransmission::propagatePosition(vector<Actuator*>& as, vector<JointState*>& js)
-{
-  ROS_DEBUG(" propagate position");
-  ROS_ASSERT(as.size() == 1);
-  ROS_ASSERT(js.size() == 1);
+} // namespace sr_mechanism_model
 
-  const ActuatorState &state = as[0]->state_;
-  js[0]->position_ = state.position_;
-  js[0]->velocity_ = state.velocity_;
-  js[0]->measured_effort_ = state.last_measured_effort_;
-
-  ROS_DEBUG("end propagate position");
-}
-
-void SimpleTransmission::propagateEffort(vector<JointState*>& js, vector<Actuator*>& as)
-{
-  ROS_DEBUG(" propagate effort");
-  ROS_ASSERT(as.size() == 1);
-  ROS_ASSERT(js.size() == 1);
-
-  ActuatorCommand &command = as[0]->command_;
-  command.enable_ = true;
-  command.effort_ = js[0]->commanded_effort_;
-
-  ROS_DEBUG("end propagate effort");
-}
-
-} //end namespace
-
-/* For the emacs weenies in the crowd.
-Local Variables:
-   c-basic-offset: 2
-End:
- */
+#endif

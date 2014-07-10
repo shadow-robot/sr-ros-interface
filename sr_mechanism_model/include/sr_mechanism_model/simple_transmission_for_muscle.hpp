@@ -42,21 +42,19 @@
 #include <tinyxml.h>
 #include <ros_ethercat_model/robot_state.hpp>
 
-namespace sr_mechanism_model {
+namespace sr_mechanism_model
+{
 
-  class SimpleTransmissionForMuscle : public ros_ethercat_model::Transmission
-  {
-  public:
-    SimpleTransmissionForMuscle() {}
-    ~SimpleTransmissionForMuscle() {}
+class SimpleTransmissionForMuscle : public ros_ethercat_model::Transmission
+{
+public:
+  bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
 
-    bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
-
-    void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
-                           std::vector<ros_ethercat_model::JointState*>&);
-    void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
-                         std::vector<ros_ethercat_model::Actuator*>&);
-   };
+  void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
+                         std::vector<ros_ethercat_model::JointState*>&);
+  void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
+                       std::vector<ros_ethercat_model::Actuator*>&);
+};
 
 } // namespace sr_mechanism_model
 
