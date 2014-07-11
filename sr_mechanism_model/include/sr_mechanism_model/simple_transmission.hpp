@@ -40,6 +40,8 @@
 #define _SR_SIMPLE_TRANSMISSION_H_
 
 #include <tinyxml.h>
+#include <sr_hardware_interface/sr_actuator.hpp>
+#include <boost/smart_ptr/scoped_ptr.hpp>
 #include <ros_ethercat_model/robot_state.hpp>
 
 namespace sr_mechanism_model
@@ -49,11 +51,8 @@ class SimpleTransmission : public ros_ethercat_model::Transmission
 {
 public:
   bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
-
-  void propagatePosition(ros_ethercat_model::Actuator*,
-                         std::vector<ros_ethercat_model::JointState*>&);
-  void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
-                       ros_ethercat_model::Actuator*);
+  void propagatePosition();
+  void propagateEffort();
 };
 
 } // namespace sr_mechanism_model

@@ -37,12 +37,8 @@
  * modified by Ugo Cupcic
  */
 
-#include <math.h>
 #include <pluginlib/class_list_macros.h>
-#include "ros_ethercat_model/robot_state.hpp"
 #include "sr_mechanism_model/simple_transmission.hpp"
-
-#include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_model;
 using namespace std;
@@ -58,43 +54,40 @@ bool SimpleTransmission::initXml(TiXmlElement *elt, RobotState *robot)
   if (!ros_ethercat_model::Transmission::initXml(elt, robot))
     return false;
 
+  //reading the joint name
+  TiXmlElement *jel = elt->FirstChildElement("joint");
+  if (!jel || !jel->Attribute("name"))
+  {
+    ROS_ERROR_STREAM("Joint name not specified in transmission " << name_);
+    return false;
+  }
+
   TiXmlElement *ael = elt->FirstChildElement("actuator");
-  string actuator_name = ael ? ael->Attribute("name") : "";
-  Actuator *a = new SrMotorActuator();
-  if (actuator_name.empty() || !a)
+  if (!ael || !ael->Attribute("name"))
   {
     ROS_ERROR_STREAM("Transmission " << name_ << " has no actuator in configuration");
     return false;
   }
-  robot->actuators_.insert(actuator_name, a);
-  a->command_.enable_ = true;
-  actuator_name_ = actuator_name;
+
+  joint_ = robot->getJointState(jel->Attribute("name"));
+  actuator_ = new SrMotorActuator();
+  actuator_->name_ = ael->Attribute("name");
+  actuator_->command_.enable_ = true;
+
   return true;
 }
 
-void SimpleTransmission::propagatePosition(Actuator *as, vector<JointState*> &js)
+void SimpleTransmission::propagatePosition()
 {
-  ROS_DEBUG(" propagate position");
-  ROS_ASSERT(js.size() == 1);
-
-  const ActuatorState &state = as->state_;
-  js[0]->position_ = state.position_;
-  js[0]->velocity_ = state.velocity_;
-  js[0]->measured_effort_ = state.last_measured_effort_;
-
-  ROS_DEBUG("end propagate position");
+  joint_->position_ = actuator_->state_.position_;
+  joint_->velocity_ = actuator_->state_.velocity_;
+  joint_->measured_effort_ = actuator_->state_.last_measured_effort_;
 }
 
-void SimpleTransmission::propagateEffort(vector<JointState*> &js, Actuator *as)
+void SimpleTransmission::propagateEffort()
 {
-  ROS_DEBUG(" propagate effort");
-  ROS_ASSERT(js.size() == 1);
-
-  ActuatorCommand &command = as->command_;
-  command.enable_ = true;
-  command.effort_ = js[0]->commanded_effort_;
-
-  ROS_DEBUG("end propagate effort");
+  actuator_->command_.enable_ = true;
+  actuator_->command_.effort_ = joint_->commanded_effort_;
 }
 
 } //end namespace

@@ -39,10 +39,7 @@
 
 #include <math.h>
 #include <pluginlib/class_list_macros.h>
-#include "ros_ethercat_model/robot_state.hpp"
 #include "sr_mechanism_model/simple_transmission_for_muscle.hpp"
-
-#include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_model;
 using namespace std;
@@ -58,45 +55,46 @@ bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, RobotState *robot)
   if (!ros_ethercat_model::Transmission::initXml(elt, robot))
     return false;
 
-  TiXmlElement *ael = elt->FirstChildElement("actuator");
-  string actuator_name = ael ? ael->Attribute("name") : "";
-  Actuator *a = new SrMuscleActuator();
-  if (actuator_name.empty() || !a)
+  //reading the joint name
+  TiXmlElement *jel = elt->FirstChildElement("joint");
+  if (!jel || !jel->Attribute("name"))
   {
-    ROS_ERROR_STREAM("Muscle transmission  " << name_ << " has no actuator in configuration");
+    ROS_ERROR_STREAM("Joint name not specified in transmission " << name_);
     return false;
   }
-  robot->actuators_.insert(actuator_name, a);
-  a->command_.enable_ = true;
-  actuator_name_ = actuator_name;
+
+  TiXmlElement *ael = elt->FirstChildElement("actuator");
+  if (!ael || !ael->Attribute("name"))
+  {
+    ROS_ERROR_STREAM("Transmission " << name_ << " has no actuator in configuration");
+    return false;
+  }
+
+  joint_ = robot->getJointState(jel->Attribute("name"));
+  actuator_ = new SrMuscleActuator();
+  actuator_->name_ = ael->Attribute("name");
+  actuator_->command_.enable_ = true;
+
   return true;
 }
 
-void SimpleTransmissionForMuscle::propagatePosition(Actuator *as, vector<JointState*> &js)
+void SimpleTransmissionForMuscle::propagatePosition()
 {
-  ROS_DEBUG(" propagate position");
-  ROS_ASSERT(js.size() == 1);
-
-  const SrMuscleActuatorState &state = static_cast<SrMuscleActuator*>(as)->state_;
-  js[0]->position_ = state.position_;
-  js[0]->velocity_ = state.velocity_;
+  SrMuscleActuatorState &state = static_cast<SrMuscleActuator*>(actuator_)->state_;
+  joint_->position_ = state.position_;
+  joint_->velocity_ = state.velocity_;
 
   // We don't want to define a modified version of JointState, as that would imply using a modified version
   // of robot_state.hpp, controller manager, ethercat_hardware and ros_etherCAT main loop
   // So we will encode the two uint16_t that contain the data from the muscle pressure sensors
   // into the double measured_effort_. (We don't have any measured effort in the muscle hand anyway).
   // Then in the joint controller we will decode that back into uint16_t.
-  js[0]->measured_effort_ = ((double) (state.pressure_[1]) * 0x10000) + (double) (state.pressure_[0]);
-
-  ROS_DEBUG("end propagate position");
+  joint_->measured_effort_ = ((double) (state.pressure_[1]) * 0x10000) + (double) (state.pressure_[0]);
 }
 
-void SimpleTransmissionForMuscle::propagateEffort(vector<JointState*> &js, Actuator *as)
+void SimpleTransmissionForMuscle::propagateEffort()
 {
-  ROS_DEBUG(" propagate effort");
-  ROS_ASSERT(js.size() == 1);
-
-  SrMuscleActuatorCommand &command = static_cast<SrMuscleActuator*>(as)->command_;
+  SrMuscleActuatorCommand &command = static_cast<SrMuscleActuator*>(actuator_)->command_;
   command.enable_ = true;
 
   // We don't want to define a modified version of JointState, as that would imply using a modified version
@@ -104,7 +102,7 @@ void SimpleTransmissionForMuscle::propagateEffort(vector<JointState*> &js, Actua
   // So the controller encodes the two int16 that contain the valve commands into the double effort_.
   // (We don't have any real commanded_effort_ in the muscle hand anyway).
   // Here we decode them back into two int16_t.
-  double valve_0 = fmod(js[0]->commanded_effort_, 0x10);
+  double valve_0 = fmod(joint_->commanded_effort_, 0x10);
   int8_t valve_0_tmp = (int8_t) (valve_0 + 0.5);
   if (valve_0_tmp >= 8)
   {
@@ -112,7 +110,7 @@ void SimpleTransmissionForMuscle::propagateEffort(vector<JointState*> &js, Actua
     valve_0_tmp *= (-1);
   }
 
-  int8_t valve_1_tmp = (int8_t) (((fmod(js[0]->commanded_effort_, 0x100) - valve_0) / 0x10) + 0.5);
+  int8_t valve_1_tmp = (int8_t) (((fmod(joint_->commanded_effort_, 0x100) - valve_0) / 0x10) + 0.5);
   if (valve_1_tmp >= 8)
   {
     valve_1_tmp -= 8;
@@ -121,8 +119,6 @@ void SimpleTransmissionForMuscle::propagateEffort(vector<JointState*> &js, Actua
 
   command.valve_[0] = valve_0_tmp;
   command.valve_[1] = valve_1_tmp;
-
-  ROS_DEBUG("end propagate effort");
 }
 
 } //end namespace

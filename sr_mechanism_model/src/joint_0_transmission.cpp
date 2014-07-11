@@ -29,10 +29,7 @@
 
 #include <math.h>
 #include <pluginlib/class_list_macros.h>
-#include "ros_ethercat_model/robot_state.hpp"
 #include "sr_mechanism_model/joint_0_transmission.hpp"
-
-#include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_model;
 using namespace std;
@@ -43,15 +40,31 @@ PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::J0Transmission, Transmission)
 namespace sr_mechanism_model
 {
 
-void J0Transmission::propagatePosition(Actuator *as, vector<JointState*> &js)
+bool J0Transmission::initXml(TiXmlElement *elt, RobotState *robot)
 {
-  ROS_DEBUG(" propagate position for j0");
-  ROS_ASSERT(js.size() == 2);
+  if (!SimpleTransmission::initXml(elt, robot))
+    return false;
 
+  //reading the joint name
+  TiXmlElement *jel = elt->FirstChildElement("joint");
+  jel = elt->NextSiblingElement("joint");
+  if (!jel || !jel->Attribute("name"))
+  {
+    ROS_ERROR_STREAM("second joint name not specified in transmission " << name_);
+    return false;
+  }
+
+  joint2_ = robot->getJointState(jel->Attribute("name"));
+
+  return true;
+}
+
+void J0Transmission::propagatePosition()
+{
   //the size is either 2 or 0 when the joint hasn't been updated yet
   // (joint 0 is composed of the 2 calibrated values: joint 1 and joint 2)
 
-  const SrMotorActuatorState &state = static_cast<SrMotorActuator*>(as)->state_;
+  SrMotorActuatorState &state = static_cast<SrMotorActuator*>(actuator_)->state_;
   size_t size = state.calibrated_sensor_values_.size();
   if (size == 2)
   {
@@ -59,14 +72,14 @@ void J0Transmission::propagatePosition(Actuator *as, vector<JointState*> &js)
                      << " J1 " << state.calibrated_sensor_values_[0]
                      << " J2 " << state.calibrated_sensor_values_[1]);
 
-    js[0]->position_ = state.calibrated_sensor_values_[0];
-    js[1]->position_ = state.calibrated_sensor_values_[1];
+    joint_->position_ = state.calibrated_sensor_values_[0];
+    joint2_->position_ = state.calibrated_sensor_values_[1];
 
-    js[0]->velocity_ = state.velocity_ / 2.0;
-    js[1]->velocity_ = state.velocity_ / 2.0;
+    joint_->velocity_ = state.velocity_ / 2.0;
+    joint2_->velocity_ = state.velocity_ / 2.0;
 
-    js[0]->measured_effort_ = state.last_measured_effort_;
-    js[1]->measured_effort_ = state.last_measured_effort_;
+    joint_->measured_effort_ = state.last_measured_effort_;
+    joint2_->measured_effort_ = state.last_measured_effort_;
   }
   else if (size == 0)
   {
@@ -76,29 +89,21 @@ void J0Transmission::propagatePosition(Actuator *as, vector<JointState*> &js)
 
     //TODO: use a real formula for the coupling??
     //GAZEBO
-    js[0]->position_ = state.position_ / 2.0;
-    js[1]->position_ = state.position_ / 2.0;
+    joint_->position_ = state.position_ / 2.0;
+    joint2_->position_ = state.position_ / 2.0;
 
-    js[0]->velocity_ = state.velocity_ / 2.0;
-    js[1]->velocity_ = state.velocity_ / 2.0;
+    joint_->velocity_ = state.velocity_ / 2.0;
+    joint2_->velocity_ = state.velocity_ / 2.0;
 
-    js[0]->measured_effort_ = state.last_measured_effort_ / 2.0;
-    js[1]->measured_effort_ = state.last_measured_effort_ / 2.0;
+    joint_->measured_effort_ = state.last_measured_effort_ / 2.0;
+    joint2_->measured_effort_ = state.last_measured_effort_ / 2.0;
   }
-
-  ROS_DEBUG("end propagate position for j0");
 }
 
-void J0Transmission::propagateEffort(vector<JointState*> &js, Actuator *as)
+void J0Transmission::propagateEffort()
 {
-  ROS_DEBUG(" propagate effort for j0");
-  ROS_ASSERT(js.size() == 2);
-
-  ActuatorCommand &command = as->command_;
-  command.enable_ = true;
-  command.effort_ = (js[0]->commanded_effort_ + js[1]->commanded_effort_);
-
-  ROS_DEBUG("end propagate effort for j0");
+  actuator_->command_.enable_ = true;
+  actuator_->command_.effort_ = joint_->commanded_effort_ + joint2_->commanded_effort_;
 }
 
 } //end namespace sr_mechanism_model

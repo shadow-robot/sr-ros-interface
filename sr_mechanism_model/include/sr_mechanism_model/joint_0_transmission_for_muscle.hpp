@@ -36,10 +36,11 @@ namespace sr_mechanism_model
 class J0TransmissionForMuscle : public SimpleTransmissionForMuscle
 {
 public:
-  void propagatePosition(ros_ethercat_model::Actuator*,
-                         std::vector<ros_ethercat_model::JointState*>&);
-  void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
-                       ros_ethercat_model::Actuator*);
+  bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
+  void propagatePosition();
+  void propagateEffort();
+
+  ros_ethercat_model::JointState* joint2_;
 };
 
 } //end namespace sr_mechanism_model
