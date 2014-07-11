@@ -63,22 +63,21 @@ bool SimpleTransmission::initXml(TiXmlElement *elt, RobotState *robot)
   Actuator *a = new SrMotorActuator();
   if (actuator_name.empty() || !a)
   {
-    ROS_ERROR_STREAM("SimpleTransmission could not find actuator named : " << actuator_name);
+    ROS_ERROR_STREAM("Transmission " << name_ << " has no actuator in configuration");
     return false;
   }
   robot->actuators_.insert(actuator_name, a);
   a->command_.enable_ = true;
-  actuator_names_.push_back(actuator_name);
+  actuator_name_ = actuator_name;
   return true;
 }
 
-void SimpleTransmission::propagatePosition(vector<Actuator*>& as, vector<JointState*>& js)
+void SimpleTransmission::propagatePosition(Actuator *as, vector<JointState*> &js)
 {
   ROS_DEBUG(" propagate position");
-  ROS_ASSERT(as.size() == 1);
   ROS_ASSERT(js.size() == 1);
 
-  const ActuatorState &state = as[0]->state_;
+  const ActuatorState &state = as->state_;
   js[0]->position_ = state.position_;
   js[0]->velocity_ = state.velocity_;
   js[0]->measured_effort_ = state.last_measured_effort_;
@@ -86,13 +85,12 @@ void SimpleTransmission::propagatePosition(vector<Actuator*>& as, vector<JointSt
   ROS_DEBUG("end propagate position");
 }
 
-void SimpleTransmission::propagateEffort(vector<JointState*>& js, vector<Actuator*>& as)
+void SimpleTransmission::propagateEffort(vector<JointState*> &js, Actuator *as)
 {
   ROS_DEBUG(" propagate effort");
-  ROS_ASSERT(as.size() == 1);
   ROS_ASSERT(js.size() == 1);
 
-  ActuatorCommand &command = as[0]->command_;
+  ActuatorCommand &command = as->command_;
   command.enable_ = true;
   command.effort_ = js[0]->commanded_effort_;
 

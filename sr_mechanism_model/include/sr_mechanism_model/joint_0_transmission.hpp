@@ -37,10 +37,10 @@ namespace sr_mechanism_model
 class J0Transmission : public SimpleTransmission
 {
 public:
-  void propagatePosition(std::vector<ros_ethercat_model::Actuator*>&,
+  void propagatePosition(ros_ethercat_model::Actuator*,
                          std::vector<ros_ethercat_model::JointState*>&);
   void propagateEffort(std::vector<ros_ethercat_model::JointState*>&,
-                       std::vector<ros_ethercat_model::Actuator*>&);
+                       ros_ethercat_model::Actuator*);
 };
 
 } //end namespace sr_mechanism_model

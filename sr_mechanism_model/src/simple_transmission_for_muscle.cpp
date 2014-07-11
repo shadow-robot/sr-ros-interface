@@ -63,22 +63,21 @@ bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, RobotState *robot)
   Actuator *a = new SrMuscleActuator();
   if (actuator_name.empty() || !a)
   {
-    ROS_ERROR_STREAM("SimpleTransmissionForMuscle could not find actuator named : " << actuator_name);
+    ROS_ERROR_STREAM("Muscle transmission  " << name_ << " has no actuator in configuration");
     return false;
   }
   robot->actuators_.insert(actuator_name, a);
   a->command_.enable_ = true;
-  actuator_names_.push_back(actuator_name);
+  actuator_name_ = actuator_name;
   return true;
 }
 
-void SimpleTransmissionForMuscle::propagatePosition(vector<Actuator*>& as, vector<JointState*>& js)
+void SimpleTransmissionForMuscle::propagatePosition(Actuator *as, vector<JointState*> &js)
 {
   ROS_DEBUG(" propagate position");
-  ROS_ASSERT(as.size() == 1);
   ROS_ASSERT(js.size() == 1);
 
-  const SrMuscleActuatorState &state = static_cast<SrMuscleActuator*>(as[0])->state_;
+  const SrMuscleActuatorState &state = static_cast<SrMuscleActuator*>(as)->state_;
   js[0]->position_ = state.position_;
   js[0]->velocity_ = state.velocity_;
 
@@ -92,13 +91,12 @@ void SimpleTransmissionForMuscle::propagatePosition(vector<Actuator*>& as, vecto
   ROS_DEBUG("end propagate position");
 }
 
-void SimpleTransmissionForMuscle::propagateEffort(vector<JointState*>& js, vector<Actuator*>& as)
+void SimpleTransmissionForMuscle::propagateEffort(vector<JointState*> &js, Actuator *as)
 {
   ROS_DEBUG(" propagate effort");
-  ROS_ASSERT(as.size() == 1);
   ROS_ASSERT(js.size() == 1);
 
-  SrMuscleActuatorCommand &command = static_cast<SrMuscleActuator*>(as[0])->command_;
+  SrMuscleActuatorCommand &command = static_cast<SrMuscleActuator*>(as)->command_;
   command.enable_ = true;
 
   // We don't want to define a modified version of JointState, as that would imply using a modified version

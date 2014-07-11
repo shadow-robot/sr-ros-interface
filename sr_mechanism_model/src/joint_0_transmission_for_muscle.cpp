@@ -42,16 +42,15 @@ PLUGINLIB_EXPORT_CLASS(sr_mechanism_model::J0TransmissionForMuscle, Transmission
 namespace sr_mechanism_model
 {
 
-void J0TransmissionForMuscle::propagatePosition(vector<Actuator*>& as, vector<JointState*>& js)
+void J0TransmissionForMuscle::propagatePosition(Actuator *as, vector<JointState*> &js)
 {
   ROS_DEBUG(" propagate position for j0");
-  ROS_ASSERT(as.size() == 1);
   ROS_ASSERT(js.size() == 2);
 
   //the size is either 2 or 0 when the joint hasn't been updated yet
   // (joint 0 is composed of the 2 calibrated values: joint 1 and joint 2)
 
-  const SrMuscleActuatorState &state = static_cast<SrMuscleActuator*>(as[0])->state_;
+  const SrMuscleActuatorState &state = static_cast<SrMuscleActuator*>(as)->state_;
   size_t size = state.calibrated_sensor_values_.size();
   if (size == 0)
   {
@@ -94,13 +93,12 @@ void J0TransmissionForMuscle::propagatePosition(vector<Actuator*>& as, vector<Jo
   ROS_DEBUG("end propagate position for j0");
 }
 
-void J0TransmissionForMuscle::propagateEffort(vector<JointState*>& js, vector<Actuator*>& as)
+void J0TransmissionForMuscle::propagateEffort(vector<JointState*>& js, Actuator *as)
 {
   ROS_DEBUG(" propagate effort for j0");
-  ROS_ASSERT(as.size() == 1);
   ROS_ASSERT(js.size() == 2);
 
-  SrMuscleActuatorCommand &command = static_cast<SrMuscleActuator*>(as[0])->command_;
+  SrMuscleActuatorCommand &command = static_cast<SrMuscleActuator*>(as)->command_;
   command.enable_ = true;
 
   // We don't want to define a modified version of JointState, as that would imply using a modified version
