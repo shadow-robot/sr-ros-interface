@@ -22,19 +22,19 @@
 				izz="0.000312" />
 			</inertial>
       <visual>
-				<origin xyz="0 0 0" rpy="0 0 0" />
-				<geometry name="${prefix}thproximal_visual">
-					<mesh filename="package://sr_description/hand/model/TH3_z.dae" scale="0.001 0.001 0.001" />
-				</geometry>
-				<material name="shadow_thproximal_material">
-					<color rgba="0.2 0.2 0.2 1.0"/>
-				</material>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry name="${prefix}thproximal_visual">
+          <mesh filename="package://sr_description/hand/model/TH3_z.dae" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="shadow_thproximal_material">
+          <color rgba="0.2 0.2 0.2 1.0"/>
+        </material>
       </visual>
       <collision>
-				<origin xyz="0 0 0.019" rpy="0 0 0" />
-				<geometry name="${prefix}thproximal_collision_geom">
-					<box size="0.008 0.008 0.020" />
-				</geometry>
+        <origin xyz="0 0 0.020" rpy="0 0 0" />
+        <geometry name="${prefix}thproximal_collision_geom">
+          <cylinder radius="0.012" length="0.018" />
+        </geometry>
       </collision>
     </link>
 

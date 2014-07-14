@@ -21,20 +21,20 @@
 				<inertia  ixx="0.0003" ixy="0.0"  ixz="0.0"  iyy="0.0003"  iyz="0.0" izz="0.0003" />
 			</inertial>
       <visual>
-				<origin xyz="0 0 0" rpy="0 0 0" />
-				<geometry name="${prefix}thbase_visual">
-					<box size="0.001 0.001 0.001" />
-				</geometry>
-				<material name="shadow_thbase_material">
-					<color rgba="0.5 0.5 0.5 1.0"/>
-				</material>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry name="${prefix}thbase_visual">
+          <box size="0.001 0.001 0.001" />
+        </geometry>
+        <material name="shadow_thbase_material">
+          <color rgba="0.5 0.5 0.5 1.0"/>
+        </material>
       </visual>
       <collision>
-				<origin xyz="0 0 0" rpy="0 0 0 " />
-				<geometry name="${prefix}thbase_collision_geom">
-					<box size="0.001 0.001 0.001" />
-				</geometry>
-			</collision>
+        <origin xyz="0 0 0" rpy="0 0 0 " />
+        <geometry name="${prefix}thbase_collision_geom">
+          <sphere radius="0.011" />
+        </geometry>
+      </collision>
     </link>
 
     <joint name="${prefix}THJ5" type="revolute">

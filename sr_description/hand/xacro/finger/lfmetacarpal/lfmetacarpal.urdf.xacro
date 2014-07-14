@@ -30,13 +30,12 @@
         <material name="Grey" />
       </visual>
       <collision>
-        <origin xyz="0 0 0.04" rpy="0 0 0" />
+        <origin xyz="0 0 0.038" rpy="0 0 0" />
         <geometry name="${prefix}lfmetacarpal_collision_geom">
-          <box size="0.008 0.008 0.03" />
+          <box size="0.018 0.024 0.040" />
         </geometry>
       </collision>
     </link>
- 
 
     <joint name="${prefix}LFJ5" type="revolute">
       <parent link="${parent}"/>

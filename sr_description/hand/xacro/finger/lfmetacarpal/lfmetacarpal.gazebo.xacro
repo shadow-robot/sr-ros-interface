@@ -18,6 +18,7 @@
           <bumperTopicName>contacts/${prefix}lf/metacarpal</bumperTopicName>
         </plugin>
       </sensor>
+      <selfCollide>true</selfCollide>
       <material>LightGrey</material>
     </gazebo>
   </xacro:macro>

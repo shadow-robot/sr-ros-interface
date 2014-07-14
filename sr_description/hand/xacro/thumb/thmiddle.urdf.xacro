@@ -16,39 +16,47 @@
   <xacro:macro name="thmiddle" params="muscle bio prefix parent">
     <link name="${prefix}thmiddle">
       <inertial>
-				<mass value="0.027" />
-				<origin xyz="0 0 0.016" rpy="0 0 0"/>
-				<inertia  ixx="0.0026" ixy="0.0"  ixz="0.0"  iyy="0.0026"  iyz="0.0"
-				izz="0.000169" />
+        <mass value="0.027" />
+        <origin xyz="0 0 0.016" rpy="0 0 0"/>
+          <inertia  ixx="0.0026" ixy="0.0"  ixz="0.0"  iyy="0.0026"  iyz="0.0" izz="0.000169" />
       </inertial>
       <visual>
-				<origin xyz="0 0 0" rpy="0 0 0" />
-					<xacro:if value="${bio}">
-						<geometry name="${prefix}thmiddle_visual">
-						  <mesh filename="package://sr_description/hand/model/biotacs/biotac_thumb_adapter.dae" scale="0.001 0.001 0.001" />
-						</geometry>
-						 <material name="BiotacGreen" />
-					</xacro:if>
-					<xacro:unless value="${bio}">
-						<geometry name="${prefix}thmiddle_visual">
-							<mesh filename="package://sr_description/hand/model/TH2_z.dae" scale="0.001 0.001 0.001" />
-						</geometry>
-						<material name="shadow_thmiddle_material">
-							<color rgba="0.2 0.2 0.2 1.0"/>
-						</material>
-					</xacro:unless> 
-      </visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <xacro:if value="${bio}">
+        <geometry name="${prefix}thmiddle_visual">
+          <mesh filename="package://sr_description/hand/model/biotacs/biotac_thumb_adapter.dae" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="BiotacGreen" />
+        </xacro:if>
+        <xacro:unless value="${bio}">
+        <geometry name="${prefix}thmiddle_visual">
+          <mesh filename="package://sr_description/hand/model/TH2_z.dae" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="shadow_thmiddle_material">
+          <color rgba="0.2 0.2 0.2 1.0"/>
+        </material>
+        </xacro:unless> 
+      </visual>  
       <collision>
-				<origin xyz="0 0 0.016" rpy="0 0 0 " />
-				<geometry name="${prefix}thmiddle_collision_geom">
-					 <xacro:if value="${bio}">
-						  <box size="0.008 0.008 0.01" />
-					</xacro:if>
-					<xacro:unless value="${bio}">
-							<box size="0.008 0.008 0.015" />
-					</xacro:unless> 
-				</geometry>
+        <origin xyz="0 0 0.016" rpy="0 0 0 " />
+        <geometry name="${prefix}thmiddle_collision_geom">
+          <xacro:if value="${bio}">
+            <box size="0.008 0.008 0.01" />
+          </xacro:if>
+          <xacro:unless value="${bio}">
+            <cylinder radius="0.011" length="0.031" />
+          </xacro:unless> 
+        </geometry>
       </collision>
+      <xacro:unless value="${bio}">
+      <collision>
+        <origin xyz="0 0 0.032" rpy="0 0 0 " />
+        <geometry>
+          <sphere radius="0.010" />
+        </geometry>
+      </collision>
+      </xacro:unless> 
+      
     </link>
     
     <joint name="${prefix}THJ2" type="revolute">

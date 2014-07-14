@@ -29,10 +29,22 @@
         </geometry>
         <material name="Grey" />
       </visual>
-      <collision>
-        <origin xyz="0 0 0.0125" rpy="0 0 0" />
+    <collision>
+      <origin xyz="0 0 0.0125" rpy="0 0 0 " />
         <geometry name="${prefix}${link_prefix}middle_collision_geom">
-          <box size="0.008 0.008 0.015" />
+          <cylinder radius="0.007" length="0.025" />
+        </geometry>
+      </collision>
+      <collision>
+        <origin xyz="0 0 0.0" rpy="0 0 0 " />
+        <geometry>
+          <sphere radius="0.007" />
+        </geometry>
+      </collision>
+      <collision>
+        <origin xyz="0 0 0.025" rpy="0 0 0 " />
+        <geometry>
+          <sphere radius="0.007" />
         </geometry>
       </collision>
     </link>
