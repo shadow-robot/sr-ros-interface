@@ -37,8 +37,6 @@
  * modified by Ugo Cupcic
  */
 
-#include <math.h>
-#include <pluginlib/class_list_macros.h>
 #include "sr_mechanism_model/simple_transmission_for_muscle.hpp"
 
 using namespace ros_ethercat_model;
@@ -52,27 +50,13 @@ namespace sr_mechanism_model
 
 bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, RobotState *robot)
 {
-  if (!ros_ethercat_model::Transmission::initXml(elt, robot))
+  if (!SimpleTransmission::Transmission::initXml(elt, robot))
     return false;
 
-  //reading the joint name
-  TiXmlElement *jel = elt->FirstChildElement("joint");
-  if (!jel || !jel->Attribute("name"))
-  {
-    ROS_ERROR_STREAM("Joint name not specified in transmission " << name_);
-    return false;
-  }
-
-  TiXmlElement *ael = elt->FirstChildElement("actuator");
-  if (!ael || !ael->Attribute("name"))
-  {
-    ROS_ERROR_STREAM("Transmission " << name_ << " has no actuator in configuration");
-    return false;
-  }
-
-  joint_ = robot->getJointState(jel->Attribute("name"));
+  string act_name = actuator_->name_;
+  delete actuator_; // That's a SrMotorActuator at this point
   actuator_ = new SrMuscleActuator();
-  actuator_->name_ = ael->Attribute("name");
+  actuator_->name_ = act_name;
   actuator_->command_.enable_ = true;
 
   return true;

@@ -141,17 +141,12 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
          it != state_->model_.joint_states_.end();
          ++it)
     {
-      // fill in gazebo joints pointer
+      // fill the gazebo joints pointer vector
       physics::JointPtr joint = parent_model_->GetJoint(it->first);
       if (joint)
-      {
         joints_.push_back(joint);
-      }
       else
-      {
-        joints_.push_back(physics::JointPtr());
-        ROS_ERROR("A joint named \"%s\" is not part of Mechanism Controlled joints.\n", it->first.c_str());
-      }
+        gzerr << "A joint named " << it->first << " is not part of Mechanism Controlled joints.\n";
     }
   }
 
@@ -241,8 +236,12 @@ void GazeboRosControllerManager::UpdateChild()
       else if (joints_[i]->HasType(physics::Base::SLIDER_JOINT))
         fst->position_ = joints_[i]->GetAngle(0).Radian();
 
+      //fst->measured_effort_ = fst->commanded_effort_;
       fst->velocity_ = joints_[i]->GetVelocity(0);
     }
+
+    // Reverses the transmissions to propagate the joint position into the actuators
+    fake_state_->propagateJointPositionToActuatorPosition();
 
     //--------------------------------------------------
     //  Runs Mechanism Control
@@ -264,6 +263,8 @@ void GazeboRosControllerManager::UpdateChild()
   //--------------------------------------------------
   //  Takes in actuation commands
   //--------------------------------------------------
+  // Reverses the transmissions to propagate the actuator commands into the joints.
+  fake_state_->propagateActuatorEffortToJointEffort();
 
   // Copies the commands from the mechanism joints into the gazebo joints.
   for (size_t i = 0; i < joints_.size(); ++i)
@@ -276,13 +277,10 @@ void GazeboRosControllerManager::UpdateChild()
     if (fst->joint_->dynamics)
       damping_coef = fst->joint_->dynamics->damping;
 
-    if (joints_[i]->HasType(physics::Base::HINGE_JOINT) || joints_[i]->HasType(physics::Base::SLIDER_JOINT))
-    {
-      double current_velocity = joints_[i]->GetVelocity(0);
-      double damping_force = damping_coef * current_velocity;
-      double effort_command = effort - damping_force;
-      joints_[i]->SetForce(0, effort_command);
-    }
+    double current_velocity = joints_[i]->GetVelocity(0);
+    double damping_force = damping_coef * current_velocity;
+    double effort_command = effort - damping_force;
+    joints_[i]->SetForce(0, effort_command);
   }
   last_write_sim_time_ros_ = sim_time_ros;
 }

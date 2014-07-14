@@ -36,18 +36,15 @@
  *
  * modified by Ugo Cupcic
  */
-#ifndef _SR_SIMPLE_TRANSMISSION_H_
-#define _SR_SIMPLE_TRANSMISSION_H_
+#ifndef _SR_SIMPLE_TRANSMISSION_FOR_MUSCLE_HPP_
+#define _SR_SIMPLE_TRANSMISSION_FOR_MUSCLE_HPP_
 
-#include <tinyxml.h>
-#include <sr_hardware_interface/sr_actuator.hpp>
-#include <boost/smart_ptr/scoped_ptr.hpp>
-#include <ros_ethercat_model/robot_state.hpp>
+#include "sr_mechanism_model/simple_transmission.hpp"
 
 namespace sr_mechanism_model
 {
 
-class SimpleTransmissionForMuscle : public ros_ethercat_model::Transmission
+class SimpleTransmissionForMuscle : public sr_mechanism_model::SimpleTransmission
 {
 public:
   bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);

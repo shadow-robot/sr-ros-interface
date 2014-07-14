@@ -36,13 +36,16 @@
  *
  * modified by Ugo Cupcic
  */
-#ifndef _SR_SIMPLE_TRANSMISSION_H_
-#define _SR_SIMPLE_TRANSMISSION_H_
+#ifndef _SR_SIMPLE_TRANSMISSION_HPP_
+#define _SR_SIMPLE_TRANSMISSION_HPP_
 
+#include <math.h>
 #include <tinyxml.h>
 #include <sr_hardware_interface/sr_actuator.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 #include <ros_ethercat_model/robot_state.hpp>
+#include <pluginlib/class_list_macros.h>
+#include <actionlib/client/simple_client_goal_state.h>
 
 namespace sr_mechanism_model
 {
@@ -53,6 +56,8 @@ public:
   bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
   void propagatePosition();
   void propagateEffort();
+  void propagatePositionBackwards();
+  void propagateEffortBackwards();
 };
 
 } // namespace sr_mechanism_model

@@ -27,8 +27,6 @@
  */
 
 
-#include <math.h>
-#include <pluginlib/class_list_macros.h>
 #include "sr_mechanism_model/joint_0_transmission.hpp"
 
 using namespace ros_ethercat_model;
@@ -104,6 +102,19 @@ void J0Transmission::propagateEffort()
 {
   actuator_->command_.enable_ = true;
   actuator_->command_.effort_ = joint_->commanded_effort_ + joint2_->commanded_effort_;
+}
+
+void J0Transmission::propagatePositionBackwards()
+{
+  actuator_->state_.position_ = joint_->position_ + joint2_->position_;
+  actuator_->state_.velocity_ = joint_->velocity_ + joint2_->velocity_;
+  actuator_->state_.last_measured_effort_ = joint_->measured_effort_ + joint2_->measured_effort_;
+}
+
+void J0Transmission::propagateEffortBackwards()
+{
+  joint_->commanded_effort_ = actuator_->command_.effort_;
+  joint2_->commanded_effort_ = actuator_->command_.effort_;
 }
 
 } //end namespace sr_mechanism_model
