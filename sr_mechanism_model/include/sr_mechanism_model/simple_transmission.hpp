@@ -56,8 +56,6 @@ public:
   bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
   void propagatePosition();
   void propagateEffort();
-  void propagatePositionBackwards();
-  void propagateEffortBackwards();
 };
 
 } // namespace sr_mechanism_model

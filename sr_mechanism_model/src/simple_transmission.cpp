@@ -89,18 +89,6 @@ void SimpleTransmission::propagateEffort()
   actuator_->command_.effort_ = joint_->commanded_effort_;
 }
 
-void SimpleTransmission::propagatePositionBackwards()
-{
-  actuator_->state_.position_ = joint_->position_;
-  actuator_->state_.velocity_ = joint_->velocity_;
-  actuator_->state_.last_measured_effort_ = joint_->measured_effort_;
-}
-
-void SimpleTransmission::propagateEffortBackwards()
-{
-  joint_->commanded_effort_ = actuator_->command_.effort_;
-}
-
 } //end namespace
 
 /* For the emacs weenies in the crowd.

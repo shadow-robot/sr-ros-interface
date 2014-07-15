@@ -90,12 +90,12 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
 
   // Error message if the model couldn't be found
   if (!parent_model_)
-    gzerr << "Unable to get parent model\n";
+    ROS_ERROR("Unable to get parent model");
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboRosControllerManager::UpdateChild, this));
-  gzdbg << "plugin model name: " << modelName << "\n";
+  ROS_DEBUG_STREAM("plugin model name: " << modelName);
 
   if (getenv("CHECK_SPEEDUP"))
   {
@@ -146,7 +146,7 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
       if (joint)
         joints_.push_back(joint);
       else
-        gzerr << "A joint named " << it->first << " is not part of Mechanism Controlled joints.\n";
+        ROS_ERROR_STREAM("A joint named " << it->first << " is not part of Mechanism Controlled joints");
     }
   }
 
@@ -176,7 +176,6 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
     ROS_DEBUG_STREAM("Control period not found in URDF/SDF, defaulting to Gazebo period of "
                      << control_period_);
   }
-
 
 #ifdef USE_CBQ
   // start custom queue for controller manager
@@ -209,10 +208,9 @@ void GazeboRosControllerManager::UpdateChild()
   {
     double wall_elapsed = world->GetRealTime().Double() - wall_start_;
     double sim_elapsed = world->GetSimTime().Double() - sim_start_;
-    cout << " real time: " << wall_elapsed
-      << "  sim time: " << sim_elapsed
-      << "  speed up: " << sim_elapsed / wall_elapsed
-      << endl;
+    ROS_DEBUG_STREAM(" real time: " << wall_elapsed
+                     << "  sim time: " << sim_elapsed
+                     << "  speed up: " << sim_elapsed / wall_elapsed);
   }
   ROS_ASSERT(joints_.size() == fake_state_->joint_states_.size());
 
@@ -236,42 +234,37 @@ void GazeboRosControllerManager::UpdateChild()
       else if (joints_[i]->HasType(physics::Base::SLIDER_JOINT))
         fst->position_ = joints_[i]->GetAngle(0).Radian();
 
-      //fst->measured_effort_ = fst->commanded_effort_;
       fst->velocity_ = joints_[i]->GetVelocity(0);
     }
-
-    // Reverses the transmissions to propagate the joint position into the actuators
-    fake_state_->propagateJointPositionToActuatorPosition();
 
     //--------------------------------------------------
     //  Runs Mechanism Control
     //--------------------------------------------------
     fake_state_->current_time_ = ros::Time(world->GetSimTime().Double());
-    try
-    {
-      cm_->update(sim_time_ros, sim_period);
-    }
-    catch (const char* c)
-    {
-      if (strcmp(c, "dividebyzero") == 0)
-        ROS_WARN("PID controller reports divide by zero error");
-      else
-        ROS_WARN("unknown const char* exception: %s", c);
-    }
+    cm_->update(sim_time_ros, sim_period);
   }
 
   //--------------------------------------------------
   //  Takes in actuation commands
   //--------------------------------------------------
-  // Reverses the transmissions to propagate the actuator commands into the joints.
-  fake_state_->propagateActuatorEffortToJointEffort();
 
   // Copies the commands from the mechanism joints into the gazebo joints.
   for (size_t i = 0; i < joints_.size(); ++i)
   {
-    JointState *fst = fake_state_->getJointState(joints_[i]->GetName());
+    string joint_name = joints_[i]->GetName();
 
+    JointState *fst = fake_state_->getJointState(joint_name);
+
+    // joints 1 and 2 of fingers ff, mf, rf, lf share an actuator
+    // at this moment only commanded_effort_ in joint 2 is up to date
     double effort = fst->commanded_effort_;
+
+    if (joint_name[3] == '1' && (joint_name[0] == 'F' || joint_name[0] == 'M' || joint_name[0] == 'R' || joint_name[0] == 'L'))
+    {
+      joint_name[3] = '2';
+      JointState *fst1 = fake_state_->getJointState(joint_name);
+      effort = fst1->commanded_effort_;
+    }
 
     double damping_coef = 0;
     if (fst->joint_->dynamics)
@@ -293,27 +286,27 @@ void GazeboRosControllerManager::ReadPr2Xml()
   // search and wait for robot_description on param server
   while (urdf_string.empty())
   {
-    ROS_DEBUG("gazebo controller manager plugin is waiting for urdf: %s on the param server.", robotParam.c_str());
+    ROS_DEBUG_STREAM("gazebo controller manager plugin is waiting for urdf: " << robotParam << " on the param server");
     if (rosnode_->searchParam(robotParam, urdf_param_name))
     {
       rosnode_->getParam(urdf_param_name, urdf_string);
-      ROS_DEBUG("found upstream\n%s\n------\n%s\n------\n%s", robotParam.c_str(), urdf_param_name.c_str(), urdf_string.c_str());
+      ROS_DEBUG_STREAM("found upstream");
     }
     else
     {
       rosnode_->getParam(robotParam, urdf_string);
-      ROS_DEBUG("found in node namespace\n%s\n------\n%s\n------\n%s", robotParam.c_str(), urdf_param_name.c_str(), urdf_string.c_str());
+      ROS_DEBUG_STREAM("found in node namespace");
     }
+    ROS_DEBUG_STREAM(robotParam << "\n------\n" << urdf_param_name << "\n------\n" << urdf_string);
     usleep(100000);
   }
-  ROS_DEBUG("gazebo controller manager got pr2.xml from param server, parsing it...");
+  ROS_DEBUG_STREAM("gazebo controller manager got pr2.xml from param server, parsing it...");
 
   // initialize TiXmlDocument doc with a string
   TiXmlDocument doc;
   if (!doc.Parse(urdf_string.c_str()) && doc.Error())
   {
-    ROS_ERROR("Could not load the gazebo controller manager plugin's configuration file: %s\n",
-              urdf_string.c_str());
+    ROS_ERROR_STREAM("Could not load the gazebo controller manager plugin's configuration file: " << urdf_string);
   }
   else
   {
