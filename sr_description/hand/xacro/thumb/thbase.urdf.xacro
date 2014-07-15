@@ -37,12 +37,12 @@
       <material name="shadow_thbase_material">
 	  <color rgba="0.5 0.5 0.5 1.0"/>
 	</material>
-      </visual>
-      <collision>
-	<origin xyz="0 0 0" rpy="0 0 0 " />
+      </visual> 
+       <collision>
+        <origin xyz="0 0 0.0" rpy="0 0 0 " />
 	<geometry name="thbase_collision_geom">
-	  <box size="0.001 0.001 0.001" />
-	</geometry>
+          <sphere radius="0.011" />
+        </geometry>
       </collision>
     </link>
 
@@ -60,6 +60,7 @@
 	  <bumperTopicName>contacts/th/base</bumperTopicName>
         </plugin>
       </sensor>
+       <selfCollide>false</selfCollide>
       <material>LightGrey</material>
     </gazebo>
 

@@ -36,13 +36,13 @@
       <material name="shadow_thproximal_material">
 	  <color rgba="0.2 0.2 0.2 1.0"/>
 	</material>
-      </visual>
-      <collision>
-	<origin xyz="0 0 0.019" rpy="0 0 0" />
-	<geometry name="thproximal_collision_geom">
-	  <box size="0.008 0.008 0.020" />
-	</geometry>
-      </collision>
+      </visual>   
+       <collision>
+        <origin xyz="0 0 0.020" rpy="0 0 0 " />
+        <geometry name="thproximal_collision_geom">
+          <cylinder radius="0.012" length="0.018" />
+        </geometry>
+      </collision>      
     </link>
 
     <gazebo reference="thproximal">
@@ -59,6 +59,7 @@
 	  <bumperTopicName>contacts/th/proximal</bumperTopicName>
         </plugin>
       </sensor>
+       <selfCollide>false</selfCollide>
       <material>LightGrey</material>
     </gazebo>
 
