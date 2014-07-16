@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('sr_utilities')
 import rospy
 from sensor_msgs.msg import JointState
 import thread

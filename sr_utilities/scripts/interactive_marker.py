@@ -16,7 +16,6 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import roslib; roslib.load_manifest('sr_unplug_connector')
 import rospy
 
 from interactive_markers.interactive_marker_server import *

@@ -12,7 +12,7 @@
   </node>
 
   <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch"/>
-  
+
   <!-- Robot state publisher: publishes tf information regarding the  position
        of the hand -->
   <node pkg="robot_state_publisher" type="state_publisher"
@@ -36,11 +36,9 @@
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub"
 	args="0.0 0.0 .0 3.14159 0 0 /srh/forearm /srh/position/forearm 100" />
   <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub"
-	args="0 0 0 0 0 0 /srh/position/forearm /srh/target/forearm
-	      100" />
+	args="0 0 0 0 0 0 /srh/position/forearm /srh/target/forearm 100" />
 
-  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator"
-	>
+  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator">
     <!-- Load the file you made above -->
     <rosparam command="load"  file="$(find sr_hand)/shadowhand_analyzer.yaml"/>
   </node>

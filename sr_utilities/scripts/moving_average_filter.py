@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('sr_utilities')
 import rospy
 from std_msgs.msg import Float64
-import thread
 
 
 class FilterMessages:
@@ -18,7 +16,7 @@ class FilterMessages:
 	if rospy.has_param('~in_topic'):
 		input_topic_param = rospy.get_param('~in_topic')
 		self.subs = rospy.Subscriber(input_topic_param, Float64, self.callback)
-		self.pub = rospy.Publisher(input_topic_param+"_filtered", Float64)        
+		self.pub = rospy.Publisher(input_topic_param+"_filtered", Float64)
 	else:
         	rospy.core.logerr("No input topic provided, not starting filtering")
 		return
@@ -26,7 +24,7 @@ class FilterMessages:
         self.queue=[]
 	self.queue_len=nb_occurence
 	self.mean=Float64(0.0);
-        
+
         rospy.spin()
 
     def compute_mean(self):
@@ -41,12 +39,12 @@ class FilterMessages:
 
 	self.queue.append(data)
 
-	if len(self.queue)>=self.queue_len:       
+	if len(self.queue)>=self.queue_len:
 		self.mean=Float64(self.compute_mean())
 		self.queue.pop(0)
-	
+
 	self.pub.publish(self.mean)
-             
+
 
 if __name__ == '__main__':
     filter = FilterMessages()
