@@ -37,7 +37,6 @@ namespace controller
   {
   public:
     SrhJointPositionController();
-    virtual ~SrhJointPositionController();
 
     bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name,
                boost::shared_ptr<control_toolbox::Pid> pid_position);

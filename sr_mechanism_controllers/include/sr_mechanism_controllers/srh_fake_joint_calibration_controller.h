@@ -43,7 +43,6 @@ namespace controller
   {
   public:
     SrhFakeJointCalibrationController();
-    virtual ~SrhFakeJointCalibrationController();
 
     virtual bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 

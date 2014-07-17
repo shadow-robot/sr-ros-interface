@@ -27,7 +27,6 @@ namespace shadowrobot
     typedef std::map<std::string, ros::Publisher> JointPubMap;
   public:
     JointTrajectoryActionController();
-    ~JointTrajectoryActionController();
 
   private:
     ros::NodeHandle nh;

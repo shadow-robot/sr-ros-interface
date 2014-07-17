@@ -40,16 +40,11 @@ using namespace std;
 namespace controller {
 
   SrhMuscleJointPositionController::SrhMuscleJointPositionController()
-    : SrController(), position_deadband(0.015), command_acc_(0)
+    : position_deadband(0.015), command_acc_(0)
   {
   }
 
-  SrhMuscleJointPositionController::~SrhMuscleJointPositionController()
-  {
-    sub_command_.shutdown();
-  }
-
-  bool SrhMuscleJointPositionController::init(ros_ethercat_model::RobotState *robot, const std::string &joint_name,
+  bool SrhMuscleJointPositionController::init(ros_ethercat_model::RobotState *robot, const string &joint_name,
                                         boost::shared_ptr<control_toolbox::Pid> pid_position)
   {
     ROS_DEBUG(" --------- ");
@@ -57,14 +52,14 @@ namespace controller {
 
     joint_name_ = joint_name;
 
-    assert(robot);
+    ROS_ASSERT(robot);
     robot_ = robot;
 
-    if( joint_name.substr(3,1).compare("0") == 0)
+    if (joint_name[3] == '0')
     {
       has_j2 = true;
-      std::string j1 = joint_name.substr(0,3) + "1";
-      std::string j2 = joint_name.substr(0,3) + "2";
+      string j1 = joint_name.substr(0,3) + "1";
+      string j2 = joint_name.substr(0,3) + "2";
       ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
 
       joint_state_ = robot_->getJointState(j1);
@@ -121,10 +116,10 @@ namespace controller {
 
   bool SrhMuscleJointPositionController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
-    assert(robot);
+    ROS_ASSERT(robot);
     node_ = n;
 
-    std::string joint_name;
+    string joint_name;
     if (!node_.getParam("joint", joint_name)) {
       ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
       return false;
@@ -212,8 +207,8 @@ namespace controller {
 //        return;
 //    }
 
-    assert(robot_ != NULL);
-    assert(joint_state_->joint_);
+    ROS_ASSERT(robot_ != NULL);
+    ROS_ASSERT(joint_state_->joint_);
 
     if (!initialized_)
     {

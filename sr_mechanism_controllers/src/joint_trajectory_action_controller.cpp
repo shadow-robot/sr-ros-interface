@@ -66,11 +66,6 @@ namespace shadowrobot
     action_server->start();
   }
 
-  JointTrajectoryActionController::~JointTrajectoryActionController()
-  {
-
-  }
-
   void JointTrajectoryActionController::execute_trajectory(
       const control_msgs::FollowJointTrajectoryGoalConstPtr& goal
   ){

@@ -2,12 +2,12 @@
  * @file   joint_spline_trajectory_action_controller.hpp
  * @author Ugo Cupcic <ugo@shadowrobot.com>
  * @date   Fri Mar  4 12:57:46 2011
- * 
- * @brief  Implement an actionlib server to execute a 
- * control_msgs::JointTrajectoryAction. Follows the 
+ *
+ * @brief  Implement an actionlib server to execute a
+ * control_msgs::JointTrajectoryAction. Follows the
  * given trajectory with the arm.
- * 
- * 
+ *
+ *
  */
 
 #ifndef _SR_JOINT_TRAJECTORY_ACTION_CONTROLLER_H_
@@ -19,14 +19,13 @@
 
 
 
-namespace shadowrobot 
+namespace shadowrobot
 {
   class JointTrajectoryActionController
   {
     typedef actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> JTAS;
   public:
     JointTrajectoryActionController();
-    ~JointTrajectoryActionController();
 
   private:
     ros::NodeHandle nh, nh_tilde;
@@ -37,21 +36,21 @@ namespace shadowrobot
     std::vector<std::string> joint_names_;
     ros::ServiceClient joint_state_client;
     std::map<std::string,double> joint_state_map;
-    
+
     std::vector< ros::Publisher > controller_publishers;  //!< This vector stores publishers to each joint controller.
     std::map<std::string,std::string> jointControllerMap; //!< stores a map of controller name and associated joints
     std::map<std::string,unsigned int> jointPubIdxMap; //! stores a map of publisher associated with joint index
     std::map<std::string,unsigned int> joint_state_idx_map; //! store internal order of joints
     bool use_sendupdate;
-    
+
     ros::Time last_time_;
     boost::shared_ptr<JTAS> action_server;
-    
+
    /* bool queryStateService(control_msgs::QueryTrajectoryState::Request &req,
                          control_msgs::QueryTrajectoryState::Response &resp);
   ros::ServiceServer serve_query_state_;*/
 
-    
+
     // coef[0] + coef[1]*t + ... + coef[5]*t^5
     struct Spline
     {
@@ -67,7 +66,7 @@ namespace shadowrobot
       std::vector<Spline> splines;
     };
     typedef std::vector<Segment> SpecifiedTrajectory;
-    
+
     std::vector<double> q, qd, qdd;  // Preallocated in init
 
   // Samples, but handling time bounds.  When the time is past the end

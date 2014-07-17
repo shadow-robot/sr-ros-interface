@@ -40,7 +40,6 @@ namespace controller
   {
   public:
     SrhJointMuscleValveController();
-    virtual ~SrhJointMuscleValveController();
 
     bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name);
     bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
