@@ -28,17 +28,18 @@
 #ifndef _JOINT_0_TRANSMISSION_FOR_MUSCLE_HPP_
 #define _JOINT_0_TRANSMISSION_FOR_MUSCLE_HPP_
 
-#include "sr_mechanism_model/joint_0_transmission.hpp"
+#include "sr_mechanism_model/simple_transmission_for_muscle.hpp"
 
 namespace sr_mechanism_model
 {
 
-class J0TransmissionForMuscle : public J0Transmission
+class J0TransmissionForMuscle : public SimpleTransmissionForMuscle
 {
 public:
   bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
   void propagatePosition();
-  void propagateEffort();
+
+  ros_ethercat_model::JointState* joint2_;
 };
 
 } //end namespace sr_mechanism_model

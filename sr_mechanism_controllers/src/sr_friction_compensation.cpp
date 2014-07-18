@@ -135,7 +135,7 @@ namespace sr_friction_compensation
 
     if( joint_not_found_forward )
     {
-      ROS_INFO_STREAM("  No forward friction compensation map for: " << joint_name_ );
+      ROS_INFO_STREAM("  No forward  friction compensation map for: " << joint_name_ );
 
       friction_map_forward = generate_flat_map();
     }

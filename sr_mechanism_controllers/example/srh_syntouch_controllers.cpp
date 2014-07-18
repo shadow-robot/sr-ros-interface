@@ -94,7 +94,7 @@ namespace controller {
   {
     command_ = joint_state_->position_;
 
-    ROS_WARN("Reseting PID");
+    ROS_WARN_STREAM("Reseting PID for joint  " << joint_state_->joint_->name);
   }
 
   void SrhSyntouchController::update(const ros::Time& time, const ros::Duration& period)
@@ -121,7 +121,7 @@ namespace controller {
     // TACTILES
     /////
     //you have access here to the whole data coming from the 5 tactiles at full speed.
-    double my_first_finger_tactile_pac0 = actuator_->state_.tactiles_->at(0).biotac.pac0;
+    double my_first_finger_tactile_pac0 = actuator_->motor_state_.tactiles_->at(0).biotac.pac0;
     if(loop_count_ % 10 == 0)
     {
       ROS_ERROR_STREAM("PAC0, tactile " << my_first_finger_tactile_pac0);

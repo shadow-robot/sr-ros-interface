@@ -77,7 +77,7 @@ namespace shadowrobot
   {
     pub_mse_ = nh_tilde.advertise<std_msgs::Float64>("mse_out", 5);
 
-    if(controller_type.compare("sr")==0)
+    if(controller_type == "sr")
     {
       //nb_mvt_step is used to set the size of the buffer
       sub_ = nh_tilde.subscribe(input, nb_mvt_step, &MovementPublisher::sr_calculateErrorCallback, this);

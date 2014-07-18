@@ -39,7 +39,6 @@ class J0Transmission : public SimpleTransmission
 public:
   bool initXml(TiXmlElement *config, ros_ethercat_model::RobotState *robot);
   void propagatePosition();
-  void propagateEffort();
 
   ros_ethercat_model::JointState* joint2_;
 };

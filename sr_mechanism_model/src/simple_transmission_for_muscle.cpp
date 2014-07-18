@@ -64,22 +64,23 @@ bool SimpleTransmissionForMuscle::initXml(TiXmlElement *elt, RobotState *robot)
 
 void SimpleTransmissionForMuscle::propagatePosition()
 {
-  SrMuscleActuatorState &state = static_cast<SrMuscleActuator*>(actuator_)->state_;
-  joint_->position_ = state.position_;
-  joint_->velocity_ = state.velocity_;
+  SrMuscleActuator *act = static_cast<SrMuscleActuator*>(actuator_);
+  joint_->position_ = act->state_.position_;
+  joint_->velocity_ = act->state_.velocity_;
 
   // We don't want to define a modified version of JointState, as that would imply using a modified version
   // of robot_state.hpp, controller manager, ethercat_hardware and ros_etherCAT main loop
   // So we will encode the two uint16_t that contain the data from the muscle pressure sensors
   // into the double measured_effort_. (We don't have any measured effort in the muscle hand anyway).
   // Then in the joint controller we will decode that back into uint16_t.
-  joint_->measured_effort_ = ((double) (state.pressure_[1]) * 0x10000) + (double) (state.pressure_[0]);
+  joint_->measured_effort_ = ((double) (act->muscle_state_.pressure_[1]) * 0x10000)
+                           +  (double) (act->muscle_state_.pressure_[0]);
 }
 
 void SimpleTransmissionForMuscle::propagateEffort()
 {
-  SrMuscleActuatorCommand &command = static_cast<SrMuscleActuator*>(actuator_)->command_;
-  command.enable_ = true;
+  SrMuscleActuator *act = static_cast<SrMuscleActuator*>(actuator_);
+  act->command_.enable_ = true;
 
   // We don't want to define a modified version of JointState, as that would imply using a modified version
   // of robot_state.hpp, controller manager, ethercat_hardware and ros_etherCAT main loop
@@ -101,8 +102,8 @@ void SimpleTransmissionForMuscle::propagateEffort()
     valve_1_tmp *= (-1);
   }
 
-  command.valve_[0] = valve_0_tmp;
-  command.valve_[1] = valve_1_tmp;
+  act->muscle_command_.valve_[0] = valve_0_tmp;
+  act->muscle_command_.valve_[1] = valve_1_tmp;
 }
 
 } //end namespace

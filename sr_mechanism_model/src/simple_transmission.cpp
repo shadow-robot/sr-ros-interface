@@ -78,15 +78,17 @@ bool SimpleTransmission::initXml(TiXmlElement *elt, RobotState *robot)
 
 void SimpleTransmission::propagatePosition()
 {
-  joint_->position_ = actuator_->state_.position_;
-  joint_->velocity_ = actuator_->state_.velocity_;
-  joint_->measured_effort_ = actuator_->state_.last_measured_effort_;
+  SrMotorActuator *act = static_cast<SrMotorActuator*>(actuator_);
+  joint_->position_ = act->state_.position_;
+  joint_->velocity_ = act->state_.velocity_;
+  joint_->measured_effort_ = act->state_.last_measured_effort_;
 }
 
 void SimpleTransmission::propagateEffort()
 {
-  actuator_->command_.enable_ = true;
-  actuator_->command_.effort_ = joint_->commanded_effort_;
+  SrMotorActuator *act = static_cast<SrMotorActuator*>(actuator_);
+  act->command_.enable_ = true;
+  act->command_.effort_ = joint_->commanded_effort_;
 }
 
 } //end namespace

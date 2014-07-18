@@ -33,7 +33,7 @@
 namespace sr_actuator
 {
 
-class SrActuatorState : public ros_ethercat_model::ActuatorState
+class SrActuatorState
 {
 public:
   SrActuatorState() :
@@ -174,7 +174,7 @@ public:
   int8_t last_commanded_valve_[2];
 }; //end class SrMuscleActuatorState
 
-class SrMuscleActuatorCommand : public ros_ethercat_model::ActuatorCommand
+class SrMuscleActuatorCommand
 {
 public:
   SrMuscleActuatorCommand() :
@@ -192,7 +192,7 @@ class SrMotorActuator : public ros_ethercat_model::Actuator
 {
 public:
 
-  SrMotorActuatorState state_;
+  SrMotorActuatorState motor_state_;
 }; //end class SrMotorActuator
 
 /**
@@ -202,8 +202,8 @@ class SrMuscleActuator : public ros_ethercat_model::Actuator
 {
 public:
 
-  SrMuscleActuatorState state_;
-  SrMuscleActuatorCommand command_;
+  SrMuscleActuatorState muscle_state_;
+  SrMuscleActuatorCommand muscle_command_;
 }; //end class SrMotorActuator
 }
 

@@ -146,7 +146,10 @@ namespace controller {
     pid_controller_position_->reset();
     read_parameters();
 
-    ROS_WARN("Reseting PID");
+    if( has_j2 )
+      ROS_WARN_STREAM("Reseting PID for joints " << joint_state_->joint_->name << " and " << joint_state_2->joint_->name);
+    else
+      ROS_WARN_STREAM("Reseting PID for joint  " << joint_state_->joint_->name);
   }
 
   bool SrhMuscleJointPositionController::setGains(sr_robot_msgs::SetPidGains::Request &req,
@@ -223,7 +226,7 @@ namespace controller {
     //IGNORE the following  lines if we don't want to use the pressure sensors data
     //We don't want to define a modified version of JointState, as that would imply using a modified version of robot_state.hpp, controller manager,
     //ethercat_hardware and ros_etherCAT main loop
-    // So we heve encoded the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
+    // So we have encoded the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
     // have any measured effort in the muscle hand anyway).
     // Here we extract the pressure values from joint_state_->measured_effort_ and decode that back into uint16.
     double pressure_0_tmp = fmod(joint_state_->measured_effort_, 0x10000);
@@ -321,7 +324,7 @@ namespace controller {
     }
 
     //We encode the valve 0 command in the lowest "half byte" i.e. the lowest 16 integer values in the double var (see decoding in simple_transmission_for_muscle.cpp)
-    //the valve 1 command is envoded in the next 4 bits
+    //the valve 1 command is encoded in the next 4 bits
     joint_state_->commanded_effort_ = static_cast<double>(valve_tmp[0]) + static_cast<double>(valve_tmp[1] << 4);
 
     //*******************************************************************************

@@ -50,7 +50,7 @@ namespace shadowrobot
      * @param rate rate at which the targets should be published.
      * @param repetition number of times the movement should be repeated
      * @param nb_mvt_step number of steps we take in the image
-     * @param controller_type the type of controller ("sr" or "pr2")
+     * @param controller_type the type of controller ("sr" or "ros")
      * @param testing set to true when running a gazebo test (just adds a long sleep).
      * @param hand_commander helper for controlling the shadow hand
      */

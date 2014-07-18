@@ -102,7 +102,7 @@ namespace controller
      *
      * @return the clamped command
      */
-    double clamp_command( double cmd );
+    virtual double clamp_command( double cmd );
 
     /**
      * Reads the min and max from the robot model for

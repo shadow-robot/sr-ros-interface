@@ -186,10 +186,7 @@ namespace controller {
     else
       commanded_effort += friction_compensator->friction_compensation( joint_state_->position_ , joint_state_->velocity_, int(commanded_effort), friction_deadband );
 
-    if( has_j2 )
-      joint_state_2->commanded_effort_ = commanded_effort;
-    else
-      joint_state_->commanded_effort_ = commanded_effort;
+    joint_state_->commanded_effort_ = commanded_effort;
 
     if(loop_count_ % 10 == 0)
     {
