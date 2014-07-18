@@ -259,9 +259,12 @@ void GazeboRosControllerManager::UpdateChild()
     // at this moment only commanded_effort_ in joint 2 is up to date
     double effort = fst->commanded_effort_;
 
-    if (joint_name[3] == '1' && (joint_name[0] == 'F' || joint_name[0] == 'M' || joint_name[0] == 'R' || joint_name[0] == 'L'))
+    if (joint_name[3] == '2' && (joint_name[0] == 'F' ||
+                                 joint_name[0] == 'M' ||
+                                 joint_name[0] == 'R' ||
+                                 joint_name[0] == 'L'))
     {
-      joint_name[3] = '2';
+      joint_name[3] = '1';
       JointState *fst1 = fake_state_->getJointState(joint_name);
       effort = fst1->commanded_effort_;
     }
