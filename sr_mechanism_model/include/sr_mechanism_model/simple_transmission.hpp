@@ -45,7 +45,6 @@
 #include <boost/smart_ptr/scoped_ptr.hpp>
 #include <ros_ethercat_model/robot_state.hpp>
 #include <pluginlib/class_list_macros.h>
-#include <actionlib/client/simple_client_goal_state.h>
 
 namespace sr_mechanism_model
 {
