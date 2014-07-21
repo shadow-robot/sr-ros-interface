@@ -1,6 +1,6 @@
 <package>
   <name>shadow_robot</name>
-  <version>1.3.1</version>
+  <version>1.3.2</version>
   <description>This stack regroups the different ros interfaces developped for Shadow Robot's
   Hardware. It provides an interface to both simulated and real hardware.</description>
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
