@@ -42,6 +42,7 @@
 #include <sr_robot_msgs/sendupdate.h>
 #include <sr_robot_msgs/config.h>
 #include <sr_robot_msgs/reverseKinematics.h>
+#include <std_msgs/Float64.h>
 
 #include "sr_hand/hand/sr_articulated_robot.h"
 
@@ -91,6 +92,16 @@ private:
     void sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& msg );
     ///The subscriber to the sendupdate topic.
     Subscriber sendupdate_sub;
+
+    /**
+     * Callback the etherCAT way: one topic per joint.
+     *
+     * @param msg the target in radians
+     * @param joint_name name of the joint we're sending the command to
+     */
+    void cmd_callback(const std_msgs::Float64ConstPtr& msg, std::string joint_name);
+    ///The vector of subscribers to the different joint topics.
+    std::vector<Subscriber> controllers_sub;
 
     /**
      * process the contrlr command: send new parameters to a given controller.

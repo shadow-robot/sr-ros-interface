@@ -72,6 +72,13 @@ void SRSubscriber::init()
     // subscribe to config topic, set configCallback function
     full_topic = prefix + "config";
     config_sub = node.subscribe(full_topic, 2, &SRSubscriber::configCallback, this);
+
+    // subscribe to the new ethercat like topics: one topic per joint
+    for(JointsMap::iterator joint = sr_articulated_robot->joints_map.begin() ;
+        joint != sr_articulated_robot->joints_map.end(); ++joint)
+    {
+      controllers_sub.push_back( node.subscribe("sh_"+joint->first+"_position_controller/command", 2, boost::bind(&SRSubscriber::cmd_callback, this, _1, joint->first) ) );
+    }
 }
 
 /////////////////////////////////
@@ -96,6 +103,12 @@ void SRSubscriber::sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& 
         sr_articulated_robot->sendupdate(sensor_name, (double)target);
     }
 
+}
+
+void SRSubscriber::cmd_callback( const std_msgs::Float64 ConstPtr& msg, std::string joint_name )
+{
+  //converting to degrees as the old can interface was expecting degrees
+  sr_articulated_robot->sendupdate(joint_name, sr_math_utils::to_degrees(msg->data));
 }
 
 void SRSubscriber::contrlrCallback( const sr_robot_msgs::contrlrConstPtr& msg )
