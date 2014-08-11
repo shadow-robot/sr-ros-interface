@@ -30,6 +30,7 @@
 
 #include "sr_hand/sr_subscriber.h"
 #include <boost/algorithm/string.hpp>
+#include <sr_utilities/sr_math_utils.hpp>
 
 using namespace std;
 
@@ -74,10 +75,10 @@ void SRSubscriber::init()
     config_sub = node.subscribe(full_topic, 2, &SRSubscriber::configCallback, this);
 
     // subscribe to the new ethercat like topics: one topic per joint
-    for(JointsMap::iterator joint = sr_articulated_robot->joints_map.begin() ;
+    for(SRArticulatedRobot::JointsMap::iterator joint = sr_articulated_robot->joints_map.begin() ;
         joint != sr_articulated_robot->joints_map.end(); ++joint)
     {
-      controllers_sub.push_back( node.subscribe("sh_"+joint->first+"_position_controller/command", 2, boost::bind(&SRSubscriber::cmd_callback, this, _1, joint->first) ) );
+      controllers_sub.push_back( node.subscribe<std_msgs::Float64>("sh_"+joint->first+"_position_controller/command", 2, boost::bind(&SRSubscriber::cmd_callback, this, _1, joint->first) ) );
     }
 }
 
@@ -105,7 +106,7 @@ void SRSubscriber::sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& 
 
 }
 
-void SRSubscriber::cmd_callback( const std_msgs::Float64 ConstPtr& msg, std::string joint_name )
+void SRSubscriber::cmd_callback( const std_msgs::Float64ConstPtr& msg, std::string joint_name )
 {
   //converting to degrees as the old can interface was expecting degrees
   sr_articulated_robot->sendupdate(joint_name, sr_math_utils::to_degrees(msg->data));
@@ -141,4 +142,3 @@ void SRSubscriber::configCallback( const sr_robot_msgs::configConstPtr& msg )
 }
 
 } // end namespace
-
