@@ -31,6 +31,7 @@
 #include "sr_hand/sr_subscriber.h"
 #include <boost/algorithm/string.hpp>
 #include <sr_utilities/sr_math_utils.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -78,7 +79,7 @@ void SRSubscriber::init()
     for(SRArticulatedRobot::JointsMap::iterator joint = sr_articulated_robot->joints_map.begin() ;
         joint != sr_articulated_robot->joints_map.end(); ++joint)
     {
-      controllers_sub.push_back( node.subscribe<std_msgs::Float64>("sh_"+joint->first+"_position_controller/command", 2, boost::bind(&SRSubscriber::cmd_callback, this, _1, joint->first) ) );
+      controllers_sub.push_back( node.subscribe<std_msgs::Float64>("sh_"+boost::to_lower_copy(joint->first+"_position_controller/command"), 2, boost::bind(&SRSubscriber::cmd_callback, this, _1, joint->first) ) );
     }
 }
 
