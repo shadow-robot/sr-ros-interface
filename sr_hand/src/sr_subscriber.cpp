@@ -107,7 +107,7 @@ void SRSubscriber::sendupdateCallback( const sr_robot_msgs::sendupdateConstPtr& 
 
 }
 
-void SRSubscriber::cmd_callback( const std_msgs::Float64ConstPtr& msg, std::string joint_name )
+void SRSubscriber::cmd_callback( const std_msgs::Float64ConstPtr& msg, std::string& joint_name )
 {
   //converting to degrees as the old can interface was expecting degrees
   sr_articulated_robot->sendupdate(joint_name, sr_math_utils::to_degrees(msg->data));

@@ -99,7 +99,7 @@ private:
      * @param msg the target in radians
      * @param joint_name name of the joint we're sending the command to
      */
-    void cmd_callback(const std_msgs::Float64ConstPtr& msg, std::string joint_name);
+    void cmd_callback(const std_msgs::Float64ConstPtr& msg, std::string& joint_name);
     ///The vector of subscribers to the different joint topics.
     std::vector<Subscriber> controllers_sub;
 
