@@ -128,10 +128,10 @@ class ShadowHand_ROS():
         if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             self.joint_states_listener = rospy.Subscriber("joint_states", JointState, self.joint_states_callback)
             # Initialize the command publishers here, to avoid the delay caused when initializing them in the sendupdate
-            for joint in self.allJoints:
-                if not self.eth_publishers.has_key(joint.name):
-                    topic = "sh_"+ joint.name.lower() + self.topic_ending+"/command"
-                    self.eth_publishers[joint.name] = rospy.Publisher(topic, Float64, queue_size=1, latch=True)
+            for jnt in self.allJoints:
+                if not self.eth_publishers.has_key(jnt.name):
+                    topic = "sh_"+ jnt.name.lower() + self.topic_ending+"/command"
+                    self.eth_publishers[jnt.name] = rospy.Publisher(topic, Float64, queue_size=1, latch=True)
         self.tactile_receiver = TactileReceiver()
 
         threading.Thread(None, rospy.spin)
@@ -180,9 +180,9 @@ class ShadowHand_ROS():
         self.lastMsg = data;
         if self.isFirstMessage :
             self.init_actual_joints()
-            for joint in self.lastMsg.joints_list :
-                self.dict_pos[joint.joint_name]=joint.joint_position
-                self.dict_tar[joint.joint_name]=joint.joint_target
+            for jnt in self.lastMsg.joints_list :
+                self.dict_pos[jnt.joint_name]=jnt.joint_position
+                self.dict_tar[jnt.joint_name]=jnt.joint_target
             self.isFirstMessage = False
             self.isReady = True
 
@@ -194,9 +194,9 @@ class ShadowHand_ROS():
         """
         self.lastArmMsg = data
         if self.isFirstMessageArm :
-            for joint in self.lastArmMsg.joints_list :
-                self.dict_arm_pos[joint.joint_name]=joint.joint_position
-                self.dict_arm_tar[joint.joint_name]=joint.joint_target
+            for jnt in self.lastArmMsg.joints_list :
+                self.dict_arm_pos[jnt.joint_name]=jnt.joint_position
+                self.dict_arm_tar[jnt.joint_name]=jnt.joint_target
 
     def init_actual_joints(self):
         """
@@ -320,12 +320,12 @@ class ShadowHand_ROS():
         @param jointName: Name of the joint to read the value
         @return: 'NaN' if the value is not correct, the actual position of the joint else
         """
-        for joint in self.lastMsg.joints_list:
-            if joint.joint_name == jointName:
-                return float(joint.joint_position)
-        for joint in self.lastArmMsg.joints_list:
-            if joint.joint_name == jointName:
-                return float(joint.joint_position)
+        for jnt in self.lastMsg.joints_list:
+            if jnt.joint_name == jointName:
+                return float(jnt.joint_position)
+        for jnt in self.lastArmMsg.joints_list:
+            if jnt.joint_name == jointName:
+                return float(jnt.joint_position)
         return 'NaN'
 
     def has_arm(self):
@@ -380,8 +380,8 @@ class ShadowHand_ROS():
         """
         if not self.isReady:
             return
-        for joint in self.lastMsg.joints_list:
-            self.dict_pos[joint.joint_name] = joint.joint_position
+        for jnt in self.lastMsg.joints_list:
+            self.dict_pos[jnt.joint_name] = jnt.joint_position
         return self.dict_pos
 
     def read_all_current_targets(self):
@@ -389,8 +389,8 @@ class ShadowHand_ROS():
         @return: dictionnary mapping joint names to current targets
         Read all the targets in the lastMsg
         """
-        for joint in self.lastMsg.joints_list:
-            self.dict_tar[joint.joint_name] = joint.joint_target
+        for jnt in self.lastMsg.joints_list:
+            self.dict_tar[jnt.joint_name] = jnt.joint_target
         return self.dict_tar
 
     def read_all_current_velocities(self):
@@ -412,8 +412,8 @@ class ShadowHand_ROS():
         @return: dictionnary mapping joint names to actual positions
         Read all the positions in the lastMsg
         """
-        for joint in self.lastArmMsg.joints_list:
-            self.dict_arm_pos[joint.joint_name] = joint.joint_position
+        for jnt in self.lastArmMsg.joints_list:
+            self.dict_arm_pos[jnt.joint_name] = jnt.joint_position
         return self.dict_arm_pos
 
     def read_all_current_arm_targets(self):
@@ -421,8 +421,8 @@ class ShadowHand_ROS():
         @return: dictionnary mapping joint names to actual targets
         Read all the targets in the lastMsg
         """
-        for joint in self.lastArmMsg.joints_list:
-            self.dict_arm_tar[joint.joint_name] = joint.joint_target
+        for jnt in self.lastArmMsg.joints_list:
+            self.dict_arm_tar[jnt.joint_name] = jnt.joint_target
         return self.dict_arm_tar
 
     def resend_targets(self):
