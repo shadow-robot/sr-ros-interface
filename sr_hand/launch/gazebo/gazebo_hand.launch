@@ -1,7 +1,13 @@
 <launch>
-  <!-- Gazebo world file to load. -->
-  <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world" />
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
   <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="verbose" default="false"/>
+
+  <!-- Gazebo world file to load. -->
+  <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world"/>
 
   <!-- Gazebo world file to load. -->
   <!-- We want gazebo to stay in the root namespace but the nodes below to be
@@ -9,8 +15,13 @@
   <group ns="/">
       <!-- We reuse the logic in empty_world.launch, changing only the name of the world to be launched -->
       <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(arg world_name)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
         <arg name="gui" value="$(arg gui)"/>
+        <arg name="headless" value="$(arg headless)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="world_name" value="$(arg world_name)"/>
       </include>
   </group>
 
@@ -31,7 +42,7 @@
   <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
 
   <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch"/>
-  	
+
   <node pkg="robot_state_publisher" type="state_publisher"
         name="robot_state_publisher_full_pos">
     <param name="publish_frequency" type="double" value="20.0" />
