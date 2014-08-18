@@ -29,8 +29,8 @@
   <run_depend>sr_hand</run_depend>
   <run_depend>sr_movements</run_depend>
   <run_depend>sr_robot_msgs</run_depend>
+  <run_depend>gnuplot</run_depend>
   
   <test_depend>gtest</test_depend>
-  <test_depend>gnuplot</test_depend>
 
 </package>
