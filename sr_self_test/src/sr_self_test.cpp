@@ -45,19 +45,21 @@ namespace shadow_robot
     }
     std::string home = getenv("HOME");
     if (home=="")
-        home="/tmp";
+        home="/tmp/";
+    else
+		home+="/.ros/log/";
     //rename existing folder if it exists
-    if( boost::filesystem::exists(home+"/.ros/log/self_tests") )
+    if( boost::filesystem::exists(home+"self_tests") )
     {
       //delete the last backup if it exists
-      if( boost::filesystem::exists(home+"/.ros/log/self_tests.bk") )
-        boost::filesystem::remove_all(home+"/.ros/log/self_tests.bk");
+      if( boost::filesystem::exists(home+"self_tests.bk") )
+        boost::filesystem::remove_all(home+"self_tests.bk");
 
       //backup last test plots
-      boost::filesystem::rename(home+"/.ros/log/self_tests", home+"/.ros/log/self_tests.bk");
+      boost::filesystem::rename(home+"self_tests", home+"self_tests.bk");
     }
     //create folder in /tmp for storing the plots
-    path_to_plots_ = home+"/.ros/log/self_tests/"+ros::this_node::getName() + "/";
+    path_to_plots_ = home+"self_tests/"+ros::this_node::getName() + "/";
     boost::filesystem::create_directories(path_to_plots_);
         
     test_runner_.setID("12345");
