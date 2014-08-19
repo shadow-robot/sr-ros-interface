@@ -6,6 +6,7 @@
   relative. Can then launch this inside a namespace to namespace the hand. -->
   <group ns="/">
       <!-- We reuse the logic in empty_world.launch, changing only the name of the world to be launched -->
+       <param name="gazebo/image_path" value="$(find sr_movements)/movements/test.png"/>
       <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(arg world_name)"/>
       </include>
