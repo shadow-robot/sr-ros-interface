@@ -45,9 +45,9 @@ namespace shadow_robot
     }
     std::string home = getenv("HOME");
     if (home=="")
-        home="/tmp/";
+      home="/tmp/";
     else
-		home+="/.ros/log/";
+      home+="/.ros/log/";
     //rename existing folder if it exists
     if( boost::filesystem::exists(home+"self_tests") )
     {
@@ -61,7 +61,7 @@ namespace shadow_robot
     //create folder in /tmp for storing the plots
     path_to_plots_ = home+"self_tests/"+ros::this_node::getName() + "/";
     boost::filesystem::create_directories(path_to_plots_);
-        
+
     test_runner_.setID("12345");
 
     //add the different tests
