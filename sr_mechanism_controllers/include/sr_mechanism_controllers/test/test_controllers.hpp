@@ -28,11 +28,9 @@
 #define _SR_TEST_CONTROLLERS_HPP_
 
 #include "sr_mechanism_controllers/sr_controller.hpp"
-#include <boost/smart_ptr.hpp>
+#include "sr_mechanism_model/simple_transmission.hpp"
 
 #include <control_toolbox/pid.h>
-#include <pr2_hardware_interface/hardware_interface.h>
-#include <pr2_mechanism_model/robot.h>
 #include <tinyxml.h>
 #include <sr_hardware_interface/sr_actuator.hpp>
 
@@ -40,20 +38,26 @@ class TestControllers
 {
 public:
   TestControllers();
-  virtual ~TestControllers();
+  virtual ~TestControllers()
+  {
+    delete controller;
+    delete hw;
+    delete robot_state;
+    delete model;
+    delete joint_state;
+  }
 
   void init();
 
   virtual void init_controller() = 0;
   virtual double compute_output(double input, double current_position) = 0;
 
-  boost::shared_ptr<controller::SrController> controller;
-  boost::shared_ptr<pr2_hardware_interface::HardwareInterface> hw;
-  boost::shared_ptr<pr2_mechanism_model::Robot> robot;
-  boost::shared_ptr<pr2_mechanism_model::RobotState> robot_state;
-  boost::shared_ptr<TiXmlDocument> model;
-  boost::shared_ptr<sr_actuator::SrMotorActuator> actuator;
-  pr2_mechanism_model::JointState* joint_state;
+  controller::SrController *controller;
+  hardware_interface::HardwareInterface *hw;
+  ros_ethercat_model::RobotState *robot_state;
+  TiXmlDocument *model;
+  sr_mechanism_model::SimpleTransmission transmission;
+  ros_ethercat_model::JointState* joint_state;
 };
 
 
