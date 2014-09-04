@@ -59,8 +59,6 @@ class LoadAllControllers(object):
 if __name__ == '__main__':
     rospy.init_node("load_all_controllers")
 
-    #@TODO replace this sleep with a proper way of identifying when the controllers
-    # can be loaded
-    sleep(6.0)
+    #@TODO implement wait for calibrated
 
     lac = LoadAllControllers()
