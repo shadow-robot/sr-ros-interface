@@ -34,13 +34,33 @@ class LoadAllControllers(object):
         unique_keys = list(set(unique_keys))
 
         for controller in unique_keys:
+            success = True
+            list_controllers = rospy.ServiceProxy('controller_manager/list_controllers', ListControllers)
+            loaded_controllers = []
+            try:
+                resp1 = list_controllers()
+                loaded_controllers = [c.name for c in resp1.controller]
+            except rospy.ServiceException:
+                success = False
+
+            #don't reload controllers that are already loaded
+            if controller in loaded_controllers:
+                continue
+
             try:
                 load_controllers = rospy.ServiceProxy('controller_manager/load_controller', LoadController)
                 resp1 = load_controllers(controller)
             except rospy.ServiceException:
-                rospy.logerr("Failed to load controller for "+controller)
-            rospy.loginfo("Loaded "+controller+" sucessfully.")
+                rospy.logerr("Failed to load controller "+controller)
+                failed = True
+            if not failed:
+                rospy.loginfo("Loaded "+controller+" sucessfully.")
 
 if __name__ == '__main__':
     rospy.init_node("load_all_controllers")
+
+    #@TODO replace this sleep with a proper way of identifying when the controllers
+    # can be loaded
+    sleep(6.0)
+
     lac = LoadAllControllers()

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <launch>
   <rosparam file="$(find sr_description)/hand/config/hand_controller_gazebo.yaml" command="load"/>
   <rosparam file="$(find sr_description)/hand/config/hand_effort_controller_gazebo.yaml" command="load"/>
@@ -19,4 +20,6 @@
 	    args="sh_ffj0_position_controller sh_ffj3_position_controller sh_ffj4_position_controller sh_mfj0_position_controller sh_mfj3_position_controller sh_mfj4_position_controller sh_rfj0_position_controller sh_rfj3_position_controller sh_rfj4_position_controller sh_lfj0_position_controller sh_lfj3_position_controller sh_lfj4_position_controller sh_lfj5_position_controller sh_thj1_position_controller sh_thj2_position_controller sh_thj3_position_controller sh_thj4_position_controller sh_thj5_position_controller sh_wrj1_position_controller sh_wrj2_position_controller" />
     </group>
   </group>
+
+  <node name="load_all_controllers" pkg="sr_mechanism_controllers" type="load_all_controllers" output="screen"/>
 </launch>
