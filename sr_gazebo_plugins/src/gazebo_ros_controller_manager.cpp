@@ -47,6 +47,8 @@
 #include <angles/angles.h>
 #include <urdf/model.h>
 
+#include <std_msgs/Bool.h>
+
 #include <sr_hardware_interface/sr_actuator.hpp>
 
 using namespace ros_ethercat_model;
@@ -130,6 +132,9 @@ void GazeboRosControllerManager::Load(physics::ModelPtr _parent, sdf::ElementPtr
   ros_spinner_thread_ = boost::thread(boost::bind(&GazeboRosControllerManager::ControllerManagerROSThread, this));
 
   rosnode_->param("gazebo/start_robot_calibrated", fake_calibration_, true);
+
+  if(fake_calibration_)
+    calibrated_pub_ = rosnode_->advertise<std_msgs::Bool>("calibrated", 1);
 
   // setup the robot state
   ReadPr2Xml();
@@ -345,6 +350,13 @@ void GazeboRosControllerManager::ReadPr2Xml()
          ++jit)
     {
       jit->second->calibrated_ = fake_calibration_;
+    }
+
+    if(fake_calibration_)
+    {
+      std_msgs::Bool calib;
+      calib.data = true;
+      calibrated_pub_.publish(calib);
     }
   }
 

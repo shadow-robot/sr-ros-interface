@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sr_mechanism_controllers)
-find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp actionlib controller_manager_msgs sr_robot_msgs
+find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp rospy actionlib controller_manager_msgs sr_robot_msgs
   sr_utilities controller_interface ros_ethercat_model realtime_tools velocity_controllers
   pluginlib rosconsole angles control_toolbox sr_hardware_interface sr_mechanism_model xmlrpcpp cmake_modules)
 find_package(TinyXML REQUIRED)
@@ -8,7 +8,7 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${TinyXM
 
 catkin_package(
   DEPENDS xmlrpcpp
-  CATKIN_DEPENDS std_msgs std_srvs roscpp actionlib controller_manager_msgs sr_robot_msgs sr_utilities controller_interface ros_ethercat_model
+  CATKIN_DEPENDS std_msgs std_srvs roscpp rospy actionlib controller_manager_msgs sr_robot_msgs sr_utilities controller_interface ros_ethercat_model
     realtime_tools velocity_controllers pluginlib rosconsole angles control_toolbox sr_hardware_interface sr_mechanism_model
   INCLUDE_DIRS include
   LIBRARIES sr_mechanism_controllers
@@ -93,4 +93,8 @@ install(DIRECTORY example/
 install(FILES controller_plugins.xml
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
-
+#python script
+file(GLOB PYTHON_SCRIPTS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+   "${CMAKE_CURRENT_SOURCE_DIR}/scripts/${PROJECT_NAME}/*")
+install(PROGRAMS ${PYTHON_SCRIPTS}
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

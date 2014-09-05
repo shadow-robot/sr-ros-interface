@@ -1,0 +1,116 @@
+#!/usr/bin/env python
+#
+# Copyright 2011 Shadow Robot Company Ltd.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import rospy
+import argparse
+import time
+
+from std_msgs.msg import Bool
+from controller_manager_msgs.srv import ListControllers, LoadController
+
+class LoadAllControllers(object):
+    def __init__(self, args):
+        self._loaded_pub = rospy.Publisher("controllers_loaded", Bool)
+
+        #waiting for the bot to be loaded properly if using
+        # --wait-for=/calibrated
+        args = self.parse_args(args)
+        topic = args.wait_for
+        timeout=args.timeout
+
+        if topic != None:
+            self.wait_for_topic(topic, timeout)
+
+        params = rospy.get_param("")
+
+        unique_keys = []
+        for key in params.keys():
+            if ("sh" in key) and ("controller" in key):
+                unique_keys.append(key)
+
+        #making unique
+        unique_keys = list(set(unique_keys))
+
+        load_controllers = rospy.ServiceProxy('controller_manager/load_controller', LoadController)
+
+        for controller in unique_keys:
+            success = True
+            list_controllers = rospy.ServiceProxy('controller_manager/list_controllers', ListControllers)
+            loaded_controllers = []
+            try:
+                resp1 = list_controllers()
+                loaded_controllers = [c.name for c in resp1.controller]
+            except rospy.ServiceException:
+                success = False
+
+            print loaded_controllers
+
+            #don't reload controllers that are already loaded
+            if controller in loaded_controllers:
+                rospy.logwarn(controller + " already loaded")
+                continue
+
+            try:
+                resp1 = load_controllers(controller)
+            except rospy.ServiceException:
+                rospy.logerr("Failed to load controller "+controller)
+                success = False
+            if success:
+                rospy.loginfo("Loaded "+controller+" sucessfully.")
+
+        self._loaded_pub.publish(True)
+
+    def wait_for_topic(self, topic, timeout):
+        wait_for_topic_result = [None]
+
+        def wait_for_topic_cb(msg):
+            wait_for_topic_result[0] = msg
+            rospy.logdebug("Heard from wait-for topic: %s" % str(msg.data))
+        rospy.Subscriber(topic, Bool, wait_for_topic_cb)
+        started_waiting = time.time()
+
+        # We might not have receieved any time messages yet
+        warned_about_not_hearing_anything = False
+        while not wait_for_topic_result[0]:
+            time.sleep(0.01)
+            if rospy.is_shutdown():
+                return
+            if not warned_about_not_hearing_anything:
+                if time.time() - started_waiting > timeout:
+                    warned_about_not_hearing_anything = True
+                    rospy.logwarn("Load All Controllers hasn't heard anything from its \"wait for\" topic (%s)" % \
+                                      topic)
+        while not wait_for_topic_result[0].data:
+            time.sleep(0.01)
+            if rospy.is_shutdown():
+                return
+
+    def parse_args(self, args=None):
+        parser = argparse.ArgumentParser(description='Controller spawner')
+        parser.add_argument('--wait-for', metavar='topic', help='does not load or '
+                        'start controllers until it hears "True" on a topic (Bool)')
+        parser.add_argument('--timeout', metavar='T', type=int, default=30,
+                        help='how long to wait for controller_manager services [s] (default: 30)')
+        return parser.parse_args(args=args)
+
+if __name__ == '__main__':
+    rospy.init_node("load_all_controllers")
+
+    #@TODO implement wait for calibrated
+
+    lac = LoadAllControllers(rospy.myargv()[1:])
