@@ -201,8 +201,6 @@ void GazeboRosControllerManager::ResetChild()
 
 void GazeboRosControllerManager::UpdateChild()
 {
-  //TODO publish calibrated = true on first call
-
   if (world->IsPaused() || !fake_state_ || !cm_)
     return;
 

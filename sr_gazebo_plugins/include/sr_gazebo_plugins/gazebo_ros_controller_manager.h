@@ -128,6 +128,7 @@ private:
   ros::Time last_write_sim_time_ros_;
 
   ros::Publisher calibrated_pub_;
+  bool first_call_;
 };
 
 /** \} */

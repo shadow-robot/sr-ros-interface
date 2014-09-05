@@ -17,12 +17,23 @@
 #
 
 import rospy
-from time import sleep
+import argparse
+import time
 
+from std_msgs.msg import Bool
 from controller_manager_msgs.srv import ListControllers, LoadController
 
 class LoadAllControllers(object):
-    def __init__(self):
+    def __init__(self, args):
+        #waiting for the bot to be loaded properly if using
+        # --wait-for=/calibrated
+        args = self.parse_args(args)
+        topic = args.wait_for
+        timeout=args.timeout
+
+        if topic != None:
+            self.wait_for_topic(topic, timeout)
+
         params = rospy.get_param("")
 
         unique_keys = []
@@ -52,13 +63,51 @@ class LoadAllControllers(object):
                 resp1 = load_controllers(controller)
             except rospy.ServiceException:
                 rospy.logerr("Failed to load controller "+controller)
-                failed = True
-            if not failed:
+                success = False
+            if success:
                 rospy.loginfo("Loaded "+controller+" sucessfully.")
+
+    def wait_for_topic(self, topic, timeout):
+        wait_for_topic_result = [None]
+
+        def wait_for_topic_cb(msg):
+            wait_for_topic_result[0] = msg
+            rospy.logdebug("Heard from wait-for topic: %s" % str(msg.data))
+        rospy.Subscriber(topic, Bool, wait_for_topic_cb)
+        started_waiting = time.time()
+
+        # We might not have receieved any time messages yet
+        warned_about_not_hearing_anything = False
+        while not wait_for_topic_result[0]:
+            time.sleep(0.01)
+            if rospy.is_shutdown():
+                return
+            if not warned_about_not_hearing_anything:
+                if time.time() - started_waiting > timeout:
+                    warned_about_not_hearing_anything = True
+                    rospy.logwarn("Load All Controllers hasn't heard anything from its \"wait for\" topic (%s)" % \
+                                      topic)
+        while not wait_for_topic_result[0].data:
+            time.sleep(0.01)
+            if rospy.is_shutdown():
+                return
+
+        #TODO remove this sleep
+        # (concurrent with the controller spawner...)
+        time.sleep(10.0)
+
+
+    def parse_args(self, args=None):
+        parser = argparse.ArgumentParser(description='Controller spawner')
+        parser.add_argument('--wait-for', metavar='topic', help='does not load or '
+                        'start controllers until it hears "True" on a topic (Bool)')
+        parser.add_argument('--timeout', metavar='T', type=int, default=30,
+                        help='how long to wait for controller_manager services [s] (default: 30)')
+        return parser.parse_args(args=args)
 
 if __name__ == '__main__':
     rospy.init_node("load_all_controllers")
 
     #@TODO implement wait for calibrated
 
-    lac = LoadAllControllers()
+    lac = LoadAllControllers(rospy.myargv()[1:])
