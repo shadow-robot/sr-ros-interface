@@ -8,7 +8,7 @@
 
   <!-- Gazebo world file to load. -->
   <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world"/>
-
+  <param name="gazebo/start_robot_calibrated" value="True"/>
   <!-- Gazebo world file to load. -->
   <!-- We want gazebo to stay in the root namespace but the nodes below to be
   relative. Can then launch this inside a namespace to namespace the hand. -->

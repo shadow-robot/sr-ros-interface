@@ -6,8 +6,6 @@ find_package(catkin REQUIRED COMPONENTS rostest std_msgs std_srvs roscpp rospy a
 find_package(TinyXML REQUIRED)
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
-catkin_python_setup()
-
 catkin_package(
   DEPENDS xmlrpcpp
   CATKIN_DEPENDS std_msgs std_srvs roscpp rospy actionlib controller_manager_msgs sr_robot_msgs sr_utilities controller_interface ros_ethercat_model
