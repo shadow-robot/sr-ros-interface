@@ -25,6 +25,8 @@ from controller_manager_msgs.srv import ListControllers, LoadController
 
 class LoadAllControllers(object):
     def __init__(self, args):
+        self._loaded_pub = rospy.Publisher("controllers_loaded", Bool)
+
         #waiting for the bot to be loaded properly if using
         # --wait-for=/calibrated
         args = self.parse_args(args)
@@ -44,6 +46,8 @@ class LoadAllControllers(object):
         #making unique
         unique_keys = list(set(unique_keys))
 
+        load_controllers = rospy.ServiceProxy('controller_manager/load_controller', LoadController)
+
         for controller in unique_keys:
             success = True
             list_controllers = rospy.ServiceProxy('controller_manager/list_controllers', ListControllers)
@@ -54,18 +58,22 @@ class LoadAllControllers(object):
             except rospy.ServiceException:
                 success = False
 
+            print loaded_controllers
+
             #don't reload controllers that are already loaded
             if controller in loaded_controllers:
+                rospy.logwarn(controller + " already loaded")
                 continue
 
             try:
-                load_controllers = rospy.ServiceProxy('controller_manager/load_controller', LoadController)
                 resp1 = load_controllers(controller)
             except rospy.ServiceException:
                 rospy.logerr("Failed to load controller "+controller)
                 success = False
             if success:
                 rospy.loginfo("Loaded "+controller+" sucessfully.")
+
+        self._loaded_pub.publish(True)
 
     def wait_for_topic(self, topic, timeout):
         wait_for_topic_result = [None]
@@ -91,11 +99,6 @@ class LoadAllControllers(object):
             time.sleep(0.01)
             if rospy.is_shutdown():
                 return
-
-        #TODO remove this sleep
-        # (concurrent with the controller spawner...)
-        time.sleep(10.0)
-
 
     def parse_args(self, args=None):
         parser = argparse.ArgumentParser(description='Controller spawner')
