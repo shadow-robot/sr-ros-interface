@@ -37,8 +37,8 @@
       <axis xyz="0 1 0" />
     </xacro:finger_ellipsoid>
 
-    <xacro:little_finger_ellipsoid link_prefix="lf" joint_prefix="LF" parent="palm">
-    </xacro:little_finger_ellipsoid>
+    <xacro:little_finger link_prefix="lf" joint_prefix="LF" parent="palm">
+    </xacro:little_finger>
 
     <xacro:thumb_ellipsoid parent="palm">
     </xacro:thumb_ellipsoid>
