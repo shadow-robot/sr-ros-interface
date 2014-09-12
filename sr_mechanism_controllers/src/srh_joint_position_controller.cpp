@@ -45,38 +45,47 @@ SrhJointPositionController::SrhJointPositionController()
 {
 }
 
-bool SrhJointPositionController::init(ros_ethercat_model::RobotState *robot, const string &joint_name,
-                                      boost::shared_ptr<control_toolbox::Pid> pid_position)
+bool SrhJointPositionController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
 {
-  ROS_DEBUG(" --------- ");
-  ROS_DEBUG_STREAM("Init: " << joint_name);
-
-  joint_name_ = joint_name;
-
   ROS_ASSERT(robot);
   robot_ = robot;
+  node_ = n;
+
+  if (!node_.getParam("joint", joint_name_))
+  {
+    ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
+    return false;
+  }
+
+  pid_controller_position_.reset(new control_toolbox::Pid());
+  if (!pid_controller_position_->init(ros::NodeHandle(node_, "pid")))
+    return false;
+
+  controller_state_publisher_.reset(new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
+                                    (node_, "state", 1));
+
+  ROS_DEBUG(" --------- ");
+  ROS_DEBUG_STREAM("Init: " << joint_name_);
 
   // joint 0s e.g. FFJ0
-  if (joint_name[3] == '0')
+  if (joint_name_[3] == '0')
   {
     has_j2 = true;
-    string j1 = joint_name.substr(0, 3) + "1";
-    string j2 = joint_name.substr(0, 3) + "2";
+    string j1 = joint_name_.substr(0, 3) + "1";
+    string j2 = joint_name_.substr(0, 3) + "2";
     ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
 
     joint_state_ = robot_->getJointState(j1);
     if (!joint_state_)
     {
-      ROS_ERROR("SrhJointPositionController could not find joint named \"%s\"\n",
-                joint_name.c_str());
+      ROS_ERROR("SrhJointPositionController could not find joint named \"%s\"\n", joint_name_.c_str());
       return false;
     }
 
     joint_state_2 = robot_->getJointState(j2);
     if (!joint_state_2)
     {
-      ROS_ERROR("SrhJointPositionController could not find joint named \"%s\"\n",
-                joint_name.c_str());
+      ROS_ERROR("SrhJointPositionController could not find joint named \"%s\"\n", joint_name_.c_str());
       return false;
     }
     if (!joint_state_2->calibrated_)
@@ -90,54 +99,29 @@ bool SrhJointPositionController::init(ros_ethercat_model::RobotState *robot, con
   else
   {
     has_j2 = false;
-    joint_state_ = robot_->getJointState(joint_name);
+    joint_state_ = robot_->getJointState(joint_name_);
     if (!joint_state_)
     {
-      ROS_ERROR("SrhJointPositionController could not find joint named \"%s\"\n",
-                joint_name.c_str());
+      ROS_ERROR("SrhJointPositionController could not find joint named \"%s\"\n", joint_name_.c_str());
       return false;
     }
     if (!joint_state_->calibrated_)
     {
-      ROS_ERROR("Joint %s not calibrated for SrhJointPositionController", joint_name.c_str());
+      ROS_ERROR("Joint %s not calibrated for SrhJointPositionController", joint_name_.c_str());
       return false;
     }
   }
 
   //get the min and max value for the current joint:
-  get_min_max(robot_->robot_model_, joint_name);
+  get_min_max(robot_->robot_model_, joint_name_);
 
-  friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
-
-  pid_controller_position_ = pid_position;
+  friction_compensator.reset(new sr_friction_compensation::SrFrictionCompensator(joint_name_));
 
   serve_set_gains_ = node_.advertiseService("set_gains", &SrhJointPositionController::setGains, this);
   serve_reset_gains_ = node_.advertiseService("reset_gains", &SrhJointPositionController::resetGains, this);
 
   after_init();
   return true;
-}
-
-bool SrhJointPositionController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
-{
-  ROS_ASSERT(robot);
-  node_ = n;
-
-  string joint_name;
-  if (!node_.getParam("joint", joint_name))
-  {
-    ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
-    return false;
-  }
-
-  boost::shared_ptr<control_toolbox::Pid> pid_position = boost::shared_ptr<control_toolbox::Pid>(new control_toolbox::Pid());
-  if (!pid_position->init(ros::NodeHandle(node_, "pid")))
-    return false;
-
-  controller_state_publisher_.reset(new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
-                                    (node_, "state", 1));
-
-  return init(robot, joint_name, pid_position);
 }
 
 void SrhJointPositionController::starting(const ros::Time& time)
@@ -207,25 +191,27 @@ void SrhJointPositionController::getGains(double &p, double &i, double &d, doubl
 
 void SrhJointPositionController::update(const ros::Time& time, const ros::Duration& period)
 {
-  if (!has_j2)
-  {
-    if (!joint_state_->calibrated_)
-      return;
-  }
+  if (!has_j2 && !joint_state_->calibrated_)
+    return;
 
-  ROS_ASSERT(robot_ != NULL);
+  ROS_ASSERT(robot_);
   ROS_ASSERT(joint_state_->joint_);
 
-  if (!initialized_)
+  if (initialized_)
+  {
+    if (has_j2)
+      command_ = joint_state_->commanded_position_ + joint_state_2->commanded_position_;
+    else
+      command_ = joint_state_->commanded_position_;
+  }
+  else
   {
     initialized_ = true;
-
     if (has_j2)
       command_ = joint_state_->position_ + joint_state_2->position_;
     else
       command_ = joint_state_->position_;
   }
-
   command_ = clamp_command(command_);
 
   //Compute position demand from position error:
@@ -303,6 +289,11 @@ void SrhJointPositionController::read_parameters()
   node_.param<double>("pid/max_force", max_force_demand, 1023.0);
   node_.param<double>("pid/position_deadband", position_deadband, 0.015);
   node_.param<int>("pid/friction_deadband", friction_deadband, 5);
+}
+
+void SrhJointPositionController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
+{
+  joint_state_->commanded_position_ = msg->data;
 }
 }
 

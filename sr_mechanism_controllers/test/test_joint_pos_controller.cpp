@@ -60,7 +60,7 @@ public:
   {
     hw->current_time_ = ros::Time::now();
     joint_state->position_ = current_position;
-    controller->setCommand( input );
+    joint_state->commanded_position_ = input;
 
     controller->update();
 

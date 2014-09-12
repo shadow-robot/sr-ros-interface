@@ -42,9 +42,6 @@ namespace controller
 
     SrhMixedPositionVelocityJointController();
 
-    bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name,
-               boost::shared_ptr<control_toolbox::Pid> pid_position,
-               boost::shared_ptr<control_toolbox::Pid> pid_velocity);
     bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting(const ros::Time& time);
@@ -60,11 +57,11 @@ namespace controller
     bool setGains(sr_robot_msgs::SetMixedPositionVelocityPidGains::Request &req, sr_robot_msgs::SetMixedPositionVelocityPidGains::Response &resp);
 
   private:
-    boost::shared_ptr<control_toolbox::Pid> pid_controller_position_;       /**< Internal PID controller for the position loop. */
-    boost::shared_ptr<control_toolbox::Pid> pid_controller_velocity_;       /**< Internal PID controller for the velocity loop. */
+    boost::scoped_ptr<control_toolbox::Pid> pid_controller_position_;       /**< Internal PID controller for the position loop. */
+    boost::scoped_ptr<control_toolbox::Pid> pid_controller_velocity_;       /**< Internal PID controller for the velocity loop. */
 
     //publish our joint controller state
-    boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointControllerState> > controller_state_publisher_;
+    boost::scoped_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointControllerState> > controller_state_publisher_;
 
     /// The values for the velocity demand saturation
     double max_velocity_, min_velocity_;
@@ -89,6 +86,9 @@ namespace controller
 
     ///smallest demand we can send to the motors
     int motor_min_force_threshold;
+
+    ///set the position target from a topic
+    void setCommandCB(const std_msgs::Float64ConstPtr& msg);
   };
 } // namespace
 

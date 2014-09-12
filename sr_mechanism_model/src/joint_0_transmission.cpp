@@ -69,8 +69,8 @@ void J0Transmission::propagatePosition()
     joint_->velocity_ = act->state_.velocity_ / 2.0;
     joint2_->velocity_ = act->state_.velocity_ / 2.0;
 
-    joint_->measured_effort_ = act->state_.last_measured_effort_;
-    joint2_->measured_effort_ = act->state_.last_measured_effort_;
+    joint_->effort_ = act->state_.last_measured_effort_;
+    joint2_->effort_ = act->state_.last_measured_effort_;
   }
   else if (size == 0)
   {
@@ -86,8 +86,8 @@ void J0Transmission::propagatePosition()
     joint_->velocity_ = act->state_.velocity_ / 2.0;
     joint2_->velocity_ = act->state_.velocity_ / 2.0;
 
-    joint_->measured_effort_ = act->state_.last_measured_effort_ / 2.0;
-    joint2_->measured_effort_ = act->state_.last_measured_effort_ / 2.0;
+    joint_->effort_ = act->state_.last_measured_effort_ / 2.0;
+    joint2_->effort_ = act->state_.last_measured_effort_ / 2.0;
   }
 }
 

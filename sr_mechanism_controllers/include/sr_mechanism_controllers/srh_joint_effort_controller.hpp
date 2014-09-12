@@ -38,7 +38,6 @@ namespace controller
   class SrhEffortJointController : public SrController
   {
   public:
-    bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name);
     bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting(const ros::Time& time);
@@ -55,6 +54,9 @@ namespace controller
   private:
     ///read all the controller settings from the parameter server
     void read_parameters();
+
+    ///set the effort target from a topic
+    void setCommandCB(const std_msgs::Float64ConstPtr& msg);
   };
 } // namespace
 

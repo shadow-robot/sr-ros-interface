@@ -44,96 +44,70 @@ namespace controller {
   {
   }
 
-  bool SrhMuscleJointPositionController::init(ros_ethercat_model::RobotState *robot, const string &joint_name,
-                                        boost::shared_ptr<control_toolbox::Pid> pid_position)
-  {
-    ROS_DEBUG(" --------- ");
-    ROS_DEBUG_STREAM("Init: " << joint_name);
-
-    joint_name_ = joint_name;
-
-    ROS_ASSERT(robot);
-    robot_ = robot;
-
-    if (joint_name[3] == '0')
-    {
-      has_j2 = true;
-      string j1 = joint_name.substr(0,3) + "1";
-      string j2 = joint_name.substr(0,3) + "2";
-      ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
-
-      joint_state_ = robot_->getJointState(j1);
-      if (!joint_state_)
-      {
-        ROS_ERROR("SrhMuscleJointPositionController could not find joint named \"%s\"\n",
-                  j1.c_str());
-        return false;
-      }
-
-      joint_state_2 = robot_->getJointState(j2);
-      if (!joint_state_2)
-      {
-        ROS_ERROR("SrhMuscleJointPositionController could not find joint named \"%s\"\n",
-                  j2.c_str());
-        return false;
-      }
-//      if (!joint_state_2->calibrated_)
-//      {
-//        ROS_ERROR("Joint %s not calibrated for SrhMuscleJointPositionController", j2.c_str());
-//        return false;
-//      }
-    }
-    else
-    {
-      has_j2 = false;
-      joint_state_ = robot_->getJointState(joint_name);
-      if (!joint_state_)
-      {
-        ROS_ERROR("SrhMuscleJointPositionController could not find joint named \"%s\"\n",
-                  joint_name.c_str());
-        return false;
-      }
-//      if (!joint_state_->calibrated_)
-//      {
-//        ROS_ERROR("Joint %s not calibrated for SrhMuscleJointPositionController", joint_name.c_str());
-//        return false;
-//      }
-    }
-
-    //get the min and max value for the current joint:
-    get_min_max( robot_->robot_model_, joint_name );
-
-    friction_compensator = boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator>(new sr_friction_compensation::SrFrictionCompensator(joint_name));
-
-    pid_controller_position_ = pid_position;
-
-    serve_set_gains_ = node_.advertiseService("set_gains", &SrhMuscleJointPositionController::setGains, this);
-    serve_reset_gains_ = node_.advertiseService("reset_gains", &SrhMuscleJointPositionController::resetGains, this);
-
-    after_init();
-    return true;
-  }
-
   bool SrhMuscleJointPositionController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
     ROS_ASSERT(robot);
+    robot_ = robot;
     node_ = n;
 
-    string joint_name;
-    if (!node_.getParam("joint", joint_name)) {
+    if (!node_.getParam("joint", joint_name_)) {
       ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
 
-    boost::shared_ptr<control_toolbox::Pid> pid_position = boost::shared_ptr<control_toolbox::Pid>( new control_toolbox::Pid() );
-    if (!pid_position->init(ros::NodeHandle(node_, "pid")))
+    pid_controller_position_.reset( new control_toolbox::Pid() );
+    if (!pid_controller_position_->init(ros::NodeHandle(node_, "pid")))
       return false;
 
     controller_state_publisher_.reset(
       new realtime_tools::RealtimePublisher<sr_robot_msgs::JointMusclePositionControllerState>
       (node_, "state", 1));
 
-    return init(robot, joint_name, pid_position);
+    ROS_DEBUG(" --------- ");
+    ROS_DEBUG_STREAM("Init: " << joint_name_);
+
+    if (joint_name_[3] == '0')
+    {
+      has_j2 = true;
+      string j1 = joint_name_.substr(0,3) + "1";
+      string j2 = joint_name_.substr(0,3) + "2";
+      ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
+
+      joint_state_ = robot_->getJointState(j1);
+      if (!joint_state_)
+      {
+        ROS_ERROR("SrhMuscleJointPositionController could not find joint named \"%s\"\n", j1.c_str());
+        return false;
+      }
+
+      joint_state_2 = robot_->getJointState(j2);
+      if (!joint_state_2)
+      {
+        ROS_ERROR("SrhMuscleJointPositionController could not find joint named \"%s\"\n", j2.c_str());
+        return false;
+      }
+    }
+    else
+    {
+      has_j2 = false;
+      joint_state_ = robot_->getJointState(joint_name_);
+      if (!joint_state_)
+      {
+        ROS_ERROR("SrhMuscleJointPositionController could not find joint named \"%s\"\n", joint_name_.c_str());
+        return false;
+      }
+    }
+
+    //get the min and max value for the current joint:
+    get_min_max( robot_->robot_model_, joint_name_ );
+
+    friction_compensator.reset(new sr_friction_compensation::SrFrictionCompensator(joint_name_));
+
+    serve_set_gains_ = node_.advertiseService("set_gains", &SrhMuscleJointPositionController::setGains, this);
+    serve_reset_gains_ = node_.advertiseService("reset_gains", &SrhMuscleJointPositionController::resetGains, this);
+
+    after_init();
+    return true;
   }
 
 
@@ -204,20 +178,20 @@ namespace controller {
     //The valve commands can have values between -4 and 4
     int8_t valve[2];
 
-//    if( !has_j2)
-//    {
-//      if (!joint_state_->calibrated_)
-//        return;
-//    }
-
     ROS_ASSERT(robot_ != NULL);
     ROS_ASSERT(joint_state_->joint_);
 
-    if (!initialized_)
+    if (initialized_)
+    {
+      if (has_j2)
+        command_ = joint_state_->commanded_position_ + joint_state_2->commanded_position_;
+      else
+        command_ = joint_state_->commanded_position_;
+    }
+    else
     {
       initialized_ = true;
-
-      if( has_j2 )
+      if (has_j2)
         command_ = joint_state_->position_ + joint_state_2->position_;
       else
         command_ = joint_state_->position_;
@@ -226,11 +200,11 @@ namespace controller {
     //IGNORE the following  lines if we don't want to use the pressure sensors data
     //We don't want to define a modified version of JointState, as that would imply using a modified version of robot_state.hpp, controller manager,
     //ethercat_hardware and ros_etherCAT main loop
-    // So we have encoded the two uint16 that contain the data from the muscle pressure sensors into the double measured_effort_. (We don't
+    // So we have encoded the two uint16 that contain the data from the muscle pressure sensors into the double effort_. (We don't
     // have any measured effort in the muscle hand anyway).
-    // Here we extract the pressure values from joint_state_->measured_effort_ and decode that back into uint16.
-    double pressure_0_tmp = fmod(joint_state_->measured_effort_, 0x10000);
-    double pressure_1_tmp = (fmod(joint_state_->measured_effort_, 0x100000000) - pressure_0_tmp) / 0x10000;
+    // Here we extract the pressure values from joint_state_->effort_ and decode that back into uint16.
+    double pressure_0_tmp = fmod(joint_state_->effort_, 0x10000);
+    double pressure_1_tmp = (fmod(joint_state_->effort_, 0x100000000) - pressure_0_tmp) / 0x10000;
     uint16_t pressure_0 = static_cast<uint16_t>(pressure_0_tmp + 0.5);
     uint16_t pressure_1 = static_cast<uint16_t>(pressure_1_tmp + 0.5);
 
@@ -374,6 +348,11 @@ namespace controller {
     node_.param<double>("pid/max_force", max_force_demand, 1023.0);
     node_.param<double>("pid/position_deadband", position_deadband, 0.015);
     node_.param<int>("pid/friction_deadband", friction_deadband, 5);
+  }
+
+  void SrhMuscleJointPositionController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
+  {
+    joint_state_->commanded_position_ = msg->data;
   }
 }
 

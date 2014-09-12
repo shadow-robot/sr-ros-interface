@@ -56,48 +56,10 @@ namespace controller {
     sub_max_force_factor_ = node_.subscribe<std_msgs::Float64>("max_force_factor", 1, &SrController::maxForceFactorCB, this);
   }
 
-
   std::string SrController::getJointName()
   {
     return joint_state_->joint_->name;
   }
-
-// Set the joint position command
-  void SrController::setCommand(double cmd)
-  {
-    command_ = cmd;
-  }
-
-// Return the current position command
-  void SrController::getCommand(double & cmd)
-  {
-    cmd = command_;
-  }
-
-  void SrController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
-  {
-    command_ = msg->data;
-  }
-
-  bool SrController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
-  {
-    return true;
-  }
-
-  void SrController::update(const ros::Time& time, const ros::Duration& period)
-  {
-  }
-
-  void SrController::starting(const ros::Time& time)
-  {}
-
-  bool SrController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
-  {
-    return true;
-  }
-
-  void SrController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
-  {}
 
   void SrController::get_min_max( urdf::Model model, std::string joint_name )
   {

@@ -41,7 +41,6 @@ namespace controller
   public:
     SrhJointMuscleValveController();
 
-    bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name);
     bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting(const ros::Time& time);

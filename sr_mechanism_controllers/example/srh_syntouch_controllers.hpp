@@ -41,7 +41,6 @@ namespace controller
     SrhSyntouchController();
     ~SrhSyntouchController();
 
-    bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name );
     bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting(const ros::Time& time);
@@ -53,7 +52,7 @@ namespace controller
 
   private:
     //publish our joint controller state
-    boost::shared_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointControllerState> > controller_state_publisher_;
+    boost::scoped_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointControllerState> > controller_state_publisher_;
 
     sr_actuator::SrMotorActuator* actuator_;
   };

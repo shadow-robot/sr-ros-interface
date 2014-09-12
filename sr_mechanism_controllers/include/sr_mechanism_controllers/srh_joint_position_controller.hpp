@@ -38,8 +38,6 @@ namespace controller
   public:
     SrhJointPositionController();
 
-    bool init( ros_ethercat_model::RobotState *robot, const std::string &joint_name,
-               boost::shared_ptr<control_toolbox::Pid> pid_position);
     bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
 
     virtual void starting(const ros::Time& time);
@@ -54,7 +52,7 @@ namespace controller
     bool setGains(sr_robot_msgs::SetPidGains::Request &req, sr_robot_msgs::SetPidGains::Response &resp);
 
   private:
-    boost::shared_ptr<control_toolbox::Pid> pid_controller_position_;       /**< Internal PID controller for the position loop. */
+    boost::scoped_ptr<control_toolbox::Pid> pid_controller_position_;       /**< Internal PID controller for the position loop. */
 
     ///clamps the force demand to this value
     double max_force_demand;
@@ -68,7 +66,9 @@ namespace controller
     ///read all the controller settings from the parameter server
     void read_parameters();
 
-    std::string joint_name_;
+    ///set the position target from a topic
+    void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+
   };
 } // namespace
 
