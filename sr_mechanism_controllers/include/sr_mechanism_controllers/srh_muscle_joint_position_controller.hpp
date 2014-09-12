@@ -74,6 +74,8 @@ namespace controller
 
     ///set the position target from a topic
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+
+    void resetJointState();
   };
 } // namespace
 

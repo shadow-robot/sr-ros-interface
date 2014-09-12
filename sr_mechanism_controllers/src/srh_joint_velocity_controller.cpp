@@ -122,10 +122,7 @@ bool SrhJointVelocityController::init(ros_ethercat_model::RobotState *robot, ros
 
 void SrhJointVelocityController::starting(const ros::Time& time)
 {
-  if (has_j2)
-    command_ = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
-  else
-    command_ = joint_state_->velocity_;
+  resetJointState();
   pid_controller_velocity_->reset();
   read_parameters();
 
@@ -158,10 +155,7 @@ bool SrhJointVelocityController::setGains(sr_robot_msgs::SetPidGains::Request &r
 
 bool SrhJointVelocityController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
 {
-  if (has_j2)
-    command_ = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
-  else
-    command_ = joint_state_->velocity_;
+  resetJointState();
 
   if (!pid_controller_velocity_->init(ros::NodeHandle(node_, "velocity_pid")))
     return false;
@@ -189,21 +183,16 @@ void SrhJointVelocityController::update(const ros::Time& time, const ros::Durati
   ROS_ASSERT(robot_);
   ROS_ASSERT(joint_state_->joint_);
 
-  if (initialized_)
+  if (!initialized_)
   {
-    if (has_j2)
-      command_ = (joint_state_->commanded_velocity_ + joint_state_2->commanded_velocity_) / 2.0;
-    else
-      command_ = joint_state_->commanded_velocity_;
-  }
-  else
-  {
+    resetJointState();
     initialized_ = true;
-    if (has_j2)
-      command_ = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
-    else
-      command_ = joint_state_->velocity_;
   }
+  if (has_j2)
+    command_ = (joint_state_->commanded_velocity_ + joint_state_2->commanded_velocity_) / 2.0;
+  else
+    command_ = joint_state_->commanded_velocity_;
+  command_ = clamp_command(command_);
 
   //Compute velocity demand from position error:
   double error_velocity = 0.0;
@@ -273,6 +262,21 @@ void SrhJointVelocityController::read_parameters()
 void SrhJointVelocityController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
 {
   joint_state_->commanded_velocity_ = msg->data;
+}
+
+void SrhJointVelocityController::resetJointState()
+{
+    if (has_j2)
+    {
+      joint_state_->commanded_velocity_ = joint_state_->velocity_;
+      joint_state_2->commanded_velocity_ = joint_state_2->velocity_;
+      command_ = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
+    }
+    else
+    {
+      joint_state_->commanded_velocity_ = joint_state_->velocity_;
+      command_ = joint_state_->velocity_;
+    }
 }
 }
 

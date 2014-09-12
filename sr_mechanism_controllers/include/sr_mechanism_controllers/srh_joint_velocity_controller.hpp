@@ -67,6 +67,8 @@ namespace controller
 
     ///set the velocity target from a topic
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+
+    void resetJointState();
   };
 } // namespace
 

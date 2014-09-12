@@ -126,10 +126,7 @@ bool SrhJointPositionController::init(ros_ethercat_model::RobotState *robot, ros
 
 void SrhJointPositionController::starting(const ros::Time& time)
 {
-  if (has_j2)
-    command_ = joint_state_->position_ + joint_state_2->position_;
-  else
-    command_ = joint_state_->position_;
+  resetJointState();
   pid_controller_position_->reset();
   read_parameters();
 
@@ -166,10 +163,7 @@ bool SrhJointPositionController::setGains(sr_robot_msgs::SetPidGains::Request &r
 
 bool SrhJointPositionController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
 {
-  if (has_j2)
-    command_ = joint_state_->position_ + joint_state_2->position_;
-  else
-    command_ = joint_state_->position_;
+  resetJointState();
 
   if (!pid_controller_position_->init(ros::NodeHandle(node_, "pid")))
     return false;
@@ -197,21 +191,15 @@ void SrhJointPositionController::update(const ros::Time& time, const ros::Durati
   ROS_ASSERT(robot_);
   ROS_ASSERT(joint_state_->joint_);
 
-  if (initialized_)
+  if (!initialized_)
   {
-    if (has_j2)
-      command_ = joint_state_->commanded_position_ + joint_state_2->commanded_position_;
-    else
-      command_ = joint_state_->commanded_position_;
-  }
-  else
-  {
+    resetJointState();
     initialized_ = true;
-    if (has_j2)
-      command_ = joint_state_->position_ + joint_state_2->position_;
-    else
-      command_ = joint_state_->position_;
   }
+  if (has_j2)
+    command_ = joint_state_->commanded_position_ + joint_state_2->commanded_position_;
+  else
+    command_ = joint_state_->commanded_position_;
   command_ = clamp_command(command_);
 
   //Compute position demand from position error:
@@ -294,6 +282,21 @@ void SrhJointPositionController::read_parameters()
 void SrhJointPositionController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
 {
   joint_state_->commanded_position_ = msg->data;
+}
+
+void SrhJointPositionController::resetJointState()
+{
+    if (has_j2)
+    {
+      joint_state_->commanded_position_ = joint_state_->position_;
+      joint_state_2->commanded_position_ = joint_state_2->position_;
+      command_ = joint_state_->position_ + joint_state_2->position_;
+    }
+    else
+    {
+      joint_state_->commanded_position_ = joint_state_->position_;
+      command_ = joint_state_->position_;
+    }
 }
 }
 

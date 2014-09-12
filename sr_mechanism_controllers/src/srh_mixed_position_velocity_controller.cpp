@@ -148,11 +148,7 @@ bool SrhMixedPositionVelocityJointController::init(ros_ethercat_model::RobotStat
 
 void SrhMixedPositionVelocityJointController::starting(const ros::Time& time)
 {
-  if (has_j2)
-    command_ = joint_state_->position_ + joint_state_2->position_;
-  else
-    command_ = joint_state_->position_;
-
+  resetJointState();
   pid_controller_position_->reset();
   pid_controller_velocity_->reset();
   read_parameters();
@@ -203,10 +199,7 @@ bool SrhMixedPositionVelocityJointController::setGains(sr_robot_msgs::SetMixedPo
 
 bool SrhMixedPositionVelocityJointController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
 {
-  if (has_j2)
-    command_ = joint_state_->position_ + joint_state_2->position_;
-  else
-    command_ = joint_state_->position_;
+  resetJointState();
 
   if (!pid_controller_position_->init(ros::NodeHandle(node_, "position_pid")))
     return false;
@@ -242,21 +235,15 @@ void SrhMixedPositionVelocityJointController::update(const ros::Time& time, cons
   ROS_ASSERT(robot_);
   ROS_ASSERT(joint_state_->joint_);
 
-  if (initialized_)
+  if (!initialized_)
   {
-    if (has_j2)
-      command_ = joint_state_->commanded_position_ + joint_state_2->commanded_position_;
-    else
-      command_ = joint_state_->commanded_position_;
-  }
-  else
-  {
+    resetJointState();
     initialized_ = true;
-    if (has_j2)
-      command_ = joint_state_->position_ + joint_state_2->position_;
-    else
-      command_ = joint_state_->position_;
   }
+  if (has_j2)
+    command_ = joint_state_->commanded_position_ + joint_state_2->commanded_position_;
+  else
+    command_ = joint_state_->commanded_position_;
   command_ = clamp_command(command_);
 
   ////////////
@@ -388,6 +375,21 @@ void SrhMixedPositionVelocityJointController::read_parameters()
 void SrhMixedPositionVelocityJointController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
 {
   joint_state_->commanded_position_ = msg->data;
+}
+
+void SrhMixedPositionVelocityJointController::resetJointState()
+{
+    if (has_j2)
+    {
+      joint_state_->commanded_position_ = joint_state_->position_;
+      joint_state_2->commanded_position_ = joint_state_2->position_;
+      command_ = joint_state_->position_ + joint_state_2->position_;
+    }
+    else
+    {
+      joint_state_->commanded_position_ = joint_state_->position_;
+      command_ = joint_state_->position_;
+    }
 }
 }
 

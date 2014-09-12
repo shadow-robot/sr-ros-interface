@@ -113,10 +113,7 @@ namespace controller {
 
   void SrhMuscleJointPositionController::starting(const ros::Time& time)
   {
-    if( has_j2 )
-      command_ = joint_state_->position_ + joint_state_2->position_;
-    else
-      command_ = joint_state_->position_;
+    resetJointState();
     pid_controller_position_->reset();
     read_parameters();
 
@@ -150,10 +147,7 @@ namespace controller {
 
   bool SrhMuscleJointPositionController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
   {
-    if( has_j2 )
-      command_ = joint_state_->position_ + joint_state_2->position_;
-    else
-      command_ = joint_state_->position_;
+    resetJointState();
 
     if (!pid_controller_position_->init(ros::NodeHandle(node_, "pid")))
       return false;
@@ -181,21 +175,16 @@ namespace controller {
     ROS_ASSERT(robot_ != NULL);
     ROS_ASSERT(joint_state_->joint_);
 
-    if (initialized_)
+    if (!initialized_)
     {
-      if (has_j2)
-        command_ = joint_state_->commanded_position_ + joint_state_2->commanded_position_;
-      else
-        command_ = joint_state_->commanded_position_;
-    }
-    else
-    {
+      resetJointState();
       initialized_ = true;
-      if (has_j2)
-        command_ = joint_state_->position_ + joint_state_2->position_;
-      else
-        command_ = joint_state_->position_;
     }
+    if (has_j2)
+      command_ = joint_state_->commanded_position_ + joint_state_2->commanded_position_;
+    else
+      command_ = joint_state_->commanded_position_;
+    command_ = clamp_command(command_);
 
     //IGNORE the following  lines if we don't want to use the pressure sensors data
     //We don't want to define a modified version of JointState, as that would imply using a modified version of robot_state.hpp, controller manager,
@@ -353,6 +342,21 @@ namespace controller {
   void SrhMuscleJointPositionController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
   {
     joint_state_->commanded_position_ = msg->data;
+  }
+
+  void SrhMuscleJointPositionController::resetJointState()
+  {
+      if (has_j2)
+      {
+        joint_state_->commanded_position_ = joint_state_->position_;
+        joint_state_2->commanded_position_ = joint_state_2->position_;
+        command_ = joint_state_->position_ + joint_state_2->position_;
+      }
+      else
+      {
+        joint_state_->commanded_position_ = joint_state_->position_;
+        command_ = joint_state_->position_;
+      }
   }
 }
 
