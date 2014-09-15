@@ -189,7 +189,7 @@ void SrhJointVelocityController::update(const ros::Time& time, const ros::Durati
     initialized_ = true;
   }
   if (has_j2)
-    command_ = (joint_state_->commanded_velocity_ + joint_state_2->commanded_velocity_) / 2.0;
+    command_ = joint_state_->commanded_velocity_ + joint_state_2->commanded_velocity_;
   else
     command_ = joint_state_->commanded_velocity_;
   command_ = clamp_command(command_);
@@ -197,7 +197,7 @@ void SrhJointVelocityController::update(const ros::Time& time, const ros::Durati
   //Compute velocity demand from position error:
   double error_velocity = 0.0;
   if (has_j2)
-    error_velocity = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0 - command_;
+    error_velocity = (joint_state_->velocity_ + joint_state_2->velocity_) - command_;
   else
     error_velocity = joint_state_->velocity_ - command_;
 
@@ -233,7 +233,7 @@ void SrhJointVelocityController::update(const ros::Time& time, const ros::Durati
       controller_state_publisher_->msg_.header.stamp = time;
       controller_state_publisher_->msg_.set_point = command_;
       if (has_j2)
-        controller_state_publisher_->msg_.process_value = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
+        controller_state_publisher_->msg_.process_value = joint_state_->velocity_ + joint_state_2->velocity_;
       else
         controller_state_publisher_->msg_.process_value = joint_state_->velocity_;
       controller_state_publisher_->msg_.error = error_velocity;
@@ -270,7 +270,7 @@ void SrhJointVelocityController::resetJointState()
     {
       joint_state_->commanded_velocity_ = joint_state_->velocity_;
       joint_state_2->commanded_velocity_ = joint_state_2->velocity_;
-      command_ = (joint_state_->velocity_ + joint_state_2->velocity_) / 2.0;
+      command_ = joint_state_->velocity_ + joint_state_2->velocity_;
     }
     else
     {
