@@ -375,6 +375,8 @@ void SrhMixedPositionVelocityJointController::read_parameters()
 void SrhMixedPositionVelocityJointController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
 {
   joint_state_->commanded_position_ = msg->data;
+  if (has_j2)
+    joint_state_2->commanded_position_ = 0.0;
 }
 
 void SrhMixedPositionVelocityJointController::resetJointState()

@@ -262,6 +262,8 @@ void SrhJointVelocityController::read_parameters()
 void SrhJointVelocityController::setCommandCB(const std_msgs::Float64ConstPtr& msg)
 {
   joint_state_->commanded_velocity_ = msg->data;
+  if (has_j2)
+    joint_state_2->commanded_velocity_ = 0.0;
 }
 
 void SrhJointVelocityController::resetJointState()
