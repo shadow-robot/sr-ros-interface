@@ -47,46 +47,38 @@ namespace controller {
     sub_command_.shutdown();
   }
 
-  bool SrhSyntouchController::init(ros_ethercat_model::RobotState *robot, const std::string &joint_name)
-  {
-    ROS_DEBUG(" --------- ");
-    ROS_DEBUG_STREAM("Init: " << joint_name);
-
-    assert(robot);
-    robot_ = robot;
-
-    joint_state_ = robot_->getJointState(joint_name);
-    if (!joint_state_)
-    {
-      ROS_ERROR("SrhMixedPositionVelocityController could not find joint named \"%s\"\n",
-                joint_name.c_str());
-      return false;
-    }
-    if (!joint_state_->calibrated_)
-    {
-      ROS_ERROR("Joint %s not calibrated for SrhSyntouchController", joint_name.c_str());
-      return false;
-    }
-
-    //init the pointer to the biotacs data, updated at 1kHz
-    actuator_ = static_cast<sr_actuator::SrMotorActuator*>( robot->getActuator( joint_name ) );
-
-    after_init();
-    return true;
-  }
-
   bool SrhSyntouchController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
-    assert(robot);
+    ROS_ASSERT(robot);
+    robot_ = robot;
     node_ = n;
 
-    std::string joint_name;
-    if (!node_.getParam("joint", joint_name)) {
+    if (!node_.getParam("joint", joint_name_)) {
       ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
 
-    return init(robot, joint_name);
+    ROS_DEBUG(" --------- ");
+    ROS_DEBUG_STREAM("Init: " << joint_name_);
+
+    joint_state_ = robot_->getJointState(joint_name_);
+    if (!joint_state_)
+    {
+      ROS_ERROR("SrhMixedPositionVelocityController could not find joint named \"%s\"\n",
+                joint_name_.c_str());
+      return false;
+    }
+    if (!joint_state_->calibrated_)
+    {
+      ROS_ERROR("Joint %s not calibrated for SrhSyntouchController", joint_name_.c_str());
+      return false;
+    }
+
+    //init the pointer to the biotacs data, updated at 1kHz
+    actuator_ = static_cast<sr_actuator::SrMotorActuator*>( robot->getActuator( joint_name_ ) );
+
+    after_init();
+    return true;
   }
 
 
@@ -102,10 +94,12 @@ namespace controller {
     if (!joint_state_->calibrated_)
       return;
 
-    assert(robot_ != NULL);
-    assert(joint_state_->joint_);
+    ROS_ASSERT(robot_);
+    ROS_ASSERT(joint_state_->joint_);
 
-    if (!initialized_)
+    if (initialized_)
+      command_ = joint_state_->commanded_position_;
+    else
     {
       initialized_ = true;
       command_ = joint_state_->position_;
@@ -152,7 +146,7 @@ namespace controller {
         controller_state_publisher_->msg_.time_step = period.toSec();
 
         controller_state_publisher_->msg_.command = commanded_effort;
-        controller_state_publisher_->msg_.measured_effort = joint_state_->measured_effort_;
+        controller_state_publisher_->msg_.measured_effort = joint_state_->effort_;
 
         controller_state_publisher_->unlockAndPublish();
       }
