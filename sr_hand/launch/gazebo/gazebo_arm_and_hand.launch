@@ -1,6 +1,14 @@
 <launch>
   <!-- Gazebo world file to load. -->
   <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world" />
+  <!-- Set to 0 if the arm and hand description will not be specified with the arguments hand_description and arm_hand_description. In which case it depends on the environment variables -->
+  <arg name="set_arm_hand_description" default="0" />
+  <!-- Xacro file containing the robot description we want to load. Only taken into acount if the set_description arg is set to 1
+       the default value -->
+  <arg name="hand_description" default="$(find sr_description)/robots/shadowhand_motor.urdf.xacro" />
+  <!-- Xacro file containing the robot description we want to load. Only taken into acount if the set_description arg is set to 1
+       the default value -->
+  <arg name="arm_hand_description" default="$(find sr_description)/robots/arm_and_hand_motor.urdf.xacro" />
 
   <!-- We want gazebo to stay in the root namespace but the nodes below to be
   relative. Can then launch this inside a namespace to namespace the hand. -->
@@ -16,8 +24,20 @@
   <node name="spawn_support" pkg="gazebo_ros" type="spawn_model" args="-urdf -param support_description -z 0.0 -model support_model" respawn="false" output="screen" />
 
   <!-- spawn the arm and hand model -->
-  <include file="$(find sr_description)/loaders/load_arm_and_hand_model.launch" />
-  <include file="$(find sr_description)/loaders/load_hand_model.launch" />
+  <group unless="$(arg set_arm_hand_description)">
+    <!-- Loads the correct robot description depending on the environment variables -->
+    <include file="$(find sr_description)/loaders/load_arm_and_hand_model.launch" />
+    <!-- Loads the correct robot description depending on the environment variables -->
+    <include file="$(find sr_description)/loaders/load_hand_model.launch" />
+  </group>
+  <group if="$(arg set_arm_hand_description)">
+    <!-- Loads the robot description from the file passed as an argument -->
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(arg arm_hand_description)'" />
+    <!-- Loads the robot description from the file passed as an argument -->
+    <param name="sh_description" command="$(find xacro)/xacro.py '$(arg hand_description)'" />
+  </group>
+
+
   <node name="spawn_hand" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -z 0.0 -model shadow_model -J ShoulderJSwing 0.78 -J ElbowJSwing 2.0" respawn="false" output="screen" />
 
   <!-- Controllers for the arm and hand -->
