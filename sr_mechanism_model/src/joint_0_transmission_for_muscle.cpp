@@ -69,11 +69,11 @@ void J0TransmissionForMuscle::propagatePosition()
     // We don't want to define a modified version of JointState, as that would imply using a modified version
     // of robot_state.hpp, controller manager, ethercat_hardware and ros_etherCAT main loop
     // So we will encode the two uint16_t that contain the data from the muscle pressure sensors
-    // into the double measured_effort_. (We don't have any measured effort in the muscle hand anyway).
+    // into the double effort_. (We don't have any measured effort in the muscle hand anyway).
     // Then in the joint controller we will decode that back into uint16_t.
-    joint_->measured_effort_ = ((double) (act->muscle_state_.pressure_[1]) * 0x10000)
+    joint_->effort_ = ((double) (act->muscle_state_.pressure_[1]) * 0x10000)
                              +  (double) (act->muscle_state_.pressure_[0]);
-    joint2_->measured_effort_ = ((double) (act->muscle_state_.pressure_[1]) * 0x10000)
+    joint2_->effort_ = ((double) (act->muscle_state_.pressure_[1]) * 0x10000)
                               +  (double) (act->muscle_state_.pressure_[0]);
   }
   else if (size == 0)
@@ -90,8 +90,8 @@ void J0TransmissionForMuscle::propagatePosition()
     joint_->velocity_ = act->state_.velocity_ / 2.0;
     joint2_->velocity_ = act->state_.velocity_ / 2.0;
 
-    joint_->measured_effort_ = act->state_.last_measured_effort_ / 2.0;
-    joint2_->measured_effort_ = act->state_.last_measured_effort_ / 2.0;
+    joint_->effort_ = act->state_.last_measured_effort_ / 2.0;
+    joint2_->effort_ = act->state_.last_measured_effort_ / 2.0;
   }
 }
 

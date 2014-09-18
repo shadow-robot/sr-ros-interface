@@ -6,14 +6,14 @@ from sensor_msgs.msg import JointState
 class Joint0Publisher:
     def __init__(self):
         rospy.init_node('joint_0_publisher', anonymous=True)
-        self.subs_1 = rospy.Subscriber("joint_states", JointState, self.callback)
+        self.sub = rospy.Subscriber("joint_states", JointState, self.callback)
         self.pub = rospy.Publisher("joint_0s/joint_states", JointState, queue_size=1)
         self.joint_state_msg = JointState()
 
         rospy.spin()
 
     def callback(self, data):
-	self.joint_state_msg.header.stamp = rospy.Time.now()
+        self.joint_state_msg.header.stamp = rospy.Time.now()
 
         self.joint_state_msg.name = []
         self.joint_state_msg.position = []
@@ -26,7 +26,6 @@ class Joint0Publisher:
                                                  data.velocity,
                                                  data.effort):
             if "FJ1" in name and len(name) == 4:
-                fj0 = [0.0, 0.0, 0.0]
                 fj0 = [position, velocity, effort]
 
             if "FJ2" in name and len(name) == 4:

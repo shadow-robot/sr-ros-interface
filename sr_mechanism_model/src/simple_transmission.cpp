@@ -81,7 +81,7 @@ void SimpleTransmission::propagatePosition()
   SrMotorActuator *act = static_cast<SrMotorActuator*>(actuator_);
   joint_->position_ = act->state_.position_;
   joint_->velocity_ = act->state_.velocity_;
-  joint_->measured_effort_ = act->state_.last_measured_effort_;
+  joint_->effort_ = act->state_.last_measured_effort_;
 }
 
 void SimpleTransmission::propagateEffort()

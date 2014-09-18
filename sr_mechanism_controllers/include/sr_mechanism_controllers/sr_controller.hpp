@@ -58,37 +58,24 @@ namespace controller
     SrController();
     virtual ~SrController();
 
-    virtual bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n);
+    virtual bool init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n) = 0;
 
-    /*!
-     * \brief Give set position of the joint for next update: revolute (angle) and prismatic (position)
-     *
-     * \param cmd the received angle
-     */
-    void setCommand(double cmd);
-    virtual void setCommandCB(const std_msgs::Float64ConstPtr& msg);
-
-    /*!
-     * \brief Get latest position command to the joint: revolute (angle) and prismatic (position).
-     */
-    void getCommand(double & cmd);
-
-    virtual void starting(const ros::Time& time);
+    virtual void starting(const ros::Time& time) {};
 
     /*!
      * \brief Issues commands to the joint. Should be called at regular intervals
      */
-    virtual void update(const ros::Time& time, const ros::Duration& period);
+    virtual void update(const ros::Time& time, const ros::Duration& period) = 0;
 
-    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
+    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) {};
 
-    virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
+    virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min) {};
 
     std::string getJointName();
-    ros_ethercat_model::JointState *joint_state_;        /**< Joint we're controlling. */
-    ros_ethercat_model::JointState *joint_state_2;        /**< 2ndJoint we're controlling if joint 0. */
-    bool has_j2;         /**< true if this is a joint 0. */
-    double command_;                            /**< Last commanded position. */
+    ros_ethercat_model::JointState *joint_state_;   /**< Joint we're controlling. */
+    ros_ethercat_model::JointState *joint_state_2;  /**< 2ndJoint we're controlling if joint 0. */
+    bool has_j2;                                    /**< true if this is a joint 0. */
+    double command_;                                /**< Last commanded position. */
 
   protected:
     ///call this function at the end of the init function in the inheriting classes.
@@ -121,13 +108,14 @@ namespace controller
     ros_ethercat_model::RobotState *robot_;              /**< Pointer to robot structure. */
 
     ros::NodeHandle node_, n_tilde_;
+    std::string joint_name_;
 
-    boost::scoped_ptr<
-      realtime_tools::RealtimePublisher<
-        control_msgs::JointControllerState> > controller_state_publisher_ ;
+    boost::scoped_ptr<realtime_tools::RealtimePublisher<control_msgs::JointControllerState> > controller_state_publisher_ ;
 
-    boost::shared_ptr<sr_friction_compensation::SrFrictionCompensator> friction_compensator;
+    boost::scoped_ptr<sr_friction_compensation::SrFrictionCompensator> friction_compensator;
 
+    ///set the command from a topic
+    virtual void setCommandCB(const std_msgs::Float64ConstPtr& msg) {}
     ros::Subscriber sub_command_;
     ros::ServiceServer serve_set_gains_;
     ros::ServiceServer serve_reset_gains_;
