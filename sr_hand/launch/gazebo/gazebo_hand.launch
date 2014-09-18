@@ -8,6 +8,12 @@
 
   <!-- Gazebo world file to load. -->
   <arg name="world_name" default="$(find sr_description)/other/worlds/shadowhand.world"/>
+  <!-- Set to 0 if the hand description will not be specified with the argument hand_description. In which case it depends on the environment variables -->
+  <arg name="set_hand_description" default="0" />
+  <!-- Xacro file containing the robot description we want to load. Only taken into acount if the set_description arg is set to 1
+       the default value -->
+  <arg name="hand_description" default="$(find sr_description)/robots/shadowhand_motor.urdf.xacro" />
+
 
   <!-- Gazebo world file to load. -->
   <!-- We want gazebo to stay in the root namespace but the nodes below to be
@@ -25,16 +31,24 @@
       </include>
   </group>
 
-  <!-- The real hand uses sr_description but getting gazebo to work
+  <!-- The real hand uses sh_description but getting gazebo to work
   properly with that is a pain as it needs robotParam set in the urdf and
   various bits of mapping. The arm uses robot_description as does that arm
   and hand. So we just set both params and stop fighting! -->
-  <include file="$(find sr_description)/loaders/load_hand_model.launch">
+  <group unless="$(arg set_hand_description)">
+    <!-- Loads the correct robot description depending on the environment variables -->
+    <include file="$(find sr_description)/loaders/load_hand_model.launch">
       <arg name="robot_param" value="sh_description" />
-  </include>
-  <include file="$(find sr_description)/loaders/load_hand_model.launch">
+    </include>
+    <include file="$(find sr_description)/loaders/load_hand_model.launch">
       <arg name="robot_param" value="robot_description" />
-  </include>
+    </include>
+  </group>
+  <group if="$(arg set_hand_description)">
+    <!-- Loads the robot description from the file passed as an argument -->
+    <param name="sh_description" command="$(find xacro)/xacro.py '$(arg hand_description)'" />
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(arg hand_description)'" />
+  </group>
 
   <node name="spawn_hand" pkg="gazebo_ros" type="spawn_model" args="-urdf -param sh_description -z 0.01 -model shadow_model" respawn="false" output="screen" />
 
