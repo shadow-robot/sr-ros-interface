@@ -74,30 +74,23 @@ bool SrhMixedPositionVelocityJointController::init(ros_ethercat_model::RobotStat
   ROS_DEBUG(" --------- ");
   ROS_DEBUG_STREAM("Init: " << joint_name_);
 
-  //joint 0s
-  if (joint_name_[3] == '0')
+  // joint 0s e.g. FFJ0
+  if (has_j2 = is_joint_0())
   {
-    has_j2 = true;
-    string j1 = joint_name_.substr(0, 3) + "1";
-    string j2 = joint_name_.substr(0, 3) + "2";
-    ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
-
-    joint_state_ = robot_->getJointState(j1);
+    get_joints_states_1_2();
     if (!joint_state_)
     {
-      ROS_ERROR("SrhMixedPositionVelocityController could not find joint named \"%s\"\n", joint_name_.c_str());
+      ROS_ERROR("SrhMixedPositionVelocityController could not find the first joint relevant to \"%s\"\n", joint_name_.c_str());
       return false;
     }
-
-    joint_state_2 = robot_->getJointState(j2);
     if (!joint_state_2)
     {
-      ROS_ERROR("SrhMixedPositionVelocityController could not find joint named \"%s\"\n", joint_name_.c_str());
+      ROS_ERROR("SrhMixedPositionVelocityController could not find the second joint relevant to \"%s\"\n", joint_name_.c_str());
       return false;
     }
     if (!joint_state_2->calibrated_)
     {
-      ROS_ERROR("Joint %s not calibrated for SrhMixedPositionVelocityJointController", j2.c_str());
+      ROS_ERROR("Joint %s not calibrated for SrhMixedPositionVelocityController", joint_name_.c_str());
       return false;
     }
     else
@@ -105,8 +98,6 @@ bool SrhMixedPositionVelocityJointController::init(ros_ethercat_model::RobotStat
   }
   else //"normal" joints
   {
-    has_j2 = false;
-
     joint_state_ = robot_->getJointState(joint_name_);
     if (!joint_state_)
     {

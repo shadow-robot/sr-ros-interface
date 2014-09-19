@@ -51,7 +51,7 @@ namespace sr_friction_compensation
   {
   public:
 
-    SrFrictionCompensator(std::string joint_name);
+    SrFrictionCompensator(const std::string &joint_name);
     ~SrFrictionCompensator();
 
     /**
@@ -100,7 +100,7 @@ namespace sr_friction_compensation
      *
      * @return The map (either forward or backward)
      */
-    std::vector<joint_calibration::Point> read_one_way_map(XmlRpc::XmlRpcValue raw_map);
+    std::vector<joint_calibration::Point> read_one_way_map(XmlRpc::XmlRpcValue &raw_map);
 
     /**
      * Generates a flat map for the joints missing one of their friction map.

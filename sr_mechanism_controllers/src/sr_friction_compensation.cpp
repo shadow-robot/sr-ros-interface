@@ -34,7 +34,7 @@ namespace sr_friction_compensation
 {
   const double SrFrictionCompensator::velocity_for_static_friction = 0.01;
 
-  SrFrictionCompensator::SrFrictionCompensator(std::string joint_name)
+  SrFrictionCompensator::SrFrictionCompensator(const std::string &joint_name)
   {
     joint_name_ = joint_name;
 
@@ -163,7 +163,7 @@ namespace sr_friction_compensation
     return both_maps;
   } //end read_friction_map
 
-  std::vector<joint_calibration::Point> SrFrictionCompensator::read_one_way_map(XmlRpc::XmlRpcValue raw_map)
+  std::vector<joint_calibration::Point> SrFrictionCompensator::read_one_way_map(XmlRpc::XmlRpcValue &raw_map)
   {
     std::vector<joint_calibration::Point> friction_map;
 

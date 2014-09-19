@@ -78,6 +78,12 @@ namespace controller
     double command_;                                /**< Last commanded position. */
 
   protected:
+    // true if this is joint 0
+    bool is_joint_0();
+
+    // set joint_state_ and joint_state_2
+    void get_joints_states_1_2();
+
     ///call this function at the end of the init function in the inheriting classes.
     void after_init();
 

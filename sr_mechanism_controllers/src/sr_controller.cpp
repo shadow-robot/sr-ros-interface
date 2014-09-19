@@ -50,6 +50,26 @@ namespace controller {
     sub_command_.shutdown();
   }
 
+  bool SrController::is_joint_0()
+  {
+    // joint_name_ has unknown length
+    // it is assumed that last char is the joint number
+    if (joint_name_[joint_name_.size()-1] == '0')
+      return true;
+    return false;
+  }
+
+  void SrController::get_joints_states_1_2()
+  {
+    string j1 = joint_name_.substr(0, joint_name_.size()-2) + "1";
+    string j2 = joint_name_.substr(0, joint_name_.size()-2) + "2";
+
+    ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
+
+    joint_state_ = robot_->getJointState(j1);
+    joint_state_2 = robot_->getJointState(j2);
+  }
+
   void SrController::after_init()
   {
     sub_command_ = node_.subscribe<std_msgs::Float64>("command", 1, &SrController::setCommandCB, this);
