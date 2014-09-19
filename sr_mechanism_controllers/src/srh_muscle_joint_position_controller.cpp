@@ -69,7 +69,8 @@ bool SrhMuscleJointPositionController::init(ros_ethercat_model::RobotState *robo
   ROS_DEBUG_STREAM("Init: " << joint_name_);
 
   // joint 0s e.g. FFJ0
-  if (has_j2 = is_joint_0())
+  has_j2 = is_joint_0();
+  if (has_j2)
   {
     get_joints_states_1_2();
     if (!joint_state_)
