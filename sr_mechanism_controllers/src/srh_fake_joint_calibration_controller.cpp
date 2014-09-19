@@ -47,39 +47,35 @@ namespace controller {
   {
     robot_ = robot;
     node_ = n;
-    // Joint
 
-    std::string joint_name;
-    if (!node_.getParam("joint", joint_name))
+    // Joint
+    if (!node_.getParam("joint", joint_name_))
     {
       ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    if (!(joint_ = robot->getJointState(joint_name)))
+    if (!(joint_ = robot->getJointState(joint_name_)))
     {
       ROS_ERROR("Could not find joint %s (namespace: %s)",
-                joint_name.c_str(), node_.getNamespace().c_str());
+                joint_name_.c_str(), node_.getNamespace().c_str());
       return false;
     }
-    joint_name_ = joint_name;
 
     // Actuator
-    std::string actuator_name;
-    if (!node_.getParam("actuator", actuator_name))
+    if (!node_.getParam("actuator", actuator_name_))
     {
       ROS_ERROR("No actuator given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    if (!(actuator_ = robot->getActuator(actuator_name)))
+    if (!(actuator_ = robot->getActuator(actuator_name_)))
     {
       ROS_ERROR("Could not find actuator %s (namespace: %s)",
-                actuator_name.c_str(), node_.getNamespace().c_str());
+                actuator_name_.c_str(), node_.getNamespace().c_str());
       return false;
     }
-    actuator_name_ = actuator_name;
 
     // Transmission
-    std::string transmission_name;
+    string transmission_name;
     if (!node_.getParam("transmission", transmission_name))
     {
       ROS_ERROR("No transmission given (namespace: %s)", node_.getNamespace().c_str());
@@ -131,7 +127,7 @@ namespace controller {
   void SrhFakeJointCalibrationController::initialize_pids()
   {
     ///Reset the motor to make sure we have the proper 0 + correct PID settings
-    std::string service_name = "realtime_loop/reset_motor_" + boost::to_upper_copy(actuator_name_);
+    string service_name = "realtime_loop/reset_motor_" + boost::to_upper_copy(actuator_name_);
     if( ros::service::waitForService (service_name, ros::Duration(2.0)) )
     {
       std_srvs::Empty srv;

@@ -111,9 +111,9 @@ namespace sr_friction_compensation
     std::vector<joint_calibration::Point> generate_flat_map();
 
     /// An interpolator for the forward friction map: used to compute the offset from the map, given the current position.
-    boost::shared_ptr<shadow_robot::JointCalibration> friction_interpoler_forward;
+    boost::scoped_ptr<shadow_robot::JointCalibration> friction_interpoler_forward;
     /// An interpolator for the backward friction map: used to compute the offset from the map, given the current position.
-    boost::shared_ptr<shadow_robot::JointCalibration> friction_interpoler_backward;
+    boost::scoped_ptr<shadow_robot::JointCalibration> friction_interpoler_backward;
 
     ///the joint name
     std::string joint_name_;
