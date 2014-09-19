@@ -54,9 +54,6 @@ namespace controller
   private:
     boost::scoped_ptr<control_toolbox::Pid> pid_controller_position_;       /**< Internal PID controller for the position loop. */
 
-    ///clamps the force demand to this value
-    double max_force_demand;
-
     ///the position deadband value used in the hysteresis_deadband
     double position_deadband;
 

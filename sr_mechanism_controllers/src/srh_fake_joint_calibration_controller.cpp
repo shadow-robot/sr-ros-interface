@@ -38,13 +38,17 @@ using namespace std;
 namespace controller {
 
   SrhFakeJointCalibrationController::SrhFakeJointCalibrationController()
-    : robot_(NULL), last_publish_time_(0), calibration_state_(IS_INITIALIZED),
-      actuator_(NULL), joint_(NULL)
+    : robot_(NULL),
+      last_publish_time_(0),
+      calibration_state_(IS_INITIALIZED),
+      actuator_(NULL),
+      joint_(NULL)
   {
   }
 
   bool SrhFakeJointCalibrationController::init(ros_ethercat_model::RobotState *robot, ros::NodeHandle &n)
   {
+    ROS_ASSERT(robot);
     robot_ = robot;
     node_ = n;
 
@@ -92,8 +96,8 @@ namespace controller {
 
   void SrhFakeJointCalibrationController::update(const ros::Time& time, const ros::Duration& period)
   {
-    assert(joint_);
-    assert(actuator_);
+    ROS_ASSERT(joint_);
+    ROS_ASSERT(actuator_);
 
     switch(calibration_state_)
     {
@@ -112,7 +116,7 @@ namespace controller {
       {
         if (last_publish_time_ + ros::Duration(0.5) < robot_->getTime())
         {
-          assert(pub_calibrated_);
+          ROS_ASSERT(pub_calibrated_);
           if (pub_calibrated_->trylock())
           {
             last_publish_time_ = robot_->getTime();

@@ -67,7 +67,7 @@ namespace controller
      */
     virtual void update(const ros::Time& time, const ros::Duration& period) = 0;
 
-    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) {};
+    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) { return true; };
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min) {};
 

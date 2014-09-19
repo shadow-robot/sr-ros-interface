@@ -37,11 +37,19 @@ using namespace std;
 namespace controller {
 
   SrController::SrController()
-    : joint_state_(NULL), command_(0),
-      min_(0.0), max_(sr_math_utils::pi),
-      loop_count_(0),  initialized_(false), robot_(NULL),
+    : joint_state_(NULL),
+      joint_state_2(NULL),
+      has_j2(false),
+      command_(0),
+      min_(0.0),
+      max_(sr_math_utils::pi),
+      loop_count_(0),
+      initialized_(false),
+      robot_(NULL),
       n_tilde_("~"),
-      max_force_demand(1023.), friction_deadband(5), max_force_factor_(1.0)
+      max_force_demand(1023.),
+      friction_deadband(5),
+      max_force_factor_(1.0)
   {
   }
 
@@ -61,8 +69,9 @@ namespace controller {
 
   void SrController::get_joints_states_1_2()
   {
-    string j1 = joint_name_.substr(0, joint_name_.size()-2) + "1";
-    string j2 = joint_name_.substr(0, joint_name_.size()-2) + "2";
+    string j1 = joint_name_, j2 = joint_name_;
+    j1[j1.size()-1] = '1';
+    j2[j2.size()-1] = '2';
 
     ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
 
