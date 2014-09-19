@@ -2,8 +2,8 @@
 Changelog for package shadow_robot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.4 (2014-09-19)
+------------------
 * Update package.xml
 
 1.3.3 (2014-09-19)

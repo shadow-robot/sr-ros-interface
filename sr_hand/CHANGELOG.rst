@@ -2,8 +2,8 @@
 Changelog for package sr_hand
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.4 (2014-09-19)
+------------------
 * Add arguments to allow launching a particular robot model on gazebo.
 * Checking position controllers before mixed controllers, as the former are the default ones. This speeds up the library start up time.
 * Fix Hand library to work with hands with less fingers.

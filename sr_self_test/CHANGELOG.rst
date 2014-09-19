@@ -2,8 +2,8 @@
 Changelog for package sr_self_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.4 (2014-09-19)
+------------------
 * Update diagnostics
 
 1.3.3 (2014-09-19)

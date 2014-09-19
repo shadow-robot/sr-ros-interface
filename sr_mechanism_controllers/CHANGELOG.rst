@@ -2,8 +2,8 @@
 Changelog for package sr_mechanism_controllers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.4 (2014-09-19)
+------------------
 * Update controllers
 
 1.3.3 (2014-09-19)

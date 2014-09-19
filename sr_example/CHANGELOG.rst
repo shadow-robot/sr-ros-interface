@@ -2,8 +2,8 @@
 Changelog for package sr_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.4 (2014-09-19)
+------------------
 * New demo using the new hand_commander
 * Remove a potentially dangerous example (colliding fingers). Not a very interesting example either.
 * Remove beeps from demo.

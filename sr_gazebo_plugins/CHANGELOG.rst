@@ -2,8 +2,8 @@
 Changelog for package sr_gazebo_plugins
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.4 (2014-09-19)
+------------------
 * Fix dependencies.
 * Fix gazebo include paths
   This is needed to be compatible with newer Gazebo ABI/API
