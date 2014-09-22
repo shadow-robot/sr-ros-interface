@@ -44,7 +44,7 @@ bool J0Transmission::initXml(TiXmlElement *elt, RobotState *robot)
     return false;
 
   string joint2_name = joint_->joint_->name;
-  joint2_name[3] = '2';
+  joint2_name[joint2_name.size()-1] = '2';
   joint2_ = robot->getJointState(joint2_name);
 
   return true;

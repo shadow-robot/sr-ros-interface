@@ -57,9 +57,6 @@ namespace controller
     //publish our joint controller state
     boost::scoped_ptr<realtime_tools::RealtimePublisher<sr_robot_msgs::JointMusclePositionControllerState> > controller_state_publisher_;
 
-    ///clamps the force demand to this value
-    double max_force_demand;
-
     ///the position deadband value used in the hysteresis_deadband
     double position_deadband;
 

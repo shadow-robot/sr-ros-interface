@@ -64,10 +64,6 @@ namespace controller
 
     enum { IS_INITIALIZED, BEGINNING, MOVING_TO_LOW, MOVING_TO_HIGH, CALIBRATED };
     int calibration_state_;
-    int countdown_;
-
-    double search_velocity_, reference_position_;
-    bool original_switch_state_;
 
     ros_ethercat_model::Actuator *actuator_;
     ros_ethercat_model::JointState *joint_;

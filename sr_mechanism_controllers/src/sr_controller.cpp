@@ -37,17 +37,46 @@ using namespace std;
 namespace controller {
 
   SrController::SrController()
-    : joint_state_(NULL), command_(0),
-      min_(0.0), max_(sr_math_utils::pi),
-      loop_count_(0),  initialized_(false), robot_(NULL),
+    : joint_state_(NULL),
+      joint_state_2(NULL),
+      has_j2(false),
+      command_(0),
+      min_(0.0),
+      max_(sr_math_utils::pi),
+      loop_count_(0),
+      initialized_(false),
+      robot_(NULL),
       n_tilde_("~"),
-      max_force_demand(1023.), friction_deadband(5), max_force_factor_(1.0)
+      max_force_demand(1023.),
+      friction_deadband(5),
+      max_force_factor_(1.0)
   {
   }
 
   SrController::~SrController()
   {
     sub_command_.shutdown();
+  }
+
+  bool SrController::is_joint_0()
+  {
+    // joint_name_ has unknown length
+    // it is assumed that last char is the joint number
+    if (joint_name_[joint_name_.size()-1] == '0')
+      return true;
+    return false;
+  }
+
+  void SrController::get_joints_states_1_2()
+  {
+    string j1 = joint_name_, j2 = joint_name_;
+    j1[j1.size()-1] = '1';
+    j2[j2.size()-1] = '2';
+
+    ROS_DEBUG_STREAM("Joint 0: " << j1 << " " << j2);
+
+    joint_state_ = robot_->getJointState(j1);
+    joint_state_2 = robot_->getJointState(j2);
   }
 
   void SrController::after_init()

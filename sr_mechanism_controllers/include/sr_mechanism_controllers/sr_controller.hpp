@@ -67,7 +67,7 @@ namespace controller
      */
     virtual void update(const ros::Time& time, const ros::Duration& period) = 0;
 
-    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) {};
+    virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) { return true; };
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min) {};
 
@@ -78,6 +78,12 @@ namespace controller
     double command_;                                /**< Last commanded position. */
 
   protected:
+    // true if this is joint 0
+    bool is_joint_0();
+
+    // set joint_state_ and joint_state_2
+    void get_joints_states_1_2();
+
     ///call this function at the end of the init function in the inheriting classes.
     void after_init();
 
