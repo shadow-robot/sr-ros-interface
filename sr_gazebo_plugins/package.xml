@@ -1,6 +1,6 @@
 <package>
   <name>sr_gazebo_plugins</name>
-  <version>1.3.4</version>
+  <version>1.3.5</version>
   <description>Gazebo Plugins for various Shadow Robot-specific sensors and actuators on the robot.</description>
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 

@@ -2,8 +2,8 @@
 Changelog for package sr_tactile_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.5 (2014-09-22)
+------------------
 * gazebo dependency fix
 * Contributors: Toni Oliver
 
