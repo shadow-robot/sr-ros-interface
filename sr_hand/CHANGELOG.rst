@@ -2,6 +2,9 @@
 Changelog for package sr_hand
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.3.4 (2014-09-19)
 ------------------
 * Add arguments to allow launching a particular robot model on gazebo.

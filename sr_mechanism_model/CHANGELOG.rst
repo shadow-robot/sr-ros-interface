@@ -2,6 +2,9 @@
 Changelog for package sr_mechanism_model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.3.4 (2014-09-19)
 ------------------
 
