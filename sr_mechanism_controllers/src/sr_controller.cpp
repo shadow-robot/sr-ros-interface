@@ -92,16 +92,25 @@ namespace controller {
 
   void SrController::get_min_max( urdf::Model model, std::string joint_name )
   {
-    if( joint_name.substr(3,1).compare("0") == 0)
+
+    if(joint_name.size() > 3)
     {
-      std::string j1 = joint_name.substr(0,3) + "1";
-      std::string j2 = joint_name.substr(0,3) + "2";
+      if (joint_name[joint_name.size() - 1] == '2' && (joint_name[joint_name.size() -4] == 'F' ||
+						       joint_name[joint_name.size() -4] == 'M' ||
+						       joint_name[joint_name.size() -4] == 'R' ||
+						       joint_name[joint_name.size() -4] == 'L'))
+      {
+	joint_name[joint_name.size() - 1] = '1';
+	std::string j1 = joint_name;
+	joint_name[joint_name.size() - 1] = '2';
+	std::string j2 = joint_name;
 
-      boost::shared_ptr<const urdf::Joint> joint1 = model.getJoint( j1 );
-      boost::shared_ptr<const urdf::Joint> joint2 = model.getJoint( j2 );
+	boost::shared_ptr<const urdf::Joint> joint1 = model.getJoint( j1 );
+	boost::shared_ptr<const urdf::Joint> joint2 = model.getJoint( j2 );
 
-      min_ = joint1->limits->lower + joint2->limits->lower;
-      max_ = joint1->limits->upper + joint2->limits->upper;
+	min_ = joint1->limits->lower + joint2->limits->lower;
+	max_ = joint1->limits->upper + joint2->limits->upper;
+      }
     }
     else
     {
@@ -141,5 +150,3 @@ Local Variables:
    c-basic-offset: 2
 End:
 */
-
-
