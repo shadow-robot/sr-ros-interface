@@ -144,6 +144,12 @@
       <material>BiotacGreen</material>
     </gazebo>
 
+    <joint name="th_biotac_joint" type="fixed">
+      <parent link="thmiddle"/>
+      <child link="thbiotac"/>
+      <origin xyz="0 0.0 0.01" rpy="0 0 -1.571" />
+    </joint>
+
     <!-- extra link to imaginary sphere in fingertip for FK/IK calculations -->
     <!-- remove visual and collision once the correct position is found -->
     <link name="thtip">
