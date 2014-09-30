@@ -68,7 +68,7 @@ namespace controller
     ros_ethercat_model::Actuator *actuator_;
     ros_ethercat_model::JointState *joint_;
 
-    std::string joint_name_, actuator_name_;
+    std::string joint_name_, actuator_name_, robot_id_, joint_prefix_, ns_;
 
     /**
      * Read the pids values from the parameter server and calls the service

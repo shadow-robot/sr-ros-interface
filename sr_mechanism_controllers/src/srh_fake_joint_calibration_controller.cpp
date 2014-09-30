@@ -52,16 +52,25 @@ namespace controller {
     robot_ = robot;
     node_ = n;
 
+    // robot_id robot_id_, joint_prefix_, ns_
+    if (node_.getParam("robot_id", robot_id_)
+        && (!robot_id_.empty()))
+    {
+      joint_prefix_ = robot_id_ + "_";
+      ns_ = robot_id_ + "/";
+    }
+
+
     // Joint
     if (!node_.getParam("joint", joint_name_))
     {
       ROS_ERROR("No joint given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    if (!(joint_ = robot->getJointState(joint_name_)))
+    if (!(joint_ = robot->getJointState(joint_prefix_ + joint_name_)))
     {
       ROS_ERROR("Could not find joint %s (namespace: %s)",
-                joint_name_.c_str(), node_.getNamespace().c_str());
+                (joint_prefix_ + joint_name_).c_str(), node_.getNamespace().c_str());
       return false;
     }
 
@@ -71,10 +80,10 @@ namespace controller {
       ROS_ERROR("No actuator given (namespace: %s)", node_.getNamespace().c_str());
       return false;
     }
-    if (!(actuator_ = robot->getActuator(actuator_name_)))
+    if (!(actuator_ = robot->getActuator(joint_prefix_ + actuator_name_)))
     {
       ROS_ERROR("Could not find actuator %s (namespace: %s)",
-                actuator_name_.c_str(), node_.getNamespace().c_str());
+                (joint_prefix_ + actuator_name_).c_str(), node_.getNamespace().c_str());
       return false;
     }
 
@@ -131,7 +140,7 @@ namespace controller {
   void SrhFakeJointCalibrationController::initialize_pids()
   {
     ///Reset the motor to make sure we have the proper 0 + correct PID settings
-    string service_name = "realtime_loop/reset_motor_" + boost::to_upper_copy(actuator_name_);
+    string service_name = "realtime_loop/" + ns_ + "reset_motor_" + boost::to_upper_copy(actuator_name_);
     if( ros::service::waitForService (service_name, ros::Duration(2.0)) )
     {
       std_srvs::Empty srv;
