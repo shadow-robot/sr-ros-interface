@@ -227,34 +227,19 @@ namespace shadowrobot
 
   std::string EtherCATCompatibilityHand::findControllerTopicName( std::string joint_name)
   {
-    ros::Duration max_wait(0.8);
-    std::string controller_suffix = "mixed_position_velocity_controller";
-    std::string topic = "/sh_"+ joint_name + "_" + controller_suffix + "/state";
-    bool success = true;
-    sr_robot_msgs::JointControllerState::ConstPtr msg_received = ros::topic::waitForMessage<sr_robot_msgs::JointControllerState>(topic, max_wait);
-    if(!msg_received)
-    {
-      ROS_WARN("Mixed controller state not received for joint: %s", joint_name.c_str());
-      controller_suffix = "position_controller";
-      topic = "/sh_"+ joint_name + "_" + controller_suffix + "/state";
-      control_msgs::JointControllerState::ConstPtr msg_received_2 = ros::topic::waitForMessage<control_msgs::JointControllerState>(topic, max_wait);
-      if(!msg_received_2)
-      {
-        ROS_WARN("Position controller state not received for joint: %s", joint_name.c_str());
-        success = false;
-      }
-    }
+    std::string joint_prefix;
+    n_tilde.param("joint_prefix", joint_prefix, std::string(""));
 
-    if(!success)
-    {
-      std::string searched_param;
-      n_tilde.searchParam("controller_suffix", searched_param);
-      n_tilde.param(searched_param, controller_suffix, std::string("mixed_position_velocity_controller"));
-    }
+
+    std::string controller_suffix = "position_controller";
+
+    std::string searched_param;
+    n_tilde.searchParam("controller_suffix", searched_param);
+    n_tilde.param(searched_param, controller_suffix, std::string("position_controller"));
 
     std::string topic_prefix = "/sh_";
     std::string topic_suffix = "_" + controller_suffix + "/command";
-    std::string full_topic = topic_prefix + joint_name + topic_suffix;
+    std::string full_topic = topic_prefix + joint_prefix + joint_name + topic_suffix;
 
     return full_topic;
   }
