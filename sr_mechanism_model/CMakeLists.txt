@@ -12,7 +12,7 @@ catkin_package(
 )
 
 add_library(sr_mechanism_model src/joint_0_transmission.cpp src/simple_transmission.cpp
-  src/joint_0_transmission_for_muscle.cpp src/simple_transmission_for_muscle.cpp)
+  src/joint_0_transmission_for_muscle.cpp src/simple_transmission_for_muscle.cpp src/null_transmission.cpp)
 add_dependencies(sr_mechanism_model ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_mechanism_model ${TinyXML_LIBRARIES} ${catkin_LIBRARIES})
 
