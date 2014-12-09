@@ -1,4 +1,7 @@
 <launch>
+  <arg name="joint_prefix" default=""/>
+  <arg name="controller_suffix" default="position_controller"/>
+
   <include file="$(find sr_description)/loaders/load_hand_model.launch" />
 
   <!-- shadowhand -->
@@ -6,9 +9,10 @@
 	type="shadowhand_ethercat" >
     <remap from="hand_description" to="sh_description"/>
     <param name="shadowhand_prefix" type="string" value="srh/" />
-    <param name="controller_suffix" type="string" value="mixed_position_velocity_controller" />
+    <param name="controller_suffix" type="string" value="$(arg controller_suffix)" />
     <param name="publish_frequency_diagnostics" type="double" value="1.0" />
     <param name="publish_frequency" type="double" value="100.0" />
+    <param name="joint_prefix" type="string" value="$(arg joint_prefix)" />
   </node>
 
 </launch>
