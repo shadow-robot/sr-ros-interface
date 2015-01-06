@@ -39,6 +39,20 @@ Number select grasp, z zero hand, g grasp, p pre-grasp, q quit
 : 
 ```
 
+### Working with grasp files.
+
+Sets of grasps can be stored in YAML files containing a top level array of moveit_msgs/Grasp objects serialised to YAML
+the same way rostopic does. Although most of the fields are optional you must have an id and will need at least one
+pre-grasp posture and grasp posture. sr_grasp contains some example files in the resource directory.
+
+quick grasp reads it's ~grasps_file param to get the file name of grasps to use, defaulting to grasps.yaml in the
+sr_grasp package. So to use another file:
+```
+rosrun sr_grasp quick_grasp _grasps_file:=foo.yaml
+```
+You can use the n command to create a new grasp using the current hands pose as the grasp pose. The s command will
+re-write the file with the current list of grasps.
+
 ### Actionlib
 
 The main interface to the node is via actionlib, it exposes the sr_robot_msgs/Grasp action on the grasp/ topic. See the
@@ -47,7 +61,7 @@ quick_grasp script for a python example of using this interface.
 
 ## grasp_planner
 
-Node impliementing the sr_robot_msgs/PlanGrasp action to generate grasps. Currently returns a single, hardcoded grasp.
+Node implementing the sr_robot_msgs/PlanGrasp action to generate grasps. Currently returns a single, hardcoded grasp.
 
 ## sr_grasp.utils
 
@@ -61,4 +75,16 @@ grasp = mk_grasp({
     'THJ1': 0.4, 'THJ2': 0.36, 'THJ3': 0.2, 'THJ4': 1.23, 'THJ5': 0.06, 
 })
 
+```
+
+## Converting sr_hand XML grasps
+
+sr_hand has some grasps classes, interpolater and gui that work with an XML file found in
+sr_hand/scripts/sr_hand/grasps.xml. You can convert them to new style moveit messages in YAML using:
+```
+rosrun sr_grasp convert_xml.py sr_hand/scripts/sr_hand/grasps.xml > converted.yaml
+```
+Then load them up to play with:
+```
+rosrun sr_grasp quick_grasp _grasps_file:=converted.yaml
 ```

@@ -1,17 +1,39 @@
 
 from copy import deepcopy
-import os, yaml
-from rospy import logerr, loginfo
+import os, yaml, string
+from rospy import logerr, loginfo, get_param
 import rospkg, genpy
 import moveit_msgs.msg
+from trajectory_msgs.msg import JointTrajectoryPoint
 from sr_grasp.utils import mk_grasp
+from sr_robot_msgs.msg import GraspArray
+
+#http://code.activestate.com/recipes/66055-changing-the-indentation-of-a-multi-line-string/
+def reindent(s, numSpaces):
+    s = string.split(s, '\n')
+    s = [(numSpaces * ' ') + line for line in s]
+    s = string.join(s, '\n')
+    return s
 
 class Grasp(moveit_msgs.msg.Grasp):
     """
-    Represents a single grasp, basically a wrapper around moveit_msgs/Grasp.
+    Represents a single grasp, basically a wrapper around moveit_msgs/Grasp
+    with added functions and Shadow Hand specific knowledge.
     """
     def __init__(self):
         super(Grasp, self).__init__()
+        self.grasp_quality = 0.001
+        self.joint_names = [
+            'FFJ1', 'FFJ2', 'FFJ3', 'FFJ4',
+            'LFJ1', 'LFJ2', 'LFJ3', 'LFJ4', 'LFJ5',
+            'MFJ1', 'MFJ2', 'MFJ3', 'MFJ4',
+            'RFJ1', 'RFJ2', 'RFJ3', 'RFJ4',
+            'THJ1', 'THJ2', 'THJ3', 'THJ4', 'THJ5',
+            'WRJ1', 'WRJ2']
+
+        # Default the pre grasp to all 0.0
+        zero_joints = dict.fromkeys(self.joint_names, 0.0)
+        self.set_pre_grasp_point(zero_joints)
 
     @classmethod
     def from_msg(cls, msg):
@@ -43,6 +65,39 @@ class Grasp(moveit_msgs.msg.Grasp):
         genpy.message.fill_message_args(grasp, y)
         return grasp
 
+    def set_pre_grasp_point(self, *args, **kwargs):
+        """
+        Set the positions for a point (default 0) in the pre-grasp to a dict of
+        joint positions.
+        """
+        self._set_posture_point(self.pre_grasp_posture, *args, **kwargs)
+
+    def set_grasp_point(self, *args, **kwargs):
+        """
+        Set the positions for a point (default 0) in the grasp to a dict of
+        joint positions.
+        """
+        self._set_posture_point(self.grasp_posture, *args, **kwargs)
+
+    def _set_posture_point(self, posture, positions, point=0):
+        """Set the posture positions using a dict of joint positions."""
+        # XXX: Why have we been doing this?
+        #posture.header.stamp = now
+        posture.joint_names = positions.keys()
+
+        # Extend the array to be big enough.
+        if len(posture.points) < point+1:
+            for i in range(point+1):
+                posture.points.append(JointTrajectoryPoint())
+
+        # Update the point in place
+        jtp = JointTrajectoryPoint()
+        for name, pos in positions.iteritems():
+            jtp.positions.append(pos)
+        posture.points[point] = jtp
+
+
+
 
 class GraspStash(object):
     """
@@ -53,11 +108,19 @@ class GraspStash(object):
     def __init__(self):
         # Store of all loaded grasps, indexed on grasp.id.
         self._store = {}
-        pass
+        rp = rospkg.RosPack()
+        self.grasps_file = get_param('~grasps_file',
+                default = os.path.join(
+                rp.get_path('sr_grasp'), 'resource', 'grasps.yaml') )
 
     def get_all(self):
         """Return list of all grasps."""
         return self._store.values();
+
+    def get_grasp_array(self):
+        arr = GraspArray()
+        arr.grasps = self.get_all()
+        return arr
 
     def get_grasp(self, id):
         """Return a single grasp from the stash from it's id field."""
@@ -83,9 +146,10 @@ class GraspStash(object):
 
     def load_all(self):
         """Load all configured sources of grasps into the stash."""
-        rp = rospkg.RosPack()
-        grasp_file = os.path.join(rp.get_path('sr_grasp'), 'resource', 'grasps.yaml')
-        self.load_yaml_file(grasp_file)
+        self.load_yaml_file(self.grasps_file)
+
+    def as_yaml(self):
+        return genpy.message.strify_message(self.get_grasp_array().grasps)
 
     def load_yaml_file(self, fname):
         """Load a set of grasps from a YAML file."""
@@ -104,4 +168,10 @@ class GraspStash(object):
         for g in data:
             grasp = Grasp.from_yaml(g)
             self.put_grasp(grasp)
+
+    def save_yaml_file(self, fname=""):
+        if fname == "":
+            fname = self.grasps_file
+        with open(fname, "w") as txtfile:
+            txtfile.write(self.as_yaml())
 
