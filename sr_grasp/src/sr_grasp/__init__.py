@@ -1,11 +1,12 @@
 
 from copy import deepcopy
 import os, yaml, string
-from rospy import logerr, loginfo
+from rospy import logerr, loginfo, get_param
 import rospkg, genpy
 import moveit_msgs.msg
 from trajectory_msgs.msg import JointTrajectoryPoint
 from sr_grasp.utils import mk_grasp
+from sr_robot_msgs.msg import GraspArray
 
 #http://code.activestate.com/recipes/66055-changing-the-indentation-of-a-multi-line-string/
 def reindent(s, numSpaces):
@@ -108,14 +109,18 @@ class GraspStash(object):
         # Store of all loaded grasps, indexed on grasp.id.
         self._store = {}
         rp = rospkg.RosPack()
-        self.grasps_file = os.path.join(
-                rp.get_path('sr_grasp'), 'resource', 'grasps.yaml')
-        self.save_grasps_file = os.path.join(
-                rp.get_path('sr_grasp'), 'resource', 'grasps.yaml')
+        self.grasps_file = get_param('~grasps_file',
+                default = os.path.join(
+                rp.get_path('sr_grasp'), 'resource', 'grasps.yaml') )
 
     def get_all(self):
         """Return list of all grasps."""
         return self._store.values();
+
+    def get_grasp_array(self):
+        arr = GraspArray()
+        arr.grasps = self.get_all()
+        return arr
 
     def get_grasp(self, id):
         """Return a single grasp from the stash from it's id field."""
@@ -143,6 +148,9 @@ class GraspStash(object):
         """Load all configured sources of grasps into the stash."""
         self.load_yaml_file(self.grasps_file)
 
+    def as_yaml(self):
+        return genpy.message.strify_message(self.get_grasp_array().grasps)
+
     def load_yaml_file(self, fname):
         """Load a set of grasps from a YAML file."""
         try:
@@ -163,12 +171,7 @@ class GraspStash(object):
 
     def save_yaml_file(self, fname=""):
         if fname == "":
-            fname = self.save_grasps_file
+            fname = self.grasps_file
         with open(fname, "w") as txtfile:
-            for grasp in self.get_all():
-                txt = reindent(str(grasp), 2)
-                s = list(txt)
-                s[0] = '-'
-                txt = "".join(s) + "\n"
-                txtfile.write(txt)
+            txtfile.write(self.as_yaml())
 
