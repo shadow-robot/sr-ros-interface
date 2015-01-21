@@ -4,6 +4,6 @@
 
   <node name="spawn_gazebo_arm_controllers_extended"
 	pkg="controller_manager" type="spawner" respawn="false" output="screen"
-	args="r_arm_cartesian_pose_controller r_arm_joint_trajectory_controller"/>
+	args="--shutdown-timeout=1.0 r_arm_cartesian_pose_controller r_arm_joint_trajectory_controller"/>
 
 </launch>
