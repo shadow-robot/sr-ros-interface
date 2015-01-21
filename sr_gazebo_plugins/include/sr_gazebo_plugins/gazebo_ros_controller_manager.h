@@ -103,6 +103,7 @@ private:
 
   bool fake_calibration_;
 
+
 #ifdef USE_CBQ
   private: ros::CallbackQueue controller_manager_queue_;
   private: void ControllerManagerQueueThread();
@@ -110,6 +111,7 @@ private:
 #endif
   void ControllerManagerROSThread();
   boost::thread ros_spinner_thread_;
+  bool stop_;
 
   // Pointer to the model
   physics::WorldPtr world;

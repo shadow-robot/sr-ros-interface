@@ -5,18 +5,18 @@
   <group if="$(optenv ONE_FINGER 0)">
     <node name="spawn_gazebo_hand_controllers"
 	  pkg="controller_manager" type="spawner" respawn="false" output="screen"
-	  args="sh_mfj0_position_controller sh_mfj3_position_controller sh_mfj4_position_controller" />
+	  args="--shutdown-timeout=1.0 sh_mfj0_position_controller sh_mfj3_position_controller sh_mfj4_position_controller" />
   </group>
   <group unless="$(optenv ONE_FINGER 0)">
     <group if="$(optenv THREE_FINGER 0)">
       <node name="spawn_gazebo_hand_controllers"
 	    pkg="controller_manager" type="spawner" respawn="false" output="screen"
-	    args="sh_ffj0_position_controller sh_ffj3_position_controller sh_ffj4_position_controller sh_rfj0_position_controller sh_rfj3_position_controller sh_rfj4_position_controller sh_thj1_position_controller sh_thj2_position_controller sh_thj3_position_controller sh_thj4_position_controller sh_thj5_position_controller sh_wrj1_position_controller sh_wrj2_position_controller" />
+	    args="--shutdown-timeout=1.0 sh_ffj0_position_controller sh_ffj3_position_controller sh_ffj4_position_controller sh_rfj0_position_controller sh_rfj3_position_controller sh_rfj4_position_controller sh_thj1_position_controller sh_thj2_position_controller sh_thj3_position_controller sh_thj4_position_controller sh_thj5_position_controller sh_wrj1_position_controller sh_wrj2_position_controller" />
     </group>
     <group unless="$(optenv THREE_FINGER 0)">
       <node name="spawn_gazebo_hand_controllers"
 	    pkg="controller_manager" type="spawner" respawn="false" output="screen"
-	    args="sh_ffj0_position_controller sh_ffj3_position_controller sh_ffj4_position_controller sh_mfj0_position_controller sh_mfj3_position_controller sh_mfj4_position_controller sh_rfj0_position_controller sh_rfj3_position_controller sh_rfj4_position_controller sh_lfj0_position_controller sh_lfj3_position_controller sh_lfj4_position_controller sh_lfj5_position_controller sh_thj1_position_controller sh_thj2_position_controller sh_thj3_position_controller sh_thj4_position_controller sh_thj5_position_controller sh_wrj1_position_controller sh_wrj2_position_controller" />
+	    args="--shutdown-timeout=1.0 sh_ffj0_position_controller sh_ffj3_position_controller sh_ffj4_position_controller sh_mfj0_position_controller sh_mfj3_position_controller sh_mfj4_position_controller sh_rfj0_position_controller sh_rfj3_position_controller sh_rfj4_position_controller sh_lfj0_position_controller sh_lfj3_position_controller sh_lfj4_position_controller sh_lfj5_position_controller sh_thj1_position_controller sh_thj2_position_controller sh_thj3_position_controller sh_thj4_position_controller sh_thj5_position_controller sh_wrj1_position_controller sh_wrj2_position_controller" />
     </group>
   </group>
 </launch>

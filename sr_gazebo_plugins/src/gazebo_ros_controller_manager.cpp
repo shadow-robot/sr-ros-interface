@@ -57,7 +57,7 @@ namespace gazebo
 {
 
 GazeboRosControllerManager::GazeboRosControllerManager()
-  : state_(NULL), cm_(NULL), fake_state_(NULL), rosnode_(NULL)
+  : state_(NULL), cm_(NULL), fake_state_(NULL), rosnode_(NULL), stop_(false)
 {
 }
 
@@ -70,8 +70,10 @@ GazeboRosControllerManager::~GazeboRosControllerManager()
   controller_manager_queue_.disable();
   controller_manager_callback_queue_thread_.join();
 #endif
+  stop_ = true;
   ros_spinner_thread_.join();
-
+  ROS_DEBUG("spinner terminated");
+  self_test_.reset();
   delete cm_;
   delete rosnode_;
   delete state_;
@@ -375,7 +377,7 @@ void GazeboRosControllerManager::ControllerManagerROSThread()
 {
   ROS_INFO_STREAM("Callback thread id=" << boost::this_thread::get_id());
 
-  while (rosnode_->ok())
+  while (rosnode_->ok() && !stop_)
   {
     self_test_->checkTest();
     usleep(1000);
