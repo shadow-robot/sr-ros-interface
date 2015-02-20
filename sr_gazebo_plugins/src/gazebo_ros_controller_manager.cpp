@@ -205,7 +205,6 @@ void GazeboRosControllerManager::UpdateChild()
   common::Time gz_time_now = parent_model_->GetWorld()->GetSimTime();
   ros::Time sim_time_ros(gz_time_now.sec, gz_time_now.nsec);
   ros::Duration sim_period = sim_time_ros - last_update_sim_time_ros_;
-
   if (getenv("CHECK_SPEEDUP"))
   {
     double wall_elapsed = world->GetRealTime().Double() - wall_start_;
@@ -278,10 +277,18 @@ void GazeboRosControllerManager::UpdateChild()
     double damping_coef = 0;
     if (fst->joint_->dynamics)
       damping_coef = fst->joint_->dynamics->damping;
-
+    
     double current_velocity = joints_[i]->GetVelocity(0);
-    double damping_force = damping_coef * current_velocity;
-    double effort_command = effort - damping_force;
+    // using implicit spring damper from gazebo instead of explicit.
+    //double damping_force = damping_coef * current_velocity;
+    //double effort_command = effort - damping_force;
+    double effort_command = effort;
+    //enforce limits (are these limites enforced in gazebo ?)
+    //if (fst->joint_->limits)
+    //{
+      //double effort_limit= fst->joint_->limits->effort;
+      //effort_command=std::min(std::max(effort_command, -effort_limit), effort_limit);
+    //}
     joints_[i]->SetForce(0, effort_command);
   }
   last_write_sim_time_ros_ = sim_time_ros;
