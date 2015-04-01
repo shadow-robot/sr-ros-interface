@@ -150,10 +150,26 @@ void SrhEffortJointController::update(const ros::Time& time, const ros::Duration
     command_ = 0.0;
   }
 
-  //The commanded effort is the error directly:
-  // the PID loop for the force controller is running on the
-  // motorboard.
-  double commanded_effort = command_;
+  double commanded_effort = 0.0;
+
+  //check if we're running the torque control on the motor board or not
+  switch( joint_state_->control_type_.control_type)
+  {
+    case sr_robot_msgs::ControlType::PWM:
+      //The commanded effort is the error directly:
+      // the PID loop for the force controller is running on the
+      // motorboard.
+      commanded_effort = command_;
+      break;
+    case sr_robot_msgs::ControlType::FORCE:
+      //Computes the PWM command to be sent to the motor.
+      // The torque pid loop is running on the host.
+      commanded_effort = 0.0;
+      break;
+    default:
+      ROS_ERROR_STREAM("Unrecognised control type ("<< joint_state_->control_type_.control_type <<") for joint " << joint_state_->joint_->name);
+      return;
+  }
 
   //Clamps the effort
   commanded_effort = min(commanded_effort, (max_force_demand * max_force_factor_));
