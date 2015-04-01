@@ -54,6 +54,10 @@ bool SrhEffortJointController::init(ros_ethercat_model::RobotState *robot, ros::
     return false;
   }
 
+  pid_controller_effort_.reset(new control_toolbox::Pid());
+  if (!pid_controller_effort_->init(ros::NodeHandle(node_, "pid")))
+    return false;
+
   controller_state_publisher_.reset(new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
                                     (node_, "state", 1));
 
@@ -101,26 +105,42 @@ bool SrhEffortJointController::init(ros_ethercat_model::RobotState *robot, ros::
 
 void SrhEffortJointController::starting(const ros::Time& time)
 {
-  command_ = 0.0;
+  resetJointState();
+  pid_controller_effort_->reset();
   read_parameters();
 }
 
-bool SrhEffortJointController::setGains(sr_robot_msgs::SetEffortControllerGains::Request &req,
-                                        sr_robot_msgs::SetEffortControllerGains::Response &resp)
+bool SrhEffortJointController::setGains(sr_robot_msgs::SetPidGains::Request &req,
+					sr_robot_msgs::SetPidGains::Response &resp)
 {
+  ROS_INFO_STREAM("Setting new PID parameters. P:" << req.p << " / I:" << req.i <<
+                  " / D:" << req.d << " / IClamp:" << req.i_clamp << ", max force: " <<
+                  req.max_force << ", friction deadband: " << req.friction_deadband <<
+                  " torque deadband: " << req.deadband);
+
+  pid_controller_effort_->setGains(req.p, req.i, req.d, req.i_clamp, -req.i_clamp);
   max_force_demand = req.max_force;
   friction_deadband = req.friction_deadband;
+  effort_deadband = req.deadband;
 
   //Setting the new parameters in the parameter server
-  node_.setParam("max_force", max_force_demand);
-  node_.setParam("friction_deadband", friction_deadband);
+  node_.setParam("pid/p", req.p);
+  node_.setParam("pid/i", req.i);
+  node_.setParam("pid/d", req.d);
+  node_.setParam("pid/i_clamp", req.i_clamp);
+  node_.setParam("pid/max_force", max_force_demand);
+  node_.setParam("pid/effort_deadband", effort_deadband);
+  node_.setParam("pid/friction_deadband", friction_deadband);
 
   return true;
 }
 
 bool SrhEffortJointController::resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp)
 {
-  command_ = 0.0;
+  resetJointState();
+
+  if (!pid_controller_effort_->init(ros::NodeHandle(node_, "pid")))
+    return false;
 
   read_parameters();
 
@@ -134,6 +154,7 @@ bool SrhEffortJointController::resetGains(std_srvs::Empty::Request& req, std_srv
 
 void SrhEffortJointController::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
 {
+  pid_controller_effort_->getGains(p, i, d, i_max, i_min);
 }
 
 void SrhEffortJointController::update(const ros::Time& time, const ros::Duration& period)
@@ -146,14 +167,27 @@ void SrhEffortJointController::update(const ros::Time& time, const ros::Duration
 
   if (!initialized_)
   {
-    initialized_ = true;
-    command_ = 0.0;
+    resetJointState();
+   initialized_ = true;
   }
 
-  //The commanded effort is the error directly:
-  // the PID loop for the force controller is running on the
-  // motorboard.
   double commanded_effort = command_;
+
+  //check if we're running the torque control on the motor board or not
+  if(joint_state_->control_type_.control_type == sr_robot_msgs::ControlType::FORCE)
+  {
+    //Computes the PWM command to be sent to the motor.
+    // The torque pid loop is running on the host.
+    double error_effort = 0.0;
+
+    if (has_j2)
+      error_effort = (joint_state_->effort_ + joint_state_2->effort_) - command_;
+    else
+      error_effort = joint_state_->effort_ - command_;
+
+    bool in_deadband = hysteresis_deadband.is_in_deadband(command_, error_effort, effort_deadband);
+    commanded_effort = pid_controller_effort_->computeCommand(-error_effort, period);
+  }
 
   //Clamps the effort
   commanded_effort = min(commanded_effort, (max_force_demand * max_force_factor_));
@@ -202,6 +236,22 @@ void SrhEffortJointController::setCommandCB(const std_msgs::Float64ConstPtr& msg
 {
   command_ = msg->data;
 }
+
+void SrhEffortJointController::resetJointState()
+{
+  if (has_j2)
+  {
+    joint_state_->commanded_effort_ = joint_state_->effort_;
+    joint_state_2->commanded_effort_ = joint_state_2->effort_;
+    command_ = joint_state_->effort_ + joint_state_2->effort_;
+  }
+  else
+  {
+    joint_state_->commanded_effort_ = joint_state_->effort_;
+    command_ = joint_state_->effort_;
+  }
+}
+
 }
 
 /* For the emacs weenies in the crowd.
