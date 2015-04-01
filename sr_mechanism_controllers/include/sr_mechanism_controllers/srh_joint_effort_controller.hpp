@@ -49,14 +49,24 @@ namespace controller
 
     virtual void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
     virtual bool resetGains(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
-    bool setGains(sr_robot_msgs::SetEffortControllerGains::Request &req, sr_robot_msgs::SetEffortControllerGains::Response &resp);
+    bool setGains(sr_robot_msgs::SetPidGains::Request &req, sr_robot_msgs::SetPidGains::Response &resp);
 
   private:
+    boost::scoped_ptr<control_toolbox::Pid> pid_controller_effort_;       /**< Internal PID controller for the effort loop. */
+
+    ///the effort deadband value used in the hysteresis_deadband
+    double effort_deadband;
+
+    ///We're using an hysteresis deadband.
+    sr_deadband::HysteresisDeadband<double> hysteresis_deadband;
+
     ///read all the controller settings from the parameter server
     void read_parameters();
 
     ///set the effort target from a topic
     void setCommandCB(const std_msgs::Float64ConstPtr& msg);
+
+    void resetJointState();
   };
 } // namespace
 
