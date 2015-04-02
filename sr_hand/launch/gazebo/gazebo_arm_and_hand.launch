@@ -43,7 +43,7 @@
   <!-- Controllers for the hand -->
   <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch"/>
 
-  <!-- launch trajectory controllers for the hand -->
+  <!-- launch trajectory controllers for the arm -->
   <include file="$(find sr_hand)/launch/gazebo/loaders/arm_controllers_extended.launch"/>
 
   <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch"/>
