@@ -2,8 +2,8 @@
 Changelog for package sr_hand
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.0 (2015-04-07)
+------------------
 * starting trajectory controllers only for the arm when running arm + hand as it is more standard. Can't have both running with ros_control
 * removing cartesian control - not implemented in ros-control + changing to the new traj controller
 * Added shutdown-timeout=1.0 in controller spawner to improve shutdown time

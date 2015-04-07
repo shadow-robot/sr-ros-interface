@@ -2,8 +2,8 @@
 Changelog for package sr_mechanism_controllers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.0 (2015-04-07)
+------------------
 * Adapt calibration controller
 * Fix joint limit reading
 * using prefix on joints didn't work with gazebo controllers. This is now working
