@@ -2,6 +2,9 @@
 Changelog for package sr_tactile_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.3.1 (2014-07-18)
 ------------------
 

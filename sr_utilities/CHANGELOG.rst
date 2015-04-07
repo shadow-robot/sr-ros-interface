@@ -2,6 +2,10 @@
 Changelog for package sr_utilities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* initialize commands to current state
+
 1.3.1 (2014-07-18)
 ------------------
 

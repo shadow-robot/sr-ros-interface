@@ -2,6 +2,10 @@
 Changelog for package sr_mechanism_model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix for joint names of bimanual systems
+
 1.3.1 (2014-07-18)
 ------------------
 
