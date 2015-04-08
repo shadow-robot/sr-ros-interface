@@ -70,7 +70,7 @@ class Commander(SrRobotCommander):
         @param command - Dictionary of joint names in the keys and angles in
         degrees in the values.
         """
-        self._set_joint_value_target(command)
+        self._set_joint_value_target(command, wait_result=False)
 
     def get_hand_position(self):
         """
