@@ -17,7 +17,6 @@
 
 import rospy
 import threading
-import warnings
 
 from sr_robot_msgs.msg import sendupdate, joint
 from sr_hand.shadowhand_ros import ShadowHand_ROS
@@ -53,8 +52,8 @@ See the examples directory in the package sr_examples.
 
 class Commander(object):
     def __init__(self):
-        warnings.warn("This class is deprecated. Please use SrHandCommander from package sr_robot_commander",
-                      DeprecationWarning)
+        rospy.logwarn("The class Commander in package sr_hand is deprecated. "
+                      "Please use SrHandCommander from package sr_robot_commander")
 
         # Mutex to control thread access to certain operations 
         self.mutex = threading.Lock()
@@ -94,10 +93,10 @@ class Commander(object):
         degrees in the values. The key interpolation_time gives the time in seconds that 
         the movement will last.
         """
-        
+
         # Copy the dictionary, so that we will not affect the original user command
         joints = dict(command)
-        
+
         interpolation_time = 0.0
         if 'interpolation_time' in joints:
             interpolation_time = joints['interpolation_time']
@@ -105,7 +104,7 @@ class Commander(object):
 
         if interpolation_time == 0.0:
             self.mutex.acquire()
-            self._prune_interpolators(joints)            
+            self._prune_interpolators(joints)
             self.mutex.release()
             self.hand.sendupdate_from_dict(joints)
         else:
@@ -122,14 +121,14 @@ class Commander(object):
         degrees in the values.
         @param interpolation_time - A float. Interpolation time in seconds.
         """
-        
+
         rospy.logdebug("call interpolation")
         thread_name = threading.current_thread().name
         try:
             self.mutex.acquire()
             self._prune_interpolators(joints)
             self.mutex.release()
-          
+
             rospy.logdebug("start interpolation")
             current_grasp = Grasp()
             current_grasp.joints_and_positions = self.hand.read_all_current_positions()
@@ -138,9 +137,9 @@ class Commander(object):
 
             interpolator = GraspInterpoler(current_grasp, target_grasp)
             self.grasp_interpolators[thread_name] = interpolator
-            
+
             r = rospy.Rate(1.0 / self.hand_interpolation_period)
-            
+
             for interpolation in range (1, int(interpolation_time / self.hand_interpolation_period) + 1):
                 self.mutex.acquire()
                 targets_to_send = interpolator.interpolate(100.0 * interpolation * self.hand_interpolation_period / interpolation_time)
@@ -175,25 +174,25 @@ class Commander(object):
         Returns a dictionary with the position of each joint in degrees.
         """
         return dict(self.hand.read_all_current_positions())
-    
+
     def get_hand_velocity(self):
         """
         Returns a dictionary with the velocity of each joint in degrees/s.
         """
         return dict(self.hand.read_all_current_velocities())
-    
+
     def get_hand_effort(self):
         """
         Returns a dictionary with the effort of each joint. Currently in ADC units, as no calibration is performed on the strain gauges.
         """
         return dict(self.hand.read_all_current_efforts())
-    
+
     def get_tactile_type(self):
         """
         Returns a string indicating the type of tactile sensors present. Possible values are: PST, biotac, UBI0 .
         """
         return self.hand.get_tactile_type()
-    
+
     def get_tactile_state(self):
         """
         Returns an object containing tactile data. The structure of the data is different for every tactile_type .
