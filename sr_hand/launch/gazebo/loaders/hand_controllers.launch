@@ -1,6 +1,10 @@
 <launch>
-  <rosparam file="$(find sr_description)/hand/config/hand_controller_gazebo.yaml" command="load"/>
-  <rosparam file="$(find sr_description)/hand/config/hand_effort_controller_gazebo.yaml" command="load"/>
+  <arg name="hand_controller_gazebo" default="$(find sr_description)/hand/config/hand_controller_gazebo.yaml"/>
+  <arg name="hand_effort_controller_gazebo" default="$(find sr_description)/hand/config/hand_effort_controller_gazebo.yaml"/>
+
+
+  <rosparam file="$(arg hand_controller_gazebo)" command="load"/>
+  <rosparam file="$(arg hand_effort_controller_gazebo)" command="load"/>
 
   <group if="$(optenv ONE_FINGER 0)">
     <node name="spawn_gazebo_hand_controllers"
