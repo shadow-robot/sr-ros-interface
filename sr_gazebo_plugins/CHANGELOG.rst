@@ -2,8 +2,8 @@
 Changelog for package sr_gazebo_plugins
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.0 (2015-04-07)
+------------------
 * Inertia now exact values, with inertia tensor at COM (gazebo and ode support the small values now)
   Removed explicit viscous damping from sr_gazebo_plugin,
   enabled springDamper in each joint (implicit viscous damping)
