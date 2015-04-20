@@ -35,8 +35,11 @@ class TactileReceiver():
         self.tactile_state = None
 
         #appends trailing slash if necessary
-        if prefix[-1] is not "/":
-            prefix += "/"
+        try:
+            if prefix[-1] is not "/":
+                prefix += "/"
+        except IndexError:
+            pass
 
         if self.tactile_type == "PST":
             self.tactile_listener = rospy.Subscriber(prefix+"tactile", ShadowPST, self.tactile_callback)
