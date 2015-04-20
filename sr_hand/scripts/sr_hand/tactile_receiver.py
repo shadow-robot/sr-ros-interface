@@ -26,16 +26,24 @@ Module that receives the tactile values.
 
 class TactileReceiver():
 
-    def __init__(self):
+    def __init__(self, prefix = ""):
+        """
+        Receives the tactile information from a Shadow Hand
+        @param prefix - prefix for the tactile topic
+        """
         self.tactile_type = self.find_tactile_type()
         self.tactile_state = None
-        
+
+        #appends trailing slash if necessary
+        if prefix[-1] is not "/":
+            prefix += "/"
+
         if self.tactile_type == "PST":
-            self.tactile_listener = rospy.Subscriber("tactile", ShadowPST, self.tactile_callback)
+            self.tactile_listener = rospy.Subscriber(prefix+"tactile", ShadowPST, self.tactile_callback)
         elif self.tactile_type == "biotac":
-            self.tactile_listener = rospy.Subscriber("tactile", BiotacAll, self.tactile_callback)
+            self.tactile_listener = rospy.Subscriber(prefix+"tactile", BiotacAll, self.tactile_callback)
         elif self.tactile_type == "UBI0":
-            self.tactile_listener = rospy.Subscriber("tactile", UBI0All, self.tactile_callback)
+            self.tactile_listener = rospy.Subscriber(prefix+"tactile", UBI0All, self.tactile_callback)
         
         
     def find_tactile_type(self):
