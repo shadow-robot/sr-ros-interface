@@ -35,7 +35,7 @@ class TactileReceiver():
         self.tactile_state = None
 
         #appends trailing slash if necessary
-        if prefix[-1] is not "/":
+        if not prefix.endswith("/"):
             prefix += "/"
 
         if self.tactile_type == "PST":
