@@ -4,8 +4,15 @@ project(sr_robot_commander)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
-
+find_package(catkin REQUIRED COMPONENTS
+    rospy
+    moveit_commander
+    pluginlib
+    moveit_core
+    moveit_ros_planning_interface
+    moveit_ros_perception
+    interactive_markers
+)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -13,7 +20,7 @@ find_package(catkin REQUIRED)
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -78,7 +85,14 @@ find_package(catkin REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES sr_robot_commander
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS
+    rospy
+    moveit_commander
+    pluginlib
+    moveit_core
+    moveit_ros_planning_interface
+    moveit_ros_perception
+    interactive_markers
 #  DEPENDS system_lib
 )
 
@@ -136,11 +150,10 @@ catkin_package(
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(DIRECTORY
+  src
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##
@@ -153,4 +166,4 @@ catkin_package(
 # endif()
 
 ## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+#catkin_add_nosetests(test)
