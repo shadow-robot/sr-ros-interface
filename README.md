@@ -4,7 +4,7 @@
 
 This stack focuses on the core software packages built around [our robots](http://www.shadowrobot.com). We'll focus more on the simulated side of things here (as you'll get a full training when receiving one of our robot), but all the code that runs on our simulated robot also runs on the real hardware.
 
-The commands below are mostly summarised in this (cheatsheet)[/docs/resources/ShadowROSCheatsheet.pdf]
+The commands below are mostly summarised in this [cheatsheet](/docs/resources/ShadowROSCheatsheet.pdf)
 
 ## Getting Started
 
@@ -22,7 +22,7 @@ To start the hand and arm, run the following command:
 roslaunch sr_hand gazebo_arm_and_hand.launch
 ```
 
-{{attachment:launch_gazebo.png|Launching Gazebo|width=650}}
+![Gazebo](/docs/resources/launch_gazebo.png)
 
 *Note: The first time you run gazebo, it might spend some time fetching the model database from the net. If this takes too long the gazebo gui won't start (and you'll get the following error in your terminal:*
 `Error [ConnectionManager.cc:116] Failed to connect to master in 30 seconds`*). If this happens, simply kill (pressing ctrl+c) and rerun the previous command.*
@@ -46,7 +46,7 @@ rostopic pub /sa_ss_position_controller/command std_msgs/Float64 0.5
 
 All the joints of the hand are prefixed by `/sh_`, while those of the arm are prefixed by `/sa` (Shadow Hand, Shadow Arm). Here's a diagram to see which joint is which.
 
-{{attachment:annotated_hand.png|Annotated Hand Diagram|width=650}}
+![Annotated Hand Diagram](/docs/resources/annotated_hand.png)
 
 #### Receiving your first data from the robot
 
