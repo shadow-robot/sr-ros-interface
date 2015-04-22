@@ -1,10 +1,10 @@
-#Shadow Robot
+# Shadow Robot
 
 ## Overview
 
-This stack focuses on the core software packages built around [http://www.shadowrobot.com](our robots). We'll focus more on the simulated side of things here (as you'll get a full training when receiving one of our robot), but all the code that runs on our simulated robot also runs on the real hardware.
+This stack focuses on the core software packages built around [our robots](http://www.shadowrobot.com). We'll focus more on the simulated side of things here (as you'll get a full training when receiving one of our robot), but all the code that runs on our simulated robot also runs on the real hardware.
 
-The commands below are mostly summarised in this [attachment:ShadowROSCheatsheet.pdf](cheatsheet)
+The commands below are mostly summarised in this (cheatsheet)[/docs/resources/ShadowROSCheatsheet.pdf]
 
 ## Getting Started
 
