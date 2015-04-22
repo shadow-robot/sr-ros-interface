@@ -12,7 +12,14 @@ The commands below are mostly summarised in this [cheatsheet](/resources/ShadowR
 
 ### Installation Instructions
 
-TODO
+We'll assume that you've already installed ROS Indigo from [those instructions](http://wiki.ros.org/indigo/Installation/Ubuntu) using the recommended proposed solution.
+
+To get our software, run the following command from a terminal:
+```bash
+sudo apt-get install ros-indigo-shadow-robot
+```
+
+To get the latest development version, you can also use the following [rosinstall file](https://github.com/shadow-robot/sr-build-tools/blob/master/data/shadow_robot-indigo.rosinstall).
 
 ### Running a simulated Hand and Arm
 
@@ -62,7 +69,7 @@ rostopic echo /joint_states
 
 ### GUI
 
-A set of GUI plugins are [sr_visualization](available) to control our robot.
+A set of GUI plugins are [available](sr_visualization) to control our robot.
 
 ### Programming
 
