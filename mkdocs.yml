@@ -1,0 +1,18 @@
+site_favicon: /resources/hand.png
+
+pages:
+- ['README.md', 'Introduction', 'Overview']
+- ['resources/send_command.md', 'Introduction', 'Sending Commands [python]']
+- ['resources/link_two_joints_python.md', 'Introduction', 'Link Two Joints [python]']
+- ['resources/link_two_joints_cpp.md', 'Introduction', 'Link Two Joints [C++]']
+- ['sr_robot_commander/README.md', 'sr_robot_commander', 'Overview']
+- ['sr_robot_commander/doc/tutorial/RobotCommander.md', 'sr_robot_commander', 'Robot Commander']
+- ['sr_robot_commander/doc/tutorial/HandCommander.md', 'sr_robot_commander', 'Hand Commander']
+- ['sr_robot_commander/doc/tutorial/ArmCommander.md', 'sr_robot_commander', 'Arm Commander']
+- ['sr_description/README.md', 'sr_hand_description', 'Overview']
+- ['sr_description/doc/HandInertia.md', 'sr_hand_description', 'Hand Inertia']
+- ['sr_description/doc/ArmInertia.md', 'sr_hand_description', 'Arm Inertia']
+- ['sr_robot_launch/README.md', 'sr_robot_launch', 'Overview']
+- ['sr_multi_description/README.md', 'sr_multi_description', 'Overview']
+- ['sr_multi_description/urdf/for_moveit/README.md', 'sr_multi_description', 'Specific MoveIt files']
+- ['sr_grasp/README.md', 'sr_grasp', 'Overview']
