@@ -1,5 +1,3 @@
-site_favicon: /resources/hand.png
-
 pages:
 - ['README.md', 'Introduction', 'Overview']
 - ['resources/send_command.md', 'Introduction', 'Sending Commands [python]']
