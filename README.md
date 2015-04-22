@@ -6,6 +6,8 @@ This stack focuses on the core software packages built around [our robots](http:
 
 The commands below are mostly summarised in this [cheatsheet](/resources/ShadowROSCheatsheet.pdf)
 
+[![Shadow Hand manipulates pen](http://img.youtube.com/vi/3WAp_DHwg1c/0.jpg)](http://www.youtube.com/watch?v=3WAp_DHwg1c)
+
 ## Getting Started
 
 ### Installation Instructions
