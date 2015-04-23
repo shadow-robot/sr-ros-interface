@@ -45,7 +45,7 @@ Basic script will look like:
         "LFJ0": 30, "LFJ3": 0, "LFJ4": -10, "LFJ5": 10
     })
     rospy.sleep(3.0)
-    
+
 
 See the examples directory in the package sr_examples.
 """
@@ -55,7 +55,7 @@ class Commander(object):
         rospy.logwarn("The class Commander in package sr_hand is deprecated. "
                       "Please use SrHandCommander from package sr_robot_commander")
 
-        # Mutex to control thread access to certain operations 
+        # Mutex to control thread access to certain operations
         self.mutex = threading.Lock()
 
         # This is used to store the grasp interpolators for the different threads.
@@ -64,7 +64,7 @@ class Commander(object):
         # Shadow hand setup
         self.hand = ShadowHand_ROS()
 
-        # Period in seconds between interpolated commands (e.g. if we want an interpolation time of 1s and have a period of 0.1, 
+        # Period in seconds between interpolated commands (e.g. if we want an interpolation time of 1s and have a period of 0.1,
         # the interpoler will use 10 steps
         self.hand_interpolation_period = 0.01
         if self.hand.check_hand_type() == "gazebo":
@@ -80,17 +80,17 @@ class Commander(object):
 
         If called with interpolation time of 0.0 the joints will move to the target position
         at maximum velocity (i.e. the max. vel. allowed by the position controller for that joint)
-        
+
         If called with interpolation time greater than self.hand_interpolation_period,
-        a separate thread will deal with the interpolation time and will keep 
+        a separate thread will deal with the interpolation time and will keep
         sending targets to the hand until the last target is sent.
-        
+
         If move_hand() is called again before the previous movements have finished,
         the new call will override only the conciding joints. The others will keep moving
         to their previous targets at their previous velocity.
 
         @param command - Dictionary of joint names in the keys and angles in
-        degrees in the values. The key interpolation_time gives the time in seconds that 
+        degrees in the values. The key interpolation_time gives the time in seconds that
         the movement will last.
         """
 
@@ -198,5 +198,5 @@ class Commander(object):
         Returns an object containing tactile data. The structure of the data is different for every tactile_type .
         """
         return self.hand.get_tactile_state()
-    
+
 
