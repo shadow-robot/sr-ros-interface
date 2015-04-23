@@ -25,7 +25,7 @@ class MergeMessages:
         self.mutex.acquire()
         self.pst[0]=msg.data
         self.mutex.release()
-        
+
     def mf_cb(self, msg):
         self.mutex.acquire()
         self.pst[1]=msg.data
@@ -45,8 +45,8 @@ class MergeMessages:
         self.mutex.acquire()
         self.pst[4]=msg.data
         self.mutex.release()
-        
-    def shadowpst_publisher(self):  
+
+    def shadowpst_publisher(self):
         pst_state_msg=ShadowPST()
         pst_state_msg.temperature=[0,0,0,0,0,0]
         pressure=[]
@@ -56,7 +56,7 @@ class MergeMessages:
         pst_state_msg.pressure=pressure
         #print pst_state_msg.pressure
         self.mutex.release()
-        
+
         pst_state_msg.header.stamp = rospy.Time.now()
         self.pub.publish(pst_state_msg)
 

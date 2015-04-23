@@ -44,34 +44,34 @@ class TactileReceiver():
             self.tactile_listener = rospy.Subscriber(prefix+"tactile", BiotacAll, self.tactile_callback)
         elif self.tactile_type == "UBI0":
             self.tactile_listener = rospy.Subscriber(prefix+"tactile", UBI0All, self.tactile_callback)
-        
-        
+
+
     def find_tactile_type(self):
         try:
             rospy.wait_for_message("tactile", ShadowPST, timeout = 0.2)
             return "PST"
         except:
             pass
-        
+
         try:
             rospy.wait_for_message("tactile", BiotacAll, timeout = 0.2)
             return "biotac"
         except:
             pass
-            
+
         try:
             rospy.wait_for_message("tactile", UBI0All, timeout = 0.2)
             return "UBI0"
         except:
             rospy.logwarn("No tactile topic found. This is normal for a simulated hand")
-            
+
         return None
-    
+
     def tactile_callback(self, tactile_msg):
         self.tactile_state = tactile_msg
-    
+
     def get_tactile_type(self):
         return self.tactile_type
-        
+
     def get_tactile_state(self):
         return self.tactile_state
