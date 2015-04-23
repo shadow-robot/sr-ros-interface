@@ -30,7 +30,7 @@ class TactileReceiver(object):
         Receives the tactile information from a Shadow Hand
         @param prefix - prefix for the tactile topic
         """
-        self.tactile_type = self.find_tactile_type()
+        self.tactile_type = find_tactile_type()
         self.tactile_state = None
 
         # appends trailing slash if necessary
@@ -45,7 +45,7 @@ class TactileReceiver(object):
             self.tactile_listener = rospy.Subscriber(prefix+"tactile", UBI0All, self.tactile_callback)
 
     @staticmethod
-    def find_tactile_type(self):
+    def find_tactile_type():
         try:
             rospy.wait_for_message("tactile", ShadowPST, timeout = 0.2)
             return "PST"
