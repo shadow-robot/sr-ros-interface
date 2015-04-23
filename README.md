@@ -69,11 +69,10 @@ rostopic echo /joint_states
 
 ### GUI
 
-A set of GUI plugins are [available](sr_visualization) to control our robot.
+A set of GUI plugins are [available](https://github.com/shadow-robot/sr-visualization) to control our robot.
 
 ### Programming
-Now that you know how to send and receive data to and from the robot, we can go one step further and write a simple script that [sends a target to a joint](/sr_example/doc/send_command.md), then something a bit more useful that reads the position from one finger joint and sets it as the target for
-another finger joint [in python](/sr_example/doc/link_two_joints_python.md) / [in C++](/sr_example/doc/link_two_joints_cpp.md).
+Now that you know how to send and receive data to and from the robot, feel free to take things a step further by looking at the *sr_example* package.
 
 ## Contacting us
 
