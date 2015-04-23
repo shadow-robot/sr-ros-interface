@@ -17,8 +17,10 @@ arm_commander.move_to_position_target(position_1)
 rospy.sleep(rospy.Duration(5))
 
 position_2 = [0.25527, 0.36682, 0.5426]
-print("Moving arm to position\n" + str(position_2) + "\n")
-arm_commander.move_to_position_target(position_2)
+print("Planning the move to the second position\n" + str(position_2) + "\n")
+arm_commander.plan_to_position_target(position_2)
+print("Finished planning, moving the arm now.")
+arm_commander.execute()
 
 rospy.sleep(rospy.Duration(5))
 
@@ -85,4 +87,3 @@ rospy.sleep(rospy.Duration(3))
 
 print("Arm joints position\n" + str(arm_commander.get_joints_position()) + "\n")
 print("Arm joints velocities\n" + str(arm_commander.get_joints_velocity()) + "\n")
-

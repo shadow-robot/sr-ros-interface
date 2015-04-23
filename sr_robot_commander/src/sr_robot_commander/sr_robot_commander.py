@@ -19,7 +19,7 @@ import rospy
 import threading
 from actionlib import SimpleActionClient
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
-from moveit_commander import MoveGroupCommander
+from moveit_commander import MoveGroupCommander, RobotCommander, PlanningSceneInterface
 from moveit_msgs.msg import RobotTrajectory
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
@@ -40,11 +40,15 @@ class SrRobotCommander(object):
         @param name - name of the MoveIt group
         """
         self._move_group_commander = MoveGroupCommander(name)
+        self._robot_commander = RobotCommander()
+        self._planning_scene = PlanningSceneInterface()
+
         self._joint_states_lock = threading.Lock()
         self._joint_states_listener = rospy.Subscriber("joint_states", JointState, self._joint_states_callback)
         self._joints_position = {}
         self._joints_velocity = {}
         self._joints_effort = {}
+        self.__plan = None
 
         # prefix of the trajectory controller
         self._prefix = self.__group_prefixes[name]
@@ -56,6 +60,16 @@ class SrRobotCommander(object):
 
         threading.Thread(None, rospy.spin)
 
+    def execute(self):
+        """
+        Executes the last plan made.
+        """
+        if self.__plan is not None:
+            self._move_group_commander.execute(self.__plan)
+            self.__plan = None
+        else:
+            rospy.logwarn("No plans where made, not executing anything.")
+
     def move_to_joint_value_target(self, joint_states, wait_result=True):
         """
         Set target of the robot's links and moves to it.
@@ -66,6 +80,16 @@ class SrRobotCommander(object):
         self._move_group_commander.set_joint_value_target(joint_states)
         self._move_group_commander.go(wait=wait_result)
 
+    def plan_to_joint_value_target(self, joint_states):
+        """
+        Set target of the robot's links and plans.
+        @param joint_states - dictionary with joint name and value. It can contain only joints values of which need to
+        be changed.
+        This is a blocking method.
+        """
+        self._move_group_commander.set_joint_value_target(joint_states)
+        self.__plan = self._move_group_commander.plan()
+
     def move_to_named_target(self, name, wait_result=True):
         """
         Set target of the robot's links and moves to it
@@ -74,6 +98,15 @@ class SrRobotCommander(object):
         """
         self._move_group_commander.set_named_target(name)
         self._move_group_commander.go(wait=wait_result)
+
+    def plan_to_named_target(self, name):
+        """
+        Set target of the robot's links and plans
+        This is a blocking method.
+        @param name - name of the target pose defined in SRDF
+        """
+        self._move_group_commander.set_named_target(name)
+        self.__plan = self._move_group_commander.plan()
 
     def get_joints_position(self):
         """
@@ -119,6 +152,16 @@ class SrRobotCommander(object):
         """
         self._move_group_commander.set_position_target(xyz, end_effector_link)
         self._move_group_commander.go(wait=wait_result)
+
+    def _plan_to_position_target(self, xyz, end_effector_link=""):
+        """
+        Specify a target position for the end-effector and plans.
+        This is a blocking method.
+        @param xyz - new position of end-effector
+        @param end_effector_link - name of the end effector link
+        """
+        self._move_group_commander.set_position_target(xyz, end_effector_link)
+        self.__plan = self._move_group_commander.plan()
 
     def _joint_states_callback(self, joint_state):
         """
