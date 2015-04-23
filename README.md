@@ -53,13 +53,13 @@ You can of course control any other joints of the robot in the same way. For exa
 rostopic pub /sa_ss_position_controller/command std_msgs/Float64 0.5
 ```
 
-All the joints of the hand are prefixed by `/sh_`, while those of the arm are prefixed by `/sa` (Shadow Hand, Shadow Arm). Here's a diagram to see which joint is which.
+All the joints of the hand are prefixed by `/sh_`, while those of the arm are prefixed by `/sa_` (Shadow Hand, Shadow Arm). Here's a diagram to see which joint is which.
 
 ![Annotated Hand Diagram](/resources/annotated_hand.png)
 
 #### Receiving your first data from the robot
 
-The data concerning the joints (position, velocity and effort) is published to the '''/joint_states''' topic. To display it on the command line, you can run:
+The data concerning the joints (position, velocity and effort) is published to the `/joint_states` topic. To display it on the command line, you can run:
 
 ```bash
 rostopic echo /joint_states
@@ -72,10 +72,9 @@ rostopic echo /joint_states
 A set of GUI plugins are [available](sr_visualization) to control our robot.
 
 ### Programming
-
 Now that you know how to send and receive data to and from the robot, we can go one step further and write a simple script that [sends a target to a joint](/resources/send_command.md), then something a bit more useful that reads the position from one finger joint and sets it as the target for
 another finger joint [in python](/resources/link_two_joints_python.md) / [in C++](/resources/link_two_joints_cpp.md).
 
 ## Contacting us
 
-If you encounter a bug in our code, or need a new feature implemented, please use [https://github.com/shadow-robot/sr-ros-interface/issues?state=open)[github issues]. Otherwise you can also contact us via email: *software@shadowrobot.com*.
+If you encounter a bug in our code, or need a new feature implemented, please use [github issues](https://github.com/shadow-robot/sr-ros-interface/issues?state=open). Otherwise you can also contact us via email: *software@shadowrobot.com*.
