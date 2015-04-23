@@ -16,17 +16,16 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import rospy
-import threading
 
 from sr_robot_msgs.msg import BiotacAll, ShadowPST, UBI0All
 
-"""
-Module that receives the tactile values.
-"""
 
-class TactileReceiver():
+class TactileReceiver(object):
+    """
+    Module that receives the tactile values.
+    """
 
-    def __init__(self, prefix = ""):
+    def __init__(self, prefix=""):
         """
         Receives the tactile information from a Shadow Hand
         @param prefix - prefix for the tactile topic
@@ -34,7 +33,7 @@ class TactileReceiver():
         self.tactile_type = self.find_tactile_type()
         self.tactile_state = None
 
-        #appends trailing slash if necessary
+        # appends trailing slash if necessary
         if not prefix.endswith("/"):
             prefix += "/"
 
@@ -45,24 +44,24 @@ class TactileReceiver():
         elif self.tactile_type == "UBI0":
             self.tactile_listener = rospy.Subscriber(prefix+"tactile", UBI0All, self.tactile_callback)
 
-
+    @staticmethod
     def find_tactile_type(self):
         try:
             rospy.wait_for_message("tactile", ShadowPST, timeout = 0.2)
             return "PST"
-        except:
+        except (rospy.ROSException, rospy.ROSInterruptException):
             pass
 
         try:
             rospy.wait_for_message("tactile", BiotacAll, timeout = 0.2)
             return "biotac"
-        except:
+        except (rospy.ROSException, rospy.ROSInterruptException):
             pass
 
         try:
             rospy.wait_for_message("tactile", UBI0All, timeout = 0.2)
             return "UBI0"
-        except:
+        except (rospy.ROSException, rospy.ROSInterruptException):
             rospy.logwarn("No tactile topic found. This is normal for a simulated hand")
 
         return None
