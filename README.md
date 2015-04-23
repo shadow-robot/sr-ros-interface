@@ -72,8 +72,8 @@ rostopic echo /joint_states
 A set of GUI plugins are [available](sr_visualization) to control our robot.
 
 ### Programming
-Now that you know how to send and receive data to and from the robot, we can go one step further and write a simple script that [sends a target to a joint](/sr_example/send_command.md), then something a bit more useful that reads the position from one finger joint and sets it as the target for
-another finger joint [in python](/sr_example/link_two_joints_python.md) / [in C++](/sr_example/link_two_joints_cpp.md).
+Now that you know how to send and receive data to and from the robot, we can go one step further and write a simple script that [sends a target to a joint](/sr_example/doc/send_command.md), then something a bit more useful that reads the position from one finger joint and sets it as the target for
+another finger joint [in python](/sr_example/doc/link_two_joints_python.md) / [in C++](/sr_example/doc/link_two_joints_cpp.md).
 
 ## Contacting us
 
