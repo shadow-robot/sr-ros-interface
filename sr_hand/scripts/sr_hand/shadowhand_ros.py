@@ -313,7 +313,7 @@ class ShadowHand_ROS():
         Sends a new target for the specified joint
         """
         message = [joint(joint_name=jointName, joint_target=angle)]
-        self.pub_arm.publish(sendupdate_arm(len(message), message))
+        self.pub_arm.publish(sendupdate(len(message), message))
 
     def valueof(self, jointName):
         """
