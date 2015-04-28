@@ -30,12 +30,14 @@ class TactileReceiver(object):
         Receives the tactile information from a Shadow Hand
         @param prefix - prefix for the tactile topic
         """
-        self.tactile_type = TactileReceiver.find_tactile_type()
-        self.tactile_state = None
-
         # appends trailing slash if necessary
         if not prefix.endswith("/"):
             prefix += "/"
+
+        self._prefix = prefix
+
+        self.tactile_type = self.find_tactile_type()
+        self.tactile_state = None
 
         if self.tactile_type == "PST":
             self.tactile_listener = rospy.Subscriber(prefix+"tactile", ShadowPST, self.tactile_callback)
@@ -44,22 +46,21 @@ class TactileReceiver(object):
         elif self.tactile_type == "UBI0":
             self.tactile_listener = rospy.Subscriber(prefix+"tactile", UBI0All, self.tactile_callback)
 
-    @staticmethod
-    def find_tactile_type():
+    def find_tactile_type(self):
         try:
-            rospy.wait_for_message("tactile", ShadowPST, timeout=0.2)
+            rospy.wait_for_message(self._prefix+"tactile", ShadowPST, timeout=0.2)
             return "PST"
         except (rospy.ROSException, rospy.ROSInterruptException):
             pass
 
         try:
-            rospy.wait_for_message("tactile", BiotacAll, timeout=0.2)
+            rospy.wait_for_message(self._prefix+"tactile", BiotacAll, timeout=0.2)
             return "biotac"
         except (rospy.ROSException, rospy.ROSInterruptException):
             pass
 
         try:
-            rospy.wait_for_message("tactile", UBI0All, timeout=0.2)
+            rospy.wait_for_message(self._prefix+"tactile", UBI0All, timeout=0.2)
             return "UBI0"
         except (rospy.ROSException, rospy.ROSInterruptException):
             rospy.logwarn("No tactile topic found. This is normal for a simulated hand")
