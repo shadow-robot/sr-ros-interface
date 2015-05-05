@@ -21,7 +21,7 @@ To get our software, run the following command from a terminal:
 sudo apt-get install ros-indigo-shadow-robot
 ```
 
-To get the latest development version, you can also use the following [rosinstall file](https://github.com/shadow-robot/sr-build-tools/blob/master/data/shadow_robot-indigo.rosinstall).
+To get the latest development version, you can also look at those [install steps](INSTALL.md).
 
 ### Running a simulated Hand and Arm
 
