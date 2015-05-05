@@ -1,0 +1,85 @@
+# Source Install
+To get the latest version of our software, you can install it from source. We're doing our best to keep the indigo-devel branch stable.
+
+You'll first need to [install ROS](http://wiki.ros.org/indigo/Installation/Ubuntu).
+
+## Workspaces
+As explained in this [ROS tutorial](http://wiki.ros.org/catkin/Tutorials/create_a_workspace), to install from source you first need to create a workspace.
+
+At Shadow, we recommend overlaying different workspaces. For example, if you develop some code that uses our software, you should probably have a `development` workspace containing your code based on top of a `shadow` workspace that contains ours. The idea is that you don't need to recompile all our code (or update it) when you're developing your own code.
+
+### Creating this overlay hierarchy
+We'll explain how to create the 2 workspaces as explained above.
+ - let's create the `shadow` overlay. It will overlay the standard ROS packages (installed via `apt-get`).
+  - first make sure you're using the base install:
+  ```bash
+  source /opt/ros/indigo/setup.bash
+  ```
+  - now let's create the folders you'll need for this first overlay
+  ```bash
+  mkdir -p ~/workspaces/shadow/src
+  ```
+  - and initialise the workspace
+  ```bash
+  cd ~/workspace/shadow/src
+  catkin_init_workspace
+  cd ~/workspace/shadow
+  catkin_make
+  ```
+  - your first workspace is created, you now need to load it before creating the second workspace that will overlay it.
+  ```bash
+  source ~/workspace/shadow/devel/setup.bash
+  ```
+
+ - let's create the second overlay: `development` which will contain your own code. You'll repeat the steps above, except that you're using the setup.bash from the `shadow overlay`.
+   - first make sure you're using the base install:
+   ```bash
+   source ~/workspace/shadow/devel/setup.bash
+   ```
+   - now let's create the folders you'll need for this second overlay
+   ```bash
+   mkdir -p ~/workspaces/development/src
+   ```
+   - and initialise the workspace
+   ```bash
+   cd ~/workspace/development/src
+   catkin_init_workspace
+   cd ~/workspace/development
+   catkin_make
+   ```
+   - your second workspace is created, and it is overlaying the `shadow` workspace. You need to load it (each time you open a new terminal).
+   ```bash
+   source ~/workspace/development/devel/setup.bash
+   ```
+
+To load this workspace automatically, it is a very good idea to add it to your `~/.bashrc`:
+```bash
+echo "source ~/workspace/development/setup.bash" >> ~/.bashrc
+```
+
+## Populating the Shadow workspace with the code
+To get the source code, we use [wstool](http://wiki.ros.org/wstool).
+
+ - install it:
+ ```bash
+ sudo apt-get install python-wstool
+ ```
+ - initialise the `wstool` workspace
+ ```bash
+ cd ~/workspaces/shadow/src
+ wstool init ~/workspaces/shadow/src /opt/ros/indigo/setup.bash
+ ```
+ - use our rosinstall file to install the different stacks
+ ```bash
+ wstool merge https://raw.githubusercontent.com/shadow-robot/sr-build-tools/master/data/shadow_robot-indigo.rosinstall
+ wstool update
+ ```
+ - install the dependencies
+ ```bash
+ rosdep install --from-paths /tank/code/workspace/base --ignore-src --rosdistro=indigo
+ ```
+ - compile the code
+ ```
+ cd ~/workspaces/shadow
+ catkin_make
+ ```
