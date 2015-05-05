@@ -1,3 +1,5 @@
+[![Code Health](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel)
+
 # Shadow Robot
 
 [![Shadow Hand manipulates pen](http://img.youtube.com/vi/3WAp_DHwg1c/0.jpg)](http://www.youtube.com/watch?v=3WAp_DHwg1c)
