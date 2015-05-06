@@ -32,14 +32,16 @@ from sr_hand.tactile_receiver import TactileReceiver
 # this is only used to detect if the hand is a Gazebo hand, not to actually reconfigure anything
 from dynamic_reconfigure.msg import Config
 
-class Joint():
-    def __init__(self, name="", motor="", min=0, max=90):
+
+class Joint(object):
+    def __init__(self, name="", motor="", j_min=0, j_max=90):
         self.name = name
         self.motor = motor
-        self.min = min
-        self.max = max
+        self.min = j_min
+        self.max = j_max
 
-class ShadowHand_ROS():
+
+class ShadowHand_ROS(object):
     """
     This is a python library used to easily access the shadow hand ROS interface.
     """
@@ -50,31 +52,31 @@ class ShadowHand_ROS():
         values of shadowhand_data and sendupdate
         """
         self.allJoints = [Joint("THJ1", "smart_motor_th1", 0, 90),
-                           Joint("THJ2", "smart_motor_th2", -40, 40),
-                           Joint("THJ3", "smart_motor_th3",-15, 15),
-                           Joint("THJ4", "smart_motor_th4",0, 75),
-                           Joint("THJ5", "smart_motor_th5",-60, 60),
-                           Joint("FFJ0", "smart_motor_ff2", 0, 180),
-                           Joint("FFJ3", "smart_motor_ff3"),
-                           Joint("FFJ4", "smart_motor_ff4", -20, 20),
-                           Joint("MFJ0", "smart_motor_mf2", 0, 180),
-                           Joint("MFJ3", "smart_motor_mf3"),
-                           Joint("MFJ4", "smart_motor_mf4", -20, 20),
-                           Joint("RFJ0", "smart_motor_rf2", 0, 180),
-                           Joint("RFJ3", "smart_motor_rf3"),
-                           Joint("RFJ4", "smart_motor_rf4", -20,20),
-                           Joint("LFJ0", "smart_motor_lf2", 0, 180),
-                           Joint("LFJ3", "smart_motor_lf3"),
-                           Joint("LFJ4", "smart_motor_lf4", -20, 20),
-                           Joint("LFJ5", "smart_motor_lf5", 0, 45),
-                           Joint("WRJ1", "smart_motor_wr1", -45, 30),
-                           Joint("WRJ2", "smart_motor_wr2", -30, 10),
+                          Joint("THJ2", "smart_motor_th2", -40, 40),
+                          Joint("THJ3", "smart_motor_th3", -15, 15),
+                          Joint("THJ4", "smart_motor_th4", 0, 75),
+                          Joint("THJ5", "smart_motor_th5", -60, 60),
+                          Joint("FFJ0", "smart_motor_ff2", 0, 180),
+                          Joint("FFJ3", "smart_motor_ff3"),
+                          Joint("FFJ4", "smart_motor_ff4", -20, 20),
+                          Joint("MFJ0", "smart_motor_mf2", 0, 180),
+                          Joint("MFJ3", "smart_motor_mf3"),
+                          Joint("MFJ4", "smart_motor_mf4", -20, 20),
+                          Joint("RFJ0", "smart_motor_rf2", 0, 180),
+                          Joint("RFJ3", "smart_motor_rf3"),
+                          Joint("RFJ4", "smart_motor_rf4", -20, 20),
+                          Joint("LFJ0", "smart_motor_lf2", 0, 180),
+                          Joint("LFJ3", "smart_motor_lf3"),
+                          Joint("LFJ4", "smart_motor_lf4", -20, 20),
+                          Joint("LFJ5", "smart_motor_lf5", 0, 45),
+                          Joint("WRJ1", "smart_motor_wr1", -45, 30),
+                          Joint("WRJ2", "smart_motor_wr2", -30, 10),
                            ]
         self.handJoints = []
         self.armJoints = [Joint("ShoulderJRotate", "", -45, 60),
                           Joint("ShoulderJSwing", "", 0, 80),
-                          Joint("ElbowJSwing", "", 0,120),
-                          Joint("ElbowJRotate", "", -80,80)
+                          Joint("ElbowJSwing", "", 0, 120),
+                          Joint("ElbowJRotate", "", -80, 80)
                          ]
         self.lastMsg = joints_data()
         self.lastArmMsg = joints_data()
@@ -129,7 +131,7 @@ class ShadowHand_ROS():
             self.joint_states_listener = rospy.Subscriber("joint_states", JointState, self.joint_states_callback)
             # Initialize the command publishers here, to avoid the delay caused when initializing them in the sendupdate
             for jnt in self.allJoints:
-                if not self.eth_publishers.has_key(jnt.name):
+                if jnt.name not in self.eth_publishers:
                     topic = "sh_"+ jnt.name.lower() + self.topic_ending+"/command"
                     self.eth_publishers[jnt.name] = rospy.Publisher(topic, Float64, queue_size=1, latch=True)
         self.tactile_receiver = TactileReceiver()
@@ -158,18 +160,17 @@ class ShadowHand_ROS():
             self.lastMsg.joints_list.append(self.dict_ethercat_joints[joint_name])
             #self.lastMsg.joints_list_length++
 
-        #TODO This is not the right way to do it. We should check that messages from all the joints have been received (but we don't know if we have all the joints, e.g three finger hand)
+        #TODO This is not the right way to do it. We should check that messages from all the joints have been
+        #  received (but we don't know if we have all the joints, e.g three finger hand)
         self.isReady = True
 
-        '''
-        if self.isFirstMessage :
-            self.init_actual_joints()
-            for joint in self.lastMsg.joints_list :
-                self.dict_pos[joint.joint_name]=joint.joint_position
-                self.dict_tar[joint.joint_name]=joint.joint_target
-            self.isFirstMessage = False
-            self.isReady = True
-        '''
+        # if self.isFirstMessage :
+        #     self.init_actual_joints()
+        #     for joint in self.lastMsg.joints_list :
+        #         self.dict_pos[joint.joint_name]=joint.joint_position
+        #         self.dict_tar[joint.joint_name]=joint.joint_target
+        #     self.isFirstMessage = False
+        #     self.isReady = True
 
     def callback(self, data):
         """
@@ -259,7 +260,7 @@ class ShadowHand_ROS():
         if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
             for join in dicti.keys():
 
-                if not self.eth_publishers.has_key(join):
+                if join not in self.eth_publishers:
                     topic = "sh_"+ join.lower() + self.topic_ending+"/command"
                     self.eth_publishers[join] = rospy.Publisher(topic, Float64, latch=True)
 
@@ -283,7 +284,7 @@ class ShadowHand_ROS():
         self.sendupdate_lock.acquire()
 
         if (self.hand_type == "etherCAT") or (self.hand_type == "gazebo"):
-            if not self.eth_publishers.has_key(jointName):
+            if jointName not in self.eth_publishers:
                 topic = "sh_"+ jointName.lower() + self.topic_ending + "/command"
                 self.eth_publishers[jointName] = rospy.Publisher(topic, Float64, latch=True)
 
@@ -455,7 +456,7 @@ class ShadowHand_ROS():
 
         try:
             rospy.wait_for_message("joint_states", JointState, timeout = 0.2)
-        except:
+        except rospy.ROSException:
             rospy.logwarn("no message received from joint_states")
             return False
 
@@ -470,7 +471,7 @@ class ShadowHand_ROS():
 
         try:
             rospy.wait_for_message("gazebo/parameter_updates", Config, timeout = 0.2)
-        except:
+        except rospy.ROSException:
             return False
 
         return True
@@ -491,14 +492,17 @@ class ShadowHand_ROS():
                     self.topic_ending = "_mixed_position_velocity_controller"
                     topic = "sh_"+ joint_all.name.lower() + self.topic_ending + "/state"
                     rospy.wait_for_message(topic, JointControllerState, timeout = 0.2)
-                except:
+                except rospy.ROSException:
                     success = False
 
             if success:
                 if self.topic_ending == "_mixed_position_velocity_controller":
                     self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, JointControllerState, self.callback_ethercat_states, joint_all.name)
                 else:
-                    self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic, control_msgs.msg.JointControllerState, self.callback_ethercat_states, joint_all.name)
+                    self.eth_subscribers[joint_all.name] = rospy.Subscriber(topic,
+                                                                            control_msgs.msg.JointControllerState,
+                                                                            self.callback_ethercat_states,
+                                                                            joint_all.name)
 
         if len(self.eth_subscribers) > 0:
             return True
