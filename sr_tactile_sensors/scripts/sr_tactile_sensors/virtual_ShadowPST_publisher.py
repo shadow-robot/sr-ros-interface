@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # This node combines 5 virtual touch sensors into a ShadowPST message compatible with etherCAT hand
 
-import roslib; roslib.load_manifest('sr_utilities')
 import rospy
-from std_msgs.msg import Float64,Int16
+from std_msgs.msg import Float64
 from sr_robot_msgs.msg import ShadowPST
 import thread
 
 
-class MergeMessages:
+class MergeMessages(object):
     def __init__(self):
         rospy.init_node('ShadowPST_publisher', anonymous=True)
         self.ff_sub=rospy.Subscriber('/sr_tactile/touch/ff',Float64,self.ff_cb)
