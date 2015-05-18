@@ -22,7 +22,7 @@ source /opt/ros/indigo/setup.bash
   - now let's create the folders you'll need for this first overlay
 
 ```bash
-mkdir -p ~/workspaces/shadow/src
+mkdir -p ~/workspace/shadow/src
 ```
 
   - and initialise the workspace
@@ -51,7 +51,7 @@ source ~/workspace/shadow/devel/setup.bash
    - now let's create the folders you'll need for this second overlay
 
 ```bash
-mkdir -p ~/workspaces/development/src
+mkdir -p ~/workspace/development/src
 ```
 
    - and initialise the workspace
@@ -87,8 +87,8 @@ sudo apt-get install python-wstool
  - initialise the `wstool` workspace
 
 ```bash
-cd ~/workspaces/shadow/src
-wstool init ~/workspaces/shadow/src /opt/ros/indigo/setup.bash
+cd ~/workspace/shadow/src
+wstool init
 ```
 
  - use our rosinstall file to install the different stacks
@@ -101,12 +101,12 @@ wstool update
  - install the dependencies
 
 ```bash
-rosdep install --from-paths /tank/code/workspace/base --ignore-src --rosdistro=indigo
+rosdep install --from-paths ~/workspace --ignore-src --rosdistro=indigo
 ```
 
  - compile the code
 
 ```bash
-cd ~/workspaces/shadow
+cd ~/workspace/shadow
 catkin_make
 ```
