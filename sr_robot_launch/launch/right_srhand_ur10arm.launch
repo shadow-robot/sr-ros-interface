@@ -4,7 +4,7 @@
   <!-- set to false if you want to use real robots, true if you need the gazebo simulation -->
   <arg name="sim" default="true"/>
   <!-- Use xacro prefix for hand or not -->
-  <arg name="use_xacro_prefix" default="true"/>
+  <arg name="use_xacro_prefix" default="false"/>
   <!--Left or right hand/arm  -->
   <arg name="xacro_prefix" default="r"/>
   <!-- Set to true for debugging -->
@@ -15,18 +15,20 @@
   <arg name="arm_trajectory" default="true"/>
   <!-- Set to true to spawn the position controllers for the hands-->
   <arg name="hand_ctrl" default="true"/>
+  <!-- Set to true to spawn the position controllers for the arm-->
+  <arg name="arm_ctrl" default="true"/>
   <!-- Serial number of the hand to be used-->
   <arg name="hand_serial" default="1082" />
 
   <!-- Loads the robot description -->
-  <arg name="robot_description" value="$(find sr_multi_description)/urdf/srhand_ur10arm.urdf.xacro"/>
+  <arg name="robot_description" default="$(find sr_multi_description)/urdf/right_srhand_ur10_joint_limited.urdf.xacro"/>
 
   <!-- SIMULATED ROBOTS -->
   <group if="$(arg sim)">
     <arg name="world_name" value="$(find sr_description)/other/worlds/shadowhand.world"/>
     <arg name="paused" value="false"/>
 
-    <param name="robot_description" command="$(find xacro)/xacro.py '$(arg robot_description)' prefix:=$(arg xacro_prefix)"/>
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(arg robot_description)'"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
       <arg name="world_name" default="$(arg world_name)"/>
@@ -57,7 +59,7 @@
   <!-- REAL ROBOTS -->
   <group unless="$(arg sim)">
     <!-- controllers for arm -->
-    <rosparam command="load" file="$(find sr_ur_controller)/config/right_ur_arm_controller.yaml"/>
+    <rosparam command="load" file="$(find sr_robot_launch)/config/right_ur_arm_controller.yaml"/>
 
     <!-- trajectory controller -->
     <rosparam command="load" file="$(find sr_robot_launch)/config/rh_trajectory_controller.yaml"/>
@@ -89,8 +91,10 @@
     </group>
     -->
 
-    <param name="ra_sr_ur_controller/robot_program_path" type="str" value="$(find sr_ur_bringup)/robot_programs/"/>
-    <node name="arm_controller_spawner" pkg="controller_manager" type="spawner" output="screen" args="--shutdown-timeout=1.0 ra_sr_ur_controller"/>
+    <group if="$(arg arm_ctrl)">
+      <param name="ra_sr_ur_controller/robot_program_path" type="str" value="$(find sr_ur_bringup)/robot_programs/"/>
+      <node name="arm_controller_spawner" pkg="controller_manager" type="spawner" output="screen" args="--shutdown-timeout=1.0 ra_sr_ur_controller"/>
+    </group>
 
     <!-- Should only be used when testing arm alone, as hand launch includes joint state publisher -->
     <!-- <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch"/> -->
@@ -105,7 +109,9 @@
     </group>
 
     <group if="$(arg arm_trajectory)">
-      <node name="arm_checker" pkg="sr_robot_launch" type="check_arms_ready" output="screen"/>
+      <node name="arm_checker" pkg="sr_robot_launch" type="check_arms_ready" output="screen">
+        <rosparam param="controllers">["ra_sr_ur_controller"]</rosparam>
+      </node>
       <node name="arm_trajectory_controller_spawner" pkg="controller_manager" type="spawner" output="screen" args="--wait-for=/arms_ready --shutdown-timeout=1.0 ra_trajectory_controller"/>
     </group>
     
