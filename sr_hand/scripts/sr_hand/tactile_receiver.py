@@ -40,11 +40,11 @@ class TactileReceiver(object):
         self.tactile_state = None
 
         if self.tactile_type == "PST":
-            self.tactile_listener = rospy.Subscriber(prefix+"tactile", ShadowPST, self.tactile_callback)
+            self.tactile_listener = rospy.Subscriber(prefix+"tactile", ShadowPST, self.tactile_callback, queue_size=1)
         elif self.tactile_type == "biotac":
-            self.tactile_listener = rospy.Subscriber(prefix+"tactile", BiotacAll, self.tactile_callback)
+            self.tactile_listener = rospy.Subscriber(prefix+"tactile", BiotacAll, self.tactile_callback, queue_size=1)
         elif self.tactile_type == "UBI0":
-            self.tactile_listener = rospy.Subscriber(prefix+"tactile", UBI0All, self.tactile_callback)
+            self.tactile_listener = rospy.Subscriber(prefix+"tactile", UBI0All, self.tactile_callback, queue_size=1)
 
     def find_tactile_type(self):
         try:
