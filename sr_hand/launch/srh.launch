@@ -1,28 +1,25 @@
 <launch>
   <include file="$(find sr_description)/loaders/load_hand_model.launch" />
-
   <!-- shadowhand -->
-  <node pkg="sr_hand" name="shadowhand"
-	type="shadowhand_virtual">
-    <remap from="hand_description" to="sh_description"/>
+  <node pkg="sr_hand" name="shadowhand" type="shadowhand_virtual">
+    <remap from="hand_description" to="sh_description" />
     <param name="shadowhand_prefix" type="string" value="srh/" />
-    <param name="gazebo_joint_states_prefix" type="string" value="gazebo/" />
-    <param name="publish_frequency_diagnostics" type="double" value="1.0" />
+    <param name="gazebo_joint_states_prefix" type="string"
+    value="gazebo/" />
+    <param name="publish_frequency_diagnostics" type="double"
+    value="1.0" />
     <param name="publish_frequency" type="double" value="20.0" />
   </node>
-
-  <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch"/>
-
+  <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch" />
   <!-- Robot state publisher: publishes tf information regarding the  position
        of the hand -->
   <node pkg="robot_state_publisher" type="state_publisher"
-	name="srh_robot_state_publisher_pos">
-    <remap from="robot_description" to="sh_description"/>
+  name="srh_robot_state_publisher_pos">
+    <remap from="robot_description" to="sh_description" />
     <remap from="joint_states" to="srh/position/joint_states" />
     <param name="publish_frequency" type="double" value="10.0" />
     <param name="tf_prefix" type="string" value="srh/position" />
   </node>
-
   <!-- Robot state publisher: publishes tf information regarding the  targets
        of the hand
        <node pkg="robot_state_publisher" type="state_publisher"
@@ -33,13 +30,16 @@
        <param name="tf_prefix" type="string" value="srh/target" />
        </node>
   -->
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub"
-	args="0.0 0.0 .0 3.14159 0 0 /srh/forearm /srh/position/forearm 100" />
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub"
-	args="0 0 0 0 0 0 /srh/position/forearm /srh/target/forearm 100" />
-
-  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator">
+  <node pkg="tf" type="static_transform_publisher"
+  name="fixed_frame_pos_pub"
+  args="0.0 0.0 .0 3.14159 0 0 /srh/forearm /srh/position/forearm 100" />
+  <node pkg="tf" type="static_transform_publisher"
+  name="fixed_frame_target_pub"
+  args="0 0 0 0 0 0 /srh/position/forearm /srh/target/forearm 100" />
+  <node pkg="diagnostic_aggregator" type="aggregator_node"
+  name="diagnostic_aggregator">
     <!-- Load the file you made above -->
-    <rosparam command="load"  file="$(find sr_hand)/shadowhand_analyzer.yaml"/>
+    <rosparam command="load"
+    file="$(find sr_hand)/shadowhand_analyzer.yaml" />
   </node>
 </launch>

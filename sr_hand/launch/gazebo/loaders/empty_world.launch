@@ -1,13 +1,15 @@
 <launch>
   <!-- start gazebo with an empty plane -->
   <param name="/use_sim_time" value="true" />
-
-  <node name="gazebo" pkg="gazebo_ros" type="gzserver" args=" $(find sr_description)/other/worlds/empty.world" respawn="false" output="screen">
-    <remap from="joint_states" to="/gazebo/joint_states"/>
-    <param name="image_path" value="$(find sr_movements)/movements/test.png"/>
+  <node name="gazebo" pkg="gazebo_ros" type="gzserver"
+  args="$(find sr_description)/other/worlds/empty.world"
+  respawn="false" output="screen">
+    <remap from="joint_states" to="/gazebo/joint_states" />
+    <param name="image_path"
+    value="$(find sr_movements)/movements/test.png" />
   </node>
-
   <group unless="$(optenv GAZEBO_NO_X 0)">
-    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen"/>
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient"
+    respawn="false" output="screen" />
   </group>
 </launch>

@@ -1,39 +1,42 @@
 <launch>
   <!-- DO NOT USE ROBOT DESCRIPTION IF NOT NEEDED  <param name="robot_description" command="$(find xacro)/xacro.py '$(find sr_description)/robots/arm_and_hand_motor.urdf.xacro'" /> -->
   <include file="$(find sr_description)/loaders/load_arm_model.launch" />
-
   <!--
            shadowarm
                         -->
-  <node pkg="sr_hand" name="shadowarm"
-        type="shadowarm_can" >
-    <param name="shadowhand_prefix" type="string" value="sr_arm/" />
-    <param name="controller_suffix" type="string" value="position_controller" />
+  <node pkg="sr_hand" name="shadowarm" type="shadowarm_can">
+    <param name="shadowhand_prefix" type="string"
+    value="sr_arm/" />
+    <param name="controller_suffix" type="string"
+    value="position_controller" />
     <remap from="joint_states" to="/sa/joint_states" />
-    <param name="publish_frequency_diagnostics" type="double" value="1.0" />
+    <param name="publish_frequency_diagnostics" type="double"
+    value="1.0" />
     <param name="publish_frequency" type="double" value="100.0" />
   </node>
- <!-- Robot state publisher: publishes tf information regarding the
+  <!-- Robot state publisher: publishes tf information regarding the
        positions of the arm -->
   <node pkg="robot_state_publisher" type="state_publisher"
-        name="robot_state_publisher_pos_arm">
+  name="robot_state_publisher_pos_arm">
     <remap from="robot_description" to="sa_description" />
     <remap from="joint_states" to="sr_arm/position/joint_states" />
     <param name="publish_frequency" type="double" value="10.0" />
-    <param name="tf_prefix" type="string" value="sr_arm/position" />
+    <param name="tf_prefix" type="string"
+    value="sr_arm/position" />
   </node>
-<!-- Robot state publisher: publishes tf information regarding the
+  <!-- Robot state publisher: publishes tf information regarding the
        targets of the arm -->
   <node pkg="robot_state_publisher" type="state_publisher"
-        name="robot_state_publisher_target_arm">
+  name="robot_state_publisher_target_arm">
     <remap from="robot_description" to="sa_description" />
     <remap from="joint_states" to="sr_arm/target/joint_states" />
     <param name="publish_frequency" type="double" value="1.0" />
     <param name="tf_prefix" type="string" value="sr_arm/target" />
   </node>
-
-  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_pos" args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link_hand_arm_target" args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm 100" />
+  <node pkg="tf" type="static_transform_publisher"
+  name="link_hand_arm_pos"
+  args="0 0 0 2.3562 0 0 /sr_arm/position/shadowarm_handsupport_motor /srh/position/forearm 100" />
+  <node pkg="tf" type="static_transform_publisher"
+  name="link_hand_arm_target"
+  args="0 0 0 2.3562 0 0 /sr_arm/target/shadowarm_handsupport_motor /srh/target/forearm 100" />
 </launch>
-
-
