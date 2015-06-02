@@ -1,37 +1,31 @@
 <launch>
   <include file="$(find sr_description)/loaders/load_hand_model.launch" />
-
   <!-- shadowhand -->
-  <node pkg="sr_hand" name="shadowhand"
-	type="shadowhand_ethercat" >
-    <remap from="robot_description" to="sh_description"/>
+  <node pkg="sr_hand" name="shadowhand" type="shadowhand_ethercat">
+    <remap from="robot_description" to="sh_description" />
     <param name="shadowhand_prefix" type="string" value="srh/" />
-    <param name="controller_suffix" type="string" value="mixed_position_velocity_controller" />
-    <param name="publish_frequency_diagnostics" type="double" value="1.0" />
+    <param name="controller_suffix" type="string"
+    value="mixed_position_velocity_controller" />
+    <param name="publish_frequency_diagnostics" type="double"
+    value="1.0" />
     <param name="publish_frequency" type="double" value="100.0" />
   </node>
-
   <!-- Robot state publisher: publishes tf information regarding the
        position of the hand -->
   <node pkg="robot_state_publisher" type="state_publisher"
-	name="srh_robot_state_publisher_pos">
-    <remap from="robot_description" to="sh_description"/>
+  name="srh_robot_state_publisher_pos">
+    <remap from="robot_description" to="sh_description" />
     <remap from="joint_states" to="srh/position/joint_states" />
     <param name="publish_frequency" type="double" value="10.0" />
     <param name="tf_prefix" type="string" value="srh/position" />
   </node>
-
   <!-- Robot state publisher: publishes tf information regarding the
        targets of the hand -->
   <node pkg="robot_state_publisher" type="state_publisher"
-	name="srh_robot_state_publisher_target">
-    <remap from="robot_description" to="sh_description"/>
+  name="srh_robot_state_publisher_target">
+    <remap from="robot_description" to="sh_description" />
     <remap from="joint_states" to="srh/target/joint_states" />
     <param name="publish_frequency" type="double" value="1.0" />
     <param name="tf_prefix" type="string" value="srh/target" />
   </node>
-
-
 </launch>
-
-

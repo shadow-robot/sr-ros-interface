@@ -1,13 +1,12 @@
 <launch>
-  <include file="$(find sr_hand)/launch/advanced/sr_arm_CAN.launch"/>
-
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub_arm" args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
-
+  <include file="$(find sr_hand)/launch/advanced/sr_arm_CAN.launch" />
+  <node pkg="tf" type="static_transform_publisher"
+  name="fixed_frame_pos_pub_arm"
+  args="0 0 0 0 0 0 fixed /sr_arm/position/world 100" />
+  <node pkg="tf" type="static_transform_publisher"
+  name="fixed_frame_target_pub_arm"
+  args="0 0 0 0 0 0 fixed /sr_arm/target/world 100" />
   <!-- Publish palm x,y,z -->
   <!--DOES NOT WORK USES 100% CPU if virtual hand not there -->
-  <!--	<node pkg="sr_utilities" type="palm_pos_publisher.py" name="palm_pos_pub" />  -->
-
+  <!--  <node pkg="sr_utilities" type="palm_pos_publisher.py" name="palm_pos_pub" />  -->
 </launch>
-
-

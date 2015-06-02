@@ -1,15 +1,12 @@
 <launch>
-
-<!-- we start this in sr_manipulation  <node pkg="tf" type="static_transform_publisher" name="world_to_fixed"
-	args="0 0 0 0 0 0 /world /fixed  100"/> -->
-<!--  <node pkg="tf" type="static_transform_publisher" name="world_to_base_link"
-	args="0 0 0 0 0 0 /world /base_link  100"/> -->
+  <!-- we start this in sr_manipulation  <node pkg="tf" type="static_transform_publisher" name="world_to_fixed"
+        args="0 0 0 0 0 0 /world /fixed  100"/> -->
+  <!--  <node pkg="tf" type="static_transform_publisher" name="world_to_base_link"
+        args="0 0 0 0 0 0 /world /base_link  100"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_to_fixed"
        args="0 0 0 0 0 0 /base_link /fixed  100"/>-->
-
   <!--  <node pkg="tf" type="static_transform_publisher" name="shadowarmtrunk_to_kinectbase"
        args="0.00724 0.153 0.4405 -0.2618 0.5236 -1.5708 /shadowarm_trunk /camera_link  100"/>
        <node pkg="tf" type="static_transform_publisher" name="kinectbase_to_depthopticalframe"
        args="0.0 .018 0 -1.5708 0.0 -1.5708 /camera_link /camera_depth_optical_frame 100"/> -->
-
 </launch>

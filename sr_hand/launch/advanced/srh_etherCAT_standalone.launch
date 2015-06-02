@@ -1,8 +1,9 @@
 <launch>
   <include file="$(find sr_hand)/launch/advanced/srh_etherCAT.launch" />
-
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_pos_pub" args="0 0 0 0 0 0 /srh/position/forearm fixed 100" />
-  <node pkg="tf" type="static_transform_publisher" name="fixed_frame_target_pub" args="0 0 0 0 0 0 fixed /srh/target/forearm 100" />
+  <node pkg="tf" type="static_transform_publisher"
+  name="fixed_frame_pos_pub"
+  args="0 0 0 0 0 0 /srh/position/forearm fixed 100" />
+  <node pkg="tf" type="static_transform_publisher"
+  name="fixed_frame_target_pub"
+  args="0 0 0 0 0 0 fixed /srh/target/forearm 100" />
 </launch>
-
-
