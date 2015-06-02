@@ -1,9 +1,8 @@
 <launch>
-
-  <rosparam file="$(find sr_description)/arm/config/arm_controller.yaml" command="load"/>
-
+  <rosparam file="$(find sr_description)/arm/config/arm_controller.yaml"
+  command="load" />
   <node name="spawn_gazebo_arm_controllers"
-	pkg="controller_manager" type="spawner" respawn="false" output="screen"
-	args="--shutdown-timeout=1.0 sa_sr_position_controller sa_ss_position_controller sa_es_position_controller sa_er_position_controller"/>
-
+  pkg="controller_manager" type="spawner" respawn="false"
+  output="screen"
+  args="--shutdown-timeout=1.0 sa_sr_position_controller sa_ss_position_controller sa_es_position_controller sa_er_position_controller" />
 </launch>
