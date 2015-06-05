@@ -1,6 +1,18 @@
 <launch>
   <node pkg="rviz" name="rviz_visualizer" type="rviz" />
-  <include file="$(find sr_hand)/launch/load_hand_model.launch" />
-  <param name="sa_description"
-  command="$(find xacro)/xacro.py '$(find sr_description)/robots/sr_arm_motor.urdf.xacro'" />
+  <include file="$(find sr_description)/loaders/load_hand_model.launch" />
+  
+   <!-- publish joint values, open gui if use_gui=True -->
+	 <node name="joint_publisher"
+			 pkg="joint_state_publisher" type="joint_state_publisher">
+		<param name="use_gui" value="True"/>
+    <remap from="robot_description" to="sh_description"/>
+	 </node>
+   
+   <node name="state_publisher" 
+			 pkg="robot_state_publisher" type="robot_state_publisher">
+		<param name="publish_frequency" type="double" value="10.0"/>
+     <remap from="robot_description" to="sh_description"/>
+	 </node>
+   
 </launch>
