@@ -1,4 +1,5 @@
 <launch>
+  <arg name="planning" default="ompl" />
   <!-- By default, we do not start a database (it can be large) -->
   <arg name="db" default="false" />
   <!-- By default, we are not in debug mode -->
@@ -23,7 +24,7 @@
   type="robot_state_publisher" respawn="true" output="screen" />
   <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
   <include file="$(find right_sr_ur10_moveit_config)/launch/move_group.launch">
-
+    <arg name="pipeline" value="$(arg planning)" />
     <arg name="allow_trajectory_execution" value="false" />
     <arg name="fake_execution" value="true" />
     <arg name="info" value="true" />
