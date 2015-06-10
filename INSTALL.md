@@ -72,7 +72,7 @@ source ~/workspace/development/devel/setup.bash
 To load this workspace automatically, it is a very good idea to add it to your `~/.bashrc`:
 
 ```bash
-echo "source ~/workspace/development/setup.bash" >> ~/.bashrc
+echo "source ~/workspace/development/devel/setup.bash" >> ~/.bashrc
 ```
 
 ## Populating the Shadow workspace with the code
