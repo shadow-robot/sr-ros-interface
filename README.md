@@ -1,4 +1,4 @@
-[![Code Health](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel)
+[![Build Status](https://api.shippable.com/projects/554b2991edd7f2c052e402be/badge?branchName=indigo-devel)](https://app.shippable.com/projects/554b2991edd7f2c052e402be/builds/latest) [![Code Health](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel) [![codecov.io](http://codecov.io/github/shadow-robot/sr-ros-interface/coverage.svg?branch=indigo-devel)](http://codecov.io/github/shadow-robot/sr-ros-interface?branch=indigo-devel)
 
 # Shadow Robot
 
