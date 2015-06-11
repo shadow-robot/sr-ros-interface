@@ -1,0 +1,29 @@
+language: python
+build_image: shippableimages/ubuntu1404_python
+python:
+  - 2.7
+
+#codecov token (encrypted)
+env:
+  - secure: scUdeUqVQRsKE/aP7JwAfDkqrR9rGqU0/cn2nCiUyvfR1Fzf03NfepiJXIiHtyeUd/bqczwdbnQCg3/BH91dBQI72vfHBxDfMfZ4dBN0FpDJBP98G/0Itqrr1OPxgcREJhgUNUt58WNVLvqbRZULowIiBEfOM/oMy2ujBm0gY8JeAD4Eeo11V5OmtxqPWvUyoOi9Hx5BQmXeCUtwIXbP7zrNQ1dOLuW8dnfWZ5yN/F8ocsm7c7MziwfAAoPmu31prFRnDdtpdPzA71f8xWUNzTlsSIx8xz0aK8rzUNX/g3FWKOCuqsUygOYmzDKWUHEjk3YPuxcRPJDK3509Vb86oQ==
+
+install:
+  - root_folder=`pwd`
+  - mkdir -p ~/workspace
+  - cd ~/workspace
+  - git clone https://github.com/shadow-robot/sr-build-tools.git
+  - sudo apt-get update
+  - sudo apt-get install python-dev libxml2-dev libxslt-dev python-pip lcov wget curl -y
+  - sudo pip install ansible gcovr
+  - mkdir -p ${root_folder}/shippable/codecoverage
+
+before_script:
+  - cd ~/workspace/sr-build-tools/ansible
+
+script:
+  - sudo ansible-playbook -v -i "localhost," -c local docker_site.yml --tags "shippable,build_pr_only,install,create_workspace,update_dependencies,build,unit_tests" -e "shippable_repo_dir=$SHIPPABLE_REPO_DIR  shippable_is_pull_request=$PULL_REQUEST"
+
+after_success:
+  - gcovr -r ~/workspace --xml-pretty > ${root_folder}/shippable/codecoverage/coverage.xml
+  - cd ${root_folder}/shippable/codecoverage
+  - bash <(curl -s https://codecov.io/bash)
