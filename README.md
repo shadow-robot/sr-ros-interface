@@ -38,6 +38,11 @@ roslaunch sr_hand gazebo_arm_and_hand.launch
 *Note: The first time you run gazebo, it might spend some time fetching the model database from the net. If this takes too long the gazebo gui won't start (and you'll get the following error in your terminal:*
 `Error [ConnectionManager.cc:116] Failed to connect to master in 30 seconds`*). If this happens, simply kill (pressing ctrl+c) and rerun the previous command.*
 
+
+#### Running the real hand driver
+
+Although you should have received an already installed machine with the hand delivery, you can find the commands for starting [your system here](http://shadow-robot-ethercat-driver.readthedocs.org).
+
 #### Sending your first commands to the robot
 
 Let's send a command to the proximal joint of the first finger:

@@ -6,7 +6,7 @@
 - git:
     local-name: universal_robot
     uri: 'https://github.com/shadow-robot/universal_robot.git'
-    version: F_sr_plugin_compatible_latest
+    version: F_sr_plugin_compatible
 
 - git:
     local-name: sr_ur_arm
