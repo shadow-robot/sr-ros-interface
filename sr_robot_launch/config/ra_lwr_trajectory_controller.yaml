@@ -1,0 +1,23 @@
+ra_lwr_trajectory_controller:
+
+  type: "position_controllers/JointTrajectoryController"
+  joints:
+    - ra_0_joint
+    - ra_1_joint
+    - ra_2_joint
+    - ra_3_joint
+    - ra_4_joint
+    - ra_5_joint
+    - ra_6_joint
+  constraints:
+      goal_time: 0.6
+      stopped_velocity_tolerance: 0.05
+      ra_0_joint: {trajectory: 0.3, goal: 0.1}
+      ra_1_joint: {trajectory: 0.3, goal: 0.1}
+      ra_2_joint: {trajectory: 0.3, goal: 0.1}
+      ra_3_joint: {trajectory: 0.3, goal: 0.1}
+      ra_4_joint: {trajectory: 0.3, goal: 0.1}
+      ra_5_joint: {trajectory: 0.3, goal: 0.1}
+      ra_6_joint: {trajectory: 0.3, goal: 0.1}
+  stop_trajectory_duration: 0.5
+
