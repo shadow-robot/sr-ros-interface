@@ -1,7 +1,26 @@
 <launch>
   <!-- This launch file is for a right KUKA lwr arm and shadow hand -->
+  <arg name="load_moveit" default="true"/>
+
   <arg name="robot_description"
     default="$(find sr_multi_description)/urdf/right_srhand_lwr.urdf.xacro" />
+
+	<!-- load moveit configuration -->
+    <group if="$(arg load_moveit)">
+        <include file="$(find right_sr_lwr_moveit_config)/launch/move_group.launch">
+            <arg name="allow_trajectory_execution" value="true"/>  
+            <arg name="fake_execution" value="false"/>
+            <arg name="info" value="true"/>
+            <arg name="debug" value="false"/>
+        </include>
+
+		<!-- run Rviz and load the default config to see the state of the move_group node -->
+		<include file="$(find right_sr_lwr_moveit_config)/launch/moveit_rviz.launch">
+			<arg name="config" value="true"/>
+			<arg name="debug" value="false"/>
+		</include>
+    </group>
+
 
   <!-- SIMULATED ROBOT -->
   <arg name="world_name"
@@ -22,7 +41,6 @@
       <arg name="hand_controller_gazebo"
       value="$(find sr_description)/hand/config/right_hand_controller_gazebo.yaml" />
     </include>
-
     <param name="publish_frequency" value="100"/>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"  />
 
