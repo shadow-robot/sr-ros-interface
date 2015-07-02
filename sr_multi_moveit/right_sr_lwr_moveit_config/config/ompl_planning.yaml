@@ -65,8 +65,6 @@ right_arm:
     - TRRTkConfigDefault
     - PRMkConfigDefault
     - PRMstarkConfigDefault
-  projection_evaluator: joints(ra_0_joint,ra_1_joint)
-  longest_valid_segment_fraction: 0.05
 right_hand:
   planner_configs:
     - SBLkConfigDefault

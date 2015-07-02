@@ -18,6 +18,7 @@
         <joint name="ra_5_joint" />
         <joint name="ra_6_joint" />
         <joint name="arm_to_hand" />
+        <chain base_link="world" tip_link="ra_7_link" />
     </group>
     <group name="right_hand">
         <joint name="rh_WRJ2" />
@@ -52,6 +53,7 @@
     </group>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="right_hand" parent_link="rh_forearm" group="right_hand" />
+    <end_effector name="lwr_eef" parent_link="rh_forearm" group="right_arm" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="world_to_arm" type="fixed" parent_frame="world" child_link="ra_base_link" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->

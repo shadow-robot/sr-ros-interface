@@ -1,3 +1,7 @@
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 300  
+
 ra_lwr_trajectory_controller:
   type: effort_controllers/JointTrajectoryController
   topic: "ra_lwr_trajectory_controller"
@@ -10,25 +14,13 @@ ra_lwr_trajectory_controller:
      - ra_5_joint
      - ra_6_joint
   gains:
-    ra_0_joint: {p: 600.0, i: 500.0, d: 100.0, i_clamp: 100.0}
-    ra_1_joint: {p: 1500.0, i: 500.0, d: 100.0, i_clamp: 100.0}
-    ra_2_joint: {p: 1500.0, i: 500.0, d: 100.0, i_clamp: 100.0}
-    ra_3_joint: {p: 100.0, i: 0.0, d: 0.0, i_clamp: 0.0}
-    ra_4_joint: {p: 100.0, i: 0.0, d: 0.0, i_clamp: 0.0}
-    ra_5_joint: {p: 100.0, i: 0.0, d: 0.0, i_clamp: 0.0}
-    ra_6_joint: {p: 100.0, i: 0.0, d: 0.0, i_clamp: 0.0}
-  constraints:
-      goal_time: 0.6
-      stopped_velocity_tolerance: 0.5
+    ra_0_joint: {p: 300.0, i: 30.0, d: 10.0, i_clamp: 50000000.0}
+    ra_1_joint: {p: 300.0, i: 30.0, d: 10.0, i_clamp: 50000000.0}
+    ra_2_joint: {p: 300.0, i: 30.0, d: 10.0, i_clamp: 50000000.0}
+    ra_3_joint: {p: 300.0, i: 30.0, d: 10.0, i_clamp: 50000000.0}
+    ra_4_joint: {p: 300.0, i: 30.0, d: 10.0, i_clamp: 50000000.0}
+    ra_5_joint: {p: 300.0, i: 30.0, d: 10.0, i_clamp: 50000000.0}
+    ra_6_joint: {p: 300.0, i: 30.0, d: 10.0, i_clamp: 50000000.0}
 
-      ra_0_joint: {trajectory: 0.1, goal: 0.1}
-      ra_1_joint: {trajectory: 0.1, goal: 0.1}
-      ra_2_joint: {trajectory: 0.1, goal: 0.1}
-      ra_3_joint: {trajectory: 0.1, goal: 0.1}
-      ra_4_joint: {trajectory: 0.1, goal: 0.1}
-      ra_5_joint: {trajectory: 0.1, goal: 0.1}
-      ra_6_joint: {trajectory: 0.1, goal: 0.1}
-
-  stop_trajectory_duration: 0.5
   state_publish_rate:  25
   action_monitor_rate: 10
