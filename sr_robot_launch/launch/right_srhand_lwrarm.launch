@@ -28,7 +28,7 @@
   <!-- SIMULATED ROBOT -->
     <!-- OLD VALUE value="$(find single_lwr_robot)/worlds/simple_environment.world" /> -->
   <arg name="world_name"
-    value="$(find sr_description)/other/worlds/shadowhand.world" />
+    value="$(find sr_multi_description)/other/worlds/shadowhand.world" />
   <arg name="paused" value="false" />
   <param name="robot_description"
     command="$(find xacro)/xacro.py '$(arg robot_description)'" />
