@@ -1,0 +1,73 @@
+<launch>
+  <!-- This launch file is for a right KUKA lwr arm and shadow hand -->
+  <arg name="load_moveit" default="false"/>
+  <arg name="gui" default="false" />
+
+  <arg name="robot_description"
+    default="$(find sr_multi_description)/urdf/right_srhand_lwr.urdf.xacro" />        
+  <rosparam command="load" file="$(find sr_multi_description)/config/right_srhand_lwr.urdf.yaml" />
+
+    <!-- If desired, load moveit configuration -->
+    <group if="$(arg load_moveit)">
+        <include file="$(find right_sr_lwr_moveit_config)/launch/move_group.launch">
+            <arg name="allow_trajectory_execution" value="true"/>  
+            <arg name="fake_execution" value="false"/>
+            <arg name="info" value="true"/>
+            <arg name="debug" value="false"/>
+        </include>
+
+		<!-- run Rviz and load the default config to see the state of the move_group node -->
+		<include file="$(find right_sr_lwr_moveit_config)/launch/moveit_rviz.launch">
+			<arg name="config" value="true"/>
+			<arg name="debug" value="false"/>
+		</include>
+    </group>
+
+  <!-- Load world -->
+  <arg name="world_name"
+    value="$(find sr_multi_description)/other/worlds/shadowhand.world" />
+  <arg name="paused" value="false" />
+
+  <!-- Load robot_description -->
+  <param name="robot_description"
+    command="$(find xacro)/xacro.py '$(arg robot_description)'" />
+
+  <!-- Launch gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="$(arg world_name)" />
+    <arg name="gui" default="true" />
+    <arg name="paused" value="false" />
+    <arg name="debug" value="false" />
+  </include>
+
+  <!-- Spawn robot model in gazebo -->
+  <node name="spawn_model" pkg="gazebo_ros" type="spawn_model"
+    args="-urdf -param robot_description -model lwrsrh"
+    respawn="false" output="screen" />
+
+  <!-- Load hand Controllers -->
+  <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch">
+    <arg name="hand_controller_gazebo"
+      value="$(find sr_description)/hand/config/right_hand_controller_gazebo.yaml" />
+  </include>
+
+  <!-- Load joint state publisher -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="$(arg gui)"/>
+    <!-- listens to each part -->
+    <rosparam param="source_list">[/joint_states]</rosparam>
+  </node>
+
+  <!-- Load robot state publisher --> 
+  <param name="publish_frequency" value="300"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"  />
+
+  <!-- Load arm controllers definitions and parameters -->
+  <rosparam file="$(find sr_robot_launch)/config/gazebo/controller/ra_lwr_trajectory_controller.yaml"
+    command="load" />
+
+  <!-- Launch arm controllers -->
+  <node name="arm_trajectory_controller_spawner"
+    pkg="controller_manager" type="spawner" output="screen"
+    args="--shutdown-timeout=1.0 joint_state_controller ra_lwr_trajectory_controller" /> 
+</launch>

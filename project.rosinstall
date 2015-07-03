@@ -17,3 +17,13 @@
     local-name: lma_kinematics_plugin
     uri: 'https://github.com/shadow-robot/lma_kinematics_plugin'
     version: F_ik_with_joint_limits
+
+- git:
+    local-name: kuka_lwr
+    uri: 'https://github.com/nrontsis/kuka-lwr.git'
+    version: adaptations_for_SHADOW
+
+- git:
+    local-name: ros_control
+    uri: 'https://github.com/CentroEPiaggio/ros_control.git'
+    version: multi-robot-test
