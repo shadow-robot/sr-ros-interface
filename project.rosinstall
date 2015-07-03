@@ -17,3 +17,8 @@
     local-name: lma_kinematics_plugin
     uri: 'https://github.com/shadow-robot/lma_kinematics_plugin'
     version: F_ik_with_joint_limits
+
+- git:
+    local-name: kuka-lwr
+    uri: 'https://github.com/nrontsis/kuka-lwr.git'
+    version: adaptations_for_SHADOW
