@@ -4,11 +4,16 @@
   <!-- By default, we are not in debug mode -->
   <arg name="debug" default="false" />
   <arg name="limited" default="true" />
+  <!-- Do not open Rviz if running tests -->
+  <arg name="visualization" default="true" />
+  <!-- Loads the hand with biotac sensors -->
+  <arg name="biotacs" default="false" />
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
   <include file="$(find right_sr_ur10_moveit_config)/launch/planning_context.launch">
 
     <arg name="load_robot_description" value="true" />
     <arg name="limited" value="$(arg limited)" />
+    <arg name="biotacs" value="$(arg biotacs)" />
   </include>
   <!-- If needed, broadcast static tf for robot root -->
   <!-- We do not have a robot connected, so publish fake joint states -->
@@ -30,7 +35,7 @@
     <arg name="debug" value="$(arg debug)" />
   </include>
   <!-- Run Rviz and load the default config to see the state of the move_group node -->
-  <include file="$(find right_sr_ur10_moveit_config)/launch/moveit_rviz.launch">
+  <include file="$(find right_sr_ur10_moveit_config)/launch/moveit_rviz.launch" if="$(arg visualization)">
 
     <arg name="config" value="true" />
     <arg name="debug" value="$(arg debug)" />

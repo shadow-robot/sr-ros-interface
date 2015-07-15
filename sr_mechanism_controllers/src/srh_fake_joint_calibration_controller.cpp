@@ -140,7 +140,9 @@ namespace controller {
   void SrhFakeJointCalibrationController::initialize_pids()
   {
     ///Reset the motor to make sure we have the proper 0 + correct PID settings
-    string service_name = "realtime_loop/" + ns_ + "reset_motor_" + boost::to_upper_copy(actuator_name_);
+    // trim any prefix in the actuator_name for low level driver to find it
+    std::string lowlevel_actuator_name= actuator_name_.substr(actuator_name_.size()-4,4);
+    string service_name = "realtime_loop/" + ns_ + "reset_motor_" + boost::to_upper_copy(lowlevel_actuator_name);
     if( ros::service::waitForService (service_name, ros::Duration(2.0)) )
     {
       std_srvs::Empty srv;

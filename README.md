@@ -1,4 +1,4 @@
-[![Code Health](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel)
+[![Build Status](https://api.shippable.com/projects/554b2991edd7f2c052e402be/badge?branchName=indigo-devel)](https://app.shippable.com/projects/554b2991edd7f2c052e402be/builds/latest) [![Documentation Status](https://readthedocs.org/projects/shadow-robot/badge)](http://shadow-robot.readthedocs.org/) [![Code Health](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel) [![codecov.io](http://codecov.io/github/shadow-robot/sr-ros-interface/coverage.svg?branch=indigo-devel)](http://codecov.io/github/shadow-robot/sr-ros-interface?branch=indigo-devel)
 
 # Shadow Robot
 
@@ -37,6 +37,11 @@ roslaunch sr_hand gazebo_arm_and_hand.launch
 
 *Note: The first time you run gazebo, it might spend some time fetching the model database from the net. If this takes too long the gazebo gui won't start (and you'll get the following error in your terminal:*
 `Error [ConnectionManager.cc:116] Failed to connect to master in 30 seconds`*). If this happens, simply kill (pressing ctrl+c) and rerun the previous command.*
+
+
+#### Running the real hand driver
+
+Although you should have received an already installed machine with the hand delivery, you can find the commands for starting [your system here](http://shadow-robot-ethercat-driver.readthedocs.org).
 
 #### Sending your first commands to the robot
 

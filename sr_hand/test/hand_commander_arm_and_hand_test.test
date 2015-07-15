@@ -1,5 +1,7 @@
 <launch>
-  <include file="$(find sr_hand)/launch/gazebo/gazebo_arm_and_hand.launch" />
+  <include file="$(find sr_hand)/launch/gazebo/gazebo_arm_and_hand.launch">
+    <arg name="gui" value="false"/>
+  </include>
 
-  <test test-name="hand_commander_arm_and_hand_test" pkg="sr_hand" type="hand_commander_test"/>
+  <test test-name="hand_commander_arm_and_hand_test" pkg="sr_hand" type="hand_commander_test" time-limit="50.0" retry="2"/>
 </launch>

@@ -17,11 +17,11 @@ add_dependencies(sr_self_test ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
 
 
-if(COMMAND add_rostest_gtest)
-  add_rostest_gtest(sr_self_test_test test/sr_self_test.test test/test_self_test.cpp)
-  add_dependencies(sr_self_test_test ${catkin_EXPORTED_TARGETS})
-  target_link_libraries(sr_self_test_test  sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
-endif(COMMAND add_rostest_gtest)
+# if(COMMAND add_rostest_gtest)
+#   add_rostest_gtest(sr_self_test_test test/sr_self_test.test test/test_self_test.cpp)
+#   add_dependencies(sr_self_test_test ${catkin_EXPORTED_TARGETS})
+#   target_link_libraries(sr_self_test_test  sr_self_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+# endif(COMMAND add_rostest_gtest)
 
 
 install(TARGETS sr_self_test
