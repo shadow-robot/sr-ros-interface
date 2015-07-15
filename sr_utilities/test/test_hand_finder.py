@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+
+import rospy, rostest, unittest
+
+from sr_utilities.hand_finder import HandFinder
+
+class TestHandFinder(unittest.TestCase):
+    def test_one_hand_finder(self):
+        rospy.set_param("hand/joint_prefix/1", "rh_")
+        rospy.set_param("hand/mapping/1", "rh")
+
+
+
+if __name__ == "__main__":
+    rospy.init_node("test_hand_finder")
+    rostest.rosrun("sr_utilities", "test_hand_finder", TestHandFinder)
