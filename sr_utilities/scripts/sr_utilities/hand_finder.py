@@ -18,6 +18,14 @@
 
 import rospy
 
+class HandConfig(object):
+    def __init__(self, mapping, joint_prefix):
+        """
+
+        """
+        self.mapping = mapping
+        self.joint_prefix = joint_prefix
+
 class HandFinder(object):
     """
     The HandFinder is a utility library for detecting Shadow Hands running on the system.
@@ -28,8 +36,8 @@ class HandFinder(object):
         """
         Parses the parameter server to extract the necessary information.
         """
-        self.hand_parameters = rospy.get_param("hand")
-
+        hand_parameters = rospy.get_param("hand")
+        self.hand_config = HandConfig(hand_parameters["mapping"], hand_parameters["joint_prefix"])
 
     def get_hand_parameters(self):
-        return self.hand_parameters
+        return self.hand_config

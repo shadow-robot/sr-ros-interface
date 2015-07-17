@@ -9,7 +9,9 @@ class TestHandFinder(unittest.TestCase):
         rospy.set_param("hand/joint_prefix/1", "rh_")
         rospy.set_param("hand/mapping/1", "rh")
 
+        hand_finder = HandFinder()
 
+        self.assertIsNotNone(hand_finder.get_hand_parameters(), "Parameters extracted.")
 
 if __name__ == "__main__":
     rospy.init_node("test_hand_finder")
