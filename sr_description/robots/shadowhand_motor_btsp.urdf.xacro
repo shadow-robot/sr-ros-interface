@@ -7,5 +7,5 @@ name="shadowhand_motor">
   <xacro:include filename="$(find sr_description)/hand/xacro/full_hand.urdf.xacro" />
   <xacro:include filename="$(find sr_description)/other/xacro/gazebo/gazebo.urdf.xacro" />
   <xacro:shadowhand muscletrans="false" muscle="false" bio="false" bt_sp="true"
-  ubi="false" eli="false" reflect="1.0" prefix="" />
+  ubi="false" eli="false" reflect="1.0" prefix="rh_" />
 </robot>
