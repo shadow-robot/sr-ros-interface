@@ -3,7 +3,7 @@
   <arg name="hand_controller_gazebo"
   default="$(find sr_description)/hand/config/$(arg prefix)controller_gazebo.yaml" />
   <arg name="hand_effort_controller_gazebo"
-  default="$(find sr_description)/hand/config/hand_effort_controller_gazebo.yaml" />
+  default="$(find sr_description)/hand/config/$(arg prefix)effort_controller_gazebo.yaml" />
   <rosparam file="$(arg hand_controller_gazebo)" command="load" />
   <rosparam file="$(arg hand_effort_controller_gazebo)"
   command="load" />
