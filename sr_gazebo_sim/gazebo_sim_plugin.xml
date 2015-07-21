@@ -1,0 +1,5 @@
+<library path="lib/libsr_gazebo_sim">
+  <class name="sr_gazebo_sim/SrGazeboHWSim" type="sr_gazebo_sim::SrGazeboHWSim" base_class_type="gazebo_ros_control::RobotHWSim">
+    <description>This simulated hardware creates supports RobotState for ethercat based controllers.</description>
+  </class>
+</library>

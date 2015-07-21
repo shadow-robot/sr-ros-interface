@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package>
+  <name>sr_gazebo_sim</name>
+  <version>0.0.0</version>
+  <description>The sr_gazebo_sim package</description>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
+
+  <license>GPL</license>
+
+  <url type="repository">https://github.com/shadow-robot/sr-ros-interface</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr-ros-interface/issues</url>
+
+  <author>Andriy Petlovanyy</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>roscpp</build_depend>
+  <build_depend>sr_hardware_interface</build_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>tinyxml</build_depend>
+  <build_depend>ros_ethercat_model</build_depend>
+  <build_depend>gazebo_ros_control</build_depend>
+  <build_depend>gazebo</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>roscpp</run_depend>
+  <run_depend>sr_hardware_interface</run_depend>
+  <run_depend>tinyxml</run_depend>
+  <run_depend>ros_ethercat_model</run_depend>
+  <run_depend>gazebo_ros_control</run_depend>
+  <run_depend>gazebo</run_depend>
+
+<export>
+    <gazebo_ros_control plugin="${prefix}/gazebo_sim_plugin.xml"/>
+</export>
+</package>
