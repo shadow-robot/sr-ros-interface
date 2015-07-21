@@ -5,7 +5,7 @@
   <arg name="headless" default="false" />
   <arg name="debug" default="false" />
   <arg name="verbose" default="false" />
-  <arg name="prefix" default="rh_" />
+  <arg name="hand_id" default="rh" />
   <!-- Gazebo world file to load. -->
   <arg name="world_name"
   default="$(find sr_description)/other/worlds/shadowhand.world" />
@@ -57,7 +57,7 @@
   respawn="false" output="screen" />
   <!-- Controllers for the hand -->
   <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch" >
-    <arg name="prefix" value="$(arg prefix)" />
+    <arg name="hand_id" value="$(arg hand_id)" />
   </include>
   <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch" />
   <node pkg="robot_state_publisher" type="state_publisher"
