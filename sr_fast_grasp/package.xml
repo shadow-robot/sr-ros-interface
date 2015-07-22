@@ -47,6 +47,9 @@
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>shape_msgs</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+
+  <run_depend>visualization_msgs</run_depend>
   <run_depend>shape_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>moveit_msgs</run_depend>
