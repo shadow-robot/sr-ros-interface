@@ -6,6 +6,10 @@
   <arg name="debug" default="false" />
   <arg name="verbose" default="false" />
   <arg name="hand_id" default="rh" />
+  <arg name="hand_serial" default="1234"/>  
+  
+  <param name="/hand/mapping/$(arg hand_serial)" value="$(arg hand_id)"/>
+  	
   <!-- Gazebo world file to load. -->
   <arg name="world_name"
   default="$(find sr_description)/other/worlds/shadowhand.world" />
