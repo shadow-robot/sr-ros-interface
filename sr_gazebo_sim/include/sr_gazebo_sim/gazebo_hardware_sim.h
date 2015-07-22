@@ -2,22 +2,20 @@
 #ifndef SR_ROS_INTERFACE_GAZEBO_HARDWARE_SIM_H
 #define SR_ROS_INTERFACE_GAZEBO_HARDWARE_SIM_H
 
-// ROS
+#include <string>
+#include <boost/unordered_map.hpp>
 #include <ros/ros.h>
-#include <angles/angles.h>
 #include <pluginlib/class_list_macros.h>
 #include "ros_ethercat_model/robot_state.hpp"
-
-// gazebo_ros_control
 #include <gazebo_ros_control/default_robot_hw_sim.h>
 #include <gazebo_ros_control/robot_hw_sim.h>
-
-// URDF
 #include <urdf/model.h>
 
-namespace sr_gazebo_sim {
+namespace sr_gazebo_sim
+{
 
-class SrGazeboHWSim : public gazebo_ros_control::DefaultRobotHWSim {
+class SrGazeboHWSim : public gazebo_ros_control::DefaultRobotHWSim
+{
 public:
 
   SrGazeboHWSim();
@@ -38,13 +36,19 @@ protected:
   template <class T>
   void fixJointName(std::vector<T> *items, const std::string old_joint_name, const std::string new_joint_name) const;
 
-  bool isFourFingersJoints(const std::string joint_name, const unsigned joint_index) const;
+  void addFakeTransmissionsForJ0(std::vector<transmission_interface::TransmissionInfo> *transmissions);
 
-  void addFakeTransmissionsForJ0(std::vector<transmission_interface::TransmissionInfo> *transmissions) const;
+  void initializeFakeRobotState(const urdf::Model*const urdf_model,
+                                const std::vector<transmission_interface::TransmissionInfo> &transmissions);
 
-  void initializeFakeRobotState(const urdf::Model*const urdf_model);
+  bool is_hand_joint(const std::vector<transmission_interface::TransmissionInfo> &transmissions,
+                     const std::string &joint_name) const;
+
+  static const std::string j0_transmission_name;
+  static const std::string simple_transmission_name;
 
   ros_ethercat_model::RobotState fake_state_;
+  boost::unordered_map<std::string, std::string> j2_j1_joints_;
 
 };
 

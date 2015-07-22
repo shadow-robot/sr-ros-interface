@@ -4,38 +4,15 @@
 #include <string>
 
 using boost::ptr_unordered_map;
-using namespace ros_ethercat_model;
-
 
 namespace sr_gazebo_sim
 {
 
+const std::string SrGazeboHWSim::j0_transmission_name = "sr_mechanism_model/J0Transmission";
+const std::string SrGazeboHWSim::simple_transmission_name = "sr_mechanism_model/SimpleTransmission";
+
 SrGazeboHWSim::SrGazeboHWSim() : DefaultRobotHWSim(), fake_state_(NULL)
 {
-}
-
-bool SrGazeboHWSim::isFourFingersJoints(const std::string joint_name, const unsigned joint_index) const
-{
-    bool result = false;
-
-    if (joint_name.size() > 3)
-    {
-        if ('F' == joint_name[joint_name.size() - 4] || 'M' == joint_name[joint_name.size() - 4] ||
-                'R' == joint_name[joint_name.size() - 4] || 'L' == joint_name[joint_name.size() - 4])
-        {
-
-            if (joint_index < 10)
-            {
-                char index_character = '0' + joint_index;
-                if (index_character == joint_name[joint_name.size() - 1])
-                {
-                    result = true;
-                }
-            }
-        }
-    }
-
-    return result;
 }
 
 template <class T>
@@ -59,31 +36,69 @@ void SrGazeboHWSim::fixJointName(std::vector<T> *items, const std::string old_jo
 }
 
 void SrGazeboHWSim::addFakeTransmissionsForJ0(
-        std::vector<transmission_interface::TransmissionInfo> *transmissions) const
+        std::vector<transmission_interface::TransmissionInfo> *transmissions)
 {
-    for (unsigned i = transmissions->size() - 1; i != static_cast<unsigned>(-1); --i)
+    for (size_t i = 0; i < transmissions->size(); ++i)
+    {
+        if (j0_transmission_name == transmissions->at(i).type_)
+        {
+            if (transmissions->at(i).joints_.size() > 0)
+            {
+                const std::string joint_name = transmissions->at(i).joints_[0].name_;
+                std::string second_joint_name = joint_name;
+                second_joint_name[second_joint_name.size() - 1] = '2';
+                this->j2_j1_joints_[second_joint_name] = joint_name;
+            }
+        }
+    }
+
+    for (size_t i = transmissions->size() - 1; i != static_cast<size_t>(-1); --i)
     {
         if (transmissions->at(i).joints_.size() > 0)
         {
             const std::string joint_name = transmissions->at(i).joints_[0].name_;
 
-            if (this->isFourFingersJoints(joint_name, 3))
+            if ((joint_name.size() > 0) && ('3' == joint_name[joint_name.size() - 1]))
             {
-                std::string new_joint_name = joint_name;
-                new_joint_name[new_joint_name.size() - 1] = '2';
+                std::string second_joint_name = joint_name;
+                second_joint_name[second_joint_name.size() - 1] = '2';
 
-                transmission_interface::TransmissionInfo new_transmission = transmissions->at(i);
+                if (this->j2_j1_joints_.count(second_joint_name) > 0)
+                {
+                    transmission_interface::TransmissionInfo new_transmission = transmissions->at(i);
 
-                fixJointName(&new_transmission.joints_, joint_name, new_joint_name);
-                fixJointName(&new_transmission.actuators_, joint_name, new_joint_name);
-                transmissions->push_back(new_transmission);
+                    fixJointName(&new_transmission.joints_, joint_name, second_joint_name);
+                    fixJointName(&new_transmission.actuators_, joint_name, second_joint_name);
+                    transmissions->push_back(new_transmission);
+                }
             }
-
         }
     }
 }
 
-void SrGazeboHWSim::initializeFakeRobotState(const urdf::Model *const urdf_model)
+bool SrGazeboHWSim::is_hand_joint(const std::vector<transmission_interface::TransmissionInfo> &transmissions,
+                                  const std::string &joint_name) const
+{
+    // TODO: Reimplement this function. It is using simple assumption that hand joint has one of
+    // two types of transmission from sr_mechanism_model package.
+    bool result = false;
+    for (size_t i = 0; i < transmissions.size(); ++i)
+    {
+        if ((transmissions[i].joints_.size() > 0) && ((j0_transmission_name == transmissions[i].type_) ||
+             (simple_transmission_name == transmissions[i].type_)))
+        {
+            if (transmissions[i].joints_[0].name_ == joint_name)
+            {
+                result = true;
+            }
+        }
+    }
+
+    return result;
+}
+
+void SrGazeboHWSim::initializeFakeRobotState(const urdf::Model *const urdf_model,
+                                             const std::vector<transmission_interface::TransmissionInfo> &transmissions)
 {
     this->fake_state_.robot_model_ = *urdf_model;
 
@@ -91,23 +106,15 @@ void SrGazeboHWSim::initializeFakeRobotState(const urdf::Model *const urdf_model
          it != urdf_model->joints_.end();
          ++it)
     {
-        // we are only loading joints that can be controlled
-        if (it->second->type == urdf::Joint::PRISMATIC || it->second->type == urdf::Joint::REVOLUTE)
+        if (this->is_hand_joint(transmissions, it->first))
         {
             this->fake_state_.joint_states_[it->first].joint_ = it->second;
+            this->fake_state_.joint_states_[it->first].calibrated_ = true;
         }
     }
 
-
-    for (ptr_unordered_map<std::string, JointState>::iterator jit = this->fake_state_.joint_states_.begin();
-         jit != this->fake_state_.joint_states_.end();
-         ++jit)
-    {
-        jit->second->calibrated_ = true;
-    }
-
     registerInterface(&this->fake_state_);
-    ROS_INFO_STREAM("registered fake state");
+    ROS_INFO_STREAM("Registered fake state");
 }
 
 bool SrGazeboHWSim::initSim(
@@ -125,7 +132,7 @@ bool SrGazeboHWSim::initSim(
     if (result)
     {
 
-        this->initializeFakeRobotState(urdf_model);
+        this->initializeFakeRobotState(urdf_model, transmissions);
     }
 
     return result;
@@ -154,10 +161,11 @@ void SrGazeboHWSim::writeSim(ros::Time time, ros::Duration period)
     for (unsigned j = 0; j < n_dof_; ++j)
     {
         std::string joint_name = joint_names_[j];
-
-        if (this->isFourFingersJoints(joint_name, 2))
+        if (this->j2_j1_joints_.count(joint_name) > 0)
         {
-            joint_name[joint_name.size() - 1] = '1';
+            joint_name = this->j2_j1_joints_[joint_name];
+            // TODO: Add here logic to calculate position of J2 based on values for J1 joint
+
         }
 
         if (NULL != this->fake_state_.getJointState(joint_name))
