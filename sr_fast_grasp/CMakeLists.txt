@@ -7,7 +7,7 @@ project(sr_fast_grasp)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   moveit_msgs
-  moveit_ros
+  moveit_ros_warehouse
   roscpp
   rospy
   std_msgs
