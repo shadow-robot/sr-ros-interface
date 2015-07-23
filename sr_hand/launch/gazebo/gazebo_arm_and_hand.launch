@@ -58,7 +58,9 @@
   args="-urdf -param robot_description -z 0.0 -model shadow_model -J ShoulderJSwing 0.78 -J ElbowJSwing 2.0"
   respawn="false" output="screen" />
   <!-- Controllers for the hand -->
-  <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch" />
+   <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch" >
+    <arg name="prefix" value="$(arg prefix)" />
+  </include>
   <!-- launch trajectory controllers for the arm -->
   <include file="$(find sr_hand)/launch/gazebo/loaders/arm_controllers_extended.launch" />
   <include file="$(find ros_ethercat_model)/launch/joint_state_publisher.launch" />
