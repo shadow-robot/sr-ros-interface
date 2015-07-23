@@ -9,6 +9,9 @@ from moveit_commander       import MoveGroupCommander
 from geometry_msgs.msg      import Pose
 from moveit_msgs.srv import GetRobotStateFromWarehouse as GetState
 from sensor_msgs.msg import JointState
+from moveit_msgs.msg import PositionIKRequest
+from moveit_msgs.srv import GetPositionIK
+
 class SrFastGrasp:
     def __init__(self):
         self.__marker_pub   = rospy.Publisher("visualization_marker",
@@ -20,6 +23,9 @@ class SrFastGrasp:
         self.__get_state = rospy.ServiceProxy(
             '/moveit_warehouse_services/get_robot_state', GetState)
         self.__group = MoveGroupCommander("right_hand")
+        self.__arm_g = MoveGroupCommander("right_arm")
+        self.__ik = rospy.ServiceProxy("compute_ik", GetPositionIK)
+
 
     def __bounding_box_cb(self, request):
         box  = request.bounding_box
@@ -31,6 +37,22 @@ class SrFastGrasp:
         grasp_name = self.__select_grasp()
         grasp = self.__get_grasp(grasp_name)
         grasp.grasp_pose = self.__orient_grasp(box, pose)
+
+        arm_req = PositionIKRequest()
+        arm_req.group_name="right_arm"
+        arm_req.pose_stamped = grasp.grasp_pose
+
+        rospy.loginfo(pose)
+
+        arm_req.robot_state.joint_state.name = self.__arm_g.get_joints()
+        arm_req.robot_state.joint_state.position = self.__arm_g.get_current_joint_values()
+
+
+        self.__arm_g.set_start_state_to_current_state()
+        soln = self.__ik(arm_req)
+        self.__arm_g.plan(soln.solution.joint_state)
+        rospy.loginfo(soln)
+
         return grasp
 
     def __select_grasp(self):
