@@ -100,7 +100,7 @@ void SrGazeboHWSim::addFakeTransmissionsForJ0(
     }
 }
 
-bool SrGazeboHWSim::is_hand_joint(const std::vector<transmission_interface::TransmissionInfo> &transmissions,
+bool SrGazeboHWSim::isHandJoint(const std::vector<transmission_interface::TransmissionInfo> &transmissions,
                                   const std::string &joint_name) const
 {
     // TODO(Andriy): Reimplement this function. It is using simple assumption that hand joint has one of
@@ -129,7 +129,7 @@ void SrGazeboHWSim::initializeFakeRobotState(const urdf::Model *const urdf_model
     for (std::map<std::string, boost::shared_ptr<urdf::Joint> >::const_iterator it = urdf_model->joints_.begin();
          it != urdf_model->joints_.end(); ++it)
     {
-        if (this->is_hand_joint(transmissions, it->first))
+        if (this->isHandJoint(transmissions, it->first))
         {
             this->fake_state_.joint_states_[it->first].joint_ = it->second;
             this->fake_state_.joint_states_[it->first].calibrated_ = true;

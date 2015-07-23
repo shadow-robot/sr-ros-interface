@@ -1,7 +1,7 @@
 /**
- * @file   gazebo_hardware_sim.h
- * @author Andriy Petlovanyy <software@shadowrobot.com>
- *
+* @file   gazebo_hardware_sim.h
+* @author Andriy Petlovanyy <software@shadowrobot.com>
+*
 * Copyright 2015 Shadow Robot Company Ltd.
 *
 * This program is free software: you can redistribute it and/or modify it
@@ -63,7 +63,7 @@ protected:
   void initializeFakeRobotState(const urdf::Model*const urdf_model,
                                 const std::vector<transmission_interface::TransmissionInfo> &transmissions);
 
-  bool is_hand_joint(const std::vector<transmission_interface::TransmissionInfo> &transmissions,
+  bool isHandJoint(const std::vector<transmission_interface::TransmissionInfo> &transmissions,
                      const std::string &joint_name) const;
 
   static const std::string j0_transmission_name;
