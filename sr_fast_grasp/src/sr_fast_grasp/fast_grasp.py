@@ -19,7 +19,7 @@ class SrFastGrasp:
         self.__default_grasp = 'super_amazing_grasp'
         self.__grasp_db_cnxn = rospy.ServiceProxy(
             '/moveit_warehouse_services/get_robot_state', GetState)
-        ##self.__group = MoveGroupCommander("hand")
+        self.__group = MoveGroupCommander("right_hand")
 
     def __bounding_box_cb(self, request):
         box  = request.bounding_box

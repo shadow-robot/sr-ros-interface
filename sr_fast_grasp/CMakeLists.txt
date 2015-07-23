@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   shape_msgs
   visualization_msgs
+  sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
