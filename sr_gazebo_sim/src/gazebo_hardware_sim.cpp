@@ -1,7 +1,32 @@
+/**
+* @file   gazebo_hardware_sim.cpp
+* @author Andriy Petlovanyy <software@shadowrobot.com>
+*
+* Copyright 2015 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*
+* @brief Gazebo custom hardware implementation.
+*
+*/
 
 #include "sr_gazebo_sim/gazebo_hardware_sim.h"
 
 #include <string>
+#include <vector>
+#include <map>
 
 using boost::ptr_unordered_map;
 
@@ -29,7 +54,6 @@ void SrGazeboHWSim::fixJointName(std::vector<T> *items, const std::string old_jo
         {
             xml_data.replace(index, old_joint_name.length(), new_joint_name);
             index += new_joint_name.length();
-
         }
         items->at(0).xml_element_ = xml_data;
     }
@@ -79,7 +103,7 @@ void SrGazeboHWSim::addFakeTransmissionsForJ0(
 bool SrGazeboHWSim::is_hand_joint(const std::vector<transmission_interface::TransmissionInfo> &transmissions,
                                   const std::string &joint_name) const
 {
-    // TODO: Reimplement this function. It is using simple assumption that hand joint has one of
+    // TODO(Andriy): Reimplement this function. It is using simple assumption that hand joint has one of
     // two types of transmission from sr_mechanism_model package.
     bool result = false;
     for (size_t i = 0; i < transmissions.size(); ++i)
@@ -103,8 +127,7 @@ void SrGazeboHWSim::initializeFakeRobotState(const urdf::Model *const urdf_model
     this->fake_state_.robot_model_ = *urdf_model;
 
     for (std::map<std::string, boost::shared_ptr<urdf::Joint> >::const_iterator it = urdf_model->joints_.begin();
-         it != urdf_model->joints_.end();
-         ++it)
+         it != urdf_model->joints_.end(); ++it)
     {
         if (this->is_hand_joint(transmissions, it->first))
         {
@@ -124,14 +147,12 @@ bool SrGazeboHWSim::initSim(
         const urdf::Model *const urdf_model,
         std::vector<transmission_interface::TransmissionInfo> transmissions)
 {
-
     this->addFakeTransmissionsForJ0(&transmissions);
 
     bool result = gazebo_ros_control::DefaultRobotHWSim::initSim(robot_namespace, model_nh, parent_model, urdf_model,
                                                                  transmissions);
     if (result)
     {
-
         this->initializeFakeRobotState(urdf_model, transmissions);
     }
 
@@ -142,7 +163,7 @@ void SrGazeboHWSim::readSim(ros::Time time, ros::Duration period)
 {
     gazebo_ros_control::DefaultRobotHWSim::readSim(time, period);
 
-    for(unsigned j = 0; j < n_dof_; ++j)
+    for (unsigned j = 0; j < n_dof_; ++j)
     {
         const std::string joint_name = joint_names_[j];
         if (NULL != this->fake_state_.getJointState(joint_name))
@@ -164,8 +185,7 @@ void SrGazeboHWSim::writeSim(ros::Time time, ros::Duration period)
         if (this->j2_j1_joints_.count(joint_name) > 0)
         {
             joint_name = this->j2_j1_joints_[joint_name];
-            // TODO: Add here logic to calculate position of J2 based on values for J1 joint
-
+            // TODO(Andriy): Add here logic to calculate position of J2 based on values for J1 joint
         }
 
         if (NULL != this->fake_state_.getJointState(joint_name))
@@ -185,6 +205,6 @@ void SrGazeboHWSim::writeSim(ros::Time time, ros::Duration period)
 }
 
 
-}
+}  // namespace sr_gazebo_sim
 
 PLUGINLIB_EXPORT_CLASS(sr_gazebo_sim::SrGazeboHWSim, gazebo_ros_control::RobotHWSim)

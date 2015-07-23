@@ -1,8 +1,32 @@
+/**
+ * @file   gazebo_hardware_sim.h
+ * @author Andriy Petlovanyy <software@shadowrobot.com>
+ *
+* Copyright 2015 Shadow Robot Company Ltd.
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 2 of the License, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*
+* @brief Gazebo custom hardware implementation.
+*
+*/
 
-#ifndef SR_ROS_INTERFACE_GAZEBO_HARDWARE_SIM_H
-#define SR_ROS_INTERFACE_GAZEBO_HARDWARE_SIM_H
+#ifndef __GAZEBO_HARDWARE_SIM_H
+#define __GAZEBO_HARDWARE_SIM_H
 
 #include <string>
+#include <vector>
 #include <boost/unordered_map.hpp>
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
@@ -17,7 +41,6 @@ namespace sr_gazebo_sim
 class SrGazeboHWSim : public gazebo_ros_control::DefaultRobotHWSim
 {
 public:
-
   SrGazeboHWSim();
 
   bool initSim(
@@ -32,7 +55,6 @@ public:
   void writeSim(ros::Time time, ros::Duration period);
 
 protected:
-
   template <class T>
   void fixJointName(std::vector<T> *items, const std::string old_joint_name, const std::string new_joint_name) const;
 
@@ -49,13 +71,11 @@ protected:
 
   ros_ethercat_model::RobotState fake_state_;
   boost::unordered_map<std::string, std::string> j2_j1_joints_;
-
 };
-
 
 typedef boost::shared_ptr <SrGazeboHWSim> SrGazeboHWSimPtr;
 
-}
+}  // namespace sr_gazebo_sim
 
 
-#endif //SR_ROS_INTERFACE_GAZEBO_HARDWARE_SIM_H
+#endif  // __GAZEBO_HARDWARE_SIM_H
