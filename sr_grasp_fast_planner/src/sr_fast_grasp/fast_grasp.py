@@ -56,8 +56,15 @@ class SrFastGrasp:
 
     def __orient_grasp(self, box, pose):
         major_axis = self.__get_major_axis(box)
-        rospy.loginfo(major_axis)
+        if   2 == major_axis:  # z
+            pass
+        elif 1 == major_axis:  # y
+            pass
+        else:  # x
+            pass
+
         return pose
+
 
     def __get_major_axis(self, box):
         m = max(box.dimensions)
