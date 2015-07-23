@@ -8,7 +8,7 @@ from moveit_msgs.msg        import Grasp
 from moveit_commander       import MoveGroupCommander
 from geometry_msgs.msg      import Pose
 from moveit_msgs.srv import GetRobotStateFromWarehouse as GetState
-
+from sensor_msgs.msg import JointState
 class SrFastGrasp:
     def __init__(self):
         self.__marker_pub   = rospy.Publisher("visualization_marker",
@@ -17,7 +17,7 @@ class SrFastGrasp:
                                             GetFastGraspFromBoundingBox,
                                             self.__bounding_box_cb)
         self.__default_grasp = 'super_amazing_grasp'
-        self.__grasp_db_cnxn = rospy.ServiceProxy(
+        self.__get_state = rospy.ServiceProxy(
             '/moveit_warehouse_services/get_robot_state', GetState)
         self.__group = MoveGroupCommander("right_hand")
 
@@ -29,32 +29,35 @@ class SrFastGrasp:
             return None
         self.__send_marker_to_rviz(box, pose)
         grasp_name = self.__select_grasp()
-        return self.__get_grasp(grasp_name)
+        grasp = self.__get_grasp(grasp_name)
+        grasp.grasp_pose = self.__orient_grasp(box, pose)
+        return grasp
 
     def __select_grasp(self):
         return self.__default_grasp
 
     def __get_grasp(self, name):
-        open_state   = self.__get_state(name + "_open").joint_state
-        closed_state  = self.__get_state(name + "_closed").joint_state
-        current_state = self.__group.get_current_joint_values()
+        open_state   = self.__get_state(name + "_open", "").state
+        closed_state  = self.__get_state(name + "_closed", "").state
 
-        (pre_pose, fraction) = self.__group.plan([current_state, open_state])
-        (pose,     fraction) = self.__group.plan([open_state, close_state])
-        #  TODO(dg-shadow) check trajs worked
+        self.__group.set_start_state_to_current_state()
+        pre_pose = self.__group.plan(open_state.joint_state)
+
+        self.__group.set_start_state(open_state)
+        pose = self.__group.plan(closed_state.joint_state)
 
         grasp = Grasp()
         grasp.id = name
-        grasp.pre_grasp_posture = pre_pose
-        grasp.grasp_posture     = pose
+        grasp.pre_grasp_posture = pre_pose.joint_trajectory
+        grasp.grasp_posture     = pose.joint_trajectory
         #fill grasp
 
-        return Grasp()
+        return grasp
 
     def __orient_grasp(self, box, pose):
         major_axis = self.__get_major_axis(box)
         rospy.loginfo(major_axis)
-        return Pose
+        return pose
 
     def __get_major_axis(self, box):
         m = max(box.dimensions)
