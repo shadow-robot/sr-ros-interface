@@ -119,11 +119,3 @@ class HandFinder(object):
 
     def get_hand_control_tuning(self):
         return self.hand_control_tuning
-
-if __name__ == '__main__':
-    rospy.init_node('hand_finder_node', anonymous=True)
-    try:
-        hand_find = HandFinder()
-    except KeyError:
-        rospy.logfatal("No hand is detected!")
-    rospy.spin()
