@@ -18,6 +18,7 @@
 import rospy
 import rospkg
 
+
 class HandControllerTuning(object):
     def __init__(self, mapping):
         """
@@ -48,6 +49,7 @@ class HandControllerTuning(object):
             self.motor_control[hand] = ethercat_path + '/controls/motors/' +\
                 mapping[hand] + '/motor_board_effort_controllers.yaml'
 
+
 class HandCalibration(object):
     def __init__(self, mapping):
         """
@@ -60,6 +62,7 @@ class HandCalibration(object):
             self.calibration_path[hand] = ethercat_path + '/' + mapping[hand] \
                 + '/' + "calibration.yaml"
 
+
 class HandConfig(object):
     def __init__(self, mapping, joint_prefix):
         """
@@ -67,6 +70,7 @@ class HandConfig(object):
         """
         self.mapping = mapping
         self.joint_prefix = joint_prefix
+
 
 class HandJoints(object):
     def __init__(self, mapping):
@@ -82,6 +86,7 @@ class HandJoints(object):
             for joint in joints:
                 hand_joints.append(mapping[hand] + '/' + joint)
             self.joints[hand] = hand_joints
+
 
 class HandFinder(object):
     """
@@ -121,6 +126,4 @@ if __name__ == '__main__':
         hand_find = HandFinder()
     except KeyError:
         rospy.logfatal("No hand is detected!")
-
     rospy.spin()
-
