@@ -12,9 +12,15 @@ class TestHandFinder(unittest.TestCase):
         rospy.set_param("hand/mapping/1", "rh")
 
         hand_finder = HandFinder()
-
         self.assertIsNotNone(hand_finder.get_hand_parameters(),
                              "Parameters extracted.")
+        self.assertIsNotNone(hand_finder.get_hand_joints(),
+                             "Joints extracted.")
+        self.assertIsNotNone(hand_finder.get_calibration_path(),
+                             "Calibration extracted.")
+        self.assertIsNotNone(hand_finder.get_hand_control_tuning(),
+                             "Control tuning parameters extracted.")
+
 
 if __name__ == "__main__":
     rospy.init_node("test_hand_finder")

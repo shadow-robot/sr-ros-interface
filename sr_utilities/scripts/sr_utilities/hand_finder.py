@@ -84,7 +84,7 @@ class HandJoints(object):
         hand_joints = []
         for hand in mapping:
             for joint in joints:
-                hand_joints.append(mapping[hand] + '/' + joint)
+                hand_joints.append(mapping[hand] + '_' + joint)
             self.joints[hand] = hand_joints
 
 
