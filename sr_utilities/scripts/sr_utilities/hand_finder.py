@@ -77,9 +77,9 @@ class HandJoints(object):
         """
 
         """
-        joints = ['ffj0', 'ffj3', 'ffj4', 'mfj0', 'mfj3', 'mfj4', 'rfj0',
-                  'rfj3', 'rfj4', 'lfj0', 'lfj3', 'lfj4', 'lfj5', 'thj1',
-                  'thj2', 'thj3', 'thj4', 'thj5', 'wrj1', 'wrj2']
+        joints = ['FFJ0', 'FFJ3', 'FFJ4', 'MFJ0', 'MFJ3', 'MFJ4', 'RFJ0',
+                  'RFJ3', 'RFJ4', 'LFJ0', 'LFJ3', 'LFJ4', 'LFJ5', 'THJ1',
+                  'THJ2', 'THJ3', 'THJ4', 'THJ5', 'WRJ1', 'WRJ2']
         self.joints = {}
         hand_joints = []
         for hand in mapping:
