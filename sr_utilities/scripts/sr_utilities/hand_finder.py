@@ -30,10 +30,10 @@ class HandControllerTuning(object):
         self.host_control = {}
         self.motor_control = {}
         for hand in mapping:
-            self.friction_compensation[hand] = ethercat_path + '/controls/' \
-                + 'friction_compensation.yaml'
+            self.friction_compensation[mapping[hand]] = \
+                ethercat_path + '/controls/' + 'friction_compensation.yaml'
             host_path = ethercat_path + '/controls/host/' + mapping[hand] + '/'
-            self.host_control[hand] = \
+            self.host_control[mapping[hand]] = \
                 [host_path + 'r_edc_calibration_controllers.yaml',
                  host_path + 'sr_edc_joint_velocity_controllers_PWM.yaml',
                  host_path + 'sr_edc_effort_controllers_PWM.yaml',
@@ -46,7 +46,8 @@ class HandControllerTuning(object):
                              'joint_controllers.yaml',
                  host_path + 'sr_edc_joint_position_controllers.yaml']
 
-            self.motor_control[hand] = ethercat_path + '/controls/motors/' +\
+            self.motor_control[mapping[hand]] = \
+                ethercat_path + '/controls/motors/' +\
                 mapping[hand] + '/motor_board_effort_controllers.yaml'
 
 
@@ -59,7 +60,7 @@ class HandCalibration(object):
         ethercat_path = ros_pack.get_path('sr_ethercat_hand_config')
         self.calibration_path = {}
         for hand in mapping:
-            self.calibration_path[hand] = ethercat_path + '/' + mapping[hand] \
+            self.calibration_path[mapping[hand]] = ethercat_path + '/' + mapping[hand] \
                 + '/' + "calibration.yaml"
 
 
@@ -85,7 +86,7 @@ class HandJoints(object):
         for hand in mapping:
             for joint in joints:
                 hand_joints.append(mapping[hand] + '_' + joint)
-            self.joints[hand] = hand_joints
+            self.joints[mapping[hand]] = hand_joints
 
 
 class HandFinder(object):
