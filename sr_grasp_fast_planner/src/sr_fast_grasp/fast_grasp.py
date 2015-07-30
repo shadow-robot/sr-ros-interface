@@ -38,20 +38,9 @@ class SrFastGrasp:
         grasp = self.__get_grasp(grasp_name)
         grasp.grasp_pose = self.__orient_grasp(box, pose)
 
-        arm_req = PositionIKRequest()
-        arm_req.group_name="right_arm"
-        arm_req.pose_stamped = grasp.grasp_pose
-
-        rospy.loginfo(pose)
-
-        arm_req.robot_state.joint_state.name = self.__arm_g.get_joints()
-        arm_req.robot_state.joint_state.position = self.__arm_g.get_current_joint_values()
-
 
         self.__arm_g.set_start_state_to_current_state()
-        soln = self.__ik(arm_req)
-        self.__arm_g.plan(soln.solution.joint_state)
-        rospy.loginfo(soln)
+        self.__arm_g.plan(pose)
 
         return grasp
 
