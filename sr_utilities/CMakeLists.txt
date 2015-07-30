@@ -35,6 +35,7 @@ target_link_libraries(test_math_utils ${catkin_LIBRARIES} pthread)
 
 catkin_add_gtest(test_hand_finder test/test_hand_finder.cpp)
 add_dependencies(test_hand_finder sr_utilities_gencpp ${catkin_EXPORTED_TARGETS})
+target_link_libraries(test_hand_finder sr_hand_finder ${catkin_LIBRARIES})
 
 install(DIRECTORY include/${PROJECT_NAME}/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
