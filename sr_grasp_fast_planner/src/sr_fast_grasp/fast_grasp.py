@@ -35,12 +35,12 @@ class SrFastGrasp:
             return None
         self.__send_marker_to_rviz(box, pose)
         grasp_name = self.__select_grasp()
-        grasp = self.__get_grasp(grasp_name)
+        grasp = Grasp()#self.__get_grasp(grasp_name)
         grasp.grasp_pose = self.__orient_grasp(box, pose)
 
 
-        self.__arm_g.set_start_state_to_current_state()
-        self.__arm_g.plan(pose)
+        #        self.__arm_g.set_start_state_to_current_state()
+        #        self.__arm_g.plan(pose)
 
         return grasp
 
