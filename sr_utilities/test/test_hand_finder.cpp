@@ -17,8 +17,23 @@ using std::vector;
 using std::map;
 using std::string;
 
-TEST(SrHandFinder, construction_test)
+TEST(SrHandFinder, hand_absent_test)
 {
+  shadow_robot::SrHandFinder hand_finder;
+  map<string, vector<string> > hand_joints(hand_finder.get_joints());
+  ASSERT_EQ(hand_joints.size(), 0);
+  map<string, string> calibration_path(hand_finder.get_calibration_path());
+  ASSERT_EQ(calibration_path.size(), 0);
+  shadow_robot::HandControllerTuning controller_tuning(hand_finder.get_hand_controller_tuning());
+  ASSERT_EQ(controller_tuning.friction_compensation_.size(), 0);
+  ASSERT_EQ(controller_tuning.host_control_.size(), 0);
+  ASSERT_EQ(controller_tuning.motor_control_.size(), 0);
+}
+TEST(SrHandFinder, hand_present_test)
+{
+  ros::NodeHandle nh;
+  nh.setParam("hand/mapping/1", "rh");
+  nh.setParam("hand/joint_prefix/1", "rh_");
   const string joint_names[] = {"FFJ0", "FFJ3", "FFJ4", "MFJ0", "MFJ3", "MFJ4", "RFJ0",
                                               "RFJ3", "RFJ4", "LFJ0", "LFJ3", "LFJ4", "LFJ5", "THJ1",
                                               "THJ2", "THJ3", "THJ4", "THJ5", "WRJ1", "WRJ2"};
@@ -73,6 +88,8 @@ TEST(SrHandFinder, construction_test)
       ROS_DEBUG_STREAM(iter->second[i]);
     }
   }
+  nh.deleteParam("hand/mapping/1");
+  nh.deleteParam("hand/joint_prefix/1");
   ASSERT_TRUE(true);
 }
 
@@ -81,8 +98,6 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "test_hand_finder");
   ros::NodeHandle nh;
-  nh.setParam("hand/mapping/1", "rh");
-  nh.setParam("hand/joint_prefix/1", "rh_");
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
