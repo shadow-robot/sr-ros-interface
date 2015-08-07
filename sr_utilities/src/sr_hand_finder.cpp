@@ -33,10 +33,9 @@ using std::vector;
 namespace shadow_robot
 {
 const size_t SrHandFinder::number_of_joints_ = 20;
-const char* SrHandFinder::joint_names_[] = {"FFJ0", "FFJ3", "FFJ4", "MFJ0", "MFJ3", "MFJ4", "RFJ0",
-                                            "RFJ3", "RFJ4", "LFJ0", "LFJ3", "LFJ4", "LFJ5", "THJ1",
-                                            "THJ2", "THJ3", "THJ4", "THJ5", "WRJ1", "WRJ2"};
-
+const char* SrHandFinder::joint_names_[] = {"FFJ1", "FFJ2", "FFJ3", "FFJ4", "MFJ1", "MFJ2", "MFJ3", "MFJ4",
+                                            "RFJ1", "RFJ2", "RFJ3", "RFJ4", "LFJ1", "LFJ2", "LFJ3", "LFJ4",
+                                            "LFJ5", "THJ1", "THJ2", "THJ3", "THJ4", "THJ5", "WRJ1", "WRJ2"};
 SrHandFinder::SrHandFinder()
 {
   map<string, string> mapping_map;
