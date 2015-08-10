@@ -60,8 +60,8 @@ class HandCalibration(object):
         ethercat_path = ros_pack.get_path('sr_ethercat_hand_config')
         self.calibration_path = {}
         for hand in mapping:
-            self.calibration_path[mapping[hand]] = ethercat_path + '/' + mapping[hand] \
-                + '/' + "calibration.yaml"
+            self.calibration_path[mapping[hand]] = \
+                ethercat_path + '/' + mapping[hand] + '/' + "calibration.yaml"
 
 
 class HandConfig(object):
@@ -78,9 +78,10 @@ class HandJoints(object):
         """
 
         """
-        joints = ['FFJ0', 'FFJ3', 'FFJ4', 'MFJ0', 'MFJ3', 'MFJ4', 'RFJ0',
-                  'RFJ3', 'RFJ4', 'LFJ0', 'LFJ3', 'LFJ4', 'LFJ5', 'THJ1',
-                  'THJ2', 'THJ3', 'THJ4', 'THJ5', 'WRJ1', 'WRJ2']
+        joints = ['FFJ1', 'FFJ2', 'FFJ3', 'FFJ4', 'MFJ1', 'MFJ2', 'MFJ3',
+                  'MFJ4', 'RFJ1', 'RFJ2', 'RFJ3', 'RFJ4', 'LFJ1', 'LFJ2',
+                  'LFJ3', 'LFJ4', 'LFJ5', 'THJ1', 'THJ2', 'THJ3', 'THJ4',
+                  'THJ5', 'WRJ1', 'WRJ2']
         self.joints = {}
         hand_joints = []
         for hand in mapping:
