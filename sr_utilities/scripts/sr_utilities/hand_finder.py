@@ -34,7 +34,7 @@ class HandControllerTuning(object):
                 ethercat_path + '/controls/' + 'friction_compensation.yaml'
             host_path = ethercat_path + '/controls/host/' + mapping[hand] + '/'
             self.host_control[mapping[hand]] = \
-                [host_path + 'r_edc_calibration_controllers.yaml',
+                [host_path + 'sr_edc_calibration_controllers.yaml',
                  host_path + 'sr_edc_joint_velocity_controllers_PWM.yaml',
                  host_path + 'sr_edc_effort_controllers_PWM.yaml',
                  host_path + 'sr_edc_joint_velocity_controllers.yaml',
@@ -61,7 +61,8 @@ class HandCalibration(object):
         self.calibration_path = {}
         for hand in mapping:
             self.calibration_path[mapping[hand]] = \
-                ethercat_path + '/' + mapping[hand] + '/' + "calibration.yaml"
+                ethercat_path + '/calibrations/' + mapping[hand] + '/' \
+                + "calibration.yaml"
 
 
 class HandConfig(object):
