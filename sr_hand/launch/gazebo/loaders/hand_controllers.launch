@@ -5,8 +5,6 @@
   default="$(find sr_description)/hand/config/$(arg hand_id)_controller_gazebo.yaml" />
   <arg name="hand_effort_controller_gazebo"
   default="$(find sr_description)/hand/config/$(arg hand_id)_effort_controller_gazebo.yaml" />
-  <param name="/hand/mapping/$(arg hand_serial)" value="$(arg hand_id)"/>
-  <param name="/hand/joint_prefix/$(arg hand_serial)" value="$(arg hand_id)_"/>
   <rosparam file="$(arg hand_controller_gazebo)" command="load" />
   <rosparam file="$(arg hand_effort_controller_gazebo)"
   command="load" />

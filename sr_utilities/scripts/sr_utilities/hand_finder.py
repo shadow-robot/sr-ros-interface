@@ -66,6 +66,7 @@ class HandCalibration(object):
 
 
 class HandConfig(object):
+
     def __init__(self, mapping, joint_prefix):
         """
 
@@ -103,16 +104,17 @@ class HandFinder(object):
         Parses the parameter server to extract the necessary information.
         """
         if not rospy.has_param("hand"):
-            rospy.logfatal("No hand is detected")
+            rospy.logerr("No hand is detected")
+            hand_parameters = {'joint_prefix': {}, 'mapping': {}}
         else:
             hand_parameters = rospy.get_param("hand")
-            self.hand_config = HandConfig(hand_parameters["mapping"],
-                                          hand_parameters["joint_prefix"])
-            self.hand_joints = HandJoints(self.hand_config.mapping).joints
-            self.calibration_path = \
-                HandCalibration(self.hand_config.mapping).calibration_path
-            self.hand_control_tuning = \
-                HandControllerTuning(self.hand_config.mapping)
+        self.hand_config = HandConfig(hand_parameters["mapping"],
+                                      hand_parameters["joint_prefix"])
+        self.hand_joints = HandJoints(self.hand_config.mapping).joints
+        self.calibration_path = \
+            HandCalibration(self.hand_config.mapping).calibration_path
+        self.hand_control_tuning = \
+            HandControllerTuning(self.hand_config.mapping)
 
     def get_calibration_path(self):
         return self.calibration_path
