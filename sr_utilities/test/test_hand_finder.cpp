@@ -51,8 +51,8 @@ TEST(SrHandFinder, hand_present_test)
   map<string, string> calibration_path(hand_finder.get_calibration_path());
   for (map<string, string>::const_iterator iter = calibration_path.begin(); iter != calibration_path.end(); ++iter)
   {
-    ROS_DEBUG_STREAM(iter->second);
-    ASSERT_STREQ(iter->second.c_str(), (ethercat_path + "/rh/" + "calibration.yaml").c_str());
+    ROS_INFO_STREAM(iter->second);
+    ASSERT_STREQ(iter->second.c_str(), (ethercat_path + "/calibrations/rh/" + "calibration.yaml").c_str());
   }
   shadow_robot::HandControllerTuning controller_tuning(hand_finder.get_hand_controller_tuning());
   for (map<string, string>::const_iterator iter = controller_tuning.friction_compensation_.begin();

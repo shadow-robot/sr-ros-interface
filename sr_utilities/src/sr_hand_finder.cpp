@@ -69,7 +69,7 @@ void SrHandFinder::generate_calibration_path()
   for (map<string, string>::const_iterator mapping_iter = hand_config_.mapping_.begin();
       mapping_iter != hand_config_.mapping_.end(); ++mapping_iter)
   {
-    calibration_path_[mapping_iter->second] = ethercat_path + "/"
+    calibration_path_[mapping_iter->second] = ethercat_path + "/calibrations/"
         + mapping_iter->second + "/" + "calibration.yaml";
   }
 }

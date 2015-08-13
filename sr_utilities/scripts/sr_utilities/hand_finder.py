@@ -34,7 +34,7 @@ class HandControllerTuning(object):
                 ethercat_path + '/controls/' + 'friction_compensation.yaml'
             host_path = ethercat_path + '/controls/host/' + mapping[hand] + '/'
             self.host_control[mapping[hand]] = \
-                [host_path + 'r_edc_calibration_controllers.yaml',
+                [host_path + 'sr_edc_calibration_controllers.yaml',
                  host_path + 'sr_edc_joint_velocity_controllers_PWM.yaml',
                  host_path + 'sr_edc_effort_controllers_PWM.yaml',
                  host_path + 'sr_edc_joint_velocity_controllers.yaml',
@@ -61,10 +61,12 @@ class HandCalibration(object):
         self.calibration_path = {}
         for hand in mapping:
             self.calibration_path[mapping[hand]] = \
-                ethercat_path + '/' + mapping[hand] + '/' + "calibration.yaml"
+                ethercat_path + '/calibrations/' + mapping[hand] + '/' \
+                + "calibration.yaml"
 
 
 class HandConfig(object):
+
     def __init__(self, mapping, joint_prefix):
         """
 
@@ -101,7 +103,11 @@ class HandFinder(object):
         """
         Parses the parameter server to extract the necessary information.
         """
-        hand_parameters = rospy.get_param("hand")
+        if not rospy.has_param("hand"):
+            rospy.logerr("No hand is detected")
+            hand_parameters = {'joint_prefix': {}, 'mapping': {}}
+        else:
+            hand_parameters = rospy.get_param("hand")
         self.hand_config = HandConfig(hand_parameters["mapping"],
                                       hand_parameters["joint_prefix"])
         self.hand_joints = HandJoints(self.hand_config.mapping).joints
