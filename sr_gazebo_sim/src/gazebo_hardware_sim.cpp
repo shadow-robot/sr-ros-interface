@@ -185,18 +185,12 @@ void SrGazeboHWSim::writeSim(ros::Time time, ros::Duration period)
         if (this->j2_j1_joints_.count(joint_name) > 0)
         {
             joint_name = this->j2_j1_joints_[joint_name];
-            // TODO(Andriy): Add here logic to calculate position of J2 based on values for J1 joint
         }
 
         if (NULL != this->fake_state_.getJointState(joint_name))
         {
-            this->joint_position_[j] = this->fake_state_.getJointState(joint_name)->position_;
             this->joint_position_command_[j] = this->fake_state_.getJointState(joint_name)->commanded_position_;
-
-            this->joint_velocity_[j] = this->fake_state_.getJointState(joint_name)->velocity_;
             this->joint_velocity_command_[j] = this->fake_state_.getJointState(joint_name)->commanded_velocity_;
-
-            this->joint_effort_[j] = this->fake_state_.getJointState(joint_name)->effort_;
             this->joint_effort_command_[j] = this->fake_state_.getJointState(joint_name)->commanded_effort_;
         }
     }
