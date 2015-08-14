@@ -2,20 +2,20 @@
 import rospy
 from sr_robot_msgs.srv import GetFastGraspFromBoundingBox \
     as GetGrasp
-from shape_msgs.msg    import SolidPrimitive
+from shape_msgs.msg import SolidPrimitive
 from geometry_msgs.msg import PoseStamped
 from math import log10, floor
+from unittest import TestCase
+
 
 def round_sig(x, sig):
     return round(x, sig-int(floor(log10(x)))-1)
 
-from unittest import TestCase
 
 class TestFastGraspPlanner(TestCase):
     def setUp(self):
         self._planning_service = rospy.ServiceProxy(
             '/grasp_from_bounding_box', GetGrasp)
-
         pass
 
     def test_service_running(self):
@@ -40,7 +40,7 @@ class TestFastGraspPlanner(TestCase):
 
         box = SolidPrimitive()
         box.type = 1
-        box.dimensions = [0.05,0.05,0.05]
+        box.dimensions = [0.05, 0.05, 0.05]
         return box, pose
 
     def test_grasp(self):
@@ -48,6 +48,7 @@ class TestFastGraspPlanner(TestCase):
         grasp = self._planning_service(box, pose).grasp
 
         self.assertEqual(grasp.id, "super_amazing_grasp")
+
         self.assertEqual(grasp.grasp_pose.pose.position.x, 0.5)
         self.assertEqual(grasp.grasp_pose.pose.position.y, 0.5)
         self.assertEqual(grasp.grasp_pose.pose.position.z, 0.7)
@@ -61,7 +62,7 @@ class TestFastGraspPlanner(TestCase):
         self.assertEqual(round_sig(grasp.grasp_pose.pose.orientation.w, 5),
                          round_sig(0.2282137599, 5))
 
-        self.assertEqual(1,1)
+        self.assertEqual(1, 1)
 
 
 if __name__ == '__main__':

@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
 import rospy
-from shape_msgs.msg         import SolidPrimitive
+from shape_msgs.msg import SolidPrimitive
 from visualization_msgs.msg import Marker
-from sr_robot_msgs.srv      import GetFastGraspFromBoundingBox
-from moveit_msgs.msg        import Grasp
-from moveit_commander       import MoveGroupCommander
-from geometry_msgs.msg      import Pose
+from sr_robot_msgs.srv import GetFastGraspFromBoundingBox
+from moveit_msgs.msg import Grasp
+from moveit_commander import MoveGroupCommander
+from geometry_msgs.msg import Pose
 from moveit_msgs.srv import GetRobotStateFromWarehouse as GetState
 from sensor_msgs.msg import JointState
 from moveit_msgs.msg import PositionIKRequest
 from moveit_msgs.srv import GetPositionIK
 import numpy
 from copy import deepcopy
+
 
 def quaternion_from_matrix(matrix, isprecise=False):
     M = numpy.array(matrix, dtype=numpy.float64, copy=False)[:4, :4]
@@ -59,10 +60,11 @@ def quaternion_from_matrix(matrix, isprecise=False):
         numpy.negative(q, q)
     return q
 
+
 class SrFastGrasp:
     def __init__(self):
-        self.__marker_pub   = rospy.Publisher("visualization_marker",
-                                              Marker, queue_size=1)
+        self.__marker_pub = rospy.Publisher("visualization_marker",
+                                            Marker, queue_size=1)
         self.__grasp_server = rospy.Service("grasp_from_bounding_box",
                                             GetFastGraspFromBoundingBox,
                                             self.__bounding_box_cb)
@@ -74,24 +76,26 @@ class SrFastGrasp:
         self.__ik = rospy.ServiceProxy("compute_ik", GetPositionIK)
 
     def __modify_grasp_pose(self, grasp, pose):
-        v1 = numpy.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z])
+        v1 = numpy.array([pose.pose.position.x,
+                          pose.pose.position.y,
+                          pose.pose.position.z])
         v1_length = numpy.linalg.norm(v1)
 
         v1 = v1/v1_length
 
-        v2 = [1,0,-v1[0]/v1[2]]
+        v2 = [1, 0, -v1[0]/v1[2]]
         v2 = v2/numpy.linalg.norm(v2)
 
-        v3 = numpy.cross(v1,v2)
+        v3 = numpy.cross(v1, v2)
         v3 = v3/numpy.linalg.norm(v3)
 
         m = [
-            [v3[0],v1[0],v2[0]],
-            [v3[1],v1[1],v2[1]],
-            [v3[2],v1[2],v2[2]]
+            [v3[0], v1[0], v2[0]],
+            [v3[1], v1[1], v2[1]],
+            [v3[2], v1[2], v2[2]]
         ]
 
-        q= quaternion_from_matrix(m)
+        q = quaternion_from_matrix(m)
 
         grasp.grasp_pose = deepcopy(pose)
 
@@ -100,9 +104,8 @@ class SrFastGrasp:
         grasp.grasp_pose.pose.orientation.z = q[2]
         grasp.grasp_pose.pose.orientation.w = q[3]
 
-
     def __bounding_box_cb(self, request):
-        box  = request.bounding_box
+        box = request.bounding_box
         pose = request.pose
         if SolidPrimitive.BOX != box.type:
             rospy.logerr("Bounding volume must be a BOX.")
@@ -122,8 +125,8 @@ class SrFastGrasp:
         return self.__default_grasp
 
     def __get_grasp(self, name):
-        open_state   = self.__get_state(name + "_open", "").state
-        closed_state  = self.__get_state(name + "_closed", "").state
+        open_state = self.__get_state(name + "_open", "").state
+        closed_state = self.__get_state(name + "_closed", "").state
 
         self.__group.set_start_state_to_current_state()
         pre_pose = self.__group.plan(open_state.joint_state)
@@ -134,7 +137,7 @@ class SrFastGrasp:
         grasp = Grasp()
         grasp.id = name
         grasp.pre_grasp_posture = pre_pose.joint_trajectory
-        grasp.grasp_posture     = pose.joint_trajectory
+        grasp.grasp_posture = pose.joint_trajectory
 
         grasp.pre_grasp_approach.desired_distance = 0.2
         grasp.pre_grasp_approach.min_distance = 0.1
@@ -146,11 +149,11 @@ class SrFastGrasp:
 
     def __get_major_axis(self, box):
         m = max(box.dimensions)
-        max_index = [i for i,j in enumerate(box.dimensions) if j == m]
+        max_index = [i for i, j in enumerate(box.dimensions) if j == m]
         return max_index[-1]  # Get the LAST axis with max val.
 
     def __send_marker_to_rviz(self, box, pose):
-        marker = self.__get_marker_from_box(box,pose)
+        marker = self.__get_marker_from_box(box, pose)
         self.__marker_pub.publish(marker)
 
     def __get_marker_from_box(self, box, pose):

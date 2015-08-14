@@ -8,6 +8,7 @@ from sensor_msgs.msg import JointState
 from moveit_msgs.msg import RobotState
 from sys import argv
 
+
 class GraspSaver:
     def __init__(self, name):
         self.__group_name = "right_hand"
@@ -35,9 +36,6 @@ class GraspSaver:
                 self.__done = True
             else:
                 rospy.sleep(.1)
-
-
-
 
 if "__main__" == __name__:
     rospy.init_node("grasp_saver")
