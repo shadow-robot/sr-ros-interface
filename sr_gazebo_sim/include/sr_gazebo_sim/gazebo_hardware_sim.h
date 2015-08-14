@@ -66,6 +66,8 @@ protected:
   bool isHandJoint(const std::vector<transmission_interface::TransmissionInfo> &transmissions,
                      const std::string &joint_name) const;
 
+  void registerSecondHardwareInterface(std::vector<transmission_interface::TransmissionInfo> transmissions);
+
   static const std::string j0_transmission_name;
   static const std::string simple_transmission_name;
 

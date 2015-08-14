@@ -140,6 +140,26 @@ void SrGazeboHWSim::initializeFakeRobotState(const urdf::Model *const urdf_model
     ROS_INFO_STREAM("Registered fake state");
 }
 
+void SrGazeboHWSim::registerSecondHardwareInterface(std::vector<transmission_interface::TransmissionInfo> transmissions)
+{
+  for(unsigned int j=0; j < transmissions.size(); j++)
+  {
+    std::vector<std::string> joint_interfaces = transmissions[j].joints_[0].hardware_interfaces_;
+    if (joint_interfaces.size() > 1)
+    {
+      // We use the second interface to allow to have the hand trajectory controller running on top of the hand position controllers.
+      // We use this trick because the DefaultRobotHWSim only deals with one (the first) hardware interface
+      if(joint_interfaces[1] == "PositionJointInterface")
+      {
+        // Create position joint interface
+        hardware_interface::JointHandle joint_handle = hardware_interface::JointHandle(js_interface_.getHandle(joint_names_[j]),
+                                                       &(this->fake_state_.getJointState(joint_names_[j])->commanded_position_));
+        pj_interface_.registerHandle(joint_handle);
+      }
+    }
+  }
+}
+
 bool SrGazeboHWSim::initSim(
         const std::string& robot_namespace,
         ros::NodeHandle model_nh,
@@ -148,12 +168,13 @@ bool SrGazeboHWSim::initSim(
         std::vector<transmission_interface::TransmissionInfo> transmissions)
 {
     this->addFakeTransmissionsForJ0(&transmissions);
+    this->initializeFakeRobotState(urdf_model, transmissions);
 
     bool result = gazebo_ros_control::DefaultRobotHWSim::initSim(robot_namespace, model_nh, parent_model, urdf_model,
                                                                  transmissions);
     if (result)
     {
-        this->initializeFakeRobotState(urdf_model, transmissions);
+      registerSecondHardwareInterface(transmissions);
     }
 
     return result;
