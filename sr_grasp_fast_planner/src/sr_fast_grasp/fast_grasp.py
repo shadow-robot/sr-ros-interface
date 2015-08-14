@@ -73,7 +73,7 @@ class SrFastGrasp:
         self.__arm_g = MoveGroupCommander("right_arm")
         self.__ik = rospy.ServiceProxy("compute_ik", GetPositionIK)
 
-    def __modify_grasp_pose(grasp, pose):
+    def __modify_grasp_pose(self, grasp, pose):
         v1 = numpy.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z])
         v1_length = numpy.linalg.norm(v1)
 
@@ -138,9 +138,9 @@ class SrFastGrasp:
 
         grasp.pre_grasp_approach.desired_distance = 0.2
         grasp.pre_grasp_approach.min_distance = 0.1
-        grasp.direction.vector.x = 0
-        grasp.direction.vector.y = -1
-        grasp.direction.vector.z = 0
+        grasp.pre_grasp_approach.direction.vector.x = 0
+        grasp.pre_grasp_approach.direction.vector.y = -1
+        grasp.pre_grasp_approach.direction.vector.z = 0
 
         return grasp
 

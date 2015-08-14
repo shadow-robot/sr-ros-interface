@@ -173,3 +173,5 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest(test/test_fast_grasp_planner.test)
   endif()
 endif()
+
+catkin_add_nosetests(test)
