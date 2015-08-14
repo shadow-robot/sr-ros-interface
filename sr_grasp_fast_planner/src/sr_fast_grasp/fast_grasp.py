@@ -12,43 +12,9 @@ from sensor_msgs.msg import JointState
 from moveit_msgs.msg import PositionIKRequest
 from moveit_msgs.srv import GetPositionIK
 import numpy
+from copy import deepcopy
 
 def quaternion_from_matrix(matrix, isprecise=False):
-    """Return quaternion from rotation matrix.
-
-    If isprecise is True, the inumpyut matrix is assumed to be a precise rotation
-    matrix and a faster algorithm is used.
-
-    >>> q = quaternion_from_matrix(numpy.identity(4), True)
-    >>> numpy.allclose(q, [1, 0, 0, 0])
-    True
-    >>> q = quaternion_from_matrix(numpy.diag([1, -1, -1, 1]))
-    >>> numpy.allclose(q, [0, 1, 0, 0]) or numpy.allclose(q, [0, -1, 0, 0])
-    True
-    >>> R = rotation_matrix(0.123, (1, 2, 3))
-    >>> q = quaternion_from_matrix(R, True)
-    >>> numpy.allclose(q, [0.9981095, 0.0164262, 0.0328524, 0.0492786])
-    True
-    >>> R = [[-0.545, 0.797, 0.260, 0], [0.733, 0.603, -0.313, 0],
-    ...      [-0.407, 0.021, -0.913, 0], [0, 0, 0, 1]]
-    >>> q = quaternion_from_matrix(R)
-    >>> numpy.allclose(q, [0.19069, 0.43736, 0.87485, -0.083611])
-    True
-    >>> R = [[0.395, 0.362, 0.843, 0], [-0.626, 0.796, -0.056, 0],
-    ...      [-0.677, -0.498, 0.529, 0], [0, 0, 0, 1]]
-    >>> q = quaternion_from_matrix(R)
-    >>> numpy.allclose(q, [0.82336615, -0.13610694, 0.46344705, -0.29792603])
-    True
-    >>> R = random_rotation_matrix()
-    >>> q = quaternion_from_matrix(R)
-    >>> is_same_transform(R, quaternion_matrix(q))
-    True
-    >>> R = euler_matrix(0.0, 0.0, numpy.pi/2.0)
-    >>> numpy.allclose(quaternion_from_matrix(R, isprecise=False),
-    ...                quaternion_from_matrix(R, isprecise=True))
-    True
-
-    """
     M = numpy.array(matrix, dtype=numpy.float64, copy=False)[:4, :4]
     if isprecise:
         q = numpy.empty((4, ))
@@ -102,26 +68,12 @@ class SrFastGrasp:
                                             self.__bounding_box_cb)
         self.__default_grasp = 'super_amazing_grasp'
         self.__get_state = rospy.ServiceProxy(
-            '/moveit_warehouse_services/get_robot_state', GetState)
+            '/grasp_warehouse/get_robot_state', GetState)
         self.__group = MoveGroupCommander("right_hand")
         self.__arm_g = MoveGroupCommander("right_arm")
         self.__ik = rospy.ServiceProxy("compute_ik", GetPositionIK)
 
-
-    def __bounding_box_cb(self, request):
-        box  = request.bounding_box
-        pose = request.pose
-        if SolidPrimitive.BOX != box.type:
-            rospy.logerr("Bounding volume must be a BOX.")
-            return None
-        self.__send_marker_to_rviz(box, pose)
-        grasp_name = self.__select_grasp()
-        #grasp = self.__get_grasp(grasp_name)
-        #grasp.grasp_pose = self.__orient_grasp(box, pose)
-
-
-        self.__arm_g.set_start_state_to_current_state()
-
+    def __modify_grasp_pose(grasp, pose):
         v1 = numpy.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z])
         v1_length = numpy.linalg.norm(v1)
 
@@ -134,24 +86,37 @@ class SrFastGrasp:
         v3 = v3/numpy.linalg.norm(v3)
 
         m = [
-            [v1[0],v2[0],v3[0]],
-            [v1[1],v2[1],v3[1]],
-            [v1[2],v2[2],v3[2]]
+            [v3[0],v1[0],v2[0]],
+            [v3[1],v1[1],v2[1]],
+            [v3[2],v1[2],v2[2]]
         ]
-
-
 
         q= quaternion_from_matrix(m)
 
-        pose.pose.orientation.x = q[0]
-        pose.pose.orientation.y = q[1]
-        pose.pose.orientation.z = q[2]
-        pose.pose.orientation.w = q[3]
+        grasp.grasp_pose = deepcopy(pose)
+
+        grasp.grasp_pose.pose.orientation.x = q[0]
+        grasp.grasp_pose.pose.orientation.y = q[1]
+        grasp.grasp_pose.pose.orientation.z = q[2]
+        grasp.grasp_pose.pose.orientation.w = q[3]
 
 
-        self.__arm_g.plan(pose)
+    def __bounding_box_cb(self, request):
+        box  = request.bounding_box
+        pose = request.pose
+        if SolidPrimitive.BOX != box.type:
+            rospy.logerr("Bounding volume must be a BOX.")
+            return None
+        self.__send_marker_to_rviz(box, pose)
+        grasp_name = self.__select_grasp()
+        grasp = self.__get_grasp(grasp_name)
 
-        return Grasp()
+        self.__modify_grasp_pose(grasp, pose)
+
+        self.__arm_g.set_start_state_to_current_state()
+        self.__arm_g.plan(grasp.grasp_pose)
+
+        return grasp
 
     def __select_grasp(self):
         return self.__default_grasp
@@ -168,23 +133,16 @@ class SrFastGrasp:
 
         grasp = Grasp()
         grasp.id = name
-        #grasp.pre_grasp_posture = pre_pose.joint_trajectory
-        #grasp.grasp_posture     = pose.joint_trajectory
-        #fill grasp
+        grasp.pre_grasp_posture = pre_pose.joint_trajectory
+        grasp.grasp_posture     = pose.joint_trajectory
+
+        grasp.pre_grasp_approach.desired_distance = 0.2
+        grasp.pre_grasp_approach.min_distance = 0.1
+        grasp.direction.vector.x = 0
+        grasp.direction.vector.y = -1
+        grasp.direction.vector.z = 0
 
         return grasp
-
-    def __orient_grasp(self, box, pose):
-        major_axis = self.__get_major_axis(box)
-        if   2 == major_axis:  # z
-            pass
-        elif 1 == major_axis:  # y
-            pass
-        else:  # x
-            pass
-
-        return pose
-
 
     def __get_major_axis(self, box):
         m = max(box.dimensions)
@@ -203,7 +161,6 @@ class SrFastGrasp:
         marker.scale.x = box.dimensions[SolidPrimitive.BOX_X]
         marker.scale.y = box.dimensions[SolidPrimitive.BOX_Y]
         marker.scale.z = box.dimensions[SolidPrimitive.BOX_Z]
-
         marker.color.r = 1.0
         marker.color.g = 0.0
         marker.color.b = 0.0

@@ -166,4 +166,10 @@ include_directories(
 # endif()
 
 ## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+
+if (CATKIN_ENABLE_TESTING)
+  if (RUN_ROS_TESTS)
+    find_package(rostest REQUIRED)
+    add_rostest(test/test_fast_grasp_planner.test)
+  endif()
+endif()
