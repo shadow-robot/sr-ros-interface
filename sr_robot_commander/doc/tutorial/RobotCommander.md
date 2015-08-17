@@ -5,14 +5,15 @@
 Main purpose of the commander is to provide simplified access to [hand](HandCommander.md) or [arm](ArmCommander.md).
 It provides methods which can be used on both [hand](HandCommander.md) and [arm](ArmCommander.md).
 
-Examples of usage can be found in the package **sr_example** in files **sr_hand_examples.py** and **sr_arm_examples.py**
+Examples of usage can be found in the package **sr_example** in files **sr_hand_examples.py**, **sr_arm_examples.py** and **sr_handfinder_examples.py**.
 
+**Warning** RobotCommander should not direcly be used. Unless necessary use [Hand commander](HandCommander.md) or [Arm commander](ArmCommander.md).
 ## Constructor
 
 The constructors for `SrArmCommander` and `SrHandCommander` take a name parameter that should match the group name of the robot to be used.
 
 ### Example
-
+This example uses [HandFinder](../../../sr_utilities/README.md) for finding launched hand.
 For a right arm:
 
 ```python
@@ -24,6 +25,25 @@ For a left arm:
 ```python
 arm_commander = SrArmCommander(name="left_arm", set_ground=True)
 ```
+You can use HandFinder utility to find the hand launched on the system.
+
+```python
+hand_finder = HandFinder()
+
+hand_parameters = hand_finder.get_hand_parameters()
+
+hand_serial = hand_parameters.mapping.keys()[0]
+
+hand_id = hand_parameters.mapping[hand_serial]
+
+prefix = hand_parameters.joint_prefix[hand_serial]
+
+if hand_id == 'rh':
+    hand_commander = SrHandCommander(name="right_hand", prefix="rh")
+else:
+    hand_commander = SrHandCommander(name="left_hand", prefix="lh")
+```
+Alternatively you can hardcode the hand you are launching.
 
 For a right hand:
 
@@ -106,11 +126,31 @@ roslaunch ur10srh_moveit_config setup_assistant.launch
 
 rospy.init_node("robot_commander_examples", anonymous=True)
 
-hand_commander = SrHandCommander("left_hand", "lh")
+hand_finder = HandFinder()
+
+hand_parameters = hand_finder.get_hand_parameters()
+
+hand_serial = hand_parameters.mapping.keys()[0]
+
+hand_id = hand_parameters.mapping[hand_serial]
+
+if hand_id == 'rh':
+    hand_commander = SrHandCommander(name="right_hand", prefix="rh")
+else:
+    hand_commander = SrHandCommander(name="left_hand", prefix="lh")
 
 # pack is predefined pose from SRDF file
 hand_commander.move_to_named_target("pack")
 ```
+Note: you can hardcode the parameters instead of using HandFinder utility```python
+```python
+rospy.init_node("robot_commander_examples", anonymous=True)
+
+hand_commander = SrHandCommander("left_hand", "lh")
+
+# pack is predefined pose from SRDF file
+hand_commander.move_to_named_target("pack")
+``` 
 
 ## get_joints_position and get_joints_velocity
 
@@ -134,3 +174,4 @@ print("Arm joints velocity\n" + str(joints_velocity) + "\n")
 
 
 ```
+**Warning** All of above codes will crash if hand is not launched yet. If you are using HandFinder, you can avoid this by checking the length of the mapping. Otherwise you can check the parameter server directly to see if the hand is launched.

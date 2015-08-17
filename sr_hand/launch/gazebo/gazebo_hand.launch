@@ -9,7 +9,8 @@
   <arg name="hand_serial" default="1234"/>  
   
   <param name="/hand/mapping/$(arg hand_serial)" value="$(arg hand_id)"/>
-  	
+  <param name="/hand/joint_prefix/$(arg hand_serial)" value="$(arg hand_id)_"/>
+
   <!-- Gazebo world file to load. -->
   <arg name="world_name"
   default="$(find sr_description)/other/worlds/shadowhand.world" />

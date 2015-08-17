@@ -17,3 +17,13 @@
     local-name: lma_kinematics_plugin
     uri: 'https://github.com/shadow-robot/lma_kinematics_plugin'
     version: F_ik_with_joint_limits
+
+- git:
+    local-name: moveit_ros
+    uri: https://github.com/shadow-robot/moveit_ros.git
+    version: F#276_add_db_state
+
+- git:
+    local-name: moveit_msgs
+    uri: https://github.com/shadow-robot/moveit_msgs.git
+    version: F#276_add_db_state
