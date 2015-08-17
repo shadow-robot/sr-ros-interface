@@ -147,7 +147,8 @@ void SrGazeboHWSim::registerSecondHardwareInterface(std::vector<transmission_int
     std::vector<std::string> joint_interfaces = transmissions[j].joints_[0].hardware_interfaces_;
     if (joint_interfaces.size() > 1)
     {
-      // We use the second interface to allow to have the hand trajectory controller running on top of the hand position controllers.
+      // We use the second interface to allow to have the hand trajectory controller running on top of the hand
+      // position controllers.
       // We use this trick because the DefaultRobotHWSim only deals with one (the first) hardware interface
       if (joint_interfaces[1] == "PositionJointInterface")
       {
@@ -217,6 +218,6 @@ void SrGazeboHWSim::writeSim(ros::Time time, ros::Duration period)
   gazebo_ros_control::DefaultRobotHWSim::writeSim(time, period);
 }
 
-} // namespace sr_gazebo_sim
+}  // namespace sr_gazebo_sim
 
 PLUGINLIB_EXPORT_CLASS(sr_gazebo_sim::SrGazeboHWSim, gazebo_ros_control::RobotHWSim)

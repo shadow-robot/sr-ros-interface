@@ -22,8 +22,8 @@
 *
 */
 
-#ifndef __GAZEBO_HARDWARE_SIM_H
-#define __GAZEBO_HARDWARE_SIM_H
+#ifndef __SR_GAZEBO_SIM_GAZEBO_HARDWARE_SIM_H
+#define __SR_GAZEBO_SIM_GAZEBO_HARDWARE_SIM_H
 
 #include <string>
 #include <vector>
@@ -80,4 +80,4 @@ typedef boost::shared_ptr <SrGazeboHWSim> SrGazeboHWSimPtr;
 }  // namespace sr_gazebo_sim
 
 
-#endif  // __GAZEBO_HARDWARE_SIM_H
+#endif  // __SR_GAZEBO_SIM_GAZEBO_HARDWARE_SIM_H
