@@ -28,8 +28,6 @@
 #include <vector>
 #include <map>
 
-using boost::ptr_unordered_map;
-
 namespace sr_gazebo_sim
 {
 
@@ -142,7 +140,7 @@ void SrGazeboHWSim::initializeFakeRobotState(const urdf::Model * const urdf_mode
 
 void SrGazeboHWSim::registerSecondHardwareInterface(std::vector<transmission_interface::TransmissionInfo> transmissions)
 {
-  for (unsigned int j = 0; j < transmissions.size(); j++)
+  for (size_t j = 0; j < transmissions.size(); j++)
   {
     std::vector<std::string> joint_interfaces = transmissions[j].joints_[0].hardware_interfaces_;
     if (joint_interfaces.size() > 1)
@@ -183,7 +181,7 @@ void SrGazeboHWSim::readSim(ros::Time time, ros::Duration period)
 {
   gazebo_ros_control::DefaultRobotHWSim::readSim(time, period);
 
-  for (unsigned j = 0; j < n_dof_; ++j)
+  for (unsigned int j = 0; j < n_dof_; ++j)
   {
     const std::string joint_name = joint_names_[j];
     if (NULL != this->fake_state_.getJointState(joint_name))
@@ -199,7 +197,7 @@ void SrGazeboHWSim::readSim(ros::Time time, ros::Duration period)
 
 void SrGazeboHWSim::writeSim(ros::Time time, ros::Duration period)
 {
-  for (unsigned j = 0; j < n_dof_; ++j)
+  for (unsigned int j = 0; j < n_dof_; ++j)
   {
     std::string joint_name = joint_names_[j];
     if (this->j2_j1_joints_.count(joint_name) > 0)
