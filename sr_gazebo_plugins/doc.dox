@@ -1,9 +1,0 @@
-/**
-@mainpage
-
-@htmlinclude manifest.html
-
-In this package we extend the Gazebo ROS controller manager plugin to fit with the Shadow hand model.
- \li \ref gazebo::GazeboRosControllerManager "Gazebo-ROS Mechanism Controls Plugin for the Shadow hand"
-
-**/
