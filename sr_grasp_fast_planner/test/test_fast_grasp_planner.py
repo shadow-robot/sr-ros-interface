@@ -18,7 +18,6 @@ class TestFastGraspPlanner(TestCase):
             '/grasp_from_bounding_box', GetGrasp)
 
     # For some reason, calling wait for service crashes rostest :/
-    # In any case, not really an issue. The other test would fail too if this one did.
     # def test_service_running(self):
     #     self.assertFalse(self._planning_service is None)
 
@@ -27,8 +26,6 @@ class TestFastGraspPlanner(TestCase):
     #     except rospy.ServiceException as e:
     #         self.assertTrue(False)
     #         pass
-
-
 
     def make_box_and_pose(self):
         pose = PoseStamped()
