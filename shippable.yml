@@ -1,12 +1,9 @@
 language: python
-build_image: shippableimages/ubuntu1404_python
 python:
   - 2.7
 #codecov token (encrypted)
 env:
-  - secure: 0H+yc5mVPndNARbIecRjEnv8nnjJCnd6GjfdLJBdS2ily8QD3JX6ZmxVGgMOwA0pytpBUxoffHecZQNfDLE2TuSrSTh+Z059cKVEFLretPIplcugl+fdb/DKCR9oxn2LZqRFaliXic2d+4syYi2UOs1fMJ8pc60yzqxf05FPoirBoyt5AlLaTneTlT/y5K7Xdg7sPl5Kfdh2Gs2qPKa/3xYlq33xKv+vhVm7ITWv3Xpm/Waodc01e4li3Ph50k0m31DkLLl2AHOPT3dr+AqCGDvZcBAdTQ56MlityfEtlU0tOUiUBSM1k52GxYaaMMqEamSrZkr8NQGo5v+3YgKFPg==
-
-cache: true
+  - secure: isTUVzKgzSF3x2vWnKQRvcvPkq2u9sevFh6HmBp08Pe+vgZiM3WlVsUam6e2Z8J4I5qBS7ljzyCBWxvm+ADDDMqjJEHyGP+Mc3gGqEvCmphHY2/7/BfOm0u3ycoYg7jE2dPgRwpHg/5+W/qOIu1qMPfQ015gVUsAuxrSQzzQ3g3QXYSYxqkWdlxD3sZFjo2JJN1PxZl5HMAaA26RG6Law2OkUIIdn+Mr7YxeLNCT7i0eD5oi8MxmSFwup0Xonh9kJf19PULvLQJsIuLmVuCqLxg6klVMlVuI+479ENB9sZZELukM2IIjuw7W97tEV0KLSYpFlw5l1CJ6FPBrwTR28A==
 
 install:
   - sudo apt-get update

@@ -28,6 +28,7 @@
   <run_depend>rospy</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>rostest</run_depend>
 
   <!-- Dependencies needed only for running tests. -->
   <test_depend>gtest</test_depend>

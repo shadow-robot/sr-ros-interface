@@ -1,0 +1,4 @@
+<launch>
+  <test test-name="test_hand_finder_cpp" pkg="sr_utilities" type="test_hand_finder"/>
+  <test test-name="test_hand_finder_py" pkg="sr_utilities" type="test_hand_finder.py" />
+</launch>
