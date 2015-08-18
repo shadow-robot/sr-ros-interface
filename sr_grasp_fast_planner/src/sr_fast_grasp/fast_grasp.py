@@ -76,6 +76,12 @@ class SrFastGrasp:
         self.__ik = rospy.ServiceProxy("compute_ik", GetPositionIK)
 
     def __modify_grasp_pose(self, grasp, pose):
+        """
+        Aligns grasp with axis from origin to center of object.
+        A crude way to make a vaguely sane orientation for the hand
+        that seems to more or less work.
+        """
+
         v1 = numpy.array([pose.pose.position.x,
                           pose.pose.position.y,
                           pose.pose.position.z])
@@ -116,23 +122,27 @@ class SrFastGrasp:
 
         self.__modify_grasp_pose(grasp, pose)
 
-        self.__arm_g.set_start_state_to_current_state()
-        self.__arm_g.plan(grasp.grasp_pose)
-
         return grasp
 
     def __select_grasp(self):
         return self.__default_grasp
 
     def __get_grasp(self, name):
-        open_state = self.__get_state(name + "_open", "").state
-        closed_state = self.__get_state(name + "_closed", "").state
+        try:
+            open_state = self.__get_state(name + "_open", "").state
+            closed_state = self.__get_state(name + "_closed", "").state
+        except:
+            rospy.logfatal("Couldn't get grasp pose from db.")
+            return Grasp()
 
-        self.__group.set_start_state_to_current_state()
-        pre_pose = self.__group.plan(open_state.joint_state)
-
-        self.__group.set_start_state(open_state)
-        pose = self.__group.plan(closed_state.joint_state)
+        try:
+            self.__group.set_start_state_to_current_state()
+            pre_pose = self.__group.plan(open_state.joint_state)
+            self.__group.set_start_state(open_state)
+            pose = self.__group.plan(closed_state.joint_state)
+        except:
+            rospy.logfatal("Couldn't plan grasp trajectories.")
+            return Grasp()
 
         grasp = Grasp()
         grasp.id = name
