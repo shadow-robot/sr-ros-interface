@@ -69,8 +69,12 @@ class SrFastGrasp:
         self.__default_grasp = 'super_amazing_grasp'
         self.__get_state = rospy.ServiceProxy(
             '/grasp_warehouse/get_robot_state', GetState)
-        self.__group = MoveGroupCommander("right_hand")
-        self.__arm_g = MoveGroupCommander("right_arm")
+
+        hand_group = rospy.get_param("~hand_group", "right_hand")
+        arm_group = rospy.get_param("~arm_group", "right_arm")
+
+        self.__group = MoveGroupCommander(hand_group)
+        self.__arm_g = MoveGroupCommander(arm_group)
         self.__ik = rospy.ServiceProxy("compute_ik", GetPositionIK)
 
     def __modify_grasp_pose(self, grasp, pose):
