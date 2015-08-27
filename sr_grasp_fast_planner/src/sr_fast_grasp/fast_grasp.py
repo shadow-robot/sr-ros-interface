@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 
+import numpy
+from copy import deepcopy
+
 import rospy
 from shape_msgs.msg import SolidPrimitive
 from visualization_msgs.msg import Marker
 from sr_robot_msgs.srv import GetFastGraspFromBoundingBox
 from moveit_msgs.msg import Grasp
 from moveit_commander import MoveGroupCommander
-from geometry_msgs.msg import Pose
 from moveit_msgs.srv import GetRobotStateFromWarehouse as GetState
-from sensor_msgs.msg import JointState
-from moveit_msgs.msg import PositionIKRequest
 from moveit_msgs.srv import GetPositionIK
-import numpy
-from copy import deepcopy
 
 
 def quaternion_from_matrix(matrix, isprecise=False):

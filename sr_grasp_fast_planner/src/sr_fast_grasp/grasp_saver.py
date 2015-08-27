@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
+from sys import argv
+
 import rospy
 from moveit_msgs.srv import SaveRobotStateToWarehouse as SaveState
-from sr_hand import shadowhand_ros
-from moveit_commander import MoveGroupCommander
 from sensor_msgs.msg import JointState
 from moveit_msgs.msg import RobotState
-from sys import argv
 
 
 class GraspSaver:
