@@ -1,0 +1,9 @@
+<launch>
+  <include file="$(find right_sr_ur10_moveit_config)/launch/demo.launch">
+    <arg name='limited' value='true'/>
+    <arg db="true"/>
+  </include>
+
+  <node name="sr_grasp_fast_grasp" pkg="sr_grasp_fast_planner" type="fast_grasp.py"/>
+  <node name="grasp_warehouse" pkg="moveit_ros_warehouse" type="moveit_warehouse_services"/>
+</launch>

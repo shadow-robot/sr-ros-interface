@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find sr_grasp_fast_planner)/launch/fast_planner.launch" />
+  <test test-name="test_fast_grasp_planner" pkg="sr_grasp_fast_planner" type="test_fast_grasp_planner.py"/>
+</launch>

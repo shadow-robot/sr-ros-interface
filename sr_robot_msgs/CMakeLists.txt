@@ -60,6 +60,7 @@ add_service_files(
   SetPidGains.srv
   SimpleMotorFlasher.srv
   which_fingers_are_touching.srv
+  GetFastGraspFromBoundingBox.srv
   PlanTrajectoryFromList.srv
   PlanTrajectoryFromPrefix.srv
   PlanNamedTrajectory.srv
