@@ -44,13 +44,12 @@
       <arg name="debug" value="$(arg debug)" />
     </include>
     <node name="spawn_model" pkg="gazebo_ros" type="spawn_model"
-    args="-urdf -param robot_description -model ur10srh -z 0.05 -J ra_elbow_joint 0.0 -J ra_shoulder_lift_joint 0.0 -J ra_shoulder_pan_joint 0.0 -J ra_wrist_1_joint 0.0 -J ra_wrist_2_joint 0.0 -J ra_wrist_3_joint 0.0"
+    args="-urdf -param robot_description -model ur10srh -z 0.1 -J ra_elbow_joint 0.0 -J ra_shoulder_lift_joint 0.0 -J ra_shoulder_pan_joint 0.0 -J ra_wrist_1_joint 0.0 -J ra_wrist_2_joint 0.0 -J ra_wrist_3_joint 0.0"
     respawn="false" output="screen" />
     <include file="$(find ur_gazebo)/launch/controller_utils.launch" />
     <include file="$(find sr_hand)/launch/gazebo/loaders/hand_controllers.launch">
-      <arg name="hand_serial" value="$(arg hand_serial)"/>
-      <arg name="hand_controller_gazebo"
-      value="$(find sr_description)/hand/config/rh_controller_gazebo.yaml" />
+      <arg name="hand_id"
+      value="$(arg hand_id)" />
     </include>
     <rosparam file="$(find sr_robot_launch)/config/gazebo/controller/ra_trajectory_controller.yaml"
     command="load" />
