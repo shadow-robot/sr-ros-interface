@@ -1,11 +1,12 @@
 #!/usr/bin/env python
+from math import log10, floor
+from unittest import TestCase
+
 import rospy
 from sr_robot_msgs.srv import GetFastGraspFromBoundingBox \
     as GetGrasp
 from shape_msgs.msg import SolidPrimitive
 from geometry_msgs.msg import PoseStamped
-from math import log10, floor
-from unittest import TestCase
 
 
 def round_sig(x, sig):
