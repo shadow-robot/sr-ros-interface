@@ -1,4 +1,10 @@
-[![Build Status](https://api.shippable.com/projects/554b2991edd7f2c052e402be/badge?branchName=indigo-devel)](https://app.shippable.com/projects/554b2991edd7f2c052e402be/builds/latest) [![Circle CI](https://circleci.com/gh/shadow-robot/sr-ros-interface.svg?style=shield)](https://circleci.com/gh/shadow-robot/sr-ros-interface) [![Build Status](https://semaphoreci.com/api/v1/projects/11755ff7-a716-4ac2-a7fb-5edb3c7a87b5/518634/shields_badge.svg)](https://semaphoreci.com/andriy/sr-ros-interface) [![Documentation Status](https://readthedocs.org/projects/shadow-robot/badge)](http://shadow-robot.readthedocs.org/) [![Code Health](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr-ros-interface/indigo-devel) [![codecov.io](http://codecov.io/github/shadow-robot/sr-ros-interface/coverage.svg?branch=indigo-devel)](http://codecov.io/github/shadow-robot/sr-ros-interface?branch=indigo-devel)
+|     Service       |  Status  |
+| ----------------- | -------- |
+| Documentation     | [![Documentation Status](https://readthedocs.org/projects/shadow-robot/badge)](http://shadow-robot.readthedocs.org/) |
+| Code style checks | [![Circle CI](https://circleci.com/gh/shadow-robot/sr-ros-interface.svg?style=shield)](https://circleci.com/gh/shadow-robot/sr-ros-interface) |
+| Unit tests        | [![Build Status](https://img.shields.io/shippable/554b2991edd7f2c052e402be.svg)](https://app.shippable.com/projects/554b2991edd7f2c052e402be) |
+| Install tests     | [![Build Status](https://semaphoreci.com/api/v1/projects/11755ff7-a716-4ac2-a7fb-5edb3c7a87b5/518634/shields_badge.svg)](https://semaphoreci.com/andriy/sr-ros-interface) |
+| Code Coverage     | [![codecov.io](https://img.shields.io/codecov/c/github/shadow-robot/sr-ros-interface/indigo-devel.svg)](http://codecov.io/github/shadow-robot/sr-ros-interface?branch=indigo-devel)
 
 # Shadow Robot
 
@@ -6,7 +12,11 @@
 
 ## Overview
 
-This stack focuses on the core software packages built around [our robots](http://www.shadowrobot.com). We'll focus more on the simulated side of things here (as you'll get a full training when receiving one of our robot), but all the code that runs on our simulated robot also runs on the real hardware.
+This is the starting point for our core software packages built around [our robots](http://www.shadowrobot.com). We'll focus more on the simulated side of things here (as you'll get a full training when receiving one of our robot), but all the code that runs on our simulated robot also runs on the real hardware. This repository only contains the meta package, the code being split into different repositories:
+ - [sr_common](https://github.com/shadow-robot/sr_common): This repository contains the bare minimum for communicating with the Shadow Hand from a remote computer (urdf models and messages).
+ - [sr_core](https://github.com/shadow-robot/sr_core): These are the core packages for the Shadow Robot hardware and simulation.
+ - [sr_interface](https://github.com/shadow-robot/sr_interface): This repository contains the high level interface and its dependencies for interacting simply with our robots.
+ - [sr_tools](https://github.com/shadow-robot/sr_tools): This repository contains more advanced tools that might be needed in specific use cases.
 
 The commands below are mostly summarised in this [cheatsheet](/resources/ShadowROSCheatsheet.pdf)
 
