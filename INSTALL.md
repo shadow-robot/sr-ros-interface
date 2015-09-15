@@ -101,7 +101,7 @@ wstool update
  - install some additional necessary stacks from source
 
 ```bash
-for INSTALL in `find . -name "project.rosinstall"`; do wstool merge -y ${INSTALL} ; done
+for INSTALL in `find . -name "repository.rosinstall"`; do wstool merge -y ${INSTALL} ; done
 wstool update
 ```
 
