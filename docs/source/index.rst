@@ -1,22 +1,21 @@
-.. Shadow Robot documentation master file, created by
-   sphinx-quickstart on Wed Sep 30 09:25:50 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Shadow Robot's Documentation
-========================================
 
 .. toctree::
    :maxdepth: 3
    :hidden:
-   
-  Install Instructions <generated/shadow_robot/INSTALL.rst>
-  Starting the robots <generated/sr_interface/sr_robot_launch/README.rst>
-  High Level Interface <generated/sr_interface/sr_robot_commander/README.rst>
-  Hand Commander <generated/sr_interface/sr_robot_commander/tutorial/HandCommander.rst>
-  Arm Commander <generated/sr_interface/sr_robot_commander/tutorial/ArmCommander.rst>
-  Robot Commander <generated/sr_interface/sr_robot_commander/tutorial/RobotCommander.rst>
-  Follow a Warehouse Trajectory <generated/sr_interface/sr_robot_commander/tutorial/FollowWarehouseTrajectory.rst>
+
+    Overview <index.rst>
+    Install Instructions <generated/shadow_robot/INSTALL.rst>
+    Starting the robots <generated/sr_interface/sr_robot_launch/README.rst>
+    High Level Interface <generated/sr_interface/sr_robot_commander/README.rst>
+        Hand Commander <generated/sr_interface/sr_robot_commander/doc/tutorial/HandCommander.rst>
+        Arm Commander <generated/sr_interface/sr_robot_commander/doc/tutorial/ArmCommander.rst>
+        Robot Commander <generated/sr_interface/sr_robot_commander/doc/tutorial/RobotCommander.rst>
+        Follow a Warehouse Trajectory <generated/sr_interface/sr_robot_commander/doc/tutorial/FollowWarehouseTrajectory.rst>
+
+
+Shadow Robot's Documentation
+========================================
+
 Overview
 --------
 
