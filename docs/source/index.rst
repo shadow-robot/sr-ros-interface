@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    Install Instructions <generated/shadow_robot/INSTALL.rst>
+   Starting the (simulated or not) robots <generated/sr_interface/sr_robot_launch/README.rst>
 
 Overview
 --------
