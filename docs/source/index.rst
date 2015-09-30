@@ -11,7 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-
+   Getting Started <generated/shadow_robot/README.rst>
+   Install Instructions <generated/shadow_robot/INSTALL.rst>
 
 Indices and tables
 ------------------
