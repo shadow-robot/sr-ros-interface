@@ -6,14 +6,17 @@
 Shadow Robot's Documentation
 ========================================
 
-Contents:
-
 .. toctree::
-   :maxdepth: 2
-
-   Install Instructions <generated/shadow_robot/INSTALL.rst>
-   Starting the (simulated or not) robots <generated/sr_interface/sr_robot_launch/README.rst>
-
+   :maxdepth: 3
+   :hidden:
+   
+  Install Instructions <generated/shadow_robot/INSTALL.rst>
+  Starting the robots <generated/sr_interface/sr_robot_launch/README.rst>
+  High Level Interface <generated/sr_interface/sr_robot_commander/README.rst>
+  Hand Commander <generated/sr_interface/sr_robot_commander/tutorial/HandCommander.rst>
+  Arm Commander <generated/sr_interface/sr_robot_commander/tutorial/ArmCommander.rst>
+  Robot Commander <generated/sr_interface/sr_robot_commander/tutorial/RobotCommander.rst>
+  Follow a Warehouse Trajectory <generated/sr_interface/sr_robot_commander/tutorial/FollowWarehouseTrajectory.rst>
 Overview
 --------
 
