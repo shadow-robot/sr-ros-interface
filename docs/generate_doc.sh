@@ -24,7 +24,7 @@ done
 # copy rst files
 for FILE in `find ../../ -name "*.rst" | grep -v CHANGELOG | grep -v shadow_robot/docs/source/generated`; do
     echo "--------_"
-    FILE_BASENAME=`basename`
+    FILE_BASENAME=`basename ${FILE}`
     PATH_TO_FILE=`dirname ${FILE}`
     echo ${PATH_TO_FILE} "  " ${FILE_BASENAME}
     STRIPPED_PATH_TO_FILE=`echo ${PATH_TO_FILE} | sed 's;../../;;g'`
