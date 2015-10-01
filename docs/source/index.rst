@@ -3,15 +3,9 @@
    :maxdepth: 3
    :hidden:
 
-    Overview <index.rst>
-    Install Instructions <generated/shadow_robot/INSTALL.rst>
-    Starting the robots <generated/sr_interface/sr_robot_launch/README.rst>
-    High Level Interface <generated/sr_interface/sr_robot_commander/README.rst>
-        Hand Commander <generated/sr_interface/sr_robot_commander/doc/tutorial/HandCommander.rst>
-        Arm Commander <generated/sr_interface/sr_robot_commander/doc/tutorial/ArmCommander.rst>
-        Robot Commander <generated/sr_interface/sr_robot_commander/doc/tutorial/RobotCommander.rst>
-        Follow a Warehouse Trajectory <generated/sr_interface/sr_robot_commander/doc/tutorial/FollowWarehouseTrajectory.rst>
-
+    Install Instructions <generated/shadow_robot/INSTALL>
+    Starting the robots <generated/sr_interface/sr_robot_launch/README>
+    High Level Interface <generated/sr_interface/sr_robot_commander/README>
 
 Shadow Robot's Documentation
 ========================================
