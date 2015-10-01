@@ -6,6 +6,10 @@
     Install Instructions <generated/shadow_robot/INSTALL>
     Starting the robots <generated/sr_interface/sr_robot_launch/README>
     High Level Interface <generated/sr_interface/sr_robot_commander/README>
+        Hand Commander <doc/tutorial/HandCommander>
+        Arm Commander <doc/tutorial/ArmCommander>
+        Robot Commander <doc/tutorial/RobotCommander>
+        Follow a Warehouse Trajectory <doc/tutorial/FollowWarehouseTrajectory>
 
 Shadow Robot's Documentation
 ========================================
