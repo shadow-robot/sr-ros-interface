@@ -22,7 +22,7 @@ for FILE in `find ../../ -name "*.md"`; do
 done
 
 # copy rst files
-for FILE in `find ../../ -name "*.rst" | grep -v CHANGELOG | grep -v shadow_robot/docs/source/generated`; do
+for FILE in `find ../../ -name "*.rst" | grep -v CHANGELOG | grep -v shadow_robot/docs/source`; do
     echo "--------_"
     FILE_BASENAME=`basename ${FILE}`
     PATH_TO_FILE=`dirname ${FILE}`
