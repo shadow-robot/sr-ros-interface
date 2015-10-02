@@ -8,4 +8,4 @@
 
 # Shadow Robot
 
-La documentation est disponible sur [readthedocs](shadow-robot.readthedocs.org).
+You will find our documentation on [readthedocs](shadow-robot.readthedocs.org).
