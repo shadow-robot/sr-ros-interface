@@ -29,7 +29,7 @@ Overview
 This is the starting point for our core software packages built around
 `our robots <http://www.shadowrobot.com>`__. We'll focus more on the
 simulated side of things here (as you'll get a full training when
-receiving one of our robot), but all the code that runs on our simulated
+receiving one of our robots), but all the code that runs on our simulated
 robot also runs on the real hardware.
 
 Our code is split into different repositories:
@@ -46,11 +46,11 @@ Getting Started
 Installation Instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll assume that you've already installed ROS Indigo from `those
+We'll assume that you've already installed ROS Indigo from `these
 instructions <http://wiki.ros.org/indigo/Installation/Ubuntu>`__ using
 the recommended proposed solution.
 
-To install our software please take a look at those `install steps <generated/shadow_robot/INSTALL.html>`__.
+To install our software please take a look at these `install steps <generated/shadow_robot/INSTALL.html>`__.
 
 Running the software
 ~~~~~~~~~~~~~~~~~~~~
