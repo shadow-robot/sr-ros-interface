@@ -13,7 +13,7 @@ We created a one liner script that installs everything for you:
 You simply need to run (replace `-w ~/projects/shadow_robot/base` with the path you want to install the sources in):
 
 ```bash
-curl -L bit.ly/dev-install | bash -s -- -w ~/projects/shadow_robot/base
+curl -L bit.ly/dev-machine | bash -s -- -w ~/projects/shadow_robot/base
 ```
 
 ## Installing for a real robot
@@ -30,7 +30,7 @@ git branch
 The highlighted branch is the one that is currently used. Let's assume it's `shadowrobot_1234` for the following instructions. On the newly installed computer you will need to pull the same branch:
 
 ```bash
-curl -L bit.ly/dev-install | bash -s -- -w ~/projects/shadow_robot/base -c shadowrobot_1234
+curl -L bit.ly/dev-machine | bash -s -- -w ~/projects/shadow_robot/base -c shadowrobot_1234
 ```
 
 *Note: the etherCAT configuration has evolved quite a bit in the latest years. If the config is not working for you, get in touch and we'll help you migrate the configuration.*
