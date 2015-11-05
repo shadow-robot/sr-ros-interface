@@ -25,15 +25,15 @@ programmed in Python and can be started from within rqt
    :target: http://sr-visualization.readthedocs.org
 .. |Circle CI| image:: https://circleci.com/gh/shadow-robot/sr-visualization.svg?style=shield
    :target: https://circleci.com/gh/shadow-robot/sr-visualization
-.. |Build Status| image:: https://img.shields.io/shippable/554b2991edd7f2c052e402c2.svg
-   :target: https://app.shippable.com/projects/554b2991edd7f2c052e402c2
+.. |Build Status| image:: https://travis-ci.org/shadow-robot/sr-visualization.svg
+   :target: https://travis-ci.org/shadow-robot/sr-visualization
 .. |Build Status| image:: https://semaphoreci.com/api/v1/projects/680462a5-c461-404c-b01d-9c0cbd82261d/537672/shields_badge.svg
    :target: https://semaphoreci.com/shadow-robot/sr-visualization
 .. |codecov.io| image:: https://img.shields.io/codecov/c/github/shadow-robot/sr-visualization/indigo-devel.svg
    :target: http://codecov.io/github/shadow-robot/sr-visualization?branch=indigo-devel
 .. |Code Health| image:: https://landscape.io/github/shadow-robot/sr-visualization/indigo-devel/landscape.svg?style=flat
    :target: https://landscape.io/github/shadow-robot/sr-visualization/indigo-devel
-.. |Build Status| image:: https://img.shields.io/shippable/554b2991edd7f2c052e402c2.svg
-   :target: https://app.shippable.com/projects/554b2991edd7f2c052e402c2
+.. |Build Status| image:: https://travis-ci.org/shadow-robot/sr-visualization.svg
+   :target: https://travis-ci.org/shadow-robot/sr-visualization
 .. |Build Status| image:: https://semaphoreci.com/api/v1/projects/680462a5-c461-404c-b01d-9c0cbd82261d/537672/shields_badge.svg
    :target: https://semaphoreci.com/shadow-robot/sr-visualization

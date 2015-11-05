@@ -119,13 +119,13 @@ Available arguments for sr\_edc.launch
    :target: http://shadow-robot-ethercat-driver.readthedocs.org
 .. |Circle CI| image:: https://circleci.com/gh/shadow-robot/sr-ros-interface-ethercat.svg?style=shield
    :target: https://circleci.com/gh/shadow-robot/sr-ros-interface-ethercat
-.. |Build Status| image:: https://img.shields.io/shippable/554b2991edd7f2c052e402bf.svg
-   :target: https://app.shippable.com/projects/554b2991edd7f2c052e402bf
+.. |Build Status| image:: https://travis-ci.org/shadow-robot/sr-ros-interface-ethercat.svg
+   :target: https://travis-ci.org/shadow-robot/sr-ros-interface-ethercat
 .. |Build Status| image:: https://semaphoreci.com/api/v1/projects/8797e7d4-058b-4f0f-bc34-9a1f8c23e31d/539067/shields_badge.svg
    :target: https://semaphoreci.com/shadow-robot/sr-ros-interface-ethercat
 .. |codecov.io| image:: https://img.shields.io/codecov/c/github/shadow-robot/sr-ros-interface-ethercat/indigo-devel.svg
    :target: http://codecov.io/github/shadow-robot/sr-ros-interface-ethercat?branch=indigo-devel
-.. |Build Status| image:: https://img.shields.io/shippable/554b2991edd7f2c052e402bf.svg
-   :target: https://app.shippable.com/projects/554b2991edd7f2c052e402bf
+.. |Build Status| image:: https://travis-ci.org/shadow-robot/sr-ros-interface-ethercat.svg
+   :target: https://travis-ci.org/shadow-robot/sr-ros-interface-ethercat
 .. |Build Status| image:: https://semaphoreci.com/api/v1/projects/8797e7d4-058b-4f0f-bc34-9a1f8c23e31d/539067/shields_badge.svg
    :target: https://semaphoreci.com/shadow-robot/sr-ros-interface-ethercat
