@@ -4,9 +4,6 @@ Source Install
 To get the latest version of our software, you can install it from
 source. We're doing our best to keep the indigo-devel branch stable.
 
-You'll first need to `install
-ROS <http://wiki.ros.org/indigo/Installation/Ubuntu>`__.
-
 Workspaces
 ----------
 
@@ -14,12 +11,15 @@ We created a one liner script that installs everything for you: - ros
 and dependencies - creates the proper workspaces hierarchy (we are
 pulling a few dependencies from source) - compiles everything
 
-You simply need to run (replace ``-w ~/projects/shadow_robot/base`` with
-the path you want to install the sources in):
+You simply need to run (replace
+``-w ~{{ros_user}}/projects/shadow_robot/base`` with the path you want
+to install the sources in, make sure you keep the ``~{{ros_user}}`` if
+you want the project in your home folder or that you point to a
+directory with write permission for your user):
 
 .. code:: bash
 
-    curl -L bit.ly/dev-machine | bash -s -- -w ~/projects/shadow_robot/base
+    curl -L bit.ly/dev-machine | bash -s -- -w ~{{ros_user}}/projects/shadow_robot/base
 
 Installing for a real robot
 ---------------------------
