@@ -21,6 +21,16 @@ directory with write permission for your user):
 
     curl -L bit.ly/dev-machine | bash -s -- -w ~{{ros_user}}/projects/shadow_robot/base
 
+Updating your workspace
+-----------------------
+
+For a quick update of the main workspace, we added an alias: simply run
+``ws_update`` from the console to get the latest source code.
+
+To fully update the different workspaces (both the shadow code and the
+dependencies), you can rerun the install script. **WARNING: If you use
+the same workspace path, it'll completely overwrite it**
+
 Installing for a real robot
 ---------------------------
 
