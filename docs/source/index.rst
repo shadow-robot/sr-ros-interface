@@ -62,5 +62,5 @@ Connecting to the robots
 
 Depending on your level of expertise with ROS and our software stack, as well as the use case there are two main ways to interface with our hand:
 
- - for a high level, low expertise access to our hand, please refer to the `robot commander interface <generated/sr_interface/sr_robot_commander/README>`__.
+ - for a high level, low expertise access to our hand, please refer to the `robot commander interface <generated/sr_interface/sr_robot_commander/README.html>`__.
  - for power users, you can obviously access the different ROS interfaces directly.
