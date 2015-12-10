@@ -9,11 +9,11 @@ Simulation
 
 These are the hands available:
 
-+-----------------------+-------------------------------+-----------------------------------+-----------------------------+----------------------------------+----------------------------------------------+------------------------+--------------------------------+----------------------+-----------------------------+
-| |shadowhand\_motor|   | |shadowhand\_motor\_biotac|   | |shadowhand\_motor\_ff\_biotac|   | |shadowhand\_motor\_btsp|   | |shadowhand\_motor\_ellipsoid|   | |shadowhand\_motor\_th\_ff\_rf\_ellipsoid|   | |shadowhand\_muscle|   | |shadowhand\_muscle\_biotac|   | |shadowhand\_lite|   | |shadowhand\_extra\_lite|   |
-+=======================+===============================+===================================+=============================+==================================+==============================================+========================+================================+======================+=============================+
-| 1                     | 2                             | 3                                 | 4                           | 5                                | 6                                            | 7                      | 8                              | 9                    | 10                          |
-+-----------------------+-------------------------------+-----------------------------------+-----------------------------+----------------------------------+----------------------------------------------+------------------------+--------------------------------+----------------------+-----------------------------+
++------------+------------+------------+------------+------------+------------+------------+------------+------------+------------+
+| |image0|   | |image1|   | |image2|   | |image3|   | |image4|   | |image5|   | |image6|   | |image7|   | |image8|   | |image9|   |
++============+============+============+============+============+============+============+============+============+============+
+| 1          | 2          | 3          | 4          | 5          | 6          | 7          | 8          | 9          | 10         |
++------------+------------+------------+------------+------------+------------+------------+------------+------------+------------+
 
 +------+-------------------------------------------------------+----------------------------------------------+
 |      | Right                                                 | Left                                         |
@@ -182,13 +182,13 @@ To start the real robots, do:
 
     roslaunch sr_robot_launch sr_bimanual.launch use_moveit:=true sim:=false rh_serial:=1290 lh_serial:=1338
 
-.. |shadowhand\_motor| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor.png
-.. |shadowhand\_motor\_biotac| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_biotac.png
-.. |shadowhand\_motor\_ff\_biotac| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_ff_biotac.png
-.. |shadowhand\_motor\_btsp| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_btsp.png
-.. |shadowhand\_motor\_ellipsoid| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_ellipsoid.png
-.. |shadowhand\_motor\_th\_ff\_rf\_ellipsoid| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_th_ff_rf_ellipsoid.png
-.. |shadowhand\_muscle| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_muscle.png
-.. |shadowhand\_muscle\_biotac| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_muscle_biotac.png
-.. |shadowhand\_lite| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_lite.png
-.. |shadowhand\_extra\_lite| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_extra_lite.png
+.. |image0| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor.png
+.. |image1| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_biotac.png
+.. |image2| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_ff_biotac.png
+.. |image3| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_btsp.png
+.. |image4| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_ellipsoid.png
+.. |image5| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_th_ff_rf_ellipsoid.png
+.. |image6| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_muscle.png
+.. |image7| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_muscle_biotac.png
+.. |image8| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_lite.png
+.. |image9| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_extra_lite.png
