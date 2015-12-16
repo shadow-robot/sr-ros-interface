@@ -9,12 +9,10 @@ package contains examples on how to use it.
 
 Use cases are given for:
 
--  [Hand]
-   (https://github.com/shadow-robot/sr\_interface/tree/indigo-devel/sr\_example/scripts/sr\_example/hand\_examples)
--  [Arm]
-   (https://github.com/shadow-robot/sr\_interface/tree/indigo-devel/sr\_example/scripts/sr\_example/arm\_examples)
--  [Hand and arm]
-   (https://github.com/shadow-robot/sr\_interface/tree/indigo-devel/sr\_example/scripts/sr\_example/hand\_and\_arm\_examples)
+-  `Hand <https://github.com/shadow-robot/sr_interface/tree/indigo-devel/sr_example/scripts/sr_example/hand_examples>`__
+-  `Arm <https://github.com/shadow-robot/sr_interface/tree/indigo-devel/sr_example/scripts/sr_example/arm_examples>`__
+-  `Hand and
+   arm <https://github.com/shadow-robot/sr_interface/tree/indigo-devel/sr_example/scripts/sr_example/hand_and_arm_examples>`__
 
 To run these examples, the robot should be launched first (instructions
 for this can be found `here <../sr_robot_launch/README.html>`__)
