@@ -47,10 +47,6 @@ Getting Started
 Installation Instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll assume that you've already installed ROS Indigo from `these
-instructions <http://wiki.ros.org/indigo/Installation/Ubuntu>`__ using
-the recommended proposed solution.
-
 To install our software please take a look at these `install steps <generated/shadow_robot/INSTALL.html>`__.
 
 Running the software
