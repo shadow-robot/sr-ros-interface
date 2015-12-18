@@ -7,7 +7,14 @@ Shadow hand only
 Simulation
 ~~~~~~~~~~
 
-These are the hands available:
+To start our hand, simply do:
+
+.. code:: bash
+
+    roslaunch sr_robot_launch srhand.launch
+
+This will launch the five finger hand (shadowhand\_motor) by default .
+If you want to launch another hand, these are the hands available:
 
 +------------+------------+------------+------------+------------+------------+------------+------------+------------+------------+
 | |image0|   | |image1|   | |image2|   | |image3|   | |image4|   | |image5|   | |image6|   | |image7|   | |image8|   | |image9|   |
@@ -43,7 +50,7 @@ To start the simulation of a shadow hand, you can run:
 
 .. code:: bash
 
-    roslaunch sr_robot_launch srhand.launch use_moveit:=true robot_description:=`rospack find sr_description`/robots/shadowhand_motor.urdf.xacro
+    roslaunch sr_robot_launch srhand.launch robot_description:=`rospack find sr_description`/robots/shadowhand_motor.urdf.xacro
 
 -  The ``robot description`` param can be changed to start any of the
    available Shadow hands shown in the table.
@@ -51,7 +58,7 @@ To start the simulation of a shadow hand, you can run:
 
    .. code:: bash
 
-       roslaunch sr_robot_launch srhand.launch use_moveit:=true robot_description:=`rospack find sr_description`/robots/shadowhand_left_motor.urdf.xacro hand_id:=lh
+       roslaunch sr_robot_launch srhand.launch robot_description:=`rospack find sr_description`/robots/shadowhand_left_motor.urdf.xacro hand_id:=lh
 
 -  Moveit will enable advanced behaviour (inverse kinematics, planning,
    collision detectection, etc...), but if it is not needed, you can set
@@ -180,7 +187,7 @@ To start the real robots, do:
 
 .. code:: bash
 
-    roslaunch sr_robot_launch sr_bimanual.launch use_moveit:=true sim:=false rh_serial:=1290 lh_serial:=1338
+    roslaunch sr_robot_launch sr_bimanual.launch sim:=false rh_serial:=1290 lh_serial:=1338
 
 .. |image0| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor.png
 .. |image1| image:: https://raw.githubusercontent.com/shadow-robot/sr_interface/indigo-devel/images/shadowhand_motor_biotac.png
