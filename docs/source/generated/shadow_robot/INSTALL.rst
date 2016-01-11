@@ -21,6 +21,44 @@ directory with write permission for your user):
 
     curl -L bit.ly/dev-machine | bash -s -- -w ~{{ros_user}}/projects/shadow_robot/base
 
+The output is quite verbose:
+
+.. code:: bash
+
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                     Dload  Upload   Total   Spent    Left  Speed
+    100   177  100   177    0     0    465      0 --:--:-- --:--:-- --:--:--   465
+    100  4146  100  4146    0     0   6281      0 --:--:-- --:--:-- --:--:--  6281
+    =================================================================
+    |       Installing Shadow Robot development environment
+
+[...]
+
+.. code:: bash
+
+    -------------------
+     | Running Ansible |
+     -------------------
+
+    sudo password: 
+
+
+    PLAY [ros-hydro-desktop-precise64] ******************************************** 
+    skipping: no hosts match
+
+[...]
+
+.. code:: bash
+
+    PLAY RECAP ******************************************************************** 
+    changed: [localhost] => {"changed": true, "cmd": "usermod -a -G dialout 'ugo' ", "delta": "0:00:00.009358", "end": "2016-01-04 08:33:52.390686", "item": "", "rc": 0, "start": "2016-01-04 08:33:52.381328", "stderr": "", "stdout": ""}
+    localhost                  : ok=38   changed=26   unreachable=0    failed=0   
+
+
+     ------------------------------------------------
+     | Install complete, please restart the machine |
+     ------------------------------------------------
+
 Updating your workspace
 -----------------------
 
