@@ -80,7 +80,7 @@ Documentation
 ~~~~~~~~~~~~~
 
 -  `Erle Robotics blockly
-   docs <http://erlerobotics.com/docs/ROS/Blockly/Intro.html>`__
+   docs <http://erlerobotics.com/docs/Robot_Operating_System/ROS/Blockly/Intro.html>`__
 -  `ROS Wiki <http://wiki.ros.org/blockly>`__
 
 Robots where blockly has been implemented:
