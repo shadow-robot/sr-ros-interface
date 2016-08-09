@@ -11,11 +11,14 @@ need to include them in your workspace.
 Launch
 ======
 
-To run all the benchmarkings, simply run:
+To run all the benchmarkings, simply launch a roscore and run:
 
 ::
 
     rosrun sr_moveit_planner_benchmarking benchmark_planners.py _data:=`rospack find sr_moveit_planner_benchmarking`/data _results:=/tmp
+
+To visualise the tests in Rviz, set the visualisation argument in
+launch/benchmarking.launch to 'True'.
 
 Configuration
 =============
@@ -38,7 +41,4 @@ Notes
 ARA\* planner in sbpl currently causes movegroup to crash during the 2nd
 planning request. The point cloud for collision\_scene\_2 is generated
 from two rosbags of pointcloud data, office\_scene.bag and
-office\_scene\_2.bag, `here <data/>`__. These bags are played when
-launching a scene loading them and have a duration of 1s. To synchronise
-the time of the rosbags with the simulated time in Gazebo, a `simple
-script <scripts/header_time_adjust.py>`__ is run.
+office\_scene\_2.bag, `here <data/>`__.
