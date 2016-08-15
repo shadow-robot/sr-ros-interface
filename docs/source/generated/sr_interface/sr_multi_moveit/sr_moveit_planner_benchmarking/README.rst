@@ -3,7 +3,9 @@ sr\_moveit\_planner\_benchmarking
 
 A package to test the different MoveIt planners. Planners currently
 configured are OMPL, SBPL and STOMP. Different scenes can be found in
-the **data** folder. The scpl repository can be found
+the **data/inactive\_tests** folder. To include the scene in the
+benchmarking tests, move the yaml file up a directory level into
+**data**. The sbpl repository can be found
 `here <https://github.com/shadow-robot/sandbox>`__ and stomp
 `here <https://github.com/ros-industrial/industrial_moveit>`__. You'll
 need to include them in your workspace.
