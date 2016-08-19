@@ -7,7 +7,7 @@ source.
 
 **The project page is https://developers.google.com/blockly/**
 
-.. figure:: https://developers.google.com/blockly/sample.png
+.. figure:: https://developers.google.com/blockly/images/sample.png
    :alt: 
 
 
