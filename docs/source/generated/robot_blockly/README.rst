@@ -80,7 +80,7 @@ Create your own blocks
 -  Design you own block and then add the metadata to: ``blocks`` and
    ``generators`` in the block repository. An xml snippet should be
    included in any Javascript file of the block repository, please see
-   `sr\_blockly <https://github.com/shadow-robot/sr_blockly/toolbox>`__
+   `sr\_blockly <https://github.com/shadow-robot/sr_blockly/tree/master/sr_blockly_blocks/toolbox>`__
    for an example of how to do this.
 -  catkin\_make will automatically merge all Javascript files into a
    single file. So in case if you have changed Javascript file you need
