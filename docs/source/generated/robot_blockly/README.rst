@@ -86,10 +86,33 @@ Create your own blocks
    single file. So in case if you have changed Javascript file you need
    to run catkin\_make.
 
+Advanced
+~~~~~~~~
+
+Saving functions
+^^^^^^^^^^^^^^^^
+
+Functions can be created with the standard in-built function blocks. If
+you wish to save a function as a new block, select 'Save Function' from
+the Builder menu. You may select in which category you wish to save the
+new block, this can be a new category that is specified by appending '/'
+and the name of the new category to the existing category name, for
+example:
+
+| Select existing category: Variables
+| or to place block in a new category: Variables/new\_category\_name
+
+The 'Function' dropdown allows you to select the function that you wish
+to save. Once 'Save' has been selected, a Javascript file will be
+downloaded. This file should be added to your block repository toolbox
+directory where the existing category Javascript files reside.
+catkin\_make clean and then catkin\_make should be run to rebuild
+blocks\_uncompressed.js.
+
 Dynamic data loading from server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes it is convinient to load data from the server for a component.
+Sometimes it is convenient to load data from the server for a component.
 In order to implement server side processing web service modules were
 introduced. You need to create the file **web\_service\_module.py** in
 your library package and put in there the class **WebServiceModule**.
