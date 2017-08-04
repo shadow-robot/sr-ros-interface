@@ -30,7 +30,6 @@
   <run_depend>sr_mechanism_model</run_depend>
   <run_depend>sr_movements</run_depend>
   <run_depend>sr_robot_msgs</run_depend>
-  <run_depend>sr_self_test</run_depend>
   <run_depend>sr_tactile_sensors</run_depend>
   <run_depend>sr_utilities</run_depend>
   
