@@ -84,8 +84,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/shadow-robot/sr-build-tools/ma
 ```
 
 After successfull command execution of command please execute:
-```
-bash
+```bash
 echo 'source $HOME/workspace/shadow_robot-kinetic/base/devel/setup.bash' >> ~/.bashrc 
 ```
 
