@@ -56,6 +56,8 @@ To fully update the different workspaces (both the shadow code and the dependenc
 
 ## Installing for a real robot
 
+### Configuration
+
 If you're installing the code for a real robot, you simply need to add an option to the line above to pull the proper `sr-config` branch. `sr-config` contains the parameters specific to your hand (calibration, controller tuning etc...).
 
 You can check which branch is installed on the computer provided by Shadow by running (on the machine provided with your hand):
@@ -65,10 +67,27 @@ roscd sr_ethercat_hand_config
 git branch
 ```
 
-The highlighted branch is the one that is currently used. Let's assume it's `shadowrobot_1234` for the following instructions. On the newly installed computer you will need to pull the same branch:
+The highlighted branch is the one that is currently used. Let's assume it's `shadowrobot_1234` for the following instructions.
+
+### ROS Indigo
+
+On the newly installed computer with Ubuntu Trusty you will need to pull the same configuration branch:
 
 ```bash
 curl -L bit.ly/dev-machine | bash -s -- -w ~/projects/shadow_robot/base -c shadowrobot_1234
 ```
+### ROS Kinetic
+
+Please install Ubuntu Xenial and use the following command for ROS Kinetic:
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/shadow-robot/sr-build-tools/master/ansible/deploy.sh) -r sr-build-tools -b master -i data/shadow_robot-kinetic.rosinstall -v kinetic -t mongodb,pyassimp -с shadowrobot_1234
+```
+
+After successfull command execution please run:
+```bash
+echo 'source $HOME/workspace/shadow_robot-kinetic/base/devel/setup.bash' >> ~/.bashrc 
+```
+
+### Notice 
 
 *Note: the etherCAT configuration has evolved quite a bit in the latest years. If the config is not working for you, get in touch and we'll help you migrate the configuration.*
