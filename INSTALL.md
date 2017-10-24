@@ -71,14 +71,14 @@ The highlighted branch is the one that is currently used. Let's assume it's `sha
 
 ### ROS Indigo
 
-On the newly installed computer you will need to pull the same configuration branch:
+On the newly installed computer with Ubuntu Trusty you will need to pull the same configuration branch:
 
 ```bash
 curl -L bit.ly/dev-machine | bash -s -- -w ~/projects/shadow_robot/base -c shadowrobot_1234
 ```
 ### ROS Kinetic
 
-For ROS Kinetic please use the following command:
+Please install Ubuntu Xenial and use the following command for ROS Kinetic:
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/shadow-robot/sr-build-tools/master/ansible/deploy.sh) -r sr-build-tools -b master -i data/shadow_robot-kinetic.rosinstall -v kinetic -t mongodb,pyassimp -с shadowrobot_1234
 ```
