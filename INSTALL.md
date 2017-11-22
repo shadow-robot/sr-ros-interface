@@ -161,11 +161,7 @@ Now you are ready to use Docker container with your hand.
 
 Launch the right hand in PWM mode (safe in case of uncalibrated hand or untested sensors)
 ```bash
-roslaunch sr_ethercat_hand_config sr_rhand.launch eth_port:=<Hand's Ethernet port>
-```
-For the left hand please use
-```bash
-roslaunch sr_ethercat_hand_config sr_lhand.launch eth_port:=<Hand's Ethernet port>
+roslaunch sr_robot_launch srhand.launch eth_port:=<Hand's Ethernet port> hand_serial:=<Hand's serial>
 ```
 
 To close the container use CTRL-d or
