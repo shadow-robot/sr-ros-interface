@@ -150,7 +150,7 @@ The highlighted branch is the one that is currently used. Let's assume it's `sha
 
 In Docker container's console window type the following commands
 ```bash
-roscd sr_config
+roscd sr_ethercat_hand_config
 git fetch
 git checkout shadowrobot_1234
 ```
@@ -161,7 +161,12 @@ Now you are ready to use Docker container with your hand.
 
 Launch the hand in PWM mode (safe in case of uncalibrated hand or untested sensors)
 ```bash
-roslaunch sr_ethercat_hand_config sr_rhand.launch
+roslaunch sr_ethercat_hand_config sr_rhand.launch eth_port:=<Hand's Ethernet port>
+```
+
+Default hand launch file
+```bash
+roslaunch sr_robot_launch srhand.launch eth_port:=<Hand's Ethernet port> sim:=false
 ```
 
 To close the container use CTRL-d or
