@@ -97,7 +97,7 @@ echo 'source $HOME/workspace/shadow_robot-kinetic/base/devel/setup.bash' >> ~/.b
 ### Docker installation
 
 Your machine should have Ubuntu Trusty or Xenial installed.  
-Please install docker container using the following [instructions](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/).
+Please install Docker using the following [instructions](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/).
 
 ### ROS Indigo Docker container
 
@@ -159,14 +159,13 @@ Now you are ready to use Docker container with your hand.
 
 ### Launch
 
-Launch the hand in PWM mode (safe in case of uncalibrated hand or untested sensors)
+Launch the right hand in PWM mode (safe in case of uncalibrated hand or untested sensors)
 ```bash
 roslaunch sr_ethercat_hand_config sr_rhand.launch eth_port:=<Hand's Ethernet port>
 ```
-
-Default hand launch file
+For the left hand please use
 ```bash
-roslaunch sr_robot_launch srhand.launch eth_port:=<Hand's Ethernet port> sim:=false
+roslaunch sr_ethercat_hand_config sr_lhand.launch eth_port:=<Hand's Ethernet port>
 ```
 
 To close the container use CTRL-d or
