@@ -91,3 +91,80 @@ echo 'source $HOME/workspace/shadow_robot-kinetic/base/devel/setup.bash' >> ~/.b
 ### Notice 
 
 *Note: the etherCAT configuration has evolved quite a bit in the latest years. If the config is not working for you, get in touch and we'll help you migrate the configuration.*
+
+## Installing for a real robot using Docker container
+
+### Docker installation
+
+Your machine should have Ubuntu Trusty or Xenial installed.  
+Please install Docker using the following [instructions](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/).
+
+### ROS Indigo Docker container
+
+Pull ROS Indigo container
+```bash
+docker pull shadowrobot/dexterous-hand:indigo
+```
+
+Container created via
+```bash
+docker run -it --privileged --name hand_e_indigo_real_hw --network=host -e DISPLAY -e QT_X11_NO_MITSHM=1 -e LOCAL_USER_ID=$(id -u) -v /tmp/.X11-unix:/tmp/.X11-unix:rw shadowrobot/dexterous-hand:indigo
+```
+(you don’t need to run “docker run” every time, as the container is persistent)
+
+To start the container again please execute
+```bash
+docker start hand_e_indigo_real_hw
+```
+
+### ROS Kinetic Docker container
+
+Pull ROS Kinetic container
+```bash
+docker pull shadowrobot/dexterous-hand:kinetic
+```
+
+Container created via
+```bash
+docker run -it --privileged --name hand_e_kinetic_real_hw --network=host -e DISPLAY -e QT_X11_NO_MITSHM=1 -e LOCAL_USER_ID=$(id -u) -v /tmp/.X11-unix:/tmp/.X11-unix:rw shadowrobot/dexterous-hand:kinetic
+```
+(you don’t need to run “docker run” every time, as the container is persistent)
+
+To start the container again please execute
+```bash
+docker start hand_e_kinetic_real_hw
+```
+
+### Configuration
+
+If you're installing the code for a real robot, you simply need to pull the proper `sr-config` branch. `sr-config` contains the parameters specific to your hand (calibration, controller tuning etc...).
+
+You can check which branch is installed on the computer provided by Shadow by running (on the machine provided with your hand):
+
+```bash
+roscd sr_ethercat_hand_config
+git branch
+```
+
+The highlighted branch is the one that is currently used. Let's assume it's `shadowrobot_1234` for the following instructions.
+
+In Docker container's console window type the following commands
+```bash
+roscd sr_ethercat_hand_config
+git fetch
+git checkout shadowrobot_1234
+```
+
+Now you are ready to use Docker container with your hand.
+
+### Launch
+
+Launch the right hand in PWM mode (safe in case of uncalibrated hand or untested sensors)
+```bash
+roslaunch sr_ethercat_hand_config sr_rhand.launch
+```
+
+To close the container use CTRL-d or
+```bash
+exit
+```
