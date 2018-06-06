@@ -35,16 +35,16 @@ roslaunch sr_ethercat_hand_config sr_rhand.launch
 This rqt_graph shows the flow of topics between nodes whilst running : https://drive.google.com/file/d/1qql0WbgprA80IwDrDELh8RsrF1o3i266/view?usp=sharing
 
 **_/cal_sh_rh_*/calibrated_**
-/calibrated
+**_/calibrated_**
 These topics are used during the Hand startup routine to make sure that Hand is calibrated./calibrated
 These topics are used during the Hand startup routine to make sure that Hand is calibrated.
 
 An empty message is published to the /cal_sh_rh_*/calibrated topics for each joint when they are calibrated. The /calibrate_sr_edc node subscribes to these topics and when all of them have had a empty message published to them, it publishes True to the /calibrated topic. Before empty messages have been received by all the joints it publishes False to the /calibrated topic.
 
 
-/diagnostics
-/diagnostics_agg
-/diagnostics_toplevel_state
+**_/diagnostics_**
+**_/diagnostics_agg_**
+**_/diagnostics_toplevel_state
 These topics update at 2 Hz with information on each joints Temperature, Current, Measured effort and Command effort, as well as information about the EtherCat devices and firmware version, and contain all the diagnostics information that gets published from the fh_driver and fh_safety_checks nodes.
 
 It should not be necessary to publish to these topic from a terminal.
@@ -54,12 +54,12 @@ It should not be necessary to publish to these topic from a terminal.
 You can see the output from these topics in rqt : Plugins->Robot Tools->Diagnostics Viewer
 
 
-/joint_0s/joint_states
+**_/joint_0s/joint_states_**
 
 This topic is not currently used and may be soon removed.
 
 
-/joint_states
+**_/joint_states_**
 This topic is read-only and updates at 100 Hz with the name, position, velocity and effort values of all joints in a Hand.
 
 Example topic message :
@@ -71,7 +71,7 @@ velocity: [-7.484333985952662e-06, -7.484333985952662e-06, 0.0023735860019749185
 effort: [-1.3660655058510802, -1.3660655058510802, -2.030169817308198, -1.9577332816789155, 0.0, 0.0, -17.29928766980003, -1.5006516553524243, -1.8579749510438912, -1.504877130092884, -1.504877130092884, -0.3374653182042338, -1.6492254479379729, -8.476660697182016, -8.476660697182016, -3.3867013328219056, -2.3404145772688683, -0.7688013735971971, 11.02319645071454, 0.8482082620071664, 0.08818910881575533, 1.127772119947565, -2.2344970991165316, -3.5544023107705667]
 
 
-/rh/biotac_*
+**_/rh/biotac_*_**
 These topics are read-only and update at 100 Hz with data from the biotac sensors, which comprises their pressure, temperature and electrode resistance. This topic is published from the /biotac_republisher node which receives this data from the driver via the /rh/tactile topic. For further information about the biotacts, refer to their documentation : https://www.syntouchinc.com/wp-content/uploads/2016/12/BioTac_SP_Product_Manual.pdf
 
 Example topic message :
@@ -83,7 +83,7 @@ tdc: 2454
 electrodes: [2512, 3062, 2404, 2960, 2902, 2382, 2984, 138, 2532, 2422, 2809, 3167, 2579, 2950, 2928, 2269, 2966, 981, 2374, 2532, 3199, 3152, 3155, 3033]
 
 
-/rh/debug_etherCAT_data
+**_/rh/debug_etherCAT_data_**
 This topic updates at 800 Hz with information for debugging. It is similar to the driver state topic used for Hand H which shows data from the Hand as it is received.
 
 Example topic message :
@@ -101,7 +101,7 @@ tactile: [2050, 0, 0, 0, 0]
 idle_time_us: 1495
 
 
-/rh/palm_extras
+**_/rh/palm_extras_**
 This topic updates at 84 Hz with data from additional devices plugged into the palm.
 
 Example topic message :
@@ -119,7 +119,7 @@ tactile: [2052, 0, 0, 0, 0]
 idle_time_us: 267
 
 
-/rh/tactile
+**_/rh/tactile_**
 This topic is published by the driver at 100 Hz with data from tactile sensors.
 
 Example topic message :
@@ -161,7 +161,7 @@ tdc: 0
 electrodes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 
-/rh_trajectory_controller/command
+**_/rh_trajectory_controller/command_**
 This topic can be published to and is the set position for the trajectory controller. It comprises an array of all the joints set positions and is used for commanding the robot.
 
 For example the rqt joint sliders publish to it.
@@ -181,7 +181,7 @@ secs: 0
 nsecs: 5000000
 
 
-/rh_trajectory_controller/state
+**_/rh_trajectory_controller/state_**
 This topic is read-only and update at 50 Hz from the trajectory controller with the positions and velocities of all 24 joints.
 
 Example topic message :
@@ -189,7 +189,7 @@ positions: [0.0029928404547430176, 0.0007821521859359137, 0.004102784627362688, 
 velocities: [-0.0008510441551395189, -0.0008510441551395189, 0.00016883698712266695, 0.00034715798956923955, -0.00017869100331692196, -0.00017869100331692196, -0.001275520583476054, -0.0004885423191519772, 0.00012555078906251334, 0.00012555078906251334, 0.0028653614401722843, -0.0008023399951605057, 0.0011760287859774613, 0.0011760287859774613, -0.0005423468659163991, -0.00017066612487367117, 0.0003102610817406156, -0.001127052578802167, -0.001465708865391472, -0.00028520412005307133, -0.00029795158858164227, 0.0002596403670543647, -5.819600689424957e-05, -0.0002980347643777659]
 
 
-/sh_rh_*_position_controller/command
+/**_sh_rh_*_position_controller/command_**
 
 These topics can be published to and are the set position of each joint in radians. The topics are subscribed to by the driver (/sr_hand_robot node). This topic is used to communicate the set position with the rqt Joint Sliders plugin, when using position control. The Hand can be set to position control using the Change Controllers rqt plugin.
 
@@ -210,7 +210,7 @@ Example topic message :
 data: 0.628318530718
 
 
-/sh_rh_*_position_controller/state
+**_/sh_rh_*_position_controller/state_**
 These topics are published at 87 Hz by the driver (/sr_hand_robot node). They contain messages of type control_msgs/JointControllerState, which contain the parameters used for the each joints position controller.
 
 Example topic message :
@@ -226,20 +226,20 @@ i_clamp: 0.0
 antiwindup: False
 
 
-/sh_rh_*_position_controller/max_force_factor
+**_/sh_rh_*_position_controller/max_force_factor_**
 The "/sh_rh_*_position_controller/max_force_factor" topic can be published to and scales down the maximum output command of the joints position controller. The output command is interpreted by the driver (/sr_hand_robot node) as PWM if the driver is in PWM mode, or as tendon force if it are in Torque mode.
 The maximum force is controlled by the parameter "max_force" that is specified in this yaml file : https://github.com/shadow-robot/sr-config/blob/kinetic-devel/sr_ethercat_hand_config/controls/host/rh/sr_edc_joint_position_controllers_PWM.yaml#L9
 "max_force_factor" has a value between [0.0, 1.0] and controls the percentage of the `max_force` that will be effectively considered.
 This parameter doesn't exist in the grasp controller.
 
 
-/sh_rh_*_position_controller/pid/parameter_descriptions
-/sh_rh_*_position_controller/pid/parameter_updates
+**_/sh_rh_*_position_controller/pid/parameter_descriptions_**
+**_/sh_rh_*_position_controller/pid/parameter_updates_**
 These topics are read-only and contain parameters used for tuning the position controllers. They should not be published to directly and are accessed through rqt_reconfigure :
 
 
-/tf
-/tf_static
+**_/tf_**
+**_/tf_static_**
 A "tf" is a transform in ROS. These topics store information on the active tfs in the ROS environment and holds their position and orientation in relation their parents. Static tfs are fixed and the dynamic tfs update at 100 Hz.
 They can be published to, as well and read from.
 
@@ -284,7 +284,7 @@ transforms:
        z: 0.0
        w: 0.650624365955
 
-/mechanism_statistics
+**_/mechanism_statistics_**
 This topic is read-only and updates at 1 Hz with the attributes of each joint, for example :
 position: 0.715602037549
 velocity: 0.0
@@ -299,16 +299,17 @@ max_abs_velocity: 0.0363159179688
 max_abs_effort: 15.84
 
 
-/ros_ethercat/motors_halted
+**_/ros_ethercat/motors_halted_**
 This topic is deprecated - no longer used.
 It is a read-only boolean value, updated at 1 Hz, which indicates if the motors have been halted. Generally the value of this is true : http://wiki.ros.org/ethercat_hardware
 
 
-/rosout
-/rosout_agg
+**_/rosout_**
+**_/rosout_agg_**
 This is the ROS console log reporting mechanism : http://wiki.ros.org/rosout
 The ROS core node, rosout subscribes to the standard /rosout topic, records these messages in a textual log file, and rebroadcasts the messages on /rosout_agg
-Moveit! Topics
+
+## Moveit! Topics
 
 In Position control the Moveit topics are used for trajectory planning.
 It should not be necessary to interface with these topics, which are described in their documentation here : https://moveit.ros.org/documentation/
