@@ -80,7 +80,7 @@ curl -L bit.ly/dev-machine | bash -s -- -w ~/projects/shadow_robot/base -c shado
 
 Please install Ubuntu Xenial and use the following command for ROS Kinetic:
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/shadow-robot/sr-build-tools/master/ansible/deploy.sh) -r sr-build-tools -b master -i data/shadow_robot-kinetic.rosinstall -v kinetic -t mongodb,pyassimp -с shadowrobot_1234
+bash <(curl -Ls https://raw.githubusercontent.com/shadow-robot/sr-build-tools/master/ansible/deploy.sh) -r sr-build-tools -b master -i data/shadow_robot-kinetic.rosinstall -v kinetic -t mongodb,pyassimp,hand_e_icons -с shadowrobot_1234
 ```
 
 After successfull command execution please run:
