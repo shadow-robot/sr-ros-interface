@@ -1,5 +1,8 @@
-CyberGlove Configuration
-========================
+Shadow Robot CyberGlove Configuration
+=====================================
+
+Contains the configuration for combining the Shadow Robot Hand with
+CyberGlove (per person and per CyberGlove)
 
 -  `Calibrations <calibrations>`__ - Calibration files for CyberGlove to
    Shadow Robot hand
@@ -24,3 +27,26 @@ And selecting an appropriate minimum and maximum value. The file
 cyberglove.cal should then be edited, inserting the new raw values taken
 from the joint\_states topic, to coincide with the calibrated minimum
 and maximum values of that joint, in degrees.
+
+Branch naming convention
+------------------------
+
+There are 2 CyberGloves. Glove A has a large control box. Glove B has a
+small control box.
+
+For more information on CyberGloves, see `this Confluence
+page <https://shadowrobot.atlassian.net/wiki/spaces/SDSR/pages/314310900/The+Cyberglove>`__
+
+There are 3 main users of the CyberGlove. The CyberGlove configuration
+is glove and user's hand specific. Therefore, the following branches
+exist:
+
+-  A-dg
+-  A-penny
+-  A-anastasios
+
+-  B-dg
+-  B-penny
+-  B-anastasios
+
+
