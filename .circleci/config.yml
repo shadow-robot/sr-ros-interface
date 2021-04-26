@@ -3,9 +3,9 @@ jobs:
   build:
     working_directory: /tmp/repository
     docker:
-      - image: shadowrobot/build-tools:focal-noetic
+      - image: public.ecr.aws/shadowrobot/build-tools:focal-noetic
         environment:
-          toolset_branch: master
+          toolset_branch: python3
           server_type: circle
           ros_release_name: noetic
           ubuntu_version_name: focal
