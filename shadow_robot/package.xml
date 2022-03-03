@@ -24,7 +24,6 @@
   <run_depend>sr_description</run_depend>
   <run_depend>sr_example</run_depend>
   <run_depend>sr_gazebo_sim</run_depend>
-  <run_depend>sr_hand</run_depend>
   <run_depend>sr_hardware_interface</run_depend>
   <run_depend>sr_mechanism_controllers</run_depend>
   <run_depend>sr_mechanism_model</run_depend>
