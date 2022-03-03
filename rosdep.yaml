@@ -29,4 +29,3 @@ liblapack:
     lucid: liblapack-dev
     oneiric: liblapack-dev
   debian: liblapack-dev
-
