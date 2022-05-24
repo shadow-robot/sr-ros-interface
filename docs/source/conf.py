@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2019 Shadow Robot Company Ltd.
+# Copyright 2019, 2022 Shadow Robot Company Ltd.
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -25,10 +25,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-
-import sys
-import os
-import shlex
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -61,7 +57,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Shadow Robot'
-copyright = u'2015, Ugo Cupcic'
+copyright = u'2015, Ugo Cupcic'  # pylint: disable=W0622
 author = u'Ugo Cupcic'
 
 # The version info for the project you're documenting, acts as replacement for
