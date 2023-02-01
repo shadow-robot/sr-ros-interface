@@ -29,7 +29,7 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+# sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
 
@@ -214,7 +214,7 @@ htmlhelp_basename = 'ShadowRobotdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {
+latex_elements = {}
 # The paper size ('letterpaper' or 'a4paper').
 # 'papersize': 'letterpaper',
 
@@ -226,7 +226,7 @@ latex_elements = {
 
 # Latex figure (float) alignment
 # 'figure_align': 'htbp',
-}
+# }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
